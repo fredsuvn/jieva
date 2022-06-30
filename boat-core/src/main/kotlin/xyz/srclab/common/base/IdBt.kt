@@ -1,3 +1,6 @@
+/**
+ * Id utilities.
+ */
 @file:JvmName("IdBt")
 
 package xyz.srclab.common.base

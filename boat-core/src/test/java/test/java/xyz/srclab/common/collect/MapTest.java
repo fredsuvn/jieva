@@ -87,10 +87,10 @@ public class MapTest {
     @Test
     public void testGet() {
         Map<Integer, Integer> map = BMap.newMap(0, 1, 2, 3);
-        Assert.assertEquals(BMap.getConvert(map, 2, String.class), "3");
-        Assert.assertEquals(BMap.getConvertOrDefault(map, 100, "66"), "null");
+        Assert.assertEquals(BMap.get(map, 2, String.class), "3");
+        Assert.assertEquals(BMap.getOrConvert(map, 100, "66"), "null");
         Assert.assertEquals(
-            BMap.getConvertOrDefault(map, 100, "66",
+            BMap.getOrConvert(map, 100, "66",
                 Converter.newConverter(BList.newList(CompatibleConvertHandler.INSTANCE))),
             "66"
         );

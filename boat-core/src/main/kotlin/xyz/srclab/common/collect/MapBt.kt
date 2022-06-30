@@ -1,3 +1,6 @@
+/**
+ * Map utilities.
+ */
 @file:JvmName("BMap")
 
 package xyz.srclab.common.collect
@@ -25,7 +28,7 @@ import kotlin.collections.sortedWith as sortedWithKt
  * the third is second key, the fourth is second value, and so on.
  */
 fun <K, V> newMap(vararg keyValues: Any?): LinkedHashMap<K, V> {
-    return LinkedHashMap<K, V>().collect(*keyValues)
+    return collect(LinkedHashMap<K, V>(), *keyValues)
 }
 
 /**
@@ -34,7 +37,7 @@ fun <K, V> newMap(vararg keyValues: Any?): LinkedHashMap<K, V> {
  * the third is second key, the fourth is second value, and so on.
  */
 fun <K, V> newMap(keyValues: Iterable<Any?>): LinkedHashMap<K, V> {
-    return LinkedHashMap<K, V>().collect(keyValues)
+    return collect(LinkedHashMap<K, V>(), keyValues)
 }
 
 /**
@@ -42,22 +45,22 @@ fun <K, V> newMap(keyValues: Iterable<Any?>): LinkedHashMap<K, V> {
  * which mean the first element is first key, the second is first value,
  * the third is second key, the fourth is second value, and so on.
  */
-fun <K, V, C : MutableMap<in K, in V>> C.collect(vararg keyValues: Any?): C {
-    return collect(keyValues.asList())
+fun <K, V, C : MutableMap<in K, in V>> collect(dest: C, vararg keyValues: Any?): C {
+    return collect(dest, keyValues.asList())
 }
 
-fun <K, V, C : MutableMap<in K, in V>> C.collect(keyValues: Iterable<Any?>): C {
+fun <K, V, C : MutableMap<in K, in V>> collect(dest: C, keyValues: Iterable<Any?>): C {
     val iterator = keyValues.iterator()
     while (iterator.hasNext()) {
         val key = iterator.next()
         if (iterator.hasNext()) {
             val value = iterator.next()
-            this[key.asType()] = value.asType()
+            dest[key.asType()] = value.asType()
         } else {
             break
         }
     }
-    return this
+    return dest
 }
 
 fun <K, V> newEntry(key: K, value: V): MutableMap.MutableEntry<K, V> {
@@ -75,7 +78,7 @@ fun <K, V : Any> Map<K, V>.getNotNull(key: K, defaultValue: V): V {
  * Returns conversion of result of `get` operation.
  */
 @JvmOverloads
-fun <K, T : Any> Map<K, *>.getConvert(
+fun <K, T : Any> Map<K, *>.get(
     key: K,
     type: Class<out T>,
     converter: Converter = Converter.defaultConverter()
@@ -87,7 +90,7 @@ fun <K, T : Any> Map<K, *>.getConvert(
  * Returns conversion of result of `get` operation, or [defaultValue] if result of conversion is null.
  */
 @JvmOverloads
-fun <K, T : Any> Map<K, *>.getConvertOrDefault(
+fun <K, T : Any> Map<K, *>.getOrConvert(
     key: K,
     defaultValue: T,
     converter: Converter = Converter.defaultConverter()
@@ -159,7 +162,7 @@ fun <K> Map<K, *>.getDoubleOrNull(key: K): Double? {
     return this[key]?.toDouble()
 }
 
-fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, value: V, collection: Function<in K, C>): Boolean {
+fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, value: V, collection: Function<in K, out C>): Boolean {
     val coll = this.computeIfAbsent(key, collection)
     return coll.add(value)
 }
@@ -167,7 +170,7 @@ fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, value: V, coll
 fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.addAll(
     key: K,
     values: Iterable<V>,
-    collection: Function<in K, C>
+    collection: Function<in K, out C>
 ): Boolean {
     val coll = this.computeIfAbsent(key, collection)
     return coll.addAll(values)
@@ -189,27 +192,27 @@ fun <K, V, M : MutableMap<in K, in V>> Map<K, V>.filterTo(
 }
 
 fun <K, V, RK, RV> Map<K, V>.mapEntries(
-    keySelector: Function<in K, RK>,
-    valueTransform: Function<in V, RV>
+    keySelector: Function<in K, out RK>,
+    valueTransform: Function<in V, out RV>
 ): Map<RK, RV> {
     return mapEntriesTo(LinkedHashMap(), keySelector, valueTransform)
 }
 
-fun <K, V, RK, RV> Map<K, V>.mapEntries(transform: BiFunction<in K, in V, Map.Entry<RK, RV>>): Map<RK, RV> {
+fun <K, V, RK, RV> Map<K, V>.mapEntries(transform: BiFunction<in K, in V, out Map.Entry<RK, RV>>): Map<RK, RV> {
     return mapEntriesTo(LinkedHashMap(), transform)
 }
 
 fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     destination: C,
-    keySelector: Function<in K, RK>,
-    valueTransform: Function<in V, RV>
+    keySelector: Function<in K, out RK>,
+    valueTransform: Function<in V, out RV>
 ): C {
     return mapEntriesTo(destination, keySelector.asKotlinFun(), valueTransform.asKotlinFun())
 }
 
 fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     destination: C,
-    transform: BiFunction<in K, in V, Map.Entry<RK, RV>>
+    transform: BiFunction<in K, in V, out Map.Entry<RK, RV>>
 ): C {
     this.forEach { (k, v) ->
         val pair = transform.apply(k, v)
@@ -218,24 +221,24 @@ fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     return destination
 }
 
-fun <K, V, R> Map<K, V>.map(transform: Function<in Map.Entry<K, V>, R>): List<R> {
+fun <K, V, R> Map<K, V>.map(transform: Function<in Map.Entry<K, V>, out R>): List<R> {
     return this.mapKt(transform.asKotlinFun())
 }
 
 fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.mapTo(
     destination: C,
-    transform: Function<in Map.Entry<K, V>, R>
+    transform: Function<in Map.Entry<K, V>, out R>
 ): C {
     return this.mapToKt(destination, transform.asKotlinFun())
 }
 
-fun <K, V, R> Map<K, V>.flatMap(transform: Function<in Map.Entry<K, V>, Iterable<R>>): List<R> {
+fun <K, V, R> Map<K, V>.flatMap(transform: Function<in Map.Entry<K, V>, out Iterable<R>>): List<R> {
     return this.flatMapKt(transform.asKotlinFun())
 }
 
 fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
     destination: C,
-    transform: Function<in Map.Entry<K, V>, Iterable<R>>
+    transform: Function<in Map.Entry<K, V>, out Iterable<R>>
 ): C {
     return this.flatMapToKt(destination, transform.asKotlinFun())
 }
@@ -290,7 +293,7 @@ fun <K, V> MutableMap<K, V>.removeAll(keys: Iterable<K>) {
  * Returns a [CopyOnWriteMap] which uses [ThreadSafePolicy.COPY_ON_WRITE] to implement threadsafe.
  */
 fun <K, V> copyOnWriteMap(
-    newMap: Function<in Map<out K, V>, MutableMap<K, V>>
+    newMap: Function<in Map<out K, V>, out MutableMap<K, V>>
 ): CopyOnWriteMap<K, V> {
     return copyOnWriteMap(emptyMap(), newMap)
 }
@@ -301,13 +304,13 @@ fun <K, V> copyOnWriteMap(
 @JvmOverloads
 fun <K, V> copyOnWriteMap(
     initMap: Map<out K, V> = emptyMap(),
-    newMap: Function<in Map<out K, V>, MutableMap<K, V>> = Function { HashMap(it) }
+    newMap: Function<in Map<out K, V>, out MutableMap<K, V>> = Function { HashMap(it) }
 ): CopyOnWriteMap<K, V> {
     return CopyOnWriteMap(initMap, newMap.asKotlinFun())
 }
 
 fun <K, V> mutableSetMap(
-    valueSet: Function<in K, MutableSet<V>>
+    valueSet: Function<in K, out MutableSet<V>>
 ): MutableSetMap<K, V> {
     return mutableSetMap(LinkedHashMap(), valueSet)
 }
@@ -315,7 +318,7 @@ fun <K, V> mutableSetMap(
 @JvmOverloads
 fun <K, V> mutableSetMap(
     map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
-    valueSet: Function<in K, MutableSet<V>> = Function { LinkedHashSet() }
+    valueSet: Function<in K, out MutableSet<V>> = Function { LinkedHashSet() }
 ): MutableSetMap<K, V> {
     return MutableSetMap(map, valueSet)
 }
@@ -329,7 +332,7 @@ fun <K, V> Map<K, Set<V>>.toSetMap(): SetMap<K, V> {
 }
 
 fun <K, V> mutableListMap(
-    valueList: Function<in K, MutableList<V>>
+    valueList: Function<in K, out MutableList<V>>
 ): MutableListMap<K, V> {
     return mutableListMap(LinkedHashMap(), valueList)
 }
@@ -337,7 +340,7 @@ fun <K, V> mutableListMap(
 @JvmOverloads
 fun <K, V> mutableListMap(
     map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
-    valueList: Function<in K, MutableList<V>> = Function { LinkedList() }
+    valueList: Function<in K, out MutableList<V>> = Function { LinkedList() }
 ): MutableListMap<K, V> {
     return MutableListMap(map, valueList.asKotlinFun())
 }

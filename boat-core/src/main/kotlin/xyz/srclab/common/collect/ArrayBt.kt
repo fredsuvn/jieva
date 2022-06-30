@@ -1,4 +1,7 @@
-@file:JvmName("BArray")
+/**
+ * Array utilities.
+ */
+@file:JvmName("ArrayBt")
 
 package xyz.srclab.common.collect
 
@@ -356,7 +359,7 @@ private inline fun <T> indexOf0(
 @JvmOverloads
 fun Any.arrayJoinToString(
     separator: CharSequence = ", ",
-    transform: Function<Any?, CharSequence>? = null
+    transform: Function<Any?, out CharSequence>? = null
 ): String {
     return this.arrayJoinToString(separator, -1, "...", transform)
 }
@@ -370,7 +373,7 @@ fun Any.arrayJoinToString(
     separator: CharSequence,
     limit: Int,
     truncated: CharSequence,
-    transform: Function<Any?, CharSequence>? = null
+    transform: Function<Any?, out CharSequence>? = null
 ): String {
     return when (this) {
         is Array<*> -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
@@ -394,7 +397,7 @@ fun Any.arrayJoinToString(
 fun <A : Appendable> Any.arrayJoinTo(
     dest: A,
     separator: CharSequence = ", ",
-    transform: Function<Any?, CharSequence>? = null
+    transform: Function<Any?, out CharSequence>? = null
 ): A {
     return this.arrayJoinTo(dest, separator, -1, "...", transform)
 }
@@ -409,7 +412,7 @@ fun <A : Appendable> Any.arrayJoinTo(
     separator: CharSequence,
     limit: Int,
     truncated: CharSequence,
-    transform: Function<Any?, CharSequence>? = null
+    transform: Function<Any?, out CharSequence>? = null
 ): A {
     return when (this) {
         is Array<*> -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
@@ -422,62 +425,5 @@ fun <A : Appendable> Any.arrayJoinTo(
         is FloatArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
         is DoubleArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
         else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
-    }
-}
-
-/**
- * This class represents reference of segment of array.
- *
- * @param A array type
- */
-open class ArrayRef<A : Any> @JvmOverloads constructor(
-    @get:JvmName("array") val array: A,
-    @get:JvmName("offset") val offset: Int = 0,
-    @get:JvmName("length") val length: Int = remainingLength(array.arrayLength(), offset),
-) : FinalClass() {
-
-    init {
-        checkState(array.javaClass.isArray) { "Not an array: $array!" }
-    }
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    @get:JvmName("startIndex")
-    open val startIndex: Int = offset
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    @get:JvmName("endIndex")
-    open val endIndex: Int = startIndex + length
-
-    /**
-     * Returns the absolute index of [array],
-     * which is computed from given [index] -- a relative index of the offset of this segment.
-     */
-    open fun absIndex(index: Int): Int {
-        return offset + index
-    }
-
-    /**
-     * Returns the copy of array range which is specified by this segment.
-     */
-    open fun copyOfRange(): A {
-        return array.arrayCopyOfRange(startIndex, endIndex)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as ArrayRef<*>
-        if (array != other.array) return false
-        if (offset != other.offset) return false
-        if (length != other.length) return false
-        return true
-    }
-
-    override fun hashCode0(): Int {
-        return toString().hashCode()
-    }
-
-    override fun toString0(): String {
-        return "ArraySeg[$array, $offset, $length]"
     }
 }

@@ -1,3 +1,6 @@
+/**
+ * Template Utilities.
+ */
 @file:JvmName("TemplateBt")
 
 package xyz.srclab.common.base

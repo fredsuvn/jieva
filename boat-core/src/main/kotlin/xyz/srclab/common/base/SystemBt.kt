@@ -1,3 +1,6 @@
+/**
+ * System utilities.
+ */
 @file:JvmName("SystemBt")
 
 package xyz.srclab.common.base

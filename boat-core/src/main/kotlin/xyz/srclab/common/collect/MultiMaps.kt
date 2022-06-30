@@ -1,5 +1,6 @@
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.JavaFunction
 import xyz.srclab.common.base.asType
 import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
@@ -7,9 +8,9 @@ import java.io.Serializable
 /**
  * A type of Multi-Map of which values are [MutableSet].
  */
-open class MutableSetMap<K, V> @JvmOverloads constructor(
+open class MutableSetMap<K, V>(
     private val map: MutableMap<K, MutableSet<V>>,
-    private val valueSet: java.util.function.Function<in K, MutableSet<V>>
+    private val valueSet: JavaFunction<in K, out MutableSet<V>>
 ) : Serializable, MutableMap<K, MutableSet<V>> by map {
 
     fun add(key: K, value: V): Boolean {
@@ -55,9 +56,9 @@ open class SetMap<K, V> constructor(
 /**
  * A type of Multi-Map of which values are [MutableList].
  */
-open class MutableListMap<K, V> constructor(
+open class MutableListMap<K, V>(
     private val map: MutableMap<K, MutableList<V>>,
-    private val valueList: java.util.function.Function<in K, MutableList<V>>
+    private val valueList: JavaFunction<in K, out MutableList<V>>
 ) : Serializable, MutableMap<K, MutableList<V>> by map {
 
     fun add(key: K, value: V): Boolean {

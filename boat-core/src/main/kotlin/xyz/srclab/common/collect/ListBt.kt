@@ -1,4 +1,7 @@
-@file:JvmName("BList")
+/**
+ * List utilities.
+ */
+@file:JvmName("ListBt")
 
 package xyz.srclab.common.collect
 
@@ -41,7 +44,7 @@ import kotlin.collections.takeLastWhile as takeLastWhileKt
  * Returns new [ArrayList] with [elements].
  */
 fun <T> newList(vararg elements: T): ArrayList<T> {
-    return ArrayList<T>().collect(*elements)
+    return collect(ArrayList(), *elements)
 }
 
 fun <T> List<T>.first(): T {
@@ -85,7 +88,7 @@ fun <T> List<T>.getOrDefault(index: Int, defaultValue: T): T {
 /**
  * Returns element at [index], or [elseValue] if index out of bounds.
  */
-fun <T> List<T>.getOrElse(index: Int, elseValue: IntFunction<T>): T {
+fun <T> List<T>.getOrElse(index: Int, elseValue: IntFunction<out T>): T {
     return this.elementAtOrElseKt(index, elseValue.asKotlinFun())
 }
 
@@ -93,7 +96,7 @@ fun <T> List<T>.getOrElse(index: Int, elseValue: IntFunction<T>): T {
  * Returns conversion of result of `get` operation.
  */
 @JvmOverloads
-fun <T : Any> List<*>.getConvert(
+fun <T : Any> List<*>.get(
     index: Int,
     type: Class<out T>,
     converter: Converter = Converter.defaultConverter()
@@ -105,7 +108,7 @@ fun <T : Any> List<*>.getConvert(
  * Returns conversion of result of `getOrNull` operation.
  */
 @JvmOverloads
-fun <T : Any> List<*>.getConvertOrNull(
+fun <T : Any> List<*>.getOrNull(
     index: Int,
     type: Class<out T>,
     converter: Converter = Converter.defaultConverter()
@@ -117,7 +120,7 @@ fun <T : Any> List<*>.getConvertOrNull(
  * Returns conversion of result of `getOrNull` operation, or [defaultValue] if result of conversion is null.
  */
 @JvmOverloads
-fun <T : Any> List<*>.getConvertOrDefault(
+fun <T : Any> List<*>.getOrConvert(
     index: Int,
     defaultValue: T,
     converter: Converter = Converter.defaultConverter()
@@ -217,27 +220,27 @@ fun <T> List<T>.dropLast(predicate: Predicate<in T>): List<T> {
     return this.dropLastWhileKt(predicate.asKotlinFun())
 }
 
-fun <S, T : S> List<T>.reduceRight(operation: BiFunction<in T, in S, S>): S {
+fun <S, T : S> List<T>.reduceRight(operation: BiFunction<in T, in S, out S>): S {
     return this.reduceRightKt(operation.asKotlinFun())
 }
 
-fun <S, T : S> List<T>.reduceRightIndexed(operation: IndexedBiFunction<in T, in S, S>): S {
+fun <S, T : S> List<T>.reduceRightIndexed(operation: IndexedBiFunction<in T, in S, out S>): S {
     return this.reduceRightIndexedKt(operation.asKotlinFun())
 }
 
-fun <S, T : S> List<T>.reduceRightOrNull(operation: BiFunction<in T, in S, S>): S? {
+fun <S, T : S> List<T>.reduceRightOrNull(operation: BiFunction<in T, in S, out S>): S? {
     return this.reduceRightOrNullKt(operation.asKotlinFun())
 }
 
-fun <S, T : S> List<T>.reduceRightIndexedOrNull(operation: IndexedBiFunction<in T, in S, S>): S? {
+fun <S, T : S> List<T>.reduceRightIndexedOrNull(operation: IndexedBiFunction<in T, in S, out S>): S? {
     return this.reduceRightIndexedOrNullKt(operation.asKotlinFun())
 }
 
-fun <T, R> List<T>.reduceRight(initial: R, operation: BiFunction<in T, in R, R>): R {
+fun <T, R> List<T>.reduceRight(initial: R, operation: BiFunction<in T, in R, out R>): R {
     return this.foldRightKt(initial, operation.asKotlinFun())
 }
 
-fun <T, R> List<T>.reduceRightIndexed(initial: R, operation: IndexedBiFunction<in T, in R, R>): R {
+fun <T, R> List<T>.reduceRightIndexed(initial: R, operation: IndexedBiFunction<in T, in R, out R>): R {
     return this.foldRightIndexedKt(initial, operation.asKotlinFun())
 }
 

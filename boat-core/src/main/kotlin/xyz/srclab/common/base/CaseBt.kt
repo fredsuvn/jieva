@@ -119,14 +119,14 @@ interface NamingCase {
 open class CamelCase @JvmOverloads constructor(
     private val capitalized: Boolean,
     private val nonLetterPolicy: NonLetterPolicy = NonLetterPolicy.AS_LOWER,
-    private val wordHandler: IndexedFunction<CharSequence, CharSequence> = IndexedFunction { _, it -> it }
+    private val wordHandler: IndexedFunction<in CharSequence, out CharSequence> = IndexedFunction { _, it -> it }
 ) : NamingCase {
 
     /**
      * Constructs with [capitalized] and [wordHandler], use [NonLetterPolicy.AS_LOWER].
      */
     constructor(
-        capitalized: Boolean, wordHandler: IndexedFunction<CharSequence, CharSequence>
+        capitalized: Boolean, wordHandler: IndexedFunction<in CharSequence, out CharSequence>
     ) : this(capitalized, NonLetterPolicy.AS_LOWER, wordHandler)
 
     override fun split(name: CharSequence): List<CharSequence> {
@@ -315,7 +315,7 @@ open class CamelCase @JvmOverloads constructor(
  */
 open class SeparatorCase(
     private val separator: CharSequence,
-    private val wordHandler: IndexedFunction<CharSequence, CharSequence> = IndexedFunction { _, it -> it }
+    private val wordHandler: IndexedFunction<in CharSequence, out CharSequence> = IndexedFunction { _, it -> it }
 ) : NamingCase {
 
     override fun split(name: CharSequence): List<CharSequence> {

@@ -11,7 +11,7 @@ import java.util.function.Function
  */
 open class CopyOnWriteMap<K, V>(
     initMap: Map<out K, V>,
-    private val newMap: Function<Map<out K, V>, MutableMap<K, V>>
+    private val newMap: Function<Map<out K, V>, out MutableMap<K, V>>
 ) : Serializable, MutableMap<K, V> {
 
     private var currentMap: MutableMap<K, V> = newMap(initMap)

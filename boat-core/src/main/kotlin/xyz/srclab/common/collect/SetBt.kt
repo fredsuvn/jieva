@@ -1,4 +1,7 @@
-@file:JvmName("BSet")
+/**
+ * Set utilities.
+ */
+@file:JvmName("SetBt")
 
 package xyz.srclab.common.collect
 
@@ -9,7 +12,7 @@ import kotlin.collections.plus as plusKt
  * Returns new [LinkedHashSet] with [elements].
  */
 fun <T> newSet(vararg elements: T): LinkedHashSet<T> {
-    return LinkedHashSet<T>().collect(*elements)
+    return collect(LinkedHashSet(), *elements)
 }
 
 fun <T> Set<T>.plus(element: T): Set<T> {
