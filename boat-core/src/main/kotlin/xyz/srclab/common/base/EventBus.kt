@@ -1,4 +1,4 @@
-package xyz.srclab.common.bus
+package xyz.srclab.common.base
 
 import xyz.srclab.common.base.asType
 import xyz.srclab.common.collect.arrayAdd
@@ -126,4 +126,19 @@ interface EventBus {
             }
         }
     }
+}
+
+/**
+ * To deal with event of [T].
+ *
+ * @see EventBus
+ */
+interface EventBusHandler<T> {
+
+    val eventType: Class<T>
+
+    /**
+     * Handles given [event].
+     */
+    fun doEvent(event: T)
 }
