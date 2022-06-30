@@ -2,8 +2,8 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.uncapitalize
-import xyz.srclab.common.invoke.InstInvoke
-import xyz.srclab.common.invoke.InstInvoke.Companion.toInstInvoke
+import xyz.srclab.common.func.InstFunc
+import xyz.srclab.common.func.InstFunc.Companion.toInstInvoke
 import xyz.srclab.common.reflect.eraseTypeParameters
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.reflect.searchFieldOrNull
@@ -116,7 +116,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     data class GetterInfo(
         val name: String,
         val type: Type,
-        val getter: InstInvoke?,
+        val getter: InstFunc?,
         val field: Field?,
         val getterMethod: Method?,
     )
@@ -124,7 +124,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     data class SetterInfo(
         val name: String,
         val type: Type,
-        val setter: InstInvoke?,
+        val setter: InstFunc?,
         val field: Field?,
         val setterMethod: Method?,
     )

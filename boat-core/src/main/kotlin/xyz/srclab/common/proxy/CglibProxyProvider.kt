@@ -2,7 +2,7 @@ package xyz.srclab.common.proxy
 
 import net.sf.cglib.proxy.*
 import xyz.srclab.common.base.asType
-import xyz.srclab.common.invoke.StaticInvoke
+import xyz.srclab.common.func.StaticFunc
 import java.lang.reflect.Method
 import java.util.*
 
@@ -42,7 +42,7 @@ object CglibProxyProvider : ClassProxyProvider {
 
     private class ProxyMethodInterceptor(val proxyInvoker: ProxyInvoker) : MethodInterceptor {
         override fun intercept(obj: Any, method: Method, args: Array<out Any?>?, proxy: MethodProxy): Any? {
-            val sourceInvoker = StaticInvoke {
+            val sourceInvoker = StaticFunc {
                 proxy.invokeSuper(obj, args)
             }
             return proxyInvoker.invokeProxy(obj, method, sourceInvoker, args)

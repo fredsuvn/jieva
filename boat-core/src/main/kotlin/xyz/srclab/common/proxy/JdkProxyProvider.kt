@@ -1,7 +1,7 @@
 package xyz.srclab.common.proxy
 
 import xyz.srclab.common.base.asType
-import xyz.srclab.common.invoke.StaticInvoke
+import xyz.srclab.common.func.StaticFunc
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
@@ -44,13 +44,13 @@ object JdkProxyProvider : ClassProxyProvider {
 
         override fun invoke(proxy: Any, method: Method, args: Array<out Any>?): Any? {
             if (proxyInvoker.isTarget(method)) {
-                return proxyInvoker.invokeProxy(proxy, method, UnsupportedSourceInvoke, args)
+                return proxyInvoker.invokeProxy(proxy, method, UnsupportedSourceFunc, args)
             }
             throw IllegalStateException("Proxy method not found: $method")
         }
     }
 
-    private object UnsupportedSourceInvoke : StaticInvoke {
+    private object UnsupportedSourceFunc : StaticFunc {
         override fun invoke(vararg args: Any?): Any? {
             throw IllegalStateException("Interface's method is not implemented.")
         }

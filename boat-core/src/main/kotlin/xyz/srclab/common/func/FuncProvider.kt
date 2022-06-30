@@ -1,4 +1,4 @@
-package xyz.srclab.common.invoke
+package xyz.srclab.common.func
 
 import xyz.srclab.common.base.getJavaMajorVersion
 import java.lang.invoke.MethodHandle
@@ -7,46 +7,49 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 
 /**
- * Provider to get [InstInvoke] and [StaticInvoke].
+ * Provider to generate [InstFunc] and [StaticFunc].
  */
-interface InvokeProvider {
+interface FuncProvider {
 
     /**
-     * Returns [InstInvoke] from [method].
+     * Returns [InstFunc] from [method].
      */
-    fun getInstInvoke(method: Method): InstInvoke = getInstInvoke(method, false)
+    fun getInstFunc(method: Method): InstFunc = getInstFunc(method, false)
 
     /**
-     * Returns [InstInvoke] from [method].
+     * Returns [InstFunc] from [method].
+     *
      * @param force whether invoke forcibly if the method is not accessible.
      */
-    fun getInstInvoke(method: Method, force: Boolean): InstInvoke
+    fun getInstFunc(method: Method, force: Boolean): InstFunc
 
     /**
-     * Returns [InstInvoke] from [method].
+     * Returns [InstFunc] from [method].
      */
-    fun getStaticInvoke(method: Method): StaticInvoke = getStaticInvoke(method, false)
+    fun getStaticFunc(method: Method): StaticFunc = getStaticFunc(method, false)
 
     /**
-     * Returns [InstInvoke] from [method].
+     * Returns [InstFunc] from [method].
+     *
      * @param force whether invoke forcibly if the method is not accessible.
      */
-    fun getStaticInvoke(method: Method, force: Boolean): StaticInvoke
+    fun getStaticFunc(method: Method, force: Boolean): StaticFunc
 
     /**
-     * Returns [InstInvoke] from [constructor].
+     * Returns [InstFunc] from [constructor].
      */
-    fun getStaticInvoke(constructor: Constructor<*>): StaticInvoke = getStaticInvoke(constructor, false)
+    fun getStaticFunc(constructor: Constructor<*>): StaticFunc = getStaticFunc(constructor, false)
 
     /**
-     * Returns [InstInvoke] from [constructor].
+     * Returns [InstFunc] from [constructor].
+     *
      * @param force whether invoke forcibly if the constructor is not accessible.
      */
-    fun getStaticInvoke(constructor: Constructor<*>, force: Boolean): StaticInvoke
+    fun getStaticFunc(constructor: Constructor<*>, force: Boolean): StaticFunc
 
     companion object {
 
-        private var defaultProvider: InvokeProvider = run {
+        private var defaultProvider: FuncProvider = run {
             val javaVersion = getJavaMajorVersion()
             if (javaVersion <= 8) {
                 return@run withReflected()
@@ -55,55 +58,55 @@ interface InvokeProvider {
         }
 
         /**
-         * Gets default [InvokeProvider].
+         * Gets default [FuncProvider].
          */
         @JvmStatic
-        fun defaultProvider(): InvokeProvider {
+        fun defaultProvider(): FuncProvider {
             return defaultProvider
         }
 
         /**
-         * Sets default [InvokeProvider].
+         * Sets default [FuncProvider].
          */
         @JvmStatic
-        fun setDefaultProvider(provider: InvokeProvider) {
+        fun setDefaultProvider(provider: FuncProvider) {
             this.defaultProvider = provider
         }
 
         /**
-         * Returns the [InvokeProvider] which uses reflection to do invocation.
+         * Returns the [FuncProvider] which uses reflection to do invocation.
          */
         @JvmStatic
-        fun withReflected(): InvokeProvider {
-            return ReflectedInvokeProvider
+        fun withReflected(): FuncProvider {
+            return ReflectedFuncProvider
         }
 
         /**
-         * Returns the [InvokeProvider] which uses unreflected (by [MethodHandle]) to do invocation.
+         * Returns the [FuncProvider] which uses unreflected (by [MethodHandle]) to do invocation.
          */
         @JvmStatic
-        fun withUnreflected(): InvokeProvider {
-            return UnreflectedInvokeProvider
+        fun withUnreflected(): FuncProvider {
+            return UnreflectedFuncProvider
         }
 
-        private object ReflectedInvokeProvider : InvokeProvider {
+        private object ReflectedFuncProvider : FuncProvider {
 
-            override fun getInstInvoke(method: Method, force: Boolean): InstInvoke {
-                return ReflectedInstInvoke(method, force)
+            override fun getInstFunc(method: Method, force: Boolean): InstFunc {
+                return ReflectedInstFunc(method, force)
             }
 
-            override fun getStaticInvoke(method: Method, force: Boolean): StaticInvoke {
-                return ReflectedStaticInvoke(method, force)
+            override fun getStaticFunc(method: Method, force: Boolean): StaticFunc {
+                return ReflectedStaticFunc(method, force)
             }
 
-            override fun getStaticInvoke(constructor: Constructor<*>, force: Boolean): StaticInvoke {
-                return ReflectedConstructorInvoke(constructor, force)
+            override fun getStaticFunc(constructor: Constructor<*>, force: Boolean): StaticFunc {
+                return ReflectedConstructorFunc(constructor, force)
             }
 
-            private class ReflectedInstInvoke(
+            private class ReflectedInstFunc(
                 private val method: Method,
                 force: Boolean
-            ) : InstInvoke {
+            ) : InstFunc {
 
                 init {
                     if (force) {
@@ -116,10 +119,10 @@ interface InvokeProvider {
                 }
             }
 
-            private class ReflectedStaticInvoke(
+            private class ReflectedStaticFunc(
                 private val method: Method,
                 force: Boolean
-            ) : StaticInvoke {
+            ) : StaticFunc {
 
                 init {
                     if (force) {
@@ -132,10 +135,10 @@ interface InvokeProvider {
                 }
             }
 
-            private class ReflectedConstructorInvoke(
+            private class ReflectedConstructorFunc(
                 private val constructor: Constructor<*>,
                 force: Boolean
-            ) : StaticInvoke {
+            ) : StaticFunc {
 
                 init {
                     if (force) {
@@ -149,21 +152,21 @@ interface InvokeProvider {
             }
         }
 
-        private object UnreflectedInvokeProvider : InvokeProvider {
+        private object UnreflectedFuncProvider : FuncProvider {
 
-            override fun getInstInvoke(method: Method, force: Boolean): InstInvoke {
-                return UnreflectedInstInvoke(method, force)
+            override fun getInstFunc(method: Method, force: Boolean): InstFunc {
+                return UnreflectedInstFunc(method, force)
             }
 
-            override fun getStaticInvoke(method: Method, force: Boolean): StaticInvoke {
-                return UnreflectedStaticInvoke(method, force)
+            override fun getStaticFunc(method: Method, force: Boolean): StaticFunc {
+                return UnreflectedStaticFunc(method, force)
             }
 
-            override fun getStaticInvoke(constructor: Constructor<*>, force: Boolean): StaticInvoke {
-                return UnreflectedConstructorInvoke(constructor, force)
+            override fun getStaticFunc(constructor: Constructor<*>, force: Boolean): StaticFunc {
+                return UnreflectedConstructorFunc(constructor, force)
             }
 
-            private class UnreflectedInstInvoke(method: Method, force: Boolean) : InstInvoke {
+            private class UnreflectedInstFunc(method: Method, force: Boolean) : InstFunc {
 
                 private val handle: MethodHandle
 
@@ -193,7 +196,7 @@ interface InvokeProvider {
                 }
             }
 
-            private class UnreflectedStaticInvoke(method: Method, force: Boolean) : StaticInvoke {
+            private class UnreflectedStaticFunc(method: Method, force: Boolean) : StaticFunc {
 
                 private val handle: MethodHandle
 
@@ -209,7 +212,7 @@ interface InvokeProvider {
                 }
             }
 
-            private class UnreflectedConstructorInvoke(constructor: Constructor<*>, force: Boolean) : StaticInvoke {
+            private class UnreflectedConstructorFunc(constructor: Constructor<*>, force: Boolean) : StaticFunc {
 
                 private val handle: MethodHandle
 

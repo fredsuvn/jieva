@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.invoke.StaticInvoke
+import xyz.srclab.common.func.StaticFunc
 import java.lang.reflect.Method
 
 /**
@@ -24,7 +24,7 @@ interface ProxyInvoker {
     fun invokeProxy(
         sourceInst: Any,
         sourceMethod: Method,
-        sourceInvoke: StaticInvoke,
+        sourceInvoke: StaticFunc,
         args: Array<out Any?>?
     ): Any?
 }

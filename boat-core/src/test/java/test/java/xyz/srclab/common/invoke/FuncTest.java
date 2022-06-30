@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.invoke;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.collect.BList;
-import xyz.srclab.common.invoke.InvokeProvider;
+import xyz.srclab.common.func.FuncProvider;
 import xyz.srclab.common.reflect.BConstructor;
 import xyz.srclab.common.reflect.BMethod;
 
@@ -17,29 +17,29 @@ public class FuncTest {
 
     @Test
     public void testInvoke() throws Exception {
-        testInvokerGenerator(InvokeProvider.defaultProvider());
+        testInvokerGenerator(FuncProvider.defaultProvider());
     }
 
     @Test
     public void testReflected() throws Exception {
-        testInvokerGenerator(InvokeProvider.withReflected());
+        testInvokerGenerator(FuncProvider.withReflected());
     }
 
     @Test
     public void testUnreflected() throws Exception {
-        testInvokerGenerator(InvokeProvider.withUnreflected());
+        testInvokerGenerator(FuncProvider.withUnreflected());
     }
 
-    private synchronized void testInvokerGenerator(InvokeProvider factory) throws Exception {
+    private synchronized void testInvokerGenerator(FuncProvider factory) throws Exception {
         A.stack.clear();
 
-        A a1 = factory.getStaticInvoke(BConstructor.getConstructor(A.class)).invokeTyped();
+        A a1 = factory.getStaticFunc(BConstructor.getConstructor(A.class)).invokeTyped();
         Assert.assertNotNull(a1);
         Assert.assertEquals(
             A.stack.get(0),
             "A()"
         );
-        A a2 = factory.getStaticInvoke(BConstructor.getDeclaredConstructor(A.class, String.class), true).invokeTyped("123");
+        A a2 = factory.getStaticFunc(BConstructor.getDeclaredConstructor(A.class, String.class), true).invokeTyped("123");
         Assert.assertNotNull(a2);
         Assert.assertEquals(
             A.stack,
@@ -48,68 +48,68 @@ public class FuncTest {
 
         A a = new A();
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(I.class, "i1")).invoke(a),
+            factory.getInstFunc(BMethod.getMethod(I.class, "i1")).invoke(a),
             "i1"
         );
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(I.class, "i2", String.class)).invoke(a, "123"),
+            factory.getInstFunc(BMethod.getMethod(I.class, "i2", String.class)).invoke(a, "123"),
             "i2: 123"
         );
 
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(A.class, "i1")).invoke(a),
+            factory.getInstFunc(BMethod.getMethod(A.class, "i1")).invoke(a),
             "i1"
         );
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(A.class, "i2", String.class)).invoke(a, "123"),
+            factory.getInstFunc(BMethod.getMethod(A.class, "i2", String.class)).invoke(a, "123"),
             "i2: 123"
         );
 
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(A.class, "a1")).invoke(a),
+            factory.getInstFunc(BMethod.getMethod(A.class, "a1")).invoke(a),
             "a1"
         );
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getDeclaredMethod(A.class, "a2"), true).invoke(a),
+            factory.getInstFunc(BMethod.getDeclaredMethod(A.class, "a2"), true).invoke(a),
             "a2"
         );
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(A.class, "a3", String.class)).invoke(a, "123"),
+            factory.getInstFunc(BMethod.getMethod(A.class, "a3", String.class)).invoke(a, "123"),
             "a3: 123"
         );
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getDeclaredMethod(A.class, "a4", String.class), true).invoke(a, "123"),
+            factory.getInstFunc(BMethod.getDeclaredMethod(A.class, "a4", String.class), true).invoke(a, "123"),
             "a4: 123"
         );
 
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(I.class, "i3")).invoke(a),
+            factory.getInstFunc(BMethod.getMethod(I.class, "i3")).invoke(a),
             "i3"
         );
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(I.class, "i4", String.class)).invoke(a, "123"),
+            factory.getInstFunc(BMethod.getMethod(I.class, "i4", String.class)).invoke(a, "123"),
             "i4: 123"
         );
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(A.class, "i3")).invoke(a),
+            factory.getInstFunc(BMethod.getMethod(A.class, "i3")).invoke(a),
             "i3"
         );
         Assert.assertEquals(
-            factory.getInstInvoke(BMethod.getMethod(A.class, "i4", String.class)).invoke(a, "123"),
+            factory.getInstFunc(BMethod.getMethod(A.class, "i4", String.class)).invoke(a, "123"),
             "i4: 123"
         );
 
-        factory.getInstInvoke(BMethod.getMethod(A.class, "av")).invoke(a);
+        factory.getInstFunc(BMethod.getMethod(A.class, "av")).invoke(a);
         Assert.assertEquals(
             A.stack,
             BList.newList("A()", "A(123)", "A()", "av")
         );
 
-        if (factory != InvokeProvider.withUnreflected()) {
+        if (factory != FuncProvider.withUnreflected()) {
             Assert.assertThrows(IllegalAccessException.class, () ->
-                factory.getInstInvoke(BMethod.getDeclaredMethod(A.class, "a2")).invoke(a));
+                factory.getInstFunc(BMethod.getDeclaredMethod(A.class, "a2")).invoke(a));
             Assert.assertThrows(IllegalAccessException.class, () ->
-                factory.getInstInvoke(BMethod.getDeclaredMethod(A.class, "a4", String.class)).invoke(a, "123"));
+                factory.getInstFunc(BMethod.getDeclaredMethod(A.class, "a4", String.class)).invoke(a, "123"));
         }
     }
 

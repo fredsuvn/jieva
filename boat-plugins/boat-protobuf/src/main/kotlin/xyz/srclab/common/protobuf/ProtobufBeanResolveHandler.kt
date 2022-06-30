@@ -8,9 +8,9 @@ import xyz.srclab.common.bean.AbstractBeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveContext
 import xyz.srclab.common.bean.BeanResolveHandler
 import xyz.srclab.common.bean.BeanTypeBuilder
-import xyz.srclab.common.invoke.InstInvoke
-import xyz.srclab.common.invoke.InstInvoke.Companion.toInstInvoke
-import xyz.srclab.common.invoke.StaticInvoke.Companion.toStaticInvoke
+import xyz.srclab.common.func.InstFunc
+import xyz.srclab.common.func.InstFunc.Companion.toInstInvoke
+import xyz.srclab.common.func.StaticFunc.Companion.toStaticInvoke
 import xyz.srclab.common.reflect.getTypeSignature
 import xyz.srclab.common.reflect.method
 import xyz.srclab.common.reflect.methodOrNull
@@ -40,8 +40,8 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
 
         fun addProperty(field: Descriptors.FieldDescriptor, isBuilder: Boolean) {
 
-            fun createSetter(clearMethod: Method, addAllMethod: Method): InstInvoke {
-                return object : InstInvoke {
+            fun createSetter(clearMethod: Method, addAllMethod: Method): InstFunc {
+                return object : InstFunc {
                     override fun invoke(inst: Any, vararg args: Any?): Any? {
                         clearMethod.invoke(inst)
                         addAllMethod.invoke(inst, *args)
