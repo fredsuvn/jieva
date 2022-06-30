@@ -1,6 +1,6 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.asType
+import xyz.srclab.common.base.EventBus.Handler
 import xyz.srclab.common.collect.arrayAdd
 import xyz.srclab.common.collect.arrayRemove
 import xyz.srclab.common.reflect.canAssignedBy
@@ -10,32 +10,65 @@ import java.util.concurrent.Executor
 /**
  * Event bus. Use [register] or [registerAll] to register event handler, [unregister] and [unregisterAll] to unregister.
  *
- * [EventBusHandler] is used to handle event.
- * [EventBus] will post event for each [EventBusHandler] of which [EventBusHandler.eventType] is assignable from event,
+ * [Handler] is used to handle event.
+ * [EventBus] will post event for each [Handler] of which [Handler.eventType] is assignable from event,
  * in sub-to-super order.
  */
 interface EventBus {
 
-    fun register(handler: EventBusHandler<*>)
+    /**
+     * Registers [handler].
+     */
+    fun register(handler: Handler<*>)
 
-    fun registerAll(handlers: Iterable<EventBusHandler<*>>) {
+    /**
+     * Registers [handlers].
+     */
+    fun registerAll(handlers: Iterable<Handler<*>>) {
         for (handler in handlers) {
             register(handler)
         }
     }
 
-    fun unregister(handler: EventBusHandler<*>)
+    /**
+     * Unregisters [handler].
+     */
+    fun unregister(handler: Handler<*>)
 
-    fun unregisterAll(handlers: Iterable<EventBusHandler<*>>) {
+    /**
+     * Unregisters [handlers].
+     */
+    fun unregisterAll(handlers: Iterable<Handler<*>>) {
         for (handler in handlers) {
             unregister(handler)
         }
     }
 
+    /**
+     * Posts event for registered handlers.
+     */
     fun post(event: Any)
+
+    /**
+     * To deal with event of [T].
+     */
+    interface Handler<T> {
+
+        val eventType: Class<T>
+
+        /**
+         * Handles given [event].
+         */
+        fun doEvent(event: T)
+    }
 
     companion object {
 
+        /**
+         * Returns new [EventBus].
+         *
+         * @param executor executor where event handlers run on
+         */
         @JvmStatic
         @JvmOverloads
         fun newEventBus(executor: Executor = SyncRunner): EventBus {
@@ -46,10 +79,10 @@ interface EventBus {
             private val executor: Executor
         ) : EventBus {
 
-            private var handlers: Array<EventBusHandler<*>> = emptyArray()
+            private var handlers: Array<Handler<*>> = emptyArray()
 
             @Synchronized
-            override fun register(handler: EventBusHandler<*>) {
+            override fun register(handler: Handler<*>) {
                 var i = 0
                 while (i < handlers.size) {
                     val hi = handlers[i]
@@ -100,7 +133,7 @@ interface EventBus {
             }
 
             @Synchronized
-            override fun unregister(handler: EventBusHandler<*>) {
+            override fun unregister(handler: Handler<*>) {
                 var i = 0
                 while (i < handlers.size) {
                     val hi = handlers[i]
@@ -115,7 +148,7 @@ interface EventBus {
             override fun post(event: Any) {
                 val type = event.javaClass
                 for (handler in handlers) {
-                    val h = handler.asType<EventBusHandler<Any>>()
+                    val h = handler.asType<Handler<Any>>()
                     val ht = handler.eventType
                     if (ht.canAssignedBy(type)) {
                         executor.execute {
@@ -126,19 +159,4 @@ interface EventBus {
             }
         }
     }
-}
-
-/**
- * To deal with event of [T].
- *
- * @see EventBus
- */
-interface EventBusHandler<T> {
-
-    val eventType: Class<T>
-
-    /**
-     * Handles given [event].
-     */
-    fun doEvent(event: T)
 }
