@@ -2,6 +2,7 @@ package xyz.srclab.common.cache
 
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
 import xyz.srclab.common.base.asType
 import java.util.concurrent.ExecutionException
 import java.util.function.Function
@@ -91,14 +92,15 @@ open class GuavaCache<K : Any, V>(
  * Loading [Cache] implementation using [guava](https://github.com/google/guava).
  */
 open class LoadingGuavaCache<K : Any, V>(
-    override val cache: com.google.common.cache.LoadingCache<K, CacheVal<V>>
+    override val cache: LoadingCache<K, CacheVal<V>>
 ) : BaseGuavaCache<K, V>(cache) {
 
     /**
      * Constructs with cache builder.
      */
     constructor(builder: Cache.Builder<K, V>) : this(
-        buildGuavaBuilder(builder).build<K, CacheVal<V>>(buildGuavaLoader(builder.loader)))
+        buildLoadingCaffeine(builder)
+    )
 
     override fun getVal(key: K): CacheVal<V>? {
         try {
@@ -157,4 +159,10 @@ private fun <K : Any, V> buildGuavaLoader(loader: Function<in K, out V>?): Cache
             }
         }
     }
+}
+
+private fun <K : Any, V> buildLoadingCaffeine(builder: Cache.Builder<K, V>): LoadingCache<K, CacheVal<V>> {
+    val guavaBuilder: CacheBuilder<K, CacheVal<V>> = buildGuavaBuilder(builder)
+    val cacheLoader: CacheLoader<K, CacheVal<V>> = buildGuavaLoader(builder.loader)
+    return guavaBuilder.build(cacheLoader)
 }

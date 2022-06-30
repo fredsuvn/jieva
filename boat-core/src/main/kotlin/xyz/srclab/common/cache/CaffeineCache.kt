@@ -2,6 +2,7 @@ package xyz.srclab.common.cache
 
 import com.github.benmanes.caffeine.cache.CacheLoader
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
 import xyz.srclab.common.base.asType
 import java.util.function.Function
 
@@ -88,14 +89,15 @@ open class CaffeineCache<K : Any, V>(
  * Loading [Cache] implementation using [caffeine](https://github.com/ben-manes/caffeine).
  */
 open class LoadingCaffeineCache<K : Any, V>(
-    override val cache: com.github.benmanes.caffeine.cache.LoadingCache<K, CacheVal<V>>
+    override val cache: LoadingCache<K, CacheVal<V>>
 ) : BaseCaffeineCache<K, V>(cache) {
 
     /**
      * Constructs with cache builder.
      */
     constructor(builder: Cache.Builder<K, V>) : this(
-        buildCaffeine(builder).build<K, CacheVal<V>>(buildCaffeineLoader(builder.loader)))
+        buildLoadingCaffeine(builder)
+    )
 
     override fun getVal(key: K): CacheVal<V>? {
         try {
@@ -131,7 +133,7 @@ private fun <K : Any, V> buildCaffeine(builder: Cache.Builder<K, V>): Caffeine<K
     return caffeine.asType()
 }
 
-private fun <K : Any, V> buildCaffeineLoader(loader: Function<in K, out V>?): CacheLoader<in K, CacheVal<V>?> {
+private fun <K : Any, V> buildCaffeineLoader(loader: Function<in K, out V>?): CacheLoader<in K, CacheVal<V>> {
     if (loader === null) {
         throw IllegalArgumentException("Loader must not be null!")
     }
@@ -142,4 +144,10 @@ private fun <K : Any, V> buildCaffeineLoader(loader: Function<in K, out V>?): Ca
             null
         }
     }
+}
+
+private fun <K : Any, V> buildLoadingCaffeine(builder: Cache.Builder<K, V>): LoadingCache<K, CacheVal<V>> {
+    val c: Caffeine<K, CacheVal<V>> = buildCaffeine(builder)
+    val l: CacheLoader<in K, CacheVal<V>> = buildCaffeineLoader(builder.loader)
+    return c.build(l)
 }

@@ -7,13 +7,6 @@ import xyz.srclab.common.base.Val
  */
 interface CacheVal<V> : Val<V> {
 
-    ///**
-    // * Returns whether [value] is null.
-    // */
-    //fun isNull(): Boolean {
-    //    return value === null
-    //}
-
     companion object {
 
         /**
