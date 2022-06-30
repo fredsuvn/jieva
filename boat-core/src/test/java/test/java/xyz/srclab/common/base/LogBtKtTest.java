@@ -7,7 +7,7 @@ import xyz.srclab.common.base.LogPrinter;
 
 import java.io.ByteArrayOutputStream;
 
-public class BLogTest {
+public class LogBtKtTest {
 
     @Test
     public void testLog() {

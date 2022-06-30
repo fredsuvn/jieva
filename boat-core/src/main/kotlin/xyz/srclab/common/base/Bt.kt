@@ -7,6 +7,7 @@ package xyz.srclab.common.base
 
 import xyz.srclab.common.Boat
 import xyz.srclab.common.base.DatePattern.Companion.toDatePattern
+import xyz.srclab.common.collect.toStringMap
 import xyz.srclab.common.io.readString
 import xyz.srclab.common.reflect.defaultClassLoader
 import java.io.*
@@ -814,6 +815,36 @@ fun <T> File.readObject(close: Boolean = false): T {
 @JvmOverloads
 fun <T> readObject(fileName: CharSequence, close: Boolean = false): T {
     return FileInputStream(fileName.toString()).readObject(close)
+}
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun InputStream.readProperties(charset: Charset = defaultCharset(), close: Boolean = false): Map<String, String> {
+    return this.reader(charset).readProperties(close)
+}
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun Reader.readProperties(close: Boolean = false): Map<String, String> {
+    val props = Properties()
+    props.load(this)
+    val map = props.toStringMap()
+    if (close) {
+        this.close()
+    }
+    return map
+}
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun File.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
+    return this.reader(charset).readProperties(true)
 }
 
 private object BtHolder {

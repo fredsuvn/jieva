@@ -1,4 +1,4 @@
-@file:JvmName("BTemplate")
+@file:JvmName("TemplateBt")
 
 package xyz.srclab.common.base
 
@@ -6,14 +6,14 @@ import java.io.Serializable
 import java.util.*
 
 /**
- * Parses [this] to [CharsTemplate] implemented by [SimpleTemplate].
+ * Parses [this] to [StringTemplate] implemented by [SimpleTemplate].
  *
  * @receiver this source text to be template
  * @param escapeChar escape char, may be null if no escape
  * @param parameterPrefix parameter prefix
  * @param parameterSuffix parameter suffix, or null if no suffix
  *
- * @see CharsTemplate
+ * @see StringTemplate
  * @see SimpleTemplate
  */
 @JvmName("parse")
@@ -23,7 +23,7 @@ fun CharSequence.parseTemplate(
     escapeChar: Char?,
     parameterPrefix: CharSequence,
     parameterSuffix: CharSequence? = null
-): CharsTemplate {
+): StringTemplate {
     return SimpleTemplate(this, escapeChar, parameterPrefix, parameterSuffix)
 }
 
@@ -35,18 +35,18 @@ fun CharSequence.parseTemplate(
  * Map<String, Object> args = new HashMap<>();
  * args.put("n1", "Dog");
  * args.put("n2}", "Cat");
- * CharsTemplate template1 = BTemplate.parse("This is a {n1}, that is a {n2}", null, "{", "}");
+ * StringTemplate template1 = TemplateBt.parse("This is a {n1}, that is a {n2}", null, "{", "}");
  * Assert.assertEquals(template1.process(args), "This is a Dog, that is a Cat");
  * ```
  *
  * @see SimpleTemplate
  */
-interface CharsTemplate {
+interface StringTemplate {
 
     /**
      * Parsed nodes of this template. There are two type of node:
      *
-     * * Chars node: general node represents a sequence of chars;
+     * * [CharSequence]: general node represents a sequence of chars;
      * * [Parameter] node: represents a parameter;
      */
     @get:Throws(TemplateException::class)
@@ -166,7 +166,7 @@ interface CharsTemplate {
 }
 
 /**
- * Default and simple implementation of [CharsTemplate],
+ * Default and simple implementation of [StringTemplate],
  * supporting escape, parameter prefix and parameter suffix (may null if needn't).
  *
  * ```
@@ -174,24 +174,24 @@ interface CharsTemplate {
  * Map<String, Object> args = new HashMap<>();
  * args.put("n1", "Dog");
  * args.put("n2}", "Cat");
- * CharsTemplate template1 = BTemplate.parse("This is a {n1}, that is a {n2}", null, "{", "}");
+ * StringTemplate template1 = TemplateBt.parse("This is a {n1}, that is a {n2}", null, "{", "}");
  * Assert.assertEquals(template1.process(args), "This is a Dog, that is a Cat");
  *
  * //Using unnamed args:
- * CharsTemplate template2 = BTemplate.parse("This is a {}, that is a {}", null, "{", "}");
+ * StringTemplate template2 = TemplateBt.parse("This is a {}, that is a {}", null, "{", "}");
  * Assert.assertEquals(template2.processArgs("Dog", "Cat"), "This is a Dog, that is a Cat");
  *
  * //Using only prefix:
- * CharsTemplate template3 = BTemplate.parse("This is a $n1, that is a $n2", null, "$");
+ * StringTemplate template3 = TemplateBt.parse("This is a $n1, that is a $n2", null, "$");
  * Assert.assertEquals(template3.process(args), "This is a Dog, that is a Cat");
- * CharsTemplate template4 = BTemplate.parse("This is a $, that is a $", null, "$");
+ * StringTemplate template4 = TemplateBt.parse("This is a $, that is a $", null, "$");
  * Assert.assertEquals(template4.processArgs("Dog", "Cat"), "This is a Dog, that is a Cat");
  * ```
  *
  * It supports escape:
  *
  * ```
- * CharsTemplate template5 = BTemplate.parse("This \\is a \\{{n1}, that is a {n2}\\", '\\', "{", "}");
+ * StringTemplate template5 = TemplateBt.parse("This \\is a \\{{n1}, that is a {n2}\\", '\\', "{", "}");
  * Assert.assertEquals(template5.process(args), "This \\is a {Dog, that is a Cat\\");
  * ```
  *
@@ -199,7 +199,7 @@ interface CharsTemplate {
  *
  * * Escape is valid only before the parameter prefix or escape itself;
  * * Parameter suffix before the prefix is permitted, the suffix will be seen as a normal char in this case;
- * * If there is no parameter suffix, the parameter name only consists of `[0, 9]`, `[a, z]`, `[A, Z]`, `$`, `#` or `@`;
+ * * If there is no parameter suffix, the parameter name will end at next white char with [Char.isWhitespace];
  *
  * @param source source text to be template
  * @param escapeChar escape char, may be null if no escape
@@ -211,7 +211,7 @@ open class SimpleTemplate(
     private val escapeChar: Char?,
     parameterPrefix: CharSequence,
     parameterSuffix: CharSequence? = null
-) : CharsTemplate {
+) : StringTemplate {
 
     override val nodes: List<CharSequence> by lazy { parse0() }
 
@@ -247,15 +247,6 @@ open class SimpleTemplate(
             return source.startsWith(prefix, index)
         }
 
-        fun Char.isPrefixOnlyName(): Boolean {
-            return this in '0'..'9'
-                || this in 'a'..'z'
-                || this in 'A'..'Z'
-                || this == '$'
-                || this == '#'
-                || this == '@'
-        }
-
         var start = 0
         var i = 0
         var paramIndex = 0
@@ -269,14 +260,14 @@ open class SimpleTemplate(
                 val cn = source[i]
                 if (cn == escapeChar) {
                     //Escape itself
-                    getBuffer().add(source.charsRef(start, i))
+                    getBuffer().add(source.subRef(start, i))
                     i++
                     start = i
                     continue
                 }
                 if (isParameterPrefix(i)) {
                     //Escape parameter prefix
-                    getBuffer().add(source.charsRef(start, i - 1))
+                    getBuffer().add(source.subRef(start, i - 1))
                     getBuffer().add(prefix)
                     i += prefix.length
                     start = i
@@ -284,20 +275,20 @@ open class SimpleTemplate(
                 }
             }
             if (isParameterPrefix(i)) {
-                getBuffer().add(source.charsRef(start, i))
+                getBuffer().add(source.subRef(start, i))
                 i += prefix.length
                 if (suffix === null) {
                     //Case no suffix: find next whitespace
                     val paramNameStart = i
-                    while (i < source.length && source[i].isPrefixOnlyName()) {
+                    while (i < source.length && !source[i].isWhitespace()) {
                         i++
                     }
                     if (paramNameStart == i) {
                         //empty name
-                        getBuffer().add(CharsTemplate.Parameter.of(paramIndex++))
+                        getBuffer().add(StringTemplate.Parameter.of(paramIndex++))
                     } else {
-                        val nameRef = source.charsRef(paramNameStart, i)
-                        getBuffer().add(CharsTemplate.Parameter.of(paramIndex++, nameRef))
+                        val nameRef = source.subRef(paramNameStart, i)
+                        getBuffer().add(StringTemplate.Parameter.of(paramIndex++, nameRef))
                     }
                     start = i
                     i++
@@ -310,13 +301,13 @@ open class SimpleTemplate(
                 }
                 if (suffixIndex == i) {
                     //empty name
-                    getBuffer().add(CharsTemplate.Parameter.of(paramIndex++))
+                    getBuffer().add(StringTemplate.Parameter.of(paramIndex++))
                     i++
                     start = i
                     continue
                 }
-                val nameRef = source.charsRef(i, suffixIndex)
-                getBuffer().add(CharsTemplate.Parameter.of(paramIndex++, nameRef))
+                val nameRef = source.subRef(i, suffixIndex)
+                getBuffer().add(StringTemplate.Parameter.of(paramIndex++, nameRef))
                 i = suffixIndex + 1
                 start = i
                 continue
@@ -328,7 +319,7 @@ open class SimpleTemplate(
             return listOf(source)
         }
         if (start < source.length) {
-            getBuffer().add(source.charsRef(start))
+            getBuffer().add(source.subRef(start))
         }
         return getBuffer()
     }

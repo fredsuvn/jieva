@@ -6,7 +6,7 @@ import xyz.srclab.common.base.BEscape;
 import xyz.srclab.common.io.BIO;
 import xyz.srclab.common.io.BytesAppender;
 
-public class BEscapeTest {
+public class EscapeBtKtTest {
 
     @Test
     public void testEscape() {

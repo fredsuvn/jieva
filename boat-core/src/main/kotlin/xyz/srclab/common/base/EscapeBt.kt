@@ -1,4 +1,7 @@
-@file:JvmName("BEscape")
+/**
+ * Escape utilities.
+ */
+@file:JvmName("EscapeBt")
 
 package xyz.srclab.common.base
 
@@ -8,22 +11,22 @@ import java.io.Reader
 import java.util.*
 
 /**
- * Simply escapes receiver [InputStream] with [escapeByte].
- * It inserts [escapeByte] before each [escapedBytes] when escaping:
+ * Simply escapes receiver [InputStream] with [escByte].
+ * It inserts [escByte] before each byte of [needBytes] when escaping:
  *
  * ```
  * //{"ss": "sss\n"} -> \{\"ss\": \"sss\\n\"\}
- * BEscapes.escape("{\"ss\": \"sss\\n\"}".asInputStream(), '\\'.toByte(), "\"{}".toByteArray());
+ * EscapeBt.escape("{\"ss\": \"sss\\n\"}".asInputStream(), '\\'.toByte(), "\"{}".toByteArray());
  * ```
  */
-fun InputStream.escape(escapeByte: Byte, escapedBytes: ByteArray, dest: OutputStream): Long {
+fun InputStream.escape(escByte: Byte, needBytes: ByteArray, dest: OutputStream): Long {
     var count = 0L
     var b = this.read()
     while (b != -1) {
         val bb = b.toByte()
-        if (bb == escapeByte || escapedBytes.contains(bb)) {
+        if (bb == escByte || needBytes.contains(bb)) {
             //Escape: \ -> \\
-            dest.write(escapeByte.toInt())
+            dest.write(escByte.toInt())
             dest.write(b)
             count += 2
         } else {
@@ -36,22 +39,22 @@ fun InputStream.escape(escapeByte: Byte, escapedBytes: ByteArray, dest: OutputSt
 }
 
 /**
- * Simply escapes receiver [Reader] with [escapeChar].
- * It inserts [escapeChar] before each [escapedChars] when escaping:
+ * Simply escapes receiver [Reader] with [escChar].
+ * It inserts [escChar] before each char of [needChars] when escaping:
  *
  * ```
  * //{"ss": "sss\n"} -> \{\"ss\": \"sss\\n\"\}
- * BEscapes.escape("{\"ss\": \"sss\\n\"}".asReader(), '\\'.toByte(), "\"{}");
+ * EscapeBt.escape("{\"ss\": \"sss\\n\"}".asReader(), '\\'.toByte(), "\"{}");
  * ```
  */
-fun Reader.escape(escapeChar: Char, escapedChars: CharSequence, dest: Appendable): Long {
+fun Reader.escape(escChar: Char, needChars: CharSequence, dest: Appendable): Long {
     var count = 0L
     var b = this.read()
     while (b != -1) {
         val bb = b.toChar()
-        if (bb == escapeChar || escapedChars.contains(bb)) {
+        if (bb == escChar || needChars.contains(bb)) {
             //Escape: \ -> \\
-            dest.append(escapeChar)
+            dest.append(escChar)
             dest.append(bb)
             count += 2
         } else {
@@ -64,15 +67,15 @@ fun Reader.escape(escapeChar: Char, escapedChars: CharSequence, dest: Appendable
 }
 
 /**
- * Simply escapes receiver [CharSequence] with [escapeChar].
- * It inserts [escapeChar] before each [escapedChars] when escaping:
+ * Simply escapes receiver [CharSequence] with [escChar].
+ * It inserts [escChar] before each char of [needChars] when escaping:
  *
  * ```
  * //{"ss": "sss\n"} -> \{\"ss\": \"sss\\n\"\}
- * BEscapes.escape("{\"ss\": \"sss\\n\"}", '\\', "\"{}");
+ * EscapeBt.escape("{\"ss\": \"sss\\n\"}", '\\', "\"{}");
  * ```
  */
-fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
+fun CharSequence.escape(escChar: Char, needChars: CharSequence): String {
     if (this.isEmpty()) {
         return this.toString()
     }
@@ -92,10 +95,10 @@ fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
     var i = 0
     while (i < this.length) {
         val c = this[i]
-        if (c == escapeChar || escapedChars.contains(c)) {
+        if (c == escChar || needChars.contains(c)) {
             //Escape: \ -> \\
-            getBuffer().add(this.charsRef(start, i))
-            getBuffer().add(escapeChar)
+            getBuffer().add(this.subRef(start, i))
+            getBuffer().add(escChar)
             start = i
         }
         i++
@@ -105,27 +108,27 @@ fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
         return this.toString()
     }
     if (start < this.length) {
-        getBuffer().add(this.charsRef(start))
+        getBuffer().add(this.subRef(start))
     }
 
     return getBuffer().joinToString("")
 }
 
 /**
- * Simply unescapes receiver [InputStream] with [escapeByte].
- * It removes [escapeByte] before each [escapedBytes] when unescaping:
+ * Simply unescapes receiver [InputStream] with [escByte].
+ * It removes [escByte] before each byte of [needBytes] when unescaping:
  *
  * ```
  * //\{\"ss\": \"sss\\n\"\} -> {"ss": "sss\n"}
- * BEscapes.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}".asInputStream(), '\\'.toByte(), "\"{}".toByteArray());
+ * EscapeBt.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}".asInputStream(), '\\'.toByte(), "\"{}".toByteArray());
  * ```
  */
-fun InputStream.unescape(escapeByte: Byte, escapedBytes: ByteArray, dest: OutputStream): Long {
+fun InputStream.unescape(escByte: Byte, needBytes: ByteArray, dest: OutputStream): Long {
     var count = 0L
     var b = this.read()
     while (b != -1) {
         val bb = b.toByte()
-        if (bb == escapeByte) {
+        if (bb == escByte) {
             //Escape: \\ -> \
             val bn = this.read()
             if (bn == -1) {
@@ -134,7 +137,7 @@ fun InputStream.unescape(escapeByte: Byte, escapedBytes: ByteArray, dest: Output
                 break
             }
             val bnb = bn.toByte()
-            if (bnb == escapeByte || escapedBytes.contains(bnb)) {
+            if (bnb == escByte || needBytes.contains(bnb)) {
                 dest.write(bn)
                 count++
             } else {
@@ -152,20 +155,20 @@ fun InputStream.unescape(escapeByte: Byte, escapedBytes: ByteArray, dest: Output
 }
 
 /**
- * Simply unescapes receiver [Reader] with [escapeChar].
- * It removes [escapeChar] before each [escapedChars] when unescaping:
+ * Simply unescapes receiver [Reader] with [escChar].
+ * It removes [escChar] before each char of [needChars] when unescaping:
  *
  * ```
  * //\{\"ss\": \"sss\\n\"\} -> {"ss": "sss\n"}
- * BEscapes.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}".asReader(), '\\', "\"{}");
+ * EscapeBt.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}".asReader(), '\\', "\"{}");
  * ```
  */
-fun Reader.unescape(escapeChar: Char, escapedChars: CharSequence, dest: Appendable): Long {
+fun Reader.unescape(escChar: Char, needChars: CharSequence, dest: Appendable): Long {
     var count = 0L
     var b = this.read()
     while (b != -1) {
         val bb = b.toChar()
-        if (bb == escapeChar) {
+        if (bb == escChar) {
             //Escape: \\ -> \
             val bn = this.read()
             if (bn == -1) {
@@ -174,7 +177,7 @@ fun Reader.unescape(escapeChar: Char, escapedChars: CharSequence, dest: Appendab
                 break
             }
             val bnb = bn.toChar()
-            if (bnb == escapeChar || escapedChars.contains(bnb)) {
+            if (bnb == escChar || needChars.contains(bnb)) {
                 dest.append(bnb)
                 count++
             } else {
@@ -192,15 +195,15 @@ fun Reader.unescape(escapeChar: Char, escapedChars: CharSequence, dest: Appendab
 }
 
 /**
- * Simply unescapes receiver [CharSequence] with [escapeChar].
- * It removes [escapeChar] before each [escapedChars] when unescaping:
+ * Simply unescapes receiver [CharSequence] with [escChar].
+ * It removes [escChar] before each char of [needChars] when unescaping:
  *
  * ```
  * //\{\"ss\": \"sss\\n\"\} -> {"ss": "sss\n"}
- * BEscapes.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}", '\\', "\"{}");
+ * EscapeBt.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}", '\\', "\"{}");
  * ```
  */
-fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String {
+fun CharSequence.unescape(escChar: Char, needChars: CharSequence): String {
     if (this.isEmpty()) {
         return this.toString()
     }
@@ -220,15 +223,15 @@ fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String 
     var i = 0
     while (i < this.length) {
         val c = this[i]
-        if (c == escapeChar) {
+        if (c == escChar) {
             i++
             if (i >= this.length) {
                 break
             }
             val cn = this[i]
-            if (cn == escapeChar || escapedChars.contains(cn)) {
+            if (cn == escChar || needChars.contains(cn)) {
                 //Unescape: \\ -> \
-                getBuffer().add(this.charsRef(start, i - 1))
+                getBuffer().add(this.subRef(start, i - 1))
                 start = i
             }
         }
@@ -239,7 +242,7 @@ fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String 
         return this.toString()
     }
     if (start < this.length) {
-        getBuffer().add(this.charsRef(start))
+        getBuffer().add(this.subRef(start))
     }
 
     return getBuffer().joinToString("")

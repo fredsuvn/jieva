@@ -56,7 +56,7 @@ fun upperHyphenCase(): NamingCase = CaseBtHolder.UPPER_HYPHEN
  *
  * ```
  * //first-second -> FirstSecond
- * BCase.toCase("first-second", BCase.lowerHyphen(), BCase.upperCamel();
+ * CaseBt.toCase("first-second", CaseBt.lowerHyphen(), CaseBt.upperCamel();
  * ```
  */
 fun CharSequence.toCase(from: NamingCase, to: NamingCase): String {
@@ -69,7 +69,7 @@ fun CharSequence.toCase(from: NamingCase, to: NamingCase): String {
  *
  * ```
  * //first-second -> FirstSecond
- * BCase.toCase("first-second", BCase.lowerHyphen(), BCase.upperCamel();
+ * CaseBt.toCase("first-second", CaseBt.lowerHyphen(), CaseBt.upperCamel();
  * ```
  *
  * @see CamelCase

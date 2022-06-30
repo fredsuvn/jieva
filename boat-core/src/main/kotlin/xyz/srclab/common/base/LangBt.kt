@@ -51,6 +51,9 @@ abstract class FinalClass {
  * Functional interface represents [java.util.function.Predicate] with index.
  */
 fun interface IndexedPredicate<T> {
+    /**
+     * Tests [t] with [index].
+     */
     fun test(index: Int, t: T): Boolean
 }
 
@@ -58,6 +61,9 @@ fun interface IndexedPredicate<T> {
  * Functional interface represents [java.util.function.Function] with index.
  */
 fun interface IndexedFunction<T, R> {
+    /**
+     * Applies [t] with [index].
+     */
     fun apply(index: Int, t: T): R
 }
 
@@ -65,6 +71,9 @@ fun interface IndexedFunction<T, R> {
  * Functional interface represents [java.util.function.Consumer] with index.
  */
 fun interface IndexedConsumer<T> {
+    /**
+     * Accepts [t] with [index].
+     */
     fun accept(index: Int, t: T)
 }
 
@@ -72,6 +81,9 @@ fun interface IndexedConsumer<T> {
  * Functional interface represents [java.util.function.BiPredicate] with index.
  */
 fun interface IndexedBiPredicate<T, U> {
+    /**
+     * Tests [t], [u] with [index].
+     */
     fun test(index: Int, t: T, u: U): Boolean
 }
 
@@ -79,6 +91,9 @@ fun interface IndexedBiPredicate<T, U> {
  * Functional interface represents [java.util.function.BiFunction] with index.
  */
 fun interface IndexedBiFunction<T, U, R> {
+    /**
+     * Applies [t], [u] with [index].
+     */
     fun apply(index: Int, t: T, u: U): R
 }
 
@@ -86,6 +101,9 @@ fun interface IndexedBiFunction<T, U, R> {
  * Functional interface represents [java.util.function.BiConsumer] with index.
  */
 fun interface IndexedBiConsumer<T, U> {
+    /**
+     * Accepts [t], [u] with [index].
+     */
     fun accept(index: Int, t: T, u: U)
 }
 

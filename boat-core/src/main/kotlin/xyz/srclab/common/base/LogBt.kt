@@ -1,4 +1,4 @@
-@file:JvmName("BLog")
+@file:JvmName("LogBt")
 
 package xyz.srclab.common.base
 
@@ -197,7 +197,7 @@ interface LogPrinter {
                 }
 
                 //Builds message.
-                val formattedMessage = message?.fastFormat(*arguments) ?: "null"
+                val formattedMessage = if (message === null) defaultNullString() else format(message, *arguments)
                 val timestamp = timeFormatter.format(LocalDateTime.now())
 
                 //Computes caller stack trace.

@@ -1,4 +1,4 @@
-@file:JvmName("BSystem")
+@file:JvmName("SystemBt")
 
 package xyz.srclab.common.base
 
@@ -268,7 +268,7 @@ fun jvmCharset(): Charset {
  * If still not found, return [Charset.defaultCharset]
  */
 fun nativeCharset(): Charset {
-    return BSystemHolder.nativeCharset
+    return SystemBtHolder.nativeCharset
 }
 
 /**
@@ -366,7 +366,7 @@ open class NoSuchSystemPropertyException @JvmOverloads constructor(
     }
 }
 
-private object BSystemHolder {
+private object SystemBtHolder {
     var nativeCharset: Charset = getNativeCharset0()
     fun getNativeCharset0(): Charset {
         val nativeEncoding = getSystemPropertyOrNull(NATIVE_ENCODING_KEY)

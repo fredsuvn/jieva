@@ -1,4 +1,7 @@
-@file:JvmName("BRandom")
+/**
+ * Random utilities.
+ */
+@file:JvmName("RandomBt")
 
 package xyz.srclab.common.base
 
@@ -41,7 +44,7 @@ fun Random.between(from: Int, to: Int): Int {
  */
 @JvmOverloads
 fun randomDigits(size: Int, random: Random = defaultRandom): String {
-    return BRandomHolder.randomDigits.randomString(size, random)
+    return RandomBtHolder.randomDigits.randomString(size, random)
 }
 
 /**
@@ -49,7 +52,7 @@ fun randomDigits(size: Int, random: Random = defaultRandom): String {
  */
 @JvmOverloads
 fun randomLowerLetters(size: Int, random: Random = defaultRandom): String {
-    return BRandomHolder.randomLowerLetters.randomString(size, random)
+    return RandomBtHolder.randomLowerLetters.randomString(size, random)
 }
 
 /**
@@ -57,7 +60,7 @@ fun randomLowerLetters(size: Int, random: Random = defaultRandom): String {
  */
 @JvmOverloads
 fun randomUpperLetters(size: Int, random: Random = defaultRandom): String {
-    return BRandomHolder.randomUpperLetters.randomString(size, random)
+    return RandomBtHolder.randomUpperLetters.randomString(size, random)
 }
 
 /**
@@ -65,7 +68,7 @@ fun randomUpperLetters(size: Int, random: Random = defaultRandom): String {
  */
 @JvmOverloads
 fun randomLetters(size: Int, random: Random = defaultRandom): String {
-    return BRandomHolder.randomLetters.randomString(size, random)
+    return RandomBtHolder.randomLetters.randomString(size, random)
 }
 
 /**
@@ -73,7 +76,7 @@ fun randomLetters(size: Int, random: Random = defaultRandom): String {
  */
 @JvmOverloads
 fun randomString(size: Int, random: Random = defaultRandom): String {
-    return BRandomHolder.randomString.randomString(size, random)
+    return RandomBtHolder.randomString.randomString(size, random)
 }
 
 /**
@@ -91,11 +94,11 @@ fun CharSequence.randomString(size: Int, random: Random = defaultRandom): String
 }
 
 /**
- * Returns a new [RandomSupplierBuilder].
+ * Returns a new [RandomBuilder].
  */
 @JvmName("newBuilder")
-fun <T : Any> newRandomBuilder(): RandomSupplierBuilder<T> {
-    return RandomSupplierBuilder()
+fun <T : Any> newRandomBuilder(): RandomBuilder<T> {
+    return RandomBuilder()
 }
 
 /**
@@ -114,7 +117,7 @@ fun <T : Any> newRandomBuilder(): RandomSupplierBuilder<T> {
  *
  * The result of `sp.get()` is 20% to "a" and 80% to "b".
  */
-open class RandomSupplierBuilder<T : Any> {
+open class RandomBuilder<T : Any> {
 
     private var builderRandom: Random? = null
     private var totalScore = 0
@@ -160,8 +163,8 @@ open class RandomSupplierBuilder<T : Any> {
         return object : Supplier<T> {
 
             private val random = builderRandom ?: Random()
-            private val totalScore = this@RandomSupplierBuilder.totalScore
-            private val values = this@RandomSupplierBuilder.values
+            private val totalScore = this@RandomBuilder.totalScore
+            private val values = this@RandomBuilder.values
 
             override fun get(): T {
                 val score = random.between(0, totalScore)
@@ -186,7 +189,7 @@ open class RandomSupplierBuilder<T : Any> {
     )
 }
 
-private object BRandomHolder {
+private object RandomBtHolder {
     const val randomDigits = "0123456789"
     const val randomLowerLetters = "abcdefghijklnmopqrstuvwxyz"
     const val randomUpperLetters = "ABCDEFGHIJKLNMOPQRSTUVWXYZ"

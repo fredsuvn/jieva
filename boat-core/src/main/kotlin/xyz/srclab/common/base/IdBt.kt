@@ -1,4 +1,4 @@
-@file:JvmName("BId")
+@file:JvmName("IdBt")
 
 package xyz.srclab.common.base
 
@@ -24,11 +24,11 @@ fun uuid(): String {
  * @see SnowflakeId
  */
 fun snowflakeId(): Long {
-    return BIdHolder.currentSnowflakeId.next()
+    return IdBtHolder.currentSnowflakeId.next()
 }
 
 /**
- * Snowflake is a unique id generator for distributed nodes.
+ * [SnowflakeId] is a unique id generator for distributed nodes.
  *
  * A snowflake id is a long type value (64 bits), consists of:
  *
@@ -55,7 +55,8 @@ open class SnowflakeId {
     private var lastSequence = 0L
     private var lastTimestamp = 0L
 
-    // Go write ASM, C or Rust if you like mask.
+    //Go write ASM, C or Rust if you like mask.
+    //Write easy codes in JAVA!
     //private val maxSequenceMask: Long
 
     private val maxSequence: Long
@@ -89,18 +90,7 @@ open class SnowflakeId {
         this.timestampBits = timestampBits
         this.workerIdBits = workerIdBits
         this.sequenceBits = 64 - reservedBits - timestampBits - workerIdBits
-
-        //maskReservedLeftBits = 64 - reservedBits
-        //maskTimestampLeftBits = 64 - timestampBits
-        //maskTimestampRightBits = reservedBits
-        //maskSequenceLeftBits = 64 - sequenceBits
-        //this.maxSequenceMask = maskBits(BJava.LONG_MASK_VALUE, maskSequenceLeftBits, maskSequenceLeftBits).inv()
-
-        //val maskWorkerIdLeftBits = 64 - workerIdBits
-        //val maskWorkerIdRightBits = reservedBits + timestampBits
-        //this.workerId = maskBits(workerId.toUnsignedLong(), maskWorkerIdLeftBits, maskWorkerIdRightBits)
         this.workerId = shiftBits(workerId.toLong(), 64 - workerIdBits, reservedBits + timestampBits)
-
         this.maxSequence = shiftBits(JavaLong.MAX_VALUE, 64 - sequenceBits, 64 - sequenceBits)
         this.maxWaitTimeMilli = maxWaitTimeMilli
     }
@@ -154,18 +144,6 @@ open class SnowflakeId {
         return (value shl left) ushr right
     }
 
-    //private fun maskTimestamp(value: Long): Long {
-    //    return maskBits(value, maskTimestampLeftBits, maskTimestampRightBits)
-    //}
-    //
-    //private fun maskSequence(value: Long): Long {
-    //    return maskBits(value, maskSequenceLeftBits, maskSequenceLeftBits)
-    //}
-    //
-    //private fun maskBits(value: Long, leftShiftBits: Int, rightShiftBits: Int): Long {
-    //    return (value shl leftShiftBits) ushr rightShiftBits
-    //}
-
     companion object {
         const val DEFAULT_RESERVED_BITS = 1
         const val DEFAULT_TIMESTAMP_BITS = 41
@@ -173,6 +151,6 @@ open class SnowflakeId {
     }
 }
 
-private object BIdHolder {
+private object IdBtHolder {
     val currentSnowflakeId: SnowflakeId = SnowflakeId(systemNanos().toInt())
 }
