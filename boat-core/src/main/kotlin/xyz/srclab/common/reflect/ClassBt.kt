@@ -1,4 +1,7 @@
-@file:JvmName("BClass")
+/**
+ * Class utilities.
+ */
+@file:JvmName("ClassBt")
 
 package xyz.srclab.common.reflect
 
@@ -65,7 +68,7 @@ val Class<*>.isVoidType: Boolean
 val Class<*>.shortName: String
     get() {
         val name = this.name
-        val lastDotIndex = BClassHolder.shortNameMatcher.lastIndexIn(name)
+        val lastDotIndex = ClassBtHolder.shortNameMatcher.lastIndexIn(name)
         return if (lastDotIndex < 0) name else name.substring(lastDotIndex + 1, name.length)
     }
 
@@ -234,6 +237,6 @@ fun Class<*>.canAssignedBy(other: Class<*>): Boolean {
     return this.toWrapperClass() == other.toWrapperClass()
 }
 
-private object BClassHolder {
+private object ClassBtHolder {
     val shortNameMatcher: CharMatcher = CharMatcher.`is`('$').or(dotMatcher())
 }

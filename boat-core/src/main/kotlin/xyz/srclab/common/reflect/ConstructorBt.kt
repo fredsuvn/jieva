@@ -1,4 +1,7 @@
-@file:JvmName("BConstructor")
+/**
+ * Constructor utilities.
+ */
+@file:JvmName("ConstructorBt")
 
 package xyz.srclab.common.reflect
 

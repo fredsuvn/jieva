@@ -1,4 +1,7 @@
-@file:JvmName("BMethod")
+/**
+ * Method utilities.
+ */
+@file:JvmName("MethodBt")
 
 package xyz.srclab.common.reflect
 

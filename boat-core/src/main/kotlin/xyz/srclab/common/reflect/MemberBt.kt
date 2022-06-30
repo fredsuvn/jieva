@@ -1,4 +1,7 @@
-@file:JvmName("BMember")
+/**
+ * Member utilities.
+ */
+@file:JvmName("MemberBt")
 
 package xyz.srclab.common.reflect
 

@@ -1,4 +1,7 @@
-@file:JvmName("BReflect")
+/**
+ * Reflection utilities.
+ */
+@file:JvmName("ReflectBt")
 
 package xyz.srclab.common.reflect
 

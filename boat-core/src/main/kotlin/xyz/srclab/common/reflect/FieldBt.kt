@@ -1,4 +1,7 @@
-@file:JvmName("BField")
+/**
+ * Field utilities.
+ */
+@file:JvmName("FieldBt")
 
 package xyz.srclab.common.reflect
 
