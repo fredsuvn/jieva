@@ -41,14 +41,14 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
     /**
      * Returns next value. It is equivalent to `next(0, 0)`.
      */
-    fun next(): T {
+    open fun next(): T {
         return next(0, 0)
     }
 
     /**
      * Returns next value. It is equivalent to `next(retryCount, 1)`.
      */
-    fun next(retryCount: Int): T {
+    open fun next(retryCount: Int): T {
         return next(retryCount, 1)
     }
 
@@ -56,7 +56,7 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
      * Returns next value, retry count is [retryCount], and delay [delayMillis] after each retry.
      * It is equivalent to `next(retryCount, delayMillis, 0)`.
      */
-    fun next(retryCount: Int, delayMillis: Long): T {
+    open fun next(retryCount: Int, delayMillis: Long): T {
         val result = nextOrNull(retryCount, delayMillis)
         if (result === null) {
             throw IllegalStateException("Serial overflow in same compare.")
@@ -67,7 +67,7 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
     /**
      * Returns next value, retry count is [retryCount], and delay [delayMillis] after each retry.
      */
-    fun next(retryCount: Int, delayMillis: Long, nanos: Int): T {
+    open fun next(retryCount: Int, delayMillis: Long, nanos: Int): T {
         val result = nextOrNull(retryCount, delayMillis, nanos)
         if (result === null) {
             throw IllegalStateException("Serial overflow in same compare.")
@@ -78,7 +78,7 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
     /**
      * Returns next value, or null if serial was overflow.
      */
-    fun nextOrNull(): T? {
+    open fun nextOrNull(): T? {
         return next0()
     }
 
@@ -86,7 +86,7 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
      * Returns next value, or null if serial was overflow.
      * It is equivalent to `nextOrNull(retryCount, 1)`.
      */
-    fun nextOrNull(retryCount: Int): T? {
+    open fun nextOrNull(retryCount: Int): T? {
         return nextOrNull(retryCount, 1)
     }
 
@@ -95,7 +95,7 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
      * retry count is [retryCount], and delay [delayMillis] after each retry.
      * It is equivalent to `nextOrNull(retryCount, delayMillis, 0)`.
      */
-    fun nextOrNull(retryCount: Int, delayMillis: Long): T? {
+    open fun nextOrNull(retryCount: Int, delayMillis: Long): T? {
         return nextOrNull(retryCount, delayMillis, 0)
     }
 
@@ -103,7 +103,7 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
      * Returns next value, or null if serial was overflow,
      * retry count is [retryCount], and delay [delayMillis] with additional [nanos] after each retry.
      */
-    fun nextOrNull(retryCount: Int, delayMillis: Long, nanos: Int): T? {
+    open fun nextOrNull(retryCount: Int, delayMillis: Long, nanos: Int): T? {
         val result = next0()
         if (result !== null) {
             return result

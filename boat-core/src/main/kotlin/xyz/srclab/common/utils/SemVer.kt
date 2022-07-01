@@ -23,23 +23,23 @@ open class SemVer @JvmOverloads constructor(
     /**
      * Gets major version.
      */
-    val major: Int,
+    open val major: Int,
     /**
      * Gets minor version.
      */
-    val minor: Int,
+    open val minor: Int,
     /**
      * Gets patch version.
      */
-    val patch: Int,
+    open val patch: Int,
     /**
      * Gets pre-release version info.
      */
-    val preRelease: List<String> = emptyList(),
+    open val preRelease: List<String> = emptyList(),
     /**
      * Gets build info.
      */
-    val buildMetadata: List<String> = emptyList()
+    open val buildMetadata: List<String> = emptyList()
 ) : FinalClass(), Comparable<SemVer>, Serializable {
 
     /**
@@ -49,17 +49,17 @@ open class SemVer @JvmOverloads constructor(
      * major.minor.patch
      * ```
      */
-    fun normalString(): String = "$major.$minor.$patch"
+    open fun normalString(): String = "$major.$minor.$patch"
 
     /**
      * Returns pre-release version info as string.
      */
-    fun preReleaseString(): String = preRelease.joinDotToString()
+    open fun preReleaseString(): String = preRelease.joinDotToString()
 
     /**
      * Returns build info as string.
      */
-    fun buildMetadataString(): String = buildMetadata.joinDotToString()
+    open fun buildMetadataString(): String = buildMetadata.joinDotToString()
 
     /**
      * Returns full version info as string:
@@ -68,7 +68,7 @@ open class SemVer @JvmOverloads constructor(
      * major.minor.patch-preRelease+buildMetadata
      * ```
      */
-    fun fullString(): String {
+    open fun fullString(): String {
         if (preRelease.isEmpty() && buildMetadata.isEmpty()) {
             return normalString()
         }
