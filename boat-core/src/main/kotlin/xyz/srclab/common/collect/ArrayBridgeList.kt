@@ -169,7 +169,7 @@ interface ArrayBridge<T> {
     companion object {
 
         @JvmStatic
-        fun <T> Array<T>.toArrayBridge(): ArrayBridge<T> {
+        fun <E> Array<E>.toArrayBridge(): ArrayBridge<E> {
             return OfArray(this)
         }
 
