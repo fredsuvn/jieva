@@ -917,6 +917,36 @@ fun <T, R> Iterable<T>.toArray(array: Array<R>, transform: Function<in T, out R>
     return array
 }
 
+/**
+ * Returns an immutable [Set] of which elements are copied from [this].
+ */
+fun <T> Iterable<T>.copySet(): Set<T> {
+    if (this is Collection) {
+        val set = LinkedHashSet(this)
+        return Collections.unmodifiableSet(set)
+    }
+    val set = LinkedHashSet<T>()
+    for (t in this) {
+        set.add(t)
+    }
+    return Collections.unmodifiableSet(set)
+}
+
+/**
+ * Returns an immutable [List] of which elements are copied from [this].
+ */
+fun <T> Iterable<T>.copyList(): List<T> {
+    if (this is Collection) {
+        val list = ArrayList(this)
+        return Collections.unmodifiableList(list)
+    }
+    val list = LinkedList<T>()
+    for (t in this) {
+        list.add(t)
+    }
+    return Collections.unmodifiableList(list.toArrayList())
+}
+
 fun <T> Iterable<T>.plus(element: T): List<T> {
     return this.plusKt(element)
 }

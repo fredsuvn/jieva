@@ -5,6 +5,7 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.collect.copyList
 import java.io.OutputStream
 import java.nio.charset.Charset
 import java.time.LocalDateTime
@@ -227,6 +228,16 @@ interface StackLogger : Logger {
      */
     fun getStack(key: Any): List<Any?>
 
+    /**
+     * Clears `stack messages` with [key].
+     */
+    fun clearStack(key: Any)
+
+    /**
+     * Clears all `stack messages`.
+     */
+    fun clearStack()
+
     companion object {
         /**
          * Creates a simple implementation of [StackLogger].
@@ -358,16 +369,16 @@ private abstract class AbstractSimpleLogger(
 
 private class SimpleLogger(
     override val level: Int,
-    private val output: OutputStream,
-    private val callerOffset: Int,
-    private val charset: Charset,
+    output: OutputStream,
+    callerOffset: Int,
+    charset: Charset,
 ) : AbstractSimpleLogger(level, output, callerOffset, charset)
 
 private class SimpleStackLogger(
     override val level: Int,
-    private val output: OutputStream,
-    private val callerOffset: Int,
-    private val charset: Charset,
+    output: OutputStream,
+    callerOffset: Int,
+    charset: Charset,
 ) : AbstractSimpleLogger(level, output, callerOffset, charset), StackLogger {
 
     private val stackMap: MutableMap<Any, MutableList<Any?>> = ConcurrentHashMap()
@@ -388,6 +399,14 @@ private class SimpleStackLogger(
     }
 
     override fun getStack(key: Any): List<Any?> {
-        return stackMap[key] ?: emptyList()
+        return stackMap[key]?.copyList() ?: emptyList()
+    }
+
+    override fun clearStack(key: Any) {
+        stackMap.remove(key)
+    }
+
+    override fun clearStack() {
+        stackMap.clear()
     }
 }
