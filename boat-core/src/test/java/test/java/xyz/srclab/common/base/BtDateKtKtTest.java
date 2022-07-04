@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.BDefault;
 import xyz.srclab.common.base.BTime;
 import xyz.srclab.common.base.DatePattern;
-import xyz.srclab.common.base.ParsedDate;
+import xyz.srclab.common.base.TimePoint;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,7 +16,7 @@ import java.util.Date;
 /**
  * @author sunqian
  */
-public class DateBtKtTest {
+public class BtDateKtKtTest {
 
     @Test
     public void testTime() {
@@ -57,8 +57,8 @@ public class DateBtKtTest {
     @Test
     public void testParsedDate() {
         String time = "20220307171330007";
-        ParsedDate parsedDate = ParsedDate.of(time);
+        TimePoint timePoint = TimePoint.of(time);
         LocalDateTime localDateTime = LocalDateTime.of(2022, 3, 7, 17, 13, 30, 7_000_000);
-        Assert.assertEquals(parsedDate.toLocalDateTime(), localDateTime);
+        Assert.assertEquals(timePoint.toLocalDateTime(), localDateTime);
     }
 }

@@ -3,7 +3,7 @@ package xyz.srclab.common.base;
 /**
  * Java utilities.
  */
-public class JavaBt {
+public class BtJava {
 
     /**
      * Gets enum of given class with enum name.

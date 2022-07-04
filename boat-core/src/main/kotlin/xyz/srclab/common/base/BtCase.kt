@@ -1,7 +1,7 @@
 /**
  * Naming case utilities.
  */
-@file:JvmName("CaseBt")
+@file:JvmName("BtCase")
 
 package xyz.srclab.common.base
 
@@ -14,49 +14,49 @@ import java.util.*
  * @see CamelCase
  */
 @JvmName("lowerCamel")
-fun lowerCamelCase(): NamingCase = CaseBtHolder.LOWER_CAMEL
+fun lowerCamelCase(): NamingCase = BtCaseHolder.LOWER_CAMEL
 
 /**
  * Returns [NamingCase] for lower-camel, such as `FirstSecond`.
  * @see CamelCase
  */
 @JvmName("upperCamel")
-fun upperCamelCase(): NamingCase = CaseBtHolder.UPPER_CAMEL
+fun upperCamelCase(): NamingCase = BtCaseHolder.UPPER_CAMEL
 
 /**
  * Returns [NamingCase] for lower-camel, such as `first_second`.
  * @see SeparatorCase
  */
 @JvmName("lowerUnderscore")
-fun lowerUnderscoreCase(): NamingCase = CaseBtHolder.LOWER_UNDERSCORE
+fun lowerUnderscoreCase(): NamingCase = BtCaseHolder.LOWER_UNDERSCORE
 
 /**
  * Returns [NamingCase] for lower-camel, such as `FIRST_SECOND`.
  * @see SeparatorCase
  */
 @JvmName("upperUnderscore")
-fun upperUnderscoreCase(): NamingCase = CaseBtHolder.UPPER_UNDERSCORE
+fun upperUnderscoreCase(): NamingCase = BtCaseHolder.UPPER_UNDERSCORE
 
 /**
  * Returns [NamingCase] for lower-camel, such as `first-second`.
  * @see SeparatorCase
  */
 @JvmName("lowerHyphen")
-fun lowerHyphenCase(): NamingCase = CaseBtHolder.LOWER_HYPHEN
+fun lowerHyphenCase(): NamingCase = BtCaseHolder.LOWER_HYPHEN
 
 /**
  * Returns [NamingCase] for lower-camel, such as `FIRST-SECOND`.
  * @see SeparatorCase
  */
 @JvmName("upperHyphen")
-fun upperHyphenCase(): NamingCase = CaseBtHolder.UPPER_HYPHEN
+fun upperHyphenCase(): NamingCase = BtCaseHolder.UPPER_HYPHEN
 
 /**
  * Converts case of [this] chars from [from] case to [to] case. For example:
  *
  * ```
  * //first-second -> FirstSecond
- * CaseBt.toCase("first-second", CaseBt.lowerHyphen(), CaseBt.upperCamel();
+ * BtCase.toCase("first-second", BtCase.lowerHyphen(), BtCase.upperCamel();
  * ```
  */
 fun CharSequence.toCase(from: NamingCase, to: NamingCase): String {
@@ -69,7 +69,7 @@ fun CharSequence.toCase(from: NamingCase, to: NamingCase): String {
  *
  * ```
  * //first-second -> FirstSecond
- * CaseBt.toCase("first-second", CaseBt.lowerHyphen(), CaseBt.upperCamel();
+ * BtCase.toCase("first-second", BtCase.lowerHyphen(), BtCase.upperCamel();
  * ```
  *
  * @see CamelCase
@@ -372,7 +372,7 @@ open class SeparatorCase(
     }
 }
 
-private object CaseBtHolder {
+private object BtCaseHolder {
     val LOWER_CAMEL: NamingCase = CamelCase(false)
     val UPPER_CAMEL: NamingCase = CamelCase(true)
     val LOWER_UNDERSCORE: NamingCase = SeparatorCase("_") { _, it -> it.lowerCase() }

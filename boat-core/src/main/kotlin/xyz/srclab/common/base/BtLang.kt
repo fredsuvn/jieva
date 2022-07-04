@@ -1,7 +1,11 @@
-@file: JvmName("KotlinBt")
+/**
+ * Boat language utilities.
+ */
+@file:JvmName("BtLang")
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.base.JumpPolicy.*
 import java.util.concurrent.Callable
 import java.util.function.*
 
@@ -112,5 +116,161 @@ fun <R> (() -> R).asCallable(): Callable<R> = Callable { this() }
 /*
  * --------------------------------------------------------------------------------
  *  Kotlin functions as Java functional interfaces end:
+ * --------------------------------------------------------------------------------
+ */
+
+/*
+ * --------------------------------------------------------------------------------
+ *  Extension Java functional interfaces start:
+ * --------------------------------------------------------------------------------
+ */
+
+/**
+ * Functional interface represents [java.util.function.Predicate] with index.
+ */
+fun interface IndexedPredicate<T> {
+    /**
+     * Tests [t] with [index].
+     */
+    fun test(index: Int, t: T): Boolean
+}
+
+/**
+ * Functional interface represents [java.util.function.Function] with index.
+ */
+fun interface IndexedFunction<T, R> {
+    /**
+     * Applies [t] with [index].
+     */
+    fun apply(index: Int, t: T): R
+}
+
+/**
+ * Functional interface represents [java.util.function.Consumer] with index.
+ */
+fun interface IndexedConsumer<T> {
+    /**
+     * Accepts [t] with [index].
+     */
+    fun accept(index: Int, t: T)
+}
+
+/**
+ * Functional interface represents [java.util.function.BiPredicate] with index.
+ */
+fun interface IndexedBiPredicate<T, U> {
+    /**
+     * Tests [t], [u] with [index].
+     */
+    fun test(index: Int, t: T, u: U): Boolean
+}
+
+/**
+ * Functional interface represents [java.util.function.BiFunction] with index.
+ */
+fun interface IndexedBiFunction<T, U, R> {
+    /**
+     * Applies [t], [u] with [index].
+     */
+    fun apply(index: Int, t: T, u: U): R
+}
+
+/**
+ * Functional interface represents [java.util.function.BiConsumer] with index.
+ */
+fun interface IndexedBiConsumer<T, U> {
+    /**
+     * Accepts [t], [u] with [index].
+     */
+    fun accept(index: Int, t: T, u: U)
+}
+
+/*
+ * --------------------------------------------------------------------------------
+ *  Extension Java functional interfaces end:
+ * --------------------------------------------------------------------------------
+ */
+
+/*
+ * --------------------------------------------------------------------------------
+ *  Policies start:
+ * --------------------------------------------------------------------------------
+ */
+
+/**
+ * Policy of jump statement for process control: [CONTINUE], [BREAK], [RETURN] and [GO_ON].
+ */
+enum class JumpPolicy {
+
+    /**
+     * Stops the current execution of the iteration and proceeds to the next iteration in the loop.
+     */
+    CONTINUE,
+
+    /**
+     * Stops the current loop and breaks out.
+     */
+    BREAK,
+
+    /**
+     * Stops the current execution of the method and returns.
+     */
+    RETURN,
+
+    /**
+     * Goes on the current execution, without stopping.
+     */
+    GO_ON,
+    ;
+
+    fun isContinue(): Boolean {
+        return this == CONTINUE
+    }
+
+    fun isBreak(): Boolean {
+        return this == BREAK
+    }
+
+    fun isReturn(): Boolean {
+        lazy { }
+        return this == RETURN
+    }
+}
+
+/**
+ * Policy for thread-safe.
+ */
+enum class ThreadSafePolicy {
+
+    /**
+     * Synchronized.
+     */
+    SYNCHRONIZED,
+
+    /**
+     * Concurrent.
+     */
+    CONCURRENT,
+
+    /**
+     * Thread-local.
+     */
+    THREAD_LOCAL,
+
+    /**
+     * Copy-on-write.
+     */
+    COPY_ON_WRITE,
+
+    /**
+     * No thread-safe.
+     */
+    NONE,
+    ;
+}
+
+/*
+ * --------------------------------------------------------------------------------
+ *  Policies end.
  * --------------------------------------------------------------------------------
  */

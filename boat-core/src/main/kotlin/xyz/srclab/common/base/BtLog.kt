@@ -1,7 +1,7 @@
 /**
  * Log utilities.
  */
-@file:JvmName("LogBt")
+@file:JvmName("BtLog")
 
 package xyz.srclab.common.base
 
@@ -65,7 +65,9 @@ fun error(message: String?, vararg args: Any?) {
 }
 
 /**
- * Logs as specified message level.
+ * Logs as specified message level specified by [messageLevel].
+ *
+ * @see Logger
  */
 fun log(messageLevel: Int, message: String?, vararg args: Any?) {
     defaultLogger.log(messageLevel, message, *args)
@@ -267,25 +269,29 @@ private abstract class AbstractSimpleLogger(
             return
         }
 
-        //Configures args.
-        val arguments: Array<Any?> = args.asType()
-        val length = arguments.size
-        if (arguments.isNotEmpty()) {
+        //Builds message
+        var finalMessage = message ?: defaultNullString()
+        if (args.isNotEmpty()) {
+            //Builds arguments.
+            val arguments: Array<Any?> = args.asType()
+            val length = arguments.size
             val lastArgument = arguments[length - 1]
             if (lastArgument is Throwable) {
                 arguments[length - 1] = lastArgument.stackTraceToString()
             }
+            //Formats message.
+            finalMessage = format(finalMessage, *arguments)
         }
 
-        //Builds message.
-        val formattedMessage = if (message === null) defaultNullString() else format(message, *arguments)
+        //Builds timestamp
         val timestamp = timeFormatter.format(LocalDateTime.now())
 
-        //Computes caller stack trace.
+        //Builds caller stack trace.
         val callerTrace = callerStackTrace(callerOffset) { trace, findLogger ->
             if (!findLogger) {
                 if (trace.className == this.javaClass.name
                     || trace.className == Logger::class.java.name
+                    || trace.className == StackLogger::class.java.name
                 ) {
                     return@callerStackTrace true
                 }
@@ -293,6 +299,7 @@ private abstract class AbstractSimpleLogger(
             if (findLogger) {
                 if (trace.className != this.javaClass.name
                     && trace.className != Logger::class.java.name
+                    && trace.className != StackLogger::class.java.name
                 ) {
                     return@callerStackTrace true
                 }
@@ -301,26 +308,17 @@ private abstract class AbstractSimpleLogger(
         }
 
         //Level string
-        val levelString: ByteArray = run {
-            when (messageLevel) {
-                Logger.TRACE_LEVEL -> "TRACE".getBytes()
-                Logger.DEBUG_LEVEL -> "DEBUG".getBytes()
-                Logger.INFO_LEVEL -> "INFO".getBytes()
-                Logger.WARN_LEVEL -> "WARN".getBytes()
-                Logger.ERROR_LEVEL -> "ERROR".getBytes()
-                else -> "LOG".getBytes()
-            }
-        }
+        val levelString: ByteArray = levelInfo[messageLevel] ?: Companion.LOG_LEVEL_BYTES
 
         if (callerTrace === null) {
             writeBytes(
-                levelString, timestamp.getBytes(), formattedMessage.getBytes(charset),
+                levelString, timestamp.getBytes(), finalMessage.getBytes(charset),
                 false,
                 EMPTY_BYTES, EMPTY_BYTES, EMPTY_BYTES
             )
         } else {
             writeBytes(
-                levelString, timestamp.getBytes(), formattedMessage.getBytes(charset),
+                levelString, timestamp.getBytes(), finalMessage.getBytes(charset),
                 true,
                 callerTrace.className.getBytes(charset),
                 callerTrace.methodName.getBytes(charset),
@@ -364,6 +362,16 @@ private abstract class AbstractSimpleLogger(
         private val LINE_SEPARATOR: ByteArray = System.lineSeparator().getBytes()
         private val timeFormatter: DateTimeFormatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
+        private val LOG_LEVEL_BYTES = "LOG".getBytes()
+        private val levelInfo: Map<Int, ByteArray> = run {
+            val map = HashMap<Int, ByteArray>()
+            map[Logger.TRACE_LEVEL] = "TRACE".getBytes()
+            map[Logger.DEBUG_LEVEL] = "DEBUG".getBytes()
+            map[Logger.INFO_LEVEL] = "INFO".getBytes()
+            map[Logger.WARN_LEVEL] = "WARN".getBytes()
+            map[Logger.ERROR_LEVEL] = "ERROR".getBytes()
+            map
+        }
     }
 }
 

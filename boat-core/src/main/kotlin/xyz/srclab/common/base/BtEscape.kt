@@ -1,7 +1,7 @@
 /**
  * Escape utilities.
  */
-@file:JvmName("EscapeBt")
+@file:JvmName("BtEscape")
 
 package xyz.srclab.common.base
 
@@ -16,7 +16,7 @@ import java.util.*
  *
  * ```
  * //{"ss": "sss\n"} -> \{\"ss\": \"sss\\n\"\}
- * EscapeBt.escape("{\"ss\": \"sss\\n\"}".asInputStream(), '\\'.toByte(), "\"{}".toByteArray());
+ * BtEscape.escape("{\"ss\": \"sss\\n\"}".asInputStream(), '\\'.toByte(), "\"{}".toByteArray());
  * ```
  */
 fun InputStream.escape(escByte: Byte, needBytes: ByteArray, dest: OutputStream): Long {
@@ -44,7 +44,7 @@ fun InputStream.escape(escByte: Byte, needBytes: ByteArray, dest: OutputStream):
  *
  * ```
  * //{"ss": "sss\n"} -> \{\"ss\": \"sss\\n\"\}
- * EscapeBt.escape("{\"ss\": \"sss\\n\"}".asReader(), '\\'.toByte(), "\"{}");
+ * BtEscape.escape("{\"ss\": \"sss\\n\"}".asReader(), '\\'.toByte(), "\"{}");
  * ```
  */
 fun Reader.escape(escChar: Char, needChars: CharSequence, dest: Appendable): Long {
@@ -72,7 +72,7 @@ fun Reader.escape(escChar: Char, needChars: CharSequence, dest: Appendable): Lon
  *
  * ```
  * //{"ss": "sss\n"} -> \{\"ss\": \"sss\\n\"\}
- * EscapeBt.escape("{\"ss\": \"sss\\n\"}", '\\', "\"{}");
+ * BtEscape.escape("{\"ss\": \"sss\\n\"}", '\\', "\"{}");
  * ```
  */
 fun CharSequence.escape(escChar: Char, needChars: CharSequence): String {
@@ -120,7 +120,7 @@ fun CharSequence.escape(escChar: Char, needChars: CharSequence): String {
  *
  * ```
  * //\{\"ss\": \"sss\\n\"\} -> {"ss": "sss\n"}
- * EscapeBt.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}".asInputStream(), '\\'.toByte(), "\"{}".toByteArray());
+ * BtEscape.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}".asInputStream(), '\\'.toByte(), "\"{}".toByteArray());
  * ```
  */
 fun InputStream.unescape(escByte: Byte, needBytes: ByteArray, dest: OutputStream): Long {
@@ -160,7 +160,7 @@ fun InputStream.unescape(escByte: Byte, needBytes: ByteArray, dest: OutputStream
  *
  * ```
  * //\{\"ss\": \"sss\\n\"\} -> {"ss": "sss\n"}
- * EscapeBt.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}".asReader(), '\\', "\"{}");
+ * BtEscape.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}".asReader(), '\\', "\"{}");
  * ```
  */
 fun Reader.unescape(escChar: Char, needChars: CharSequence, dest: Appendable): Long {
@@ -200,7 +200,7 @@ fun Reader.unescape(escChar: Char, needChars: CharSequence, dest: Appendable): L
  *
  * ```
  * //\{\"ss\": \"sss\\n\"\} -> {"ss": "sss\n"}
- * EscapeBt.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}", '\\', "\"{}");
+ * BtEscape.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}", '\\', "\"{}");
  * ```
  */
 fun CharSequence.unescape(escChar: Char, needChars: CharSequence): String {

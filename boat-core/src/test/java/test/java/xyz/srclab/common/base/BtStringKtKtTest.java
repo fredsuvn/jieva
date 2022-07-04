@@ -7,7 +7,7 @@ import xyz.srclab.common.base.*;
 /**
  * @author sunqian
  */
-public class StringBtKtTest {
+public class BtStringKtKtTest {
 
     @Test
     public void testString() {

@@ -1,7 +1,7 @@
 /**
  * Enum utilities.
  */
-@file:JvmName("EnumBt")
+@file:JvmName("BtEnum")
 
 package xyz.srclab.common.base
 
@@ -78,7 +78,7 @@ fun <T> Class<*>.getEnumOrNull(index: Int): T? {
 
 private fun CharSequence.getEnum(type: Class<*>): Any {
     try {
-        return JavaBt.getEnum(type, this.toString())
+        return BtJava.getEnum(type, this.toString())
     } catch (e: Exception) {
         throw NoSuchEnumException(this.toString(), e)
     }

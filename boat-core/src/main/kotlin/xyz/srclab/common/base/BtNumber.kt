@@ -1,7 +1,7 @@
 /**
  * Number utilities.
  */
-@file:JvmName("NumberBt")
+@file:JvmName("BtNumber")
 
 package xyz.srclab.common.base
 
@@ -21,22 +21,22 @@ import kotlin.text.toShort as toShortKt
 /**
  * Returns value 100 in [BigInteger].
  */
-fun hundredInt(): BigInteger = NumberBtHolder.HUNDRED_INT
+fun hundredInt(): BigInteger = BtNumberHolder.HUNDRED_INT
 
 /**
  * Returns value 1000 in [BigInteger].
  */
-fun thousandInt(): BigInteger = NumberBtHolder.THOUSAND_INT
+fun thousandInt(): BigInteger = BtNumberHolder.THOUSAND_INT
 
 /**
  * Returns value 100 in [BigDecimal].
  */
-fun hundredDecimal(): BigDecimal = NumberBtHolder.HUNDRED_DECIMAL
+fun hundredDecimal(): BigDecimal = BtNumberHolder.HUNDRED_DECIMAL
 
 /**
  * Returns value 1000 in [BigDecimal].
  */
-fun thousandDecimal(): BigDecimal = NumberBtHolder.THOUSAND_DECIMAL
+fun thousandDecimal(): BigDecimal = BtNumberHolder.THOUSAND_DECIMAL
 
 /**
  * Converts chars to byte.
@@ -457,9 +457,9 @@ fun CharSequence.parseBigInteger(): BigInteger {
 
 private class NumberParsing(chars: CharSequence) {
 
-     val positive: Boolean
-     val radix: Int
-     val content: CharSequence
+    val positive: Boolean
+    val radix: Int
+    val content: CharSequence
 
     init {
         var offset = 0
@@ -488,23 +488,23 @@ private class NumberParsing(chars: CharSequence) {
         }
     }
 
-     fun toInt(): Int {
+    fun toInt(): Int {
         val value = content.toInt(radix)
         return if (positive) value else -value
     }
 
-     fun toLong(): Long {
+    fun toLong(): Long {
         val value = content.toLong(radix)
         return if (positive) value else -value
     }
 
-     fun toBigInteger(): BigInteger {
+    fun toBigInteger(): BigInteger {
         val value = content.toBigInteger(radix)
         return if (positive) value else -value
     }
 }
 
-private object NumberBtHolder {
+private object BtNumberHolder {
     val HUNDRED_INT: BigInteger = BigInteger("100")
     val THOUSAND_INT: BigInteger = BigInteger("1000")
     val HUNDRED_DECIMAL: BigDecimal = BigDecimal("100")

@@ -1,17 +1,24 @@
 /**
  * Date and time utilities.
  */
-@file:JvmName("DateBt")
+@file:JvmName("BtDate")
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.base.DatePattern.Companion.toDatePattern
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.TemporalAccessor
 import java.util.*
+
+/**
+ * Default [DatePattern] for timestamp with patter: [defaultTimestampPattern].
+ */
+fun defaultTimestampDatePattern(): DatePattern = BtDateHolder.timestampDatePattern
 
 /**
  * Returns current epoch seconds.
@@ -108,7 +115,7 @@ fun Date.toLocalTime(zoneId: ZoneId = ZoneId.systemDefault()): LocalTime {
 /**
  * Converts to [Date], or throw [DateTimeException] if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @Throws(DateTimeException::class)
 @JvmOverloads
@@ -119,7 +126,7 @@ fun TemporalAccessor.toDate(tryCompute: Boolean = true): Date {
 /**
  * Converts to [Instant], or throw [DateTimeException] if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @Throws(DateTimeException::class)
 @JvmOverloads
@@ -130,7 +137,7 @@ fun TemporalAccessor.toInstant(tryCompute: Boolean = true): Instant {
 /**
  * Converts to [ZonedDateTime], or throw [DateTimeException] if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @Throws(DateTimeException::class)
 @JvmOverloads
@@ -141,7 +148,7 @@ fun TemporalAccessor.toZonedDateTime(tryCompute: Boolean = true): ZonedDateTime 
 /**
  * Converts to [OffsetDateTime], or throw [DateTimeException] if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @Throws(DateTimeException::class)
 @JvmOverloads
@@ -152,7 +159,7 @@ fun TemporalAccessor.toOffsetDateTime(tryCompute: Boolean = true): OffsetDateTim
 /**
  * Converts to [LocalDateTime], or throw [DateTimeException] if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @Throws(DateTimeException::class)
 @JvmOverloads
@@ -163,7 +170,7 @@ fun TemporalAccessor.toLocalDateTime(tryCompute: Boolean = true): LocalDateTime 
 /**
  * Converts to [LocalDate], or throw [DateTimeException] if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @Throws(DateTimeException::class)
 @JvmOverloads
@@ -174,7 +181,7 @@ fun TemporalAccessor.toLocalDate(tryCompute: Boolean = true): LocalDate {
 /**
  * Converts to [LocalTime], or throw [DateTimeException] if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @Throws(DateTimeException::class)
 @JvmOverloads
@@ -185,7 +192,7 @@ fun TemporalAccessor.toLocalTime(tryCompute: Boolean = true): LocalTime {
 /**
  * Converts to [Date], or null if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @JvmOverloads
 fun TemporalAccessor.toDateOrNull(tryCompute: Boolean = true): Date? {
@@ -199,7 +206,7 @@ fun TemporalAccessor.toDateOrNull(tryCompute: Boolean = true): Date? {
 /**
  * Converts to [Instant], or null if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @JvmOverloads
 fun TemporalAccessor.toInstantOrNull(tryCompute: Boolean = true): Instant? {
@@ -225,7 +232,7 @@ fun TemporalAccessor.toInstantOrNull(tryCompute: Boolean = true): Instant? {
 /**
  * Converts to [ZonedDateTime], or null if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @JvmOverloads
 fun TemporalAccessor.toZonedDateTimeOrNull(tryCompute: Boolean = true): ZonedDateTime? {
@@ -248,7 +255,7 @@ fun TemporalAccessor.toZonedDateTimeOrNull(tryCompute: Boolean = true): ZonedDat
 /**
  * Converts to [OffsetDateTime], or null if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @JvmOverloads
 fun TemporalAccessor.toOffsetDateTimeOrNull(tryCompute: Boolean = true): OffsetDateTime? {
@@ -271,7 +278,7 @@ fun TemporalAccessor.toOffsetDateTimeOrNull(tryCompute: Boolean = true): OffsetD
 /**
  * Converts to [LocalDateTime], or null if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @JvmOverloads
 fun TemporalAccessor.toLocalDateTimeOrNull(tryCompute: Boolean = true): LocalDateTime? {
@@ -294,7 +301,7 @@ fun TemporalAccessor.toLocalDateTimeOrNull(tryCompute: Boolean = true): LocalDat
 /**
  * Converts to [LocalDate], or null if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @JvmOverloads
 fun TemporalAccessor.toLocalDateOrNull(tryCompute: Boolean = true): LocalDate? {
@@ -317,7 +324,7 @@ fun TemporalAccessor.toLocalDateOrNull(tryCompute: Boolean = true): LocalDate? {
 /**
  * Converts to [LocalTime], or null if failed.
  *
- * @param tryCompute whether tries to compute missing field y other existing fields.
+ * @param tryCompute whether tries to compute missing fields by other existing fields.
  */
 @JvmOverloads
 fun TemporalAccessor.toLocalTimeOrNull(tryCompute: Boolean = true): LocalTime? {
@@ -694,14 +701,23 @@ interface DatePattern {
 }
 
 /**
- * Represents a parsed date which can be used to convert to other date types.
+ * Represents a point of time, like [Date], [Instant] and various [LocalDateTime].
  */
-interface ParsedDate {
+interface TimePoint {
 
     /**
-     * Formats to string.
+     * Returns this time in milliseconds.
      */
-    fun format(pattern: DatePattern): String
+    fun toMillis(): Long {
+        return toInstant().toEpochMilli()
+    }
+
+    /**
+     * Returns this time in seconds.
+     */
+    fun toSeconds(): Long {
+        return toInstant().epochSecond
+    }
 
     /**
      * Converts to [Date].
@@ -807,40 +823,42 @@ interface ParsedDate {
         return toTemporalOrNull()?.toLocalTimeOrNull()
     }
 
+    /**
+     * Formats to string.
+     */
+    fun format(pattern: DatePattern): String
+
     companion object {
 
         /**
-         * Parses and returns [ParsedDate] from [this].
+         * Parses and returns [TimePoint] from [this].
          */
         @JvmName("of")
         @JvmStatic
-        fun Date.toParsedDate(): ParsedDate {
+        fun Date.toParsedDate(): TimePoint {
             return OfDate(this)
         }
 
         /**
-         * Parses and returns [ParsedDate] from [this].
+         * Parses and returns [TimePoint] from [this].
          */
         @JvmName("of")
         @JvmStatic
-        fun TemporalAccessor.toParsedDate(): ParsedDate {
+        fun TemporalAccessor.toParsedDate(): TimePoint {
             return OfTemporal(this)
         }
 
         /**
-         * Parses and returns [ParsedDate] from [this].
+         * Parses and returns [TimePoint] from [this].
          */
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun CharSequence.toParsedDate(pattern: DatePattern = defaultTimestampPattern()): ParsedDate {
+        fun CharSequence.toParsedDate(pattern: DatePattern = defaultTimestampDatePattern()): TimePoint {
             return OfChars(this, pattern)
         }
 
-        private class OfDate(private val date: Date) : ParsedDate {
-            override fun format(pattern: DatePattern): String {
-                return pattern.format(date)
-            }
+        private class OfDate(private val date: Date) : TimePoint {
 
             override fun toDate(): Date {
                 return date
@@ -857,12 +875,21 @@ interface ParsedDate {
             override fun toTemporalOrNull(): TemporalAccessor {
                 return toTemporal()
             }
+
+            override fun toMillis(): Long {
+                return date.time
+            }
+
+            override fun toSeconds(): Long {
+                return date.time / 1000
+            }
+
+            override fun format(pattern: DatePattern): String {
+                return pattern.format(date)
+            }
         }
 
-        private class OfTemporal(private val temporal: TemporalAccessor) : ParsedDate {
-            override fun format(pattern: DatePattern): String {
-                return pattern.format(temporal)
-            }
+        private class OfTemporal(private val temporal: TemporalAccessor) : TimePoint {
 
             override fun toDate(): Date {
                 return Date.from(temporal.toInstant())
@@ -880,9 +907,13 @@ interface ParsedDate {
             override fun toTemporalOrNull(): TemporalAccessor {
                 return toTemporal()
             }
+
+            override fun format(pattern: DatePattern): String {
+                return pattern.format(temporal)
+            }
         }
 
-        private class OfChars(chars: CharSequence, pattern: DatePattern) : ParsedDate {
+        private class OfChars(chars: CharSequence, pattern: DatePattern) : TimePoint {
 
             private val temporal: TemporalAccessor?
             private val date: Date?
@@ -901,13 +932,6 @@ interface ParsedDate {
                 if (temporal === null && date === null) {
                     throw DateTimeException("Cannot parse $chars to pattern: $pattern")
                 }
-            }
-
-            override fun format(pattern: DatePattern): String {
-                if (temporal !== null) {
-                    return pattern.format(temporal)
-                }
-                return pattern.format(date!!)
             }
 
             override fun toDate(): Date {
@@ -937,6 +961,42 @@ interface ParsedDate {
                 }
                 return date?.toInstant()
             }
+
+            override fun toMillis(): Long {
+                if (date !== null) {
+                    return date.time
+                }
+                return temporal!!.toInstant().toEpochMilli()
+            }
+
+            override fun toSeconds(): Long {
+                if (date !== null) {
+                    return date.time / 1000
+                }
+                return temporal!!.toInstant().epochSecond
+            }
+
+            override fun format(pattern: DatePattern): String {
+                if (temporal !== null) {
+                    return pattern.format(temporal)
+                }
+                return pattern.format(date!!)
+            }
         }
+    }
+}
+
+private object BtDateHolder {
+    val timestampDatePattern: DatePattern = run {
+        // JDK8 bug:
+        // Error for "yyyyMMddHHmmssSSS".toDatePattern()
+        if (isJdk9OrHigher()) {
+            return@run defaultTimestampPattern().toDatePattern()
+        }
+        val formatter: DateTimeFormatter = DateTimeFormatterBuilder() // date/time
+            .appendPattern("yyyyMMddHHmmss") // milliseconds
+            .appendValue(ChronoField.MILLI_OF_SECOND, 3) // create formatter
+            .toFormatter()
+        DatePattern.of(defaultTimestampPattern(), formatter)
     }
 }

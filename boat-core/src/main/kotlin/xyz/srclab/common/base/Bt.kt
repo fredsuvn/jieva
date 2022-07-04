@@ -1,24 +1,18 @@
 /**
- * Bt includes common and misc utilities.
+ * Boat base utilities, including common and misc.
  */
 @file:JvmName("Bt")
 
 package xyz.srclab.common.base
 
 import xyz.srclab.common.Boat
-import xyz.srclab.common.base.DatePattern.Companion.toDatePattern
 import xyz.srclab.common.collect.toStringMap
 import xyz.srclab.common.io.readString
 import xyz.srclab.common.reflect.defaultClassLoader
 import java.io.*
 import java.net.URL
 import java.nio.charset.Charset
-import java.time.Duration
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.temporal.ChronoField
 import java.util.*
-import java.util.function.BiPredicate
 import java.util.function.Consumer
 import java.util.function.Supplier
 import kotlin.stackTraceToString as stackTraceToStringKt
@@ -39,55 +33,45 @@ const val COMPARE_EQ = 0
  */
 const val COMPARE_GT = 1
 
-private val local: ThreadLocal<MutableMap<Any, Any?>> = ThreadLocal.withInitial { HashMap() }
-
 /**
  * Returns default charset: UTF-8.
  */
-@JvmName("charset")
 fun defaultCharset(): Charset = utf8()
 
 /**
- * Returns default buffer size: 8 * 1024.
+ * Returns default [String] for `null`.
  */
-@JvmName("bufferSize")
-fun defaultBufferSize(): Int = 8 * 1024
-
-/**
- * Returns default serial version for current boat version.
- */
-@JvmName("serialVersion")
-fun defaultSerialVersion(): Long = Boat.serialVersion()
+fun defaultNullString(): String = "null"
 
 /**
  * Returns default radix: 10.
  */
-@JvmName("radix")
 fun defaultRadix(): Int = 10
 
 /**
  * Returns default locale: [Locale.ENGLISH].
  */
-@JvmName("locale")
 fun defaultLocale(): Locale = Locale.ENGLISH
 
 /**
- * Returns default concurrency level: [availableProcessors] * 2.
+ * Returns default concurrency level: [availableProcessors] * 4.
  */
-@JvmName("concurrencyLevel")
 fun defaultConcurrencyLevel(): Int = availableProcessors() * 4
 
 /**
  * Returns default timestamp pattern: yyyyMMddHHmmssSSS.
  */
-@JvmName("timestampPattern")
-fun defaultTimestampPattern(): DatePattern = BtHolder.defaultTimestampPattern
+fun defaultTimestampPattern(): String = "yyyyMMddHHmmssSSS"
 
 /**
- * Returns default [String] for `null`.
+ * Returns default buffer size: 8 * 1024.
  */
-@JvmName("nullString")
-fun defaultNullString(): String = "null"
+fun defaultBufferSize(): Int = 8 * 1024
+
+/**
+ * Returns default serial version for current boat version.
+ */
+fun defaultSerialVersion(): Long = Boat.serialVersion()
 
 /**
  * Casts [this] to any type.
@@ -553,116 +537,6 @@ fun Throwable.stackTraceToString(): String {
 }
 
 /**
- * Returns current [Thread].
- */
-fun currentThread(): Thread {
-    return Thread.currentThread()
-}
-
-/**
- * Sleeps current thread for [millis] and [nanos].
- */
-@JvmOverloads
-fun sleep(millis: Long, nanos: Int = 0) {
-    Thread.sleep(millis, nanos)
-}
-
-/**
- * Sleeps current thread for [duration].
- */
-fun sleep(duration: Duration) {
-    sleep(duration.toMillis(), duration.nano)
-}
-
-/**
- * Returns thread local value of [key].
- */
-@JvmName("getLocal")
-fun <T> getThreadLocal(key: Any): T {
-    return local.get()[key].asType()
-}
-
-/**
- * Sets thread local value of [key], returns old value.
- */
-@JvmName("setLocal")
-fun <T> setThreadLocal(key: Any, value: Any?): T {
-    return local.get().put(key, value).asType()
-}
-
-/**
- * Returns container of all thread local values managed by `BThread`.
- *
- * Note any change for returned map will reflect [getThreadLocal] and [setThreadLocal], and vice versa.
- */
-@JvmName("getLocals")
-fun threadLocals(): MutableMap<Any, Any?> {
-    return local.get()
-}
-
-/**
- * Try to find caller stack trace element, usually used in logging.
- *
- * This function invokes [predicate] for each stack trace element of current [Thread.getStackTrace]:
- *
- * * Invokes `predicate.test(element, false)` for each stack trace element util the `true` has returned,
- * let the index of this element be `loggerIndex`;
- * * Invokes `predicate.test(element, true)` for each stack trace element
- * from the `loggerIndex` exclusive util the `true` has returned
- * let the index of this element be `callerIndex`;
- * * Return element of which index is `callerIndex`.
- *
- * Note if stack trace elements of current thread is null,
- * or index of returned element is out of bounds, return null.
- */
-fun callerStackTrace(
-    predicate: BiPredicate<StackTraceElement, Boolean>
-): StackTraceElement? {
-    return callerStackTrace(0, predicate)
-}
-
-/**
- * Try to find caller stack trace element, usually used in logging.
- *
- * This function invokes [predicate] for each stack trace element of current [Thread.getStackTrace]:
- *
- * * Invokes `predicate.test(element, false)` for each stack trace element util the `true` has returned,
- * let the index of this element be `loggerIndex`;
- * * Invokes `predicate.test(element, true)` for each stack trace element
- * from the `loggerIndex` exclusive util the `true` has returned
- * let the index of this element be `callerIndex`;
- * * Return element of which index is ([offset] + `callerIndex`).
- *
- * Note if stack trace elements of current thread is null,
- * or index of returned element is out of bounds, return null.
- */
-fun callerStackTrace(
-    offset: Int,
-    predicate: BiPredicate<StackTraceElement, Boolean>
-): StackTraceElement? {
-    val stackTrace = currentThread().stackTrace
-    if (stackTrace.isNullOrEmpty()) {
-        return null
-    }
-    for (i in stackTrace.indices) {
-        var result = predicate.test(stackTrace[i], false)
-        if (result) {
-            for (j in i + 1 until stackTrace.size) {
-                result = predicate.test(stackTrace[j], true)
-                if (result) {
-                    val index = j + offset
-                    if (index.isInBounds(0, stackTrace.size)) {
-                        return stackTrace[index]
-                    }
-                    return null
-                }
-            }
-        }
-    }
-    return null
-}
-
-/**
  * Loads resource in current classpath.
  * It finds first resource specified by the [path] (generally in current jar).
  * The [path] may start with `/` or not, they are equivalent.
@@ -847,18 +721,41 @@ fun File.readProperties(charset: Charset = defaultCharset()): Map<String, String
     return this.reader(charset).readProperties(true)
 }
 
-private object BtHolder {
-    private const val defaultTimestampPatternString: String = "yyyyMMddHHmmssSSS"
-    val defaultTimestampPattern: DatePattern = run {
-        // JDK8 bug:
-        // Error for "yyyyMMddHHmmssSSS".toDatePattern()
-        if (isJdk9OrHigher()) {
-            return@run defaultTimestampPatternString.toDatePattern()
-        }
-        val formatter: DateTimeFormatter = DateTimeFormatterBuilder() // date/time
-            .appendPattern("yyyyMMddHHmmss") // milliseconds
-            .appendValue(ChronoField.MILLI_OF_SECOND, 3) // create formatter
-            .toFormatter()
-        DatePattern.of(defaultTimestampPatternString, formatter)
+/**
+ * Abstract class represents a final class, which will cache the values of [hashCode] and [toString].
+ * The subclass should implement [hashCode0] and [toString0] to compute the values of [hashCode] and [toString],
+ * each computation will be processed only once.
+ */
+abstract class FinalClass {
+
+    private var _hashCode: Int? = null
+    private var _toString: String? = null
+
+    override fun hashCode(): Int {
+        return getOrNew(
+            this,
+            { this._hashCode },
+            { this._hashCode = it },
+            { hashCode0() },
+        )
     }
+
+    override fun toString(): String {
+        return getOrNew(
+            this,
+            { this._toString },
+            { this._toString = it },
+            { toString0() },
+        )
+    }
+
+    /**
+     * Computes the hash code.
+     */
+    protected abstract fun hashCode0(): Int
+
+    /**
+     * Computes the toString value.
+     */
+    protected abstract fun toString0(): String
 }

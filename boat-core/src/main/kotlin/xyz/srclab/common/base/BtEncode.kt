@@ -1,7 +1,7 @@
 /**
  * Encode utilities.
  */
-@file:JvmName("EncodeBt")
+@file:JvmName("BtEncode")
 
 package xyz.srclab.common.base
 
@@ -344,24 +344,24 @@ fun InputStream.deHex(dest: OutputStream): Long {
 }
 
 private fun hex0(i: Int): Byte {
-    return EncodeBtHolder.hexCodes[i * 2]
+    return BtEncodeHolder.hexCodes[i * 2]
 }
 
 private fun deHex0(i: Byte): Int {
     val c = i.toInt().toChar()
     if (c in '0'..'9') {
-        return EncodeBtHolder.hexCodes[(c - '0') * 2 + 1].toInt()
+        return BtEncodeHolder.hexCodes[(c - '0') * 2 + 1].toInt()
     }
     if (c in 'a'..'f') {
-        return EncodeBtHolder.hexCodes[(c - 'a' + 10) * 2 + 1].toInt()
+        return BtEncodeHolder.hexCodes[(c - 'a' + 10) * 2 + 1].toInt()
     }
     if (c in 'A'..'F') {
-        return EncodeBtHolder.hexCodes[(c - 'a' + 10) * 2 + 1].toInt()
+        return BtEncodeHolder.hexCodes[(c - 'a' + 10) * 2 + 1].toInt()
     }
     throw IllegalArgumentException("Illegal hex char: ${i.toInt().toChar()}")
 }
 
-private object EncodeBtHolder {
+private object BtEncodeHolder {
     val hexCodes = byteArrayOf(
         '0'.code.toByte(), 0,
         '1'.code.toByte(), 1,

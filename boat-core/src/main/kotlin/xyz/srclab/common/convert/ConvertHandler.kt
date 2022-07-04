@@ -1,7 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
-import xyz.srclab.common.base.ParsedDate.Companion.toParsedDate
+import xyz.srclab.common.base.TimePoint.Companion.toParsedDate
 import xyz.srclab.common.bean.BeanCreator
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties

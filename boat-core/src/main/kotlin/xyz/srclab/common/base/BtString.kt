@@ -1,7 +1,7 @@
 /**
  * String utilities.
  */
-@file:JvmName("StringBt")
+@file:JvmName("BtString")
 
 package xyz.srclab.common.base
 
@@ -19,24 +19,24 @@ import kotlin.text.toList as toListKt
 import kotlin.text.toSet as toSetKt
 
 /**
+ * Returns charset of UTF-8.
+ */
+fun utf8(): Charset = StandardCharsets.UTF_8
+
+/**
  * Returns a [CharMatcher] for char dot: ".".
  */
-fun dotMatcher(): CharMatcher = StringBtHolder.DOT_MATCHER
+fun dotMatcher(): CharMatcher = BtStringHolder.DOT_MATCHER
 
 /**
  * Returns a [CharMatcher] for char hyphen: "-".
  */
-fun hyphenMatcher(): CharMatcher = StringBtHolder.HYPHEN_MATCHER
+fun hyphenMatcher(): CharMatcher = BtStringHolder.HYPHEN_MATCHER
 
 /**
  * Returns a [CharMatcher] for char underscore: "_".
  */
-fun underscoreMatcher(): CharMatcher = StringBtHolder.UNDERSCORE_MATCHER
-
-/**
- * Returns charset of UTF-8.
- */
-fun utf8(): Charset = StandardCharsets.UTF_8
+fun underscoreMatcher(): CharMatcher = BtStringHolder.UNDERSCORE_MATCHER
 
 /**
  * Returns whether given chars is empty or null.
@@ -595,7 +595,7 @@ interface LazyString : CharSequence {
     }
 }
 
-private object StringBtHolder {
+private object BtStringHolder {
     val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
     val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
     val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')

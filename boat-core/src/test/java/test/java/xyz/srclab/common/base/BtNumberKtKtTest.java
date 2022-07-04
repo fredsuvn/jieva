@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BNumber;
 
-public class NumberBtKtTest {
+public class BtNumberKtKtTest {
 
     @Test
     public void testConvert() {
