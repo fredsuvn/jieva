@@ -1,3 +1,6 @@
+/**
+ * Checking utilities.
+ */
 @file:JvmName("CheckBt")
 
 package xyz.srclab.common.base
