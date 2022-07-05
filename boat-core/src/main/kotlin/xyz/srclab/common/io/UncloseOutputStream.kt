@@ -11,7 +11,7 @@ open class UncloseOutputStream<T : OutputStream>(
 
     private var _count = 0L
 
-    val count: Long
+    open val count: Long
         get() = _count
 
     override fun close() {

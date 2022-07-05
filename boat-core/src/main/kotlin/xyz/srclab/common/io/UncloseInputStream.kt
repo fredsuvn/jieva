@@ -12,7 +12,7 @@ open class UncloseInputStream<T : InputStream>(
     private var _count = 0L
     private var countMark = -1L
 
-    val count: Long
+    open val count: Long
         get() = _count
 
     override fun close() {

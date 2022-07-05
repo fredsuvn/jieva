@@ -6,7 +6,7 @@ import java.io.Reader
 import kotlin.math.min
 
 /**
- * Makes [CharSequence] as [Reader].
+ * Makes [CharSequence] as source of [Reader].
  */
 open class CharSeqReader<T : CharSequence>(
     private val source: T,
@@ -38,12 +38,13 @@ open class CharSeqReader<T : CharSequence>(
         val remaining = offset + length - pos
         val readLength = min(remaining, len)
         if (source is CharsRef) {
-            source.subSequence(0, readLength)
-        }
-        var i = 0
-        while (i < readLength) {
-            b[off + i] = source[pos + i]
-            i++
+            source.subSequence(0, readLength).copyTo(b, off)
+        } else {
+            var i = 0
+            while (i < readLength) {
+                b[off + i] = source[pos + i]
+                i++
+            }
         }
         pos += readLength
         return readLength

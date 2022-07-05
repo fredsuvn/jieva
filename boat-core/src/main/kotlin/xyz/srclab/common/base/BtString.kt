@@ -439,6 +439,8 @@ fun String.asJavaString(): JavaString {
  */
 interface CharsRef : CharSequence {
 
+    override fun subSequence(startIndex: Int, endIndex: Int): CharsRef
+
     /**
      * Copies and returns a new String of current range.
      */
@@ -492,7 +494,7 @@ interface CharsRef : CharSequence {
                 return source[index.actualIndex()]
             }
 
-            override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+            override fun subSequence(startIndex: Int, endIndex: Int): OfCharSeq {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 if (startIndex == 0 && endIndex == length) {
                     return this
@@ -536,7 +538,7 @@ interface CharsRef : CharSequence {
                 return source[index.actualIndex()]
             }
 
-            override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+            override fun subSequence(startIndex: Int, endIndex: Int): OfCharArray {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 if (startIndex == 0 && endIndex == length) {
                     return this

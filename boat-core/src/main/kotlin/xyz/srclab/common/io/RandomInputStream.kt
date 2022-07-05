@@ -50,6 +50,7 @@ open class RandomInputStream(
 
     override fun reset() {
         pos = mark
+        source.seek(pos)
     }
 
     override fun markSupported(): Boolean {

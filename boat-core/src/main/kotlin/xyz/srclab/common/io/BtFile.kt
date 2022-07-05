@@ -1,4 +1,4 @@
-@file:JvmName("BFile")
+@file:JvmName("BtFile")
 
 package xyz.srclab.common.io
 
@@ -13,6 +13,7 @@ import java.nio.file.Path
 
 /**
  * Opens [InputStream] for [this] file.
+ *
  * @param bufferSize may be 0 if the buffer is not required
  */
 @JvmOverloads
@@ -22,6 +23,7 @@ fun File.openInputStream(bufferSize: Int = defaultBufferSize()): InputStream {
 
 /**
  * Opens [InputStream] for [this] path.
+ *
  * @param bufferSize may be 0 if the buffer is not required
  */
 @JvmOverloads
@@ -29,14 +31,13 @@ fun Path.openInputStream(bufferSize: Int = defaultBufferSize()): InputStream {
     if (bufferSize < 0) {
         throw IllegalArgumentException("Illegal buffer size: $bufferSize")
     }
-    if (bufferSize == 0) {
-        return Files.newInputStream(this)
-    }
-    return Files.newInputStream(this).buffered(bufferSize)
+    val input = Files.newInputStream(this)
+    return if (bufferSize == 0) input else input.buffered(bufferSize)
 }
 
 /**
  * Opens [Reader] for [this] file.
+ *
  * @param bufferSize may be 0 if the buffer is not required
  */
 @JvmOverloads
@@ -46,6 +47,7 @@ fun File.openReader(charset: Charset = defaultCharset(), bufferSize: Int = defau
 
 /**
  * Opens [Reader] for [this] path.
+ *
  * @param bufferSize may be 0 if the buffer is not required
  */
 @JvmOverloads
@@ -55,6 +57,7 @@ fun Path.openReader(charset: Charset = defaultCharset(), bufferSize: Int = defau
 
 /**
  * Opens [OutputStream] for [this] file.
+ *
  * @param bufferSize may be 0 if the buffer is not required
  */
 @JvmOverloads
@@ -64,6 +67,7 @@ fun File.openOutputStream(bufferSize: Int = defaultBufferSize()): OutputStream {
 
 /**
  * Opens [OutputStream] for [this] path.
+ *
  * @param bufferSize may be 0 if the buffer is not required
  */
 @JvmOverloads
@@ -79,6 +83,7 @@ fun Path.openOutputStream(bufferSize: Int = defaultBufferSize()): OutputStream {
 
 /**
  * Opens [Writer] for [this] file.
+ *
  * @param bufferSize may be 0 if the buffer is not required
  */
 @JvmOverloads
@@ -88,6 +93,7 @@ fun File.openWriter(charset: Charset = defaultCharset(), bufferSize: Int = defau
 
 /**
  * Opens [Writer] for [this] path.
+ *
  * @param bufferSize may be 0 if the buffer is not required
  */
 @JvmOverloads
@@ -97,6 +103,7 @@ fun Path.openWriter(charset: Charset = defaultCharset(), bufferSize: Int = defau
 
 /**
  * Opens [RandomAccessFile] for [this] file.
+ *
  * @param mode open mode: `r`, `rw`, `rws`, `rwd`
  */
 @JvmOverloads
@@ -106,6 +113,7 @@ fun File.openRandomAccessFile(mode: CharSequence = "rw"): RandomAccessFile {
 
 /**
  * Opens [RandomAccessFile] for [this] path.
+ *
  * @param mode open mode: `r`, `rw`, `rws`, `rwd`
  */
 @JvmOverloads
@@ -115,6 +123,8 @@ fun Path.openRandomAccessFile(mode: CharSequence = "rw"): RandomAccessFile {
 
 /**
  * Returns a [File] specified by [this] url.
+ *
+ * @throws FileNotFoundException if file not found for this url
  */
 fun URL.toFile(): File {
     return this.file.let {

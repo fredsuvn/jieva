@@ -61,9 +61,9 @@ fun <C, V> ExecutorService.execute(context: C, callable: JavaFunction<C, V>): Fu
 /**
  * Gets result of [Future] without checked exception.
  *
- * @throws [CancellationException] if the computation was cancelled
- * @throws [ExecutionException] if the computation threw an exception
- * @throws [InterruptedException] if the current thread was interrupted while waiting
+ * @throws CancellationException if the computation was cancelled
+ * @throws ExecutionException if the computation threw an exception
+ * @throws InterruptedException if the current thread was interrupted while waiting
  */
 fun <V> Future<V>.getResult(): V {
     return this.get()
@@ -72,10 +72,10 @@ fun <V> Future<V>.getResult(): V {
 /**
  * Gets result of [Future] without checked exception in [timeout].
  *
- * @throws [CancellationException] if the computation was cancelled
- * @throws [ExecutionException] if the computation threw an exception
- * @throws [InterruptedException] if the current thread was interrupted while waiting
- * @throws [TimeoutException] – if the wait timed out
+ * @throws CancellationException if the computation was cancelled
+ * @throws ExecutionException if the computation threw an exception
+ * @throws InterruptedException if the current thread was interrupted while waiting
+ * @throws TimeoutException if the wait timed out
  */
 fun <V> Future<V>.getResult(timeout: Duration): V {
     return this.get(timeout.toNanos(), TimeUnit.NANOSECONDS)
@@ -84,10 +84,10 @@ fun <V> Future<V>.getResult(timeout: Duration): V {
 /**
  * Gets result of [Future] without checked exception in [timeout].
  *
- * @throws [CancellationException] if the computation was cancelled
- * @throws [ExecutionException] if the computation threw an exception
- * @throws [InterruptedException] if the current thread was interrupted while waiting
- * @throws [TimeoutException] – if the wait timed out
+ * @throws CancellationException if the computation was cancelled
+ * @throws ExecutionException if the computation threw an exception
+ * @throws InterruptedException if the current thread was interrupted while waiting
+ * @throws TimeoutException if the wait timed out
  */
 fun <V> Future<V>.getResult(timeout: Long, timeUnit: TimeUnit): V {
     return this.get(timeout, timeUnit)
@@ -96,10 +96,10 @@ fun <V> Future<V>.getResult(timeout: Long, timeUnit: TimeUnit): V {
 /**
  * Gets result of [Future] without checked exception in [timeoutMillis] millis.
  *
- * @throws [CancellationException] if the computation was cancelled
- * @throws [ExecutionException] if the computation threw an exception
- * @throws [InterruptedException] if the current thread was interrupted while waiting
- * @throws [TimeoutException] – if the wait timed out
+ * @throws CancellationException if the computation was cancelled
+ * @throws ExecutionException if the computation threw an exception
+ * @throws InterruptedException if the current thread was interrupted while waiting
+ * @throws TimeoutException if the wait timed out
  */
 fun <V> Future<V>.getResult(timeoutMillis: Long): V {
     return this.get(timeoutMillis, TimeUnit.MILLISECONDS)
