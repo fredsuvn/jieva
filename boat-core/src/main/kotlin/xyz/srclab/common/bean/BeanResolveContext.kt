@@ -13,9 +13,9 @@ open class BeanResolveContext(open val type: Type) {
 
     private var _isBreak = false
 
-    val typeArguments: Map<TypeVariable<*>, Type> = type.getTypeArguments()
-    val methods: List<Method> = type.rawClass.getMethods()
-    val isBreak: Boolean get() = _isBreak
+    open val typeArguments: Map<TypeVariable<*>, Type> = type.getTypeArguments()
+    open val methods: List<Method> = type.rawClass.methods.asList()
+    open val isBreak: Boolean get() = _isBreak
 
     /**
      * Sets current resolving completed, causes remainder [BeanResolveHandler] will not be called.

@@ -1,3 +1,6 @@
+/**
+ * File utilities.
+ */
 @file:JvmName("BtFile")
 
 package xyz.srclab.common.io

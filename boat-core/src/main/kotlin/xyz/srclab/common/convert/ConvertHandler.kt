@@ -1,7 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
-import xyz.srclab.common.base.TimePoint.Companion.toParsedDate
+import xyz.srclab.common.base.TimePoint.Companion.toTimePoint
 import xyz.srclab.common.bean.BeanCreator
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
@@ -35,19 +35,36 @@ import java.util.concurrent.ConcurrentHashMap
 interface ConvertHandler {
 
     /**
-     * Converts from [from] to [toType]. Returns null if it is unsupported.
+     * Converts [from] to [toType]. Returns null if current conversion is unsupported.
      *
      * If the result value is exactly `null`, return [NULL].
+     *
+     * @param from object to be converted
+     * @param fromType type of [from]
+     * @param toType target type
+     * @param converter converter where this handler on
      */
-    fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any?
+    @Throws(ConvertException::class)
+    fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
     companion object {
 
+        /**
+         * Object that indicates the result of conversion is exactly `null`.
+         */
         @JvmField
         val NULL: Any = "(╯°Д°)╯︵ ┻━┻"
 
         /**
-         * Handler set for default [Converter].
+         * Handlers for [defaultConverter], including in order:
+         *
+         * * [CompatibleConvertHandler];
+         * * [LowerBoundConvertHandler];
+         * * [StringConvertHandler] ();
+         * * [NumberBooleanConvertHandler] ();
+         * * [DateTimeConvertHandler] ();
+         * * [CollectionConvertHandler];
+         * * [BeanConvertHandler] ();
          */
         @JvmField
         val DEFAULT_HANDLERS: List<ConvertHandler> = listOf(
@@ -70,7 +87,7 @@ interface ConvertHandler {
  * * If `from` is enum and `toType` is [String], return `from.toString()`;
  */
 object CompatibleConvertHandler : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (from === null || fromType == toType || toType == Any::class.java) {
             return from
         }
@@ -97,14 +114,14 @@ object CompatibleConvertHandler : ConvertHandler {
  * Returns lower bound of `toType` with [lowerBound] for [WildcardType] and [TypeVariable].
  */
 object LowerBoundConvertHandler : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
             is WildcardType -> {
                 val lowerBound = toType.lowerBound
                 if (lowerBound === null) {
                     null
                 } else {
-                    context.converter.convertOrNull<Any>(from, fromType, lowerBound)
+                    converter.convertOrNull<Any>(from, fromType, lowerBound)
                 }
             }
             else -> null
@@ -121,7 +138,7 @@ object LowerBoundConvertHandler : ConvertHandler {
 open class StringConvertHandler @JvmOverloads constructor(
     private val charset: Charset = defaultCharset()
 ) : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (toType !is Class<*>) {
             return null
         }
@@ -139,12 +156,12 @@ open class StringConvertHandler @JvmOverloads constructor(
             StringBuffer::class.java -> StringBuffer(fromToCharSeq())
             CharArray::class.java -> when (from) {
                 is CharSequence -> from.getChars()
-                is ByteArray -> from.bytesToChars(charset)
+                is ByteArray -> from.getString(charset).toCharArray()
                 else -> null
             }
             ByteArray::class.java -> when (from) {
                 is CharSequence -> from.getBytes(charset)
-                is CharArray -> from.toByteArray(charset)
+                is CharArray -> String(from).toByteArray(charset)
                 else -> null
             }
             else -> null
@@ -162,7 +179,7 @@ open class StringConvertHandler @JvmOverloads constructor(
 open class NumberBooleanConvertHandler @JvmOverloads constructor(
     private val radix: Int = defaultRadix()
 ) : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (toType !is Class<*>) {
             return null
         }
@@ -190,11 +207,12 @@ open class NumberBooleanConvertHandler @JvmOverloads constructor(
  * * [Instant];
  * * [LocalDate], [LocalTime], [LocalDateTime], [ZonedDateTime], [OffsetDateTime];
  * * [Duration], [Temporal];
+ * * [TimePoint];
  */
 open class DateTimeConvertHandler @JvmOverloads constructor(
-    private val pattern: DatePattern = defaultTimestampPattern()
+    private val pattern: DatePattern = defaultTimestampDatePattern()
 ) : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (from === null) {
             return null
         }
@@ -207,20 +225,21 @@ open class DateTimeConvertHandler @JvmOverloads constructor(
             }
             Duration.ofMillis(from.toLong())
         }
-        val parsedDate = when (from) {
-            is Date -> from.toParsedDate()
-            is TemporalAccessor -> from.toParsedDate()
-            else -> from.toString().toParsedDate(pattern)
+        val timePoint = when (from) {
+            is Date -> from.toTimePoint()
+            is TemporalAccessor -> from.toTimePoint()
+            else -> from.toString().toTimePoint(pattern)
         }
         return when (toType) {
-            Date::class.java -> parsedDate.toDate()
-            Instant::class.java -> parsedDate.toInstant()
-            LocalDateTime::class.java -> parsedDate.toLocalDateTime()
-            ZonedDateTime::class.java -> parsedDate.toZonedDateTime()
-            OffsetDateTime::class.java -> parsedDate.toOffsetDateTime()
-            LocalDate::class.java -> parsedDate.toLocalDate()
-            LocalTime::class.java -> parsedDate.toLocalTime()
-            TemporalAccessor::class.java -> parsedDate.toTemporal()
+            Date::class.java -> timePoint.toDate()
+            Instant::class.java -> timePoint.toInstant()
+            LocalDateTime::class.java -> timePoint.toLocalDateTime()
+            ZonedDateTime::class.java -> timePoint.toZonedDateTime()
+            OffsetDateTime::class.java -> timePoint.toOffsetDateTime()
+            LocalDate::class.java -> timePoint.toLocalDate()
+            LocalTime::class.java -> timePoint.toLocalTime()
+            TemporalAccessor::class.java -> timePoint.toTemporal()
+            TimePoint::class.java -> timePoint
             else -> null
         }
     }
@@ -235,12 +254,12 @@ open class DateTimeConvertHandler @JvmOverloads constructor(
  */
 object CollectionConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (from === null) {
             return null
         }
         if (toType is GenericArrayType) {
-            return convert(from, fromType, toType.rawClass, context)
+            return convert(from, fromType, toType.rawClass, converter)
         }
         val fromComponentType = getFromComponentType(fromType)
         if (fromComponentType === null) {
@@ -253,10 +272,10 @@ object CollectionConvertHandler : ConvertHandler {
         return when (toType) {
             is Class<*> -> {
                 if (toType.isArray) {
-                    return iterableToArray(iterable, fromComponentType, toType, context.converter)
+                    return iterableToArray(iterable, fromComponentType, toType, converter)
                 }
                 if (Iterable::class.java.isAssignableFrom(toType)) {
-                    return iterableToIterable(iterable, fromComponentType, toType, Any::class.java, context.converter)
+                    return iterableToIterable(iterable, fromComponentType, toType, Any::class.java, converter)
                 }
                 return null
             }
@@ -267,7 +286,7 @@ object CollectionConvertHandler : ConvertHandler {
                     if (toComponentType === null) {
                         return null
                     }
-                    return iterableToIterable(iterable, fromComponentType, toClass, toComponentType, context.converter)
+                    return iterableToIterable(iterable, fromComponentType, toClass, toComponentType, converter)
                 }
                 return null
             }
@@ -373,7 +392,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
     private val beanResolver: BeanResolver = BeanResolver.defaultResolver()
 ) : ConvertHandler {
 
-    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (from === null) {
             return null
         }
@@ -392,25 +411,25 @@ open class BeanConvertHandler @JvmOverloads constructor(
         }
         return when (toRawClass) {
             Map::class.java, LinkedHashMap::class.java ->
-                toLinkedHashMap(from, toType, context.converter)
+                toLinkedHashMap(from, toType, converter)
             HashMap::class.java ->
-                toHashMap(from, toType, context.converter)
+                toHashMap(from, toType, converter)
             TreeMap::class.java ->
-                toTreeMap(from, toType, context.converter)
+                toTreeMap(from, toType, converter)
             ConcurrentHashMap::class.java ->
-                toConcurrentHashMap(from, toType, context.converter)
+                toConcurrentHashMap(from, toType, converter)
             Hashtable::class.java ->
-                toHashtable(from, toType, context.converter)
+                toHashtable(from, toType, converter)
             MutableSetMap::class.java ->
-                toMutableSetMap(from, toType, context.converter)
+                toMutableSetMap(from, toType, converter)
             MutableListMap::class.java ->
-                toMutableListMap(from, toType, context.converter)
+                toMutableListMap(from, toType, converter)
             SetMap::class.java ->
-                toSetMap(from, toType, context.converter)
+                toSetMap(from, toType, converter)
             ListMap::class.java ->
-                toListMap(from, toType, context.converter)
+                toListMap(from, toType, converter)
             else ->
-                toObject(from, toType, context.converter)
+                toObject(from, toType, converter)
         }
     }
 
@@ -461,7 +480,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
 }
 
 open class NullConvertHandler(private val preventNull: Boolean) : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (from !== null) {
             return null
         }

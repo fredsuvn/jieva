@@ -1,4 +1,7 @@
-@file:JvmName("BBean")
+/**
+ * Bean utilities.
+ */
+@file:JvmName("BtBean")
 
 package xyz.srclab.common.bean
 

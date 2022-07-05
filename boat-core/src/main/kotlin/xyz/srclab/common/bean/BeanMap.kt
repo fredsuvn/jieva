@@ -9,9 +9,7 @@ import java.io.Serializable
  * A [Map] which is associated with a `bean`,
  * of which keys are properties' names, values are properties' value.
  *
- * Note:
- *
- * * For this map and origin bean, any modification will reflect each other;
+ * Note for this map and origin bean, any modification will reflect each other;
  */
 open class BeanMap(
     open val bean: Any,

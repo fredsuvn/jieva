@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean
 
+import lombok.EqualsAndHashCode
 import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.reflect.rawClass
 import java.io.Serializable
@@ -10,35 +11,22 @@ import java.lang.reflect.Type
  *
  * @see PropertyType
  */
+@EqualsAndHashCode
 open class BeanType(
-    val type: Type,
-    val properties: Map<String, PropertyType>
+    open val type: Type,
+    open val properties: Map<String, PropertyType>
 ) : Serializable {
 
-    val classType: Class<*>
+    open val classType: Class<*>
         get() = type.rawClass
 
     @Throws(NoSuchPropertyException::class)
-    fun getProperty(name: String): PropertyType {
+    open fun getProperty(name: String): PropertyType {
         return getPropertyOrNull(name) ?: throw NoSuchPropertyException(name)
     }
 
-    fun getPropertyOrNull(name: String): PropertyType? {
+    open fun getPropertyOrNull(name: String): PropertyType? {
         return properties[name]
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is BeanType) return false
-        if (type != other.type) return false
-        if (properties != other.properties) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = type.hashCode()
-        result = 31 * result + properties.hashCode()
-        return result
     }
 
     override fun toString(): String {

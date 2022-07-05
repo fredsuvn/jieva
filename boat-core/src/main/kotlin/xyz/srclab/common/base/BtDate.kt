@@ -836,7 +836,7 @@ interface TimePoint {
          */
         @JvmName("of")
         @JvmStatic
-        fun Date.toParsedDate(): TimePoint {
+        fun Date.toTimePoint(): TimePoint {
             return OfDate(this)
         }
 
@@ -845,7 +845,7 @@ interface TimePoint {
          */
         @JvmName("of")
         @JvmStatic
-        fun TemporalAccessor.toParsedDate(): TimePoint {
+        fun TemporalAccessor.toTimePoint(): TimePoint {
             return OfTemporal(this)
         }
 
@@ -855,7 +855,7 @@ interface TimePoint {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun CharSequence.toParsedDate(pattern: DatePattern = defaultTimestampDatePattern()): TimePoint {
+        fun CharSequence.toTimePoint(pattern: DatePattern = defaultTimestampDatePattern()): TimePoint {
             return OfChars(this, pattern)
         }
 
