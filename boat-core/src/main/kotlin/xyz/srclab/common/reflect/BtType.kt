@@ -1,7 +1,7 @@
 /**
  * Type utilities.
  */
-@file:JvmName("TypeBt")
+@file:JvmName("BtType")
 
 package xyz.srclab.common.reflect
 

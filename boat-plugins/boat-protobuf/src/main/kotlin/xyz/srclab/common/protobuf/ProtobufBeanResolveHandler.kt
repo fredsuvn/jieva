@@ -12,8 +12,7 @@ import xyz.srclab.common.func.InstFunc
 import xyz.srclab.common.func.InstFunc.Companion.toInstInvoke
 import xyz.srclab.common.func.StaticFunc.Companion.toStaticInvoke
 import xyz.srclab.common.reflect.getTypeSignature
-import xyz.srclab.common.reflect.method
-import xyz.srclab.common.reflect.methodOrNull
+import xyz.srclab.common.reflect.getMethodOrNull
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Method
 
@@ -55,7 +54,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
             //map
             if (field.isMapField) {
                 val name = rawName + "Map"
-                val getterMethod = rawClass.methodOrNull("get${name.capitalize()}")
+                val getterMethod = rawClass.getMethodOrNull("get${name.capitalize()}")
                 if (getterMethod === null) {
                     return
                 }
@@ -64,12 +63,12 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                 getters[name] = GetterInfo(name, type, getter, null, getterMethod)
 
                 if (isBuilder) {
-                    val clearMethod = rawClass.methodOrNull("clear${rawName.capitalize()}")
+                    val clearMethod = rawClass.getMethodOrNull("clear${rawName.capitalize()}")
                     if (clearMethod === null) {
                         throw IllegalStateException("Cannot find clear method of field: $name")
                     }
                     val putAllMethod =
-                        rawClass.methodOrNull("putAll${rawName.capitalize()}", Map::class.java)
+                        rawClass.getMethodOrNull("putAll${rawName.capitalize()}", Map::class.java)
                     if (putAllMethod === null) {
                         throw IllegalStateException("Cannot find put-all method of field: $name")
                     }
@@ -83,7 +82,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
             //repeated
             if (field.isRepeated) {
                 val name = rawName + "List"
-                val getterMethod = rawClass.methodOrNull("get${name.capitalize()}")
+                val getterMethod = rawClass.getMethodOrNull("get${name.capitalize()}")
                 if (getterMethod === null) {
                     return
                 }
@@ -92,12 +91,12 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                 getters[name] = GetterInfo(name, type, getter, null, getterMethod)
 
                 if (isBuilder) {
-                    val clearMethod = rawClass.methodOrNull("clear${rawName.capitalize()}")
+                    val clearMethod = rawClass.getMethodOrNull("clear${rawName.capitalize()}")
                     if (clearMethod === null) {
                         throw IllegalStateException("Cannot find clear method of field: $name")
                     }
                     val addAllMethod =
-                        rawClass.methodOrNull("addAll${rawName.capitalize()}", Iterable::class.java)
+                        rawClass.getMethodOrNull("addAll${rawName.capitalize()}", Iterable::class.java)
                     if (addAllMethod === null) {
                         throw IllegalStateException("Cannot find add-all method of field: $name")
                     }
@@ -109,7 +108,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
             }
 
             // Simple object
-            val getterMethod = rawClass.methodOrNull("get${rawName.capitalize()}")
+            val getterMethod = rawClass.getMethodOrNull("get${rawName.capitalize()}")
             if (getterMethod === null) {
                 return
             }
@@ -118,7 +117,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
             getters[rawName] = GetterInfo(rawName, type, getter, null, getterMethod)
 
             if (isBuilder) {
-                val setterMethod = rawClass.methodOrNull("set${rawName.capitalize()}", type.rawClass)
+                val setterMethod = rawClass.getMethodOrNull("set${rawName.capitalize()}", type.rawClass)
                 if (setterMethod === null) {
                     throw IllegalStateException("Cannot find setter method of field: $rawName")
                 }
@@ -136,7 +135,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
         }
 
         //Add class property
-        val getClassMethod = rawClass.method("getClass")
+        val getClassMethod = rawClass.getMethod("getClass")
         getters["class"] = GetterInfo("class", Class::class.java, getClassMethod.toInstInvoke(), null, getClassMethod)
 
         //break

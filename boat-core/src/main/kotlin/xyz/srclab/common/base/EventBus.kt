@@ -1,6 +1,6 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.run.SyncRunner
+import xyz.srclab.common.run.newSyncExecutor
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.function.BiConsumer
@@ -58,7 +58,7 @@ interface EventBus {
         @JvmStatic
         @JvmOverloads
         fun newEventBus(
-            executor: Executor = SyncRunner,
+            executor: Executor = newSyncExecutor(),
             handlerMap: MutableMap<Any, Any> = ConcurrentHashMap()
         ): EventBus {
             return EventBusImpl(executor, handlerMap)

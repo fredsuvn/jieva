@@ -4,7 +4,7 @@ import com.google.protobuf.Message
 import com.google.protobuf.MessageOrBuilder
 import xyz.srclab.common.base.asType
 import xyz.srclab.common.bean.BeanCreator
-import xyz.srclab.common.reflect.methodOrNull
+import xyz.srclab.common.reflect.getMethodOrNull
 
 /**
  * [BeanCreator] for protobuf types.
@@ -18,7 +18,7 @@ object ProtobufBeanCreator : BeanCreator {
             //Builder
             Message.Builder::class.java.isAssignableFrom(type) -> {
                 val outClass = type.declaringClass
-                val newBuilderMethod = outClass.methodOrNull("newBuilder")
+                val newBuilderMethod = outClass.getMethodOrNull("newBuilder")
                 if (newBuilderMethod === null) {
                     throw IllegalStateException("Cannot find newBuilder method for $outClass")
                 }
@@ -26,7 +26,7 @@ object ProtobufBeanCreator : BeanCreator {
             }
             //Message
             MessageOrBuilder::class.java.isAssignableFrom(type) -> {
-                val newBuilderMethod = type.methodOrNull("newBuilder")
+                val newBuilderMethod = type.getMethodOrNull("newBuilder")
                 if (newBuilderMethod === null) {
                     throw IllegalStateException("Cannot find newBuilder method for $type")
                 }

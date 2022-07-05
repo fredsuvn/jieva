@@ -1,7 +1,6 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.reflect.getTypeArguments
-import xyz.srclab.common.reflect.methods
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Method
 import java.lang.reflect.Type
@@ -15,7 +14,7 @@ open class BeanResolveContext(open val type: Type) {
     private var _isBreak = false
 
     val typeArguments: Map<TypeVariable<*>, Type> = type.getTypeArguments()
-    val methods: List<Method> = type.rawClass.methods()
+    val methods: List<Method> = type.rawClass.getMethods()
     val isBreak: Boolean get() = _isBreak
 
     /**

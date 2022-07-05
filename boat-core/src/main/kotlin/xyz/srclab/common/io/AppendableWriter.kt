@@ -1,10 +1,11 @@
 package xyz.srclab.common.io
 
-import xyz.srclab.common.base.checkRangeInBounds
+import xyz.srclab.common.base.charsRef
+import xyz.srclab.common.base.endIndex
 import java.io.Writer
 
 /**
- * Makes array as destination of [Appendable].
+ * Makes [Appendable] as [Writer].
  */
 open class AppendableWriter<T : Appendable>(
     private val destination: T
@@ -15,12 +16,8 @@ open class AppendableWriter<T : Appendable>(
     }
 
     override fun write(b: CharArray, off: Int, len: Int) {
-        checkRangeInBounds(off, off + len, 0, b.size)
-        var i = off
-        while (i < off + len) {
-            destination.append(b[i])
-            i++
-        }
+        val chars = b.charsRef(off, endIndex(off, len))
+        destination.append(chars)
     }
 
     override fun close() {

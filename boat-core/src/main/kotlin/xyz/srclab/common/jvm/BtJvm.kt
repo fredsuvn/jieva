@@ -1,4 +1,7 @@
-@file:JvmName("BJvm")
+/**
+ * JVM utilities.
+ */
+@file:JvmName("BtJvm")
 
 package xyz.srclab.common.jvm
 

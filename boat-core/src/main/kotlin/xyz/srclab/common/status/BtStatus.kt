@@ -1,4 +1,7 @@
-@file:JvmName("BStatus")
+/**
+ *
+ */
+@file:JvmName("BtStatus")
 
 package xyz.srclab.common.status
 

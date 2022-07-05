@@ -111,6 +111,10 @@ interface ArrayRef<T> {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
+            }
         }
     }
 }
@@ -221,6 +225,10 @@ interface BooleanArrayRef {
                 val len = min(length, dest.size - startIndex)
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
+            }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }
@@ -333,6 +341,10 @@ interface ByteArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
+            }
         }
     }
 }
@@ -443,6 +455,10 @@ interface ShortArrayRef {
                 val len = min(length, dest.size - startIndex)
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
+            }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }
@@ -555,6 +571,10 @@ interface CharArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
+            }
         }
     }
 }
@@ -665,6 +685,10 @@ interface IntArrayRef {
                 val len = min(length, dest.size - startIndex)
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
+            }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }
@@ -777,6 +801,10 @@ interface LongArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
+            }
         }
     }
 }
@@ -888,6 +916,10 @@ interface FloatArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
+            }
         }
     }
 }
@@ -998,6 +1030,10 @@ interface DoubleArrayRef {
                 val len = min(length, dest.size - startIndex)
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
+            }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }

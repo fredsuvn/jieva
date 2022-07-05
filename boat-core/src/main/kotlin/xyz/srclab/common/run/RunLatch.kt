@@ -6,9 +6,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 /**
- * Represents a thread latch,
- * a synchronization helper that allows one or more threads block to wait,
- * until the lock value of this latch equals to less than zero.
+ * Represents a thread latch allows one or more threads block to wait,
+ * until the lock value equals to or less than zero.
  *
  * @see CountDownLatch
  */

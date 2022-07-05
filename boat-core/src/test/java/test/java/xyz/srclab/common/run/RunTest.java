@@ -20,7 +20,7 @@ public class RunTest {
 
     @Test
     public void testRunSync() {
-        Runner runner = SyncRunner.INSTANCE;
+        Runner runner = SyncExecutorService.INSTANCE;
         IntRef intRef = IntRef.of(0);
         RunWork<?> work = runner.submit(() -> {
             BThread.sleep(2000);
@@ -122,7 +122,7 @@ public class RunTest {
 
     @Test
     public void testSyncRunner() {
-        Runner runner = SyncRunner.INSTANCE;
+        Runner runner = SyncExecutorService.INSTANCE;
         Thread thread = Thread.currentThread();
         int totalThread = 100;
         IntRef count = IntRef.of(0);

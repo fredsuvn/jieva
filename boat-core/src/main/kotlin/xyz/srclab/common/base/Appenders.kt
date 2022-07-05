@@ -3,6 +3,7 @@ package xyz.srclab.common.base
 import xyz.srclab.common.base.ByteArrayRef.Companion.arrayRef
 import xyz.srclab.common.base.CharArrayRef.Companion.arrayRef
 import java.io.OutputStream
+import java.io.Serializable
 import java.io.Writer
 import java.nio.ByteBuffer
 
@@ -18,7 +19,7 @@ private const val BUFFER_SIZE = 1024
  * Note, **DO NOT** modify content of appended object in `join-to-string` processing,
  * it may cause [IndexOutOfBoundsException].
  */
-open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appendable, Writer() {
+open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appendable, Writer(), Serializable {
 
     private var head = SNode<Any>()
     private var cur = head
@@ -196,6 +197,10 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
         cur.next = newNode
         cur = newNode
     }
+
+    companion object {
+        private val serialVersionUID: Long = defaultSerialVersion()
+    }
 }
 
 /**
@@ -208,7 +213,7 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
  * Note, **DO NOT** modify content of appended object in `join-to-bytes` processing,
  * it may cause [IndexOutOfBoundsException].
  */
-open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStream() {
+open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStream(), Serializable {
 
     private var head = SNode<Any>()
     private var cur = head
@@ -357,6 +362,10 @@ open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStre
         val newNode = SNode<Any>()
         cur.next = newNode
         cur = newNode
+    }
+
+    companion object {
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
 

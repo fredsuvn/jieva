@@ -1,11 +1,12 @@
 package xyz.srclab.common.io
 
+import xyz.srclab.common.base.CharsRef
 import xyz.srclab.common.base.checkRangeInBounds
 import java.io.Reader
 import kotlin.math.min
 
 /**
- * Makes [CharSequence] as source of [Reader].
+ * Makes [CharSequence] as [Reader].
  */
 open class CharSeqReader<T : CharSequence>(
     private val source: T,
@@ -35,14 +36,17 @@ open class CharSeqReader<T : CharSequence>(
             return -1
         }
         val remaining = offset + length - pos
-        val result = min(remaining, len)
+        val readLength = min(remaining, len)
+        if (source is CharsRef) {
+            source.subSequence(0, readLength)
+        }
         var i = 0
-        while (i < result) {
+        while (i < readLength) {
             b[off + i] = source[pos + i]
             i++
         }
-        pos += result
-        return result
+        pos += readLength
+        return readLength
     }
 
     override fun close() {

@@ -6,6 +6,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.base.DatePattern.Companion.toDatePattern
+import java.io.Serializable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.*
@@ -858,7 +859,15 @@ interface TimePoint {
             return OfChars(this, pattern)
         }
 
-        private class OfDate(private val date: Date) : TimePoint {
+        private class OfDate(private val date: Date) : TimePoint, Serializable {
+
+            override fun toMillis(): Long {
+                return date.time
+            }
+
+            override fun toSeconds(): Long {
+                return date.time / 1000
+            }
 
             override fun toDate(): Date {
                 return date
@@ -876,20 +885,16 @@ interface TimePoint {
                 return toTemporal()
             }
 
-            override fun toMillis(): Long {
-                return date.time
-            }
-
-            override fun toSeconds(): Long {
-                return date.time / 1000
-            }
-
             override fun format(pattern: DatePattern): String {
                 return pattern.format(date)
             }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
+            }
         }
 
-        private class OfTemporal(private val temporal: TemporalAccessor) : TimePoint {
+        private class OfTemporal(private val temporal: TemporalAccessor) : TimePoint, Serializable {
 
             override fun toDate(): Date {
                 return Date.from(temporal.toInstant())
@@ -911,9 +916,13 @@ interface TimePoint {
             override fun format(pattern: DatePattern): String {
                 return pattern.format(temporal)
             }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
+            }
         }
 
-        private class OfChars(chars: CharSequence, pattern: DatePattern) : TimePoint {
+        private class OfChars(chars: CharSequence, pattern: DatePattern) : TimePoint, Serializable {
 
             private val temporal: TemporalAccessor?
             private val date: Date?
@@ -932,6 +941,20 @@ interface TimePoint {
                 if (temporal === null && date === null) {
                     throw DateTimeException("Cannot parse $chars to pattern: $pattern")
                 }
+            }
+
+            override fun toMillis(): Long {
+                if (date !== null) {
+                    return date.time
+                }
+                return temporal!!.toInstant().toEpochMilli()
+            }
+
+            override fun toSeconds(): Long {
+                if (date !== null) {
+                    return date.time / 1000
+                }
+                return temporal!!.toInstant().epochSecond
             }
 
             override fun toDate(): Date {
@@ -962,25 +985,15 @@ interface TimePoint {
                 return date?.toInstant()
             }
 
-            override fun toMillis(): Long {
-                if (date !== null) {
-                    return date.time
-                }
-                return temporal!!.toInstant().toEpochMilli()
-            }
-
-            override fun toSeconds(): Long {
-                if (date !== null) {
-                    return date.time / 1000
-                }
-                return temporal!!.toInstant().epochSecond
-            }
-
             override fun format(pattern: DatePattern): String {
                 if (temporal !== null) {
                     return pattern.format(temporal)
                 }
                 return pattern.format(date!!)
+            }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }

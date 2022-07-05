@@ -4,7 +4,6 @@ import xyz.srclab.common.base.blockNumber
 import xyz.srclab.common.codec.CipherCodec
 import xyz.srclab.common.codec.CodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec
-import xyz.srclab.common.io.BytesAppender
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer

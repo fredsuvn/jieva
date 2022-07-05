@@ -63,15 +63,9 @@ fun <K, V, C : MutableMap<in K, in V>> collect(dest: C, keyValues: Iterable<Any?
     return dest
 }
 
-fun <K, V> newEntry(key: K, value: V): MutableMap.MutableEntry<K, V> {
-    return EntryImpl(key, value)
-}
-
-/**
- * Returns not-null value of [key], or [defaultValue] if the value is null.
- */
-fun <K, V : Any> Map<K, V>.getNotNull(key: K, defaultValue: V): V {
-    return this[key] ?: defaultValue
+@JvmOverloads
+fun <K, V> newEntry(key: K, value: V, readOnly: Boolean = false): MutableMap.MutableEntry<K, V> {
+    return if (readOnly) ReadOnlyEntryImpl(key, value) else EntryImpl(key, value)
 }
 
 /**
@@ -380,5 +374,14 @@ private data class EntryImpl<K, V>(
         val old = value
         value = newValue
         return old
+    }
+}
+
+private data class ReadOnlyEntryImpl<K, V>(
+    override val key: K,
+    override val value: V
+) : MutableMap.MutableEntry<K, V> {
+    override fun setValue(newValue: V): V {
+        throw UnsupportedOperationException("Read Only Entry!")
     }
 }

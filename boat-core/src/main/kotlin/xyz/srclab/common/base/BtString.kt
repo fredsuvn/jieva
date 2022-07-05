@@ -364,6 +364,7 @@ fun CharSequence.removeIfEndWith(suffix: CharSequence): String {
  *
  * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
  */
+@Throws(IndexOutOfBoundsException::class)
 @JvmOverloads
 fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
     if (startIndex == 0 && endIndex == this.length) {
@@ -377,6 +378,7 @@ fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharS
  *
  * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
  */
+@Throws(IndexOutOfBoundsException::class)
 @JvmOverloads
 fun CharSequence.charsRef(startIndex: Int = 0, endIndex: Int = this.length): CharsRef {
     if (startIndex == 0 && endIndex == this.length && this is CharsRef) {
@@ -388,6 +390,7 @@ fun CharSequence.charsRef(startIndex: Int = 0, endIndex: Int = this.length): Cha
 /**
  * Returns [CharsRef] of [this] from [startIndex] inclusive to [endIndex] exclusive.
  */
+@Throws(IndexOutOfBoundsException::class)
 @JvmOverloads
 fun CharArray.charsRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
     return CharsRef.of(this, startIndex, endIndex)
@@ -491,6 +494,9 @@ interface CharsRef : CharSequence {
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                if (startIndex == 0 && endIndex == length) {
+                    return this
+                }
                 return OfCharSeq(source, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
@@ -532,6 +538,9 @@ interface CharsRef : CharSequence {
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                if (startIndex == 0 && endIndex == length) {
+                    return this
+                }
                 return OfCharArray(source, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
