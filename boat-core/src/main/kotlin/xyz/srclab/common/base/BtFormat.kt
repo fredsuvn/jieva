@@ -1,7 +1,7 @@
 /**
  * Format utilities.
  */
-@file:JvmName("FormatBt")
+@file:JvmName("BtFormat")
 
 package xyz.srclab.common.base
 

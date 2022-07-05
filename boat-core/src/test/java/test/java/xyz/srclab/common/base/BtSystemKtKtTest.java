@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class SystemBtKtTest {
+public class BtSystemKtKtTest {
 
     @Test
     public void testEnvironment() {

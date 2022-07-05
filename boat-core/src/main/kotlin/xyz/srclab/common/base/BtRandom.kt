@@ -1,7 +1,7 @@
 /**
  * Random utilities.
  */
-@file:JvmName("RandomBt")
+@file:JvmName("BtRandom")
 
 package xyz.srclab.common.base
 
@@ -44,7 +44,7 @@ fun Random.between(from: Int, to: Int): Int {
  */
 @JvmOverloads
 fun randomDigits(size: Int, random: Random = defaultRandom): String {
-    return RandomBtHolder.randomDigits.randomString(size, random)
+    return BtRandomHolder.randomDigits.randomString(size, random)
 }
 
 /**
@@ -52,7 +52,7 @@ fun randomDigits(size: Int, random: Random = defaultRandom): String {
  */
 @JvmOverloads
 fun randomLowerLetters(size: Int, random: Random = defaultRandom): String {
-    return RandomBtHolder.randomLowerLetters.randomString(size, random)
+    return BtRandomHolder.randomLowerLetters.randomString(size, random)
 }
 
 /**
@@ -60,7 +60,7 @@ fun randomLowerLetters(size: Int, random: Random = defaultRandom): String {
  */
 @JvmOverloads
 fun randomUpperLetters(size: Int, random: Random = defaultRandom): String {
-    return RandomBtHolder.randomUpperLetters.randomString(size, random)
+    return BtRandomHolder.randomUpperLetters.randomString(size, random)
 }
 
 /**
@@ -68,7 +68,7 @@ fun randomUpperLetters(size: Int, random: Random = defaultRandom): String {
  */
 @JvmOverloads
 fun randomLetters(size: Int, random: Random = defaultRandom): String {
-    return RandomBtHolder.randomLetters.randomString(size, random)
+    return BtRandomHolder.randomLetters.randomString(size, random)
 }
 
 /**
@@ -76,7 +76,7 @@ fun randomLetters(size: Int, random: Random = defaultRandom): String {
  */
 @JvmOverloads
 fun randomString(size: Int, random: Random = defaultRandom): String {
-    return RandomBtHolder.randomString.randomString(size, random)
+    return BtRandomHolder.randomString.randomString(size, random)
 }
 
 /**
@@ -109,7 +109,7 @@ fun <T : Any> newRandomBuilder(): RandomBuilder<T> {
  * For example:
  *
  * ```
- * Supplier<String> sp = new RandomSupplierBuilder<String>()
+ * Supplier<String> sp = new RandomBuilder<String>()
  *     .score(10, "a")
  *     .score(40, () -> "b")
  *     .build()
@@ -189,7 +189,7 @@ open class RandomBuilder<T : Any> {
     )
 }
 
-private object RandomBtHolder {
+private object BtRandomHolder {
     const val randomDigits = "0123456789"
     const val randomLowerLetters = "abcdefghijklnmopqrstuvwxyz"
     const val randomUpperLetters = "ABCDEFGHIJKLNMOPQRSTUVWXYZ"

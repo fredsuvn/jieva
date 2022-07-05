@@ -18,7 +18,7 @@ interface EventBus {
      * @param channel event type
      * @param handler event handler
      */
-    fun <T> on(channel: Any, handler: Consumer<in T>)
+    fun <T> on(channel: Any, handler: Consumer<T>)
 
     /**
      * Adds and replaces listener on [channel].
@@ -30,7 +30,7 @@ interface EventBus {
      * @param channel event type
      * @param handler event handler
      */
-    fun <C, T> on(channel: Any, handler: BiConsumer<in T, in C>)
+    fun <C, T> on(channel: Any, handler: BiConsumer<T, C>)
 
     /**
      * Removes listener on [channel].
@@ -45,7 +45,7 @@ interface EventBus {
     /**
      * Emits [event] and [context] on [channel].
      */
-    fun <C> emit(channel: Any, event: Any, context: C)
+    fun emit(channel: Any, event: Any, context: Any)
 
     companion object {
 
@@ -69,11 +69,11 @@ interface EventBus {
             private val handlerMap: MutableMap<Any, Any>,
         ) : EventBus {
 
-            override fun <T> on(channel: Any, handler: Consumer<in T>) {
+            override fun <T> on(channel: Any, handler: Consumer<T>) {
                 handlerMap[channel] = handler
             }
 
-            override fun <C, T> on(channel: Any, handler: BiConsumer<in T, in C>) {
+            override fun <C, T> on(channel: Any, handler: BiConsumer<T, C>) {
                 handlerMap[channel] = handler
             }
 
@@ -86,15 +86,15 @@ interface EventBus {
                 if (handler === null || handler !is Consumer<*>) {
                     return
                 }
-                executor.execute { handler.asType<Consumer<Any?>>().accept(event) }
+                executor.execute { handler.asType<Consumer<Any>>().accept(event) }
             }
 
-            override fun <C> emit(channel: Any, event: Any, context: C) {
+            override fun emit(channel: Any, event: Any, context: Any) {
                 val handler = handlerMap[channel]
                 if (handler === null || handler !is BiConsumer<*, *>) {
                     return
                 }
-                executor.execute { handler.asType<BiConsumer<Any?, C>>().accept(event, context) }
+                executor.execute { handler.asType<BiConsumer<Any, Any>>().accept(event, context) }
             }
         }
     }

@@ -10,7 +10,7 @@ import xyz.srclab.common.base.StringFormat;
 /**
  * @author sunqian
  */
-public class FormatBtKtTest {
+public class BtFormatKtKtTest {
 
     @Test
     public void testFormat() {

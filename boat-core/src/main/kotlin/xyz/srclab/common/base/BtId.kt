@@ -1,7 +1,7 @@
 /**
  * Id utilities.
  */
-@file:JvmName("IdBt")
+@file:JvmName("BtId")
 
 package xyz.srclab.common.base
 
@@ -27,7 +27,7 @@ fun uuid(): String {
  * @see SnowflakeId
  */
 fun snowflakeId(): Long {
-    return IdBtHolder.currentSnowflakeId.next()
+    return BtIdHolder.currentSnowflakeId.next()
 }
 
 /**
@@ -154,6 +154,6 @@ open class SnowflakeId {
     }
 }
 
-private object IdBtHolder {
+private object BtIdHolder {
     val currentSnowflakeId: SnowflakeId = SnowflakeId(systemNanos().toInt())
 }

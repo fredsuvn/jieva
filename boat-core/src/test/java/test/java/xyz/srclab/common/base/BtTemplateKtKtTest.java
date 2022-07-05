@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class TemplateBtKtTest {
+public class BtTemplateKtKtTest {
 
     @Test
     public void testTemplate() {

@@ -1,4 +1,7 @@
-@file:JvmName("UnsafeBt")
+/**
+ * Unsafe utilities.
+ */
+@file:JvmName("BtUnsafe")
 
 package xyz.srclab.common.base
 

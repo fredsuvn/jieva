@@ -1,7 +1,7 @@
 /**
  * Template Utilities.
  */
-@file:JvmName("TemplateBt")
+@file:JvmName("BtTemplate")
 
 package xyz.srclab.common.base
 
@@ -38,7 +38,7 @@ fun CharSequence.parseTemplate(
  * Map<String, Object> args = new HashMap<>();
  * args.put("n1", "Dog");
  * args.put("n2}", "Cat");
- * StringTemplate template1 = TemplateBt.parse("This is a {n1}, that is a {n2}", null, "{", "}");
+ * StringTemplate template1 = BtTemplate.parse("This is a {n1}, that is a {n2}", null, "{", "}");
  * Assert.assertEquals(template1.process(args), "This is a Dog, that is a Cat");
  * ```
  *
@@ -177,24 +177,24 @@ interface StringTemplate {
  * Map<String, Object> args = new HashMap<>();
  * args.put("n1", "Dog");
  * args.put("n2}", "Cat");
- * StringTemplate template1 = TemplateBt.parse("This is a {n1}, that is a {n2}", null, "{", "}");
+ * StringTemplate template1 = BtTemplate.parse("This is a {n1}, that is a {n2}", null, "{", "}");
  * Assert.assertEquals(template1.process(args), "This is a Dog, that is a Cat");
  *
  * //Using unnamed args:
- * StringTemplate template2 = TemplateBt.parse("This is a {}, that is a {}", null, "{", "}");
+ * StringTemplate template2 = BtTemplate.parse("This is a {}, that is a {}", null, "{", "}");
  * Assert.assertEquals(template2.processArgs("Dog", "Cat"), "This is a Dog, that is a Cat");
  *
  * //Using only prefix:
- * StringTemplate template3 = TemplateBt.parse("This is a $n1, that is a $n2", null, "$");
+ * StringTemplate template3 = BtTemplate.parse("This is a $n1, that is a $n2", null, "$");
  * Assert.assertEquals(template3.process(args), "This is a Dog, that is a Cat");
- * StringTemplate template4 = TemplateBt.parse("This is a $, that is a $", null, "$");
+ * StringTemplate template4 = BtTemplate.parse("This is a $, that is a $", null, "$");
  * Assert.assertEquals(template4.processArgs("Dog", "Cat"), "This is a Dog, that is a Cat");
  * ```
  *
  * It supports escape:
  *
  * ```
- * StringTemplate template5 = TemplateBt.parse("This \\is a \\{{n1}, that is a {n2}\\", '\\', "{", "}");
+ * StringTemplate template5 = BtTemplate.parse("This \\is a \\{{n1}, that is a {n2}\\", '\\', "{", "}");
  * Assert.assertEquals(template5.process(args), "This \\is a {Dog, that is a Cat\\");
  * ```
  *
