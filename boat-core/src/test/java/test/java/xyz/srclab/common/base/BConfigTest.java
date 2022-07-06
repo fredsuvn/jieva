@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BConfig;
 import xyz.srclab.common.base.BResource;
+import xyz.srclab.common.base.Bt;
 import xyz.srclab.common.collect.BList;
 
 import java.io.InputStream;
@@ -14,14 +15,15 @@ public class BConfigTest {
 
     @Test
     public void testProperties() {
-        InputStream inputStream = BResource.loadClasspathStream("META-INF/test.properties");
-        Map<String, String> properties = BConfig.readProperties(inputStream);
+        InputStream inputStream = Bt.loadStream("META-INF/test.properties");
+        assert inputStream != null;
+        Map<String, String> properties = Bt.readProperties(inputStream);
         Assert.assertEquals(properties.get("info"), "123");
     }
 
     @Test
     public void testLoadAll() {
-        List<String> strings = BResource.loadClasspathStrings("META-INF/test.properties");
-        Assert.assertEquals(strings, BList.newList("info=123"));
+        List<String> strings = Bt.loadStrings("META-INF/test.properties");
+        Assert.assertEquals(strings, BtL.newList("info=123"));
     }
 }

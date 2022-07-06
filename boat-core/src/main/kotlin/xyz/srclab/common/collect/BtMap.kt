@@ -1,12 +1,13 @@
 /**
  * Map utilities.
  */
-@file:JvmName("BMap")
+@file:JvmName("BtMap")
 
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.convert.Converter
+import xyz.srclab.common.convert.defaultConverter
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -75,7 +76,7 @@ fun <K, V> newEntry(key: K, value: V, readOnly: Boolean = false): MutableMap.Mut
 fun <K, T : Any> Map<K, *>.get(
     key: K,
     type: Class<out T>,
-    converter: Converter = Converter.defaultConverter()
+    converter: Converter = defaultConverter()
 ): T {
     return converter.convert(this[key], type)
 }
@@ -87,7 +88,7 @@ fun <K, T : Any> Map<K, *>.get(
 fun <K, T : Any> Map<K, *>.getOrConvert(
     key: K,
     defaultValue: T,
-    converter: Converter = Converter.defaultConverter()
+    converter: Converter = defaultConverter()
 ): T {
     return converter.convertOrNull(this[key], defaultValue.javaClass) ?: defaultValue
 }

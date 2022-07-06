@@ -1,7 +1,7 @@
 /**
  * Set utilities.
  */
-@file:JvmName("SetBt")
+@file:JvmName("BtSet")
 
 package xyz.srclab.common.collect
 

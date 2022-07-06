@@ -1,12 +1,13 @@
 /**
  * Collection utilities.
  */
-@file:JvmName("CollectBt")
+@file:JvmName("BtCollect")
 
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.convert.Converter
+import xyz.srclab.common.convert.defaultConverter
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -239,7 +240,7 @@ fun <T> Iterable<T>.getOrElse(index: Int, elseValue: IntFunction<out T>): T {
 fun <T : Any> Iterable<*>.get(
     index: Int,
     type: Class<out T>,
-    converter: Converter = Converter.defaultConverter()
+    converter: Converter = defaultConverter()
 ): T {
     return converter.convert(this.get(index), type)
 }
@@ -251,7 +252,7 @@ fun <T : Any> Iterable<*>.get(
 fun <T : Any> Iterable<*>.getOrNull(
     index: Int,
     type: Class<out T>,
-    converter: Converter = Converter.defaultConverter()
+    converter: Converter = defaultConverter()
 ): T? {
     return converter.convertOrNull(this.getOrNull(index), type)
 }
@@ -263,7 +264,7 @@ fun <T : Any> Iterable<*>.getOrNull(
 fun <T : Any> Iterable<*>.getOrConvert(
     index: Int,
     defaultValue: T,
-    converter: Converter = Converter.defaultConverter()
+    converter: Converter = defaultConverter()
 ): T {
     return converter.convertOrNull(this.getOrNull(index), defaultValue.javaClass) ?: defaultValue
 }

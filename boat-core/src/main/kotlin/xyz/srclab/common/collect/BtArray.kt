@@ -1,7 +1,7 @@
 /**
  * Array utilities.
  */
-@file:JvmName("ArrayBt")
+@file:JvmName("BtArray")
 
 package xyz.srclab.common.collect
 
