@@ -1,20 +1,13 @@
 package xyz.srclab.common.status
 
-import xyz.srclab.annotations.Immutable
-import xyz.srclab.common.exception.StatusException
-
 /**
- * Represents a `status` such as response status.
+ * Represents a `status` which consists of a [code] and a [message].
  *
  * @param C code type
- * @param D description type
- *
- * @see StringStatus
- * @see IntStringStatus
- * @see StatusException
+ * @param D message type
+ * @param S type of [Status]
  */
-@Immutable
-interface Status<C, D, T : Status<C, D, T>> {
+interface Status<C, D, S : Status<C, D, S>> {
 
     /**
      * Code of status.
@@ -22,17 +15,17 @@ interface Status<C, D, T : Status<C, D, T>> {
     val code: C
 
     /**
-     * Description of status.
+     * Message of status.
      */
-    val description: D?
+    val message: D?
 
     /**
-     * Returns a new `status` instance which is appended additional description.
+     * Returns a new `status` with this [code] and [message] followed by [additional] message.
      */
-    fun withMoreDescription(addition: D): T
+    fun withMoreMessage(additional: D): S
 
     /**
-     * Returns a new `status` instance of which descriptions are replaced by [description] but code is not changed.
+     * Returns a new `status` with this [code] and new [message].
      */
-    fun withNewDescription(description: D?): T
+    fun withNewMessage(message: D?): S
 }

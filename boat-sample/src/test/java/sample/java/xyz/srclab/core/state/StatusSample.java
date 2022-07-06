@@ -17,7 +17,7 @@ public class StatusSample {
     @Test
     public void testState() {
         MyStatus myState = new MyStatus(1, "description");
-        MyStatus newState = myState.withMoreDescription("cause");
+        MyStatus newState = myState.withMoreMessage("cause");
         //description[cause]
         logger.log(newState.description());
     }
@@ -56,13 +56,13 @@ public class StatusSample {
 
         @NotNull
         @Override
-        public StatusSample.MyStatus withNewDescription(@Nullable String newDescription) {
+        public StatusSample.MyStatus withNewMessage(@Nullable String newDescription) {
             return new MyStatus(code, StringStatus.newDescriptions(newDescription));
         }
 
         @NotNull
         @Override
-        public StatusSample.MyStatus withMoreDescription(String moreDescription) {
+        public StatusSample.MyStatus withMoreMessage(String moreDescription) {
             return new MyStatus(code, StringStatus.moreDescriptions(descriptions(), moreDescription));
         }
     }

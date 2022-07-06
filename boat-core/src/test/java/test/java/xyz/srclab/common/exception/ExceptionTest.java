@@ -18,14 +18,14 @@ public class ExceptionTest {
     public void test() {
         ImpossibleException impossibleException = new ImpossibleException();
         TestException testException = new TestException(StatusException.INTERNAL_STATUS, impossibleException);
-        Assert.assertEquals(testException.getDescription(), StatusException.INTERNAL_STATUS.getDescription());
+        Assert.assertEquals(testException.getMessage(), StatusException.INTERNAL_STATUS.getMessage());
         Assert.assertEquals(testException.getCause(), impossibleException);
 
         TestException testException2 = new TestException("8", "888", impossibleException);
         Status<String, String, StringStatus> exceptionStatus = testException2.withMoreDescription("999");
-        Assert.assertEquals(exceptionStatus.getDescription(), "888[999]");
+        Assert.assertEquals(exceptionStatus.getMessage(), "888[999]");
         Status<String, String, StringStatus> exceptionStatus2 = testException2.withNewDescription("999");
-        Assert.assertEquals(exceptionStatus2.getDescription(), "999");
+        Assert.assertEquals(exceptionStatus2.getMessage(), "999");
     }
 
     public static class TestException extends StatusException {
@@ -45,8 +45,8 @@ public class ExceptionTest {
 
         @Nullable
         @Override
-        public String getDescription() {
-            return super.getDescription();
+        public String getMessage() {
+            return super.getMessage();
         }
     }
 }

@@ -16,8 +16,8 @@ public class StatusTest {
         TestStatus newState = testState.withMoreDescription("cause");
         TestStatus newNewState = newState.withMoreDescription("cause2");
         //description[cause][cause2]
-        BLog.info("newNewState.getDescription: {}", newNewState.getDescription());
-        Assert.assertEquals(newNewState.getDescription(), "description[cause][cause2]");
+        BLog.info("newNewState.getDescription: {}", newNewState.getMessage());
+        Assert.assertEquals(newNewState.getMessage(), "description[cause][cause2]");
     }
 
     public static class TestStatus extends IntStringStatus {
@@ -27,7 +27,7 @@ public class StatusTest {
         }
 
         public TestStatus(Status<Integer, String, IntStringStatus> intStringStatus) {
-            super(intStringStatus.getCode(), intStringStatus.getDescription());
+            super(intStringStatus.getCode(), intStringStatus.getMessage());
         }
 
         @NotNull
@@ -50,8 +50,8 @@ public class StatusTest {
 
         @Nullable
         @Override
-        public String getDescription() {
-            return super.getDescription();
+        public String getMessage() {
+            return super.getMessage();
         }
     }
 }
