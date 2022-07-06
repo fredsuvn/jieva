@@ -7,7 +7,6 @@ import xyz.srclab.common.base.capitalize
 import xyz.srclab.common.bean.AbstractBeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveContext
 import xyz.srclab.common.bean.BeanResolveHandler
-import xyz.srclab.common.bean.BeanTypeBuilder
 import xyz.srclab.common.func.InstFunc
 import xyz.srclab.common.func.InstFunc.Companion.toInstInvoke
 import xyz.srclab.common.func.StaticFunc.Companion.toStaticInvoke

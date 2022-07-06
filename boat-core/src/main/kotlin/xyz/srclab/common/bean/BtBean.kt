@@ -9,12 +9,18 @@ import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.asType
 import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.convert.Converter
+import xyz.srclab.common.convert.defaultConverter
 import java.lang.reflect.Type
 
-private val defaultResolver: BeanResolver
-    get() = BeanResolver.defaultResolver()
-private val defaultConverter
-    get() = Converter.defaultConverter()
+private var defaultResolver: BeanResolver = BeanResolver.newBeanResolver()
+
+fun defaultResolver(): BeanResolver {
+    return defaultResolver
+}
+
+fun setDefaultResolver(resolver: BeanResolver) {
+    defaultResolver = resolver
+}
 
 @JvmName("resolve")
 @JvmOverloads
@@ -35,7 +41,7 @@ fun Any.asBeanMap(beanType: BeanType): BeanMap {
 fun <T : Any> Any.copyProperties(
     @Written to: T,
     beanResolver: BeanResolver = defaultResolver,
-    converter: Converter = defaultConverter,
+    converter: Converter = defaultConverter(),
 ): T {
     return copyProperties(to, true, beanResolver, converter)
 }
@@ -45,7 +51,7 @@ fun <T : Any> Any.copyProperties(
     @Written to: T,
     toType: Type,
     beanResolver: BeanResolver = defaultResolver,
-    converter: Converter = defaultConverter,
+    converter: Converter = defaultConverter(),
 ): T {
     return copyProperties(to, toType, true, beanResolver, converter)
 }
@@ -55,7 +61,7 @@ fun <T : Any> Any.copyProperties(
     @Written to: T,
     copyNull: Boolean,
     beanResolver: BeanResolver = defaultResolver,
-    converter: Converter = defaultConverter,
+    converter: Converter = defaultConverter(),
 ): T {
     return copyProperties(to, to.javaClass, copyNull, beanResolver, converter)
 }
@@ -66,7 +72,7 @@ fun <T : Any> Any.copyProperties(
     toType: Type,
     copyNull: Boolean,
     beanResolver: BeanResolver = defaultResolver,
-    converter: Converter = defaultConverter,
+    converter: Converter = defaultConverter(),
 ): T {
     return when {
         this is Map<*, *> && to is MutableMap<*, *> -> {

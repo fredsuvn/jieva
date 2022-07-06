@@ -18,41 +18,36 @@ import java.lang.reflect.Type
  */
 interface BeanResolver {
 
+    /**
+     * Handlers of this resolver.
+     */
     val resolveHandlers: List<BeanResolveHandler>
 
+    /**
+     * Resolves [type] to [BeanType].
+     */
     fun resolve(type: Type): BeanType {
-        val context = BeanResolveContext(type)
-        val builder = BeanTypeBuilder(type)
+        val properties = LinkedHashMap<String, PropertyType>()
+        val beanType = BeanType(type, properties)
+        val context = BeanResolveContext(type, beanType, properties)
         for (resolveHandler in resolveHandlers) {
-            resolveHandler.resolve(context, builder)
+            resolveHandler.resolve(context)
             if (context.isBreak) {
                 break
             }
         }
-        return builder.build()
+        return beanType
     }
 
     companion object {
 
-        private var defaultResolver: BeanResolver = newBeanResolver(BeanResolveHandler.DEFAULTS)
-
-        @JvmStatic
-        fun defaultResolver(): BeanResolver {
-            return defaultResolver
-        }
-
-        @JvmStatic
-        fun setDefaultResolver(resolver: BeanResolver) {
-            this.defaultResolver = resolver
-        }
-
         /**
-         * Return a new [BeanResolver] with given [resolveHandlers] and [cache] (default is [Cache.weakCache]).
+         * Creates a new [BeanResolver] with given [resolveHandlers] and [cache].
          */
         @JvmOverloads
         @JvmStatic
         fun newBeanResolver(
-            resolveHandlers: Iterable<BeanResolveHandler>,
+            resolveHandlers: Iterable<BeanResolveHandler> = BeanResolveHandler.DEFAULTS,
             cache: Cache<Type, BeanType> = Cache.ofWeak()
         ): BeanResolver {
             return CachedBeanResolver(resolveHandlers.asToList(), cache)

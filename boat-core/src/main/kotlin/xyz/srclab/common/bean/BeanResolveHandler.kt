@@ -22,18 +22,33 @@ import java.lang.reflect.Type
 interface BeanResolveHandler {
 
     /**
-     * Resolves into given [builder].
+     * Resolves [BeanResolveContext.type] from given [context].
+     *
+     * For each handler, the resolved properties should be put into or remove from [BeanResolveContext.properties].
      */
-    fun resolve(@Written context: BeanResolveContext, @Written builder: BeanTypeBuilder)
+    fun resolve(@Written context: BeanResolveContext)
 
     companion object {
 
+        /**
+         * Bean style resolve handler.
+         *
+         * @see BeanStyleBeanResolveHandler
+         */
         @JvmField
         val BEAN_STYLE = BeanStyleBeanResolveHandler
 
+        /**
+         * Record style resolve handler.
+         *
+         * @see RecordStyleBeanResolveHandler
+         */
         @JvmField
         val RECORD_STYLE = RecordStyleBeanResolveHandler
 
+        /**
+         * Default resolve handlers for [defaultResolver].
+         */
         @JvmField
         val DEFAULTS: List<BeanResolveHandler> = listOf(
             BEAN_STYLE
@@ -51,26 +66,24 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
      */
     protected abstract fun resolveAccessors(
         context: BeanResolveContext,
-        @Written builder: BeanTypeBuilder,
         @Written getters: MutableMap<String, GetterInfo>,
         @Written setters: MutableMap<String, SetterInfo>,
     )
 
-    override fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder) {
+    override fun resolve(context: BeanResolveContext) {
 
         val getters: MutableMap<String, GetterInfo> = LinkedHashMap()
         val setters: MutableMap<String, SetterInfo> = LinkedHashMap()
 
-        resolveAccessors(context, builder, getters, setters)
+        resolveAccessors(context, getters, setters)
 
-        val beanType = builder.build()
         for (getterEntry in getters) {
             val propertyName = getterEntry.key
             val getter = getterEntry.value
             val setter = setters[propertyName]
             if (setter === null) {
                 val propertyType = PropertyType(
-                    beanType,
+                    context.beanType,
                     propertyName,
                     getter.type,
                     getter.getter,
@@ -79,10 +92,10 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                     getter.getterMethod,
                     null
                 )
-                builder.addProperty(propertyType)
+                context.properties[propertyName] = propertyType
             } else if (getter.type == setter.type) {
                 val propertyType = PropertyType(
-                    beanType,
+                    context.beanType,
                     propertyName,
                     getter.type,
                     getter.getter,
@@ -91,7 +104,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                     getter.getterMethod,
                     setter.setterMethod
                 )
-                builder.addProperty(propertyType)
+                context.properties[propertyName] = propertyType
                 setters.remove(propertyName)
             }
         }
@@ -100,7 +113,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
             val propertyName = setterEntry.key
             val setter = setterEntry.value
             val propertyType = PropertyType(
-                beanType,
+                context.beanType,
                 propertyName,
                 setter.type,
                 null,
@@ -109,7 +122,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                 null,
                 setter.setterMethod
             )
-            builder.addProperty(propertyType)
+            context.properties[propertyName] = propertyType
         }
     }
 
@@ -143,11 +156,10 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
     override fun resolveAccessors(
         context: BeanResolveContext,
-        @Written builder: BeanTypeBuilder,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
     ) {
-        val beanClass = builder.type.rawClass
+        val beanClass = context.type.rawClass
         val methods = context.methods
         for (method in methods) {
             if (method.isBridge || method.isSynthetic) {
@@ -159,7 +171,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             }
             if (name.startsWith("get") && method.parameterCount == 0) {
                 val propertyName = name.substring(3).uncapitalize()
-                if (builder.hasProperty(propertyName)) {
+                if (context.properties.containsKey(propertyName)) {
                     continue
                 }
                 val type = method.genericReturnType.eraseTypeParameters(context.typeArguments)
@@ -169,7 +181,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             }
             if (name.startsWith("set") && method.parameterCount == 1) {
                 val propertyName = name.substring(3).uncapitalize()
-                if (builder.hasProperty(propertyName)) {
+                if (context.properties.containsKey(propertyName)) {
                     continue
                 }
                 val type = method.genericParameterTypes[0].eraseTypeParameters(context.typeArguments)
@@ -193,18 +205,17 @@ object RecordStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
     override fun resolveAccessors(
         context: BeanResolveContext,
-        @Written builder: BeanTypeBuilder,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
     ) {
-        val beanClass = builder.type.rawClass
+        val beanClass = context.type.rawClass
         val methods = context.methods
         for (method in methods) {
             if (method.isBridge || method.isSynthetic || method.declaringClass == Any::class.java) {
                 continue
             }
             val propertyName = method.name
-            if (builder.hasProperty(propertyName)) {
+            if (context.properties.containsKey(propertyName)) {
                 continue
             }
             if (method.parameterCount == 0) {
