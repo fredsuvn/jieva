@@ -2,44 +2,44 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BCheck;
+import xyz.srclab.common.base.BtCheck;
 
 import java.util.NoSuchElementException;
 
-public class CheckBtKtTest {
+public class BeCheckTest {
 
     @Test
     public void testCheck() {
         Assert.expectThrows(NullPointerException.class, () ->
-            BCheck.checkNull(false, () -> ""));
+            BtCheck.checkNull(false, () -> ""));
         Assert.expectThrows(IllegalArgumentException.class, () ->
-            BCheck.checkArgument(false, () -> ""));
+            BtCheck.checkArgument(false, () -> ""));
         Assert.expectThrows(IllegalStateException.class, () ->
-            BCheck.checkState(false, () -> ""));
+            BtCheck.checkState(false, () -> ""));
         Assert.expectThrows(NoSuchElementException.class, () ->
-            BCheck.checkElement(false, () -> ""));
+            BtCheck.checkElement(false, () -> ""));
         Assert.expectThrows(UnsupportedOperationException.class, () ->
-            BCheck.checkSupported(false, () -> ""));
+            BtCheck.checkSupported(false, () -> ""));
         Assert.expectThrows(IndexOutOfBoundsException.class, () ->
-            BCheck.checkBounds(false, () -> ""));
+            BtCheck.checkBounds(false, () -> ""));
         Assert.expectThrows(IndexOutOfBoundsException.class, () ->
-            BCheck.checkInBounds(0, 1, 2));
+            BtCheck.checkInBounds(0, 1, 2));
         Assert.expectThrows(IndexOutOfBoundsException.class, () ->
-            BCheck.checkInBounds(0, 0, 0));
+            BtCheck.checkInBounds(0, 0, 0));
         Assert.expectThrows(IndexOutOfBoundsException.class, () ->
-            BCheck.checkInBounds(0, 2, 1));
+            BtCheck.checkInBounds(0, 2, 1));
         Assert.expectThrows(IndexOutOfBoundsException.class, () ->
-            BCheck.checkRangeInBounds(0, 4, 2, 10));
+            BtCheck.checkRangeInBounds(0, 4, 2, 10));
         Assert.expectThrows(IndexOutOfBoundsException.class, () ->
-            BCheck.checkRangeInBounds(0, 4, 1, 4));
+            BtCheck.checkRangeInBounds(0, 4, 1, 4));
         Assert.expectThrows(IndexOutOfBoundsException.class, () ->
-            BCheck.checkRangeInBounds(0, 4, 0, 3));
-        Assert.expectThrows(Exception.class, () -> BCheck.checkThrow(false, Exception::new));
+            BtCheck.checkRangeInBounds(0, 4, 0, 3));
+        Assert.expectThrows(Exception.class, () -> BtCheck.checkThrow(false, Exception::new));
 
-        BCheck.checkInBounds(1, 0, 2);
-        BCheck.checkInBounds(0, 0, 1);
-        BCheck.checkRangeInBounds(0, 4, 0, 4);
-        BCheck.checkRangeInBounds(0, 4, -1, 4);
-        BCheck.checkRangeInBounds(2, 4, 0, 4);
+        BtCheck.checkInBounds(1, 0, 2);
+        BtCheck.checkInBounds(0, 0, 1);
+        BtCheck.checkRangeInBounds(0, 4, 0, 4);
+        BtCheck.checkRangeInBounds(0, 4, -1, 4);
+        BtCheck.checkRangeInBounds(2, 4, 0, 4);
     }
 }

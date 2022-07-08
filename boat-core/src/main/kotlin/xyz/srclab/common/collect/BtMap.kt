@@ -28,6 +28,7 @@ import kotlin.collections.sortedWith as sortedWithKt
  * which mean the first element is first key, the second is first value,
  * the third is second key, the fourth is second value, and so on.
  */
+@JvmName("of")
 fun <K, V> newMap(vararg keyValues: Any?): LinkedHashMap<K, V> {
     return collect(LinkedHashMap<K, V>(), *keyValues)
 }
@@ -37,6 +38,7 @@ fun <K, V> newMap(vararg keyValues: Any?): LinkedHashMap<K, V> {
  * which mean the first element is first key, the second is first value,
  * the third is second key, the fourth is second value, and so on.
  */
+@JvmName("of")
 fun <K, V> newMap(keyValues: Iterable<Any?>): LinkedHashMap<K, V> {
     return collect(LinkedHashMap<K, V>(), keyValues)
 }

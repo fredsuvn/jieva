@@ -2,22 +2,22 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.base.BRandom;
+import xyz.srclab.common.base.BtLog;
+import xyz.srclab.common.base.BtRandom;
 
 import java.util.function.Supplier;
 
-public class BRandomTest {
+public class BtRandomTest {
 
     @Test
     public void testRandoms() {
         for (int i = 0; i < 10000; i++) {
-            int r = BRandom.between(10, 20);
+            int r = BtRandom.between(10, 20);
             // BLog.info("random[10, 20): {}", r);
             Assert.assertTrue(r >= 10 && r < 20);
         }
-        String rd = BRandom.randomString(100);
-        BLog.info("randomString: {}", rd);
+        String rd = BtRandom.randomString(100);
+        BtLog.info("randomString: {}", rd);
         Assert.assertEquals(rd.length(), 100);
         for (int i = 0; i < rd.length(); i++) {
             char c = rd.charAt(i);
@@ -27,7 +27,7 @@ public class BRandomTest {
 
     @Test
     public void testRandomSupplier() {
-        Supplier<?> rs = BRandom.newBuilder()
+        Supplier<?> rs = BtRandom.newBuilder()
             .score(20, "A")
             .score(20, "B")
             .score(60, "C")
@@ -47,6 +47,6 @@ public class BRandomTest {
         }
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
-        BLog.info("countA: {}, countB: {}, countC: {}, total: {}", countA, countB, countC, total);
+        BtLog.info("countA: {}, countB: {}, countC: {}, total: {}", countA, countB, countC, total);
     }
 }

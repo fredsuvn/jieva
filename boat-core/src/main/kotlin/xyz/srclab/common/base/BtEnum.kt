@@ -55,7 +55,6 @@ fun <T> Class<*>.getEnumOrNull(name: CharSequence, ignoreCase: Boolean = false):
 /**
  * Returns enum instance of given [index].
  */
-@JvmName("getValue")
 @Throws(NoSuchEnumException::class)
 fun <T> Class<*>.getEnum(index: Int): T {
     return getEnumOrNull(index) ?: throw NoSuchEnumException("$this[$index]")
@@ -64,7 +63,6 @@ fun <T> Class<*>.getEnum(index: Int): T {
 /**
  * Returns enum instance of given [index], or null if it doesn't exit or index out of bounds.
  */
-@JvmName("getValueOrNull")
 fun <T> Class<*>.getEnumOrNull(index: Int): T? {
     val values = this.enumConstants
     if (values.isNullOrEmpty()) {

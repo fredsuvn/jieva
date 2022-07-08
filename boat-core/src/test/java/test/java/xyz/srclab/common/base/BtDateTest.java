@@ -2,8 +2,7 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BDefault;
-import xyz.srclab.common.base.BTime;
+import xyz.srclab.common.base.BtDate;
 import xyz.srclab.common.base.DatePattern;
 import xyz.srclab.common.base.TimePoint;
 
@@ -16,18 +15,18 @@ import java.util.Date;
 /**
  * @author sunqian
  */
-public class BtDateKtKtTest {
+public class BtDateTest {
 
     @Test
     public void testTime() {
-        String timestamp = BTime.currentTimestamp();
-        LocalDateTime now = LocalDateTime.from(BDefault.timestampPattern().formatter().parse(timestamp));
-        Assert.assertEquals(DateTimeFormatter.ofPattern(BDefault.timestampPattern().getPattern()).format(now), timestamp);
-        Assert.assertEquals(BTime.toInstant(now), now.atZone(ZoneId.systemDefault()).toInstant());
-        Assert.assertEquals(BTime.toDate(now), Date.from(BTime.toInstant(now)));
-        Assert.assertEquals(BTime.toLocalDate(now), now.toLocalDate());
-        Assert.assertEquals(BTime.toLocalTime(now), now.toLocalTime());
-        Assert.assertEquals(BTime.toZonedDateTime(now), now.atZone(ZoneId.systemDefault()));
+        String timestamp = BtDate.currentTimestamp();
+        LocalDateTime now = LocalDateTime.from(BtDate.defaultTimestampDatePattern().formatter().parse(timestamp));
+        Assert.assertEquals(DateTimeFormatter.ofPattern(BtDate.defaultTimestampDatePattern().getPattern()).format(now), timestamp);
+        Assert.assertEquals(BtDate.toInstant(now), now.atZone(ZoneId.systemDefault()).toInstant());
+        Assert.assertEquals(BtDate.toDate(now), Date.from(BtDate.toInstant(now)));
+        Assert.assertEquals(BtDate.toLocalDate(now), now.toLocalDate());
+        Assert.assertEquals(BtDate.toLocalTime(now), now.toLocalTime());
+        Assert.assertEquals(BtDate.toZonedDateTime(now), now.atZone(ZoneId.systemDefault()));
     }
 
     @Test
@@ -45,11 +44,11 @@ public class BtDateKtKtTest {
         DatePattern pattern = DatePattern.of("yyyy-MM-dd hh:mm:ss");
         String date = "2021-09-16 03:00:18";
         Assert.assertEquals(
-            BTime.toLocalDateTime(pattern.parseTemporal(date)),
+            BtDate.toLocalDateTime(pattern.parseTemporal(date)),
             LocalDateTime.of(2021, 9, 16, 3, 0, 18)
         );
         Assert.assertEquals(
-            BTime.toZonedDateTime(pattern.parseTemporal(date)),
+            BtDate.toZonedDateTime(pattern.parseTemporal(date)),
             ZonedDateTime.of(LocalDateTime.of(2021, 9, 16, 3, 0, 18), ZoneId.systemDefault())
         );
     }

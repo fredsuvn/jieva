@@ -11,6 +11,7 @@ import kotlin.collections.plus as plusKt
 /**
  * Returns new [LinkedHashSet] with [elements].
  */
+@JvmName("of")
 fun <T> newSet(vararg elements: T): LinkedHashSet<T> {
     return collect(LinkedHashSet(), *elements)
 }

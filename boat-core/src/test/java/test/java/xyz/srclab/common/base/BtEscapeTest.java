@@ -2,11 +2,11 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BEscape;
-import xyz.srclab.common.io.BIO;
-import xyz.srclab.common.io.BytesAppender;
+import xyz.srclab.common.base.BtEscape;
+import xyz.srclab.common.base.BytesAppender;
+import xyz.srclab.common.io.BtIO;
 
-public class EscapeBtKtTest {
+public class BtEscapeTest {
 
     @Test
     public void testEscape() {
@@ -23,28 +23,28 @@ public class EscapeBtKtTest {
     }
 
     private void doTestEscape(char escape, String escapedChars, String input, String expected) {
-        String encoded = BEscape.escape(input, escape, escapedChars);
+        String encoded = BtEscape.escape(input, escape, escapedChars);
         Assert.assertEquals(encoded, expected);
 
         BytesAppender bytesDest = new BytesAppender();
-        BEscape.escape(BIO.asInputStream(input.getBytes()), (byte) escape, escapedChars.getBytes(), bytesDest);
-        Assert.assertEquals(new String(bytesDest.toBytes()), expected);
+        BtEscape.escape(BtIO.asInputStream(input.getBytes()), (byte) escape, escapedChars.getBytes(), bytesDest);
+        Assert.assertEquals(new String(bytesDest.toByteArray()), expected);
 
         StringBuilder charsDest = new StringBuilder();
-        BEscape.escape(BIO.asReader(input), escape, escapedChars, charsDest);
+        BtEscape.escape(BtIO.asReader(input), escape, escapedChars, charsDest);
         Assert.assertEquals(charsDest.toString(), expected);
     }
 
     private void doTestUnescape(char escape, String escapedChars, String input, String expected) {
-        String encoded = BEscape.unescape(input, escape, escapedChars);
+        String encoded = BtEscape.unescape(input, escape, escapedChars);
         Assert.assertEquals(encoded, expected);
 
         BytesAppender bytesDest = new BytesAppender();
-        BEscape.unescape(BIO.asInputStream(input.getBytes()), (byte) escape, escapedChars.getBytes(), bytesDest);
-        Assert.assertEquals(new String(bytesDest.toBytes()), expected);
+        BtEscape.unescape(BtIO.asInputStream(input.getBytes()), (byte) escape, escapedChars.getBytes(), bytesDest);
+        Assert.assertEquals(new String(bytesDest.toByteArray()), expected);
 
         StringBuilder charsDest = new StringBuilder();
-        BEscape.unescape(BIO.asReader(input), escape, escapedChars, charsDest);
+        BtEscape.unescape(BtIO.asReader(input), escape, escapedChars, charsDest);
         Assert.assertEquals(charsDest.toString(), expected);
     }
 }

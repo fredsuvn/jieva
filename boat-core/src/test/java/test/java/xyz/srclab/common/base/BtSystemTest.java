@@ -2,32 +2,32 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.base.BSystem;
+import xyz.srclab.common.base.BtLog;
+import xyz.srclab.common.base.BtSystem;
 
 import java.util.Map;
 
 /**
  * @author sunqian
  */
-public class BtSystemKtKtTest {
+public class BtSystemTest {
 
     @Test
     public void testEnvironment() {
-        int availableProcessors = BSystem.availableProcessors();
-        BLog.info("availableProcessors: " + availableProcessors);
+        int availableProcessors = BtSystem.availableProcessors();
+        BtLog.info("availableProcessors: " + availableProcessors);
         Assert.assertEquals(Runtime.getRuntime().availableProcessors(), availableProcessors);
-        BLog.info("Environment.properties():");
-        Map<String, String> properties = BSystem.getProperties();
+        BtLog.info("Environment.properties():");
+        Map<String, String> properties = BtSystem.getProperties();
         properties.keySet().stream().sorted().forEach(k ->
             System.out.printf("%-60s: %s%n", k, properties.get(k)));
     }
 
     @Test
     public void testJavaVersion() {
-        int versionNumber = BSystem.getJavaMajorVersion();
-        String version = BSystem.getJavaSpecificationVersion();
-        BLog.info("Current version: {}, number: {}", version, versionNumber);
+        int versionNumber = BtSystem.getJavaMajorVersion();
+        String version = BtSystem.getJavaSpecificationVersion();
+        BtLog.info("Current version: {}, number: {}", version, versionNumber);
         if (versionNumber <= 8) {
             Assert.assertTrue(version.startsWith("1." + versionNumber));
         } else {
@@ -37,7 +37,7 @@ public class BtSystemKtKtTest {
 
     @Test
     public void testSystemDefault() {
-        BLog.info("JVM charset: {}", BSystem.jvmCharset());
-        BLog.info("Native charset: {}", BSystem.nativeCharset());
+        BtLog.info("JVM charset: {}", BtSystem.jvmCharset());
+        BtLog.info("Native charset: {}", BtSystem.nativeCharset());
     }
 }

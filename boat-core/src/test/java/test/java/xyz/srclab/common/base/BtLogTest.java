@@ -1,17 +1,17 @@
 package test.java.xyz.srclab.common.base;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.base.BString;
+import xyz.srclab.common.base.BtLog;
+import xyz.srclab.common.base.BtString;
 import xyz.srclab.common.base.Logger;
 
 import java.io.ByteArrayOutputStream;
 
-public class LogBtKtTest {
+public class BtLogTest {
 
     @Test
     public void testLog() {
-        BLog.error("This is an error message: {}", "BLog Test!");
+        BtLog.error("This is an error message: {}", "BLog Test!");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Logger logger = Logger.newLogger(Logger.INFO_LEVEL, out);
         logger.trace("This is an trace message: {}", "BLog Test!");
@@ -21,7 +21,7 @@ public class LogBtKtTest {
         logger.error("This is an error message: {}", "BLog Test!");
         logger.log(Logger.INFO_LEVEL - 1, "This is an log message: {}", "BLog Test!");
         logger.log(Logger.INFO_LEVEL + 1, "This is an log message: {}", "BLog Test!");
-        String logs = BString.toString(out.toByteArray());
+        String logs = BtString.toString(out.toByteArray());
         System.out.println(logs);
     }
 }

@@ -49,6 +49,7 @@ fun <A : Any> A.arrayCopyOfRange(fromIndex: Int = 0, toIndex: Int = this.arrayLe
 /**
  * Returns new array of [elements].
  */
+@JvmName("of")
 fun <T> newArray(vararg elements: T): Array<T> {
     return elements.asType()
 }
@@ -58,6 +59,7 @@ fun <T> newArray(vararg elements: T): Array<T> {
  *
  * @param A array type
  */
+@JvmName("ofType")
 fun <A> newArrayOfType(type: Type, length: Int): A {
     return java.lang.reflect.Array.newInstance(type.rawClass.componentType, length).asType()
 }

@@ -44,6 +44,7 @@ import kotlin.collections.takeLastWhile as takeLastWhileKt
 /**
  * Returns new [ArrayList] with [elements].
  */
+@JvmName("of")
 fun <T> newList(vararg elements: T): ArrayList<T> {
     return collect(ArrayList(), *elements)
 }

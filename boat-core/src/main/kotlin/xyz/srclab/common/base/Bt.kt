@@ -6,6 +6,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.Boat
+import xyz.srclab.common.collect.newArray
 import xyz.srclab.common.collect.toStringMap
 import xyz.srclab.common.io.readString
 import xyz.srclab.common.reflect.defaultClassLoader
@@ -719,6 +720,36 @@ fun Reader.readProperties(close: Boolean = false): Map<String, String> {
 @JvmOverloads
 fun File.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
     return this.reader(charset).readProperties(true)
+}
+
+/**
+ * Runs a new process with [command].
+ */
+fun runProcess(command: String): Process {
+    return Runtime.getRuntime().exec(command)
+}
+
+/**
+ * Runs a new process with [command], directory([dir]) and environments([env]) (name=value format).
+ */
+fun runProcess(command: String, env: Array<out String>?, dir: File?): Process {
+    newArray("", "")
+    arrayOf("", "")
+    return Runtime.getRuntime().exec(command, env, dir)
+}
+
+/**
+ * Runs a new process with command array([cmdArray]).
+ */
+fun runProcess(vararg cmdArray: String): Process {
+    return Runtime.getRuntime().exec(cmdArray)
+}
+
+/**
+ * Runs a new process with command array([cmdArray]), directory([dir]) and environments([env]) (name=value format).
+ */
+fun runProcess(cmdArray: Array<out String>, env: Array<out String>?, dir: File?): Process {
+    return Runtime.getRuntime().exec(cmdArray, env, dir)
 }
 
 /**

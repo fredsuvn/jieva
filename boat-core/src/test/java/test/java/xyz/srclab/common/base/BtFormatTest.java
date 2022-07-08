@@ -2,21 +2,21 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BFormat;
-import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.base.BtFormat;
+import xyz.srclab.common.base.BtLog;
 import xyz.srclab.common.base.FastFormat;
 import xyz.srclab.common.base.StringFormat;
 
 /**
  * @author sunqian
  */
-public class BtFormatKtKtTest {
+public class BtFormatTest {
 
     @Test
     public void testFormat() {
-        String fastFormat = BFormat.fastFormat("This is {} {}.", "fast", "format");
+        String fastFormat = BtFormat.format("This is {} {}.", "fast", "format");
         Assert.assertEquals(fastFormat, "This is fast format.");
-        String fastFormat2 = BFormat.fastFormat("This is {} {} {} {}.", "fast", "format");
+        String fastFormat2 = BtFormat.format("This is {} {} {} {}.", "fast", "format");
         Assert.assertEquals(fastFormat2, "This is fast format {} {}.");
     }
 
@@ -43,7 +43,7 @@ public class BtFormatKtKtTest {
         Object... args
     ) {
         String actual = format.format(pattern, args);
-        BLog.info("Test CharsFormat ({}): {}", format, actual);
+        BtLog.info("Test CharsFormat ({}): {}", format, actual);
         Assert.assertEquals(actual, expected);
     }
 }
