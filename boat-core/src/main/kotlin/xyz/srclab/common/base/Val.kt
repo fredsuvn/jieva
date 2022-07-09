@@ -2,32 +2,47 @@ package xyz.srclab.common.base
 
 import java.util.*
 import java.util.function.Function
+import java.util.function.Supplier
 
 /**
- * [Val] represents a value wrapper, of which [value] is a final reference cannot be reassigned,
+ * [Val] is a value wrapper, it is final and its value cannot be reassigned,
  * just like the kotlin keyword: `val`.
  *
  * @param T type of wrapped value
  */
-interface Val<T> {
+interface Val<T : Any> {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: T
+    fun get(): T?
 
     /**
-     * Maps current [value] by [func], returns a new [Val] to wrap the new value.
+     * Returns value of this wrapper, or [defaultValue] if the value is null.
      */
-    fun <R> map(func: Function<in T, out R>): Val<R> {
-        return func.apply(value).toVal()
+    fun getOrDefault(defaultValue: T): T {
+        return get() ?: defaultValue
     }
 
     /**
-     * Returns [Optional] from current [value].
+     * Returns value of this wrapper, or result of [supplier] if the value is null.
+     */
+    fun getOrElse(supplier: Supplier<T>): T {
+        return get() ?: supplier.get()
+    }
+
+    /**
+     * Maps current value by [func], returns a new [Val] to wrap the new value.
+     */
+    fun <R : Any> map(func: Function<in T?, out R?>): Val<R> {
+        return func.apply(get()).toVal()
+    }
+
+    /**
+     * Returns [Optional] from current value.
      */
     fun toOptional(): Optional<T> {
-        return Optional.ofNullable(value)
+        return Optional.ofNullable(get())
     }
 
     companion object {
@@ -37,11 +52,13 @@ interface Val<T> {
          */
         @JvmName("of")
         @JvmStatic
-        fun <T> T.toVal(): Val<T> {
+        fun <T : Any> T?.toVal(): Val<T> {
             return ValImpl(this)
         }
 
-        private data class ValImpl<T>(override val value: T) : Val<T>
+        private data class ValImpl<T : Any>(private val value: T?) : Val<T> {
+            override fun get(): T? = value
+        }
     }
 }
 
@@ -52,17 +69,16 @@ interface Val<T> {
 interface BooleanVal {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: Boolean
+    fun get(): Boolean
 
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
     fun asVal(): Val<Boolean> {
         return object : Val<Boolean> {
-            override val value: Boolean
-                get() = this@BooleanVal.value
+            override fun get(): Boolean = this@BooleanVal.get()
         }
     }
 
@@ -77,7 +93,9 @@ interface BooleanVal {
             return BooleanValImpl(this)
         }
 
-        private data class BooleanValImpl(override val value: Boolean) : BooleanVal
+        private data class BooleanValImpl(private val value: Boolean) : BooleanVal {
+            override fun get(): Boolean = value
+        }
     }
 }
 
@@ -88,17 +106,16 @@ interface BooleanVal {
 interface ByteVal {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: Byte
+    fun get(): Byte
 
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
     fun asVal(): Val<Byte> {
         return object : Val<Byte> {
-            override val value: Byte
-                get() = this@ByteVal.value
+            override fun get(): Byte = this@ByteVal.get()
         }
     }
 
@@ -113,7 +130,9 @@ interface ByteVal {
             return ByteValImpl(this)
         }
 
-        private data class ByteValImpl(override val value: Byte) : ByteVal
+        private data class ByteValImpl(private val value: Byte) : ByteVal {
+            override fun get(): Byte = value
+        }
     }
 }
 
@@ -124,17 +143,16 @@ interface ByteVal {
 interface ShortVal {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: Short
+    fun get(): Short
 
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
     fun asVal(): Val<Short> {
         return object : Val<Short> {
-            override val value: Short
-                get() = this@ShortVal.value
+            override fun get(): Short = this@ShortVal.get()
         }
     }
 
@@ -149,7 +167,9 @@ interface ShortVal {
             return ShortValImpl(this)
         }
 
-        private data class ShortValImpl(override val value: Short) : ShortVal
+        private data class ShortValImpl(private val value: Short) : ShortVal {
+            override fun get(): Short = value
+        }
     }
 }
 
@@ -160,17 +180,16 @@ interface ShortVal {
 interface CharVal {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: Char
+    fun get(): Char
 
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
     fun asVal(): Val<Char> {
         return object : Val<Char> {
-            override val value: Char
-                get() = this@CharVal.value
+            override fun get(): Char = this@CharVal.get()
         }
     }
 
@@ -185,7 +204,9 @@ interface CharVal {
             return CharValImpl(this)
         }
 
-        private data class CharValImpl(override val value: Char) : CharVal
+        private data class CharValImpl(private val value: Char) : CharVal {
+            override fun get(): Char = value
+        }
     }
 }
 
@@ -196,17 +217,16 @@ interface CharVal {
 interface IntVal {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: Int
+    fun get(): Int
 
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
     fun asVal(): Val<Int> {
         return object : Val<Int> {
-            override val value: Int
-                get() = this@IntVal.value
+            override fun get(): Int = this@IntVal.get()
         }
     }
 
@@ -221,7 +241,9 @@ interface IntVal {
             return IntValImpl(this)
         }
 
-        private data class IntValImpl(override val value: Int) : IntVal
+        private data class IntValImpl(private val value: Int) : IntVal {
+            override fun get(): Int = value
+        }
     }
 }
 
@@ -232,17 +254,16 @@ interface IntVal {
 interface LongVal {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: Long
+    fun get(): Long
 
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
     fun asVal(): Val<Long> {
         return object : Val<Long> {
-            override val value: Long
-                get() = this@LongVal.value
+            override fun get(): Long = this@LongVal.get()
         }
     }
 
@@ -257,7 +278,9 @@ interface LongVal {
             return LongValImpl(this)
         }
 
-        private data class LongValImpl(override val value: Long) : LongVal
+        private data class LongValImpl(private val value: Long) : LongVal {
+            override fun get(): Long = value
+        }
     }
 }
 
@@ -268,17 +291,16 @@ interface LongVal {
 interface FloatVal {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: Float
+    fun get(): Float
 
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
     fun asVal(): Val<Float> {
         return object : Val<Float> {
-            override val value: Float
-                get() = this@FloatVal.value
+            override fun get(): Float = this@FloatVal.get()
         }
     }
 
@@ -293,7 +315,9 @@ interface FloatVal {
             return FloatValImpl(this)
         }
 
-        private data class FloatValImpl(override val value: Float) : FloatVal
+        private data class FloatValImpl(private val value: Float) : FloatVal {
+            override fun get(): Float = value
+        }
     }
 }
 
@@ -304,17 +328,16 @@ interface FloatVal {
 interface DoubleVal {
 
     /**
-     * Value of this [Val].
+     * Returns value of this wrapper.
      */
-    val value: Double
+    fun get(): Double
 
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
     fun asVal(): Val<Double> {
         return object : Val<Double> {
-            override val value: Double
-                get() = this@DoubleVal.value
+            override fun get(): Double = this@DoubleVal.get()
         }
     }
 
@@ -329,6 +352,8 @@ interface DoubleVal {
             return DoubleValImpl(this)
         }
 
-        private data class DoubleValImpl(override val value: Double) : DoubleVal
+        private data class DoubleValImpl(private val value: Double) : DoubleVal {
+            override fun get(): Double = value
+        }
     }
 }

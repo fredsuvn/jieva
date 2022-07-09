@@ -5,6 +5,7 @@ import xyz.srclab.common.base.TimePoint.Companion.toTimePoint
 import xyz.srclab.common.bean.BeanCreator
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
+import xyz.srclab.common.bean.defaultResolver
 import xyz.srclab.common.collect.*
 import xyz.srclab.common.collect.IterableType.Companion.toIterableType
 import xyz.srclab.common.reflect.*
@@ -389,7 +390,7 @@ object CollectionConvertHandler : ConvertHandler {
  */
 open class BeanConvertHandler @JvmOverloads constructor(
     private val beanCreator: BeanCreator = BeanCreator.DEFAULT,
-    private val beanResolver: BeanResolver = BeanResolver.defaultResolver()
+    private val beanResolver: BeanResolver = defaultResolver()
 ) : ConvertHandler {
 
     override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {

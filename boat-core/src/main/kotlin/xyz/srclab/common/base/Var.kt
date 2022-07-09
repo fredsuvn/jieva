@@ -3,34 +3,34 @@ package xyz.srclab.common.base
 import java.util.function.Function
 
 /**
- * [Var] represents a variable wrapper, of which [value] is a variable reference can be reassigned,
+ * [Var] is a variable wrapper, its value can be gotten and set,
  * just like the kotlin keyword: `var`.
  *
  * @param T type of wrapped value
  */
-interface Var<T> : Val<T> {
+interface Var<T : Any> : Val<T> {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: T
+    fun set(value: T?): T?
 
     /**
-     * Maps current [value] by [func], returns a new [Var] to wrap the new value.
+     * Maps current value by [func], returns a new [Var] to wrap the new value.
      */
-    override fun <R> map(func: Function<in T, out R>): Var<R> {
-        return func.apply(value).toVar()
+    override fun <R : Any> map(func: Function<in T?, out R?>): Var<R> {
+        return func.apply(get()).toVar()
     }
 
     /**
-     * Maps current [value] by [func], returns this [Var] to wrap the new value.
+     * Maps current value by [func], returns this [Var] to wrap the new value.
      *
      * Note: [map] method will create a new [Var] instance,
-     * but [mapSet] returns this instance itself, it only changes the [value] and casts the generic type of [T].
+     * but [mapSet] returns this instance itself, it only changes the value and casts the generic type of [T].
      */
-    fun <R> mapSet(func: Function<in T, out R>): Var<R> {
+    fun <R : Any> mapSet(func: Function<in T?, out R?>): Var<R> {
         val thisVar = this.asType<Var<R>>()
-        thisVar.value = func.apply(value)
+        thisVar.set(func.apply(get()))
         return thisVar
     }
 
@@ -41,11 +41,20 @@ interface Var<T> : Val<T> {
          */
         @JvmName("of")
         @JvmStatic
-        fun <T> T.toVar(): Var<T> {
+        fun <T : Any> T?.toVar(): Var<T> {
             return VarImpl(this)
         }
 
-        private data class VarImpl<T>(override var value: T) : Var<T>
+        private data class VarImpl<T : Any>(private var value: T?) : Var<T> {
+
+            override fun get(): T? = value
+
+            override fun set(value: T?): T? {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
 
@@ -56,20 +65,25 @@ interface Var<T> : Val<T> {
 interface BooleanVar : BooleanVal {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: Boolean
+    fun set(value: Boolean): Boolean
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     *
+     * Note set `null` value will be seen as set `false`.
      */
     fun asVar(): Var<Boolean> {
         return object : Var<Boolean> {
-            override var value: Boolean
-                get() = this@BooleanVar.value
-                set(v) {
-                    this@BooleanVar.value = v
-                }
+
+            override fun get(): Boolean = this@BooleanVar.get()
+
+            override fun set(value: Boolean?): Boolean? {
+                val old = this@BooleanVar.get()
+                this@BooleanVar.set(value ?: false)
+                return old
+            }
         }
     }
 
@@ -84,7 +98,16 @@ interface BooleanVar : BooleanVal {
             return BooleanVarImpl(this)
         }
 
-        private data class BooleanVarImpl(override var value: Boolean) : BooleanVar
+        private data class BooleanVarImpl(private var value: Boolean) : BooleanVar {
+
+            override fun get(): Boolean = value
+
+            override fun set(value: Boolean): Boolean {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
 
@@ -95,20 +118,25 @@ interface BooleanVar : BooleanVal {
 interface ByteVar : ByteVal {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: Byte
+    fun set(value: Byte): Byte
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     *
+     * Note set `null` value will be seen as set `0`.
      */
     fun asVar(): Var<Byte> {
         return object : Var<Byte> {
-            override var value: Byte
-                get() = this@ByteVar.value
-                set(v) {
-                    this@ByteVar.value = v
-                }
+
+            override fun get(): Byte = this@ByteVar.get()
+
+            override fun set(value: Byte?): Byte? {
+                val old = this@ByteVar.get()
+                this@ByteVar.set(value ?: 0)
+                return old
+            }
         }
     }
 
@@ -123,7 +151,16 @@ interface ByteVar : ByteVal {
             return ByteVarImpl(this)
         }
 
-        private data class ByteVarImpl(override var value: Byte) : ByteVar
+        private data class ByteVarImpl(private var value: Byte) : ByteVar {
+
+            override fun get(): Byte = value
+
+            override fun set(value: Byte): Byte {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
 
@@ -134,20 +171,25 @@ interface ByteVar : ByteVal {
 interface ShortVar : ShortVal {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: Short
+    fun set(value: Short): Short
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     *
+     * Note set `null` value will be seen as set `0`.
      */
     fun asVar(): Var<Short> {
         return object : Var<Short> {
-            override var value: Short
-                get() = this@ShortVar.value
-                set(v) {
-                    this@ShortVar.value = v
-                }
+
+            override fun get(): Short = this@ShortVar.get()
+
+            override fun set(value: Short?): Short? {
+                val old = this@ShortVar.get()
+                this@ShortVar.set(value ?: 0)
+                return old
+            }
         }
     }
 
@@ -162,7 +204,16 @@ interface ShortVar : ShortVal {
             return ShortVarImpl(this)
         }
 
-        private data class ShortVarImpl(override var value: Short) : ShortVar
+        private data class ShortVarImpl(private var value: Short) : ShortVar {
+
+            override fun get(): Short = value
+
+            override fun set(value: Short): Short {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
 
@@ -173,20 +224,25 @@ interface ShortVar : ShortVal {
 interface CharVar : CharVal {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: Char
+    fun set(value: Char): Char
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     *
+     * Note set `null` value will be seen as set `0`.
      */
     fun asVar(): Var<Char> {
         return object : Var<Char> {
-            override var value: Char
-                get() = this@CharVar.value
-                set(v) {
-                    this@CharVar.value = v
-                }
+
+            override fun get(): Char = this@CharVar.get()
+
+            override fun set(value: Char?): Char? {
+                val old = this@CharVar.get()
+                this@CharVar.set(value ?: 0.toChar())
+                return old
+            }
         }
     }
 
@@ -201,7 +257,16 @@ interface CharVar : CharVal {
             return CharVarImpl(this)
         }
 
-        private data class CharVarImpl(override var value: Char) : CharVar
+        private data class CharVarImpl(private var value: Char) : CharVar {
+
+            override fun get(): Char = value
+
+            override fun set(value: Char): Char {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
 
@@ -212,20 +277,25 @@ interface CharVar : CharVal {
 interface IntVar : IntVal {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: Int
+    fun set(value: Int): Int
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     *
+     * Note set `null` value will be seen as set `0`.
      */
     fun asVar(): Var<Int> {
         return object : Var<Int> {
-            override var value: Int
-                get() = this@IntVar.value
-                set(v) {
-                    this@IntVar.value = v
-                }
+
+            override fun get(): Int = this@IntVar.get()
+
+            override fun set(value: Int?): Int? {
+                val old = this@IntVar.get()
+                this@IntVar.set(value ?: 0)
+                return old
+            }
         }
     }
 
@@ -240,7 +310,16 @@ interface IntVar : IntVal {
             return IntVarImpl(this)
         }
 
-        private data class IntVarImpl(override var value: Int) : IntVar
+        private data class IntVarImpl(private var value: Int) : IntVar {
+
+            override fun get(): Int = value
+
+            override fun set(value: Int): Int {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
 
@@ -251,20 +330,25 @@ interface IntVar : IntVal {
 interface LongVar : LongVal {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: Long
+    fun set(value: Long): Long
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     *
+     * Note set `null` value will be seen as set `0`.
      */
     fun asVar(): Var<Long> {
         return object : Var<Long> {
-            override var value: Long
-                get() = this@LongVar.value
-                set(v) {
-                    this@LongVar.value = v
-                }
+
+            override fun get(): Long = this@LongVar.get()
+
+            override fun set(value: Long?): Long? {
+                val old = this@LongVar.get()
+                this@LongVar.set(value ?: 0)
+                return old
+            }
         }
     }
 
@@ -279,7 +363,16 @@ interface LongVar : LongVal {
             return LongVarImpl(this)
         }
 
-        private data class LongVarImpl(override var value: Long) : LongVar
+        private data class LongVarImpl(private var value: Long) : LongVar {
+
+            override fun get(): Long = value
+
+            override fun set(value: Long): Long {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
 
@@ -290,20 +383,25 @@ interface LongVar : LongVal {
 interface FloatVar : FloatVal {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: Float
+    fun set(value: Float): Float
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     *
+     * Note set `null` value will be seen as set `0`.
      */
     fun asVar(): Var<Float> {
         return object : Var<Float> {
-            override var value: Float
-                get() = this@FloatVar.value
-                set(v) {
-                    this@FloatVar.value = v
-                }
+
+            override fun get(): Float = this@FloatVar.get()
+
+            override fun set(value: Float?): Float? {
+                val old = this@FloatVar.get()
+                this@FloatVar.set(value ?: 0.0f)
+                return old
+            }
         }
     }
 
@@ -318,7 +416,16 @@ interface FloatVar : FloatVal {
             return FloatVarImpl(this)
         }
 
-        private data class FloatVarImpl(override var value: Float) : FloatVar
+        private data class FloatVarImpl(private var value: Float) : FloatVar {
+
+            override fun get(): Float = value
+
+            override fun set(value: Float): Float {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
 
@@ -329,20 +436,25 @@ interface FloatVar : FloatVal {
 interface DoubleVar : DoubleVal {
 
     /**
-     * Value of this [Var].
+     * Sets new value amd returns old value of this wrapper.
      */
-    override var value: Double
+    fun set(value: Double): Double
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     *
+     * Note set `null` value will be seen as set `0`.
      */
     fun asVar(): Var<Double> {
         return object : Var<Double> {
-            override var value: Double
-                get() = this@DoubleVar.value
-                set(v) {
-                    this@DoubleVar.value = v
-                }
+
+            override fun get(): Double = this@DoubleVar.get()
+
+            override fun set(value: Double?): Double? {
+                val old = this@DoubleVar.get()
+                this@DoubleVar.set(value ?: 0.0)
+                return old
+            }
         }
     }
 
@@ -357,6 +469,15 @@ interface DoubleVar : DoubleVal {
             return DoubleVarImpl(this)
         }
 
-        private data class DoubleVarImpl(override var value: Double) : DoubleVar
+        private data class DoubleVarImpl(private var value: Double) : DoubleVar {
+
+            override fun get(): Double = value
+
+            override fun set(value: Double): Double {
+                val old = this.value
+                this.value = value
+                return old
+            }
+        }
     }
 }
