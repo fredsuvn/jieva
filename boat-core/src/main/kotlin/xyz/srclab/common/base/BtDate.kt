@@ -8,10 +8,12 @@ package xyz.srclab.common.base
 import xyz.srclab.common.base.DatePattern.Companion.toDatePattern
 import java.io.Serializable
 import java.text.DateFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
+import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoField
 import java.time.temporal.TemporalAccessor
 import java.util.*
@@ -552,92 +554,100 @@ interface DatePattern {
 
     /**
      * Formats [temporal] to string with [formatter].
-     * If [formatter] is null, throw an [IllegalStateException].
+     * If [formatter] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class)
     fun format(temporal: TemporalAccessor): String {
-        return formatter()?.format(temporal) ?: throw IllegalStateException("formatter is null")
+        return formatter()?.format(temporal) ?: throw DateTimeException("formatter is null")
     }
 
     /**
      * Formats [date] to string with [dateFormat].
-     * If [dateFormat] is null, throw an [IllegalStateException].
+     * If [dateFormat] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class)
     fun format(date: Date): String {
-        return dateFormat()?.format(date) ?: throw IllegalStateException("dateFormat is null")
+        return dateFormat()?.format(date) ?: throw DateTimeException("dateFormat is null")
     }
 
     /**
      * Parses [chars] to [TemporalAccessor] with [formatter].
-     * If [formatter] is null, throw an [IllegalStateException].
+     * If [formatter] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseTemporal(chars: CharSequence): TemporalAccessor {
-        return formatter()?.parse(chars) ?: throw IllegalStateException("formatter is null")
+        return formatter()?.parse(chars) ?: throw DateTimeException("formatter is null")
     }
 
     /**
      * Parses [chars] to [Date] with [dateFormat].
-     * If [dateFormat] is null, throw an [IllegalStateException].
+     * If [dateFormat] is null, throw a [IllegalStateException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseDate(chars: CharSequence): Date {
-        return dateFormat()?.parse(chars.toString()) ?: throw IllegalStateException("dateFormat is null")
+        val dateFormat = dateFormat()
+        if (dateFormat === null) {
+            throw DateTimeException("dateFormat is null")
+        }
+        try {
+            return dateFormat.parse(chars.toString())
+        } catch (e: ParseException) {
+            throw DateTimeParseException(e.message, chars, e.errorOffset, e)
+        }
     }
 
     /**
      * Parses [chars] to [Instant] with [formatter].
-     * If [formatter] is null, throw an [IllegalStateException].
+     * If [formatter] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseInstant(chars: CharSequence): Instant {
-        return formatter()?.parse(chars) { Instant.from(it) } ?: throw IllegalStateException("formatter is null")
+        return formatter()?.parse(chars) { Instant.from(it) } ?: throw DateTimeException("formatter is null")
     }
 
     /**
      * Parses [chars] to [ZonedDateTime] with [formatter].
-     * If [formatter] is null, throw an [IllegalStateException].
+     * If [formatter] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseZonedDateTime(chars: CharSequence): ZonedDateTime {
-        return formatter()?.parse(chars) { ZonedDateTime.from(it) } ?: throw IllegalStateException("formatter is null")
+        return formatter()?.parse(chars) { ZonedDateTime.from(it) } ?: throw DateTimeException("formatter is null")
     }
 
     /**
      * Parses [chars] to [OffsetDateTime] with [formatter].
-     * If [formatter] is null, throw an [IllegalStateException].
+     * If [formatter] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseOffsetDateTime(chars: CharSequence): OffsetDateTime {
-        return formatter()?.parse(chars) { OffsetDateTime.from(it) } ?: throw IllegalStateException("formatter is null")
+        return formatter()?.parse(chars) { OffsetDateTime.from(it) } ?: throw DateTimeException("formatter is null")
     }
 
     /**
      * Parses [chars] to [LocalDateTime] with [formatter].
-     * If [formatter] is null, throw an [IllegalStateException].
+     * If [formatter] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseLocalDateTime(chars: CharSequence): LocalDateTime {
-        return formatter()?.parse(chars) { LocalDateTime.from(it) } ?: throw IllegalStateException("formatter is null")
+        return formatter()?.parse(chars) { LocalDateTime.from(it) } ?: throw DateTimeException("formatter is null")
     }
 
     /**
      * Parses [chars] to [LocalDate] with [formatter].
-     * If [formatter] is null, throw an [IllegalStateException].
+     * If [formatter] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseLocalDate(chars: CharSequence): LocalDate {
-        return formatter()?.parse(chars) { LocalDate.from(it) } ?: throw IllegalStateException("formatter is null")
+        return formatter()?.parse(chars) { LocalDate.from(it) } ?: throw DateTimeException("formatter is null")
     }
 
     /**
      * Parses [chars] to [LocalTime] with [formatter].
-     * If [formatter] is null, throw an [IllegalStateException].
+     * If [formatter] is null, throw a [DateTimeException].
      */
-    @Throws(IllegalStateException::class)
+    @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseLocalTime(chars: CharSequence): LocalTime {
-        return formatter()?.parse(chars) { LocalTime.from(it) } ?: throw IllegalStateException("formatter is null")
+        return formatter()?.parse(chars) { LocalTime.from(it) } ?: throw DateTimeException("formatter is null")
     }
 
     companion object {
@@ -709,6 +719,7 @@ interface TimePoint {
     /**
      * Returns this time in milliseconds.
      */
+    @Throws(DateTimeException::class)
     fun toMillis(): Long {
         return toInstant().toEpochMilli()
     }
@@ -716,6 +727,7 @@ interface TimePoint {
     /**
      * Returns this time in seconds.
      */
+    @Throws(DateTimeException::class)
     fun toSeconds(): Long {
         return toInstant().epochSecond
     }
@@ -723,26 +735,31 @@ interface TimePoint {
     /**
      * Converts to [Date].
      */
+    @Throws(DateTimeException::class)
     fun toDate(): Date
 
     /**
      * Converts to [Date], or null if failed.
      */
+    @Throws(DateTimeException::class)
     fun toDateOrNull(): Date?
 
     /**
      * Converts to [TemporalAccessor].
      */
+    @Throws(DateTimeException::class)
     fun toTemporal(): TemporalAccessor
 
     /**
      * Converts to [TemporalAccessor], or null if failed.
      */
+    @Throws(DateTimeException::class)
     fun toTemporalOrNull(): TemporalAccessor?
 
     /**
      * Converts to [Instant].
      */
+    @Throws(DateTimeException::class)
     fun toInstant(): Instant {
         return toTemporal().toInstant()
     }
@@ -750,6 +767,7 @@ interface TimePoint {
     /**
      * Converts to [Instant], or null if failed.
      */
+    @Throws(DateTimeException::class)
     fun toInstantOrNull(): Instant? {
         return toTemporalOrNull()?.toInstantOrNull()
     }
@@ -757,6 +775,7 @@ interface TimePoint {
     /**
      * Converts to [ZonedDateTime].
      */
+    @Throws(DateTimeException::class)
     fun toZonedDateTime(): ZonedDateTime {
         return toTemporal().toZonedDateTime()
     }
@@ -764,6 +783,7 @@ interface TimePoint {
     /**
      * Converts to [ZonedDateTime], or null if failed.
      */
+    @Throws(DateTimeException::class)
     fun toZonedDateTimeOrNull(): ZonedDateTime? {
         return toTemporalOrNull()?.toZonedDateTimeOrNull()
     }
@@ -771,6 +791,7 @@ interface TimePoint {
     /**
      * Converts to [OffsetDateTime].
      */
+    @Throws(DateTimeException::class)
     fun toOffsetDateTime(): OffsetDateTime {
         return toTemporal().toOffsetDateTime()
     }
@@ -778,6 +799,7 @@ interface TimePoint {
     /**
      * Converts to [OffsetDateTime], or null if failed.
      */
+    @Throws(DateTimeException::class)
     fun toOffsetDateTimeOrNull(): OffsetDateTime? {
         return toTemporalOrNull()?.toOffsetDateTimeOrNull()
     }
@@ -785,6 +807,7 @@ interface TimePoint {
     /**
      * Converts to [LocalDateTime].
      */
+    @Throws(DateTimeException::class)
     fun toLocalDateTime(): LocalDateTime {
         return toTemporal().toLocalDateTime()
     }
@@ -792,6 +815,7 @@ interface TimePoint {
     /**
      * Converts to [LocalDateTime], or null if failed.
      */
+    @Throws(DateTimeException::class)
     fun toLocalDateTimeOrNull(): LocalDateTime? {
         return toTemporalOrNull()?.toLocalDateTimeOrNull()
     }
@@ -799,6 +823,7 @@ interface TimePoint {
     /**
      * Converts to [LocalDate].
      */
+    @Throws(DateTimeException::class)
     fun toLocalDate(): LocalDate {
         return toTemporal().toLocalDate()
     }
@@ -806,6 +831,7 @@ interface TimePoint {
     /**
      * Converts to [LocalDate], or null if failed.
      */
+    @Throws(DateTimeException::class)
     fun toLocalDateOrNull(): LocalDate? {
         return toTemporalOrNull()?.toLocalDateOrNull()
     }
@@ -813,6 +839,7 @@ interface TimePoint {
     /**
      * Converts to [LocalTime].
      */
+    @Throws(DateTimeException::class)
     fun toLocalTime(): LocalTime {
         return toTemporal().toLocalTime()
     }
@@ -820,6 +847,7 @@ interface TimePoint {
     /**
      * Converts to [LocalTime], or null if failed.
      */
+    @Throws(DateTimeException::class)
     fun toLocalTimeOrNull(): LocalTime? {
         return toTemporalOrNull()?.toLocalTimeOrNull()
     }
@@ -827,6 +855,7 @@ interface TimePoint {
     /**
      * Formats to string.
      */
+    @Throws(DateTimeException::class)
     fun format(pattern: DatePattern): String
 
     companion object {

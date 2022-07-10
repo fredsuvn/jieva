@@ -6,7 +6,6 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.collect.toStringMap
-import java.io.Serializable
 import java.nio.charset.Charset
 
 /*
@@ -51,138 +50,123 @@ const val NATIVE_ENCODING_KEY = "native.encoding"
  */
 
 fun getJavaVersion(): String {
-    return getSystemProperty(JAVA_VERSION_KEY)
+    return getSystemProperty(JAVA_VERSION_KEY)!!
 }
 
 fun getJavaVendor(): String {
-    return getSystemProperty(JAVA_VENDOR_KEY)
+    return getSystemProperty(JAVA_VENDOR_KEY)!!
 }
 
 fun getJavaVendorUrl(): String {
-    return getSystemProperty(JAVA_VENDOR_URL_KEY)
+    return getSystemProperty(JAVA_VENDOR_URL_KEY)!!
 }
 
 fun getJavaHome(): String {
-    return getSystemProperty(JAVA_HOME_KEY)
+    return getSystemProperty(JAVA_HOME_KEY)!!
 }
 
 fun getJavaVmSpecificationVersion(): String {
-    return getSystemProperty(JAVA_VM_SPECIFICATION_VERSION_KEY)
+    return getSystemProperty(JAVA_VM_SPECIFICATION_VERSION_KEY)!!
 }
 
 fun getJavaVmSpecificationVendor(): String {
-    return getSystemProperty(JAVA_VM_SPECIFICATION_VENDOR_KEY)
+    return getSystemProperty(JAVA_VM_SPECIFICATION_VENDOR_KEY)!!
 }
 
 fun getJavaVmSpecificationName(): String {
-    return getSystemProperty(JAVA_VM_SPECIFICATION_NAME_KEY)
+    return getSystemProperty(JAVA_VM_SPECIFICATION_NAME_KEY)!!
 }
 
 fun getJavaVmVersion(): String {
-    return getSystemProperty(JAVA_VM_VERSION_KEY)
+    return getSystemProperty(JAVA_VM_VERSION_KEY)!!
 }
 
 fun getJavaVmVendor(): String {
-    return getSystemProperty(JAVA_VM_VENDOR_KEY)
+    return getSystemProperty(JAVA_VM_VENDOR_KEY)!!
 }
 
 fun getJavaVmName(): String {
-    return getSystemProperty(JAVA_VM_NAME_KEY)
+    return getSystemProperty(JAVA_VM_NAME_KEY)!!
 }
 
 fun getJavaSpecificationVersion(): String {
-    return getSystemProperty(JAVA_SPECIFICATION_VERSION_KEY)
+    return getSystemProperty(JAVA_SPECIFICATION_VERSION_KEY)!!
 }
 
 fun getJavaSpecificationVendor(): String {
-    return getSystemProperty(JAVA_SPECIFICATION_VENDOR_KEY)
+    return getSystemProperty(JAVA_SPECIFICATION_VENDOR_KEY)!!
 }
 
 fun getJavaSpecificationName(): String {
-    return getSystemProperty(JAVA_SPECIFICATION_NAME_KEY)
+    return getSystemProperty(JAVA_SPECIFICATION_NAME_KEY)!!
 }
 
 fun getJavaClassVersion(): String {
-    return getSystemProperty(JAVA_CLASS_VERSION_KEY)
+    return getSystemProperty(JAVA_CLASS_VERSION_KEY)!!
 }
 
 fun getJavaClassPath(): String {
-    return getSystemProperty(JAVA_CLASS_PATH_KEY)
+    return getSystemProperty(JAVA_CLASS_PATH_KEY)!!
 }
 
 fun getJavaLibraryPath(): String {
-    return getSystemProperty(JAVA_LIBRARY_PATH_KEY)
+    return getSystemProperty(JAVA_LIBRARY_PATH_KEY)!!
 }
 
 fun getJavaIoTmpdir(): String {
-    return getSystemProperty(JAVA_IO_TMPDIR_KEY)
+    return getSystemProperty(JAVA_IO_TMPDIR_KEY)!!
 }
 
 fun getJavaCompiler(): String {
-    return getSystemProperty(JAVA_COMPILER_KEY)
+    return getSystemProperty(JAVA_COMPILER_KEY)!!
 }
 
 fun getJavaExtDirs(): String {
-    return getSystemProperty(JAVA_EXT_DIRS_KEY)
+    return getSystemProperty(JAVA_EXT_DIRS_KEY)!!
 }
 
 fun getOsName(): String {
-    return getSystemProperty(OS_NAME_KEY)
-}
-
-fun getOsNameOrNull(): String? {
-    return getSystemPropertyOrNull(OS_NAME_KEY)
+    return getSystemProperty(OS_NAME_KEY)!!
 }
 
 fun getOsArch(): String {
-    return getSystemProperty(OS_ARCH_KEY)
+    return getSystemProperty(OS_ARCH_KEY)!!
 }
 
 fun getOsVersion(): String {
-    return getSystemProperty(OS_VERSION_KEY)
+    return getSystemProperty(OS_VERSION_KEY)!!
 }
 
 fun getFileSeparator(): String {
-    return getSystemProperty(FILE_SEPARATOR_KEY)
+    return getSystemProperty(FILE_SEPARATOR_KEY)!!
 }
 
 fun getPathSeparator(): String {
-    return getSystemProperty(PATH_SEPARATOR_KEY)
+    return getSystemProperty(PATH_SEPARATOR_KEY)!!
 }
 
 fun getLineSeparator(): String {
-    return getSystemProperty(LINE_SEPARATOR_KEY)
+    return getSystemProperty(LINE_SEPARATOR_KEY)!!
 }
 
 fun getUserName(): String {
-    return getSystemProperty(USER_NAME_KEY)
+    return getSystemProperty(USER_NAME_KEY)!!
 }
 
 fun getUserHome(): String {
-    return getSystemProperty(USER_HOME_KEY)
+    return getSystemProperty(USER_HOME_KEY)!!
 }
 
 fun getUserDir(): String {
-    return getSystemProperty(USER_DIR_KEY)
+    return getSystemProperty(USER_DIR_KEY)!!
 }
 
 fun getFileEncoding(): String {
-    return getSystemProperty(FILE_ENCODING_KEY)
+    return getSystemProperty(FILE_ENCODING_KEY)!!
 }
 
 fun getNativeEncoding(): String {
-    return getSystemProperty(NATIVE_ENCODING_KEY)
-}
-
-/**
- * Gets the system property indicated by the specified key.
- *
- * @see System.getProperty
- */
-@JvmName("getProperty")
-@Throws(NoSuchSystemPropertyException::class)
-fun getSystemProperty(key: CharSequence): String {
-    return getSystemPropertyOrNull(key) ?: throw NoSuchSystemPropertyException(key.toString())
+    return getSystemProperty(NATIVE_ENCODING_KEY)!!
 }
 
 /**
@@ -190,8 +174,8 @@ fun getSystemProperty(key: CharSequence): String {
  *
  * @see System.getProperty
  */
-@JvmName("getPropertyOrNull")
-fun getSystemPropertyOrNull(key: CharSequence): String? {
+@JvmName("getProperty")
+fun getSystemProperty(key: CharSequence): String? {
     val k = key.toString()
     return System.getProperty(k)
 }
@@ -217,21 +201,11 @@ fun getSystemProperties(): Map<String, String> {
 }
 
 /**
- * Gets the value of the specified environment variable.
- *
- * @see System.getenv
- */
-@Throws(NoSuchSystemPropertyException::class)
-fun getEnv(key: CharSequence): String {
-    return getEnvOrNull(key) ?: throw NoSuchSystemPropertyException(key.toString())
-}
-
-/**
  * Gets the value of the specified environment variable, or null if not found.
  *
  * @see System.getenv
  */
-fun getEnvOrNull(key: CharSequence): String? {
+fun getEnv(key: CharSequence): String? {
     return System.getenv(key.toString())
 }
 
@@ -285,10 +259,7 @@ fun lineSeparator(): String {
  * Returns whether current OS is Windows.
  */
 fun isWindows(): Boolean {
-    val osName = getOsNameOrNull()
-    if (osName === null) {
-        return false
-    }
+    val osName = getOsName()
     return osName.startsWith("Windows")
 }
 
@@ -296,10 +267,7 @@ fun isWindows(): Boolean {
  * Returns whether current OS is Linux.
  */
 fun isLinux(): Boolean {
-    val osName = getOsNameOrNull()
-    if (osName === null) {
-        return false
-    }
+    val osName = getOsName()
     return osName.startsWith("Linux") || osName.startsWith("LINUX")
 }
 
@@ -307,10 +275,7 @@ fun isLinux(): Boolean {
  * Returns whether current OS is Mac.
  */
 fun isMac(): Boolean {
-    val osName = getOsNameOrNull()
-    if (osName === null) {
-        return false
-    }
+    val osName = getOsName()
     return osName.startsWith("Mac")
 }
 
@@ -318,10 +283,7 @@ fun isMac(): Boolean {
  * Returns whether current OS is FreeBSD, OpenBSD or NetBSD.
  */
 fun isBsd(): Boolean {
-    val osName = getOsNameOrNull()
-    if (osName === null) {
-        return false
-    }
+    val osName = getOsName()
     return osName.startsWith("FreeBSD") || osName.startsWith("OpenBSD") || osName.startsWith("NetBSD")
 }
 
@@ -358,29 +320,18 @@ fun isJdk9OrHigher(): Boolean {
     return getJavaMajorVersion() >= 9
 }
 
-/**
- * No such system property exception.
- */
-open class NoSuchSystemPropertyException @JvmOverloads constructor(
-    message: String? = null, cause: Throwable? = null
-) : RuntimeException(message, cause), Serializable {
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
-}
-
 private object BtSystemHolder {
     var nativeCharset: Charset = getNativeCharset0()
     fun getNativeCharset0(): Charset {
-        val nativeEncoding = getSystemPropertyOrNull(NATIVE_ENCODING_KEY)
+        val nativeEncoding = getSystemProperty(NATIVE_ENCODING_KEY)
         if (nativeEncoding !== null) {
             return charset(nativeEncoding)
         }
-        val sunEncoding = getSystemPropertyOrNull("sun.jnu.encoding")
+        val sunEncoding = getSystemProperty("sun.jnu.encoding")
         if (sunEncoding !== null) {
             return charset(sunEncoding)
         }
-        val fileEncoding = getSystemPropertyOrNull(FILE_ENCODING_KEY)
+        val fileEncoding = getSystemProperty(FILE_ENCODING_KEY)
         if (fileEncoding !== null) {
             return charset(fileEncoding)
         }

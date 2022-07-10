@@ -101,7 +101,7 @@ object CompatibleConvertHandler : ConvertHandler {
                 return from
             }
             if (fromClass == String::class.java && toType.isEnum) {
-                return toType.getEnumOrNull<Any>(from.toString(), true)
+                return toType.getEnum<Any>(from.toString(), true)
             }
             if (fromClass.isEnum && toType == String::class.java) {
                 return from.toString()
