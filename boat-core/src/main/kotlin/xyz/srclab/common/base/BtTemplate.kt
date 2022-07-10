@@ -5,8 +5,8 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.annotations.concurrent.ThreadSafe
 import java.io.Serializable
-import java.util.*
 
 /**
  * Parses [this] to [StringTemplate] implemented by [SimpleTemplate].
@@ -44,6 +44,7 @@ fun CharSequence.parseTemplate(
  *
  * @see SimpleTemplate
  */
+@ThreadSafe
 interface StringTemplate {
 
     /**
@@ -235,11 +236,11 @@ open class SimpleTemplate(
             return listOf(source)
         }
 
-        var buffer: MutableList<CharSequence>? = null
-        fun getBuffer(): MutableList<CharSequence> {
+        var buffer: ListAppender<CharSequence>? = null
+        fun getBuffer(): ListAppender<CharSequence> {
             val bf = buffer
             if (bf === null) {
-                val newBuffer = LinkedList<CharSequence>()
+                val newBuffer = ListAppender<CharSequence>()
                 buffer = newBuffer
                 return newBuffer
             }
@@ -263,22 +264,22 @@ open class SimpleTemplate(
                 val cn = source[i]
                 if (cn == escapeChar) {
                     //Escape itself
-                    getBuffer().add(source.subRef(start, i))
+                    getBuffer().append(source.subRef(start, i))
                     i++
                     start = i
                     continue
                 }
                 if (isParameterPrefix(i)) {
                     //Escape parameter prefix
-                    getBuffer().add(source.subRef(start, i - 1))
-                    getBuffer().add(prefix)
+                    getBuffer().append(source.subRef(start, i - 1))
+                    getBuffer().append(prefix)
                     i += prefix.length
                     start = i
                     continue
                 }
             }
             if (isParameterPrefix(i)) {
-                getBuffer().add(source.subRef(start, i))
+                getBuffer().append(source.subRef(start, i))
                 i += prefix.length
                 if (suffix === null) {
                     //Case no suffix: find next whitespace
@@ -288,10 +289,10 @@ open class SimpleTemplate(
                     }
                     if (paramNameStart == i) {
                         //empty name
-                        getBuffer().add(StringTemplate.Parameter.of(paramIndex++))
+                        getBuffer().append(StringTemplate.Parameter.of(paramIndex++))
                     } else {
                         val nameRef = source.subRef(paramNameStart, i)
-                        getBuffer().add(StringTemplate.Parameter.of(paramIndex++, nameRef))
+                        getBuffer().append(StringTemplate.Parameter.of(paramIndex++, nameRef))
                     }
                     start = i
                     i++
@@ -304,13 +305,13 @@ open class SimpleTemplate(
                 }
                 if (suffixIndex == i) {
                     //empty name
-                    getBuffer().add(StringTemplate.Parameter.of(paramIndex++))
+                    getBuffer().append(StringTemplate.Parameter.of(paramIndex++))
                     i++
                     start = i
                     continue
                 }
                 val nameRef = source.subRef(i, suffixIndex)
-                getBuffer().add(StringTemplate.Parameter.of(paramIndex++, nameRef))
+                getBuffer().append(StringTemplate.Parameter.of(paramIndex++, nameRef))
                 i = suffixIndex + 1
                 start = i
                 continue
@@ -322,9 +323,9 @@ open class SimpleTemplate(
             return listOf(source)
         }
         if (start < source.length) {
-            getBuffer().add(source.subRef(start))
+            getBuffer().append(source.subRef(start))
         }
-        return getBuffer()
+        return getBuffer().toListAsNoNull()
     }
 }
 

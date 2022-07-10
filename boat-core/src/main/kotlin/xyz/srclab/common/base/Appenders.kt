@@ -2,6 +2,7 @@ package xyz.srclab.common.base
 
 import xyz.srclab.common.base.ByteArrayRef.Companion.arrayRef
 import xyz.srclab.common.base.CharArrayRef.Companion.arrayRef
+import xyz.srclab.common.collect.newArrayOfType
 import java.io.OutputStream
 import java.io.Serializable
 import java.io.Writer
@@ -19,7 +20,7 @@ private const val BUFFER_SIZE = 1024
  * Note, **DO NOT** modify content of appended object in `join-to-string` processing,
  * it may cause [IndexOutOfBoundsException].
  */
-open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appendable, Writer(), Serializable {
+open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appendable, Writer(), Serializable {
 
     private var head = SNode<Any>()
     private var cur = head
@@ -86,6 +87,10 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
         cur.value = chars.arrayRef(startIndex, endIndex)
         newTail()
         return this
+    }
+
+    override fun isEmpty(): Boolean {
+        return head.next === null
     }
 
     override fun write(c: Int) {
@@ -213,7 +218,7 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
  * Note, **DO NOT** modify content of appended object in `join-to-bytes` processing,
  * it may cause [IndexOutOfBoundsException].
  */
-open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStream(), Serializable {
+open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStream(), Serializable {
 
     private var head = SNode<Any>()
     private var cur = head
@@ -248,7 +253,7 @@ open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStre
         return this
     }
 
-    fun append(b: Byte): BytesAppender {
+    open fun append(b: Byte): BytesAppender {
         val buf = buffer
         if (buf === null) {
             val newBuffer = ByteArray(BUFFER_SIZE)
@@ -267,11 +272,15 @@ open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStre
         return this
     }
 
-    fun append(buf: ByteBuffer): BytesAppender {
+    open fun append(buf: ByteBuffer): BytesAppender {
         flushBuffer()
         cur.value = buf
         newTail()
         return this
+    }
+
+    override fun isEmpty(): Boolean {
+        return head.next === null
     }
 
     override fun write(b: Int) {
@@ -298,7 +307,7 @@ open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStre
     /**
      * Joins appended objects into a [String].
      */
-    fun toByteArray(): ByteArray {
+    open fun toByteArray(): ByteArray {
         // Computes size:
         var size = 0
         var n = head
@@ -370,26 +379,103 @@ open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStre
 }
 
 /**
+ * List appender, used to build an array, o [ArrayList], or a readonly [List].
+ */
+open class ListAppender<E : Any> : Appender<E, ListAppender<E>>, Serializable {
+
+    private var head = SNode<E>()
+    private var cur = head
+    private var count = 0
+
+    override fun append(t: E?): ListAppender<E> {
+        cur.value = t
+        newTail()
+        return this
+    }
+
+    override fun isEmpty(): Boolean {
+        return head.next === null
+    }
+
+    private fun newTail() {
+        val newNode = SNode<E>()
+        cur.next = newNode
+        cur = newNode
+        count++
+    }
+
+    /**
+     * Joins appended elements as array and returns.
+     */
+    open fun toArray(type: Class<E>): Array<E?> {
+        return toArray0(type)
+    }
+
+    /**
+     * Joins appended elements as array which is treated as having no null elements, and returns.
+     */
+    open fun toArrayAsNoNull(type: Class<E>): Array<E> {
+        return toArray(type).asType()
+    }
+
+    /**
+     * Joins appended elements as [List] and returns.
+     */
+    open fun toList(): List<E?> {
+        val array = toArray0(Any::class.java)
+        return array.asList().asType()
+    }
+
+    /**
+     * Joins appended elements as [List] which is treated as having no null elements, and returns.
+     */
+    open fun toListAsNoNull(): List<E> {
+        return toList().asType()
+    }
+
+    private fun <T> toArray0(type: Class<T>): Array<T?> {
+        val array = newArrayOfType<Array<T?>>(type, count)
+        var n = head
+        var i = 0
+        while (n.next !== null) {
+            array[i] = n.value.asType()
+            i++
+            n = n.next!!
+        }
+        return array
+    }
+
+    companion object {
+        private val serialVersionUID: Long = defaultSerialVersion()
+    }
+}
+
+/**
  * Appender interface, used for appending.
  *
- * @param A type of this appender
  * @param T type of appended object
+ * @param A type of this appender
  */
-interface Appender<A : Appender<A, T>, T : Any> {
+interface Appender<T : Any, A : Appender<T, A>> {
 
     /**
      * Appends and returns this.
      */
     fun append(t: T?): A
+
+    /**
+     * Returns whether this appender is empty.
+     */
+    fun isEmpty(): Boolean
 }
 
 /**
  * [Appender] of which appended type [T] is segmented.
  *
- * @param A type of this appender
  * @param T type of appended object
+ * @param A type of this appender
  */
-interface SegmentAppender<A : SegmentAppender<A, T>, T : Any> : Appender<A, T> {
+interface SegmentAppender<T : Any, A : SegmentAppender<T, A>> : Appender<T, A> {
 
     /**
      * Appends with [startIndex] and returns this.

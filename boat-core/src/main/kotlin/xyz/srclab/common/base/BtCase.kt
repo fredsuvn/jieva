@@ -136,7 +136,7 @@ open class CamelCase @JvmOverloads constructor(
             return Collections.singletonList(name)
         }
 
-        val result = LinkedList<CharSequence>()
+        val appender = ListAppender<CharSequence>()
 
         var startIndex = 0
         var lastCharCase = name[0].case()
@@ -151,12 +151,12 @@ open class CamelCase @JvmOverloads constructor(
                     //join the former word
                 } else if (cCase == UPPER) {
                     //aA -> a,A
-                    result.add(name.subRef(startIndex, i))
+                    appender.append(name.subRef(startIndex, i))
                     startIndex = i
                 } else if (nonLetterPolicy === NonLetterPolicy.INDEPENDENT) {
                     //a0 -> a,0
                     //split to new word for non-letter chars
-                    result.add(name.subRef(startIndex, i))
+                    appender.append(name.subRef(startIndex, i))
                     startIndex = i
                 } else {
                     throw IllegalArgumentException("Unknown char: ${name[i]}")
@@ -166,7 +166,7 @@ open class CamelCase @JvmOverloads constructor(
                     if (startIndex < i - 1) {
                         //AAa -> A,Aa
                         //AAAa -> AA,Aa
-                        result.add(name.subRef(startIndex, i - 1))
+                        appender.append(name.subRef(startIndex, i - 1))
                         startIndex = i - 1
                     } else {
                         //Aa -> Aa
@@ -180,7 +180,7 @@ open class CamelCase @JvmOverloads constructor(
                 } else if (nonLetterPolicy === NonLetterPolicy.INDEPENDENT) {
                     //A0 -> A,0
                     //split to new word for non-letter chars
-                    result.add(name.subRef(startIndex, i))
+                    appender.append(name.subRef(startIndex, i))
                     startIndex = i
                 } else {
                     throw IllegalArgumentException("Unknown char: ${name[i]}")
@@ -190,12 +190,12 @@ open class CamelCase @JvmOverloads constructor(
                     if (cCase == LOWER) {
                         //0a -> 0,a
                         //split to new word for non-letter chars
-                        result.add(name.subRef(startIndex, i))
+                        appender.append(name.subRef(startIndex, i))
                         startIndex = i
                     } else if (cCase == UPPER) {
                         //0A -> 0,A
                         //split to new word for non-letter chars
-                        result.add(name.subRef(startIndex, i))
+                        appender.append(name.subRef(startIndex, i))
                         startIndex = i
                     } else {
                         //00 -> 00
@@ -208,13 +208,13 @@ open class CamelCase @JvmOverloads constructor(
             lastCharCase = cCase
             i++
         }
-        if (result.isEmpty()) {
+        if (appender.isEmpty()) {
             return Collections.singletonList(name)
         }
         if (startIndex < name.length) {
-            result.add(name.subRef(startIndex))
+            appender.append(name.subRef(startIndex))
         }
-        return result
+        return appender.toListAsNoNull()
     }
 
     override fun join(words: List<CharSequence>): String {
@@ -331,24 +331,24 @@ open class SeparatorCase(
             return Collections.singletonList(name)
         }
 
-        val result = LinkedList<CharSequence>()
-        result.add(name.subRef(0, splitIndex))
+        val appender = ListAppender<CharSequence>()
+        appender.append(name.subRef(0, splitIndex))
         var startIndex = splitIndex + separatorString.length
 
         while (startIndex < name.length) {
             splitIndex = name.indexOf(separatorString, startIndex)
             if (splitIndex < 0) {
-                result.add(name.subRef(startIndex))
+                appender.append(name.subRef(startIndex))
                 break
             }
-            result.add(name.subRef(startIndex, splitIndex))
+            appender.append(name.subRef(startIndex, splitIndex))
             startIndex = splitIndex + separatorString.length
         }
         //Last word is empty
         if (startIndex == name.length) {
-            result.add("")
+            appender.append("")
         }
-        return result
+        return appender.toListAsNoNull()
     }
 
     override fun join(words: List<CharSequence>): String {

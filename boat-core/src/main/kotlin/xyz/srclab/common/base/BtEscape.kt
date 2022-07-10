@@ -8,7 +8,6 @@ package xyz.srclab.common.base
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.Reader
-import java.util.*
 
 /**
  * Simply escapes receiver [InputStream] with [escByte].
@@ -80,11 +79,11 @@ fun CharSequence.escape(escChar: Char, needChars: CharSequence): String {
         return this.toString()
     }
 
-    var buffer: MutableList<Any>? = null
-    fun getBuffer(): MutableList<Any> {
+    var buffer: StringAppender? = null
+    fun getBuffer(): StringAppender {
         val bf = buffer
         if (bf === null) {
-            val newBuffer = LinkedList<Any>()
+            val newBuffer = StringAppender()
             buffer = newBuffer
             return newBuffer
         }
@@ -97,8 +96,8 @@ fun CharSequence.escape(escChar: Char, needChars: CharSequence): String {
         val c = this[i]
         if (c == escChar || needChars.contains(c)) {
             //Escape: \ -> \\
-            getBuffer().add(this.subRef(start, i))
-            getBuffer().add(escChar)
+            getBuffer().append(this.subRef(start, i))
+            getBuffer().append(escChar)
             start = i
         }
         i++
@@ -108,10 +107,10 @@ fun CharSequence.escape(escChar: Char, needChars: CharSequence): String {
         return this.toString()
     }
     if (start < this.length) {
-        getBuffer().add(this.subRef(start))
+        getBuffer().append(this.subRef(start))
     }
 
-    return getBuffer().joinToString("")
+    return getBuffer().toString()
 }
 
 /**
@@ -208,11 +207,11 @@ fun CharSequence.unescape(escChar: Char, needChars: CharSequence): String {
         return this.toString()
     }
 
-    var buffer: MutableList<CharSequence>? = null
-    fun getBuffer(): MutableList<CharSequence> {
+    var buffer: StringAppender? = null
+    fun getBuffer(): StringAppender {
         val bf = buffer
         if (bf === null) {
-            val newBuffer = LinkedList<CharSequence>()
+            val newBuffer = StringAppender()
             buffer = newBuffer
             return newBuffer
         }
@@ -231,7 +230,7 @@ fun CharSequence.unescape(escChar: Char, needChars: CharSequence): String {
             val cn = this[i]
             if (cn == escChar || needChars.contains(cn)) {
                 //Unescape: \\ -> \
-                getBuffer().add(this.subRef(start, i - 1))
+                getBuffer().append(this.subRef(start, i - 1))
                 start = i
             }
         }
@@ -242,8 +241,8 @@ fun CharSequence.unescape(escChar: Char, needChars: CharSequence): String {
         return this.toString()
     }
     if (start < this.length) {
-        getBuffer().add(this.subRef(start))
+        getBuffer().append(this.subRef(start))
     }
 
-    return getBuffer().joinToString("")
+    return getBuffer().toString()
 }
