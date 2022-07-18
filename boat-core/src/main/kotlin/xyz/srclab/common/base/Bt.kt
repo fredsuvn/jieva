@@ -279,14 +279,14 @@ fun Any?.toCharSeq(): CharSequence {
 /**
  * Returns [t] if it is not null, or [defaultValue] if [t] is null.
  */
-fun <T : Any> getOrDefault(t: T?, defaultValue: T): T {
+fun <T : Any> notNull(t: T?, defaultValue: T): T {
     return t ?: defaultValue
 }
 
 /**
  * Returns [t] if it is not null, or computes [supplier] and returns if [t] is null.
  */
-fun <T : Any> getOrElse(t: T?, supplier: Supplier<T>): T {
+fun <T : Any> notNullGet(t: T?, supplier: Supplier<T>): T {
     return t ?: supplier.get()
 }
 

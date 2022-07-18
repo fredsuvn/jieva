@@ -9,7 +9,7 @@ import java.util.function.Function
 /**
  * Base [Cache] implementation using [caffeine](https://github.com/ben-manes/caffeine).
  */
-abstract class BaseCaffeineCache<K : Any, V>(
+abstract class BaseCaffeineCache<K : Any, V : Any>(
     protected open val cache: com.github.benmanes.caffeine.cache.Cache<K, CacheVal<V>>
 ) : Cache<K, V> {
 
@@ -71,7 +71,7 @@ abstract class BaseCaffeineCache<K : Any, V>(
 /**
  * [Cache] implementation using [caffeine](https://github.com/ben-manes/caffeine).
  */
-open class CaffeineCache<K : Any, V>(
+open class CaffeineCache<K : Any, V : Any>(
     cache: com.github.benmanes.caffeine.cache.Cache<K, CacheVal<V>>
 ) : BaseCaffeineCache<K, V>(cache) {
 
@@ -88,7 +88,7 @@ open class CaffeineCache<K : Any, V>(
 /**
  * Loading [Cache] implementation using [caffeine](https://github.com/ben-manes/caffeine).
  */
-open class LoadingCaffeineCache<K : Any, V>(
+open class LoadingCaffeineCache<K : Any, V : Any>(
     override val cache: LoadingCache<K, CacheVal<V>>
 ) : BaseCaffeineCache<K, V>(cache) {
 
@@ -108,7 +108,7 @@ open class LoadingCaffeineCache<K : Any, V>(
     }
 }
 
-private fun <K : Any, V> buildCaffeine(builder: Cache.Builder<K, V>): Caffeine<K, CacheVal<V>> {
+private fun <K : Any, V : Any> buildCaffeine(builder: Cache.Builder<K, V>): Caffeine<K, CacheVal<V>> {
     val caffeine = Caffeine.newBuilder()
     val initialCapacity = builder.initialCapacity
     if (initialCapacity !== null) {
@@ -133,7 +133,7 @@ private fun <K : Any, V> buildCaffeine(builder: Cache.Builder<K, V>): Caffeine<K
     return caffeine.asType()
 }
 
-private fun <K : Any, V> buildCaffeineLoader(loader: Function<in K, out V>?): CacheLoader<in K, CacheVal<V>> {
+private fun <K : Any, V : Any> buildCaffeineLoader(loader: Function<in K, out V>?): CacheLoader<in K, CacheVal<V>> {
     if (loader === null) {
         throw IllegalArgumentException("Loader must not be null!")
     }
@@ -146,7 +146,7 @@ private fun <K : Any, V> buildCaffeineLoader(loader: Function<in K, out V>?): Ca
     }
 }
 
-private fun <K : Any, V> buildLoadingCaffeine(builder: Cache.Builder<K, V>): LoadingCache<K, CacheVal<V>> {
+private fun <K : Any, V : Any> buildLoadingCaffeine(builder: Cache.Builder<K, V>): LoadingCache<K, CacheVal<V>> {
     val c: Caffeine<K, CacheVal<V>> = buildCaffeine(builder)
     val l: CacheLoader<in K, CacheVal<V>> = buildCaffeineLoader(builder.loader)
     return c.build(l)

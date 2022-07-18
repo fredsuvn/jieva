@@ -71,7 +71,7 @@ interface BeanResolver {
             override fun resolve(type: Type): BeanType {
                 return cache.get(type) {
                     super.resolve(type)
-                }
+                }!!
             }
         }
     }

@@ -20,14 +20,14 @@ interface Val<T : Any> {
     /**
      * Returns value of this wrapper, or [defaultValue] if the value is null.
      */
-    fun getOrDefault(defaultValue: T): T {
+    fun orElse(defaultValue: T): T {
         return get() ?: defaultValue
     }
 
     /**
      * Returns value of this wrapper, or result of [supplier] if the value is null.
      */
-    fun getOrElse(supplier: Supplier<T>): T {
+    fun orElseGet(supplier: Supplier<T>): T {
         return get() ?: supplier.get()
     }
 

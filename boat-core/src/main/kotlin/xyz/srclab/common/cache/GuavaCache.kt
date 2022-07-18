@@ -10,7 +10,7 @@ import java.util.function.Function
 /**
  * Base [Cache] implementation using [guava](https://github.com/google/guava).
  */
-abstract class BaseGuavaCache<K : Any, V>(
+abstract class BaseGuavaCache<K : Any, V : Any>(
     protected open val cache: com.google.common.cache.Cache<K, CacheVal<V>>
 ) : Cache<K, V> {
 
@@ -74,7 +74,7 @@ abstract class BaseGuavaCache<K : Any, V>(
 /**
  * [Cache] implementation using [guava](https://github.com/google/guava).
  */
-open class GuavaCache<K : Any, V>(
+open class GuavaCache<K : Any, V : Any>(
     cache: com.google.common.cache.Cache<K, CacheVal<V>>
 ) : BaseGuavaCache<K, V>(cache) {
 
@@ -91,7 +91,7 @@ open class GuavaCache<K : Any, V>(
 /**
  * Loading [Cache] implementation using [guava](https://github.com/google/guava).
  */
-open class LoadingGuavaCache<K : Any, V>(
+open class LoadingGuavaCache<K : Any, V : Any>(
     override val cache: LoadingCache<K, CacheVal<V>>
 ) : BaseGuavaCache<K, V>(cache) {
 
@@ -117,7 +117,7 @@ open class LoadingGuavaCache<K : Any, V>(
     }
 }
 
-private fun <K : Any, V> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheBuilder<K, CacheVal<V>> {
+private fun <K : Any, V : Any> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheBuilder<K, CacheVal<V>> {
     val guavaBuilder = CacheBuilder.newBuilder()
     val initialCapacity = builder.initialCapacity
     if (initialCapacity !== null) {
@@ -146,7 +146,7 @@ private fun <K : Any, V> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheB
     return guavaBuilder.asType()
 }
 
-private fun <K : Any, V> buildGuavaLoader(loader: Function<in K, out V>?): CacheLoader<K, CacheVal<V>> {
+private fun <K : Any, V : Any> buildGuavaLoader(loader: Function<in K, out V>?): CacheLoader<K, CacheVal<V>> {
     if (loader === null) {
         throw IllegalArgumentException("Loader must not be null!")
     }
@@ -161,7 +161,7 @@ private fun <K : Any, V> buildGuavaLoader(loader: Function<in K, out V>?): Cache
     }
 }
 
-private fun <K : Any, V> buildLoadingCaffeine(builder: Cache.Builder<K, V>): LoadingCache<K, CacheVal<V>> {
+private fun <K : Any, V : Any> buildLoadingCaffeine(builder: Cache.Builder<K, V>): LoadingCache<K, CacheVal<V>> {
     val guavaBuilder: CacheBuilder<K, CacheVal<V>> = buildGuavaBuilder(builder)
     val cacheLoader: CacheLoader<K, CacheVal<V>> = buildGuavaLoader(builder.loader)
     return guavaBuilder.build(cacheLoader)

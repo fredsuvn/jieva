@@ -82,8 +82,8 @@ fun <T : Any> Any.copyProperties(
                 if (v === null && !copyNull) {
                     return@forEach
                 }
-                val toKey = converter.convertOrNull<Any>(k, toMapType.keyType)
-                val toValue = converter.convertOrNull<Any>(v, toMapType.valueType)
+                val toKey = converter.convert<Any>(k, toMapType.keyType)
+                val toValue = converter.convert<Any>(v, toMapType.valueType)
                 toMap[toKey] = toValue
             }
             to
@@ -95,7 +95,7 @@ fun <T : Any> Any.copyProperties(
                 if (v === null && !copyNull) {
                     return@forEach
                 }
-                val toPropertyName = converter.convertOrNull<Any>(k, String::class.java)
+                val toPropertyName = converter.convert<Any>(k, String::class.java)
                 if (toPropertyName === null) {
                     return@forEach
                 }
@@ -103,7 +103,7 @@ fun <T : Any> Any.copyProperties(
                 if (toProperty === null || !toProperty.isWriteable) {
                     return@forEach
                 }
-                toProperty.setValue(to, converter.convertOrNull(v, toProperty.type))
+                toProperty.setValue(to, converter.convert(v, toProperty.type))
             }
             to
         }
@@ -120,8 +120,8 @@ fun <T : Any> Any.copyProperties(
                 if (value === null && !copyNull) {
                     return@forEach
                 }
-                val toKey = converter.convertOrNull<Any>(name, toMapType.keyType)
-                val toValue = converter.convertOrNull<Any>(value, toMapType.valueType)
+                val toKey = converter.convert<Any>(name, toMapType.keyType)
+                val toValue = converter.convert<Any>(value, toMapType.valueType)
                 toMap[toKey] = toValue
             }
             to
@@ -143,7 +143,7 @@ fun <T : Any> Any.copyProperties(
                 if (value === null && !copyNull) {
                     return@forEach
                 }
-                toProperty.setValue(to, converter.convertOrNull(value, toProperty.type))
+                toProperty.setValue(to, converter.convert(value, toProperty.type))
             }
             to
         }

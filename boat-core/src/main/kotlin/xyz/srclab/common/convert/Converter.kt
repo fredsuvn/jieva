@@ -26,177 +26,138 @@ interface Converter {
     val convertHandlers: List<ConvertHandler>
 
     /**
-     * Converts [from] to [toType], the result is not null.
+     * Converts [from] to [toType].
+     * The result may be null if the conversion is unsupported, or the value of result is null.
      */
     @Throws(ConvertException::class)
-    fun <T : Any> convert(from: Any?, toType: Class<T>): T {
-        return convertOrNull(from, toType) ?: throw ConvertException(from, toType)
+    fun <T : Any> convert(from: Any?, toType: Class<T>): T? {
+        return convert(from, from?.javaClass ?: Any::class.java, toType)
     }
 
     /**
-     * Converts [from] to [toType], the result is not null.
+     * Converts [from] to [toType].
+     * The result may be null if the conversion is unsupported, or the value of result is null.
      */
     @Throws(ConvertException::class)
-    fun <T : Any> convert(from: Any?, toType: Type): T {
-        return convertOrNull(from, toType) ?: throw ConvertException(from, toType)
+    fun <T : Any> convert(from: Any?, toType: Type): T? {
+        return convert(from, from?.javaClass ?: Any::class.java, toType)
     }
 
     /**
-     * Converts [from] to [toType], the result is not null.
+     * Converts [from] to [toType].
+     * The result may be null if the conversion is unsupported, or the value of result is null.
      */
     @Throws(ConvertException::class)
-    fun <T : Any> convert(from: Any?, toType: TypeRef<T>): T {
-        return convertOrNull(from, toType) ?: throw ConvertException(from, toType.type)
+    fun <T : Any> convert(from: Any?, toType: TypeRef<T>): T? {
+        return convert(from, from?.javaClass ?: Any::class.java, toType)
     }
 
     /**
-     * Converts [from] of which type is [fromType] to [toType], the result is not null.
+     * Converts [from] of which type is [fromType] to [toType].
+     * The result may be null if the conversion is unsupported, or the value of result is null.
      */
     @Throws(ConvertException::class)
-    fun <T : Any> convert(from: Any?, fromType: Type, toType: Class<T>): T {
-        return convertOrNull(from, fromType, toType) ?: throw ConvertException(fromType, toType)
+    fun <T : Any> convert(from: Any?, fromType: Type, toType: Class<T>): T? {
+        return convert(from, fromType, toType as Type)
     }
 
     /**
-     * Converts [from] of which type is [fromType] to [toType], the result is not null.
+     * Converts [from] of which type is [fromType] to [toType].
+     * The result may be null if the conversion is unsupported, or the value of result is null.
      */
     @Throws(ConvertException::class)
-    fun <T : Any> convert(from: Any?, fromType: Type, toType: Type): T {
-        return convertOrNull(from, fromType, toType) ?: throw ConvertException(fromType, toType)
-    }
-
-    /**
-     * Converts [from] of which type is [fromType] to [toType], the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convert(from: Any?, fromType: Type, toType: TypeRef<T>): T {
-        return convertOrNull(from, fromType, toType) ?: throw ConvertException(fromType, toType.type)
-    }
-
-    /**
-     * Converts [from] to type of [defaultValue], return [defaultValue] if the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertOrDefault(from: Any?, defaultValue: T): T {
-        return convertOrNull(from, defaultValue.javaClass) ?: defaultValue
-    }
-
-    /**
-     * Converts [from] of which type is [fromType] to type of [defaultValue],
-     * return [defaultValue] if the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertOrDefault(from: Any?, fromType: Type, defaultValue: T): T {
-        return convertOrNull(from, fromType, defaultValue.javaClass) ?: defaultValue
-    }
-
-    /**
-     * Converts [from] to [toType], the result may be null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertOrNull(from: Any?, toType: Class<T>): T? {
-        return convertOrNull(from, from?.javaClass ?: Any::class.java, toType)
-    }
-
-    /**
-     * Converts [from] to [toType], the result may be null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertOrNull(from: Any?, toType: Type): T? {
-        return convertOrNull(from, from?.javaClass ?: Any::class.java, toType)
-    }
-
-    /**
-     * Converts [from] to [toType], the result may be null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertOrNull(from: Any?, toType: TypeRef<T>): T? {
-        return convertOrNull(from, toType.type)
-    }
-
-    /**
-     * Converts [from] of which type is [fromType] to [toType], the result may be null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Class<T>): T? {
-        return convertOrNull(from, fromType, toType as Type)
-    }
-
-    /**
-     * Converts [from] of which type is [fromType] to [toType], the result may be null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Type): T? {
-        return convertOrNull0(from, fromType, toType).asType()
-    }
-
-    /**
-     * Converts [from] of which type is [fromType] to [toType], the result may be null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: TypeRef<T>): T? {
-        return convertOrNull(from, fromType, toType.type)
-    }
-
-    /**
-     * Converts [from] to [toType], the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertVal(from: Any?, toType: Class<T>): Val<T?> {
-        return convertOrNull(from, toType).toVal()
-    }
-
-    /**
-     * Converts [from] to [toType], the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertVal(from: Any?, toType: Type): Val<T?> {
-        return convertOrNull<T>(from, toType).toVal()
-    }
-
-    /**
-     * Converts [from] to [toType], the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertVal(from: Any?, toType: TypeRef<T>): Val<T?> {
-        return convertOrNull(from, toType).toVal()
-    }
-
-    /**
-     * Converts [from] of which type is [fromType] to [toType], the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertVal(from: Any?, fromType: Type, toType: Class<T>): Val<T?> {
-        return convertOrNull(from, fromType, toType).toVal()
-    }
-
-    /**
-     * Converts [from] of which type is [fromType] to [toType], the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertVal(from: Any?, fromType: Type, toType: Type): Val<T?> {
-        return convertOrNull<T>(from, fromType, toType).toVal()
-    }
-
-    /**
-     * Converts [from] of which type is [fromType] to [toType], the result is not null.
-     */
-    @Throws(ConvertException::class)
-    fun <T : Any> convertVal(from: Any?, fromType: Type, toType: TypeRef<T>): Val<T?> {
-        return convertOrNull(from, fromType, toType).toVal()
-    }
-
-    private fun convertOrNull0(from: Any?, fromType: Type, toType: Type): Any? {
-        for (convertHandler in convertHandlers) {
-            val result = convertHandler.convert(from, fromType, toType, this)
-            if (result === ConvertHandler.NULL) {
+    fun <T : Any> convert(from: Any?, fromType: Type, toType: Type): T? {
+        try {
+            val result = convert0(from, fromType, toType)
+            if (result === ConvertHandler.UNSUPPORTED) {
                 return null
             }
-            if (result !== null) {
-                return result
-            }
+            return result.asType()
+        } catch (e: Exception) {
+            throw ConvertException(fromType, toType, e)
         }
-        return null
+    }
+
+    /**
+     * Converts [from] of which type is [fromType] to [toType].
+     * The result may be null if the conversion is unsupported, or the value of result is null.
+     */
+    @Throws(ConvertException::class)
+    fun <T : Any> convert(from: Any?, fromType: Type, toType: TypeRef<T>): T? {
+        return convert(from, fromType, toType.type)
+    }
+
+    /**
+     * Converts [from] to [toType].
+     * The result may be null if the conversion is unsupported.
+     */
+    @Throws(ConvertException::class)
+    fun <T : Any> convertVal(from: Any?, toType: Class<T>): Val<T>? {
+        return convertVal(from, from?.javaClass ?: Any::class.java, toType)
+    }
+
+    /**
+     * Converts [from] to [toType].
+     * The result may be null if the conversion is unsupported.
+     */
+    @Throws(ConvertException::class)
+    fun <T : Any> convertVal(from: Any?, toType: Type): Val<T>? {
+        return convertVal(from, from?.javaClass ?: Any::class.java, toType)
+    }
+
+    /**
+     * Converts [from] to [toType].
+     * The result may be null if the conversion is unsupported.
+     */
+    @Throws(ConvertException::class)
+    fun <T : Any> convertVal(from: Any?, toType: TypeRef<T>): Val<T>? {
+        return convertVal(from, from?.javaClass ?: Any::class.java, toType.type)
+    }
+
+    /**
+     * Converts [from] of which type is [fromType] to [toType].
+     * The result may be null if the conversion is unsupported.
+     */
+    @Throws(ConvertException::class)
+    fun <T : Any> convertVal(from: Any?, fromType: Type, toType: Class<T>): Val<T>? {
+        return convertVal(from, fromType, toType as Type)
+    }
+
+    /**
+     * Converts [from] of which type is [fromType] to [toType].
+     * The result may be null if the conversion is unsupported.
+     */
+    @Throws(ConvertException::class)
+    fun <T : Any> convertVal(from: Any?, fromType: Type, toType: Type): Val<T>? {
+        try {
+            val result = convert0(from, fromType, toType)
+            if (result === ConvertHandler.UNSUPPORTED) {
+                return null
+            }
+            return result.toVal().asType()
+        } catch (e: Exception) {
+            throw ConvertException(fromType, toType, e)
+        }
+    }
+
+    /**
+     * Converts [from] of which type is [fromType] to [toType].
+     * The result may be null if the conversion is unsupported.
+     */
+    @Throws(ConvertException::class)
+    fun <T : Any> convertVal(from: Any?, fromType: Type, toType: TypeRef<T>): Val<T>? {
+        return convertVal(from, fromType, toType.type)
+    }
+
+    private fun convert0(from: Any?, fromType: Type, toType: Type): Any? {
+        for (convertHandler in convertHandlers) {
+            val result = convertHandler.convert(from, fromType, toType, this)
+            if (result === ConvertHandler.UNSUPPORTED) {
+                continue
+            }
+            return result
+        }
+        return ConvertHandler.UNSUPPORTED
     }
 
     companion object {

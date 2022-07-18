@@ -5,7 +5,7 @@ import java.util.function.Function
 /**
  * [Cache] based on [MutableMap].
  */
-open class MapCache<K : Any, V>(
+open class MapCache<K : Any, V : Any>(
     private val map: MutableMap<K, CacheVal<V>>
 ) : Cache<K, V> {
 
@@ -47,7 +47,7 @@ open class MapCache<K : Any, V>(
 /**
  * Loading [Cache] based on [MutableMap].
  */
-open class LoadingMapCache<K : Any, V> constructor(
+open class LoadingMapCache<K : Any, V : Any> constructor(
     map: MutableMap<K, CacheVal<V>>,
     private val loader: Function<in K, out V>
 ) : MapCache<K, V>(map) {

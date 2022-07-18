@@ -8,6 +8,8 @@ package xyz.srclab.common.collect
 import xyz.srclab.common.base.*
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.convert.defaultConverter
+import xyz.srclab.common.reflect.TypeRef
+import java.lang.reflect.Type
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -213,23 +215,16 @@ fun <T> Iterable<T>.get(index: Int): T {
 }
 
 /**
- * Returns element at [index], or null if index out of bounds.
- */
-fun <T> Iterable<T>.getOrNull(index: Int): T? {
-    return this.elementAtOrNullKt(index)
-}
-
-/**
  * Returns element at [index], or [defaultValue] if index out of bounds.
  */
-fun <T> Iterable<T>.getOrDefault(index: Int, defaultValue: T): T {
+fun <T> Iterable<T>.get(index: Int, defaultValue: T): T {
     return this.elementAtOrElseKt(index) { defaultValue }
 }
 
 /**
- * Returns element at [index], or [elseValue] if index out of bounds.
+ * Returns element at [index], or call [elseValue] if index out of bounds.
  */
-fun <T> Iterable<T>.getOrElse(index: Int, elseValue: IntFunction<out T>): T {
+fun <T> Iterable<T>.get(index: Int, elseValue: IntFunction<out T>): T {
     return this.elementAtOrElseKt(index, elseValue.asKotlinFun())
 }
 
@@ -237,12 +232,43 @@ fun <T> Iterable<T>.getOrElse(index: Int, elseValue: IntFunction<out T>): T {
  * Returns conversion of result of `get` operation.
  */
 @JvmOverloads
-fun <T : Any> Iterable<*>.get(
+fun <T > Iterable<*>.get(
     index: Int,
     type: Class<out T>,
     converter: Converter = defaultConverter()
 ): T {
     return converter.convert(this.get(index), type)
+}
+
+/**
+ * Returns conversion of result of `get` operation.
+ */
+@JvmOverloads
+fun <T > Iterable<*>.get(
+    index: Int,
+    type: Type,
+    converter: Converter = defaultConverter()
+): T {
+    return converter.convert(this.get(index), type)
+}
+
+/**
+ * Returns conversion of result of `get` operation.
+ */
+@JvmOverloads
+fun <T > Iterable<*>.get(
+    index: Int,
+    type: TypeRef<T>,
+    converter: Converter = defaultConverter()
+): T {
+    return converter.convert(this.get(index), type)
+}
+
+/**
+ * Returns element at [index], or null if index out of bounds.
+ */
+fun <T> Iterable<T>.getOrNull(index: Int): T? {
+    return this.elementAtOrNullKt(index)
 }
 
 /**
@@ -255,18 +281,6 @@ fun <T : Any> Iterable<*>.getOrNull(
     converter: Converter = defaultConverter()
 ): T? {
     return converter.convertOrNull(this.getOrNull(index), type)
-}
-
-/**
- * Returns conversion of result of `getOrNull` operation, or [defaultValue] if result of conversion is null.
- */
-@JvmOverloads
-fun <T : Any> Iterable<*>.getOrConvert(
-    index: Int,
-    defaultValue: T,
-    converter: Converter = defaultConverter()
-): T {
-    return converter.convertOrNull(this.getOrNull(index), defaultValue.javaClass) ?: defaultValue
 }
 
 fun Iterable<*>.getBoolean(index: Int): Boolean {

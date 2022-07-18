@@ -5,7 +5,7 @@ import xyz.srclab.common.base.Val
 /**
  * [Val] for cache value.
  */
-interface CacheVal<V> : Val<V> {
+interface CacheVal<V : Any> : Val<V> {
 
     companion object {
 
@@ -13,10 +13,12 @@ interface CacheVal<V> : Val<V> {
          * Returns a [CacheVal] with [v].
          */
         @JvmStatic
-        fun <V> of(v: V): CacheVal<V> {
+        fun <V : Any> of(v: V): CacheVal<V> {
             return CacheValImpl(v)
         }
 
-        private data class CacheValImpl<V>(override val value: V) : CacheVal<V>
+        private data class CacheValImpl<V : Any>(private val value: V?) : CacheVal<V> {
+            override fun get(): V? = value
+        }
     }
 }

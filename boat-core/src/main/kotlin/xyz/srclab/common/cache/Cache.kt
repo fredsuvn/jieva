@@ -22,12 +22,12 @@ import java.util.function.Function
  * If loading failed, the loader will throw a [NoSuchElementException].
  * If a [Cache] has a default loader, we will call it `Loading Cache`.
  *
- * The key must not null but null value is permitted.
+ * The key must not null but **null value is permitted**.
  *
  * @see Builder
  */
 @ThreadSafe
-interface Cache<K : Any, V> {
+interface Cache<K : Any, V : Any> {
 
     /**
      * Returns the value associated with the [key] in this cache.
@@ -36,12 +36,12 @@ interface Cache<K : Any, V> {
      * a [NoSuchElementException] will be thrown.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    operator fun get(key: K): V {
+    operator fun get(key: K): V? {
         val cv = getVal(key)
         if (cv === null) {
             throw NoSuchElementException(key.toString())
         }
-        return cv.value
+        return cv.get()
     }
 
     /**
@@ -60,12 +60,12 @@ interface Cache<K : Any, V> {
      * Note for [loader] if loading failed, the [loader] will throw a [NoSuchElementException].
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun get(key: K, loader: Function<in K, out V?>): V {
+    fun get(key: K, loader: Function<in K, out V?>): V? {
         val cv = getVal(key, loader)
         if (cv === null) {
             throw NoSuchElementException(key.toString())
         }
-        return cv.value
+        return cv.get()
     }
 
     /**
@@ -85,12 +85,12 @@ interface Cache<K : Any, V> {
      * Note whatever this cache has a default loader, it never loads the new value.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun getPresent(key: K): V {
+    fun getPresent(key: K): V? {
         val cv = getPresentVal(key)
         if (cv === null) {
             throw NoSuchElementException(key.toString())
         }
-        return cv.value
+        return cv.get()
     }
 
     /**
@@ -139,7 +139,7 @@ interface Cache<K : Any, V> {
     /**
      * Builder for [Cache]. This builder can build [Cache] based on `caffeine`(default) and `guava`.
      */
-    class Builder<K : Any, V> {
+    class Builder<K : Any, V : Any> {
 
         var initialCapacity: Int? = null
         var maxCapacity: Long? = null
@@ -228,7 +228,7 @@ interface Cache<K : Any, V> {
          * Returns new builder for Cache interface.
          */
         @JvmStatic
-        fun <K : Any, V> newBuilder(): Builder<K, V> {
+        fun <K : Any, V : Any> newBuilder(): Builder<K, V> {
             return Builder()
         }
 
@@ -240,7 +240,7 @@ interface Cache<K : Any, V> {
         @JvmName("ofMap")
         @JvmOverloads
         @JvmStatic
-        fun <K : Any, V> MutableMap<K, CacheVal<V>>.asCache(
+        fun <K : Any, V : Any> MutableMap<K, CacheVal<V>>.asCache(
             loader: Function<in K, out V>? = null
         ): Cache<K, V> {
             return if (loader === null) MapCache(this) else LoadingMapCache(this, loader)
@@ -251,7 +251,7 @@ interface Cache<K : Any, V> {
          */
         @JvmOverloads
         @JvmStatic
-        fun <K : Any, V> ofWeak(
+        fun <K : Any, V : Any> ofWeak(
             concurrencyLevel: Int = defaultConcurrencyLevel(),
             loader: Function<in K, out V>? = null,
         ): Cache<K, V> {
