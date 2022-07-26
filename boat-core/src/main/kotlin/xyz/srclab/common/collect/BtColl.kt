@@ -1,7 +1,7 @@
 /**
  * Collection utilities.
  */
-@file:JvmName("BtCollect")
+@file:JvmName("BtColl")
 
 package xyz.srclab.common.collect
 
@@ -17,6 +17,7 @@ import java.util.function.IntFunction
 import java.util.function.Predicate
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
+import kotlin.NoSuchElementException
 import kotlin.random.Random
 import kotlin.collections.addAll as addAllKt
 import kotlin.collections.all as allKt
@@ -122,17 +123,21 @@ fun <T> Iterable<T>.count(): Int {
 }
 
 fun <T> Iterable<T>.count(predicate: Predicate<in T>): Int {
-    return this.countKt(predicate.asKotlinFun())
+    val it = this.iterator()
+    var c = 0
+    while (it.hasNext()) {
+        if (predicate.test(it.next())) {
+            c++
+        }
+    }
+    return c
 }
 
 fun <T> Iterable<T>.isEmpty(): Boolean {
     if (this is Collection) {
         return this.isEmpty()
     }
-    for (it in this) {
-        return false
-    }
-    return true
+    return !this.iterator().hasNext()
 }
 
 fun <T> Iterable<T>.isNotEmpty(): Boolean {
@@ -147,10 +152,6 @@ fun <T> Iterable<T>.any(predicate: Predicate<in T>): Boolean {
     return this.anyKt(predicate.asKotlinFun())
 }
 
-fun <T> Iterable<T>.none(): Boolean {
-    return this.noneKt()
-}
-
 fun <T> Iterable<T>.none(predicate: Predicate<in T>): Boolean {
     return this.noneKt(predicate.asKotlinFun())
 }
@@ -159,10 +160,12 @@ fun <T> Iterable<T>.all(predicate: Predicate<in T>): Boolean {
     return this.allKt(predicate.asKotlinFun())
 }
 
+@Throws(NoSuchElementException::class)
 fun <T> Iterable<T>.first(): T {
     return this.firstKt()
 }
 
+@Throws(NoSuchElementException::class)
 fun <T> Iterable<T>.first(predicate: Predicate<in T>): T {
     return this.firstKt(predicate.asKotlinFun())
 }
@@ -208,143 +211,34 @@ fun <T> Iterable<T>.randomOrNull(random: Random): T? {
 }
 
 /**
- * Returns element at [index].
+ * Returns element at [index], or throws [IndexOutOfBoundsException] if the [index] out of bounds.
  */
+@Throws(IndexOutOfBoundsException::class)
 fun <T> Iterable<T>.get(index: Int): T {
     return this.elementAtKt(index)
 }
 
 /**
- * Returns element at [index], or [defaultValue] if index out of bounds.
- */
-fun <T> Iterable<T>.get(index: Int, defaultValue: T): T {
-    return this.elementAtOrElseKt(index) { defaultValue }
-}
-
-/**
- * Returns element at [index], or call [elseValue] if index out of bounds.
- */
-fun <T> Iterable<T>.get(index: Int, elseValue: IntFunction<out T>): T {
-    return this.elementAtOrElseKt(index, elseValue.asKotlinFun())
-}
-
-/**
- * Returns conversion of result of `get` operation.
- */
-@JvmOverloads
-fun <T > Iterable<*>.get(
-    index: Int,
-    type: Class<out T>,
-    converter: Converter = defaultConverter()
-): T {
-    return converter.convert(this.get(index), type)
-}
-
-/**
- * Returns conversion of result of `get` operation.
- */
-@JvmOverloads
-fun <T > Iterable<*>.get(
-    index: Int,
-    type: Type,
-    converter: Converter = defaultConverter()
-): T {
-    return converter.convert(this.get(index), type)
-}
-
-/**
- * Returns conversion of result of `get` operation.
- */
-@JvmOverloads
-fun <T > Iterable<*>.get(
-    index: Int,
-    type: TypeRef<T>,
-    converter: Converter = defaultConverter()
-): T {
-    return converter.convert(this.get(index), type)
-}
-
-/**
- * Returns element at [index], or null if index out of bounds.
+ * Returns element at [index], or null if [index] out of bounds.
  */
 fun <T> Iterable<T>.getOrNull(index: Int): T? {
     return this.elementAtOrNullKt(index)
 }
 
 /**
- * Returns conversion of result of `getOrNull` operation.
+ * Returns element at the given [index],
+ * or [defaultValue] if the [index] is out of bounds of this collection.
  */
-@JvmOverloads
-fun <T : Any> Iterable<*>.getOrNull(
-    index: Int,
-    type: Class<out T>,
-    converter: Converter = defaultConverter()
-): T? {
-    return converter.convertOrNull(this.getOrNull(index), type)
+fun <T> Iterable<T>.get(index: Int, defaultValue: T): T {
+    return this.elementAtOrElseKt(index) { defaultValue }
 }
 
-fun Iterable<*>.getBoolean(index: Int): Boolean {
-    return get(index).toBoolean()
-}
-
-fun Iterable<*>.getBooleanOrNull(index: Int): Boolean? {
-    return getOrNull(index)?.toBoolean()
-}
-
-fun Iterable<*>.getByte(index: Int): Byte {
-    return get(index).toByte()
-}
-
-fun Iterable<*>.getByteOrNull(index: Int): Byte? {
-    return getOrNull(index)?.toByte()
-}
-
-fun Iterable<*>.getShort(index: Int): Short {
-    return get(index).toShort()
-}
-
-fun Iterable<*>.getShortOrNull(index: Int): Short? {
-    return getOrNull(index)?.toShort()
-}
-
-fun Iterable<*>.getChar(index: Int): Char {
-    return get(index).toChar()
-}
-
-fun Iterable<*>.getCharOrNull(index: Int): Char? {
-    return getOrNull(index)?.toChar()
-}
-
-fun Iterable<*>.getInt(index: Int): Int {
-    return get(index).toInt()
-}
-
-fun Iterable<*>.getIntOrNull(index: Int): Int? {
-    return getOrNull(index)?.toInt()
-}
-
-fun Iterable<*>.getLong(index: Int): Long {
-    return get(index).toLong()
-}
-
-fun Iterable<*>.getLongOrNull(index: Int): Long? {
-    return getOrNull(index)?.toLong()
-}
-
-fun Iterable<*>.getFloat(index: Int): Float {
-    return get(index).toFloat()
-}
-
-fun Iterable<*>.getFloatOrNull(index: Int): Float? {
-    return getOrNull(index)?.toFloat()
-}
-
-fun Iterable<*>.getDouble(index: Int): Double {
-    return get(index).toDouble()
-}
-
-fun Iterable<*>.getDoubleOrNull(index: Int): Double? {
-    return getOrNull(index)?.toDouble()
+/**
+ * Returns element at the given [index],
+ * or the result of calling the [defaultValue] function if the [index] is out of bounds of this collection.
+ */
+fun <T> Iterable<T>.get(index: Int, defaultValue: IntFunction<out T>): T {
+    return this.elementAtOrElseKt(index, defaultValue.asKotlinFun())
 }
 
 fun <T> Iterable<T>.find(predicate: Predicate<in T>): T? {

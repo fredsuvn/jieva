@@ -11,17 +11,17 @@ import java.util.function.Supplier
 private var defaultRandom: Random = Random()
 
 /**
+ * Gets default [Random].
+ */
+fun defaultRandom(): Random {
+    return defaultRandom
+}
+
+/**
  * Sets default [Random].
  */
 fun setDefaultRandom(random: Random) {
     defaultRandom = random
-}
-
-/**
- * Gets default [Random].
- */
-fun getDefaultRandom(): Random {
-    return defaultRandom
 }
 
 /**

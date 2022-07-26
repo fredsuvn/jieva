@@ -6,6 +6,8 @@ import xyz.srclab.common.base.BtRandom;
 import xyz.srclab.common.base.BtString;
 import xyz.srclab.common.base.StringAppender;
 
+import java.util.ArrayList;
+
 /**
  * @author sunqian
  */
