@@ -1,6 +1,6 @@
 package xyz.srclab.common.codec.rsa
 
-import xyz.srclab.common.base.blockNumber
+import xyz.srclab.common.base.countSeg
 import xyz.srclab.common.codec.CipherCodec
 import xyz.srclab.common.codec.CodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec
@@ -352,7 +352,7 @@ open class RsaCodec @JvmOverloads constructor(
     }
 
     private fun rsaNeedingBlock(length: Int, blockSize: Int, outputSize: Int): Int {
-        val actualSize = blockNumber(length, blockSize) * outputSize
+        val actualSize = countSeg(length, blockSize) * outputSize
         if (blockSize <= outputSize) {
             return actualSize
         }

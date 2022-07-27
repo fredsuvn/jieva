@@ -91,12 +91,12 @@ public class BtTest {
 
     @Test
     public void testMath() {
-        org.junit.Assert.assertEquals(Bt.remainingLength(100, 10), 90);
-        org.junit.Assert.assertEquals(Bt.blockNumber(100, 10), 10);
-        org.junit.Assert.assertEquals(Bt.blockNumber(101, 10), 11);
-        org.junit.Assert.assertEquals(Bt.blockNumber(9, 10), 1);
-        org.junit.Assert.assertEquals(Bt.newSizeForBlock(12, 3, 4), 16);
-        org.junit.Assert.assertEquals(Bt.newSizeForBlock(13, 3, 4), 20);
+        org.junit.Assert.assertEquals(Bt.remLength(100, 10), 90);
+        org.junit.Assert.assertEquals(Bt.countSeg(100, 10), 10);
+        org.junit.Assert.assertEquals(Bt.countSeg(101, 10), 11);
+        org.junit.Assert.assertEquals(Bt.countSeg(9, 10), 1);
+        org.junit.Assert.assertEquals(Bt.resize(12, 3, 4), 16);
+        org.junit.Assert.assertEquals(Bt.resize(13, 3, 4), 20);
         org.junit.Assert.assertEquals(Bt.endIndex(0, 10), 10);
         org.junit.Assert.assertEquals(Bt.endIndex(1, 10), 11);
     }

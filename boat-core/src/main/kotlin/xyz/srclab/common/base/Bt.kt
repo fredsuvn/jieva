@@ -6,14 +6,20 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.Boat
+import xyz.srclab.common.collect.addAll
 import xyz.srclab.common.collect.newArray
 import xyz.srclab.common.collect.toStringMap
+import xyz.srclab.common.convert.Converter
+import xyz.srclab.common.convert.defaultConverter
 import xyz.srclab.common.io.readString
+import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.reflect.defaultClassLoader
 import java.io.*
+import java.lang.reflect.Type
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 import java.util.function.Supplier
 import kotlin.stackTraceToString as stackTraceToStringKt
@@ -284,10 +290,37 @@ fun <T : Any> notNull(t: T?, defaultValue: T): T {
 }
 
 /**
- * Returns [t] if it is not null, or computes [supplier] and returns if [t] is null.
+ * Returns [t] if it is not null, or result of [supplier] if [t] is null.
  */
-fun <T : Any> notNullGet(t: T?, supplier: Supplier<T>): T {
+fun <T : Any> notNull(t: T?, supplier: Supplier<out T>): T {
     return t ?: supplier.get()
+}
+
+/**
+ * Returns result of conversion by [converter] if the result is not null, or [defaultValue] if the result is null.
+ */
+@JvmOverloads
+fun <T : Any> notNull(t: Any?, type: Class<out T>, defaultValue: T, converter: Converter = defaultConverter()): T {
+    val result = converter.convert(t, type)
+    return result ?: defaultValue
+}
+
+/**
+ * Returns result of conversion by [converter] if the result is not null, or [defaultValue] if the result is null.
+ */
+@JvmOverloads
+fun <T : Any> notNull(t: Any?, type: Type, defaultValue: T, converter: Converter = defaultConverter()): T {
+    val result = converter.convert<T>(t, type)
+    return result ?: defaultValue
+}
+
+/**
+ * Returns result of conversion by [converter] if the result is not null, or [defaultValue] if the result is null.
+ */
+@JvmOverloads
+fun <T : Any> notNull(t: Any?, type: TypeRef<T>, defaultValue: T, converter: Converter = defaultConverter()): T {
+    val result = converter.convert(t, type)
+    return result ?: defaultValue
 }
 
 /**
@@ -455,15 +488,16 @@ fun <T> T.isBetween(min: T, max: T, comparator: Comparator<T>): Boolean {
 /**
  * Returns remaining length of [size] from [offset].
  */
-fun remainingLength(size: Int, offset: Int): Int = size - offset
+fun remLength(size: Int, offset: Int): Int = size - offset
 
 /**
  * Returns remaining length of [size] from [offset].
  */
-fun remainingLength(size: Long, offset: Long): Long = size - offset
+fun remLength(size: Long, offset: Long): Long = size - offset
 
 /**
- * Returns end index exclusive computed from [offset] and [length]:
+ * Returns end index exclusive from [offset] through [length].
+ * It is equivalent to:
  *
  * ```
  * return offset + length;
@@ -472,7 +506,8 @@ fun remainingLength(size: Long, offset: Long): Long = size - offset
 fun endIndex(offset: Int, length: Int): Int = offset + length
 
 /**
- * Returns end index exclusive computed from [offset] and [length]:
+ * Returns end index exclusive from [offset] through [length].
+ * It is equivalent to:
  *
  * ```
  * return offset + length;
@@ -481,53 +516,43 @@ fun endIndex(offset: Int, length: Int): Int = offset + length
 fun endIndex(offset: Long, length: Long): Long = offset + length
 
 /**
- * Returns the least number to meet: [blockSize] * `number` >= [size].
- */
-fun blockNumber(size: Int, blockSize: Int): Int {
-    val num = size / blockSize
-    return if (size % blockSize == 0) num else num + 1
-}
-
-/**
- * Returns the least number to meet: [blockSize] * `number` >= [size].
- */
-fun blockNumber(size: Long, blockSize: Long): Long {
-    val num = size / blockSize
-    return if (size % blockSize == 0L) num else num + 1
-}
-
-/**
- * Separates the [oldSize] with [oldBlockSize], then change the block size to [newBlockSize],
- * returns the least size for new block size. This function is equivalent to:
+ * Returns count of segment in [segSize].
+ * It is equivalent to:
  *
  * ```
- * int newSize = oldSize / oldBlockSize * newBlockSize;
- * if (oldSize % oldBlockSize == 0) {
- *     return newSize;
+ * int div = totalSize / segSize;
+ * if (totalSize % segSize == 0) {
+ *     return div;
  * }
- * return newSize + newBlockSize;
+ * return div + 1;
  * ```
+ *
+ * @param totalSize total size
+ * @param segSize size of segment
  */
-fun newSizeForBlock(oldSize: Int, oldBlockSize: Int, newBlockSize: Int): Int {
-    val newSize = oldSize / oldBlockSize * newBlockSize
-    return if (oldSize % oldBlockSize == 0) newSize else newSize + newBlockSize
+fun countSeg(totalSize: Int, segSize: Int): Int {
+    val div = totalSize / segSize
+    return if (totalSize % segSize == 0) div else div + 1
 }
 
 /**
- * Separates the [oldSize] with [oldBlockSize], then change the block size to [newBlockSize],
- * returns the least size for new block size. This function is equivalent to:
+ * Returns count of segment in [segSize].
+ * It is equivalent to:
  *
  * ```
- * int newSize = oldSize / oldBlockSize * newBlockSize;
- * if (oldSize % oldBlockSize == 0) {
- *     return newSize;
+ * int div = totalSize / segSize;
+ * if (totalSize % segSize == 0) {
+ *     return div;
  * }
- * return newSize + newBlockSize;
+ * return div + 1;
  * ```
+ *
+ * @param totalSize total size
+ * @param segSize size of segment
  */
-fun newSizeForBlock(oldSize: Long, oldBlockSize: Long, newBlockSize: Long): Long {
-    val newSize = oldSize / oldBlockSize * newBlockSize
-    return if (oldSize % oldBlockSize == 0L) newSize else newSize + newBlockSize
+fun countSeg(totalSize: Long, segSize: Long): Long {
+    val div = totalSize / segSize
+    return if (totalSize % segSize == 0L) div else div + 1
 }
 
 /**
@@ -752,41 +777,119 @@ fun runProcess(cmdArray: Array<out String>, env: Array<out String>?, dir: File?)
     return Runtime.getRuntime().exec(cmdArray, env, dir)
 }
 
+// Quick way to create array and collection:
+
 /**
- * Abstract class represents a final class, which will cache the values of [hashCode] and [toString].
- * The subclass should implement [hashCode0] and [toString0] to compute the values of [hashCode] and [toString],
- * each computation will be processed only once.
+ * Creates and returns an array consists of [elements].
  */
-abstract class FinalClass {
+fun <T> array(vararg elements: T): Array<T> {
+    return elements.asType()
+}
 
-    private var _hashCode: Int? = null
-    private var _toString: String? = null
+/**
+ * Collects [elements] into [dest] and returns the [dest].
+ */
+fun <T, C : MutableCollection<T>> collect(dest: C, vararg elements: T): C {
+    dest.addAll(elements)
+    return dest
+}
 
-    override fun hashCode(): Int {
-        return getOrNew(
-            this,
-            { this._hashCode },
-            { this._hashCode = it },
-            { hashCode0() },
-        )
+/**
+ * Collects [elements] into [dest] and returns the [dest].
+ *
+ * The [elements] will be split in two elements as `key-value-pairs`, that is:
+ * the first element as `key1`, the second as `value1`, the third as `key2`, the fourth as `value2`, and so on.
+ * Then, all pairs will be put into [dest] in encounter order.
+ *
+ * If the last pair only has a key (if length of [elements] is odd number), its value will be seen as `null`.
+ */
+fun <K, V, C : MutableMap<K, V>> collectMap(dest: C, vararg elements: Any?): C {
+    val map = dest.asType<MutableMap<Any?, Any?>>()
+    if (elements.size % 2 == 0) {
+        var i = 0
+        while (i < elements.size) {
+            val key = elements[i++]
+            val value = elements[i++]
+            map[key] = value
+        }
+    } else {
+        var i = 0
+        while (i < elements.size - 1) {
+            val key = elements[i++]
+            val value = elements[i++]
+            map[key] = value
+        }
+        map[elements[i]] = null
     }
+    return dest
+}
 
-    override fun toString(): String {
-        return getOrNew(
-            this,
-            { this._toString },
-            { this._toString = it },
-            { toString0() },
-        )
-    }
+/**
+ * Creates and returns a readonly [List] consists of [elements].
+ */
+fun <T> list(vararg elements: T): List<T> {
+    return listOf(*elements)
+}
 
-    /**
-     * Computes the hash code.
-     */
-    protected abstract fun hashCode0(): Int
+/**
+ * Creates and returns an [ArrayList] consists of [elements].
+ */
+fun <T> arrayList(vararg elements: T): ArrayList<T> {
+    return collect(ArrayList(elements.size), *elements)
+}
 
-    /**
-     * Computes the toString value.
-     */
-    protected abstract fun toString0(): String
+/**
+ * Creates and returns a [LinkedList] consists of [elements].
+ */
+fun <T> linkedList(vararg elements: T): LinkedList<T> {
+    return collect(LinkedList(), *elements)
+}
+
+/**
+ * Creates and returns a readonly [Set] consists of [elements].
+ */
+fun <T> set(vararg elements: T): Set<T> {
+    return setOf(*elements)
+}
+
+/**
+ * Creates and returns a [HashSet] consists of [elements].
+ */
+fun <T> hashSet(vararg elements: T): HashSet<T> {
+    return collect(HashSet(elements.size), *elements)
+}
+
+/**
+ * Creates and returns a [LinkedHashSet] consists of [elements].
+ */
+fun <T> linkedHashSet(vararg elements: T): LinkedHashSet<T> {
+    return collect(LinkedHashSet(elements.size), *elements)
+}
+
+/**
+ * Creates and returns a readonly [Map] consists of [elements] by [collectMap].
+ */
+fun <K, V> map(vararg elements: Any?): Map<K, V> {
+    return linkedHashMap(*elements)
+}
+
+/**
+ * Creates and returns a [HashMap] consists of [elements] by [collectMap].
+ */
+fun <K, V> hashMap(vararg elements: Any?): HashMap<K, V> {
+    return collectMap(HashMap(countSeg(elements.size, 2)), *elements)
+}
+
+/**
+ * Creates and returns a [LinkedHashMap] consists of [elements] by [collectMap].
+ */
+fun <K, V> linkedHashMap(vararg elements: Any?): LinkedHashMap<K, V> {
+    return collectMap(LinkedHashMap(countSeg(elements.size, 2)), *elements)
+}
+
+/**
+ * Creates and returns a [ConcurrentHashMap] consists of [elements] by [collectMap].
+ */
+fun <K, V> concurrentHashMap(vararg elements: Any?): ConcurrentHashMap<K, V> {
+    return collectMap(ConcurrentHashMap(countSeg(elements.size, 2)), *elements)
 }

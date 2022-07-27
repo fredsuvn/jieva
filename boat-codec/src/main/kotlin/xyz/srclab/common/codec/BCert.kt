@@ -3,7 +3,7 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.deBase64
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import xyz.srclab.common.base.to8BitBytes
 import xyz.srclab.common.base.to8BitString
 import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
@@ -143,7 +143,7 @@ fun ByteArray.readPemContentOrNull(begin: CharSequence, end: CharSequence): Byte
     if (endIndex < 0) {
         return null
     }
-    val chars = this.to8BitString(contentBeginIndex, remainingLength(endIndex, contentBeginIndex))
+    val chars = this.to8BitString(contentBeginIndex, remLength(endIndex, contentBeginIndex))
     val pureChars = chars.replace(Regex("\r|\n"), "")
     return pureChars.to8BitBytes().deBase64()
 }

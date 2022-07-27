@@ -1,6 +1,6 @@
 package xyz.srclab.common.data
 
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import xyz.srclab.common.io.asInputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -38,7 +38,7 @@ interface DataParser<T : DataElement> {
     }
 
     fun parse(bytes: ByteArray, offset: Int): T {
-        return parse(bytes, offset, remainingLength(bytes.size, offset))
+        return parse(bytes, offset, remLength(bytes.size, offset))
     }
 
     fun parse(bytes: ByteArray, offset: Int, length: Int): T

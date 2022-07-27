@@ -1,6 +1,6 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import java.io.OutputStream
 import java.nio.ByteBuffer
 
@@ -16,7 +16,7 @@ interface PreparedCodec {
     }
 
     fun doFinal(dest: ByteArray, offset: Int): Int {
-        return doFinal(dest, offset, remainingLength(dest.size, offset))
+        return doFinal(dest, offset, remLength(dest.size, offset))
     }
 
     fun doFinal(dest: ByteArray, offset: Int, length: Int): Int

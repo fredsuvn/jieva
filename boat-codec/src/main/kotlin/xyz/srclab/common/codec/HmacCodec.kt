@@ -1,7 +1,7 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.ThreadSafePolicy
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.io.getBytes
@@ -34,7 +34,7 @@ interface HmacCodec : Codec {
     }
 
     fun hmac(key: Key, data: ByteArray, offset: Int): PreparedCodec {
-        return hmac(key, data, offset, remainingLength(data.size, offset))
+        return hmac(key, data, offset, remLength(data.size, offset))
     }
 
     fun hmac(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {

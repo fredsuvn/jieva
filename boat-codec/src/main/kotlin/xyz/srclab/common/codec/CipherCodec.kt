@@ -1,7 +1,7 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.ThreadSafePolicy
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
@@ -44,7 +44,7 @@ interface CipherCodec : Codec {
     }
 
     fun encrypt(key: Key, data: ByteArray, offset: Int): PreparedCodec {
-        return encrypt(key, data, offset, remainingLength(data.size, offset))
+        return encrypt(key, data, offset, remLength(data.size, offset))
     }
 
     fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
@@ -64,7 +64,7 @@ interface CipherCodec : Codec {
     }
 
     fun decrypt(key: Key, data: ByteArray, offset: Int): PreparedCodec {
-        return decrypt(key, data, offset, remainingLength(data.size, offset))
+        return decrypt(key, data, offset, remLength(data.size, offset))
     }
 
     fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {

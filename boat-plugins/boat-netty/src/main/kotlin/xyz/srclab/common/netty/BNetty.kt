@@ -9,7 +9,7 @@ import io.netty.channel.ChannelOption
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.checkLengthInRange
 import xyz.srclab.common.base.getString
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import xyz.srclab.common.collect.newMap
 import java.net.InetSocketAddress
 import java.net.SocketAddress
@@ -76,9 +76,9 @@ fun ByteBuf.getBuffer(length: Int, direct: Boolean = false): ByteBuf {
 
 @JvmOverloads
 fun ByteArray.getBuffer(
-    offset: Int = 0,
-    length: Int = remainingLength(this.size, offset),
-    direct: Boolean = false
+        offset: Int = 0,
+        length: Int = remLength(this.size, offset),
+        direct: Boolean = false
 ): ByteBuf {
     val buffer = newByteBuf(length, direct)
     buffer.writeBytes(this, offset, length)

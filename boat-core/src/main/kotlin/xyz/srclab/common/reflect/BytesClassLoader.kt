@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import java.io.InputStream
 import java.nio.ByteBuffer
 
@@ -13,7 +13,7 @@ object BytesClassLoader : ClassLoader() {
      * Loads class from bytes.
      */
     @JvmOverloads
-    fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = remainingLength(bytes.size, offset)): Class<*> {
+    fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = remLength(bytes.size, offset)): Class<*> {
         return super.defineClass(null, bytes, offset, length)
     }
 
@@ -22,7 +22,7 @@ object BytesClassLoader : ClassLoader() {
      */
     @JvmOverloads
     fun loadClass(
-        name: String, bytes: ByteArray, offset: Int = 0, length: Int = remainingLength(bytes.size, offset)
+        name: String, bytes: ByteArray, offset: Int = 0, length: Int = remLength(bytes.size, offset)
     ): Class<*> {
         return super.defineClass(name, bytes, offset, length)
     }

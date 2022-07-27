@@ -1,7 +1,7 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.ThreadSafePolicy
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.PreparedVerify.Companion.toSync
@@ -34,7 +34,7 @@ interface SignCodec : Codec {
     }
 
     fun sign(key: PrivateKey, data: ByteArray, offset: Int): PreparedCodec {
-        return sign(key, data, offset, remainingLength(data.size, offset))
+        return sign(key, data, offset, remLength(data.size, offset))
     }
 
     fun sign(key: PrivateKey, data: ByteArray, offset: Int, length: Int): PreparedCodec {
@@ -54,7 +54,7 @@ interface SignCodec : Codec {
     }
 
     fun verify(key: PublicKey, data: ByteArray, offset: Int): PreparedVerify {
-        return verify(key, data, offset, remainingLength(data.size, offset))
+        return verify(key, data, offset, remLength(data.size, offset))
     }
 
     fun verify(key: PublicKey, data: ByteArray, offset: Int, length: Int): PreparedVerify {

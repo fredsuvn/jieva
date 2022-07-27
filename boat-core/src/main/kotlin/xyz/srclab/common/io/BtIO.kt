@@ -172,7 +172,7 @@ fun Writer.asOutputStream(charset: Charset = defaultCharset()): OutputStream {
  * Returns a [BytesInputStream] of which content is [this] [ByteArray].
  */
 @JvmOverloads
-fun ByteArray.asInputStream(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesInputStream {
+fun ByteArray.asInputStream(offset: Int = 0, length: Int = remLength(this.size, offset)): BytesInputStream {
     return BytesInputStream(this, offset, length)
 }
 
@@ -180,7 +180,7 @@ fun ByteArray.asInputStream(offset: Int = 0, length: Int = remainingLength(this.
  * Returns a [BytesOutputStream] of which content is [this] [ByteArray].
  */
 @JvmOverloads
-fun ByteArray.asOutputStream(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesOutputStream {
+fun ByteArray.asOutputStream(offset: Int = 0, length: Int = remLength(this.size, offset)): BytesOutputStream {
     return BytesOutputStream(this, offset, length)
 }
 
@@ -188,7 +188,7 @@ fun ByteArray.asOutputStream(offset: Int = 0, length: Int = remainingLength(this
  * Returns a [CharsReader] of which content is [this] [CharArray].
  */
 @JvmOverloads
-fun CharArray.asReader(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsReader {
+fun CharArray.asReader(offset: Int = 0, length: Int = remLength(this.size, offset)): CharsReader {
     return CharsReader(this, offset, length)
 }
 
@@ -196,7 +196,7 @@ fun CharArray.asReader(offset: Int = 0, length: Int = remainingLength(this.size,
  * Returns a [CharsWriter] of which content is [this] [CharArray].
  */
 @JvmOverloads
-fun CharArray.asWriter(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsWriter {
+fun CharArray.asWriter(offset: Int = 0, length: Int = remLength(this.size, offset)): CharsWriter {
     return CharsWriter(this, offset, length)
 }
 
@@ -206,7 +206,7 @@ fun CharArray.asWriter(offset: Int = 0, length: Int = remainingLength(this.size,
 @JvmOverloads
 fun <T : CharSequence> T.asReader(
     offset: Int = 0,
-    length: Int = remainingLength(this.length, offset)
+    length: Int = remLength(this.length, offset)
 ): CharSeqReader<T> {
     return CharSeqReader(this, offset, length)
 }
@@ -223,7 +223,7 @@ fun <T : Appendable> T.asWriter(): AppendableWriter<T> {
  */
 @JvmOverloads
 fun RandomAccessFile.asInputStream(
-    offset: Long = 0, length: Long = remainingLength(this.length(), offset)
+    offset: Long = 0, length: Long = remLength(this.length(), offset)
 ): RandomInputStream {
     return RandomInputStream(this, offset, length)
 }
@@ -233,7 +233,7 @@ fun RandomAccessFile.asInputStream(
  */
 @JvmOverloads
 fun RandomAccessFile.asOutputStream(
-    offset: Long = 0, length: Long = remainingLength(this.length(), offset)
+    offset: Long = 0, length: Long = remLength(this.length(), offset)
 ): RandomOutputStream {
     return RandomOutputStream(this, offset, length)
 }
@@ -377,9 +377,9 @@ fun ByteBuffer.getBuffer(length: Int, direct: Boolean = false): ByteBuffer {
  */
 @JvmOverloads
 fun ByteArray.getBuffer(
-    offset: Int = 0,
-    length: Int = remainingLength(this.size, offset),
-    direct: Boolean = false
+        offset: Int = 0,
+        length: Int = remLength(this.size, offset),
+        direct: Boolean = false
 ): ByteBuffer {
     val buffer = newByteBuffer(length, direct)
     buffer.put(this, offset, length)

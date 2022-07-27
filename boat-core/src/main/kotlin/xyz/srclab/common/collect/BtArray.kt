@@ -77,7 +77,7 @@ fun <A : Any> A.arrayAdd(value: Any?, index: Int): A {
     }
     java.lang.reflect.Array.set(newArray, index, value)
     if (index < length) {
-        System.arraycopy(this, index, newArray, index + 1, remainingLength(length + 1, index + 1))
+        System.arraycopy(this, index, newArray, index + 1, remLength(length + 1, index + 1))
     }
     return newArray
 }
@@ -94,7 +94,7 @@ fun <A : Any> A.arrayRemove(index: Int): A {
         System.arraycopy(this, 0, newArray, 0, index)
     }
     if (index < length) {
-        System.arraycopy(this, index + 1, newArray, index, remainingLength(length - 1, index))
+        System.arraycopy(this, index + 1, newArray, index, remLength(length - 1, index))
     }
     return newArray
 }

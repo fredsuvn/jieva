@@ -243,9 +243,9 @@ fun CharSequence.getBytes(charset: Charset = defaultCharset()): ByteArray {
 @JvmName("toString")
 @JvmOverloads
 fun ByteArray.getString(
-    charset: Charset = defaultCharset(),
-    offset: Int = 0,
-    length: Int = remainingLength(this.size, offset),
+        charset: Charset = defaultCharset(),
+        offset: Int = 0,
+        length: Int = remLength(this.size, offset),
 ): String {
     return String(this, offset, length, charset)
 }
@@ -254,7 +254,7 @@ fun ByteArray.getString(
  * Converts chars to bytes, each of char will be seen as an 8-bit byte.
  */
 @JvmOverloads
-fun CharSequence.getBytes8Bit(offset: Int = 0, length: Int = remainingLength(this.length, offset)): ByteArray {
+fun CharSequence.getBytes8Bit(offset: Int = 0, length: Int = remLength(this.length, offset)): ByteArray {
     //checkRangeInBounds(offset, offset + length, 0, this.length)
     return getBytes8Bit(length) { this[it + offset] }
 }
@@ -263,7 +263,7 @@ fun CharSequence.getBytes8Bit(offset: Int = 0, length: Int = remainingLength(thi
  * Converts chars to bytes, each of char will be seen as an 8-bit byte.
  */
 @JvmOverloads
-fun CharArray.getBytes8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ByteArray {
+fun CharArray.getBytes8Bit(offset: Int = 0, length: Int = remLength(this.size, offset)): ByteArray {
     //checkRangeInBounds(offset, offset + length, 0, this.size)
     return getBytes8Bit(length) { this[it + offset] }
 }
@@ -285,7 +285,7 @@ private inline fun getBytes8Bit(
  */
 @JvmName("toString8Bit")
 @JvmOverloads
-fun ByteArray.getString8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): String {
+fun ByteArray.getString8Bit(offset: Int = 0, length: Int = remLength(this.size, offset)): String {
     return String(this, offset, length, StandardCharsets.ISO_8859_1)
 }
 
@@ -304,7 +304,7 @@ fun CharSequence.getChars(): CharArray {
  * Fills [dest] char array with [this] char sequence.
  */
 @JvmOverloads
-fun CharSequence.getChars(dest: CharArray, offset: Int = 0, length: Int = remainingLength(dest.size, offset)) {
+fun CharSequence.getChars(dest: CharArray, offset: Int = 0, length: Int = remLength(dest.size, offset)) {
     val minLen = min(this.length, length)
     if (this is JavaString) {
         this.getChars(0, minLen, dest, offset)
@@ -507,7 +507,7 @@ interface CharsRef : CharSequence {
             }
 
             override fun copyTo(dest: CharArray, offset: Int): Int {
-                val len = min(this.length, remainingLength(dest.size, offset))
+                val len = min(this.length, remLength(dest.size, offset))
                 if (source is String) {
                     source.asJavaString().getChars(this.startIndex, this.startIndex + len, dest, offset)
                 } else {
@@ -547,11 +547,11 @@ interface CharsRef : CharSequence {
             }
 
             override fun copy(): String {
-                return String(source, startIndex, remainingLength(source.size, startIndex))
+                return String(source, startIndex, remLength(source.size, startIndex))
             }
 
             override fun copyTo(dest: CharArray, offset: Int): Int {
-                val len = min(this.length, remainingLength(dest.size, offset))
+                val len = min(this.length, remLength(dest.size, offset))
                 System.arraycopy(source, this.startIndex, dest, offset, len)
                 return len
             }

@@ -17,28 +17,28 @@ import java.util.*
  * Returns the base64 length for [dataSize].
  */
 fun getBase64Length(dataSize: Int): Int {
-    return newSizeForBlock(dataSize, 3, 4)
+    return countSeg(dataSize, 3) * 4
 }
 
 /**
  * Returns the base64 length for [dataSize].
  */
 fun getBase64Length(dataSize: Long): Long {
-    return newSizeForBlock(dataSize, 3, 4)
+    return countSeg(dataSize, 3) * 4
 }
 
 /**
  * Returns data length from [base64Size].
  */
 fun getDeBase64Length(base64Size: Int): Int {
-    return newSizeForBlock(base64Size, 4, 3)
+    return countSeg(base64Size, 4) * 3
 }
 
 /**
  * Returns data length from [base64Size].
  */
 fun getDeBase64Length(base64Size: Long): Long {
-    return newSizeForBlock(base64Size, 4, 3)
+    return countSeg(base64Size, 4) * 3
 }
 
 /**
@@ -67,7 +67,7 @@ fun ByteBuffer.base64(): ByteBuffer {
  * Base64 encodes [this].
  */
 @JvmOverloads
-fun ByteArray.base64(offset: Int, length: Int = remainingLength(this.size, offset)): ByteArray {
+fun ByteArray.base64(offset: Int, length: Int = remLength(this.size, offset)): ByteArray {
     return this.asInputStream(offset, length).base64()
 }
 
@@ -119,7 +119,7 @@ fun ByteBuffer.deBase64(): ByteBuffer {
  * Base64 decodes [this].
  */
 @JvmOverloads
-fun ByteArray.deBase64(offset: Int, length: Int = remainingLength(this.size, offset)): ByteArray {
+fun ByteArray.deBase64(offset: Int, length: Int = remLength(this.size, offset)): ByteArray {
     return this.asInputStream(offset, length).deBase64()
 }
 
@@ -200,7 +200,7 @@ fun ByteBuffer.hex(): ByteBuffer {
  * Hex encodes [this].
  */
 @JvmOverloads
-fun ByteArray.hex(offset: Int, length: Int = remainingLength(this.size, offset)): ByteArray {
+fun ByteArray.hex(offset: Int, length: Int = remLength(this.size, offset)): ByteArray {
     val dest = ByteArray(getHexLength(length))
     hex(this, offset, length, dest, 0)
     return dest
@@ -284,7 +284,7 @@ fun ByteBuffer.deHex(): ByteBuffer {
  * Hex decodes [this].
  */
 @JvmOverloads
-fun ByteArray.deHex(offset: Int, length: Int = remainingLength(this.size, offset)): ByteArray {
+fun ByteArray.deHex(offset: Int, length: Int = remLength(this.size, offset)): ByteArray {
     val dest = ByteArray(getDeHexLength(length))
     deHex(this, offset, length, dest, 0)
     return dest

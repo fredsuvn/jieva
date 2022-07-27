@@ -1,6 +1,6 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.remLength
 import xyz.srclab.common.io.getBytes
 import xyz.srclab.common.io.readBytes
 import java.io.InputStream
@@ -16,7 +16,7 @@ interface PreparedVerify {
     }
 
     fun verify(sign: ByteArray, offset: Int): Boolean {
-        return verify(sign, offset, remainingLength(sign.size, offset))
+        return verify(sign, offset, remLength(sign.size, offset))
     }
 
     fun verify(sign: ByteArray, offset: Int, length: Int): Boolean
