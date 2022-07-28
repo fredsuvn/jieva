@@ -5,6 +5,7 @@
 
 package xyz.srclab.common.base
 
+import java.util.function.Predicate
 import java.util.function.Supplier
 
 /**
@@ -289,4 +290,18 @@ fun checkRangeInBounds(
             "[$rangeStartInclusive, $rangeEndExclusive) is of bounds: [$boundStartInclusive, $boundEndExclusive)"
         )
     }
+}
+
+/**
+ * Returns true if any of [objs] pass the test of [this].
+ */
+fun <T> Predicate<T>.testAny(vararg objs: T): Boolean {
+    return anyPredicate({ this.test(it) }, *objs)
+}
+
+/**
+ * Returns true if all of [objs] pass the test of [this].
+ */
+fun <T> Predicate<T>.testAll(vararg objs: T): Boolean {
+    return allPredicate({ this.test(it) }, *objs)
 }
