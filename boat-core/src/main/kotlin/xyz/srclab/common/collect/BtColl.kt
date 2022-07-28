@@ -6,10 +6,6 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.*
-import xyz.srclab.common.convert.Converter
-import xyz.srclab.common.convert.defaultConverter
-import xyz.srclab.common.reflect.TypeRef
-import java.lang.reflect.Type
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -790,7 +786,7 @@ fun <T> Iterable<T>.toArray(): Array<Any?> {
 
 fun <T : R, R> Iterable<T>.toArray(type: Class<R>): Array<R> {
     val set = this.asToCollection()
-    val array = newArrayOfType<Array<R>>(type, set.size)
+    val array = arrayOfType<Array<R>>(type, set.size)
     return this.toArray(array)
 }
 
@@ -809,7 +805,7 @@ fun <T : R, R> Iterable<T>.toArray(array: Array<R>): Array<R> {
 
 fun <T, R> Iterable<T>.toArray(type: Class<R>, transform: Function<in T, out R>): Array<R> {
     val set = asToCollection()
-    val array = newArrayOfType<Array<R>>(type, set.size)
+    val array = arrayOfType<Array<R>>(type, set.size)
     return this.toArray(array, transform)
 }
 

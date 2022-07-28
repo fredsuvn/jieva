@@ -5,22 +5,35 @@
 
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.asType
 import xyz.srclab.common.base.*
-import xyz.srclab.common.collect.ArrayBridge.Companion.toArrayBridge
+import xyz.srclab.common.equals
 import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.common.remLength
 import java.lang.reflect.Type
 import java.util.function.Function
 import kotlin.collections.joinTo as joinToKt
 import kotlin.collections.joinToString as joinToStringKt
 
-private const val NOT_ARRAY_TYPE_PREFIX = "Not an array type"
+private const val NOT_ARRAY_TYPE_PREFIX = "Not an array type: "
 
 /**
  * Returns length of [this] array.
  */
 @JvmName("getLength")
 fun Any.arrayLength(): Int {
-    return java.lang.reflect.Array.getLength(this)
+    return when (this) {
+        is Array<*> -> this.size
+        is BooleanArray -> this.size
+        is ByteArray -> this.size
+        is ShortArray -> this.size
+        is CharArray -> this.size
+        is IntArray -> this.size
+        is LongArray -> this.size
+        is FloatArray -> this.size
+        is DoubleArray -> this.size
+        else -> throw IllegalArgumentException("NOT_ARRAY_TYPE_PREFIX${this.javaClass}")
+    }
 }
 
 /**
@@ -29,9 +42,9 @@ fun Any.arrayLength(): Int {
  * @param fromIndex start index inclusive
  * @param toIndex end index exclusive
  */
-@JvmName("copyOfRange")
+@JvmName("copy")
 @JvmOverloads
-fun <A : Any> A.arrayCopyOfRange(fromIndex: Int = 0, toIndex: Int = this.arrayLength()): A {
+fun <A : Any> A.arrayCopy(fromIndex: Int = 0, toIndex: Int = this.arrayLength()): A {
     return when (this) {
         is Array<*> -> this.copyOfRange(fromIndex, toIndex)
         is BooleanArray -> this.copyOfRange(fromIndex, toIndex)
@@ -42,26 +55,28 @@ fun <A : Any> A.arrayCopyOfRange(fromIndex: Int = 0, toIndex: Int = this.arrayLe
         is LongArray -> this.copyOfRange(fromIndex, toIndex)
         is FloatArray -> this.copyOfRange(fromIndex, toIndex)
         is DoubleArray -> this.copyOfRange(fromIndex, toIndex)
-        else -> throw IllegalArgumentException("Not an array: $this!")
+        else -> throw IllegalArgumentException("NOT_ARRAY_TYPE_PREFIX${this.javaClass}")
     }.asType()
 }
 
 /**
- * Returns new array of [elements].
- */
-@JvmName("of")
-fun <T> newArray(vararg elements: T): Array<T> {
-    return elements.asType()
-}
-
-/**
- * Returns new array of [type].
+ * Returns new array of [arrayType].
  *
  * @param A array type
  */
-@JvmName("ofType")
-fun <A> newArrayOfType(type: Type, length: Int): A {
-    return java.lang.reflect.Array.newInstance(type.rawClass.componentType, length).asType()
+@JvmName("newArray")
+fun <A> arrayOfType(arrayType: Class<A>, length: Int): A {
+    return java.lang.reflect.Array.newInstance(arrayType.componentType, length).asType()
+}
+
+/**
+ * Returns new array of [arrayType].
+ *
+ * @param A array type
+ */
+@JvmName("newArray")
+fun <A> arrayOfType(arrayType: Type, length: Int): A {
+    return java.lang.reflect.Array.newInstance(arrayType.rawClass.componentType, length).asType()
 }
 
 /**
@@ -71,7 +86,7 @@ fun <A> newArrayOfType(type: Type, length: Int): A {
 fun <A : Any> A.arrayAdd(value: Any?, index: Int): A {
     val length = this.arrayLength()
     index.checkInBounds(0, length + 1)
-    val newArray = newArrayOfType<A>(this.javaClass, length + 1)
+    val newArray = arrayOfType(this.javaClass, length + 1)
     if (index > 0) {
         System.arraycopy(this, 0, newArray, 0, index)
     }
@@ -89,7 +104,7 @@ fun <A : Any> A.arrayAdd(value: Any?, index: Int): A {
 fun <A : Any> A.arrayRemove(index: Int): A {
     val length = this.arrayLength()
     index.checkInBounds(0, length)
-    val newArray = newArrayOfType<A>(this.javaClass, length - 1)
+    val newArray = arrayOfType(this.javaClass, length - 1)
     if (index > 0) {
         System.arraycopy(this, 0, newArray, 0, index)
     }
@@ -123,135 +138,207 @@ fun <T> Any.arrayAsList(): MutableList<T> {
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun <T> Array<T>.asList(): MutableList<T> {
-    return ArrayBridgeList(this.toArrayBridge())
-}
-
-/**
- * Returns a fixed-size [MutableList] that wraps the original array.
- */
-fun ByteArray.asList(): MutableList<Byte> {
-    return ArrayBridgeList(this.toArrayBridge())
-}
-
-/**
- * Returns a fixed-size [MutableList] that wraps the original array.
- */
-fun ShortArray.asList(): MutableList<Short> {
-    return ArrayBridgeList(this.toArrayBridge())
-}
-
-/**
- * Returns a fixed-size [MutableList] that wraps the original array.
- */
-fun IntArray.asList(): MutableList<Int> {
-    return ArrayBridgeList(this.toArrayBridge())
-}
-
-/**
- * Returns a fixed-size [MutableList] that wraps the original array.
- */
-fun LongArray.asList(): MutableList<Long> {
-    return ArrayBridgeList(this.toArrayBridge())
-}
-
-/**
- * Returns a fixed-size [MutableList] that wraps the original array.
- */
-fun FloatArray.asList(): MutableList<Float> {
-    return ArrayBridgeList(this.toArrayBridge())
-}
-
-/**
- * Returns a fixed-size [MutableList] that wraps the original array.
- */
-fun DoubleArray.asList(): MutableList<Double> {
-    return ArrayBridgeList(this.toArrayBridge())
+    return ArrayWrapper(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun BooleanArray.asList(): MutableList<Boolean> {
-    return ArrayBridgeList(this.toArrayBridge())
+    return BooleanArrayWrapper(this)
+}
+
+/**
+ * Returns a fixed-size [MutableList] that wraps the original array.
+ */
+fun ByteArray.asList(): MutableList<Byte> {
+    return ByteArrayWrapper(this)
+}
+
+/**
+ * Returns a fixed-size [MutableList] that wraps the original array.
+ */
+fun ShortArray.asList(): MutableList<Short> {
+    return ShortArrayWrapper(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun CharArray.asList(): MutableList<Char> {
-    return ArrayBridgeList(this.toArrayBridge())
+    return CharArrayWrapper(this)
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
-@JvmOverloads
-fun <T> Array<T>.indexOf(elements: Array<T>, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun IntArray.asList(): MutableList<Int> {
+    return IntArrayWrapper(this)
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
-@JvmOverloads
-fun BooleanArray.indexOf(elements: BooleanArray, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun LongArray.asList(): MutableList<Long> {
+    return LongArrayWrapper(this)
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
-@JvmOverloads
-fun ByteArray.indexOf(elements: ByteArray, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun FloatArray.asList(): MutableList<Float> {
+    return FloatArrayWrapper(this)
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
-@JvmOverloads
-fun ShortArray.indexOf(elements: ShortArray, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun DoubleArray.asList(): MutableList<Double> {
+    return DoubleArrayWrapper(this)
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
  */
-@JvmOverloads
-fun CharArray.indexOf(elements: CharArray, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun <T> Array<T>.indexOf(offset: Int, element:T):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
  */
-@JvmOverloads
-fun IntArray.indexOf(elements: IntArray, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun BooleanArray.indexOf(offset: Int, element:Boolean):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
  */
-@JvmOverloads
-fun LongArray.indexOf(elements: LongArray, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun ByteArray.indexOf(offset: Int, element:Byte):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
  */
-@JvmOverloads
-fun FloatArray.indexOf(elements: FloatArray, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun ShortArray.indexOf(offset: Int, element:Short):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
  */
-@JvmOverloads
-fun DoubleArray.indexOf(elements: DoubleArray, start: Int = 0, end: Int = elements.size): Int {
-    return this.indexOf(0, elements, start, end)
+fun CharArray.indexOf(offset: Int, element:Char):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
+}
+
+/**
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
+ */
+fun IntArray.indexOf(offset: Int, element:Int):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
+}
+
+/**
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
+ */
+fun LongArray.indexOf(offset: Int, element:Long):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
+}
+
+/**
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
+ */
+fun FloatArray.indexOf(offset: Int, element:Float):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
+}
+
+/**
+ * Returns index of element which is equal to given [element],
+ * or `-1` if there is no element is equal to given [element].
+ */
+fun DoubleArray.indexOf(offset: Int, element:Double):Int {
+    offset.checkInBounds(0, this.size)
+    var i = offset
+    while (i < this.size) {
+        if (this[i] == element) {
+            return i
+        }
+        i++
+    }
+    return -1
 }
 
 /**
@@ -319,12 +406,32 @@ fun FloatArray.indexOf(offset: Int, elements: FloatArray, start: Int = 0, end: I
 }
 
 /**
- * Returns index of [elements] segment in [this] array.
+ * Returns index of `sub-array`, the `sub-array` is
+ * the sub-sequence of [sub] starts from [subStartIndex] inclusive and end at [subEndIndex] exclusive.
+ *
+ * The searching starts from [offset], tries to find out same sequence with `sub-array`,
+ * will return the index where the `sub-array` find out.
  */
 @JvmOverloads
-fun DoubleArray.indexOf(offset: Int, elements: DoubleArray, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+fun DoubleArray.indexOf(offset: Int, sub: DoubleArray, subStartIndex: Int = 0, subEndIndex: Int = sub.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, sub.size)
+    val anchor = sub[subStartIndex]
+    var anchorIndex = this.indexOfFirst { it == anchor }
+    search@while (anchorIndex >= 0) {
+        var i = anchorIndex + 1
+        var j = subStartIndex + 1
+        while (i < this.size && j < subEndIndex) {
+            if (this[i] != sub[j]) {
+
+            }
+            i++
+            j++
+        }
+    }
 }
+
+
 
 private inline fun <T> indexOf0(
     size: Int, offset: Int, start: Int, end: Int,

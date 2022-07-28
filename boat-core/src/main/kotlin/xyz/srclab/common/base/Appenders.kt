@@ -2,7 +2,7 @@ package xyz.srclab.common.base
 
 import xyz.srclab.common.base.ByteArrayRef.Companion.arrayRef
 import xyz.srclab.common.base.CharArrayRef.Companion.arrayRef
-import xyz.srclab.common.collect.newArrayOfType
+import xyz.srclab.common.collect.arrayOfType
 import java.io.OutputStream
 import java.io.Serializable
 import java.io.Writer
@@ -434,7 +434,7 @@ open class ListAppender<E : Any> : Appender<E, ListAppender<E>>, Serializable {
     }
 
     private fun <T> toArray0(type: Class<T>): Array<T?> {
-        val array = newArrayOfType<Array<T?>>(type, count)
+        val array = arrayOfType<Array<T?>>(type, count)
         var n = head
         var i = 0
         while (n.next !== null) {

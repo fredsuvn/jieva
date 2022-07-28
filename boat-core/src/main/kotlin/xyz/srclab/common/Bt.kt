@@ -1,13 +1,14 @@
 /**
- * Boat base utilities, including common and misc.
+ * Boat core and base utilities, provides convenient and common functions.
  */
 @file:JvmName("Bt")
 
-package xyz.srclab.common.base
+package xyz.srclab.common
 
-import xyz.srclab.common.Boat
-import xyz.srclab.common.collect.addAll
-import xyz.srclab.common.collect.newArray
+import xyz.srclab.common.base.allPredicate
+import xyz.srclab.common.base.anyPredicate
+import xyz.srclab.common.base.availableProcessors
+import xyz.srclab.common.base.removeIfStartWith
 import xyz.srclab.common.collect.toStringMap
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.convert.defaultConverter
@@ -18,6 +19,7 @@ import java.io.*
 import java.lang.reflect.Type
 import java.net.URL
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
@@ -25,25 +27,12 @@ import java.util.function.Supplier
 import kotlin.stackTraceToString as stackTraceToStringKt
 import kotlin.toString as toStringKt
 
-/**
- * Represents `less than` in [Comparable] and [Comparator].
- */
-const val COMPARE_LT = -1
-
-/**
- * Represents `equal to` in [Comparable] and [Comparator].
- */
-const val COMPARE_EQ = 0
-
-/**
- * Represents `greater than` in [Comparable] and [Comparator].
- */
-const val COMPARE_GT = 1
+// Default settings:
 
 /**
  * Returns default charset: UTF-8.
  */
-fun defaultCharset(): Charset = utf8()
+fun defaultCharset(): Charset = StandardCharsets.UTF_8
 
 /**
  * Returns default [String] for `null`.
@@ -79,6 +68,8 @@ fun defaultBufferSize(): Int = 8 * 1024
  * Returns default serial version for current boat version.
  */
 fun defaultSerialVersion(): Long = Boat.serialVersion()
+
+// For any object:
 
 /**
  * Casts [this] to any type.
@@ -121,19 +112,19 @@ fun Any?.deepEquals(other: Any?): Boolean {
 /**
  * Returns true if [this] equals any of [others].
  */
-fun Any?.anyEquals(vararg others: Any?): Boolean {
+fun Any?.equalsAny(vararg others: Any?): Boolean {
     return anyPredicate({ obj -> this.equals(obj) }, *others)
 }
 
 /**
  * Returns true if [this] equals each of [others].
  */
-fun Any?.allEquals(vararg others: Any?): Boolean {
+fun Any?.equalsAll(vararg others: Any?): Boolean {
     return allPredicate({ obj -> this.equals(obj) }, *others)
 }
 
 /**
- * Returns whether all [args] are equals each other.
+ * Returns true if they are equal to each other.
  */
 fun equals(vararg args: Any?): Boolean {
     for (i in 0..args.size - 2) {
@@ -145,9 +136,47 @@ fun equals(vararg args: Any?): Boolean {
 }
 
 /**
+ * Returns true if they are deep equal to each other.
+ */
+fun deepEquals(vararg args: Any?): Boolean {
+    for (i in 0..args.size - 2) {
+        if (!Objects.deepEquals(args[i], args[i + 1])) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
+ * Returns true if [this] is same with (===) any of [others].
+ */
+fun Any?.sameAny(vararg others: Any?): Boolean {
+    return anyPredicate({ obj -> this === obj }, *others)
+}
+
+/**
+ * Returns true if [this] is same with (===) each of [others].
+ */
+fun Any?.sameAll(vararg others: Any?): Boolean {
+    return allPredicate({ obj -> this === obj }, *others)
+}
+
+/**
+ * Returns true if they are same with (===) each other.
+ */
+fun same(vararg args: Any?): Boolean {
+    for (i in 0..args.size - 2) {
+        if (args[i] !== args[i + 1]) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
  * Returns hash code of [this].
  */
-fun Any?.hash(): Int {
+fun Any?.toHash(): Int {
     return this.hashCode()
 }
 
@@ -172,7 +201,7 @@ fun Any?.arrayHash(): Int {
         is FloatArray -> Arrays.hashCode(this)
         is DoubleArray -> Arrays.hashCode(this)
         is Array<*> -> Arrays.hashCode(this)
-        else -> hash()
+        else -> toHash()
     }
 }
 
@@ -181,7 +210,7 @@ fun Any?.arrayHash(): Int {
  * or array hash code if this is an array,
  * or deep array hash code if this is a deep array.
  */
-fun Any?.deepHash(): Int {
+fun Any?.deepToHash(): Int {
     return when (this) {
         is BooleanArray -> Arrays.hashCode(this)
         is ByteArray -> Arrays.hashCode(this)
@@ -192,7 +221,7 @@ fun Any?.deepHash(): Int {
         is FloatArray -> Arrays.hashCode(this)
         is DoubleArray -> Arrays.hashCode(this)
         is Array<*> -> Arrays.deepHashCode(this)
-        else -> hash()
+        else -> toHash()
     }
 }
 
@@ -221,9 +250,9 @@ fun Any?.toString(): String {
 }
 
 /**
- * Returns `toString` of [this], or array `toString` if this is an array.
+ * Returns `toString` of [this], or `Arrays.toString` if this is an array.
  */
-fun Any?.arrayToString(): String {
+fun Any?.arrayString(): String {
     return when (this) {
         is BooleanArray -> Arrays.toString(this)
         is ByteArray -> Arrays.toString(this)
@@ -240,8 +269,8 @@ fun Any?.arrayToString(): String {
 
 /**
  * Returns `toString` of [this],
- * or array `toString` if this is an array,
- * or deep array `toString` if this is a deep array.
+ * or `Arrays.toString` if this is a primitive array,
+ * or `Arrays.deepToString` if this is an object array.
  */
 fun Any?.deepToString(): String {
     return when (this) {
@@ -259,10 +288,10 @@ fun Any?.deepToString(): String {
 }
 
 /**
- * Returns `toString` of given [args] by [arrayToString].
+ * Returns `toString` of given [args] by [arrayString].
  */
 fun toString(vararg args: Any?): String {
-    return args.arrayToString()
+    return args.arrayString()
 }
 
 /**
@@ -368,52 +397,7 @@ inline fun <T : Any> getOrNew(lock: Any, getter: () -> T?, setter: (T?) -> Unit,
     }
 }
 
-/**
- * Converts [this] to boolean:
- *
- * * If this is null, return false;
- * * If this is boolean, return itself;
- * * If this is number, return `false` if this is 0, else `true`;
- * * If this is [CharSequence], return `false` if this is "false", else `true`;
- * * Else `true`.
- */
-fun Any?.toBoolean(): Boolean {
-    return when (this) {
-        null -> false
-        is Boolean -> this
-        is Number -> this.toInt() != 0
-        is CharSequence -> !this.contentEquals("false")
-        else -> true
-    }
-}
-
-/**
- * Returns true if any of the result of [toBoolean] for each [objs] is true.
- */
-fun anyTrue(vararg objs: Any?): Boolean {
-    return anyPredicate({ obj -> obj.toBoolean() }, *objs)
-}
-
-/**
- * Returns true if any of the result of [toBoolean] for each [objs] is false.
- */
-fun anyFalse(vararg objs: Any?): Boolean {
-    return anyPredicate({ obj -> !obj.toBoolean() }, *objs)
-}
-
-/**
- * Returns true if all the result of [toBoolean] for each [objs] is true.
- */
-fun allTrue(vararg objs: Any?): Boolean {
-    return allPredicate({ obj -> obj.toBoolean() }, *objs)
-}
-
-/**
- * Returns true if all the result of [toBoolean] for each [objs] is false.
- */
-fun allFalse(vararg objs: Any?): Boolean {
-    return allPredicate({ obj -> !obj.toBoolean() }, *objs)
-}
+// Compare objects:
 
 /**
  * Ensures that this value is not less than [min].
@@ -485,6 +469,8 @@ fun <T> T.isBetween(min: T, max: T, comparator: Comparator<T>): Boolean {
     return comparator.compare(this, min) >= 0 && comparator.compare(this, max) <= 0
 }
 
+// Simple calculation for parameters.
+
 /**
  * Returns remaining length of [size] from [offset].
  */
@@ -555,12 +541,7 @@ fun countSeg(totalSize: Long, segSize: Long): Long {
     return if (totalSize % segSize == 0L) div else div + 1
 }
 
-/**
- * Returns the detailed description of this throwable with its stack trace.
- */
-fun Throwable.stackTraceToString(): String {
-    return this.stackTraceToStringKt()
-}
+// Resource loading:
 
 /**
  * Loads resource in current classpath.
@@ -653,8 +634,20 @@ private fun CharSequence.removeAbsolute(): String {
     return this.removeIfStartWith("/")
 }
 
+// Throwable:
+
+/**
+ * Returns the detailed description of this throwable with its stack trace.
+ */
+fun Throwable.stackTraceToString(): String {
+    return this.stackTraceToStringKt()
+}
+
+// Serialization:
+
 /**
  * Writes [this] object into [dest].
+ *
  * @param close whether close the stream after writing
  */
 @JvmOverloads
@@ -668,6 +661,7 @@ fun Any.writeObject(dest: OutputStream, close: Boolean = false) {
 
 /**
  * Writes [this] object into [file].
+ *
  * @param close whether close the stream after writing
  */
 @JvmOverloads
@@ -677,6 +671,7 @@ fun Any.writeObject(file: File, close: Boolean = false) {
 
 /**
  * Writes [this] object into file [fileName].
+ *
  * @param close whether close the stream after writing
  */
 @JvmOverloads
@@ -686,6 +681,7 @@ fun Any.writeObject(fileName: CharSequence, close: Boolean = false) {
 
 /**
  * Reads object from [this] input stream.
+ *
  * @param close whether close the stream after reading
  */
 @JvmOverloads
@@ -701,6 +697,7 @@ fun <T> InputStream.readObject(close: Boolean = false): T {
 
 /**
  * Reads object from [this] file.
+ *
  * @param close whether close the stream after reading
  */
 @JvmOverloads
@@ -710,12 +707,15 @@ fun <T> File.readObject(close: Boolean = false): T {
 
 /**
  * Reads object from file [fileName].
+ *
  * @param close whether close the stream after reading
  */
 @JvmOverloads
 fun <T> readObject(fileName: CharSequence, close: Boolean = false): T {
     return FileInputStream(fileName.toString()).readObject(close)
 }
+
+// Parsing properties:
 
 /**
  * Reads and parses properties.
@@ -747,6 +747,8 @@ fun File.readProperties(charset: Charset = defaultCharset()): Map<String, String
     return this.reader(charset).readProperties(true)
 }
 
+// Run processor:
+
 /**
  * Runs a new process with [command].
  */
@@ -755,12 +757,11 @@ fun runProcess(command: String): Process {
 }
 
 /**
- * Runs a new process with [command], directory([dir]) and environments([env]) (name=value format).
+ * Runs a new process with [command], [environments] and [directory].
  */
-fun runProcess(command: String, env: Array<out String>?, dir: File?): Process {
-    newArray("", "")
-    arrayOf("", "")
-    return Runtime.getRuntime().exec(command, env, dir)
+fun runProcess(command: String, environments: Map<String, String>?, directory: File?): Process {
+    val envArray = environments?.entries?.map { "${it.key}=${it.value}" }?.toTypedArray()
+    return Runtime.getRuntime().exec(command, envArray, directory)
 }
 
 /**
@@ -771,10 +772,11 @@ fun runProcess(vararg cmdArray: String): Process {
 }
 
 /**
- * Runs a new process with command array([cmdArray]), directory([dir]) and environments([env]) (name=value format).
+ * Runs a new process with command array([cmdArray]), [environments] and [directory].
  */
-fun runProcess(cmdArray: Array<out String>, env: Array<out String>?, dir: File?): Process {
-    return Runtime.getRuntime().exec(cmdArray, env, dir)
+fun runProcess(cmdArray: Array<out String>, environments: Map<String, String>?, directory: File?): Process {
+    val envArray = environments?.entries?.map { "${it.key}=${it.value}" }?.toTypedArray()
+    return Runtime.getRuntime().exec(cmdArray, envArray, directory)
 }
 
 // Quick way to create array and collection:
