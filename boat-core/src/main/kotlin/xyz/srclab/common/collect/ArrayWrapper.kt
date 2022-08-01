@@ -1,6 +1,5 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.defaultSerialVersion
 import java.io.Serializable
 
 /**
@@ -20,10 +19,6 @@ class ArrayWrapper<T>(
     override fun lastIndexOf(element: T): Int = array.lastIndexOf(element)
     override fun add(index: Int, element: T) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): T = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
@@ -43,10 +38,6 @@ class BooleanArrayWrapper(
     override fun lastIndexOf(element: Boolean): Int = array.lastIndexOf(element)
     override fun add(index: Int, element: Boolean) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): Boolean = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
@@ -66,10 +57,6 @@ class ByteArrayWrapper(
     override fun lastIndexOf(element: Byte): Int = array.lastIndexOf(element)
     override fun add(index: Int, element: Byte) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): Byte = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
@@ -89,10 +76,6 @@ class ShortArrayWrapper(
     override fun lastIndexOf(element: Short): Int = array.lastIndexOf(element)
     override fun add(index: Int, element: Short) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): Short = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
@@ -112,10 +95,6 @@ class CharArrayWrapper(
     override fun lastIndexOf(element: Char): Int = array.lastIndexOf(element)
     override fun add(index: Int, element: Char) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): Char = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
@@ -135,10 +114,6 @@ class IntArrayWrapper(
     override fun lastIndexOf(element: Int): Int = array.lastIndexOf(element)
     override fun add(index: Int, element: Int) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): Int = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
@@ -158,10 +133,6 @@ class LongArrayWrapper(
     override fun lastIndexOf(element: Long): Int = array.lastIndexOf(element)
     override fun add(index: Int, element: Long) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): Long = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
@@ -181,10 +152,6 @@ class FloatArrayWrapper(
     override fun lastIndexOf(element: Float): Int = array.indexOfLast { it == element }
     override fun add(index: Int, element: Float) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): Float = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
@@ -204,8 +171,4 @@ class DoubleArrayWrapper(
     override fun lastIndexOf(element: Double): Int = array.indexOfLast { it == element }
     override fun add(index: Int, element: Double) = throw UnsupportedOperationException()
     override fun removeAt(index: Int): Double = throw UnsupportedOperationException()
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }

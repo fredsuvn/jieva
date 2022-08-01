@@ -1,75 +1,22 @@
 /**
- * Boat core and base utilities, provides convenient and common functions.
+ * Base and core utilities, provides convenient and common functions.
  */
 @file:JvmName("Bt")
 
 package xyz.srclab.common
 
-import xyz.srclab.common.base.allPredicate
-import xyz.srclab.common.base.anyPredicate
-import xyz.srclab.common.base.availableProcessors
-import xyz.srclab.common.base.removeIfStartWith
+import xyz.srclab.common.base.*
 import xyz.srclab.common.collect.toStringMap
-import xyz.srclab.common.convert.Converter
-import xyz.srclab.common.convert.defaultConverter
-import xyz.srclab.common.io.readString
-import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.reflect.defaultClassLoader
-import java.io.*
-import java.lang.reflect.Type
-import java.net.URL
+import java.io.File
+import java.io.InputStream
+import java.io.Reader
 import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 import java.util.function.Supplier
-import kotlin.stackTraceToString as stackTraceToStringKt
+import kotlin.collections.joinTo as joinToKt
 import kotlin.toString as toStringKt
-
-// Default settings:
-
-/**
- * Returns default charset: UTF-8.
- */
-fun defaultCharset(): Charset = StandardCharsets.UTF_8
-
-/**
- * Returns default [String] for `null`.
- */
-fun defaultNullString(): String = "null"
-
-/**
- * Returns default radix: 10.
- */
-fun defaultRadix(): Int = 10
-
-/**
- * Returns default locale: [Locale.ENGLISH].
- */
-fun defaultLocale(): Locale = Locale.ENGLISH
-
-/**
- * Returns default concurrency level: [availableProcessors] * 4.
- */
-fun defaultConcurrencyLevel(): Int = availableProcessors() * 4
-
-/**
- * Returns default timestamp pattern: yyyyMMddHHmmssSSS.
- */
-fun defaultTimestampPattern(): String = "yyyyMMddHHmmssSSS"
-
-/**
- * Returns default buffer size: 8 * 1024.
- */
-fun defaultBufferSize(): Int = 8 * 1024
-
-/**
- * Returns default serial version for current boat version.
- */
-fun defaultSerialVersion(): Long = Boat.serialVersion()
-
-// For any object:
 
 /**
  * Casts [this] to any type.
@@ -312,6 +259,60 @@ fun Any?.toCharSeq(): CharSequence {
 }
 
 /**
+ * Joints array or iterable to string.
+ */
+@JvmOverloads
+fun Any.joinToString(separator: String = ", ", transform: JavaFunction<Any?, out CharSequence>? = null): String {
+    return joinToString(separator, -1, "...", transform)
+}
+
+/**
+ * Joints array or iterable to string.
+ */
+fun Any.joinToString(
+    separator: String,
+    limit: Int,
+    truncated: CharSequence,
+    transform: JavaFunction<Any?, out CharSequence>? = null
+): String {
+    return joinToString(StringAppender(), separator, limit, truncated, transform).toString()
+}
+
+/**
+ * Joints array or iterable to string.
+ */
+@JvmOverloads
+fun <A : Appendable> Any.joinToString(
+    dest: A, separator: String = ", ", transform: JavaFunction<Any?, out CharSequence>? = null): A {
+    return joinToString(dest, separator, -1, "...", transform)
+}
+
+/**
+ * Joints array or iterable to string.
+ */
+fun <A : Appendable> Any.joinToString(
+    dest: A,
+    separator: String,
+    limit: Int,
+    truncated: CharSequence,
+    transform: JavaFunction<Any?, out CharSequence>? = null
+): A {
+    return when (this) {
+        is Array<*> -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is BooleanArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is ByteArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is ShortArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is CharArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is IntArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is LongArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is FloatArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is DoubleArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is Iterable<*> -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        else -> throw IllegalArgumentException("Must be array or iterable: ${this.javaClass}")
+    }
+}
+
+/**
  * Returns [t] if it is not null, or [defaultValue] if [t] is null.
  */
 fun <T : Any> notNull(t: T?, defaultValue: T): T {
@@ -323,33 +324,6 @@ fun <T : Any> notNull(t: T?, defaultValue: T): T {
  */
 fun <T : Any> notNull(t: T?, supplier: Supplier<out T>): T {
     return t ?: supplier.get()
-}
-
-/**
- * Returns result of conversion by [converter] if the result is not null, or [defaultValue] if the result is null.
- */
-@JvmOverloads
-fun <T : Any> notNull(t: Any?, type: Class<out T>, defaultValue: T, converter: Converter = defaultConverter()): T {
-    val result = converter.convert(t, type)
-    return result ?: defaultValue
-}
-
-/**
- * Returns result of conversion by [converter] if the result is not null, or [defaultValue] if the result is null.
- */
-@JvmOverloads
-fun <T : Any> notNull(t: Any?, type: Type, defaultValue: T, converter: Converter = defaultConverter()): T {
-    val result = converter.convert<T>(t, type)
-    return result ?: defaultValue
-}
-
-/**
- * Returns result of conversion by [converter] if the result is not null, or [defaultValue] if the result is null.
- */
-@JvmOverloads
-fun <T : Any> notNull(t: Any?, type: TypeRef<T>, defaultValue: T, converter: Converter = defaultConverter()): T {
-    val result = converter.convert(t, type)
-    return result ?: defaultValue
 }
 
 /**
@@ -395,78 +369,6 @@ inline fun <T : Any> getOrNew(lock: Any, getter: () -> T?, setter: (T?) -> Unit,
         setter(nv)
         return nv
     }
-}
-
-// Compare objects:
-
-/**
- * Ensures that this value is not less than [min].
- */
-fun <T : Comparable<T>> T.atLeast(min: T): T {
-    return this.coerceAtLeast(min)
-}
-
-/**
- * Ensures that this value is not greater than [max].
- */
-fun <T : Comparable<T>> T.atMost(max: T): T {
-    return this.coerceAtMost(max)
-}
-
-/**
- * Ensures that this value lies in the specified range.
- */
-fun <T : Comparable<T>> T.atBetween(min: T, max: T): T {
-    return this.coerceIn(min, max)
-}
-
-/**
- * Ensures that this value is not less than [min].
- */
-fun <T> T.atLeast(min: T, comparator: Comparator<T>): T {
-    return if (comparator.compare(this, min) <= 0) min else this
-}
-
-/**
- * Ensures that this value is not greater than [max].
- */
-fun <T> T.atMost(max: T, comparator: Comparator<T>): T {
-    return if (comparator.compare(this, max) >= 0) max else this
-}
-
-/**
- * Ensures that this value lies in the specified range.
- */
-fun <T> T.atBetween(min: T, max: T, comparator: Comparator<T>): T {
-    if (comparator.compare(this, min) <= 0) {
-        return min
-    }
-    if (comparator.compare(this, max) >= 0) {
-        return max
-    }
-    return this
-}
-
-/**
- * Returns whether given value between the given range:
- *
- * ```
- * value >= min && value <= max
- * ```
- */
-fun <T : Comparable<T>> T.isBetween(min: T, max: T): Boolean {
-    return this in min..max
-}
-
-/**
- * Returns whether given value between the given range:
- *
- * ```
- * value >= min && value <= max
- * ```
- */
-fun <T> T.isBetween(min: T, max: T, comparator: Comparator<T>): Boolean {
-    return comparator.compare(this, min) >= 0 && comparator.compare(this, max) <= 0
 }
 
 // Simple calculation for parameters.
@@ -539,244 +441,6 @@ fun countSeg(totalSize: Int, segSize: Int): Int {
 fun countSeg(totalSize: Long, segSize: Long): Long {
     val div = totalSize / segSize
     return if (totalSize % segSize == 0L) div else div + 1
-}
-
-// Resource loading:
-
-/**
- * Loads resource in current classpath.
- * It finds first resource specified by the [path] (generally in current jar).
- * The [path] may start with `/` or not, they are equivalent.
- */
-@JvmOverloads
-fun loadResource(path: CharSequence, classLoader: ClassLoader = defaultClassLoader()): URL? {
-    return classLoader.getResource(path.removeAbsolute().removeAbsolute())
-}
-
-/**
- * Loads resource as [InputStream] in current classpath.
- * It finds first resource specified by the [path] (generally in current jar).
- * The [path] may start with `/` or not, they are equivalent.
- */
-@JvmOverloads
-fun loadStream(path: CharSequence, classLoader: ClassLoader = defaultClassLoader()): InputStream? {
-    return classLoader.getResource(path.removeAbsolute().removeAbsolute())?.openStream()
-}
-
-/**
- * Loads content of resource as string in current classpath.
- * It finds first resource specified by the [path] (generally in current jar).
- * The [path] may start with `/` or not, they are equivalent.
- */
-@JvmOverloads
-fun loadString(
-    path: CharSequence,
-    charset: Charset = defaultCharset(),
-    classLoader: ClassLoader = defaultClassLoader()
-): String? {
-    return loadResource(path.removeAbsolute(), classLoader)?.openStream()?.readString(charset, true)
-}
-
-/**
- * Loads content of resource as properties in current classpath.
- * It finds first resource specified by the [path] (generally in current jar).
- * The [path] may start with `/` or not, they are equivalent.
- */
-@JvmOverloads
-fun loadProperties(
-    path: CharSequence,
-    charset: Charset = defaultCharset(),
-    classLoader: ClassLoader = defaultClassLoader()
-): Map<String, String>? {
-    return loadResource(path.removeAbsolute(), classLoader)?.openStream()?.readProperties(charset, true)
-}
-
-/**
- * Loads all same-path resources in current classpath.
- * The [path] may start with `/` or not, they are equivalent.
- */
-@JvmOverloads
-fun loadResources(path: CharSequence, classLoader: ClassLoader = defaultClassLoader()): List<URL> {
-    return classLoader.getResources(path.removeAbsolute()).toList()
-}
-
-/**
- * Loads all same-path contents of resources as strings in current classpath.
- * The [path] may start with `/` or not, they are equivalent.
- */
-@JvmOverloads
-fun loadStrings(
-    path: CharSequence,
-    charset: Charset = defaultCharset(),
-    classLoader: ClassLoader = defaultClassLoader()
-): List<String> {
-    return classLoader.getResources(path.removeAbsolute()).asSequence().map {
-        it.openStream().readString(charset, true)
-    }.toList()
-}
-
-/**
- * Loads all same-path contents of resources as properties list in current classpath.
- * The [path] may start with `/` or not, they are equivalent.
- */
-@JvmOverloads
-fun loadPropertiesList(
-    path: CharSequence,
-    charset: Charset = defaultCharset(),
-    classLoader: ClassLoader = defaultClassLoader()
-): List<Map<String, String>> {
-    return classLoader.getResources(path.removeAbsolute()).asSequence().map {
-        it.openStream().readProperties(charset, true)
-    }.toList()
-}
-
-private fun CharSequence.removeAbsolute(): String {
-    return this.removeIfStartWith("/")
-}
-
-// Throwable:
-
-/**
- * Returns the detailed description of this throwable with its stack trace.
- */
-fun Throwable.stackTraceToString(): String {
-    return this.stackTraceToStringKt()
-}
-
-// Serialization:
-
-/**
- * Writes [this] object into [dest].
- *
- * @param close whether close the stream after writing
- */
-@JvmOverloads
-fun Any.writeObject(dest: OutputStream, close: Boolean = false) {
-    val oop = ObjectOutputStream(dest)
-    oop.writeObject(this)
-    if (close) {
-        oop.close()
-    }
-}
-
-/**
- * Writes [this] object into [file].
- *
- * @param close whether close the stream after writing
- */
-@JvmOverloads
-fun Any.writeObject(file: File, close: Boolean = false) {
-    return this.writeObject(FileOutputStream(file), close)
-}
-
-/**
- * Writes [this] object into file [fileName].
- *
- * @param close whether close the stream after writing
- */
-@JvmOverloads
-fun Any.writeObject(fileName: CharSequence, close: Boolean = false) {
-    return this.writeObject(FileOutputStream(fileName.toString()), close)
-}
-
-/**
- * Reads object from [this] input stream.
- *
- * @param close whether close the stream after reading
- */
-@JvmOverloads
-fun <T> InputStream.readObject(close: Boolean = false): T {
-    val ooi = ObjectInputStream(this)
-    return ooi.readObject().asType<T>().let {
-        if (close) {
-            this.close()
-        }
-        it
-    }
-}
-
-/**
- * Reads object from [this] file.
- *
- * @param close whether close the stream after reading
- */
-@JvmOverloads
-fun <T> File.readObject(close: Boolean = false): T {
-    return FileInputStream(this).readObject(close)
-}
-
-/**
- * Reads object from file [fileName].
- *
- * @param close whether close the stream after reading
- */
-@JvmOverloads
-fun <T> readObject(fileName: CharSequence, close: Boolean = false): T {
-    return FileInputStream(fileName.toString()).readObject(close)
-}
-
-// Parsing properties:
-
-/**
- * Reads and parses properties.
- */
-@JvmOverloads
-fun InputStream.readProperties(charset: Charset = defaultCharset(), close: Boolean = false): Map<String, String> {
-    return this.reader(charset).readProperties(close)
-}
-
-/**
- * Reads and parses properties.
- */
-@JvmOverloads
-fun Reader.readProperties(close: Boolean = false): Map<String, String> {
-    val props = Properties()
-    props.load(this)
-    val map = props.toStringMap()
-    if (close) {
-        this.close()
-    }
-    return map
-}
-
-/**
- * Reads and parses properties.
- */
-@JvmOverloads
-fun File.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
-    return this.reader(charset).readProperties(true)
-}
-
-// Run processor:
-
-/**
- * Runs a new process with [command].
- */
-fun runProcess(command: String): Process {
-    return Runtime.getRuntime().exec(command)
-}
-
-/**
- * Runs a new process with [command], [environments] and [directory].
- */
-fun runProcess(command: String, environments: Map<String, String>?, directory: File?): Process {
-    val envArray = environments?.entries?.map { "${it.key}=${it.value}" }?.toTypedArray()
-    return Runtime.getRuntime().exec(command, envArray, directory)
-}
-
-/**
- * Runs a new process with command array([cmdArray]).
- */
-fun runProcess(vararg cmdArray: String): Process {
-    return Runtime.getRuntime().exec(cmdArray)
-}
-
-/**
- * Runs a new process with command array([cmdArray]), [environments] and [directory].
- */
-fun runProcess(cmdArray: Array<out String>, environments: Map<String, String>?, directory: File?): Process {
-    val envArray = environments?.entries?.map { "${it.key}=${it.value}" }?.toTypedArray()
-    return Runtime.getRuntime().exec(cmdArray, envArray, directory)
 }
 
 // Quick way to create array and collection:
@@ -894,4 +558,36 @@ fun <K, V> linkedHashMap(vararg elements: Any?): LinkedHashMap<K, V> {
  */
 fun <K, V> concurrentHashMap(vararg elements: Any?): ConcurrentHashMap<K, V> {
     return collectMap(ConcurrentHashMap(countSeg(elements.size, 2)), *elements)
+}
+
+// Parsing properties:
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun InputStream.readProperties(charset: Charset = BtProps.charset(), close: Boolean = false): Map<String, String> {
+    return this.reader(charset).readProperties(close)
+}
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun Reader.readProperties(close: Boolean = false): Map<String, String> {
+    val props = Properties()
+    props.load(this)
+    val map = props.toStringMap()
+    if (close) {
+        this.close()
+    }
+    return map
+}
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun File.readProperties(charset: Charset = BtProps.charset()): Map<String, String> {
+    return this.reader(charset).readProperties(true)
 }

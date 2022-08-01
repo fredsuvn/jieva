@@ -11,14 +11,13 @@ import java.nio.ByteBuffer
 private const val BUFFER_SIZE = 1024
 
 /**
- * String appender, used to append objects and finally join them into a [String].
+ * String appender, used to append objects and finally concatenate them to a [String].
  *
  * This class is lazy, it stores the given appended object without any other computation.
- * It computes `join-to-string` operation only when the [toString] method is called,
- * so if content of object previously appended is modified, the final result value will be changed accordingly.
+ * It computes `concatenate-to-string` operation only when the [toString] method is called,
+ * so if the content of object previously appended is modified, the final result value will be changed accordingly.
  *
- * Note, **DO NOT** modify content of appended object in `join-to-string` processing,
- * it may cause [IndexOutOfBoundsException].
+ * When `concatenate-to-string` operation is processing, any modification for content of appended object is undefined.
  */
 open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appendable, Writer(), Serializable {
 
@@ -131,7 +130,7 @@ open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appen
         var n = head
         while (n.next !== null) {
             when (val v = n.value) {
-                null -> size += defaultNullString().length
+                null -> size += BtProps.nullString().length
                 is CharSequence -> size += v.length
                 is CharArray -> size += v.size
                 is CharArrayRef -> size += v.length
@@ -151,8 +150,8 @@ open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appen
         while (n.next !== null) {
             val s: Int = when (val v = n.value) {
                 null -> {
-                    defaultNullString().asJavaString().getChars(0, defaultNullString().length, buffer, i)
-                    defaultNullString().length
+                    BtProps.nullString().asJavaString().getChars(0, BtProps.nullString().length, buffer, i)
+                    BtProps.nullString().length
                 }
                 is String -> {
                     v.asJavaString().getChars(0, v.length, buffer, i)
@@ -202,21 +201,16 @@ open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appen
         cur.next = newNode
         cur = newNode
     }
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }
 
 /**
- * Bytes appender, used to append objects and finally join them into a [ByteArray].
+ * String appender, used to append objects and finally concatenate them to a [ByteArray].
  *
  * This class is lazy, it stores the given appended object without any other computation.
- * It computes `join-to-bytes` operation only when the [toByteArray] method is called,
- * so if content of object previously appended is modified, the final result value will be changed accordingly.
+ * It computes `concatenate-to-bytes` operation only when the [toByteArray] method is called,
+ * so if the content of object previously appended is modified, the final result value will be changed accordingly.
  *
- * Note, **DO NOT** modify content of appended object in `join-to-bytes` processing,
- * it may cause [IndexOutOfBoundsException].
+ * When `concatenate-to-bytes` operation is processing, any modification for content of appended object is undefined.
  */
 open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStream(), Serializable {
 
@@ -371,10 +365,6 @@ open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStre
         val newNode = SNode<Any>()
         cur.next = newNode
         cur = newNode
-    }
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
 

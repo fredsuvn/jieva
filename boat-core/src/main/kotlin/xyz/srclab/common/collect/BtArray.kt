@@ -6,14 +6,11 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.asType
-import xyz.srclab.common.base.*
-import xyz.srclab.common.equals
+import xyz.srclab.common.base.checkInBounds
+import xyz.srclab.common.base.checkRangeInBounds
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.remLength
 import java.lang.reflect.Type
-import java.util.function.Function
-import kotlin.collections.joinTo as joinToKt
-import kotlin.collections.joinToString as joinToStringKt
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not an array type: "
 
@@ -32,7 +29,7 @@ fun Any.arrayLength(): Int {
         is LongArray -> this.size
         is FloatArray -> this.size
         is DoubleArray -> this.size
-        else -> throw IllegalArgumentException("NOT_ARRAY_TYPE_PREFIX${this.javaClass}")
+        else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX${this.javaClass}")
     }
 }
 
@@ -55,7 +52,7 @@ fun <A : Any> A.arrayCopy(fromIndex: Int = 0, toIndex: Int = this.arrayLength())
         is LongArray -> this.copyOfRange(fromIndex, toIndex)
         is FloatArray -> this.copyOfRange(fromIndex, toIndex)
         is DoubleArray -> this.copyOfRange(fromIndex, toIndex)
-        else -> throw IllegalArgumentException("NOT_ARRAY_TYPE_PREFIX${this.javaClass}")
+        else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX${this.javaClass}")
     }.asType()
 }
 
@@ -197,342 +194,284 @@ fun DoubleArray.asList(): MutableList<Double> {
     return DoubleArrayWrapper(this)
 }
 
-/**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun <T> Array<T>.indexOf(offset: Int, element:T):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
+//private inline fun indexOf0(size:Int, offset: Int, getter:Int->) {
+//    offset.checkInBounds(0, size)
+//    var i = offset
+//    while (i < size) {
+//        if (this[i] == element) {
+//            return i
+//        }
+//        i++
+//    }
+//    return -1
+//}
 
 /**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun BooleanArray.indexOf(offset: Int, element:Boolean):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
-
-/**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun ByteArray.indexOf(offset: Int, element:Byte):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
-
-/**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun ShortArray.indexOf(offset: Int, element:Short):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
-
-/**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun CharArray.indexOf(offset: Int, element:Char):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
-
-/**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun IntArray.indexOf(offset: Int, element:Int):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
-
-/**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun LongArray.indexOf(offset: Int, element:Long):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
-
-/**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun FloatArray.indexOf(offset: Int, element:Float):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
-
-/**
- * Returns index of element which is equal to given [element],
- * or `-1` if there is no element is equal to given [element].
- */
-fun DoubleArray.indexOf(offset: Int, element:Double):Int {
-    offset.checkInBounds(0, this.size)
-    var i = offset
-    while (i < this.size) {
-        if (this[i] == element) {
-            return i
-        }
-        i++
-    }
-    return -1
-}
-
-/**
- * Returns index of [elements] segment in [this] array.
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
  */
 @JvmOverloads
-fun <T> Array<T>.indexOf(offset: Int, elements: Array<T>, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
-}
-
-/**
- * Returns index of [elements] segment in [this] array.
- */
-@JvmOverloads
-fun BooleanArray.indexOf(offset: Int, elements: BooleanArray, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
-}
-
-/**
- * Returns index of [elements] segment in [this] array.
- */
-@JvmOverloads
-fun ByteArray.indexOf(offset: Int, elements: ByteArray, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
-}
-
-/**
- * Returns index of [elements] segment in [this] array.
- */
-@JvmOverloads
-fun ShortArray.indexOf(offset: Int, elements: ShortArray, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
-}
-
-/**
- * Returns index of [elements] segment in [this] array.
- */
-@JvmOverloads
-fun CharArray.indexOf(offset: Int, elements: CharArray, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
-}
-
-/**
- * Returns index of [elements] segment in [this] array.
- */
-@JvmOverloads
-fun IntArray.indexOf(offset: Int, elements: IntArray, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
-}
-
-/**
- * Returns index of [elements] segment in [this] array.
- */
-@JvmOverloads
-fun LongArray.indexOf(offset: Int, elements: LongArray, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
-}
-
-/**
- * Returns index of [elements] segment in [this] array.
- */
-@JvmOverloads
-fun FloatArray.indexOf(offset: Int, elements: FloatArray, start: Int = 0, end: Int = elements.size): Int {
-    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
-}
-
-/**
- * Returns index of `sub-array`, the `sub-array` is
- * the sub-sequence of [sub] starts from [subStartIndex] inclusive and end at [subEndIndex] exclusive.
- *
- * The searching starts from [offset], tries to find out same sequence with `sub-array`,
- * will return the index where the `sub-array` find out.
- */
-@JvmOverloads
-fun DoubleArray.indexOf(offset: Int, sub: DoubleArray, subStartIndex: Int = 0, subEndIndex: Int = sub.size): Int {
+fun <T> Array<T>.indexOf(
+    offset: Int, subArray: Array<T>, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
     offset.checkInBounds(0, this.size)
-    checkRangeInBounds(subStartIndex, subEndIndex, 0, sub.size)
-    val anchor = sub[subStartIndex]
-    var anchorIndex = this.indexOfFirst { it == anchor }
-    search@while (anchorIndex >= 0) {
-        var i = anchorIndex + 1
-        var j = subStartIndex + 1
-        while (i < this.size && j < subEndIndex) {
-            if (this[i] != sub[j]) {
-
-            }
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
+    }
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
             i++
-            j++
+            continue
         }
-    }
-}
-
-
-
-private inline fun <T> indexOf0(
-    size: Int, offset: Int, start: Int, end: Int,
-    arrayGetter: (Int) -> T,
-    elementsGetter: (Int) -> T
-): Int {
-    offset.checkInBounds(0, size)
-    checkRangeInBounds(start, end, 0, size)
-    var i = offset
-    while (i < size) {
-        var j = i
-        var k = start
-        while (j < size && k < end) {
-            if (arrayGetter(j) == elementsGetter(k)) {
-                j++
-                k++
-            } else {
-                break
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
             }
         }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
+        return i
     }
     return -1
 }
 
 /**
- * Joins array to string.
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
  */
-@JvmName("joinToString")
 @JvmOverloads
-fun Any.arrayJoinToString(
-    separator: CharSequence = ", ",
-    transform: Function<Any?, out CharSequence>? = null
-): String {
-    return this.arrayJoinToString(separator, -1, "...", transform)
-}
-
-/**
- * Joins array to string.
- */
-@JvmName("joinToString")
-@JvmOverloads
-fun Any.arrayJoinToString(
-    separator: CharSequence,
-    limit: Int,
-    truncated: CharSequence,
-    transform: Function<Any?, out CharSequence>? = null
-): String {
-    return when (this) {
-        is Array<*> -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is BooleanArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is ByteArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is ShortArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is CharArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is IntArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is LongArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is FloatArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is DoubleArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-        else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
+fun BooleanArray.indexOf(
+    offset: Int, subArray: BooleanArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
     }
-}
-
-/**
- * Joins array to string to [dest].
- */
-@JvmName("joinTo")
-@JvmOverloads
-fun <A : Appendable> Any.arrayJoinTo(
-    dest: A,
-    separator: CharSequence = ", ",
-    transform: Function<Any?, out CharSequence>? = null
-): A {
-    return this.arrayJoinTo(dest, separator, -1, "...", transform)
-}
-
-/**
- * Joins array to string to [dest].
- */
-@JvmName("joinTo")
-@JvmOverloads
-fun <A : Appendable> Any.arrayJoinTo(
-    dest: A,
-    separator: CharSequence,
-    limit: Int,
-    truncated: CharSequence,
-    transform: Function<Any?, out CharSequence>? = null
-): A {
-    return when (this) {
-        is Array<*> -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is BooleanArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is ByteArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is ShortArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is CharArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is IntArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is LongArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is FloatArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        is DoubleArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
-        else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
+            i++
+            continue
+        }
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
+            }
+        }
+        return i
     }
+    return -1
+}
+
+/**
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
+ */
+@JvmOverloads
+fun ByteArray.indexOf(
+    offset: Int, subArray: ByteArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
+    }
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
+            i++
+            continue
+        }
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
+            }
+        }
+        return i
+    }
+    return -1
+}
+
+/**
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
+ */
+@JvmOverloads
+fun ShortArray.indexOf(
+    offset: Int, subArray: ShortArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
+    }
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
+            i++
+            continue
+        }
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
+            }
+        }
+        return i
+    }
+    return -1
+}
+
+/**
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
+ */
+@JvmOverloads
+fun CharArray.indexOf(
+    offset: Int, subArray: CharArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
+    }
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
+            i++
+            continue
+        }
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
+            }
+        }
+        return i
+    }
+    return -1
+}
+
+/**
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
+ */
+@JvmOverloads
+fun IntArray.indexOf(
+    offset: Int, subArray: IntArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
+    }
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
+            i++
+            continue
+        }
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
+            }
+        }
+        return i
+    }
+    return -1
+}
+
+/**
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
+ */
+@JvmOverloads
+fun LongArray.indexOf(
+    offset: Int, subArray: LongArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
+    }
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
+            i++
+            continue
+        }
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
+            }
+        }
+        return i
+    }
+    return -1
+}
+
+/**
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
+ */
+@JvmOverloads
+fun FloatArray.indexOf(
+    offset: Int, subArray: FloatArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
+    }
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
+            i++
+            continue
+        }
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
+            }
+        }
+        return i
+    }
+    return -1
+}
+
+/**
+ * Returns index of element-sequence which specified by [subArray]
+ * from [subStartIndex] inclusive to [subEndIndex] exclusive.
+ */
+@JvmOverloads
+fun DoubleArray.indexOf(
+    offset: Int, subArray: DoubleArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset.checkInBounds(0, this.size)
+    checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
+    val subLen = remLength(subEndIndex, subStartIndex)
+    if (this.size < offset + subLen) {
+        return -1
+    }
+    var i = offset
+    main@ while (i <= this.size - subLen) {
+        if (this[i] != subArray[subStartIndex]) {
+            i++
+            continue
+        }
+        for (j in 1 until subLen) {
+            if (this[i + j] != subArray[subStartIndex + j]) {
+                i++
+                continue@main
+            }
+        }
+        return i
+    }
+    return -1
 }

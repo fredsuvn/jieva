@@ -9,7 +9,7 @@ import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.annotations.Accepted
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.base.asType
+import xyz.srclab.common.asType
 import xyz.srclab.common.base.currentThread
 import xyz.srclab.common.base.dotMatcher
 import java.lang.reflect.*
@@ -298,13 +298,6 @@ val Type.lowerBound: Type?
             else -> this
         }
     }
-
-/**
- * Returns current [Thread.contextClassLoader], or [BytesClassLoader] if `contextClassLoader` is null.
- */
-fun defaultClassLoader(): ClassLoader {
-    return currentThread().contextClassLoader ?: BytesClassLoader
-}
 
 /**
  * Returns [Class] for [this] name, equivalent to [Class.forName].

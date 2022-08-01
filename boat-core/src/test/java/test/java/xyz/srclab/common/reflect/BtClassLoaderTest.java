@@ -6,14 +6,14 @@ import org.objectweb.asm.Opcodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.reflect.BytesClassLoader;
+import xyz.srclab.common.reflect.BtClassLoader;
 
-public class BytesClassLoaderTest {
+public class BtClassLoaderTest {
 
     @Test
     public void testLoadClass() {
         String newClassName = "test.xyz.srclab.A";
-        Class<?> clazz = BytesClassLoader.INSTANCE.loadClass(createClass(newClassName));
+        Class<?> clazz = BtClassLoader.INSTANCE.loadClass(createClass(newClassName));
         BLog.info("class: {}", clazz);
         BLog.info("class loader: {}", clazz.getClassLoader());
         Assert.assertEquals(clazz.getName(), newClassName);
