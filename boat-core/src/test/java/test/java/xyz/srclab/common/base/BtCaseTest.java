@@ -5,13 +5,13 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.BtCase;
 import xyz.srclab.common.base.BtString;
 import xyz.srclab.common.base.CamelCase;
-import xyz.srclab.common.base.NamingCase;
+import xyz.srclab.common.base.NameCase;
 
 public class BtCaseTest {
 
-    private static final NamingCase asUpperLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.AS_UPPER);
-    private static final NamingCase separateLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.INDEPENDENT);
-    private static final NamingCase toLowerUpperCamel = new CamelCase(true, (i, s) -> BtString.lowerCase(s));
+    private static final NameCase asUpperLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.AS_UPPER);
+    private static final NameCase separateLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.INDEPENDENT);
+    private static final NameCase toLowerUpperCamel = new CamelCase(true, (i, s) -> BtString.lowerCase(s));
 
     @Test
     public void testCase() {

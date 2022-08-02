@@ -275,7 +275,7 @@ fun Any.joinToString(
     truncated: CharSequence,
     transform: JavaFunction<Any?, out CharSequence>? = null
 ): String {
-    return joinToString(StringAppender(), separator, limit, truncated, transform).toString()
+    return joinToString(CharsBuilder(), separator, limit, truncated, transform).toString()
 }
 
 /**

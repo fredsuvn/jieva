@@ -236,11 +236,11 @@ open class SimpleTemplate(
             return listOf(source)
         }
 
-        var buffer: ListAppender<CharSequence>? = null
-        fun getBuffer(): ListAppender<CharSequence> {
+        var buffer: ListBuilder<CharSequence>? = null
+        fun getBuffer(): ListBuilder<CharSequence> {
             val bf = buffer
             if (bf === null) {
-                val newBuffer = ListAppender<CharSequence>()
+                val newBuffer = ListBuilder<CharSequence>()
                 buffer = newBuffer
                 return newBuffer
             }

@@ -49,14 +49,14 @@ public class BtEncodeTest {
         Assert.assertEquals(rd2DeBase64, new String(Base64.getDecoder().decode(rd2Base64.getBytes(Bt.defaultCharset()))));
 
         //Test output stream
-        BytesAppender out = new BytesAppender();
+        BytesBuilder out = new BytesBuilder();
         long enNumber = BtEncode.base64(BtIO.asInputStream(rd1.getBytes(Bt.defaultCharset())), out);
         BtLog.info("enNumber: {}", enNumber);
         Assert.assertEquals(enNumber, rd1.length());
         String outBase64String = BtString.toString8Bit(out.toByteArray());
         BtLog.info("outBase64String: {}", outBase64String);
         Assert.assertEquals(outBase64String, rd1Base64);
-        BytesAppender in = new BytesAppender();
+        BytesBuilder in = new BytesBuilder();
         long deNumber = BtEncode.deBase64(BtIO.asInputStream(out.toByteArray()), in);
         BtLog.info("deNumber: {}", deNumber);
         Assert.assertEquals(deNumber, BtEncode.getBase64Length(rd1.length()));
@@ -103,14 +103,14 @@ public class BtEncodeTest {
         Assert.assertEquals(rd2DeHex, new String(HexUtil.decodeHex(new String(rd2Hex.getBytes(Bt.defaultCharset())))));
 
         //Test output stream
-        BytesAppender out = new BytesAppender();
+        BytesBuilder out = new BytesBuilder();
         long enNumber = BtEncode.hex(BtIO.asInputStream(rd1.getBytes(Bt.defaultCharset())), out);
         BtLog.info("enNumber: {}", enNumber);
         Assert.assertEquals(enNumber, rd1.length());
         String outHexString = BtString.toString8Bit(out.toByteArray());
         BtLog.info("outHexString: {}", outHexString);
         Assert.assertEquals(outHexString, rd1Hex);
-        BytesAppender in = new BytesAppender();
+        BytesBuilder in = new BytesBuilder();
         long deNumber = BtEncode.deHex(BtIO.asInputStream(out.toByteArray()), in);
         BtLog.info("deNumber: {}", deNumber);
         Assert.assertEquals(deNumber, BtEncode.getHexLength(rd1.length()));

@@ -79,11 +79,11 @@ fun CharSequence.escape(escChar: Char, needChars: CharSequence): String {
         return this.toString()
     }
 
-    var buffer: StringAppender? = null
-    fun getBuffer(): StringAppender {
+    var buffer: CharsBuilder? = null
+    fun getBuffer(): CharsBuilder {
         val bf = buffer
         if (bf === null) {
-            val newBuffer = StringAppender()
+            val newBuffer = CharsBuilder()
             buffer = newBuffer
             return newBuffer
         }
@@ -207,11 +207,11 @@ fun CharSequence.unescape(escChar: Char, needChars: CharSequence): String {
         return this.toString()
     }
 
-    var buffer: StringAppender? = null
-    fun getBuffer(): StringAppender {
+    var buffer: CharsBuilder? = null
+    fun getBuffer(): CharsBuilder {
         val bf = buffer
         if (bf === null) {
-            val newBuffer = StringAppender()
+            val newBuffer = CharsBuilder()
             buffer = newBuffer
             return newBuffer
         }

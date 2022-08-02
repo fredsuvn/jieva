@@ -1,9 +1,9 @@
 /**
  * Compare utilities.
  */
-package xyz.srclab.common.base
+@file:JvmName("BtCompare")
 
-import java.util.Comparator
+package xyz.srclab.common.base
 
 /**
  * Ensures that this value is not less than [min].

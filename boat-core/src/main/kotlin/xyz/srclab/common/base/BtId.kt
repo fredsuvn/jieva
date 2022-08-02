@@ -155,5 +155,5 @@ open class SnowflakeId {
 }
 
 private object BtIdHolder {
-    val currentSnowflakeId: SnowflakeId = SnowflakeId(systemNanos().toInt())
+    val currentSnowflakeId: SnowflakeId = SnowflakeId(currentNanos().toInt())
 }

@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BtEscape;
-import xyz.srclab.common.base.BytesAppender;
+import xyz.srclab.common.base.BytesBuilder;
 import xyz.srclab.common.io.BtIO;
 
 public class BtEscapeTest {
@@ -26,7 +26,7 @@ public class BtEscapeTest {
         String encoded = BtEscape.escape(input, escape, escapedChars);
         Assert.assertEquals(encoded, expected);
 
-        BytesAppender bytesDest = new BytesAppender();
+        BytesBuilder bytesDest = new BytesBuilder();
         BtEscape.escape(BtIO.asInputStream(input.getBytes()), (byte) escape, escapedChars.getBytes(), bytesDest);
         Assert.assertEquals(new String(bytesDest.toByteArray()), expected);
 
@@ -39,7 +39,7 @@ public class BtEscapeTest {
         String encoded = BtEscape.unescape(input, escape, escapedChars);
         Assert.assertEquals(encoded, expected);
 
-        BytesAppender bytesDest = new BytesAppender();
+        BytesBuilder bytesDest = new BytesBuilder();
         BtEscape.unescape(BtIO.asInputStream(input.getBytes()), (byte) escape, escapedChars.getBytes(), bytesDest);
         Assert.assertEquals(new String(bytesDest.toByteArray()), expected);
 

@@ -7,52 +7,36 @@ import java.io.Serializable
  * Single linked list node.
  */
 @Data
-class SNode<T : Any> @JvmOverloads constructor(
-    var value: T? = null,
-    var next: SNode<T>? = null,
-) : Serializable {
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
-}
+open class SNode<T : Any> @JvmOverloads constructor(
+    open var value: T? = null,
+    open var next: SNode<T>? = null,
+) : Serializable
 
 /**
  * Double linked list node.
  */
 @Data
-class DNode<T : Any> @JvmOverloads constructor(
-    var value: T? = null,
-    var next: DNode<T>? = null,
-    var prev: DNode<T>? = null,
-) : Serializable {
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
-}
+open class DNode<T : Any> @JvmOverloads constructor(
+    open var value: T? = null,
+    open var next: DNode<T>? = null,
+    open var prev: DNode<T>? = null,
+) : Serializable
 
 /**
  * Tree node.
  */
 @Data
-class TreeNode<T : Any> @JvmOverloads constructor(
-    var value: T? = null,
-    var children: MutableList<TreeNode<T>>? = null,
-) : Serializable {
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
-}
+open class TreeNode<T : Any> @JvmOverloads constructor(
+    open var value: T? = null,
+    open var children: MutableList<TreeNode<T>>? = null,
+) : Serializable
 
 /**
  * Binary Tree node.
  */
 @Data
-class BTreeNode<T : Any> @JvmOverloads constructor(
-    var value: T? = null,
-    var left: BTreeNode<T>? = null,
-    var right: BTreeNode<T>? = null,
-) : Serializable {
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
-}
+open class BTreeNode<T : Any> @JvmOverloads constructor(
+    open var value: T? = null,
+    open var left: BTreeNode<T>? = null,
+    open var right: BTreeNode<T>? = null,
+) : Serializable

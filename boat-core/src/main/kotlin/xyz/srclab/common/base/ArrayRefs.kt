@@ -1,9 +1,10 @@
 package xyz.srclab.common.base
 
+import java.io.Serializable
 import kotlin.math.min
 
 /**
- * Array reference for [T], represents a range of array.
+ * Object array reference, refers to the source array with start index inclusive and end index exclusive.
  *
  * @param T components type of array
  */
@@ -30,43 +31,43 @@ interface ArrayRef<T> {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): T
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: T): T
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): ArrayRef<T>
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): Array<T>
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: Array<T>): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: Array<T>, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: ArrayRef<T>): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -74,6 +75,9 @@ interface ArrayRef<T> {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -85,7 +89,7 @@ interface ArrayRef<T> {
             override val source: Array<T>,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : ArrayRef<T> {
+        ) : ArrayRef<T>, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -111,16 +115,12 @@ interface ArrayRef<T> {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
     }
 }
 
 /**
- * Array reference for [BooleanArray], represents a range of array.
+ * Boolean array reference, refers to the source array with start index inclusive and end index exclusive.
  */
 interface BooleanArrayRef {
 
@@ -145,43 +145,43 @@ interface BooleanArrayRef {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): Boolean
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: Boolean): Boolean
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): BooleanArrayRef
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): BooleanArray
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: BooleanArray): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: BooleanArray, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: BooleanArrayRef): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -189,6 +189,9 @@ interface BooleanArrayRef {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -200,7 +203,7 @@ interface BooleanArrayRef {
             override val source: BooleanArray,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : BooleanArrayRef {
+        ) : BooleanArrayRef, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -226,16 +229,12 @@ interface BooleanArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
     }
 }
 
 /**
- * Array reference for [ByteArray], represents a range of array.
+ * Byte array reference, refers to the source array with start index inclusive and end index exclusive.
  */
 interface ByteArrayRef {
 
@@ -260,43 +259,43 @@ interface ByteArrayRef {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): Byte
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: Byte): Byte
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): ByteArrayRef
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): ByteArray
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: ByteArray): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: ByteArray, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: ByteArrayRef): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -304,6 +303,9 @@ interface ByteArrayRef {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -315,7 +317,7 @@ interface ByteArrayRef {
             override val source: ByteArray,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : ByteArrayRef {
+        ) : ByteArrayRef, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -341,16 +343,12 @@ interface ByteArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
     }
 }
 
 /**
- * Array reference for [ShortArray], represents a range of array.
+ * Short array reference, refers to the source array with start index inclusive and end index exclusive.
  */
 interface ShortArrayRef {
 
@@ -375,43 +373,43 @@ interface ShortArrayRef {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): Short
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: Short): Short
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): ShortArrayRef
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): ShortArray
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: ShortArray): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: ShortArray, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: ShortArrayRef): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -419,6 +417,9 @@ interface ShortArrayRef {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -430,7 +431,7 @@ interface ShortArrayRef {
             override val source: ShortArray,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : ShortArrayRef {
+        ) : ShortArrayRef, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -456,16 +457,12 @@ interface ShortArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
     }
 }
 
 /**
- * Array reference for [CharArray], represents a range of array.
+ * Char array reference, refers to the source array with start index inclusive and end index exclusive.
  */
 interface CharArrayRef {
 
@@ -490,43 +487,43 @@ interface CharArrayRef {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): Char
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: Char): Char
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): CharArrayRef
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): CharArray
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: CharArray): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: CharArray, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: CharArrayRef): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -534,6 +531,9 @@ interface CharArrayRef {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -545,7 +545,7 @@ interface CharArrayRef {
             override val source: CharArray,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : CharArrayRef {
+        ) : CharArrayRef, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -571,16 +571,12 @@ interface CharArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
     }
 }
 
 /**
- * Array reference for [IntArray], represents a range of array.
+ * Int array reference, refers to the source array with start index inclusive and end index exclusive.
  */
 interface IntArrayRef {
 
@@ -605,43 +601,43 @@ interface IntArrayRef {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): Int
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: Int): Int
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): IntArrayRef
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): IntArray
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: IntArray): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: IntArray, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: IntArrayRef): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -649,6 +645,9 @@ interface IntArrayRef {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -660,7 +659,7 @@ interface IntArrayRef {
             override val source: IntArray,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : IntArrayRef {
+        ) : IntArrayRef, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -686,16 +685,12 @@ interface IntArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
     }
 }
 
 /**
- * Array reference for [LongArray], represents a range of array.
+ * Long array reference, refers to the source array with start index inclusive and end index exclusive.
  */
 interface LongArrayRef {
 
@@ -720,43 +715,43 @@ interface LongArrayRef {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): Long
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: Long): Long
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): LongArrayRef
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): LongArray
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: LongArray): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: LongArray, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: LongArrayRef): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -764,6 +759,9 @@ interface LongArrayRef {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -775,7 +773,7 @@ interface LongArrayRef {
             override val source: LongArray,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : LongArrayRef {
+        ) : LongArrayRef, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -801,16 +799,12 @@ interface LongArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
     }
 }
 
 /**
- * Array reference for [FloatArray], represents a range of array.
+ * Float array reference, refers to the source array with start index inclusive and end index exclusive.
  */
 interface FloatArrayRef {
 
@@ -835,43 +829,43 @@ interface FloatArrayRef {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): Float
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: Float): Float
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): FloatArrayRef
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): FloatArray
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: FloatArray): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: FloatArray, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: FloatArrayRef): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -879,6 +873,9 @@ interface FloatArrayRef {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -890,7 +887,7 @@ interface FloatArrayRef {
             override val source: FloatArray,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : FloatArrayRef {
+        ) : FloatArrayRef, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -916,16 +913,12 @@ interface FloatArrayRef {
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
     }
 }
 
 /**
- * Array reference for [DoubleArray], represents a range of array.
+ * Double array reference, refers to the source array with start index inclusive and end index exclusive.
  */
 interface DoubleArrayRef {
 
@@ -950,43 +943,43 @@ interface DoubleArrayRef {
     val length: Int
 
     /**
-     * Returns elements at [index] of this range.
+     * Returns elements at [index] of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun get(index: Int): Double
 
     /**
-     * Sets elements [value] at [index], returns old value.
+     * Sets elements [value] at [index] of this reference, returns old value.
      */
     @Throws(IndexOutOfBoundsException::class)
     operator fun set(index: Int, value: Double): Double
 
     /**
-     * Returns reference of sub-range of this range.
+     * Returns array reference of sub-range of this reference.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun subRef(startIndex: Int, endIndex: Int): DoubleArrayRef
 
     /**
-     * Returns copy of content of this range.
+     * Returns copy of content of this reference.
      */
     fun copy(): DoubleArray
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: DoubleArray): Int {
         return copyTo(dest, 0)
     }
 
     /**
-     * Copies content of this range into [dest] from [startIndex], returns copied size.
+     * Copies content of this reference into [dest] from [startIndex], returns copied size.
      */
     @Throws(IndexOutOfBoundsException::class)
     fun copyTo(dest: DoubleArray, startIndex: Int): Int
 
     /**
-     * Copies content of this range into [dest], returns copied size.
+     * Copies content of this reference into [dest], returns copied size.
      */
     fun copyTo(dest: DoubleArrayRef): Int {
         return copyTo(dest.source, dest.startIndex)
@@ -994,6 +987,9 @@ interface DoubleArrayRef {
 
     companion object {
 
+        /**
+         * Returns array reference of [this].
+         */
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
@@ -1005,7 +1001,7 @@ interface DoubleArrayRef {
             override val source: DoubleArray,
             override val startIndex: Int,
             override val endIndex: Int,
-        ) : DoubleArrayRef {
+        ) : DoubleArrayRef, Serializable {
 
             override val length: Int = endIndex - startIndex
 
@@ -1030,10 +1026,6 @@ interface DoubleArrayRef {
                 val len = min(length, dest.size - startIndex)
                 System.arraycopy(source, this.startIndex, dest, startIndex, len)
                 return len
-            }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }

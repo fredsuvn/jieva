@@ -10,46 +10,46 @@ import xyz.srclab.common.base.CamelCase.NonLetterPolicy
 import java.util.*
 
 /**
- * Returns [NamingCase] for lower-camel, such as `firstSecond`.
+ * Returns [NameCase] for lower-camel, such as `firstSecond`.
  * @see CamelCase
  */
 @JvmName("lowerCamel")
-fun lowerCamelCase(): NamingCase = BtCaseHolder.LOWER_CAMEL
+fun lowerCamelCase(): NameCase = BtCaseHolder.LOWER_CAMEL
 
 /**
- * Returns [NamingCase] for lower-camel, such as `FirstSecond`.
+ * Returns [NameCase] for lower-camel, such as `FirstSecond`.
  * @see CamelCase
  */
 @JvmName("upperCamel")
-fun upperCamelCase(): NamingCase = BtCaseHolder.UPPER_CAMEL
+fun upperCamelCase(): NameCase = BtCaseHolder.UPPER_CAMEL
 
 /**
- * Returns [NamingCase] for lower-camel, such as `first_second`.
+ * Returns [NameCase] for lower-camel, such as `first_second`.
  * @see SeparatorCase
  */
 @JvmName("lowerUnderscore")
-fun lowerUnderscoreCase(): NamingCase = BtCaseHolder.LOWER_UNDERSCORE
+fun lowerUnderscoreCase(): NameCase = BtCaseHolder.LOWER_UNDERSCORE
 
 /**
- * Returns [NamingCase] for lower-camel, such as `FIRST_SECOND`.
+ * Returns [NameCase] for lower-camel, such as `FIRST_SECOND`.
  * @see SeparatorCase
  */
 @JvmName("upperUnderscore")
-fun upperUnderscoreCase(): NamingCase = BtCaseHolder.UPPER_UNDERSCORE
+fun upperUnderscoreCase(): NameCase = BtCaseHolder.UPPER_UNDERSCORE
 
 /**
- * Returns [NamingCase] for lower-camel, such as `first-second`.
+ * Returns [NameCase] for lower-camel, such as `first-second`.
  * @see SeparatorCase
  */
 @JvmName("lowerHyphen")
-fun lowerHyphenCase(): NamingCase = BtCaseHolder.LOWER_HYPHEN
+fun lowerHyphenCase(): NameCase = BtCaseHolder.LOWER_HYPHEN
 
 /**
- * Returns [NamingCase] for lower-camel, such as `FIRST-SECOND`.
+ * Returns [NameCase] for lower-camel, such as `FIRST-SECOND`.
  * @see SeparatorCase
  */
 @JvmName("upperHyphen")
-fun upperHyphenCase(): NamingCase = BtCaseHolder.UPPER_HYPHEN
+fun upperHyphenCase(): NameCase = BtCaseHolder.UPPER_HYPHEN
 
 /**
  * Converts case of [this] chars from [from] case to [to] case. For example:
@@ -59,12 +59,12 @@ fun upperHyphenCase(): NamingCase = BtCaseHolder.UPPER_HYPHEN
  * BtCase.toCase("first-second", BtCase.lowerHyphen(), BtCase.upperCamel();
  * ```
  */
-fun CharSequence.toCase(from: NamingCase, to: NamingCase): String {
+fun CharSequence.toCase(from: NameCase, to: NameCase): String {
     return from.convert(this, to)
 }
 
 /**
- * Naming case. Used to convert different naming case style.
+ * Name case, represents case style of a name, and used to convert the name in styles.
  * For example, to make `first-second` to `FirstSecond`:
  *
  * ```
@@ -76,7 +76,7 @@ fun CharSequence.toCase(from: NamingCase, to: NamingCase): String {
  * @see SeparatorCase
  */
 @ThreadSafe
-interface NamingCase {
+interface NameCase {
 
     /**
      * Splits [name] to word list.
@@ -100,14 +100,14 @@ interface NamingCase {
     /**
      * Converts [name] to [target] style.
      */
-    fun convert(name: CharSequence, target: NamingCase): String {
+    fun convert(name: CharSequence, target: NameCase): String {
         val words = split(name)
         return target.join(words)
     }
 }
 
 /**
- * Camel-Case implementation of [NamingCase], such as `firstSecond`, `FirstSecond`.
+ * Camel-Case implementation of [NameCase], such as `firstSecond`, `FirstSecond`.
  *
  * When join the words in [join] or [joinTo],
  * this case will capitalize or uncapitalize first word by [capitalized] option.
@@ -120,7 +120,7 @@ open class CamelCase @JvmOverloads constructor(
     private val capitalized: Boolean,
     private val nonLetterPolicy: NonLetterPolicy = NonLetterPolicy.AS_LOWER,
     private val wordHandler: IndexedFunction<in CharSequence, out CharSequence> = IndexedFunction { _, it -> it }
-) : NamingCase {
+) : NameCase {
 
     /**
      * Constructs with [capitalized] and [wordHandler], use [NonLetterPolicy.AS_LOWER].
@@ -136,7 +136,7 @@ open class CamelCase @JvmOverloads constructor(
             return Collections.singletonList(name)
         }
 
-        val appender = ListAppender<CharSequence>()
+        val appender = ListBuilder<CharSequence>()
 
         var startIndex = 0
         var lastCharCase = name[0].case()
@@ -175,8 +175,6 @@ open class CamelCase @JvmOverloads constructor(
                 } else if (cCase == UPPER) {
                     //AA -> AA
                     //join the former word
-                    if (startIndex < i - 1) {
-                    }
                 } else if (nonLetterPolicy === NonLetterPolicy.INDEPENDENT) {
                     //A0 -> A,0
                     //split to new word for non-letter chars
@@ -214,7 +212,7 @@ open class CamelCase @JvmOverloads constructor(
         if (startIndex < name.length) {
             appender.append(name.subRef(startIndex))
         }
-        return appender.toListAsNoNull()
+        return appender.toList()
     }
 
     override fun join(words: List<CharSequence>): String {
@@ -309,14 +307,14 @@ open class CamelCase @JvmOverloads constructor(
 }
 
 /**
- * Separator-Case implementation of [NamingCase], such as `first-second`, `FIRST_SECOND`.
+ * Separator-Case implementation of [NameCase], such as `first-second`, `FIRST_SECOND`.
  * The separator is specified by [separator],
  * and each word will be processed by [wordHandler] in join operation.
  */
 open class SeparatorCase(
     private val separator: CharSequence,
     private val wordHandler: IndexedFunction<in CharSequence, out CharSequence> = IndexedFunction { _, it -> it }
-) : NamingCase {
+) : NameCase {
 
     override fun split(name: CharSequence): List<CharSequence> {
 
@@ -331,7 +329,7 @@ open class SeparatorCase(
             return Collections.singletonList(name)
         }
 
-        val appender = ListAppender<CharSequence>()
+        val appender = ListBuilder<CharSequence>()
         appender.append(name.subRef(0, splitIndex))
         var startIndex = splitIndex + separatorString.length
 
@@ -348,7 +346,7 @@ open class SeparatorCase(
         if (startIndex == name.length) {
             appender.append("")
         }
-        return appender.toListAsNoNull()
+        return appender.toList()
     }
 
     override fun join(words: List<CharSequence>): String {
@@ -373,10 +371,10 @@ open class SeparatorCase(
 }
 
 private object BtCaseHolder {
-    val LOWER_CAMEL: NamingCase = CamelCase(false)
-    val UPPER_CAMEL: NamingCase = CamelCase(true)
-    val LOWER_UNDERSCORE: NamingCase = SeparatorCase("_") { _, it -> it.lowerCase() }
-    val UPPER_UNDERSCORE: NamingCase = SeparatorCase("_") { _, it -> it.upperCase() }
-    val LOWER_HYPHEN: NamingCase = SeparatorCase("-") { _, it -> it.lowerCase() }
-    val UPPER_HYPHEN: NamingCase = SeparatorCase("-") { _, it -> it.upperCase() }
+    val LOWER_CAMEL: NameCase = CamelCase(false)
+    val UPPER_CAMEL: NameCase = CamelCase(true)
+    val LOWER_UNDERSCORE: NameCase = SeparatorCase("_") { _, it -> it.lowerCase() }
+    val UPPER_UNDERSCORE: NameCase = SeparatorCase("_") { _, it -> it.upperCase() }
+    val LOWER_HYPHEN: NameCase = SeparatorCase("-") { _, it -> it.lowerCase() }
+    val UPPER_HYPHEN: NameCase = SeparatorCase("-") { _, it -> it.upperCase() }
 }

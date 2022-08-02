@@ -75,7 +75,7 @@ fun ByteArray.base64(offset: Int, length: Int = remLength(this.size, offset)): B
  * Base64 encodes [this].
  */
 fun InputStream.base64(): ByteArray {
-    val output = BytesAppender()
+    val output = BytesBuilder()
     val encOut = Base64.getEncoder().wrap(output)
     this.copyTo(encOut, defaultBufferSize())
     encOut.close()
@@ -128,7 +128,7 @@ fun ByteArray.deBase64(offset: Int, length: Int = remLength(this.size, offset)):
  */
 fun InputStream.deBase64(): ByteArray {
     val encIn = Base64.getDecoder().wrap(this)
-    val output = BytesAppender()
+    val output = BytesBuilder()
     encIn.copyTo(output)
     return output.toByteArray()
 }
@@ -210,7 +210,7 @@ fun ByteArray.hex(offset: Int, length: Int = remLength(this.size, offset)): Byte
  * Hex encodes [this].
  */
 fun InputStream.hex(): ByteArray {
-    val output = BytesAppender()
+    val output = BytesBuilder()
     this.hex(output)
     return output.toByteArray()
 }
@@ -294,7 +294,7 @@ fun ByteArray.deHex(offset: Int, length: Int = remLength(this.size, offset)): By
  * Hex decodes [this].
  */
 fun InputStream.deHex(): ByteArray {
-    val output = BytesAppender()
+    val output = BytesBuilder()
     this.deHex(output)
     return output.toByteArray()
 }

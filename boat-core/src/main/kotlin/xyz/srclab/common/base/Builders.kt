@@ -1,5 +1,6 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.asType
 import xyz.srclab.common.base.ByteArrayRef.Companion.arrayRef
 import xyz.srclab.common.base.CharArrayRef.Companion.arrayRef
 import xyz.srclab.common.collect.arrayOfType
@@ -7,19 +8,19 @@ import java.io.OutputStream
 import java.io.Serializable
 import java.io.Writer
 import java.nio.ByteBuffer
+import java.util.function.Supplier
 
 private const val BUFFER_SIZE = 1024
 
 /**
- * String appender, used to append objects and finally concatenate them to a [String].
+ * Chars builder, used to append given objects and concatenate them to [String] or [CharArray].
  *
- * This class is lazy, it stores the given appended object without any other computation.
- * It computes `concatenate-to-string` operation only when the [toString] method is called,
- * so if the content of object previously appended is modified, the final result value will be changed accordingly.
- *
- * When `concatenate-to-string` operation is processing, any modification for content of appended object is undefined.
+ * This class is lazy, it only stores given appended object, without any other computation.
+ * It concatenates appended objects when the [toString] or [toCharArray] method is called,
+ * so any modification (before or in processing of [toString] or [toCharArray]) for the content of appended object
+ * will affect the result.
  */
-open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appendable, Writer(), Serializable {
+open class CharsBuilder : Appendable, Writer(), Serializable {
 
     private var head = SNode<Any>()
     private var cur = head
@@ -27,28 +28,28 @@ open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appen
     private var buffer: CharArray? = null
     private var bufferOffset = 0
 
-    override fun append(t: CharSequence?): StringAppender {
+    override fun append(t: CharSequence?): CharsBuilder {
         flushBuffer()
         cur.value = t
         newTail()
         return this
     }
 
-    override fun append(t: CharSequence, startIndex: Int): StringAppender {
+    fun append(t: CharSequence, startIndex: Int): CharsBuilder {
         flushBuffer()
         cur.value = t.charsRef(startIndex)
         newTail()
         return this
     }
 
-    override fun append(t: CharSequence, startIndex: Int, endIndex: Int): StringAppender {
+    override fun append(t: CharSequence, startIndex: Int, endIndex: Int): CharsBuilder {
         flushBuffer()
         cur.value = t.charsRef(startIndex, endIndex)
         newTail()
         return this
     }
 
-    override fun append(c: Char): StringAppender {
+    override fun append(c: Char): CharsBuilder {
         val buf = buffer
         if (buf === null) {
             val newBuffer = CharArray(BUFFER_SIZE)
@@ -67,28 +68,35 @@ open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appen
         return this
     }
 
-    open fun append(obj: Any?): StringAppender {
+    open fun append(obj: Any?): CharsBuilder {
         flushBuffer()
         cur.value = obj
         newTail()
         return this
     }
 
-    open fun append(chars: CharArray, startIndex: Int): StringAppender {
+    open fun append(chars: CharArray): CharsBuilder {
+        flushBuffer()
+        cur.value = chars
+        newTail()
+        return this
+    }
+
+    open fun append(chars: CharArray, startIndex: Int): CharsBuilder {
         flushBuffer()
         cur.value = chars.arrayRef(startIndex)
         newTail()
         return this
     }
 
-    open fun append(chars: CharArray, startIndex: Int, endIndex: Int): StringAppender {
+    open fun append(chars: CharArray, startIndex: Int, endIndex: Int): CharsBuilder {
         flushBuffer()
         cur.value = chars.arrayRef(startIndex, endIndex)
         newTail()
         return this
     }
 
-    override fun isEmpty(): Boolean {
+    fun isEmpty(): Boolean {
         return head.next === null
     }
 
@@ -122,9 +130,16 @@ open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appen
     }
 
     /**
-     * Joins appended objects into a [String].
+     * Concatenates appended objects to [String].
      */
     override fun toString(): String {
+        return String(toCharArray())
+    }
+
+    /**
+     * Concatenates appended objects to [CharArray].
+     */
+    fun toCharArray(): CharArray {
         // Computes size:
         var size = 0
         var n = head
@@ -177,7 +192,7 @@ open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appen
             i += s
             n = n.next!!
         }
-        return String(buffer)
+        return buffer
     }
 
     override fun close() {
@@ -201,18 +216,25 @@ open class StringAppender : SegmentAppender<CharSequence, StringAppender>, Appen
         cur.next = newNode
         cur = newNode
     }
+
+    companion object {
+        /**
+         * Supplier to create new [CharsBuilder].
+         */
+        @JvmField
+        val SUPPLIER: Supplier<CharsBuilder> = Supplier { CharsBuilder() }
+    }
 }
 
 /**
- * String appender, used to append objects and finally concatenate them to a [ByteArray].
+ * Bytes builder, used to append given objects and concatenate them to [ByteArray].
  *
- * This class is lazy, it stores the given appended object without any other computation.
- * It computes `concatenate-to-bytes` operation only when the [toByteArray] method is called,
- * so if the content of object previously appended is modified, the final result value will be changed accordingly.
- *
- * When `concatenate-to-bytes` operation is processing, any modification for content of appended object is undefined.
+ * This class is lazy, it only stores given appended object, without any other computation.
+ * It concatenates appended objects when the [ByteArray] method is called,
+ * so any modification (before or in processing of [ByteArray]) for the content of appended object
+ * will affect the result.
  */
-open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStream(), Serializable {
+open class BytesBuilder : OutputStream(), Serializable {
 
     private var head = SNode<Any>()
     private var cur = head
@@ -221,9 +243,9 @@ open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStre
     private var bufferOffset = 0
 
     /**
-     * No operation. Appending null is unsupported by [BytesAppender].
+     * No operation. Appending null is unsupported by [BytesBuilder].
      */
-    override fun append(t: ByteArray?): BytesAppender {
+    fun append(t: ByteArray?): BytesBuilder {
         if (t === null) {
             return this
         }
@@ -233,21 +255,21 @@ open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStre
         return this
     }
 
-    override fun append(t: ByteArray, startIndex: Int): BytesAppender {
+    fun append(t: ByteArray, startIndex: Int): BytesBuilder {
         flushBuffer()
         cur.value = t.arrayRef(startIndex)
         newTail()
         return this
     }
 
-    override fun append(t: ByteArray, startIndex: Int, endIndex: Int): BytesAppender {
+    fun append(t: ByteArray, startIndex: Int, endIndex: Int): BytesBuilder {
         flushBuffer()
         cur.value = t.arrayRef(startIndex, endIndex)
         newTail()
         return this
     }
 
-    open fun append(b: Byte): BytesAppender {
+    open fun append(b: Byte): BytesBuilder {
         val buf = buffer
         if (buf === null) {
             val newBuffer = ByteArray(BUFFER_SIZE)
@@ -266,14 +288,14 @@ open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStre
         return this
     }
 
-    open fun append(buf: ByteBuffer): BytesAppender {
+    open fun append(buf: ByteBuffer): BytesBuilder {
         flushBuffer()
         cur.value = buf
         newTail()
         return this
     }
 
-    override fun isEmpty(): Boolean {
+    fun isEmpty(): Boolean {
         return head.next === null
     }
 
@@ -299,7 +321,7 @@ open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStre
     }
 
     /**
-     * Joins appended objects into a [String].
+     * Concatenate appended objects to [ByteArray].
      */
     open fun toByteArray(): ByteArray {
         // Computes size:
@@ -366,65 +388,59 @@ open class BytesAppender : SegmentAppender<ByteArray, BytesAppender>, OutputStre
         cur.next = newNode
         cur = newNode
     }
+
+    companion object {
+        /**
+         * Supplier to create new [BytesBuilder].
+         */
+        @JvmField
+        val SUPPLIER: Supplier<BytesBuilder> = Supplier { BytesBuilder() }
+    }
 }
 
 /**
- * List appender, used to build an array, o [ArrayList], or a readonly [List].
+ * List builder, used to append given objects and concatenate them to [List].
  */
-open class ListAppender<E : Any> : Appender<E, ListAppender<E>>, Serializable {
+open class ListBuilder<E> : Serializable {
 
-    private var head = SNode<E>()
+    private var head = SNode<Any>()
     private var cur = head
     private var count = 0
 
-    override fun append(t: E?): ListAppender<E> {
+    fun append(t: E?): ListBuilder<E> {
         cur.value = t
         newTail()
         return this
     }
 
-    override fun isEmpty(): Boolean {
+    fun isEmpty(): Boolean {
         return head.next === null
     }
 
     private fun newTail() {
-        val newNode = SNode<E>()
+        val newNode = SNode<Any>()
         cur.next = newNode
         cur = newNode
         count++
     }
 
     /**
-     * Joins appended elements as array and returns.
+     *Concatenates appended elements to array.
      */
-    open fun toArray(type: Class<E>): Array<E?> {
+    open fun toArray(type: Class<E>): Array<E> {
         return toArray0(type)
     }
 
     /**
-     * Joins appended elements as array which is treated as having no null elements, and returns.
+     * Concatenates appended elements to readonly [List].
      */
-    open fun toArrayAsNoNull(type: Class<E>): Array<E> {
-        return toArray(type).asType()
-    }
-
-    /**
-     * Joins appended elements as [List] and returns.
-     */
-    open fun toList(): List<E?> {
+    open fun toList(): List<E> {
         val array = toArray0(Any::class.java)
         return array.asList().asType()
     }
 
-    /**
-     * Joins appended elements as [List] which is treated as having no null elements, and returns.
-     */
-    open fun toListAsNoNull(): List<E> {
-        return toList().asType()
-    }
-
-    private fun <T> toArray0(type: Class<T>): Array<T?> {
-        val array = arrayOfType<Array<T?>>(type, count)
+    private fun <T> toArray0(type: Class<T>): Array<T> {
+        val array = arrayOfType<Array<T>>(type, count)
         var n = head
         var i = 0
         while (n.next !== null) {
@@ -435,45 +451,12 @@ open class ListAppender<E : Any> : Appender<E, ListAppender<E>>, Serializable {
         return array
     }
 
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
+    /**
+     * Clears content of this appender.
+     */
+    open fun clear() {
+        val newNode = SNode<Any>()
+        head = newNode
+        cur = newNode
     }
-}
-
-/**
- * Appender interface, used for appending.
- *
- * @param T type of appended object
- * @param A type of this appender
- */
-interface Appender<T : Any, A : Appender<T, A>> {
-
-    /**
-     * Appends and returns this.
-     */
-    fun append(t: T?): A
-
-    /**
-     * Returns whether this appender is empty.
-     */
-    fun isEmpty(): Boolean
-}
-
-/**
- * [Appender] of which appended type [T] is segmented.
- *
- * @param T type of appended object
- * @param A type of this appender
- */
-interface SegmentAppender<T : Any, A : SegmentAppender<T, A>> : Appender<T, A> {
-
-    /**
-     * Appends with [startIndex] and returns this.
-     */
-    fun append(t: T, startIndex: Int): A
-
-    /**
-     * Appends with [startIndex] and [endIndex] and returns this.
-     */
-    fun append(t: T, startIndex: Int, endIndex: Int): A
 }

@@ -12,16 +12,10 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoField
 import java.time.temporal.TemporalAccessor
 import java.util.*
-
-/**
- * Default [DatePattern] for timestamp with patter: [defaultTimestampPattern].
- */
-fun defaultTimestampDatePattern(): DatePattern = BtDateHolder.timestampDatePattern
 
 /**
  * Returns current epoch seconds.
@@ -31,25 +25,25 @@ fun currentSeconds(): Long {
 }
 
 /**
- * Returns current epoch milliseconds.
+ * Returns current epoch milliseconds: [System.currentTimeMillis].
  */
 fun currentMillis(): Long {
     return System.currentTimeMillis()
 }
 
 /**
- * Returns system nanosecond.
+ * Returns current system nanosecond: [System.nanoTime].
  */
-fun systemNanos(): Long {
+fun currentNanos(): Long {
     return System.nanoTime()
 }
 
 /**
- * Returns current timestamp of which pattern is [defaultTimestampPattern].
+ * Returns current timestamp of which pattern is [BtProps.timestampPattern].
  */
 @JvmOverloads
 fun currentTimestamp(zoneId: ZoneId = ZoneId.systemDefault()): String {
-    return defaultTimestampPattern().format(LocalDateTime.now(zoneId))
+    return BtProps.timestampPattern().format(ZonedDateTime.now(zoneId))
 }
 
 /**
@@ -712,7 +706,7 @@ interface DatePattern {
 }
 
 /**
- * Represents a point of time, like [Date], [Instant] and various [LocalDateTime].
+ * Represents a point at time-line, like [Date], [Instant] and various [LocalDateTime].
  */
 interface TimePoint {
 
@@ -861,6 +855,13 @@ interface TimePoint {
     companion object {
 
         /**
+         * Return now [TimePoint].
+         */
+        fun now(): TimePoint {
+            return Instant.now().toTimePoint()
+        }
+
+        /**
          * Parses and returns [TimePoint] from [this].
          */
         @JvmName("of")
@@ -882,9 +883,18 @@ interface TimePoint {
          * Parses and returns [TimePoint] from [this].
          */
         @JvmName("of")
+        @JvmStatic
+        fun CharSequence.toTimePoint(pattern: String): TimePoint {
+            return OfChars(this, pattern.toDatePattern())
+        }
+
+        /**
+         * Parses and returns [TimePoint] from [this].
+         */
+        @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun CharSequence.toTimePoint(pattern: DatePattern = defaultTimestampDatePattern()): TimePoint {
+        fun CharSequence.toTimePoint(pattern: DatePattern = BtProps.timestampPattern()): TimePoint {
             return OfChars(this, pattern)
         }
 
@@ -917,10 +927,6 @@ interface TimePoint {
             override fun format(pattern: DatePattern): String {
                 return pattern.format(date)
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
 
         private class OfTemporal(private val temporal: TemporalAccessor) : TimePoint, Serializable {
@@ -944,10 +950,6 @@ interface TimePoint {
 
             override fun format(pattern: DatePattern): String {
                 return pattern.format(temporal)
-            }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
 
@@ -1020,25 +1022,6 @@ interface TimePoint {
                 }
                 return pattern.format(date!!)
             }
-
-            companion object {
-                private val serialVersionUID: Long = defaultSerialVersion()
-            }
         }
-    }
-}
-
-private object BtDateHolder {
-    val timestampDatePattern: DatePattern = run {
-        // JDK8 bug:
-        // Error for "yyyyMMddHHmmssSSS".toDatePattern()
-        if (isJdk9OrHigher()) {
-            return@run defaultTimestampPattern().toDatePattern()
-        }
-        val formatter: DateTimeFormatter = DateTimeFormatterBuilder() // date/time
-            .appendPattern("yyyyMMddHHmmss") // milliseconds
-            .appendValue(ChronoField.MILLI_OF_SECOND, 3) // create formatter
-            .toFormatter()
-        DatePattern.of(defaultTimestampPattern(), formatter)
     }
 }
