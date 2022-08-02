@@ -1,8 +1,3 @@
-/**
- * Naming case utilities.
- */
-@file:JvmName("BtCase")
-
 package xyz.srclab.common.base
 
 import xyz.srclab.annotations.concurrent.ThreadSafe
@@ -10,66 +5,13 @@ import xyz.srclab.common.base.CamelCase.NonLetterPolicy
 import java.util.*
 
 /**
- * Returns [NameCase] for lower-camel, such as `firstSecond`.
- * @see CamelCase
- */
-@JvmName("lowerCamel")
-fun lowerCamelCase(): NameCase = BtCaseHolder.LOWER_CAMEL
-
-/**
- * Returns [NameCase] for lower-camel, such as `FirstSecond`.
- * @see CamelCase
- */
-@JvmName("upperCamel")
-fun upperCamelCase(): NameCase = BtCaseHolder.UPPER_CAMEL
-
-/**
- * Returns [NameCase] for lower-camel, such as `first_second`.
- * @see SeparatorCase
- */
-@JvmName("lowerUnderscore")
-fun lowerUnderscoreCase(): NameCase = BtCaseHolder.LOWER_UNDERSCORE
-
-/**
- * Returns [NameCase] for lower-camel, such as `FIRST_SECOND`.
- * @see SeparatorCase
- */
-@JvmName("upperUnderscore")
-fun upperUnderscoreCase(): NameCase = BtCaseHolder.UPPER_UNDERSCORE
-
-/**
- * Returns [NameCase] for lower-camel, such as `first-second`.
- * @see SeparatorCase
- */
-@JvmName("lowerHyphen")
-fun lowerHyphenCase(): NameCase = BtCaseHolder.LOWER_HYPHEN
-
-/**
- * Returns [NameCase] for lower-camel, such as `FIRST-SECOND`.
- * @see SeparatorCase
- */
-@JvmName("upperHyphen")
-fun upperHyphenCase(): NameCase = BtCaseHolder.UPPER_HYPHEN
-
-/**
- * Converts case of [this] chars from [from] case to [to] case. For example:
- *
- * ```
- * //first-second -> FirstSecond
- * BtCase.toCase("first-second", BtCase.lowerHyphen(), BtCase.upperCamel();
- * ```
- */
-fun CharSequence.toCase(from: NameCase, to: NameCase): String {
-    return from.convert(this, to)
-}
-
-/**
- * Name case, represents case style of a name, and used to convert the name in styles.
+ * Name case, represents case style of name such as CamelCase, hyphen-case.
+ * It can convert the name from one styles to another.
  * For example, to make `first-second` to `FirstSecond`:
  *
  * ```
  * //first-second -> FirstSecond
- * BtCase.toCase("first-second", BtCase.lowerHyphen(), BtCase.upperCamel();
+ * NameCase.convert("first-second", NameCase.LOWER_HYPHEN, NameCase.UPPER_CAMEL;
  * ```
  *
  * @see CamelCase
@@ -103,6 +45,59 @@ interface NameCase {
     fun convert(name: CharSequence, target: NameCase): String {
         val words = split(name)
         return target.join(words)
+    }
+
+    companion object {
+
+        /**
+         * Lower camel case such as: nameCase.
+         */
+        @JvmField
+        val LOWER_CAMEL: NameCase = CamelCase(false)
+
+        /**
+         * Upper camel case such as: NameCase.
+         */
+        @JvmField
+        val UPPER_CAMEL: NameCase = CamelCase(true)
+
+        /**
+         * Lower underscore case such as: name_case.
+         */
+        @JvmField
+        val LOWER_UNDERSCORE: NameCase = SeparatorCase("_") { _, it -> it.lowerCase() }
+
+        /**
+         * Upper underscore case such as: NAME_CASE.
+         */
+        @JvmField
+        val UPPER_UNDERSCORE: NameCase = SeparatorCase("_") { _, it -> it.upperCase() }
+
+        /**
+         * Lower hyphen case such as: name-case.
+         */
+        @JvmField
+        val LOWER_HYPHEN: NameCase = SeparatorCase("-") { _, it -> it.lowerCase() }
+
+        /**
+         * Upper hyphen case such as: NAME-CASE.
+         */
+        @JvmField
+        val UPPER_HYPHEN: NameCase = SeparatorCase("-") { _, it -> it.upperCase() }
+
+        /**
+         * Converts case of [this] chars from [from] case to [to] case. For example:
+         *
+         * ```
+         * //first-second -> FirstSecond
+         * NameCase.convert("first-second", NameCase.LOWER_HYPHEN, NameCase.UPPER_CAMEL;
+         * ```
+         */
+        @JvmName("convert")
+        @JvmStatic
+        fun CharSequence.convertCase(from: NameCase, to: NameCase): String {
+            return from.convert(this, to)
+        }
     }
 }
 
@@ -368,13 +363,4 @@ open class SeparatorCase(
             }
         }
     }
-}
-
-private object BtCaseHolder {
-    val LOWER_CAMEL: NameCase = CamelCase(false)
-    val UPPER_CAMEL: NameCase = CamelCase(true)
-    val LOWER_UNDERSCORE: NameCase = SeparatorCase("_") { _, it -> it.lowerCase() }
-    val UPPER_UNDERSCORE: NameCase = SeparatorCase("_") { _, it -> it.upperCase() }
-    val LOWER_HYPHEN: NameCase = SeparatorCase("-") { _, it -> it.lowerCase() }
-    val UPPER_HYPHEN: NameCase = SeparatorCase("-") { _, it -> it.upperCase() }
 }

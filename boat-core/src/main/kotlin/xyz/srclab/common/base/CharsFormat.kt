@@ -1,64 +1,76 @@
-/**
- * Format utilities.
- */
-@file:JvmName("BtFormat")
-
 package xyz.srclab.common.base
 
 import xyz.srclab.annotations.concurrent.ThreadSafe
-
-private var defaultFormat: StringFormat = FastFormat
-
-/**
- * Sets default [StringFormat] for format functions.
- *
- * @see FastFormat
- * @see PrintFormat
- */
-fun setDefaultFormat(format: StringFormat) {
-    defaultFormat = format
-}
+import java.text.MessageFormat
+import java.util.*
 
 /**
- * Gets default [StringFormat] for format functions.
- * Default is [FastFormat].
- *
- * @see FastFormat
- * @see PrintFormat
- */
-fun defaultFormat(): StringFormat {
-    return defaultFormat
-}
-
-/**
- * Formats [pattern] with [args].
- *
- * Default Formatter is [FastFormat].
- *
- * @see FastFormat
- * @see PrintFormat
- * @see setDefaultFormat
- */
-fun format(pattern: CharSequence, vararg args: Any?): String {
-    return defaultFormat.format(pattern, *args)
-}
-
-/**
- * Used to format [CharSequence].
+ * Represent a type of formatting way for [CharSequence].
  *
  * @see FastFormat
  */
 @ThreadSafe
-interface StringFormat {
+interface CharsFormat {
 
     /**
      * Formats given [pattern] with [args].
      */
     fun format(pattern: CharSequence, vararg args: Any?): String
+
+    companion object {
+
+        /**
+         * Fast format, see [FastFormat].
+         */
+        @JvmField
+        val FAST_FORMAT: FastFormat = FastFormat
+
+        /**
+         * Returns a [CharsFormat] with printf style.
+         *
+         * @param locale the format locale
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun printfFormat(locale: Locale = BtProps.locale()): CharsFormat {
+            return PrintfFormat(locale)
+        }
+
+        /**
+         * Returns a [CharsFormat] with [MessageFormat] style.
+         *
+         * @param locale the format locale
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun messageFormat(locale: Locale = BtProps.locale()): CharsFormat {
+            return JavaMessageFormat(locale)
+        }
+
+        /**
+         * Formats [this] with [FAST_FORMAT].
+         */
+        @JvmStatic
+        fun CharSequence.fastFormat(vararg args: Any?): String {
+            return FAST_FORMAT.format(this, *args)
+        }
+
+        private class PrintfFormat(private val locale: Locale) : CharsFormat {
+            override fun format(pattern: CharSequence, vararg args: Any?): String {
+                return JavaString.format(locale, pattern.toString(), *args)
+            }
+        }
+
+        private class JavaMessageFormat(private val locale: Locale) : CharsFormat {
+            override fun format(pattern: CharSequence, vararg args: Any?): String {
+                return MessageFormat(pattern.toString(), locale).format(args)
+            }
+        }
+    }
 }
 
 /**
- * Fast format using slf4j-like style (may not exactly same):
+ * Fast format using slf4j-like style (not exactly same):
  *
  * ```
  * format("1 + 1 = {}, 2 + 2 = {}", 2, 4);
@@ -95,7 +107,7 @@ interface StringFormat {
  * C:\file.zip\_{}
  * ```
  */
-object FastFormat : StringFormat {
+object FastFormat : CharsFormat {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         //return MessageFormatterSlf4j.arrayFormat(this.toString(), args, null).message
@@ -181,14 +193,5 @@ object FastFormat : StringFormat {
         }
 
         return getBuffer().toString()
-    }
-}
-
-/**
- * `printf` style format.
- */
-object PrintFormat : StringFormat {
-    override fun format(pattern: CharSequence, vararg args: Any?): String {
-        return JavaString.format(defaultLocale(), pattern.toString(), *args)
     }
 }

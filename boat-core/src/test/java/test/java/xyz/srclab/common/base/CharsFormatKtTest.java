@@ -5,12 +5,12 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.BtFormat;
 import xyz.srclab.common.base.BtLog;
 import xyz.srclab.common.base.FastFormat;
-import xyz.srclab.common.base.StringFormat;
+import xyz.srclab.common.base.CharsFormat;
 
 /**
  * @author sunqian
  */
-public class BtFormatTest {
+public class CharsFormatKtTest {
 
     @Test
     public void testFormat() {
@@ -38,7 +38,7 @@ public class BtFormatTest {
 
     private void assertEquals(
         String expected,
-        StringFormat format,
+        CharsFormat format,
         CharSequence pattern,
         Object... args
     ) {
