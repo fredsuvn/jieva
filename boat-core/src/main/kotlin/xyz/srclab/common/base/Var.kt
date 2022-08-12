@@ -1,5 +1,6 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.asType
 import java.util.function.Function
 
 /**
@@ -26,9 +27,9 @@ interface Var<T : Any> : Val<T> {
      * Maps current value by [func], returns this [Var] to wrap the new value.
      *
      * Note: [map] method will create a new [Var] instance,
-     * but [mapSet] returns this instance itself, it only changes the value and casts the generic type of [T].
+     * but [mapSelf] returns this instance itself, it only changes the value and casts the generic type of [T].
      */
-    fun <R : Any> mapSet(func: Function<in T?, out R?>): Var<R> {
+    fun <R : Any> mapSelf(func: Function<in T?, out R?>): Var<R> {
         val thisVar = this.asType<Var<R>>()
         thisVar.set(func.apply(get()))
         return thisVar

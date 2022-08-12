@@ -27,7 +27,7 @@ interface Val<T : Any> {
     /**
      * Returns value of this wrapper, or result of [supplier] if the value is null.
      */
-    fun orElseGet(supplier: Supplier<T>): T {
+    fun orElse(supplier: Supplier<T>): T {
         return get() ?: supplier.get()
     }
 
