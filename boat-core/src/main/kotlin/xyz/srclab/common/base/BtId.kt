@@ -113,7 +113,7 @@ open class SnowflakeId {
      */
     @Synchronized
     open fun next(): Long {
-        val startTime = currentMillis()
+        val startTime = epochMillis()
         var currentTime = startTime
         while (true) {
             if (currentTime < lastTimestamp) {
@@ -129,7 +129,7 @@ open class SnowflakeId {
                 }
                 //Overflow
                 sleep(1)
-                currentTime = currentMillis()
+                currentTime = epochMillis()
                 if (currentTime - startTime > maxWaitTimeMilli) {
                     throw IllegalStateException("Sequence overflow.")
                 }

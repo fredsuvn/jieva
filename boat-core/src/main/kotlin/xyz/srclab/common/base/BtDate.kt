@@ -20,21 +20,28 @@ import java.util.*
 /**
  * Returns current epoch seconds.
  */
-fun currentSeconds(): Long {
-    return currentMillis() / 1000L
+fun epochSeconds(): Long {
+    return epochMillis() / 1000L
 }
 
 /**
  * Returns current epoch milliseconds: [System.currentTimeMillis].
  */
-fun currentMillis(): Long {
+fun epochMillis(): Long {
     return System.currentTimeMillis()
+}
+
+/**
+ * Returns current nanosecond of [epochMillis].
+ */
+fun currentNanos(): Int {
+    return Instant.now().nano
 }
 
 /**
  * Returns current system nanosecond: [System.nanoTime].
  */
-fun currentNanos(): Long {
+fun systemNanos(): Long {
     return System.nanoTime()
 }
 
@@ -47,10 +54,52 @@ fun currentTimestamp(zoneId: ZoneId = ZoneId.systemDefault()): String {
 }
 
 /**
+ * Returns current zone.
+ */
+fun currentZone(): ZoneId {
+    return ZoneId.systemDefault()
+}
+
+/**
  * Returns current zone offset.
  */
 fun currentZoneOffset(): ZoneOffset {
     return LocalDateTime.now().getZoneOffset()
+}
+
+/**
+ * Formats given date.
+ */
+fun Date.format(pattern: String): String {
+    return SimpleDateFormat(pattern).format(this)
+}
+
+/**
+ * Formats given temporal.
+ */
+fun TemporalAccessor.format(pattern: String): String {
+    return DateTimeFormatter.ofPattern(pattern).format(this)
+}
+
+/**
+ * Parses [date] to [Date] with [pattern].
+ */
+fun parseDate(pattern: String, date: String): Date {
+    return SimpleDateFormat(pattern).parse(date)
+}
+
+/**
+ * Trims given date to `Day of month`. For example:
+ *
+ * ```
+ * Date day1 = BtDate.trimDay(date)
+ * // The day1 will be as 'yyyyMMdd'
+ * ```
+ */
+fun Date.trimDay(zone: ZoneId): Date {
+    val localDateTime = this.toZonedDateTime(zone).toLocalDateTime()
+    val zonedDateTime = ZonedDateTime.of(localDateTime.toLocalDate(), LocalTime.MIN, zone)
+    return Date.from(zonedDateTime.toInstant())
 }
 
 /**
@@ -347,7 +396,7 @@ fun TemporalAccessor.toLocalTimeOrNull(tryCompute: Boolean = true): LocalTime? {
 fun TemporalAccessor.computeInstant(): Instant? {
     if (this.isSupported(ChronoField.INSTANT_SECONDS)) {
         val second = this.getLong(ChronoField.INSTANT_SECONDS)
-        val nano = computeNanoOfSecond()
+        val nano = getNanoOfSecond()
         return Instant.ofEpochSecond(second, nano.toLong())
     }
     val zonedDateTime = computeZonedDateTime()
@@ -410,7 +459,7 @@ fun TemporalAccessor.computeLocalDate(): LocalDate? {
         return LocalDate.ofEpochDay(this.getLong(ChronoField.EPOCH_DAY))
     }
 
-    val year = computeYear()
+    val year = getYear()
 
     if (this.isSupported(ChronoField.DAY_OF_YEAR)) {
         return LocalDate.ofYearDay(year, this.get(ChronoField.DAY_OF_YEAR))
@@ -435,7 +484,7 @@ fun TemporalAccessor.computeLocalTime(): LocalTime? {
         return LocalTime.ofNanoOfDay(this.getLong(ChronoField.NANO_OF_DAY))
     }
 
-    val nano = computeNanoOfSecond()
+    val nano = getNanoOfSecond()
 
     if (this.isSupported(ChronoField.SECOND_OF_DAY)) {
         val secondOfDay = this.getLong(ChronoField.SECOND_OF_DAY)
@@ -453,7 +502,7 @@ fun TemporalAccessor.computeLocalTime(): LocalTime? {
         return LocalTime.ofNanoOfDay(secondOfDay + nano)
     }
 
-    val hour = computeHourOfSecond()
+    val hour = getHourOfDay()
 
     var minute = 0
     if (this.isSupported(ChronoField.MINUTE_OF_HOUR)) {
@@ -464,64 +513,93 @@ fun TemporalAccessor.computeLocalTime(): LocalTime? {
 }
 
 /**
- * Computes nano of second value from [this] with existing fields.
+ * Returns nano of second of given [TemporalAccessor], or null if failed.
+ *
+ * This method attempts the value through these one or more possible ways:
+ * [ChronoField.NANO_OF_SECOND], [ChronoField.MICRO_OF_SECOND], [ChronoField.MILLI_OF_SECOND].
  */
-fun TemporalAccessor.computeNanoOfSecond(): Int {
-    var nano = 0
+fun TemporalAccessor.getNanoOfSecond(): Int? {
     if (this.isSupported(ChronoField.NANO_OF_SECOND)) {
-        nano = this.get(ChronoField.NANO_OF_SECOND)
-    } else if (this.isSupported(ChronoField.MICRO_OF_SECOND)) {
-        nano = this.get(ChronoField.MICRO_OF_SECOND) * 1000
-    } else if (this.isSupported(ChronoField.MILLI_OF_SECOND)) {
-        nano = this.get(ChronoField.MILLI_OF_SECOND) * 1000_000
+        return this.get(ChronoField.NANO_OF_SECOND)
     }
-    return nano
+    return getNanoOfSecond0()
+}
+
+private fun TemporalAccessor.getNanoOfSecond0(): Int? {
+     if (this.isSupported(ChronoField.MICRO_OF_SECOND)) {
+        return this.get(ChronoField.MICRO_OF_SECOND) * 1000
+    } else if (this.isSupported(ChronoField.MILLI_OF_SECOND)) {
+        return this.get(ChronoField.MILLI_OF_SECOND) * 1000_000
+    }
+    return null
 }
 
 /**
- * Computes hour of second value from [this] with existing fields.
+ * Returns hour of day of given [TemporalAccessor], or null if failed.
+ *
+ * This method attempts the value through these one or more possible ways:
+ * [ChronoField.HOUR_OF_DAY], [ChronoField.AMPM_OF_DAY], [ChronoField.CLOCK_HOUR_OF_DAY],
+ * [ChronoField.HOUR_OF_AMPM], [ChronoField.CLOCK_HOUR_OF_AMPM].
  */
-fun TemporalAccessor.computeHourOfSecond(): Int {
+fun TemporalAccessor.getHourOfDay(): Int? {
+    if (this.isSupported(ChronoField.HOUR_OF_DAY)) {
+        return this.get(ChronoField.HOUR_OF_DAY)
+    }
+    return getHourOfDay0()
+}
 
-    fun getAmPm(): Int {
-        return try {
-            this.get(ChronoField.AMPM_OF_DAY)
-        } catch (e: Exception) {
-            0
+private fun TemporalAccessor.getHourOfDay0(): Int? {
+
+    fun getAmPm(): Int? {
+        if (this.isSupported(ChronoField.AMPM_OF_DAY)) {
+            return this.get(ChronoField.AMPM_OF_DAY)
         }
+        return null
     }
 
-    var hour = 0
-    if (this.isSupported(ChronoField.HOUR_OF_DAY)) {
-        hour = this.get(ChronoField.HOUR_OF_DAY)
-    } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_DAY)) {
-        hour = this.get(ChronoField.CLOCK_HOUR_OF_DAY) - 1
+    if (this.isSupported(ChronoField.CLOCK_HOUR_OF_DAY)) {
+        return this.get(ChronoField.CLOCK_HOUR_OF_DAY) - 1
     } else if (this.isSupported(ChronoField.HOUR_OF_AMPM)) {
         val ampm = getAmPm()
-        hour = this.get(ChronoField.HOUR_OF_AMPM) + ampm * 12
+        if (ampm === null) {
+            return null
+        }
+        return this.get(ChronoField.HOUR_OF_AMPM) + ampm * 12
     } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_AMPM)) {
         val ampm = getAmPm()
-        hour = this.get(ChronoField.CLOCK_HOUR_OF_AMPM) - 1 + ampm * 12
+        if (ampm === null) {
+            return null
+        }
+        return this.get(ChronoField.CLOCK_HOUR_OF_AMPM) - 1 + ampm * 12
     }
-    return hour
+    return null
 }
 
 /**
- * Computes year value from [this] with existing fields.
+ * Returns year of given [TemporalAccessor], or null if failed.
+ *
+ * This method attempts the value through these one or more possible ways:
+ * [ChronoField.YEAR], [ChronoField.YEAR_OF_ERA], [ChronoField.ERA].
  */
-fun TemporalAccessor.computeYear(): Int {
-    var year = 0
+fun TemporalAccessor.getYear(): Int? {
     if (this.isSupported(ChronoField.YEAR)) {
-        year = this.get(ChronoField.YEAR)
-    } else if (this.isSupported(ChronoField.YEAR_OF_ERA)) {
-        val era = this.get(ChronoField.ERA)
-        if (era == 1) {
-            year = this.get(ChronoField.YEAR_OF_ERA)
-        } else if (era == 0) {
-            year = -this.get(ChronoField.YEAR_OF_ERA) + 1
+        return this.get(ChronoField.YEAR)
+    }
+    return getYear0()
+}
+
+private fun TemporalAccessor.getYear0(): Int? {
+    if (this.isSupported(ChronoField.YEAR_OF_ERA)) {
+        if (this.isSupported(ChronoField.ERA)) {
+            val era = this.get(ChronoField.ERA)
+            if (era == 1) {
+                return this.get(ChronoField.YEAR_OF_ERA)
+            } else if (era == 0) {
+                return -this.get(ChronoField.YEAR_OF_ERA) + 1
+            }
         }
     }
-    return year
+    return null
 }
 
 /**
@@ -711,7 +789,7 @@ interface DatePattern {
 interface TimePoint {
 
     /**
-     * Returns this time in milliseconds.
+     * Returns this time in epoch milliseconds.
      */
     @Throws(DateTimeException::class)
     fun toMillis(): Long {
@@ -719,11 +797,19 @@ interface TimePoint {
     }
 
     /**
-     * Returns this time in seconds.
+     * Returns this time in epoch seconds.
      */
     @Throws(DateTimeException::class)
     fun toSeconds(): Long {
         return toInstant().epochSecond
+    }
+
+    /**
+     * Returns nanoseconds of epoch second of this time.
+     */
+    @Throws(DateTimeException::class)
+    fun toNanoOfSecond(): Int {
+        return toInstant().nano
     }
 
     /**

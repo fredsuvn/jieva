@@ -1,6 +1,6 @@
 package xyz.srclab.common.cache
 
-import xyz.srclab.common.base.currentMillis
+import xyz.srclab.common.base.epochMillis
 import java.util.*
 import java.util.function.Supplier
 
@@ -75,7 +75,7 @@ open class SimplePool<T : Any>(
         var count = 0
         val extSize = extNodes.size
         var findOne = false
-        val now = currentMillis()
+        val now = epochMillis()
         while (count < extSize) {
             val node = extNodes.pollFirst()
             if (node === null) {
@@ -132,7 +132,7 @@ open class SimplePool<T : Any>(
     ) : PoolNode<T> {
         override fun release() {
             inUse = false
-            lastReleaseMillis = currentMillis()
+            lastReleaseMillis = epochMillis()
         }
     }
 
