@@ -8,7 +8,6 @@ package xyz.srclab.common.base
 import xyz.srclab.common.base.DatePattern.Companion.toDatePattern
 import java.io.Serializable
 import java.text.DateFormat
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -54,412 +53,205 @@ fun currentTimestamp(zoneId: ZoneId = ZoneId.systemDefault()): String {
 }
 
 /**
- * Returns current zone.
+ * Returns current zone of system.
  */
 fun currentZone(): ZoneId {
     return ZoneId.systemDefault()
 }
 
 /**
- * Returns current zone offset.
+ * Returns current zone offset of system.
  */
 fun currentZoneOffset(): ZoneOffset {
-    return LocalDateTime.now().getZoneOffset()
+    return currentZone().rules.getOffset(Instant.now())
 }
 
 /**
  * Formats given date.
  */
-fun Date.format(pattern: String): String {
-    return SimpleDateFormat(pattern).format(this)
-}
-
-/**
- * Formats given temporal.
- */
-fun TemporalAccessor.format(pattern: String): String {
-    return DateTimeFormatter.ofPattern(pattern).format(this)
+fun Date.format(pattern: CharSequence): String {
+    return SimpleDateFormat(pattern.toString()).format(this)
 }
 
 /**
  * Parses [date] to [Date] with [pattern].
  */
-fun parseDate(pattern: String, date: String): Date {
-    return SimpleDateFormat(pattern).parse(date)
+fun parseDate(pattern: CharSequence, date: CharSequence): Date {
+    return SimpleDateFormat(pattern.toString()).parse(date.toString())
 }
 
 /**
- * Trims given date to `Day of month`. For example:
+ * Returns [Calendar] built from given date.
+ */
+@JvmOverloads
+fun Date.toCalendar(zone: ZoneId = ZoneId.systemDefault()): Calendar {
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone(zone))
+    calendar.time = this
+    return calendar
+}
+
+/**
+ * Adds or subtracts the specified amount of time to the given calendar field, based on the calendar's rules.
+ * For example, to subtract 5 days from the current time of the calendar, you can achieve it by calling:
+ *
+ * ```
+ * BtDate.add(date, Calendar.DAY_OF_MONTH, -5).
+ * ```
+ *
+ * @param field field from [Calendar]
+ * @param amount amount to be added
+ * @param zone time zone
+ */
+@JvmOverloads
+fun Date.add(field: Int, amount: Int, zone: ZoneId = ZoneId.systemDefault()): Date {
+    val calendar = this.toCalendar(zone)
+    calendar.add(field, amount)
+    return calendar.time
+}
+
+/**
+ * Sets the given calendar field to the given value.
+ * The value is not interpreted by this method regardless of the leniency mode.
+ *
+ * @param field field from [Calendar]
+ * @param amount amount to be added
+ * @param zone time zone
+ */
+@JvmOverloads
+fun Date.set(field: Int, amount: Int, zone: ZoneId = ZoneId.systemDefault()): Date {
+    val calendar = this.toCalendar(zone)
+    calendar.set(field, amount)
+    return calendar.time
+}
+
+/**
+ * Trims time part of given date, only keep the year, month and day of month. For example:
  *
  * ```
  * Date day1 = BtDate.trimDay(date)
  * // The day1 will be as 'yyyyMMdd'
  * ```
  */
-fun Date.trimDay(zone: ZoneId): Date {
-    val localDateTime = this.toZonedDateTime(zone).toLocalDateTime()
-    val zonedDateTime = ZonedDateTime.of(localDateTime.toLocalDate(), LocalTime.MIN, zone)
-    return Date.from(zonedDateTime.toInstant())
-}
-
-/**
- * Returns zone offset of [this] local date time.
- */
 @JvmOverloads
-fun LocalDateTime.getZoneOffset(zoneId: ZoneId = ZoneId.systemDefault()): ZoneOffset {
-    return zoneId.rules.getOffset(this)
+fun Date.trimTime(zone: ZoneId = ZoneId.systemDefault()): Date {
+    val calendar = this.toCalendar(zone)
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.time
 }
 
 /**
- * Returns zone offset of [this] instant.
- */
-@JvmOverloads
-fun Instant.getZoneOffset(zoneId: ZoneId = ZoneId.systemDefault()): ZoneOffset {
-    return zoneId.rules.getOffset(this)
-}
-
-/**
- * Converts to [ZonedDateTime].
- */
-@JvmOverloads
-fun Date.toZonedDateTime(zoneId: ZoneId = ZoneId.systemDefault()): ZonedDateTime {
-    return ZonedDateTime.ofInstant(this.toInstant(), zoneId)
-}
-
-/**
- * Converts to [OffsetDateTime].
- */
-@JvmOverloads
-fun Date.toOffsetDateTime(zoneId: ZoneId = ZoneId.systemDefault()): OffsetDateTime {
-    return OffsetDateTime.ofInstant(this.toInstant(), zoneId)
-}
-
-/**
- * Converts to [LocalDateTime].
- */
-@JvmOverloads
-fun Date.toLocalDateTime(zoneId: ZoneId = ZoneId.systemDefault()): LocalDateTime {
-    return LocalDateTime.ofInstant(this.toInstant(), zoneId)
-}
-
-/**
- * Converts to [LocalDate].
- */
-@JvmOverloads
-fun Date.toLocalDate(zoneId: ZoneId = ZoneId.systemDefault()): LocalDate {
-    return toLocalDateTime(zoneId).toLocalDate()
-}
-
-/**
- * Converts to [LocalTime].
- */
-@JvmOverloads
-fun Date.toLocalTime(zoneId: ZoneId = ZoneId.systemDefault()): LocalTime {
-    return toLocalDateTime(zoneId).toLocalTime()
-}
-
-/**
- * Converts to [Date], or throw [DateTimeException] if failed.
+ * Returns next [Date] of which day of month was added.
  *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
+ * @param day added number of day of month, default is 1
+ * @param zone time zone
  */
-@Throws(DateTimeException::class)
 @JvmOverloads
-fun TemporalAccessor.toDate(tryCompute: Boolean = true): Date {
-    return toDateOrNull(tryCompute) ?: throw DateTimeException("toDate failed: $this")
+fun Date.nextDay(day: Int = 1, zone: ZoneId = ZoneId.systemDefault()): Date {
+    return this.add(Calendar.DAY_OF_MONTH, day, zone)
 }
 
 /**
- * Converts to [Instant], or throw [DateTimeException] if failed.
+ * Converts given temporal to [Date].
+ * If given temporal contains the `zone`, the param [zone] will be ignored.
  *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@Throws(DateTimeException::class)
-@JvmOverloads
-fun TemporalAccessor.toInstant(tryCompute: Boolean = true): Instant {
-    return toInstantOrNull(tryCompute) ?: throw DateTimeException("toInstant failed: $this")
-}
-
-/**
- * Converts to [ZonedDateTime], or throw [DateTimeException] if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@Throws(DateTimeException::class)
-@JvmOverloads
-fun TemporalAccessor.toZonedDateTime(tryCompute: Boolean = true): ZonedDateTime {
-    return toZonedDateTimeOrNull(tryCompute) ?: throw DateTimeException("toZonedDateTime failed: $this")
-}
-
-/**
- * Converts to [OffsetDateTime], or throw [DateTimeException] if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@Throws(DateTimeException::class)
-@JvmOverloads
-fun TemporalAccessor.toOffsetDateTime(tryCompute: Boolean = true): OffsetDateTime {
-    return toOffsetDateTimeOrNull(tryCompute) ?: throw DateTimeException("toOffsetDateTime failed: $this")
-}
-
-/**
- * Converts to [LocalDateTime], or throw [DateTimeException] if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@Throws(DateTimeException::class)
-@JvmOverloads
-fun TemporalAccessor.toLocalDateTime(tryCompute: Boolean = true): LocalDateTime {
-    return toLocalDateTimeOrNull(tryCompute) ?: throw DateTimeException("toLocalDateTime failed: $this")
-}
-
-/**
- * Converts to [LocalDate], or throw [DateTimeException] if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@Throws(DateTimeException::class)
-@JvmOverloads
-fun TemporalAccessor.toLocalDate(tryCompute: Boolean = true): LocalDate {
-    return toLocalDateOrNull(tryCompute) ?: throw DateTimeException("toLocalDate failed: $this")
-}
-
-/**
- * Converts to [LocalTime], or throw [DateTimeException] if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@Throws(DateTimeException::class)
-@JvmOverloads
-fun TemporalAccessor.toLocalTime(tryCompute: Boolean = true): LocalTime {
-    return toLocalTimeOrNull(tryCompute) ?: throw DateTimeException("toLocalTime failed: $this")
-}
-
-/**
- * Converts to [Date], or null if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
+ * @param zone time zone.
  */
 @JvmOverloads
-fun TemporalAccessor.toDateOrNull(tryCompute: Boolean = true): Date? {
-    val instant = toInstantOrNull(tryCompute)
-    if (instant === null) {
-        return null
-    }
-    return Date.from(instant)
-}
-
-/**
- * Converts to [Instant], or null if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@JvmOverloads
-fun TemporalAccessor.toInstantOrNull(tryCompute: Boolean = true): Instant? {
+fun TemporalAccessor.toDate(zone: ZoneId = ZoneId.systemDefault()): Date {
     return when (this) {
-        is Instant -> this
-        is LocalDateTime -> this.toInstant(this.getZoneOffset())
-        is ZonedDateTime -> this.toInstant()
-        is OffsetDateTime -> this.toInstant()
+        is Instant -> Date.from(this)
+        is ZonedDateTime -> Date.from(Instant.ofEpochSecond(this.toEpochSecond(), this.nano.toLong()))
+        is OffsetDateTime -> Date.from(Instant.ofEpochSecond(this.toEpochSecond(), this.nano.toLong()))
+        is LocalDateTime -> {
+            val zonedDateTime = this.atZone(zone)
+            Date.from(Instant.ofEpochSecond(zonedDateTime.toEpochSecond(), zonedDateTime.nano.toLong()))
+        }
+
         is LocalDate -> {
-            val localDateTime = LocalDateTime.of(this, LocalTime.MIN)
-            localDateTime.toInstant(localDateTime.getZoneOffset())
+            val zonedDateTime = ZonedDateTime.of(this, LocalTime.MIN, zone)
+            Date.from(Instant.ofEpochSecond(zonedDateTime.toEpochSecond(), zonedDateTime.nano.toLong()))
         }
-        is LocalTime -> null
+
+        is LocalTime -> {
+            val zonedDateTime = ZonedDateTime.of(LocalDate.MIN, this, zone)
+            Date.from(Instant.ofEpochSecond(zonedDateTime.toEpochSecond(), zonedDateTime.nano.toLong()))
+        }
+
         else -> {
-            if (!tryCompute) {
-                return null
-            }
-            computeInstant()
+            val zonedDateTime = this.getLocalDateTime().atZone(
+                this.getZoneOffset() ?: zone
+            )
+            Date.from(Instant.ofEpochSecond(zonedDateTime.toEpochSecond(), zonedDateTime.nano.toLong()))
         }
     }
 }
 
 /**
- * Converts to [ZonedDateTime], or null if failed.
+ * Converts to [Date].
+ */
+fun Duration.toDate(): Date {
+    return Date.from(Instant.ofEpochSecond(this.seconds, this.nano.toLong()))
+}
+
+/**
+ * Returns zone offset of given [TemporalAccessor].
  *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
+ * This method attempts the value through these one or more possible ways:
+ * [ChronoField.OFFSET_SECONDS].
+ * The result of those fields will be seen as 0 if it is failed to get.
  */
-@JvmOverloads
-fun TemporalAccessor.toZonedDateTimeOrNull(tryCompute: Boolean = true): ZonedDateTime? {
-    return when (this) {
-        is Instant -> ZonedDateTime.ofInstant(this, ZoneId.systemDefault())
-        is LocalDateTime -> this.atZone(ZoneId.systemDefault())
-        is ZonedDateTime -> this
-        is OffsetDateTime -> this.toZonedDateTime()
-        is LocalDate -> ZonedDateTime.of(this, LocalTime.MIN, ZoneId.systemDefault())
-        is LocalTime -> ZonedDateTime.of(LocalDate.MIN, this, ZoneId.systemDefault())
-        else -> {
-            if (!tryCompute) {
-                return null
-            }
-            computeZonedDateTime()
-        }
+fun TemporalAccessor.getZoneOffset(): ZoneOffset? {
+    if (this.isSupported(ChronoField.OFFSET_SECONDS)) {
+        return ZoneOffset.ofTotalSeconds(this.get(ChronoField.OFFSET_SECONDS))
     }
+    return null
 }
 
 /**
- * Converts to [OffsetDateTime], or null if failed.
+ * Returns instant of given [TemporalAccessor].
  *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
+ * This method attempts the value through these one or more possible ways:
+ * [getNanoOfSecond],
+ * [ChronoField.INSTANT_SECONDS].
+ * The result of those fields will be seen as 0 if it is failed to get.
  */
-@JvmOverloads
-fun TemporalAccessor.toOffsetDateTimeOrNull(tryCompute: Boolean = true): OffsetDateTime? {
-    return when (this) {
-        is Instant -> OffsetDateTime.ofInstant(this, ZoneId.systemDefault())
-        is LocalDateTime -> this.atOffset(this.getZoneOffset())
-        is ZonedDateTime -> this.toOffsetDateTime()
-        is OffsetDateTime -> this
-        is LocalDate -> OffsetDateTime.of(this, LocalTime.MIN, currentZoneOffset())
-        is LocalTime -> OffsetDateTime.of(LocalDate.MIN, this, currentZoneOffset())
-        else -> {
-            if (!tryCompute) {
-                return null
-            }
-            computeOffsetDateTime()
-        }
-    }
-}
-
-/**
- * Converts to [LocalDateTime], or null if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@JvmOverloads
-fun TemporalAccessor.toLocalDateTimeOrNull(tryCompute: Boolean = true): LocalDateTime? {
-    return when (this) {
-        is Instant -> LocalDateTime.ofInstant(this, ZoneId.systemDefault())
-        is LocalDateTime -> this
-        is ZonedDateTime -> this.toLocalDateTime()
-        is OffsetDateTime -> this.toLocalDateTime()
-        is LocalDate -> LocalDateTime.of(this, LocalTime.MIN)
-        is LocalTime -> LocalDateTime.of(LocalDate.MIN, this)
-        else -> {
-            if (!tryCompute) {
-                return null
-            }
-            computeLocalDateTime()
-        }
-    }
-}
-
-/**
- * Converts to [LocalDate], or null if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@JvmOverloads
-fun TemporalAccessor.toLocalDateOrNull(tryCompute: Boolean = true): LocalDate? {
-    return when (this) {
-        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalDate()
-        is LocalDateTime -> this.toLocalDate()
-        is ZonedDateTime -> this.toLocalDate()
-        is OffsetDateTime -> this.toLocalDate()
-        is LocalDate -> this
-        is LocalTime -> null
-        else -> {
-            if (!tryCompute) {
-                return null
-            }
-            computeLocalDate()
-        }
-    }
-}
-
-/**
- * Converts to [LocalTime], or null if failed.
- *
- * @param tryCompute whether tries to compute missing fields by other existing fields.
- */
-@JvmOverloads
-fun TemporalAccessor.toLocalTimeOrNull(tryCompute: Boolean = true): LocalTime? {
-    return when (this) {
-        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalTime()
-        is LocalDateTime -> this.toLocalTime()
-        is ZonedDateTime -> this.toLocalTime()
-        is OffsetDateTime -> this.toLocalTime()
-        is LocalDate -> null
-        is LocalTime -> this
-        else -> {
-            if (!tryCompute) {
-                return null
-            }
-            computeLocalTime()
-        }
-    }
-}
-
-/**
- * Computes [Instant] from [this] with existing fields, or returns null if failed.
- */
-fun TemporalAccessor.computeInstant(): Instant? {
+fun TemporalAccessor.getInstant(): Instant? {
     if (this.isSupported(ChronoField.INSTANT_SECONDS)) {
         val second = this.getLong(ChronoField.INSTANT_SECONDS)
-        val nano = getNanoOfSecond()
+        val nano = getNanoOfSecond() ?: 0
         return Instant.ofEpochSecond(second, nano.toLong())
     }
-    val zonedDateTime = computeZonedDateTime()
-    if (zonedDateTime === null) {
-        return null
-    }
-    return zonedDateTime.toInstant()
+    return null
 }
 
 /**
- * Computes [ZonedDateTime] from [this] with existing fields, or returns null if failed.
+ * Returns local date time of given [TemporalAccessor].
+ *
+ * This method attempts the value through these one or more possible ways:
+ * [getLocalDate], [getLocalTime].
  */
-fun TemporalAccessor.computeZonedDateTime(): ZonedDateTime? {
-    return computeDateTime { local, zoneId -> ZonedDateTime.of(local, zoneId) }
+fun TemporalAccessor.getLocalDateTime(): LocalDateTime {
+    return LocalDateTime.of(getLocalDate(), getLocalTime())
 }
 
 /**
- * Computes [OffsetDateTime] from [this] with existing fields, or returns null if failed.
+ * Returns local date of given [TemporalAccessor].
+ *
+ * This method attempts the value through these one or more possible ways:
+ * [getYear],
+ * [ChronoField.EPOCH_DAY], [ChronoField.DAY_OF_YEAR], [ChronoField.MONTH_OF_YEAR],
+ * [ChronoField.DAY_OF_MONTH].
+ * The result of those fields will be seen as 0 if it is failed to get.
  */
-fun TemporalAccessor.computeOffsetDateTime(): OffsetDateTime? {
-    return computeDateTime { local, zoneId -> OffsetDateTime.of(local, zoneId.rules.getOffset(local)) }
-}
-
-private inline fun <T> TemporalAccessor.computeDateTime(
-    generator: (local: LocalDateTime, zoneId: ZoneId) -> T?
-): T? {
-    val local = computeLocalDateTime()
-    if (local === null) {
-        return null
-    }
-    val zoneId = if (this.isSupported(ChronoField.OFFSET_SECONDS)) {
-        val offsetSecond = this.get(ChronoField.OFFSET_SECONDS)
-        ZoneOffset.ofTotalSeconds(offsetSecond)
-    } else {
-        ZoneId.systemDefault()
-    }
-    return generator(local, zoneId)
-}
-
-/**
- * Computes [LocalDateTime] from [this] with existing fields, or returns null if failed.
- */
-fun TemporalAccessor.computeLocalDateTime(): LocalDateTime? {
-    val localDate = computeLocalDate()
-    if (localDate === null) {
-        return null
-    }
-    val localTime = computeLocalTime()
-    if (localTime === null) {
-        return LocalDateTime.of(localDate, LocalTime.MIN)
-    }
-    return LocalDateTime.of(localDate, localTime)
-}
-
-/**
- * Computes [LocalDate] from [this] with existing fields, or returns null if failed.
- */
-fun TemporalAccessor.computeLocalDate(): LocalDate? {
+fun TemporalAccessor.getLocalDate(): LocalDate {
     if (this.isSupported(ChronoField.EPOCH_DAY)) {
         return LocalDate.ofEpochDay(this.getLong(ChronoField.EPOCH_DAY))
     }
 
-    val year = getYear()
+    val year = getYear() ?: 0
 
     if (this.isSupported(ChronoField.DAY_OF_YEAR)) {
         return LocalDate.ofYearDay(year, this.get(ChronoField.DAY_OF_YEAR))
@@ -477,14 +269,20 @@ fun TemporalAccessor.computeLocalDate(): LocalDate? {
 }
 
 /**
- * Computes [LocalTime] from [this] with existing fields, or returns null if failed.
+ * Returns local time of given [TemporalAccessor].
+ *
+ * This method attempts the value through these one or more possible ways:
+ * [getNanoOfSecond], [getHourOfDay],
+ * [ChronoField.NANO_OF_DAY], [ChronoField.SECOND_OF_DAY], [ChronoField.SECOND_OF_MINUTE],
+ * [ChronoField.MINUTE_OF_DAY], [ChronoField.MINUTE_OF_HOUR].
+ * The result of those fields will be seen as 0 if it is failed to get.
  */
-fun TemporalAccessor.computeLocalTime(): LocalTime? {
+fun TemporalAccessor.getLocalTime(): LocalTime {
     if (this.isSupported(ChronoField.NANO_OF_DAY)) {
         return LocalTime.ofNanoOfDay(this.getLong(ChronoField.NANO_OF_DAY))
     }
 
-    val nano = getNanoOfSecond()
+    val nano = getNanoOfSecond() ?: 0
 
     if (this.isSupported(ChronoField.SECOND_OF_DAY)) {
         val secondOfDay = this.getLong(ChronoField.SECOND_OF_DAY)
@@ -502,7 +300,7 @@ fun TemporalAccessor.computeLocalTime(): LocalTime? {
         return LocalTime.ofNanoOfDay(secondOfDay + nano)
     }
 
-    val hour = getHourOfDay()
+    val hour = getHourOfDay() ?: 0
 
     var minute = 0
     if (this.isSupported(ChronoField.MINUTE_OF_HOUR)) {
@@ -526,7 +324,7 @@ fun TemporalAccessor.getNanoOfSecond(): Int? {
 }
 
 private fun TemporalAccessor.getNanoOfSecond0(): Int? {
-     if (this.isSupported(ChronoField.MICRO_OF_SECOND)) {
+    if (this.isSupported(ChronoField.MICRO_OF_SECOND)) {
         return this.get(ChronoField.MICRO_OF_SECOND) * 1000
     } else if (this.isSupported(ChronoField.MILLI_OF_SECOND)) {
         return this.get(ChronoField.MILLI_OF_SECOND) * 1000_000
@@ -603,9 +401,10 @@ private fun TemporalAccessor.getYear0(): Int? {
 }
 
 /**
- * Pattern for date/time, used to format/parse between string and Date types.
+ * Pattern for date time, used to format/parse between string and date types.
  *
- * This pattern provides both [DateTimeFormatter] and [DateFormat] to compatible with JDK7-lower and JDK8-higher.
+ * This pattern provides both [DateTimeFormatter] and [DateFormat] to compatible with
+ * JDK8 and higher and JDK7 and lower, and it uses suitable formatter to format/parse the date of different type.
  */
 interface DatePattern {
 
@@ -615,131 +414,145 @@ interface DatePattern {
     val pattern: String?
 
     /**
-     * Returns a [DateTimeFormatter] to compatible with JDK8-higher, may be null.
+     * Returns a [DateTimeFormatter] to compatible with JDK8 and higher, may be null.
      */
     fun formatter(): DateTimeFormatter?
 
     /**
-     * Returns a [DateFormat] to compatible with JDK7-lower, may be null.
+     * Returns a [DateFormat] to compatible with JDK7 and lower, may be null.
      */
     fun dateFormat(): DateFormat?
 
     /**
-     * Formats [temporal] to string with [formatter].
-     * If [formatter] is null, throw a [DateTimeException].
-     */
-    @Throws(DateTimeException::class)
-    fun format(temporal: TemporalAccessor): String {
-        return formatter()?.format(temporal) ?: throw DateTimeException("formatter is null")
-    }
-
-    /**
-     * Formats [date] to string with [dateFormat].
-     * If [dateFormat] is null, throw a [DateTimeException].
+     * Formats [date] to string.
      */
     @Throws(DateTimeException::class)
     fun format(date: Date): String {
-        return dateFormat()?.format(date) ?: throw DateTimeException("dateFormat is null")
+        return dateFormat()?.format(date)
+            ?: formatter()?.format(date.toInstant())
+            ?:throw DateTimeException(ALL_FORMATTER_NULL)
     }
 
     /**
-     * Parses [chars] to [TemporalAccessor] with [formatter].
-     * If [formatter] is null, throw a [DateTimeException].
+     * Formats [temporal] to string.
      */
-    @Throws(DateTimeException::class, DateTimeParseException::class)
-    fun parseTemporal(chars: CharSequence): TemporalAccessor {
-        return formatter()?.parse(chars) ?: throw DateTimeException("formatter is null")
+    @Throws(DateTimeException::class)
+    fun format(temporal: TemporalAccessor): String {
+        return formatter()?.format(temporal)
+            ?: dateFormat()?.format(temporal.toDate())
+            ?: throw DateTimeException(ALL_FORMATTER_NULL)
     }
 
     /**
-     * Parses [chars] to [Date] with [dateFormat].
-     * If [dateFormat] is null, throw a [IllegalStateException].
+     * Parses [chars] to [Date].
      */
-    @Throws(DateTimeException::class, DateTimeParseException::class)
+    @Throws(DateTimeException::class)
     fun parseDate(chars: CharSequence): Date {
-        val dateFormat = dateFormat()
-        if (dateFormat === null) {
-            throw DateTimeException("dateFormat is null")
+        val df = dateFormat()
+        if (df !== null) {
+            return df.parse(chars.toString())
         }
-        try {
-            return dateFormat.parse(chars.toString())
-        } catch (e: ParseException) {
-            throw DateTimeParseException(e.message, chars, e.errorOffset, e)
+        val t = formatter()?.parse(chars)
+        if (t === null) {
+            throw DateTimeException(ALL_FORMATTER_NULL)
         }
+        val instant = t.getInstant()
+        if (instant !== null) {
+            return Date.from(instant)
+        }
+        val localDateTime = t.getLocalDateTime()
+        val zone = t.getZoneOffset()
+        return Date.from(localDateTime.atZone(zone?:ZoneId.systemDefault()).toInstant())
     }
 
     /**
-     * Parses [chars] to [Instant] with [formatter].
-     * If [formatter] is null, throw a [DateTimeException].
+     * Parses [chars] to [TemporalAccessor].
      */
-    @Throws(DateTimeException::class, DateTimeParseException::class)
+    @Throws(DateTimeException::class)
+    fun parseTemporal(chars: CharSequence): TemporalAccessor {
+        return formatter()?.parse(chars)
+            ?: dateFormat()?.parse(chars.toString())?.toInstant()
+            ?: throw DateTimeException(ALL_FORMATTER_NULL)
+    }
+
+    /**
+     * Parses [chars] to [Instant].
+     */
+    @Throws(DateTimeException::class)
     fun parseInstant(chars: CharSequence): Instant {
-        return formatter()?.parse(chars) { Instant.from(it) } ?: throw DateTimeException("formatter is null")
+        return formatter()?.parse(chars){Instant.from(it)}
+            ?: dateFormat()?.parse(chars.toString())?.toInstant()
+            ?: throw DateTimeException(ALL_FORMATTER_NULL)
     }
 
     /**
-     * Parses [chars] to [ZonedDateTime] with [formatter].
-     * If [formatter] is null, throw a [DateTimeException].
+     * Parses [chars] to [ZonedDateTime].
      */
-    @Throws(DateTimeException::class, DateTimeParseException::class)
+    @Throws(DateTimeException::class)
     fun parseZonedDateTime(chars: CharSequence): ZonedDateTime {
-        return formatter()?.parse(chars) { ZonedDateTime.from(it) } ?: throw DateTimeException("formatter is null")
+        return formatter()?.parse(chars){ZonedDateTime.from(it)}
+            ?: dateFormat()?.parse(chars.toString())?.toInstant()?.atZone(ZoneId.systemDefault())
+            ?: throw DateTimeException(ALL_FORMATTER_NULL)
     }
 
     /**
-     * Parses [chars] to [OffsetDateTime] with [formatter].
-     * If [formatter] is null, throw a [DateTimeException].
+     * Parses [chars] to [OffsetDateTime].
      */
-    @Throws(DateTimeException::class, DateTimeParseException::class)
+    @Throws(DateTimeException::class)
     fun parseOffsetDateTime(chars: CharSequence): OffsetDateTime {
-        return formatter()?.parse(chars) { OffsetDateTime.from(it) } ?: throw DateTimeException("formatter is null")
+        return formatter()?.parse(chars){OffsetDateTime.from(it)}
+            ?: dateFormat()?.parse(chars.toString())?.toInstant()?.atOffset(currentZoneOffset())
+            ?: throw DateTimeException(ALL_FORMATTER_NULL)
     }
 
     /**
-     * Parses [chars] to [LocalDateTime] with [formatter].
-     * If [formatter] is null, throw a [DateTimeException].
+     * Parses [chars] to [LocalDateTime].
      */
     @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseLocalDateTime(chars: CharSequence): LocalDateTime {
-        return formatter()?.parse(chars) { LocalDateTime.from(it) } ?: throw DateTimeException("formatter is null")
+        return formatter()?.parse(chars){LocalDateTime.from(it)}
+            ?: dateFormat()?.parse(chars.toString())?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDateTime()
+            ?: throw DateTimeException(ALL_FORMATTER_NULL)
     }
 
     /**
-     * Parses [chars] to [LocalDate] with [formatter].
-     * If [formatter] is null, throw a [DateTimeException].
+     * Parses [chars] to [LocalDate].
      */
     @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseLocalDate(chars: CharSequence): LocalDate {
-        return formatter()?.parse(chars) { LocalDate.from(it) } ?: throw DateTimeException("formatter is null")
+        return formatter()?.parse(chars){LocalDate.from(it)}
+            ?: dateFormat()?.parse(chars.toString())?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+            ?: throw DateTimeException(ALL_FORMATTER_NULL)
     }
 
     /**
-     * Parses [chars] to [LocalTime] with [formatter].
-     * If [formatter] is null, throw a [DateTimeException].
+     * Parses [chars] to [LocalTime].
      */
     @Throws(DateTimeException::class, DateTimeParseException::class)
     fun parseLocalTime(chars: CharSequence): LocalTime {
-        return formatter()?.parse(chars) { LocalTime.from(it) } ?: throw DateTimeException("formatter is null")
+        return formatter()?.parse(chars){LocalTime.from(it)}
+            ?: dateFormat()?.parse(chars.toString())?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalTime()
+            ?: throw DateTimeException(ALL_FORMATTER_NULL)
     }
 
     companion object {
 
+        private const val ALL_FORMATTER_NULL = "All formatter are null."
+
         /**
          * Builds a [DatePattern] with given string, [pattern], [formatter] and [dateFormat] are not null.
          */
-        @JvmName("of")
         @JvmStatic
-        fun CharSequence.toDatePattern(): DatePattern {
-            return OfPattern(this)
+        fun of(chars: CharSequence): DatePattern {
+            return OfPattern(chars)
         }
 
         /**
          * Builds a [DatePattern] with given [DateTimeFormatter], both [pattern] and [dateFormat] are null.
          */
-        @JvmName("of")
         @JvmStatic
-        fun DateTimeFormatter.toDatePattern(): DatePattern {
-            return OfFormatter(this)
+        fun of(dateTimeFormatter:DateTimeFormatter): DatePattern {
+            return OfFormatter(dateTimeFormatter)
         }
 
         /**
@@ -789,28 +602,27 @@ interface DatePattern {
 interface TimePoint {
 
     /**
-     * Returns this time in epoch milliseconds.
+     * Zone of this time.
      */
-    @Throws(DateTimeException::class)
-    fun toMillis(): Long {
-        return toInstant().toEpochMilli()
-    }
+    val zone:ZoneId
 
     /**
-     * Returns this time in epoch seconds.
+     * Returns this time as epoch milliseconds.
      */
     @Throws(DateTimeException::class)
-    fun toSeconds(): Long {
-        return toInstant().epochSecond
-    }
+    fun epochMillis(): Long
+
+    /**
+     * Returns this time as epoch seconds.
+     */
+    @Throws(DateTimeException::class)
+    fun epochSeconds(): Long
 
     /**
      * Returns nanoseconds of epoch second of this time.
      */
     @Throws(DateTimeException::class)
-    fun toNanoOfSecond(): Int {
-        return toInstant().nano
-    }
+    fun nanoOfSecond(): Int
 
     /**
      * Converts to [Date].
@@ -819,124 +631,58 @@ interface TimePoint {
     fun toDate(): Date
 
     /**
-     * Converts to [Date], or null if failed.
-     */
-    @Throws(DateTimeException::class)
-    fun toDateOrNull(): Date?
-
-    /**
      * Converts to [TemporalAccessor].
      */
     @Throws(DateTimeException::class)
     fun toTemporal(): TemporalAccessor
 
     /**
-     * Converts to [TemporalAccessor], or null if failed.
-     */
-    @Throws(DateTimeException::class)
-    fun toTemporalOrNull(): TemporalAccessor?
-
-    /**
      * Converts to [Instant].
      */
     @Throws(DateTimeException::class)
-    fun toInstant(): Instant {
-        return toTemporal().toInstant()
-    }
-
-    /**
-     * Converts to [Instant], or null if failed.
-     */
-    @Throws(DateTimeException::class)
-    fun toInstantOrNull(): Instant? {
-        return toTemporalOrNull()?.toInstantOrNull()
-    }
+    fun toInstant(): Instant
 
     /**
      * Converts to [ZonedDateTime].
      */
     @Throws(DateTimeException::class)
-    fun toZonedDateTime(): ZonedDateTime {
-        return toTemporal().toZonedDateTime()
-    }
-
-    /**
-     * Converts to [ZonedDateTime], or null if failed.
-     */
-    @Throws(DateTimeException::class)
-    fun toZonedDateTimeOrNull(): ZonedDateTime? {
-        return toTemporalOrNull()?.toZonedDateTimeOrNull()
-    }
+    fun toZonedDateTime(): ZonedDateTime
 
     /**
      * Converts to [OffsetDateTime].
      */
     @Throws(DateTimeException::class)
-    fun toOffsetDateTime(): OffsetDateTime {
-        return toTemporal().toOffsetDateTime()
-    }
-
-    /**
-     * Converts to [OffsetDateTime], or null if failed.
-     */
-    @Throws(DateTimeException::class)
-    fun toOffsetDateTimeOrNull(): OffsetDateTime? {
-        return toTemporalOrNull()?.toOffsetDateTimeOrNull()
-    }
+    fun toOffsetDateTime(): OffsetDateTime
 
     /**
      * Converts to [LocalDateTime].
      */
     @Throws(DateTimeException::class)
-    fun toLocalDateTime(): LocalDateTime {
-        return toTemporal().toLocalDateTime()
-    }
-
-    /**
-     * Converts to [LocalDateTime], or null if failed.
-     */
-    @Throws(DateTimeException::class)
-    fun toLocalDateTimeOrNull(): LocalDateTime? {
-        return toTemporalOrNull()?.toLocalDateTimeOrNull()
-    }
+    fun toLocalDateTime(): LocalDateTime
 
     /**
      * Converts to [LocalDate].
      */
     @Throws(DateTimeException::class)
-    fun toLocalDate(): LocalDate {
-        return toTemporal().toLocalDate()
-    }
-
-    /**
-     * Converts to [LocalDate], or null if failed.
-     */
-    @Throws(DateTimeException::class)
-    fun toLocalDateOrNull(): LocalDate? {
-        return toTemporalOrNull()?.toLocalDateOrNull()
-    }
+    fun toLocalDate(): LocalDate
 
     /**
      * Converts to [LocalTime].
      */
     @Throws(DateTimeException::class)
-    fun toLocalTime(): LocalTime {
-        return toTemporal().toLocalTime()
-    }
-
-    /**
-     * Converts to [LocalTime], or null if failed.
-     */
-    @Throws(DateTimeException::class)
-    fun toLocalTimeOrNull(): LocalTime? {
-        return toTemporalOrNull()?.toLocalTimeOrNull()
-    }
+    fun toLocalTime(): LocalTime
 
     /**
      * Formats to string.
      */
     @Throws(DateTimeException::class)
     fun format(pattern: DatePattern): String
+
+    /**
+     * Formats to string.
+     */
+    @Throws(DateTimeException::class)
+    fun format(pattern: CharSequence): String
 
     companion object {
 
@@ -965,57 +711,60 @@ interface TimePoint {
             return OfTemporal(this)
         }
 
-        /**
-         * Parses and returns [TimePoint] from [this].
-         */
-        @JvmName("of")
-        @JvmStatic
-        fun CharSequence.toTimePoint(pattern: String): TimePoint {
-            return OfChars(this, pattern.toDatePattern())
-        }
+        private class OfDate(
+            private val date: Date,
+            override val zone: ZoneId
+            ) : TimePoint, Serializable {
 
-        /**
-         * Parses and returns [TimePoint] from [this].
-         */
-        @JvmName("of")
-        @JvmOverloads
-        @JvmStatic
-        fun CharSequence.toTimePoint(pattern: DatePattern = BtProps.timestampPattern()): TimePoint {
-            return OfChars(this, pattern)
-        }
-
-        private class OfDate(private val date: Date) : TimePoint, Serializable {
-
-            override fun toMillis(): Long {
+            override fun epochMillis(): Long {
                 return date.time
             }
 
-            override fun toSeconds(): Long {
-                return date.time / 1000
+            override fun epochSeconds(): Long {
+                return epochMillis() / 1000
             }
 
-            override fun toDate(): Date {
-                return date
+            override fun nanoOfSecond(): Int =0
+
+            override fun toDate(): Date = date
+
+            override fun toTemporal(): TemporalAccessor = toInstant()
+
+            override fun toInstant(): Instant = date.toInstant()
+
+            override fun toZonedDateTime(): ZonedDateTime {
+                return toInstant().atZone(zone)
             }
 
-            override fun toDateOrNull(): Date {
-                return toDate()
+            override fun toOffsetDateTime(): OffsetDateTime {
+                val instant = toInstant()
+                return instant.atOffset(zone.rules.getOffset(instant))
             }
 
-            override fun toTemporal(): TemporalAccessor {
-                return date.toInstant()
+            override fun toLocalDateTime(): LocalDateTime {
+                return toZonedDateTime().toLocalDateTime()
             }
 
-            override fun toTemporalOrNull(): TemporalAccessor {
-                return toTemporal()
+            override fun toLocalDate(): LocalDate {
+                return toLocalDateTime().toLocalDate()
+            }
+
+            override fun toLocalTime(): LocalTime {
+                return toLocalDateTime().toLocalTime()
             }
 
             override fun format(pattern: DatePattern): String {
                 return pattern.format(date)
             }
+
+            override fun format(pattern: CharSequence): String {
+                return date.format(pattern)
+            }
         }
 
-        private class OfTemporal(private val temporal: TemporalAccessor) : TimePoint, Serializable {
+        private class OfTemporal(
+            private val temporal: TemporalAccessor
+            ) : TimePoint, Serializable {
 
             override fun toDate(): Date {
                 return Date.from(temporal.toInstant())
@@ -1036,77 +785,6 @@ interface TimePoint {
 
             override fun format(pattern: DatePattern): String {
                 return pattern.format(temporal)
-            }
-        }
-
-        private class OfChars(chars: CharSequence, pattern: DatePattern) : TimePoint, Serializable {
-
-            private val temporal: TemporalAccessor?
-            private val date: Date?
-
-            init {
-                temporal = try {
-                    pattern.parseTemporal(chars)
-                } catch (e: Exception) {
-                    null
-                }
-                date = try {
-                    pattern.parseDate(chars)
-                } catch (e: Exception) {
-                    null
-                }
-                if (temporal === null && date === null) {
-                    throw DateTimeException("Cannot parse $chars to pattern: $pattern")
-                }
-            }
-
-            override fun toMillis(): Long {
-                if (date !== null) {
-                    return date.time
-                }
-                return temporal!!.toInstant().toEpochMilli()
-            }
-
-            override fun toSeconds(): Long {
-                if (date !== null) {
-                    return date.time / 1000
-                }
-                return temporal!!.toInstant().epochSecond
-            }
-
-            override fun toDate(): Date {
-                if (date !== null) {
-                    return date
-                }
-                return temporal!!.toDate()
-            }
-
-            override fun toDateOrNull(): Date? {
-                if (date !== null) {
-                    return date
-                }
-                return temporal?.toDateOrNull()
-            }
-
-            override fun toTemporal(): TemporalAccessor {
-                if (temporal !== null) {
-                    return temporal
-                }
-                return date!!.toInstant()
-            }
-
-            override fun toTemporalOrNull(): TemporalAccessor? {
-                if (temporal !== null) {
-                    return temporal
-                }
-                return date?.toInstant()
-            }
-
-            override fun format(pattern: DatePattern): String {
-                if (temporal !== null) {
-                    return pattern.format(temporal)
-                }
-                return pattern.format(date!!)
             }
         }
     }
