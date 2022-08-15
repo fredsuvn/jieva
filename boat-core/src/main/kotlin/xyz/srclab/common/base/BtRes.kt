@@ -3,11 +3,15 @@
  */
 package xyz.srclab.common.base
 
+import xyz.srclab.common.collect.toStringMap
 import xyz.srclab.common.io.readString
 import xyz.srclab.common.readProperties
+import java.io.File
 import java.io.InputStream
+import java.io.Reader
 import java.net.URL
 import java.nio.charset.Charset
+import java.util.*
 
 /**
  * Loads resource in current classpath.
@@ -95,4 +99,35 @@ fun loadPropertiesList(
 
 private fun CharSequence.removeAbsolute(): String {
     return this.removeIfStartWith("/")
+}
+
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun InputStream.readProperties(charset: Charset = BtProps.charset(), close: Boolean = false): Map<String, String> {
+    return this.reader(charset).readProperties(close)
+}
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun Reader.readProperties(close: Boolean = false): Map<String, String> {
+    val props = Properties()
+    props.load(this)
+    val map = props.toStringMap()
+    if (close) {
+        this.close()
+    }
+    return map
+}
+
+/**
+ * Reads and parses properties.
+ */
+@JvmOverloads
+fun File.readProperties(charset: Charset = BtProps.charset()): Map<String, String> {
+    return this.reader(charset).readProperties(true)
 }

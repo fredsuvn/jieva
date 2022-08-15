@@ -5,8 +5,8 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.io.asInputStream
-import xyz.srclab.common.io.unclose
+import xyz.srclab.common.divNumber
+import xyz.srclab.common.io.toUnclose
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -16,331 +16,260 @@ import java.util.*
 /**
  * Returns the base64 length for [dataSize].
  */
-fun getBase64Length(dataSize: Int): Int {
-    return countSeg(dataSize, 3) * 4
+fun base64Length(dataSize: Int): Int {
+    return divNumber(dataSize, 3) * 4
 }
 
 /**
  * Returns the base64 length for [dataSize].
  */
-fun getBase64Length(dataSize: Long): Long {
-    return countSeg(dataSize, 3) * 4
+fun base64Length(dataSize: Long): Long {
+    return divNumber(dataSize, 3) * 4
 }
 
 /**
  * Returns data length from [base64Size].
  */
-fun getDeBase64Length(base64Size: Int): Int {
-    return countSeg(base64Size, 4) * 3
+fun deBase64Length(base64Size: Int): Int {
+    return divNumber(base64Size, 4) * 3
 }
 
 /**
  * Returns data length from [base64Size].
  */
-fun getDeBase64Length(base64Size: Long): Long {
-    return countSeg(base64Size, 4) * 3
+fun deBase64Length(base64Size: Long): Long {
+    return divNumber(base64Size, 4) * 3
 }
 
 /**
- * Base64 encodes [this].
+ * Returns base64 of [data].
  */
 @JvmOverloads
-fun CharSequence.base64(charset: Charset = defaultCharset()): String {
-    return this.getBytes(charset).base64().getString8Bit()
+fun base64(data: CharSequence, charset: Charset = BtProps.charset()): String {
+    return base64(data.getBytes(charset)).getString8Bit()
 }
 
 /**
- * Base64 encodes [this].
+ * Returns base64 of [data].
  */
-fun ByteArray.base64(): ByteArray {
-    return Base64.getEncoder().encode(this)
+fun base64(data: ByteArray): ByteArray {
+    return Base64.getEncoder().encode(data)
 }
 
 /**
- * Base64 encodes [this].
+ * Returns base64 of [data].
  */
-fun ByteBuffer.base64(): ByteBuffer {
-    return Base64.getEncoder().encode(this)
+fun base64(data: ByteBuffer): ByteBuffer {
+    return Base64.getEncoder().encode(data)
 }
 
 /**
- * Base64 encodes [this].
+ * Encodes data from [data] to [dest] in Base64, returns the number of read bytes.
  */
-@JvmOverloads
-fun ByteArray.base64(offset: Int, length: Int = remLength(this.size, offset)): ByteArray {
-    return this.asInputStream(offset, length).base64()
-}
-
-/**
- * Base64 encodes [this].
- */
-fun InputStream.base64(): ByteArray {
-    val output = BytesBuilder()
-    val encOut = Base64.getEncoder().wrap(output)
-    this.copyTo(encOut, defaultBufferSize())
-    encOut.close()
-    return output.toByteArray()
-}
-
-/**
- * Base64 encodes [this] into [dest], returns read bytes number.
- */
-fun InputStream.base64(dest: OutputStream): Long {
-    val out = dest.unclose()
+fun base64(data: InputStream, dest: OutputStream): Long {
+    val out = dest.toUnclose()
     val encOut = Base64.getEncoder().wrap(out)
-    val result = this.copyTo(encOut)
+    val result = data.copyTo(encOut)
     encOut.close()
     return result
 }
 
 /**
- * Base64 decodes [this].
+ * Returns de-base64 of [base64].
  */
 @JvmOverloads
-fun CharSequence.deBase64(charset: Charset = defaultCharset()): String {
-    return this.getBytes8Bit().deBase64().getString(charset)
+fun deBase64(base64: CharSequence, charset: Charset = BtProps.charset()): String {
+    return deBase64(base64.getBytes8Bit()).getString(charset)
 }
 
 /**
- * Base64 decodes [this].
+ * Returns de-base64 of [base64].
  */
-fun ByteArray.deBase64(): ByteArray {
-    return Base64.getDecoder().decode(this)
+fun deBase64(base64: ByteArray): ByteArray {
+    return Base64.getDecoder().decode(base64)
 }
 
 /**
- * Base64 decodes [this].
+ * Returns de-base64 of [base64].
  */
-fun ByteBuffer.deBase64(): ByteBuffer {
-    return Base64.getDecoder().decode(this)
+fun deBase64(base64: ByteBuffer): ByteBuffer {
+    return Base64.getDecoder().decode(base64)
 }
 
 /**
- * Base64 decodes [this].
+ * Decodes data from [base64] to [dest] in Base64, returns the number of written bytes.
  */
-@JvmOverloads
-fun ByteArray.deBase64(offset: Int, length: Int = remLength(this.size, offset)): ByteArray {
-    return this.asInputStream(offset, length).deBase64()
-}
-
-/**
- * Base64 decodes [this].
- */
-fun InputStream.deBase64(): ByteArray {
-    val encIn = Base64.getDecoder().wrap(this)
-    val output = BytesBuilder()
+fun deBase64(base64: InputStream, dest: OutputStream): Long {
+    val encIn = Base64.getDecoder().wrap(base64)
+    val output = dest.toUnclose()
     encIn.copyTo(output)
-    return output.toByteArray()
-}
-
-/**
- * Base64 decodes [this] into [dest], returns read bytes number.
- */
-fun InputStream.deBase64(dest: OutputStream): Long {
-    val unclose = this.unclose()
-    val encIn = Base64.getDecoder().wrap(unclose)
-    encIn.copyTo(dest)
-    return unclose.count
+    return output.count
 }
 
 /**
  * Returns the hex length for [dataSize].
  */
-fun getHexLength(dataSize: Int): Int {
+fun hexLength(dataSize: Int): Int {
     return dataSize * 2
 }
 
 /**
  * Returns the hex length for [dataSize].
  */
-fun getHexLength(dataSize: Long): Long {
+fun hexLength(dataSize: Long): Long {
     return dataSize * 2
 }
 
 /**
  * Returns data length from [hexSize].
  */
-fun getDeHexLength(hexSize: Int): Int {
+fun deHexLength(hexSize: Int): Int {
     return hexSize / 2
 }
 
 /**
  * Returns data length from [hexSize].
  */
-fun getDeHexLength(hexSize: Long): Long {
+fun deHexLength(hexSize: Long): Long {
     return hexSize / 2
 }
 
 /**
- * Hex encodes [this].
+ * Returns hex of [data].
  */
 @JvmOverloads
-fun CharSequence.hex(charset: Charset = defaultCharset()): String {
-    return this.getBytes(charset).hex().getString8Bit()
+fun hex(data: CharSequence, charset: Charset = BtProps.charset()): String {
+    return hex(data.getBytes(charset)).getString8Bit()
 }
 
 /**
- * Hex encodes [this].
+ *Returns hex of [data].
  */
-fun ByteArray.hex(): ByteArray {
-    return this.hex(0, this.size)
+fun hex(data: ByteArray): ByteArray {
+    val result = ByteArray(hexLength(data.size))
+    hex(data, 0, data.size, result, 0)
+    return result
 }
 
 /**
- * Hex encodes [this].
+ * Returns hex of [data].
  */
-fun ByteBuffer.hex(): ByteBuffer {
-    val dest = ByteBuffer.allocate(getHexLength(this.remaining()))
-    this.hex(dest)
+fun hex(data: ByteBuffer): ByteBuffer {
+    val dest = ByteBuffer.allocate(hexLength(data.remaining()))
+    hex(data, dest)
     dest.flip()
     return dest
 }
 
 /**
- * Hex encodes [this].
+ * Encodes data from [data] to [dest] in Hex, returns the number of read bytes.
  */
-@JvmOverloads
-fun ByteArray.hex(offset: Int, length: Int = remLength(this.size, offset)): ByteArray {
-    val dest = ByteArray(getHexLength(length))
-    hex(this, offset, length, dest, 0)
-    return dest
-}
-
-/**
- * Hex encodes [this].
- */
-fun InputStream.hex(): ByteArray {
-    val output = BytesBuilder()
-    this.hex(output)
-    return output.toByteArray()
-}
-
-/**
- * Hex encodes [source] to [dest].
- */
-fun hex(source: ByteArray, sourceOffset: Int, sourceLength: Int, dest: ByteArray, destOffset: Int) {
-    var i = sourceOffset
-    var j = destOffset
-    while (i < sourceOffset + sourceLength) {
-        val b = source[i++].toInt() and 0x000000ff
-        dest[j++] = hex0(b ushr 4)
-        dest[j++] = hex0(b and 0x0000000f)
-    }
-}
-
-/**
- * Hex encodes [this] to [dest].
- */
-fun ByteBuffer.hex(dest: ByteBuffer) {
-    while (this.hasRemaining()) {
-        val b = this.get().toInt() and 0x000000ff
-        dest.put(hex0(b ushr 4))
-        dest.put(hex0(b and 0x0000000f))
-    }
-}
-
-/**
- * Hex encodes [this] to [dest], returns read bytes number.
- */
-fun InputStream.hex(dest: OutputStream): Long {
-    var i = this.read()
+fun hex(data: InputStream, dest: OutputStream): Long {
+    var i = data.read()
     var count = 0L
     while (i != -1) {
         val b = i and 0x000000ff
         dest.write(hex0(b ushr 4).toInt())
         dest.write(hex0(b and 0x0000000f).toInt())
         count++
-        i = this.read()
+        i = data.read()
     }
     return count
 }
 
 /**
- * Hex decodes [this].
+ * Encodes data from [data] to [dest] in Hex.
+ */
+fun hex(data: ByteArray, dataOffset: Int, dataLength: Int, dest: ByteArray, destOffset: Int) {
+    var i = dataOffset
+    var j = destOffset
+    while (i < dataOffset + dataLength) {
+        val b = data[i++].toInt() and 0x000000ff
+        dest[j++] = hex0(b ushr 4)
+        dest[j++] = hex0(b and 0x0000000f)
+    }
+}
+
+/**
+ * Encodes data from [data] to [dest] in Hex.
+ */
+fun hex(data: ByteBuffer, dest: ByteBuffer) {
+    while (data.hasRemaining()) {
+        val b = data.get().toInt() and 0x000000ff
+        dest.put(hex0(b ushr 4))
+        dest.put(hex0(b and 0x0000000f))
+    }
+}
+
+/**
+ * Returns de-hex of [data].
  */
 @JvmOverloads
-fun CharSequence.deHex(charset: Charset = defaultCharset()): String {
-    return this.getBytes8Bit().deHex().getString(charset)
+fun deHex(data: CharSequence, charset: Charset = BtProps.charset()): String {
+    return hex(data.getBytes(charset)).getString8Bit()
 }
 
 /**
- * Hex decodes [this].
+ *Returns de-hex of [hex].
  */
-fun ByteArray.deHex(): ByteArray {
-    return this.deHex(0, this.size)
+fun deHex(hex: ByteArray): ByteArray {
+    val result = ByteArray(deHexLength(hex.size))
+    deHex(hex, 0, hex.size, result, 0)
+    return result
 }
 
 /**
- * Hex decodes [this].
+ * Returns de-hex of [hex].
  */
-fun ByteBuffer.deHex(): ByteBuffer {
-    val dest = ByteBuffer.allocate(getDeHexLength(this.remaining()))
-    this.deHex(dest)
+fun deHex(hex: ByteBuffer): ByteBuffer {
+    val dest = ByteBuffer.allocate(hexLength(hex.remaining()))
+    hex(hex, dest)
     dest.flip()
     return dest
 }
 
 /**
- * Hex decodes [this].
+ * Decodes data from [hex] to [dest] in Hex, returns the number of read bytes.
  */
-@JvmOverloads
-fun ByteArray.deHex(offset: Int, length: Int = remLength(this.size, offset)): ByteArray {
-    val dest = ByteArray(getDeHexLength(length))
-    deHex(this, offset, length, dest, 0)
-    return dest
+fun deHex(hex: InputStream, dest: OutputStream): Long {
+    var i = hex.read()
+    var count = 0L
+    while (i != -1) {
+        val b1 = deHex0(i.toByte())
+        val i2 = hex.read()
+        if (i2 == -1) {
+            throw IllegalArgumentException("Wrong hex size, at position: ${count + 1}.")
+        }
+        val b2 = deHex0(i2.toByte())
+        dest.write((b1 shl 4) or b2)
+        count += 2
+        i = hex.read()
+    }
+    return count
 }
 
 /**
- * Hex decodes [this].
+ * Decodes data from [hex] to [dest] in Hex.
  */
-fun InputStream.deHex(): ByteArray {
-    val output = BytesBuilder()
-    this.deHex(output)
-    return output.toByteArray()
-}
-
-/**
- * Hex decodes [source] to [dest].
- */
-fun deHex(source: ByteArray, sourceOffset: Int, sourceLength: Int, dest: ByteArray, destOffset: Int) {
-    var i = sourceOffset
+fun deHex(hex: ByteArray, hexOffset: Int, hexLength: Int, dest: ByteArray, destOffset: Int) {
+    var i = hexOffset
     var j = destOffset
-    while (i < sourceOffset + sourceLength) {
-        val b1 = deHex0(source[i++])
-        val b2 = deHex0(source[i++])
+    while (i < hexOffset + hexLength) {
+        val b1 = deHex0(hex[i++])
+        val b2 = deHex0(hex[i++])
         dest[j++] = ((b1 shl 4) or b2).toByte()
     }
 }
 
 /**
- * Hex decodes [this] to [dest].
+ * Decodes data from [hex] to [dest] in Hex.
  */
-fun ByteBuffer.deHex(dest: ByteBuffer) {
-    while (this.hasRemaining()) {
-        val b1 = deHex0(this.get())
-        val b2 = deHex0(this.get())
+fun deHex(hex: ByteBuffer, dest: ByteBuffer) {
+    while (hex.hasRemaining()) {
+        val b1 = deHex0(hex.get())
+        val b2 = deHex0(hex.get())
         dest.put(((b1 shl 4) or b2).toByte())
     }
-}
-
-/**
- * Hex decodes [this] to [dest], returns read bytes number.
- */
-fun InputStream.deHex(dest: OutputStream): Long {
-    var i = this.read()
-    var count = 0L
-    while (i != -1) {
-        val b1 = deHex0(i.toByte())
-        val i2 = this.read()
-        if (i2 == -1) {
-            throw IllegalArgumentException("Illegal hex, end source data at position: ${count + 1}!")
-        }
-        val b2 = deHex0(i2.toByte())
-        dest.write((b1 shl 4) or b2)
-        count += 2
-        i = this.read()
-    }
-    return count
 }
 
 private fun hex0(i: Int): Byte {

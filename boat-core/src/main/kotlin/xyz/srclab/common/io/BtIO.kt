@@ -283,6 +283,16 @@ fun <T : InputStream> T.unclose(): UncloseInputStream<T> {
  *
  * @see UncloseOutputStream
  */
+fun  OutputStream.toUnclose(): UncloseOutputStream<OutputStream> {
+    return if (this is UncloseOutputStream<*>) this.asType() else UncloseOutputStream(this)
+}
+
+/**
+ * Returns a [OutputStream] which wraps all method of given stream,
+ * but prevents the `close` method, and count the written bytes.
+ *
+ * @see UncloseOutputStream
+ */
 fun <T : OutputStream> T.unclose(): UncloseOutputStream<T> {
     return UncloseOutputStream(this)
 }

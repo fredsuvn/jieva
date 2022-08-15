@@ -59,7 +59,7 @@ public class BtEncodeTest {
         BytesBuilder in = new BytesBuilder();
         long deNumber = BtEncode.deBase64(BtIO.asInputStream(out.toByteArray()), in);
         BtLog.info("deNumber: {}", deNumber);
-        Assert.assertEquals(deNumber, BtEncode.getBase64Length(rd1.length()));
+        Assert.assertEquals(deNumber, BtEncode.base64Length(rd1.length()));
         String deBase64String = BtString.toString8Bit(in.toByteArray());
         BtLog.info("deBase64String: {}", deBase64String);
         Assert.assertEquals(deBase64String, rd1);
@@ -113,7 +113,7 @@ public class BtEncodeTest {
         BytesBuilder in = new BytesBuilder();
         long deNumber = BtEncode.deHex(BtIO.asInputStream(out.toByteArray()), in);
         BtLog.info("deNumber: {}", deNumber);
-        Assert.assertEquals(deNumber, BtEncode.getHexLength(rd1.length()));
+        Assert.assertEquals(deNumber, BtEncode.hexLength(rd1.length()));
         String deHexString = BtString.toString8Bit(in.toByteArray());
         BtLog.info("deHexString: {}", deHexString);
         Assert.assertEquals(deHexString, rd1);

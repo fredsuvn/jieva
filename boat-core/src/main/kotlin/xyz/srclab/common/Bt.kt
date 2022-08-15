@@ -6,11 +6,6 @@
 package xyz.srclab.common
 
 import xyz.srclab.common.base.*
-import xyz.srclab.common.collect.toStringMap
-import java.io.File
-import java.io.InputStream
-import java.io.Reader
-import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
@@ -330,7 +325,7 @@ fun <T : Any> notNull(t: T?, supplier: Supplier<out T>): T {
  * Gets or creates a new value.
  * This function is usually used for the pattern:
  *
- * Checks whether the value is null, if it is not, return, else create a new one and set and return.
+ * Checks whether the value is null, if it is not, return; Else create a new one and set and return.
  */
 fun <T : Any> getOrNew(lock: Any, getter: Supplier<T?>, setter: Consumer<T?>, creator: Supplier<T>): T {
     val v = getter.get()
@@ -352,7 +347,7 @@ fun <T : Any> getOrNew(lock: Any, getter: Supplier<T?>, setter: Consumer<T?>, cr
  * Gets or creates a new value.
  * This function is usually used for the pattern:
  *
- * Checks whether the value is null, if it is not, return, else create a new one and set and return.
+ * Checks whether the value is null, if it is not, return; Else create a new one and set and return.
  */
 @JvmSynthetic
 inline fun <T : Any> getOrNew(lock: Any, getter: () -> T?, setter: (T?) -> Unit, creator: () -> T): T {
@@ -374,14 +369,14 @@ inline fun <T : Any> getOrNew(lock: Any, getter: () -> T?, setter: (T?) -> Unit,
 // Simple calculation for parameters.
 
 /**
- * Returns remaining length of [size] from [offset].
+ * Returns remaining length of given [length] from [offset].
  */
-fun remLength(size: Int, offset: Int): Int = size - offset
+fun remLength(length: Int, offset: Int): Int = length - offset
 
 /**
- * Returns remaining length of [size] from [offset].
+ * Returns remaining length of given [length] from [offset].
  */
-fun remLength(size: Long, offset: Long): Long = size - offset
+fun remLength(length: Long, offset: Long): Long = length - offset
 
 /**
  * Returns end index exclusive from [offset] through [length].
@@ -404,43 +399,43 @@ fun endIndex(offset: Int, length: Int): Int = offset + length
 fun endIndex(offset: Long, length: Long): Long = offset + length
 
 /**
- * Returns count of segment in [segSize].
+ * Returns number of division for [totalSize] / [partSize].
  * It is equivalent to:
  *
  * ```
- * int div = totalSize / segSize;
- * if (totalSize % segSize == 0) {
- *     return div;
+ * int division = totalSize / partSize;
+ * if (totalSize % partSize == 0) {
+ *     return division;
  * }
- * return div + 1;
+ * return division + 1;
  * ```
  *
  * @param totalSize total size
- * @param segSize size of segment
+ * @param partSize size of part
  */
-fun countSeg(totalSize: Int, segSize: Int): Int {
-    val div = totalSize / segSize
-    return if (totalSize % segSize == 0) div else div + 1
+fun divNumber(totalSize: Int, partSize: Int): Int {
+    val div = totalSize / partSize
+    return if (totalSize % partSize == 0) div else div + 1
 }
 
 /**
- * Returns count of segment in [segSize].
+ * Returns number of division for [totalSize] / [partSize].
  * It is equivalent to:
  *
  * ```
- * int div = totalSize / segSize;
- * if (totalSize % segSize == 0) {
- *     return div;
+ * int division = totalSize / partSize;
+ * if (totalSize % partSize == 0) {
+ *     return division;
  * }
- * return div + 1;
+ * return division + 1;
  * ```
  *
  * @param totalSize total size
- * @param segSize size of segment
+ * @param partSize size of part
  */
-fun countSeg(totalSize: Long, segSize: Long): Long {
-    val div = totalSize / segSize
-    return if (totalSize % segSize == 0L) div else div + 1
+fun divNumber(totalSize: Long, partSize: Long): Long {
+    val div = totalSize / partSize
+    return if (totalSize % partSize == 0L) div else div + 1
 }
 
 // Quick way to create array and collection:
@@ -543,51 +538,19 @@ fun <K, V> map(vararg elements: Any?): Map<K, V> {
  * Creates and returns a [HashMap] consists of [elements] by [collectMap].
  */
 fun <K, V> hashMap(vararg elements: Any?): HashMap<K, V> {
-    return collectMap(HashMap(countSeg(elements.size, 2)), *elements)
+    return collectMap(HashMap(divNumber(elements.size, 2)), *elements)
 }
 
 /**
  * Creates and returns a [LinkedHashMap] consists of [elements] by [collectMap].
  */
 fun <K, V> linkedHashMap(vararg elements: Any?): LinkedHashMap<K, V> {
-    return collectMap(LinkedHashMap(countSeg(elements.size, 2)), *elements)
+    return collectMap(LinkedHashMap(divNumber(elements.size, 2)), *elements)
 }
 
 /**
  * Creates and returns a [ConcurrentHashMap] consists of [elements] by [collectMap].
  */
 fun <K, V> concurrentHashMap(vararg elements: Any?): ConcurrentHashMap<K, V> {
-    return collectMap(ConcurrentHashMap(countSeg(elements.size, 2)), *elements)
-}
-
-// Parsing properties:
-
-/**
- * Reads and parses properties.
- */
-@JvmOverloads
-fun InputStream.readProperties(charset: Charset = BtProps.charset(), close: Boolean = false): Map<String, String> {
-    return this.reader(charset).readProperties(close)
-}
-
-/**
- * Reads and parses properties.
- */
-@JvmOverloads
-fun Reader.readProperties(close: Boolean = false): Map<String, String> {
-    val props = Properties()
-    props.load(this)
-    val map = props.toStringMap()
-    if (close) {
-        this.close()
-    }
-    return map
-}
-
-/**
- * Reads and parses properties.
- */
-@JvmOverloads
-fun File.readProperties(charset: Charset = BtProps.charset()): Map<String, String> {
-    return this.reader(charset).readProperties(true)
+    return collectMap(ConcurrentHashMap(divNumber(elements.size, 2)), *elements)
 }

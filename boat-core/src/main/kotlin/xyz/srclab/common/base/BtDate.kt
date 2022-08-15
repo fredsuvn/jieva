@@ -765,10 +765,10 @@ interface TimePoint {
                 is LocalTime -> OfZonedDateTime(this.atDate(LocalDate.MIN).atZone(zone), zone)
                 else -> {
                     val zonedDateTime = this.getZonedDateTime()
-                    if (zonedDateTime === null) {
-                        throw DateTimeException("Cannot convert $this to ${TimePoint::class.java}")
+                    if (zonedDateTime !== null) {
+                        return OfZonedDateTime(zonedDateTime, zone)
                     }
-                    OfZonedDateTime(zonedDateTime, zone)
+                    OfZonedDateTime(this.getLocalDateTime().atZone(zone), zone)
                 }
             }
         }
@@ -788,6 +788,20 @@ interface TimePoint {
          */
         fun now(): TimePoint {
             return Instant.now().toTimePoint()
+        }
+
+        /**
+         * Returns [TimePoint] from given params.
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun of(
+            year: Int,
+            month: Int,
+            dayOfMonth: Int,
+            zone: ZoneId = ZoneId.systemDefault()
+        ): TimePoint {
+            return of(year, month, dayOfMonth, 0, 0, 0, 0, zone)
         }
 
         /**
