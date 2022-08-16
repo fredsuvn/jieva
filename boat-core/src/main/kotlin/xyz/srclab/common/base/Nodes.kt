@@ -26,17 +26,17 @@ open class DNode<T : Any> @JvmOverloads constructor(
  * Tree node.
  */
 @Data
-open class TreeNode<T : Any> @JvmOverloads constructor(
+open class TNode<T : Any> @JvmOverloads constructor(
     open var value: T? = null,
-    open var children: MutableList<TreeNode<T>>? = null,
+    open var children: MutableList<TNode<T>>? = null,
 ) : Serializable
 
 /**
  * Binary Tree node.
  */
 @Data
-open class BTreeNode<T : Any> @JvmOverloads constructor(
+open class BNode<T : Any> @JvmOverloads constructor(
     open var value: T? = null,
-    open var left: BTreeNode<T>? = null,
-    open var right: BTreeNode<T>? = null,
+    open var left: BNode<T>? = null,
+    open var right: BNode<T>? = null,
 ) : Serializable

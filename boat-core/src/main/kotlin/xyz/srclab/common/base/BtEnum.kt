@@ -5,6 +5,8 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.asType
+
 /**
  * Returns enum instance of given [name], or null if it doesn't exit.
  */

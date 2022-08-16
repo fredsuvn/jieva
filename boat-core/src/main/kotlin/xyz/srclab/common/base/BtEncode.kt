@@ -66,10 +66,11 @@ fun base64(data: ByteBuffer): ByteBuffer {
 /**
  * Encodes data from [data] to [dest] in Base64, returns the number of read bytes.
  */
-fun base64(data: InputStream, dest: OutputStream): Long {
+@JvmOverloads
+fun base64(data: InputStream, dest: OutputStream, bufferSize: Int = BtProps.ioBufferSize()): Long {
     val out = dest.toUnclose()
     val encOut = Base64.getEncoder().wrap(out)
-    val result = data.copyTo(encOut)
+    val result = data.copyTo(encOut, bufferSize)
     encOut.close()
     return result
 }
@@ -99,10 +100,11 @@ fun deBase64(base64: ByteBuffer): ByteBuffer {
 /**
  * Decodes data from [base64] to [dest] in Base64, returns the number of written bytes.
  */
-fun deBase64(base64: InputStream, dest: OutputStream): Long {
+@JvmOverloads
+fun deBase64(base64: InputStream, dest: OutputStream, bufferSize: Int = BtProps.ioBufferSize()): Long {
     val encIn = Base64.getDecoder().wrap(base64)
     val output = dest.toUnclose()
-    encIn.copyTo(output)
+    encIn.copyTo(output, bufferSize)
     return output.count
 }
 

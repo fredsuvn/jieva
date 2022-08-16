@@ -8,6 +8,12 @@ package xyz.srclab.common.base
 import java.util.*
 
 /**
+ * Default snowflake id.
+ */
+@JvmField
+val SNOWFLAKE_ID: SnowflakeId = SnowflakeId(currentNanos())
+
+/**
  * Returns a UUID, such as:
  *
  * ```
@@ -27,7 +33,7 @@ fun uuid(): String {
  * @see SnowflakeId
  */
 fun snowflakeId(): Long {
-    return BtIdHolder.currentSnowflakeId.next()
+    return SNOWFLAKE_ID.next()
 }
 
 /**
@@ -152,8 +158,4 @@ open class SnowflakeId {
         const val DEFAULT_TIMESTAMP_BITS = 41
         const val DEFAULT_WORKER_ID_BITS = 10
     }
-}
-
-private object BtIdHolder {
-    val currentSnowflakeId: SnowflakeId = SnowflakeId(currentNanos().toInt())
 }

@@ -1,7 +1,6 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.Boat
-import xyz.srclab.common.base.DatePattern.Companion.toDatePattern
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.time.format.DateTimeFormatter
@@ -51,6 +50,12 @@ object BtProps {
     fun timestampPattern(): DatePattern = BtPropsHolder.timestampPattern
 
     /**
+     * Returns default date pattern: yyyy-MM-dd HH:mm:ss.SSS.
+     */
+    @JvmStatic
+    fun datePattern(): DatePattern = BtPropsHolder.timestampPattern
+
+    /**
      * Returns default IO buffer size: 8 * 1024.
      */
     @JvmStatic
@@ -76,10 +81,21 @@ object BtProps {
             // JDK8 bug:
             // Error for "yyyyMMddHHmmssSSS".toDatePattern()
             if (isJdk9OrHigher()) {
-                return@run pattern.toDatePattern()
+                return@run DatePattern.of(pattern)
             }
             val formatter: DateTimeFormatter = DateTimeFormatterBuilder() // date/time
                 .appendPattern("yyyyMMddHHmmss") // milliseconds
+                .appendValue(ChronoField.MILLI_OF_SECOND, 3) // create formatter
+                .toFormatter()
+            DatePattern.of(pattern, formatter)
+        }
+        val datePattern: DatePattern = run {
+            val pattern = "yyyy-MM-dd HH:mm:ss.SSS"
+            if (isJdk9OrHigher()) {
+                return@run DatePattern.of(pattern)
+            }
+            val formatter: DateTimeFormatter = DateTimeFormatterBuilder() // date/time
+                .appendPattern("yyyy-MM-dd HH:mm:ss.SSS") // milliseconds
                 .appendValue(ChronoField.MILLI_OF_SECOND, 3) // create formatter
                 .toFormatter()
             DatePattern.of(pattern, formatter)

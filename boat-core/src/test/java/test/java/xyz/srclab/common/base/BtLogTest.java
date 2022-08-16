@@ -13,14 +13,14 @@ public class BtLogTest {
     public void testLog() {
         BtLog.error("This is an error message: {}", "BLog Test!");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Logger logger = Logger.newLogger(Logger.INFO_LEVEL, out);
+        Logger logger = Logger.newLogger(Logger.LEVEL_INFO, out);
         logger.trace("This is an trace message: {}", "BLog Test!");
         logger.debug("This is an debug message: {}", "BLog Test!");
         logger.info("This is an info message: {}", "BLog Test!");
         logger.warn("This is an warn message: {}", "BLog Test!");
         logger.error("This is an error message: {}", "BLog Test!");
-        logger.log(Logger.INFO_LEVEL - 1, "This is an log message: {}", "BLog Test!");
-        logger.log(Logger.INFO_LEVEL + 1, "This is an log message: {}", "BLog Test!");
+        logger.log(Logger.LEVEL_INFO - 1, "This is an log message: {}", "BLog Test!");
+        logger.log(Logger.LEVEL_INFO + 1, "This is an log message: {}", "BLog Test!");
         String logs = BtString.toString(out.toByteArray());
         System.out.println(logs);
     }

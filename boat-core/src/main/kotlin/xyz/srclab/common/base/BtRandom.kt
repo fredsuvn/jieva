@@ -8,7 +8,7 @@ package xyz.srclab.common.base
 import java.util.*
 import java.util.function.Supplier
 
-private var defaultRandom: Random = Random()
+private var defaultRandom: Random = Random(System.nanoTime())
 
 /**
  * Gets default [Random].
@@ -25,6 +25,38 @@ fun setDefaultRandom(random: Random) {
 }
 
 /**
+ * Returns a random int.
+ */
+@JvmName("nextInt")
+fun randomInt(): Int {
+    return defaultRandom.nextInt()
+}
+
+/**
+ * Returns a random long.
+ */
+@JvmName("nextLong")
+fun randomLong(): Long {
+    return defaultRandom.nextLong()
+}
+
+/**
+ * Returns a random float.
+ */
+@JvmName("nextFloat")
+fun randomFloat(): Float {
+    return defaultRandom.nextFloat()
+}
+
+/**
+ * Returns a random double.
+ */
+@JvmName("nextDouble")
+fun randomDouble(): Double {
+    return defaultRandom.nextDouble()
+}
+
+/**
  * Returns random number in `[from, to)`.
  */
 @JvmName("between")
@@ -36,6 +68,21 @@ fun randomBetween(from: Int, to: Int): Int {
  * Returns random number in `[from, to)`.
  */
 fun Random.between(from: Int, to: Int): Int {
+    return this.nextInt(to - from) + from
+}
+
+/**
+ * Returns random number in `[from, to)`.
+ */
+@JvmName("in")
+fun randomIn(from: Int, to: Int): Int {
+    return defaultRandom.between(from, to)
+}
+
+/**
+ * Returns random number in `[from, to)`.
+ */
+fun Random.`in`(from: Int, to: Int): Int {
     return this.nextInt(to - from) + from
 }
 
@@ -170,12 +217,12 @@ open class RandomBuilder<T : Any> {
                 val score = random.between(0, totalScore)
                 val index = values.binarySearch {
                     if (it.scoreFrom <= score && it.scoreTo > score) {
-                        return@binarySearch COMPARE_EQ
+                        return@binarySearch 0
                     }
                     if (it.scoreFrom > score) {
-                        return@binarySearch COMPARE_GT
+                        return@binarySearch 1
                     }
-                    COMPARE_LT
+                    -1
                 }
                 return values[index].supplier.get()
             }
