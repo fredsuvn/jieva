@@ -34,7 +34,7 @@ fun setDefaultLogger(logger: Logger) {
  */
 @JvmName("trace")
 fun traceLog(message: CharSequence?, vararg args: Any?) {
-    defaultLogger.trace(message, *args)
+    defaultLogger().trace(message, *args)
 }
 
 /**
@@ -42,7 +42,7 @@ fun traceLog(message: CharSequence?, vararg args: Any?) {
  */
 @JvmName("debug")
 fun debugLog(message: CharSequence?, vararg args: Any?) {
-    defaultLogger.debug(message, *args)
+    defaultLogger().debug(message, *args)
 }
 
 /**
@@ -50,7 +50,7 @@ fun debugLog(message: CharSequence?, vararg args: Any?) {
  */
 @JvmName("info")
 fun infoLog(message: CharSequence?, vararg args: Any?) {
-    defaultLogger.info(message, *args)
+    defaultLogger().info(message, *args)
 }
 
 /**
@@ -58,7 +58,7 @@ fun infoLog(message: CharSequence?, vararg args: Any?) {
  */
 @JvmName("warn")
 fun warnLog(message: CharSequence?, vararg args: Any?) {
-    defaultLogger.warn(message, *args)
+    defaultLogger().warn(message, *args)
 }
 
 /**
@@ -66,7 +66,7 @@ fun warnLog(message: CharSequence?, vararg args: Any?) {
  */
 @JvmName("error")
 fun errorLog(message: CharSequence?, vararg args: Any?) {
-    defaultLogger.error(message, *args)
+    defaultLogger().error(message, *args)
 }
 
 /**
@@ -75,7 +75,7 @@ fun errorLog(message: CharSequence?, vararg args: Any?) {
  * @see Logger
  */
 fun log(level: Int, message: CharSequence?, vararg args: Any?) {
-    defaultLogger.log(level, message, *args)
+    defaultLogger().log(level, message, *args)
 }
 
 /**

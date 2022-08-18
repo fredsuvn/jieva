@@ -5,13 +5,20 @@
 
 package xyz.srclab.common.base
 
+import java.io.Serializable
 import java.util.*
+import java.util.concurrent.ThreadLocalRandom
 import java.util.function.Supplier
+import java.util.stream.DoubleStream
+import java.util.stream.IntStream
+import java.util.stream.LongStream
 
-private var defaultRandom: Random = Random(System.nanoTime())
+private var defaultRandom: Random = ThreadLocalRandomHolder
 
 /**
  * Gets default [Random].
+ *
+ * Note the default [Random] is based on [ThreadLocalRandom].
  */
 fun defaultRandom(): Random {
     return defaultRandom
@@ -25,35 +32,43 @@ fun setDefaultRandom(random: Random) {
 }
 
 /**
- * Returns a random int.
+ * Returns random int with [defaultRandom].
  */
 @JvmName("nextInt")
 fun randomInt(): Int {
-    return defaultRandom.nextInt()
+    return defaultRandom().nextInt()
 }
 
 /**
- * Returns a random long.
+ * Returns random long with [defaultRandom].
  */
 @JvmName("nextLong")
 fun randomLong(): Long {
-    return defaultRandom.nextLong()
+    return defaultRandom().nextLong()
 }
 
 /**
- * Returns a random float.
+ * Returns random float with [defaultRandom].
  */
 @JvmName("nextFloat")
 fun randomFloat(): Float {
-    return defaultRandom.nextFloat()
+    return defaultRandom().nextFloat()
 }
 
 /**
- * Returns a random double.
+ * Returns random double with [defaultRandom].
  */
 @JvmName("nextDouble")
 fun randomDouble(): Double {
-    return defaultRandom.nextDouble()
+    return defaultRandom().nextDouble()
+}
+
+/**
+ * Returns random double with [defaultRandom].
+ */
+@JvmName("nextBoolean")
+fun randomBoolean(): Boolean {
+    return defaultRandom().nextBoolean()
 }
 
 /**
@@ -61,7 +76,7 @@ fun randomDouble(): Double {
  */
 @JvmName("between")
 fun randomBetween(from: Int, to: Int): Int {
-    return defaultRandom.between(from, to)
+    return defaultRandom().between(from, to)
 }
 
 /**
@@ -72,80 +87,122 @@ fun Random.between(from: Int, to: Int): Int {
 }
 
 /**
- * Returns random number in `[from, to)`.
+ * Returns random [size] long string of which consisted chars come from given [chars].
  */
-@JvmName("in")
-fun randomIn(from: Int, to: Int): Int {
-    return defaultRandom.between(from, to)
+fun randomString(size: Int, chars: CharSequence): String {
+    return defaultRandom().getString(size, chars)
 }
 
 /**
- * Returns random number in `[from, to)`.
+ * Returns random [size] long string of which consisted chars come from given [chars].
  */
-fun Random.`in`(from: Int, to: Int): Int {
-    return this.nextInt(to - from) + from
-}
-
-/**
- * Returns a string consists of random chars in `[0, 9]`.
- */
-@JvmOverloads
-fun randomDigits(size: Int, random: Random = defaultRandom): String {
-    return BtRandomHolder.randomDigits.randomString(size, random)
-}
-
-/**
- * Returns a string consists of random chars in `[a, z]`.
- */
-@JvmOverloads
-fun randomLowerLetters(size: Int, random: Random = defaultRandom): String {
-    return BtRandomHolder.randomLowerLetters.randomString(size, random)
-}
-
-/**
- * Returns a string consists of random chars in `[A, Z]`.
- */
-@JvmOverloads
-fun randomUpperLetters(size: Int, random: Random = defaultRandom): String {
-    return BtRandomHolder.randomUpperLetters.randomString(size, random)
-}
-
-/**
- * Returns a string consists of random chars in `[a, z]` and `[A, Z]`.
- */
-@JvmOverloads
-fun randomLetters(size: Int, random: Random = defaultRandom): String {
-    return BtRandomHolder.randomLetters.randomString(size, random)
-}
-
-/**
- * Returns a string consists of random chars in `[0, 9]`, `[a, z]` and `[A, Z]`.
- */
-@JvmOverloads
-fun randomString(size: Int, random: Random = defaultRandom): String {
-    return BtRandomHolder.randomString.randomString(size, random)
-}
-
-/**
- * Returns a string consists of random chars in [this].
- */
-@JvmOverloads
-fun CharSequence.randomString(size: Int, random: Random = defaultRandom): String {
-    val result = CharArray(size)
-    var i = 0
-    while (i < result.size) {
-        result[i] = this[random.between(0, this.length)]
-        i++
+fun Random.getString(size: Int, chars: CharSequence): String {
+    if (size == 0) {
+        return ""
     }
-    return String(result)
+    if (chars.isEmpty()) {
+        throw IllegalArgumentException("GIven chars is null or empty.")
+    }
+    val builder = StringBuilder(size)
+    for (i in 0 until size) {
+        builder.append(chars[this.nextInt(chars.length)])
+    }
+    return builder.toString()
 }
 
 /**
  * Returns a new [RandomBuilder].
  */
 @JvmName("newBuilder")
-fun <T : Any> newRandomBuilder(): RandomBuilder<T> {
+fun <T : Any> randomBuilder(): RandomBuilder<T> {
     return RandomBuilder()
+}
+
+private object ThreadLocalRandomHolder : Random() {
+
+    override fun setSeed(seed: Long) {
+        ThreadLocalRandom.current().setSeed(seed)
+    }
+
+    override fun nextBytes(bytes: ByteArray?) {
+        ThreadLocalRandom.current().nextBytes(bytes)
+    }
+
+    override fun nextInt(): Int {
+        return ThreadLocalRandom.current().nextInt()
+    }
+
+    override fun nextInt(bound: Int): Int {
+        return ThreadLocalRandom.current().nextInt(bound)
+    }
+
+    override fun nextLong(): Long {
+        return ThreadLocalRandom.current().nextLong()
+    }
+
+    override fun nextBoolean(): Boolean {
+        return ThreadLocalRandom.current().nextBoolean()
+    }
+
+    override fun nextFloat(): Float {
+        return ThreadLocalRandom.current().nextFloat()
+    }
+
+    override fun nextDouble(): Double {
+        return ThreadLocalRandom.current().nextDouble()
+    }
+
+    override fun nextGaussian(): Double {
+        return ThreadLocalRandom.current().nextGaussian()
+    }
+
+    override fun ints(streamSize: Long): IntStream {
+        return ThreadLocalRandom.current().ints(streamSize)
+    }
+
+    override fun ints(): IntStream {
+        return ThreadLocalRandom.current().ints()
+    }
+
+    override fun ints(streamSize: Long, randomNumberOrigin: Int, randomNumberBound: Int): IntStream {
+        return ThreadLocalRandom.current().ints(streamSize, randomNumberOrigin, randomNumberBound)
+    }
+
+    override fun ints(randomNumberOrigin: Int, randomNumberBound: Int): IntStream {
+        return ThreadLocalRandom.current().ints(randomNumberOrigin, randomNumberBound)
+    }
+
+    override fun longs(streamSize: Long): LongStream {
+        return ThreadLocalRandom.current().longs(streamSize)
+    }
+
+    override fun longs(): LongStream {
+        return ThreadLocalRandom.current().longs()
+    }
+
+    override fun longs(streamSize: Long, randomNumberOrigin: Long, randomNumberBound: Long): LongStream {
+        return ThreadLocalRandom.current().longs(streamSize, randomNumberOrigin, randomNumberBound)
+    }
+
+    override fun longs(randomNumberOrigin: Long, randomNumberBound: Long): LongStream {
+        return ThreadLocalRandom.current().longs(randomNumberOrigin, randomNumberBound)
+    }
+
+    override fun doubles(streamSize: Long): DoubleStream {
+        return ThreadLocalRandom.current().doubles(streamSize)
+    }
+
+    override fun doubles(): DoubleStream {
+        return ThreadLocalRandom.current().doubles()
+    }
+
+    override fun doubles(streamSize: Long, randomNumberOrigin: Double, randomNumberBound: Double): DoubleStream {
+        return ThreadLocalRandom.current().doubles(streamSize, randomNumberOrigin, randomNumberBound)
+    }
+
+    override fun doubles(randomNumberOrigin: Double, randomNumberBound: Double): DoubleStream {
+        return ThreadLocalRandom.current().doubles(randomNumberOrigin, randomNumberBound)
+    }
 }
 
 /**
@@ -207,25 +264,26 @@ open class RandomBuilder<T : Any> {
         if (totalScore <= 0 || values.isEmpty()) {
             throw IllegalStateException("There is no possible value to be added.")
         }
-        return object : Supplier<T> {
+        return RandomSupplier(builderRandom ?: Random(), totalScore, ArrayList(values))
+    }
 
-            private val random = builderRandom ?: Random()
-            private val totalScore = this@RandomBuilder.totalScore
-            private val values = this@RandomBuilder.values
-
-            override fun get(): T {
-                val score = random.between(0, totalScore)
-                val index = values.binarySearch {
-                    if (it.scoreFrom <= score && it.scoreTo > score) {
-                        return@binarySearch 0
-                    }
-                    if (it.scoreFrom > score) {
-                        return@binarySearch 1
-                    }
-                    -1
+    private class RandomSupplier<T>(
+        private val random: Random,
+        private val totalScore: Int,
+        private val values: MutableList<Value<T>>,
+    ) : Supplier<T>, Serializable {
+        override fun get(): T {
+            val score = random.between(0, totalScore)
+            val index = values.binarySearch {
+                if (it.scoreFrom <= score && it.scoreTo > score) {
+                    return@binarySearch 0
                 }
-                return values[index].supplier.get()
+                if (it.scoreFrom > score) {
+                    return@binarySearch 1
+                }
+                -1
             }
+            return values[index].supplier.get()
         }
     }
 
@@ -234,12 +292,4 @@ open class RandomBuilder<T : Any> {
         val scoreTo: Int,
         val supplier: Supplier<T>
     )
-}
-
-private object BtRandomHolder {
-    const val randomDigits = "0123456789"
-    const val randomLowerLetters = "abcdefghijklnmopqrstuvwxyz"
-    const val randomUpperLetters = "ABCDEFGHIJKLNMOPQRSTUVWXYZ"
-    const val randomLetters = randomLowerLetters + randomUpperLetters
-    const val randomString = randomDigits + randomLetters
 }
