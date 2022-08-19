@@ -13,7 +13,6 @@ import java.util.function.IntFunction
 import java.util.function.Predicate
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
-import kotlin.NoSuchElementException
 import kotlin.random.Random
 import kotlin.collections.addAll as addAllKt
 import kotlin.collections.all as allKt
@@ -22,7 +21,6 @@ import kotlin.collections.associate as associateKt
 import kotlin.collections.associateBy as associateByKt
 import kotlin.collections.associateByTo as associateByToKt
 import kotlin.collections.associateTo as associateToKt
-import kotlin.collections.chunked as chunkedKt
 import kotlin.collections.contains as containsKt
 import kotlin.collections.count as countKt
 import kotlin.collections.distinct as distinctKt
@@ -53,8 +51,6 @@ import kotlin.collections.indexOf as indexOfKt
 import kotlin.collections.indexOfFirst as indexOfFirstKt
 import kotlin.collections.indexOfLast as indexOfLastKt
 import kotlin.collections.intersect as intersectKt
-import kotlin.collections.joinTo as joinToKt
-import kotlin.collections.joinToString as joinToStringKt
 import kotlin.collections.last as lastKt
 import kotlin.collections.lastIndexOf as lastIndexOfKt
 import kotlin.collections.lastOrNull as lastOrNullKt
@@ -90,25 +86,6 @@ import kotlin.collections.toSet as toSetKt
 import kotlin.collections.toSortedSet as toSortedSetKt
 import kotlin.collections.toTypedArray as toTypedArrayKt
 import kotlin.collections.union as unionKt
-import kotlin.collections.windowed as windowedKt
-import kotlin.collections.zip as zipKt
-import kotlin.collections.zipWithNext as zipWithNextKt
-
-/**
- * Adds [elements] into [dest] and returns [dest].
- */
-fun <T, C : MutableCollection<in T>> collect(dest: C, vararg elements: T): C {
-    dest.addAllKt(elements)
-    return dest
-}
-
-/**
- * Adds [elements] into [dest] and returns [dest].
- */
-fun <T, C : MutableCollection<in T>> collect(dest: C, elements: Iterable<T>): C {
-    dest.addAllKt(elements)
-    return dest
-}
 
 fun <T> Iterable<T>.contains(element: T): Boolean {
     return this.containsKt(element)
@@ -520,109 +497,6 @@ fun <T, R> Iterable<T>.reduceIndexed(initial: R, operation: IndexedBiFunction<in
     return this.foldIndexedKt(initial, operation.asKotlinFun())
 }
 
-fun <T, R, V> Iterable<T>.zip(other: Array<out R>, transform: BiFunction<in T, in R, out V>): List<V> {
-    return this.zipKt(other, transform.asKotlinFun())
-}
-
-fun <T, R, V> Iterable<T>.zip(other: Iterable<R>, transform: BiFunction<in T, in R, out V>): List<V> {
-    return this.zipKt(other, transform.asKotlinFun())
-}
-
-fun <T, R> Iterable<T>.zipWithNext(transform: BiFunction<in T, in T, out R>): List<R> {
-    return this.zipWithNextKt(transform.asKotlinFun())
-}
-
-fun <K, V> Iterable<K>.zipMap(other: Array<out V>): Map<K, V> {
-    return zipMapTo(LinkedHashMap(), other)
-}
-
-fun <K, V> Iterable<K>.zipMap(other: Iterable<V>): Map<K, V> {
-    return zipMapTo(LinkedHashMap(), other)
-}
-
-fun <K, V> Iterable<K>.zipMap(other: Array<out V>, defaultKey: K, defaultValue: V): Map<K, V> {
-    return zipMapTo(LinkedHashMap(), other, defaultKey, defaultValue)
-}
-
-fun <K, V> Iterable<K>.zipMap(other: Iterable<V>, defaultKey: K, defaultValue: V): Map<K, V> {
-    return zipMapTo(LinkedHashMap(), other, defaultKey, defaultValue)
-}
-
-fun <K, V, M : MutableMap<in K, in V>> Iterable<K>.zipMapTo(destination: M, other: Array<out V>): M {
-    return zipMapTo(destination, other.asList())
-}
-
-fun <K, V, M : MutableMap<in K, in V>> Iterable<K>.zipMapTo(destination: M, other: Iterable<V>): M {
-    val itk = this.iterator()
-    val itv = other.iterator()
-    while (itk.hasNext()) {
-        if (itv.hasNext()) {
-            destination[itk.next()] = itv.next()
-        } else {
-            break
-        }
-    }
-    return destination
-}
-
-fun <K, V, M : MutableMap<in K, in V>> Iterable<K>.zipMapTo(
-    destination: M,
-    other: Array<out V>,
-    defaultKey: K,
-    defaultValue: V
-): M {
-    return zipMapTo(destination, other.asList(), defaultKey, defaultValue)
-}
-
-fun <K, V, M : MutableMap<in K, in V>> Iterable<K>.zipMapTo(
-    destination: M,
-    other: Iterable<V>,
-    defaultKey: K,
-    defaultValue: V
-): M {
-    val itk = this.iterator()
-    val itv = other.iterator()
-    while (itk.hasNext()) {
-        val k = itk.next()
-        val v = if (itv.hasNext()) {
-            itv.next()
-        } else {
-            defaultValue
-        }
-        destination[k] = v
-    }
-    while (itv.hasNext()) {
-        destination[defaultKey] = itv.next()
-    }
-    return destination
-}
-
-fun <T> Iterable<T>.chunked(size: Int): List<List<T>> {
-    return this.chunkedKt(size)
-}
-
-fun <T, R> Iterable<T>.chunked(size: Int, transform: Function<in List<T>, out R>): List<R> {
-    return this.chunkedKt(size, transform.asKotlinFun())
-}
-
-@JvmOverloads
-fun <T> Iterable<T>.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): List<List<T>> {
-    return this.windowedKt(size, step, partialWindows)
-}
-
-fun <T, R> Iterable<T>.windowed(size: Int, transform: Function<in List<T>, out R>): List<R> {
-    return this.windowedKt(size, 1, false, transform.asKotlinFun())
-}
-
-fun <T, R> Iterable<T>.windowed(
-    size: Int,
-    step: Int,
-    partialWindows: Boolean,
-    transform: Function<in List<T>, out R>
-): List<R> {
-    return this.windowedKt(size, step, partialWindows, transform.asKotlinFun())
-}
-
 fun <T> Iterable<T>.intersect(other: Iterable<T>): Set<T> {
     return this.intersectKt(other)
 }
@@ -780,78 +654,6 @@ inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
     return this.asToCollection().toTypedArrayKt()
 }
 
-fun <T> Iterable<T>.toArray(): Array<Any?> {
-    return this.asToCollection().toTypedArrayKt()
-}
-
-fun <T : R, R> Iterable<T>.toArray(type: Class<R>): Array<R> {
-    val set = this.asToCollection()
-    val array = arrayOfType<Array<R>>(type, set.size)
-    return this.toArray(array)
-}
-
-fun <T : R, R> Iterable<T>.toArray(array: Array<R>): Array<R> {
-    var i = 0
-    for (t in this) {
-        if (i < array.size) {
-            array[i] = t
-            i++
-        } else {
-            break
-        }
-    }
-    return array
-}
-
-fun <T, R> Iterable<T>.toArray(type: Class<R>, transform: Function<in T, out R>): Array<R> {
-    val set = asToCollection()
-    val array = arrayOfType<Array<R>>(type, set.size)
-    return this.toArray(array, transform)
-}
-
-fun <T, R> Iterable<T>.toArray(array: Array<R>, transform: Function<in T, out R>): Array<R> {
-    var i = 0
-    for (t in this) {
-        if (i < array.size) {
-            array[i] = transform.apply(t)
-            i++
-        } else {
-            break
-        }
-    }
-    return array
-}
-
-/**
- * Returns an immutable [Set] of which elements are copied from [this].
- */
-fun <T> Iterable<T>.copySet(): Set<T> {
-    if (this is Collection) {
-        val set = LinkedHashSet(this)
-        return Collections.unmodifiableSet(set)
-    }
-    val set = LinkedHashSet<T>()
-    for (t in this) {
-        set.add(t)
-    }
-    return Collections.unmodifiableSet(set)
-}
-
-/**
- * Returns an immutable [List] of which elements are copied from [this].
- */
-fun <T> Iterable<T>.copyList(): List<T> {
-    if (this is Collection) {
-        val list = ArrayList(this)
-        return Collections.unmodifiableList(list)
-    }
-    val list = LinkedList<T>()
-    for (t in this) {
-        list.add(t)
-    }
-    return Collections.unmodifiableList(list.toArrayList())
-}
-
 fun <T> Iterable<T>.plus(element: T): List<T> {
     return this.plusKt(element)
 }
@@ -996,44 +798,6 @@ fun <T> MutableCollection<T>.addAll(elements: Array<out T>): Boolean {
 
 fun <T> MutableCollection<T>.addAll(elements: Iterable<T>): Boolean {
     return this.addAllKt(elements)
-}
-
-//Join to String:
-
-@JvmOverloads
-fun <T> Iterable<T>.joinToString(
-    separator: CharSequence = ", ",
-    transform: Function<in T, out CharSequence>? = null
-): String {
-    return this.joinToStringKt(separator = separator, transform = transform?.asKotlinFun())
-}
-
-fun <T> Iterable<T>.joinToString(
-    separator: CharSequence,
-    limit: Int,
-    truncated: CharSequence,
-    transform: Function<in T, out CharSequence>?
-): String {
-    return this.joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
-}
-
-@JvmOverloads
-fun <T, A : Appendable> Iterable<T>.joinTo(
-    destination: A,
-    separator: CharSequence = ", ",
-    transform: Function<in T, out CharSequence>? = null
-): A {
-    return this.joinToKt(buffer = destination, separator = separator, transform = transform?.asKotlinFun())
-}
-
-fun <T, A : Appendable> Iterable<T>.joinTo(
-    destination: A,
-    separator: CharSequence,
-    limit: Int,
-    truncated: CharSequence,
-    transform: Function<in T, out CharSequence>?
-): A {
-    return this.joinToKt(destination, separator, "", "", limit, truncated, transform?.asKotlinFun())
 }
 
 //Iterator

@@ -1,9 +1,8 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.asType
-import xyz.srclab.common.base.ByteArrayRef.Companion.arrayRef
-import xyz.srclab.common.base.CharArrayRef.Companion.arrayRef
 import xyz.srclab.common.collect.arrayOfType
+import xyz.srclab.common.remLength
 import java.io.OutputStream
 import java.io.Serializable
 import java.io.Writer
@@ -84,14 +83,14 @@ open class CharsBuilder : Appendable, Writer(), Serializable {
 
     open fun append(chars: CharArray, startIndex: Int): CharsBuilder {
         flushBuffer()
-        cur.value = chars.arrayRef(startIndex)
+        cur.value = chars.charsRef(startIndex)
         newTail()
         return this
     }
 
     open fun append(chars: CharArray, startIndex: Int, endIndex: Int): CharsBuilder {
         flushBuffer()
-        cur.value = chars.arrayRef(startIndex, endIndex)
+        cur.value = chars.charsRef(startIndex, endIndex)
         newTail()
         return this
     }
@@ -148,7 +147,6 @@ open class CharsBuilder : Appendable, Writer(), Serializable {
                 null -> size += BtProps.nullString().length
                 is CharSequence -> size += v.length
                 is CharArray -> size += v.size
-                is CharArrayRef -> size += v.length
                 is Char -> size += 1
                 else -> {
                     val s = v.toString()
@@ -172,6 +170,10 @@ open class CharsBuilder : Appendable, Writer(), Serializable {
                     v.asJavaString().getChars(0, v.length, buffer, i)
                     v.length
                 }
+                is CharsRef -> {
+                    v.copyTo(buffer, i)
+                    v.length
+                }
                 is CharSequence -> {
                     v.getChars(buffer, i, v.length)
                     v.length
@@ -179,9 +181,6 @@ open class CharsBuilder : Appendable, Writer(), Serializable {
                 is CharArray -> {
                     System.arraycopy(v, 0, buffer, i, v.size)
                     v.size
-                }
-                is CharArrayRef -> {
-                    v.copyTo(buffer, i)
                 }
                 is Char -> {
                     buffer[i] = v
@@ -257,14 +256,14 @@ open class BytesBuilder : OutputStream(), Serializable {
 
     fun append(t: ByteArray, startIndex: Int): BytesBuilder {
         flushBuffer()
-        cur.value = t.arrayRef(startIndex)
+        cur.value = ByteBuffer.wrap(t, startIndex, remLength(t.size, startIndex))
         newTail()
         return this
     }
 
     fun append(t: ByteArray, startIndex: Int, endIndex: Int): BytesBuilder {
         flushBuffer()
-        cur.value = t.arrayRef(startIndex, endIndex)
+        cur.value = ByteBuffer.wrap(t, startIndex, endIndex)
         newTail()
         return this
     }
@@ -330,7 +329,6 @@ open class BytesBuilder : OutputStream(), Serializable {
         while (n.next !== null) {
             size += when (val v = n.value) {
                 is ByteArray -> v.size
-                is ByteArrayRef -> v.length
                 is ByteBuffer -> v.remaining()
                 is Byte -> 1
                 else -> throw IllegalStateException("Unknown node value type: ${v?.javaClass}")
@@ -346,9 +344,6 @@ open class BytesBuilder : OutputStream(), Serializable {
                 is ByteArray -> {
                     System.arraycopy(v, 0, buffer, i, v.size)
                     v.size
-                }
-                is ByteArrayRef -> {
-                    v.copyTo(buffer, i)
                 }
                 is ByteBuffer -> {
                     val remaining = v.remaining()

@@ -135,63 +135,63 @@ fun <T> Any.arrayAsList(): MutableList<T> {
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun <T> Array<T>.asList(): MutableList<T> {
-    return ArrayWrapper(this)
+    return ObjectArrayList(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun BooleanArray.asList(): MutableList<Boolean> {
-    return BooleanArrayWrapper(this)
+    return BooleanArrayList(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun ByteArray.asList(): MutableList<Byte> {
-    return ByteArrayWrapper(this)
+    return ByteArrayList(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun ShortArray.asList(): MutableList<Short> {
-    return ShortArrayWrapper(this)
+    return ShortArrayList(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun CharArray.asList(): MutableList<Char> {
-    return CharArrayWrapper(this)
+    return CharArrayList(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun IntArray.asList(): MutableList<Int> {
-    return IntArrayWrapper(this)
+    return IntArrayList(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun LongArray.asList(): MutableList<Long> {
-    return LongArrayWrapper(this)
+    return LongArrayList(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun FloatArray.asList(): MutableList<Float> {
-    return FloatArrayWrapper(this)
+    return FloatArrayList(this)
 }
 
 /**
  * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun DoubleArray.asList(): MutableList<Double> {
-    return DoubleArrayWrapper(this)
+    return DoubleArrayList(this)
 }
 
 //private inline fun indexOf0(size:Int, offset: Int, getter:Int->) {

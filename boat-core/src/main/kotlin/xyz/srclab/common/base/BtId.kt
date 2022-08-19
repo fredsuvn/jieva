@@ -22,7 +22,7 @@ val SNOWFLAKE_ID: SnowflakeId = SnowflakeId(currentNanos())
  */
 fun uuid(): String {
     val withHyphens = UUID.randomUUID().toString()
-    return hyphenMatcher().removeFrom(withHyphens)
+    return HYPHEN_MATCHER.removeFrom(withHyphens)
 }
 
 /**

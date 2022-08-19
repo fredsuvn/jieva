@@ -7,6 +7,8 @@ package xyz.srclab.common.base
 
 import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.StringUtils
+import xyz.srclab.common.asType
+import xyz.srclab.common.remLength
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.function.Supplier
@@ -19,24 +21,28 @@ import kotlin.text.toList as toListKt
 import kotlin.text.toSet as toSetKt
 
 /**
- * Returns charset of UTF-8.
+ * Charset of UTF-8.
  */
-fun utf8(): Charset = StandardCharsets.UTF_8
+@JvmField
+val UTF8: Charset = StandardCharsets.UTF_8
 
 /**
- * Returns a [CharMatcher] for char dot: ".".
+ * [CharMatcher] for char dot: ".".
  */
-fun dotMatcher(): CharMatcher = BtStringHolder.DOT_MATCHER
+@JvmField
+val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
 
 /**
- * Returns a [CharMatcher] for char hyphen: "-".
+ * [CharMatcher] for char hyphen: "-".
  */
-fun hyphenMatcher(): CharMatcher = BtStringHolder.HYPHEN_MATCHER
+@JvmField
+val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
 
 /**
- * Returns a [CharMatcher] for char underscore: "_".
+ * [CharMatcher] for char underscore: "_".
  */
-fun underscoreMatcher(): CharMatcher = BtStringHolder.UNDERSCORE_MATCHER
+@JvmField
+val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
 
 /**
  * Returns whether given chars is empty or null.
@@ -173,14 +179,14 @@ fun CharSequence.uncapitalize(): String {
  * Returns the [String] of which chars were converted to lower case.
  */
 fun CharSequence.lowerCase(): String {
-    return this.toString().lowercase(defaultLocale())
+    return this.toString().lowercase(BtProps.locale())
 }
 
 /**
  * Returns the [String] of which chars were converted to upper case.
  */
 fun CharSequence.upperCase(): String {
-    return this.toString().uppercase(defaultLocale())
+    return this.toString().uppercase(BtProps.locale())
 }
 
 /**
@@ -233,7 +239,7 @@ fun CharSequence.lines(): List<String> {
  * Converts chars to bytes with [charset].
  */
 @JvmOverloads
-fun CharSequence.getBytes(charset: Charset = defaultCharset()): ByteArray {
+fun CharSequence.getBytes(charset: Charset = BtProps.charset()): ByteArray {
     return this.toString().asJavaString().getBytes(charset)
 }
 
@@ -243,9 +249,9 @@ fun CharSequence.getBytes(charset: Charset = defaultCharset()): ByteArray {
 @JvmName("toString")
 @JvmOverloads
 fun ByteArray.getString(
-        charset: Charset = defaultCharset(),
-        offset: Int = 0,
-        length: Int = remLength(this.size, offset),
+    charset: Charset = BtProps.charset(),
+    offset: Int = 0,
+    length: Int = remLength(this.size, offset),
 ): String {
     return String(this, offset, length, charset)
 }
@@ -442,11 +448,6 @@ interface CharsRef : CharSequence {
     override fun subSequence(startIndex: Int, endIndex: Int): CharsRef
 
     /**
-     * Copies and returns a new String of current range.
-     */
-    fun copy(): String
-
-    /**
      * Copies chars of current range into [dest], returns copied size.
      */
     fun copyTo(dest: CharArray): Int {
@@ -502,10 +503,6 @@ interface CharsRef : CharSequence {
                 return OfCharSeq(source, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
-            override fun copy(): String {
-                return source.subSequence(startIndex, endIndex).toString()
-            }
-
             override fun copyTo(dest: CharArray, offset: Int): Int {
                 val len = min(this.length, remLength(dest.size, offset))
                 if (source is String) {
@@ -521,7 +518,7 @@ interface CharsRef : CharSequence {
             private fun Int.actualIndex() = this + startIndex
 
             override fun toString(): String {
-                return copy()
+                return source.subSequence(startIndex, endIndex).toString()
             }
         }
 
@@ -546,10 +543,6 @@ interface CharsRef : CharSequence {
                 return OfCharArray(source, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
-            override fun copy(): String {
-                return String(source, startIndex, remLength(source.size, startIndex))
-            }
-
             override fun copyTo(dest: CharArray, offset: Int): Int {
                 val len = min(this.length, remLength(dest.size, offset))
                 System.arraycopy(source, this.startIndex, dest, offset, len)
@@ -559,7 +552,7 @@ interface CharsRef : CharSequence {
             private fun Int.actualIndex() = this + startIndex
 
             override fun toString(): String {
-                return copy()
+                return String(source, startIndex, remLength(source.size, startIndex))
             }
         }
     }
@@ -604,10 +597,4 @@ interface LazyString : CharSequence {
             }
         }
     }
-}
-
-private object BtStringHolder {
-    val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
-    val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
-    val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
 }

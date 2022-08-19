@@ -3,9 +3,11 @@ package xyz.srclab.common.collect
 import java.io.Serializable
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class ArrayWrapper<T>(
+class ObjectArrayList<T>(
     private val array: Array<T>,
 ) : AbstractMutableList<T>(), RandomAccess, Serializable {
 
@@ -22,9 +24,11 @@ class ArrayWrapper<T>(
 }
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class BooleanArrayWrapper(
+class BooleanArrayList(
     private val array: BooleanArray,
 ) : AbstractMutableList<Boolean>(), RandomAccess, Serializable {
 
@@ -41,9 +45,11 @@ class BooleanArrayWrapper(
 }
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class ByteArrayWrapper(
+class ByteArrayList(
     private val array: ByteArray,
 ) : AbstractMutableList<Byte>(), RandomAccess, Serializable {
 
@@ -60,9 +66,11 @@ class ByteArrayWrapper(
 }
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class ShortArrayWrapper(
+class ShortArrayList(
     private val array: ShortArray,
 ) : AbstractMutableList<Short>(), RandomAccess, Serializable {
 
@@ -79,9 +87,11 @@ class ShortArrayWrapper(
 }
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class CharArrayWrapper(
+class CharArrayList(
     private val array: CharArray,
 ) : AbstractMutableList<Char>(), RandomAccess, Serializable {
 
@@ -98,9 +108,11 @@ class CharArrayWrapper(
 }
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class IntArrayWrapper(
+class IntArrayList(
     private val array: IntArray,
 ) : AbstractMutableList<Int>(), RandomAccess, Serializable {
 
@@ -117,9 +129,11 @@ class IntArrayWrapper(
 }
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class LongArrayWrapper(
+class LongArrayList(
     private val array: LongArray,
 ) : AbstractMutableList<Long>(), RandomAccess, Serializable {
 
@@ -136,9 +150,11 @@ class LongArrayWrapper(
 }
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class FloatArrayWrapper(
+class FloatArrayList(
     private val array: FloatArray,
 ) : AbstractMutableList<Float>(), RandomAccess, Serializable {
 
@@ -155,9 +171,11 @@ class FloatArrayWrapper(
 }
 
 /**
- * [MutableList] to wrap the [array].
+ * Fixed-length [MutableList] to wrap the [array].
+ * The returned list will be backed by the given [array], that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-class DoubleArrayWrapper(
+class DoubleArrayList(
     private val array: DoubleArray,
 ) : AbstractMutableList<Double>(), RandomAccess, Serializable {
 

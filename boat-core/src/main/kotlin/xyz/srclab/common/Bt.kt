@@ -246,7 +246,7 @@ fun deepToString(vararg args: Any?): String {
 /**
  * If [this] is a [CharSequence], return itself; else return `toString` of this.
  */
-fun Any?.toCharSeq(): CharSequence {
+fun Any?.toChars(): CharSequence {
     return if (this is CharSequence)
         this
     else
@@ -457,6 +457,14 @@ fun <T, C : MutableCollection<T>> collect(dest: C, vararg elements: T): C {
 
 /**
  * Collects [elements] into [dest] and returns the [dest].
+ */
+fun <T, C : MutableCollection<T>> collect(dest: C, elements: Iterable<T>): C {
+    dest.addAll(elements)
+    return dest
+}
+
+/**
+ * Collects [elements] into [dest] and returns the [dest].
  *
  * The [elements] will be split in two elements as `key-value-pairs`, that is:
  * the first element as `key1`, the second as `value1`, the third as `key2`, the fourth as `value2`, and so on.
@@ -486,10 +494,41 @@ fun <K, V, C : MutableMap<K, V>> collectMap(dest: C, vararg elements: Any?): C {
 }
 
 /**
+ * Collects [elements] into [dest] and returns the [dest].
+ *
+ * The [elements] will be split in two elements as `key-value-pairs`, that is:
+ * the first element as `key1`, the second as `value1`, the third as `key2`, the fourth as `value2`, and so on.
+ * Then, all pairs will be put into [dest] in encounter order.
+ *
+ * If the last pair only has a key (if length of [elements] is odd number), its value will be seen as `null`.
+ */
+fun <K, V, C : MutableMap<K, V>> collectMap(dest: C, elements: Iterable<*>): C {
+    val map = dest.asType<MutableMap<Any?, Any?>>()
+    val it = elements.iterator()
+    while (it.hasNext()) {
+        val k = it.next()
+        if (it.hasNext()) {
+            val v = it.next()
+            map[k] = v
+        } else {
+            map[k] = null
+        }
+    }
+    return dest
+}
+
+/**
  * Creates and returns a readonly [List] consists of [elements].
  */
 fun <T> list(vararg elements: T): List<T> {
     return listOf(*elements)
+}
+
+/**
+ * Creates and returns a readonly [List] consists of [elements].
+ */
+fun <T> list(elements: Iterable<T>): List<T> {
+    return arrayList(elements)
 }
 
 /**
@@ -500,10 +539,24 @@ fun <T> arrayList(vararg elements: T): ArrayList<T> {
 }
 
 /**
+ * Creates and returns an [ArrayList] consists of [elements].
+ */
+fun <T> arrayList(elements: Iterable<T>): ArrayList<T> {
+    return collect(ArrayList<T>(elements.size()), elements)
+}
+
+/**
  * Creates and returns a [LinkedList] consists of [elements].
  */
 fun <T> linkedList(vararg elements: T): LinkedList<T> {
     return collect(LinkedList(), *elements)
+}
+
+/**
+ * Creates and returns a [LinkedList] consists of [elements].
+ */
+fun <T> linkedList(elements: Iterable<T>): LinkedList<T> {
+    return collect(LinkedList<T>(), elements)
 }
 
 /**
@@ -514,10 +567,24 @@ fun <T> set(vararg elements: T): Set<T> {
 }
 
 /**
+ * Creates and returns a readonly [Set] consists of [elements].
+ */
+fun <T> set(elements: Iterable<T>): Set<T> {
+    return linkedHashSet(elements)
+}
+
+/**
  * Creates and returns a [HashSet] consists of [elements].
  */
 fun <T> hashSet(vararg elements: T): HashSet<T> {
     return collect(HashSet(elements.size), *elements)
+}
+
+/**
+ * Creates and returns a [HashSet] consists of [elements].
+ */
+fun <T> hashSet(elements: Iterable<T>): HashSet<T> {
+    return collect(HashSet<T>(elements.size()), elements)
 }
 
 /**
@@ -528,10 +595,24 @@ fun <T> linkedHashSet(vararg elements: T): LinkedHashSet<T> {
 }
 
 /**
+ * Creates and returns a [LinkedHashSet] consists of [elements].
+ */
+fun <T> linkedHashSet(elements: Iterable<T>): LinkedHashSet<T> {
+    return collect(LinkedHashSet<T>(elements.size()), elements)
+}
+
+/**
  * Creates and returns a readonly [Map] consists of [elements] by [collectMap].
  */
 fun <K, V> map(vararg elements: Any?): Map<K, V> {
     return linkedHashMap(*elements)
+}
+
+/**
+ * Creates and returns a readonly [Map] consists of [elements] by [collectMap].
+ */
+fun <K, V> map(elements: Iterable<*>): Map<K, V> {
+    return linkedHashMap(elements)
 }
 
 /**
@@ -542,6 +623,13 @@ fun <K, V> hashMap(vararg elements: Any?): HashMap<K, V> {
 }
 
 /**
+ * Creates and returns a [HashMap] consists of [elements] by [collectMap].
+ */
+fun <K, V> hashMap(elements: Iterable<*>): HashMap<K, V> {
+    return collectMap(HashMap(divNumber(elements.size(), 2)), elements)
+}
+
+/**
  * Creates and returns a [LinkedHashMap] consists of [elements] by [collectMap].
  */
 fun <K, V> linkedHashMap(vararg elements: Any?): LinkedHashMap<K, V> {
@@ -549,8 +637,26 @@ fun <K, V> linkedHashMap(vararg elements: Any?): LinkedHashMap<K, V> {
 }
 
 /**
+ * Creates and returns a [LinkedHashMap] consists of [elements] by [collectMap].
+ */
+fun <K, V> linkedHashMap(elements: Iterable<*>): LinkedHashMap<K, V> {
+    return collectMap(LinkedHashMap(divNumber(elements.size(), 2)), elements)
+}
+
+/**
  * Creates and returns a [ConcurrentHashMap] consists of [elements] by [collectMap].
  */
 fun <K, V> concurrentHashMap(vararg elements: Any?): ConcurrentHashMap<K, V> {
     return collectMap(ConcurrentHashMap(divNumber(elements.size, 2)), *elements)
+}
+
+/**
+ * Creates and returns a [ConcurrentHashMap] consists of [elements] by [collectMap].
+ */
+fun <K, V> concurrentHashMap(elements: Iterable<*>): ConcurrentHashMap<K, V> {
+    return collectMap(ConcurrentHashMap(divNumber(elements.size(), 2)), elements)
+}
+
+private fun Iterable<*>.size(): Int {
+    return if (this is Collection) this.size else 0
 }

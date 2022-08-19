@@ -6,6 +6,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.annotations.concurrent.ThreadSafe
+import xyz.srclab.common.toChars
 import java.io.Serializable
 
 /**
@@ -66,7 +67,7 @@ interface StringTemplate {
         while (i < nodesArray.size) {
             val node = nodesArray[i]
             if (node is Parameter) {
-                nodesArray[i] = args[node.toString()].toCharSeq()
+                nodesArray[i] = args[node.toString()].toChars()
             }
             i++
         }
@@ -84,7 +85,7 @@ interface StringTemplate {
         while (i < nodesArray.size) {
             val node = nodesArray[i]
             if (node is Parameter) {
-                nodesArray[i] = args[p++].toCharSeq()
+                nodesArray[i] = args[p++].toChars()
             }
             i++
         }
@@ -98,7 +99,7 @@ interface StringTemplate {
     fun <T : Appendable> processTo(dest: T, args: Map<String, Any?>): T {
         for (node in nodes) {
             if (node is Parameter) {
-                dest.append(args[node.toString()].toCharSeq())
+                dest.append(args[node.toString()].toChars())
             } else {
                 dest.append(node)
             }
@@ -114,7 +115,7 @@ interface StringTemplate {
         var p = 0
         for (node in nodes) {
             if (node is Parameter) {
-                dest.append(args[p++].toCharSeq())
+                dest.append(args[p++].toChars())
             } else {
                 dest.append(node)
             }
@@ -325,7 +326,7 @@ open class SimpleTemplate(
         if (start < source.length) {
             getBuffer().append(source.subRef(start))
         }
-        return getBuffer().toListAsNoNull()
+        return getBuffer().toList()
     }
 }
 
@@ -334,8 +335,4 @@ open class SimpleTemplate(
  */
 open class TemplateException @JvmOverloads constructor(
     message: String? = null, cause: Throwable? = null
-) : RuntimeException(message, cause), Serializable {
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
-}
+) : RuntimeException(message, cause), Serializable

@@ -1,5 +1,6 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.asType
 import xyz.srclab.common.run.newSyncExecutor
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor

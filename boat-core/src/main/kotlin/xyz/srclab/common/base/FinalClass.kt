@@ -1,5 +1,7 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.getOrNew
+
 /**
  * Abstract class represents a final class, which will cache the values of [hashCode] and [toString].
  * The subclass should implement [hashCode0] and [toString0] to compute the values of [hashCode] and [toString],

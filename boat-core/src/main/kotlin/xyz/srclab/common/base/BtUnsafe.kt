@@ -6,6 +6,7 @@
 package xyz.srclab.common.base
 
 import sun.misc.Unsafe
+import xyz.srclab.common.asType
 import java.lang.reflect.Field
 import java.nio.ByteBuffer
 

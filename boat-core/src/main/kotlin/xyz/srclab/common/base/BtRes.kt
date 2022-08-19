@@ -5,7 +5,6 @@ package xyz.srclab.common.base
 
 import xyz.srclab.common.collect.toStringMap
 import xyz.srclab.common.io.readString
-import xyz.srclab.common.readProperties
 import java.io.File
 import java.io.InputStream
 import java.io.Reader

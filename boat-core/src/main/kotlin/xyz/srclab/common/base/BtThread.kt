@@ -5,6 +5,7 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.asType
 import java.time.Duration
 import java.util.function.BiPredicate
 
