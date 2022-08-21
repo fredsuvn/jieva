@@ -10,6 +10,7 @@ import xyz.srclab.common.base.checkInBounds
 import xyz.srclab.common.base.checkRangeInBounds
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.remLength
+import java.io.Serializable
 import java.lang.reflect.Type
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not an array type: "
@@ -132,79 +133,103 @@ fun <T> Any.arrayAsList(): MutableList<T> {
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun <T> Array<T>.asList(): MutableList<T> {
-    return ObjectArrayList(this)
+@JvmOverloads
+fun <T> Array<T>.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<T> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return ArrayWrapperList(this, startIndex, endIndex)
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun BooleanArray.asList(): MutableList<Boolean> {
-    return BooleanArrayList(this)
+@JvmOverloads
+fun BooleanArray.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<Boolean> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return BooleansWrapperList(this, startIndex, endIndex)
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun ByteArray.asList(): MutableList<Byte> {
-    return ByteArrayList(this)
+@JvmOverloads
+fun ByteArray.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<Byte> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return BytesWrapperList(this, startIndex, endIndex)
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun ShortArray.asList(): MutableList<Short> {
-    return ShortArrayList(this)
+@JvmOverloads
+fun ShortArray.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<Short> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return ShortsWrapperList(this, startIndex, endIndex)
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun CharArray.asList(): MutableList<Char> {
-    return CharArrayList(this)
+@JvmOverloads
+fun CharArray.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<Char> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return CharsWrapperList(this, startIndex, endIndex)
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun IntArray.asList(): MutableList<Int> {
-    return IntArrayList(this)
+@JvmOverloads
+fun IntArray.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<Int> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return IntsWrapperList(this, startIndex, endIndex)
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun LongArray.asList(): MutableList<Long> {
-    return LongArrayList(this)
+@JvmOverloads
+fun LongArray.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<Long> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return LongsWrapperList(this, startIndex, endIndex)
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun FloatArray.asList(): MutableList<Float> {
-    return FloatArrayList(this)
+@JvmOverloads
+fun FloatArray.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<Float> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return FloatsWrapperList(this, startIndex, endIndex)
 }
 
 /**
- * Returns a fixed-size [MutableList] that wraps the original array.
+ * Returns a fixed-siz [MutableList] to wrap the given array.
+ * The returned list will be backed by the given array, that is, any modification to the list
+ * will cause the array to be modified and vice versa.
  */
-fun DoubleArray.asList(): MutableList<Double> {
-    return DoubleArrayList(this)
+@JvmOverloads
+fun DoubleArray.asList(startIndex: Int = 0, endIndex: Int = this.size): MutableList<Double> {
+    checkRangeInBounds(startIndex, endIndex, 0, this.size)
+    return DoublesWrapperList(this, startIndex, endIndex)
 }
-
-//private inline fun indexOf0(size:Int, offset: Int, getter:Int->) {
-//    offset.checkInBounds(0, size)
-//    var i = offset
-//    while (i < size) {
-//        if (this[i] == element) {
-//            return i
-//        }
-//        i++
-//    }
-//    return -1
-//}
 
 /**
  * Returns index of element-sequence which specified by [subArray]
@@ -212,7 +237,8 @@ fun DoubleArray.asList(): MutableList<Double> {
  */
 @JvmOverloads
 fun <T> Array<T>.indexOf(
-    offset: Int, subArray: Array<T>, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: Array<T>, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -242,7 +268,8 @@ fun <T> Array<T>.indexOf(
  */
 @JvmOverloads
 fun BooleanArray.indexOf(
-    offset: Int, subArray: BooleanArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: BooleanArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -272,7 +299,8 @@ fun BooleanArray.indexOf(
  */
 @JvmOverloads
 fun ByteArray.indexOf(
-    offset: Int, subArray: ByteArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: ByteArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -302,7 +330,8 @@ fun ByteArray.indexOf(
  */
 @JvmOverloads
 fun ShortArray.indexOf(
-    offset: Int, subArray: ShortArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: ShortArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -332,7 +361,8 @@ fun ShortArray.indexOf(
  */
 @JvmOverloads
 fun CharArray.indexOf(
-    offset: Int, subArray: CharArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: CharArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -362,7 +392,8 @@ fun CharArray.indexOf(
  */
 @JvmOverloads
 fun IntArray.indexOf(
-    offset: Int, subArray: IntArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: IntArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -392,7 +423,8 @@ fun IntArray.indexOf(
  */
 @JvmOverloads
 fun LongArray.indexOf(
-    offset: Int, subArray: LongArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: LongArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -422,7 +454,8 @@ fun LongArray.indexOf(
  */
 @JvmOverloads
 fun FloatArray.indexOf(
-    offset: Int, subArray: FloatArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: FloatArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -452,7 +485,8 @@ fun FloatArray.indexOf(
  */
 @JvmOverloads
 fun DoubleArray.indexOf(
-    offset: Int, subArray: DoubleArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size): Int {
+    offset: Int, subArray: DoubleArray, subStartIndex: Int = 0, subEndIndex: Int = subArray.size
+): Int {
     offset.checkInBounds(0, this.size)
     checkRangeInBounds(subStartIndex, subEndIndex, 0, subArray.size)
     val subLen = remLength(subEndIndex, subStartIndex)
@@ -474,4 +508,355 @@ fun DoubleArray.indexOf(
         return i
     }
     return -1
+}
+
+private class ArrayWrapperList<T>(
+    private val array: Array<T>,
+    private val startIndex: Int,
+    private val endIndex: Int
+) : AbstractMutableList<T>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: T): Boolean = indexOf(element) != -1
+    override fun get(index: Int): T = array[index + startIndex]
+    override fun set(index: Int, element: T): T =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: T): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: T): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: T) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): T = throw UnsupportedOperationException()
+}
+
+private class BooleansWrapperList(
+    private val array: BooleanArray,
+    private val startIndex: Int,
+    private val endIndex: Int,
+) : AbstractMutableList<Boolean>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: Boolean): Boolean = indexOf(element) != -1
+    override fun get(index: Int): Boolean = array[index + startIndex]
+    override fun set(index: Int, element: Boolean): Boolean =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: Boolean): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: Boolean): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: Boolean) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): Boolean = throw UnsupportedOperationException()
+}
+
+private class BytesWrapperList(
+    private val array: ByteArray,
+    private val startIndex: Int,
+    private val endIndex: Int,
+) : AbstractMutableList<Byte>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: Byte): Boolean = indexOf(element) != -1
+    override fun get(index: Int): Byte = array[index + startIndex]
+    override fun set(index: Int, element: Byte): Byte =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: Byte): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: Byte): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: Byte) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): Byte = throw UnsupportedOperationException()
+}
+
+private class ShortsWrapperList(
+    private val array: ShortArray,
+    private val startIndex: Int,
+    private val endIndex: Int,
+) : AbstractMutableList<Short>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: Short): Boolean = indexOf(element) != -1
+    override fun get(index: Int): Short = array[index + startIndex]
+    override fun set(index: Int, element: Short): Short =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: Short): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: Short): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: Short) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): Short = throw UnsupportedOperationException()
+}
+
+private class CharsWrapperList(
+    private val array: CharArray,
+    private val startIndex: Int,
+    private val endIndex: Int,
+) : AbstractMutableList<Char>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: Char): Boolean = indexOf(element) != -1
+    override fun get(index: Int): Char = array[index + startIndex]
+    override fun set(index: Int, element: Char): Char =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: Char): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: Char): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: Char) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): Char = throw UnsupportedOperationException()
+}
+
+private class IntsWrapperList(
+    private val array: IntArray,
+    private val startIndex: Int,
+    private val endIndex: Int,
+) : AbstractMutableList<Int>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: Int): Boolean = indexOf(element) != -1
+    override fun get(index: Int): Int = array[index + startIndex]
+    override fun set(index: Int, element: Int): Int =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: Int): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: Int): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: Int) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): Int = throw UnsupportedOperationException()
+}
+
+private class LongsWrapperList(
+    private val array: LongArray,
+    private val startIndex: Int,
+    private val endIndex: Int,
+) : AbstractMutableList<Long>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: Long): Boolean = indexOf(element) != -1
+    override fun get(index: Int): Long = array[index + startIndex]
+    override fun set(index: Int, element: Long): Long =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: Long): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: Long): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: Long) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): Long = throw UnsupportedOperationException()
+}
+
+private class FloatsWrapperList(
+    private val array: FloatArray,
+    private val startIndex: Int,
+    private val endIndex: Int,
+) : AbstractMutableList<Float>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: Float): Boolean = indexOf(element) != -1
+    override fun get(index: Int): Float = array[index + startIndex]
+    override fun set(index: Int, element: Float): Float =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: Float): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: Float): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: Float) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): Float = throw UnsupportedOperationException()
+}
+
+private class DoublesWrapperList(
+    private val array: DoubleArray,
+    private val startIndex: Int,
+    private val endIndex: Int,
+) : AbstractMutableList<Double>(), RandomAccess, Serializable {
+
+    override val size: Int get() = endIndex - startIndex
+    override fun isEmpty(): Boolean = size == 0
+    override fun contains(element: Double): Boolean = indexOf(element) != -1
+    override fun get(index: Int): Double = array[index + startIndex]
+    override fun set(index: Int, element: Double): Double =
+        array[index + startIndex].let { array[index + startIndex] = element;it }
+
+    override fun indexOf(element: Double): Int {
+        var i = 0
+        while (i < size) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun lastIndexOf(element: Double): Int {
+        var i = size - 1
+        while (i >= 0) {
+            if (array[i + startIndex] == element) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
+    override fun add(index: Int, element: Double) = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): Double = throw UnsupportedOperationException()
 }
