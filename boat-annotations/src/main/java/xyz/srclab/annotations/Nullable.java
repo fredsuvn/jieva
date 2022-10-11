@@ -5,17 +5,16 @@ import javax.annotation.meta.TypeQualifierNickname;
 import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
+/**
+ * Claims the annotated element may be null and should be checked.
+ *
+ * @author fredsuvn
+ */
 @Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.MAYBE)
 @TypeQualifierNickname
+@Nonnull(when = When.UNKNOWN)
+@Retention(RetentionPolicy.RUNTIME)
 @Target({
-    ElementType.METHOD,
-    ElementType.FIELD,
-    ElementType.PARAMETER,
-    ElementType.LOCAL_VARIABLE,
-    ElementType.TYPE_PARAMETER,
-    ElementType.TYPE_USE,
-})
+    ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.TYPE_USE})
 public @interface Nullable {
 }
