@@ -11,7 +11,7 @@ import java.nio.CharBuffer;
  *
  * @author fredsuvn
  */
-public class CharArrayWrapperReader extends Reader {
+public class CharArrayReader extends Reader {
 
     private final char[] source;
     private final int sourceOffset;
@@ -26,7 +26,7 @@ public class CharArrayWrapperReader extends Reader {
      * @param offset given offset
      * @param length given length long
      */
-    public CharArrayWrapperReader(char[] source, int offset, int length) {
+    public CharArrayReader(char[] source, int offset, int length) {
         MgCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
         this.source = source;
         this.sourceOffset = offset;
@@ -46,6 +46,7 @@ public class CharArrayWrapperReader extends Reader {
         }
         int read = Math.min(len, sourceEndIndex - next);
         target.put(source, next, read);
+        next += read;
         return read;
     }
 
@@ -70,6 +71,7 @@ public class CharArrayWrapperReader extends Reader {
         }
         int read = Math.min(len, sourceEndIndex - next);
         System.arraycopy(source, next, cbuf, off, read);
+        next += read;
         return read;
     }
 
@@ -85,7 +87,7 @@ public class CharArrayWrapperReader extends Reader {
             next += n;
             return n;
         } else {
-            next = sourceEndIndex;
+            next += rest;
             return rest;
         }
     }
@@ -108,6 +110,20 @@ public class CharArrayWrapperReader extends Reader {
     @Override
     public void reset() throws IOException {
         next = mark;
+    }
+
+    /**
+     * Sets current read point to given position from 0 to wrapped length. The index of next read char is
+     * {@code 'pos + offset-of-wrapped-char-array'}.
+     * <p>
+     * This method can let you re-read this reader from given position,
+     * if the position is 0, you can re-read whole reader.
+     *
+     * @param pos given position
+     */
+    public void reset(int pos) {
+        MgCheck.checkInBounds(pos, 0, sourceEndIndex - sourceOffset);
+        next = sourceOffset + pos;
     }
 
     protected boolean isEnd() {
