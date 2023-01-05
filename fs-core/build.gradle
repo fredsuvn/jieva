@@ -1,0 +1,38 @@
+plugins {
+  id 'build.jar'
+  id 'org.jetbrains.kotlin.plugin.lombok' version '1.7.0'
+  id 'io.freefair.lombok' version '5.3.0'
+}
+
+description = "Core of mage."
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  api platform(project(":boat-dependencies"))
+
+  api project(":boat-annotations")
+
+  compileOnly "org.springframework:spring-core"
+  compileOnly "cglib:cglib"
+
+  testImplementation project(":boat-test")
+  testImplementation "commons-beanutils:commons-beanutils"
+  testImplementation "org.springframework:spring-core"
+  testImplementation "cglib:cglib"
+
+  testAnnotationProcessor platform(project(":boat-dependencies"))
+  testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
+
+  testImplementation "org.apache.velocity:velocity"
+  testImplementation "io.netty:netty-all"
+
+  testImplementation group: 'cn.hutool', name: 'hutool-all', version: '5.7.14'
+
+}
+
+//utils.writeBuildInfos(project, "src/main/resources/META-INF/build.properties")
