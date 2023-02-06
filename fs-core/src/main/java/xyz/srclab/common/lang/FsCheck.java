@@ -9,7 +9,9 @@ import java.util.NoSuchElementException;
  *
  * @author fredsuvn
  */
-public class CheckFs {
+public class FsCheck {
+
+    //public static boolean isEmpty()
 
     /**
      * Checks whether given object is null, if it is, throw a {@link NullPointerException}.
