@@ -17,6 +17,9 @@ dependencies {
 
   api project(":boat-annotations")
 
+  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+
   compileOnly "org.springframework:spring-core"
   compileOnly "cglib:cglib"
 
