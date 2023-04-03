@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
  * @author sunqian
  */
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 60)
-@Measurement(iterations = 3, time = 60)
+@Warmup(iterations = 3, time = 10)
+@Measurement(iterations = 3, time = 10)
 @Threads(1)
 @Fork(1)
 @State(value = Scope.Benchmark)
@@ -32,9 +32,11 @@ public class StringAppenderBenchmark {
     };
 
     /*
-     * Benchmark                                   Mode  Cnt     Score      Error   Units
-     * StringAppenderBenchmark.useStringAppender  thrpt    3  5495.719 ± 1909.060  ops/ms
-     * StringAppenderBenchmark.useStringBuilder   thrpt    3  4733.660 ± 1952.949  ops/ms
+     * Benchmark                                  Mode  Cnt       Score        Error   Units
+     * StringAppenderBenchmark.useAppender       thrpt    3    6146.967 ±    797.707  ops/ms
+     * StringAppenderBenchmark.useAppenderShort  thrpt    3    6569.592 ±   1059.797  ops/ms
+     * StringAppenderBenchmark.useBuilder        thrpt    3    4824.778 ±   1399.142  ops/ms
+     * StringAppenderBenchmark.useBuilderShort   thrpt    3  179211.338 ± 179601.239  ops/ms
      */
     public static void main(String[] args) throws Exception {
         Options options = new OptionsBuilder().include(StringAppenderBenchmark.class.getSimpleName()).build();
@@ -46,7 +48,7 @@ public class StringAppenderBenchmark {
     }
 
     @Benchmark
-    public void useStringAppender() {
+    public void useAppender() {
         StringAppender stringAppender = new StringAppender();
         for (String string : strings) {
             stringAppender.append(string);
@@ -55,11 +57,39 @@ public class StringAppenderBenchmark {
     }
 
     @Benchmark
-    public void useStringBuilder() {
+    public void useBuilder() {
         StringBuilder stringBuilder = new StringBuilder();
         for (String string : strings) {
             stringBuilder.append(string);
         }
         stringBuilder.toString();
+    }
+
+    @Benchmark
+    public void useAppenderShort() {
+        StringAppender appender = new StringAppender();
+        String word = appender
+            .append('h')
+            .append('e')
+            .append("llo")
+            .append(' ')
+            .append('w')
+            .append("orld")
+            .append('!')
+            .toString();
+    }
+
+    @Benchmark
+    public void useBuilderShort() {
+        StringBuilder builder = new StringBuilder();
+        String word = builder
+            .append('h')
+            .append('e')
+            .append("llo")
+            .append(' ')
+            .append('w')
+            .append("orld")
+            .append('!')
+            .toString();
     }
 }

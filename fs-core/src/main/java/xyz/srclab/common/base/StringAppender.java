@@ -1,11 +1,13 @@
 package xyz.srclab.common.base;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.jetbrains.annotations.NotNull;
+import lombok.NoArgsConstructor;
 import xyz.srclab.annotations.Nullable;
 
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.Arrays;
 
 /**
  * StringAppender is used to append objects and concat them into a string,
@@ -20,14 +22,14 @@ import java.io.Writer;
  */
 public class StringAppender extends Writer implements Appendable {
 
-    private static final int CHAR_BUFFER_SIZE = 16;
-
     private Node head = null;
-    private Node current = null;
+    private Node cur = null;
+    //to concat simple char node as a char[] or String node
+    private Node charStart = null;
 
     @Override
-    public void write(@NotNull char[] cbuf, int off, int len) {
-        append(new String(cbuf, off, len));
+    public void write(char[] cbuf, int off, int len) {
+        append(cbuf, off, off + len);
     }
 
     @Override
@@ -36,31 +38,23 @@ public class StringAppender extends Writer implements Appendable {
     }
 
     @Override
-    public void write(@NotNull char[] cbuf) {
-        append(new String(cbuf));
+    public void write(char[] cbuf) {
+        append(cbuf);
     }
 
     @Override
-    public void write(@NotNull String str) {
+    public void write(String str) {
         append(str);
     }
 
     @Override
-    public void write(@NotNull String str, int off, int len) {
-        append(str.substring(off, off + len));
+    public void write(String str, int off, int len) {
+        append(str, off, off + len);
     }
 
     @Override
     public StringAppender append(CharSequence csq) {
-        if (current == null) {
-            current = new Node(csq);
-            head = current;
-        } else {
-            Node newNode = new Node(csq);
-            current.next = newNode;
-            current = newNode;
-        }
-        return this;
+        return append0(String.valueOf(csq));
     }
 
     @Override
@@ -70,41 +64,31 @@ public class StringAppender extends Writer implements Appendable {
 
     @Override
     public StringAppender append(char c) {
-        if (current == null) {
-            char[] buffer = new char[CHAR_BUFFER_SIZE + 1];
-            buffer[0] = c;
-            //store the size
-            buffer[CHAR_BUFFER_SIZE] = 1;
-            current = new Node(buffer);
-            head = current;
-        } else {
-            Node oldNode = current;
-            if (oldNode.value instanceof char[]) {
-                char[] buffer = (char[]) oldNode.value;
-                char count = buffer[CHAR_BUFFER_SIZE];
-                if (count < CHAR_BUFFER_SIZE) {
-                    //means buffer has space
-                    buffer[count] = c;
-                    buffer[CHAR_BUFFER_SIZE] = (char) (count + 1);
-                } else {
-                    //means buffer is full
-                    char[] newBuffer = new char[CHAR_BUFFER_SIZE + 1];
-                    newBuffer[0] = c;
-                    newBuffer[CHAR_BUFFER_SIZE] = 1;
-                    Node newNode = new Node(newBuffer);
-                    current.next = newNode;
-                    current = newNode;
-                }
-            } else {
-                char[] newBuffer = new char[CHAR_BUFFER_SIZE + 1];
-                newBuffer[0] = c;
-                newBuffer[CHAR_BUFFER_SIZE] = 1;
-                Node newNode = new Node(newBuffer);
-                current.next = newNode;
-                current = newNode;
-            }
+        Node charNode = new Node(c, null);
+        if (charStart == null) {
+            charStart = charNode;
         }
-        return this;
+        return appendNode(charNode);
+    }
+
+    /**
+     * Appends char values of given char array to this appender.
+     *
+     * @param chars given char array
+     */
+    public StringAppender append(char[] chars) {
+        return append0(Arrays.copyOf(chars, chars.length));
+    }
+
+    /**
+     * Appends char values of given char array to this appender.
+     *
+     * @param chars given char array
+     * @param start start index, inclusive
+     * @param end   end index, exclusive
+     */
+    public StringAppender append(char[] chars, int start, int end) {
+        return append0(Arrays.copyOfRange(chars, start, end));
     }
 
     /**
@@ -113,7 +97,7 @@ public class StringAppender extends Writer implements Appendable {
      * @param obj given object
      */
     public StringAppender append(Object obj) {
-        return append(String.valueOf(obj));
+        return append0(String.valueOf(obj));
     }
 
     @Override
@@ -124,14 +108,48 @@ public class StringAppender extends Writer implements Appendable {
     public void close() {
     }
 
+    private StringAppender append0(Object obj) {
+        if (charStart != null && !(obj instanceof Character)) {
+            //concat chars
+            Node charNow = charStart;
+            int charCount = 0;
+            while (charNow != null) {
+                charCount++;
+                charNow = charNow.next;
+            }
+            char[] concatBuf = new char[charCount];
+            charNow = charStart;
+            charCount = 0;
+            while (charNow != null) {
+                concatBuf[charCount++] = (Character) charNow.value;
+                charNow = charNow.next;
+            }
+            charStart.value = concatBuf;
+            cur = charStart;
+            charStart.next = null;
+            charStart = null;
+        }
+        return appendNode(new Node(obj, null));
+    }
+
+    private StringAppender appendNode(Node node) {
+        if (cur == null) {
+            cur = node;
+            head = cur;
+        } else {
+            cur.next = node;
+            cur = node;
+        }
+        return this;
+    }
+
     @Override
     public String toString() {
         int size = 0;
         Node node = head;
         while (node != null) {
             if (node.value instanceof char[]) {
-                char[] buffer = (char[]) node.value;
-                size += buffer[CHAR_BUFFER_SIZE];
+                size += ((char[]) node.value).length;
             } else {
                 size += String.valueOf(node.value).length();
             }
@@ -142,9 +160,8 @@ public class StringAppender extends Writer implements Appendable {
         node = head;
         while (node != null) {
             if (node.value instanceof char[]) {
-                char[] buffer = (char[]) node.value;
-                System.arraycopy(buffer, 0, chars, charsOffset, buffer[CHAR_BUFFER_SIZE]);
-                charsOffset += buffer[CHAR_BUFFER_SIZE];
+                System.arraycopy(node.value, 0, chars, charsOffset, ((char[]) node.value).length);
+                charsOffset += ((char[]) node.value).length;
             } else {
                 String value = String.valueOf(node.value);
                 value.getChars(0, value.length(), chars, charsOffset);
@@ -155,9 +172,11 @@ public class StringAppender extends Writer implements Appendable {
         return new String(chars);
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Data
     private static class Node implements Serializable {
-        private final Object value;
+        private Object value;
         private @Nullable Node next;
     }
 }
