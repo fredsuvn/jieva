@@ -22,10 +22,34 @@ import java.util.Arrays;
  */
 public class StringAppender extends Writer implements Appendable {
 
-    private Node head = null;
-    private Node cur = null;
-    //to concat simple char node as a char[] or String node
-    private Node charStart = null;
+    private static final int DEFAULT_INIT_CAPACITY = 16;
+    private static final int DEFAULT_MAX_CAPACITY = 2048;
+
+    private final int initCapacity;
+    private final int maxCapacity;
+    private char[][] data;
+    private int dataOffset = 0;
+    private char[] buffer;
+    private int bufferOffset = 0;
+
+    public StringAppender() {
+        this(DEFAULT_INIT_CAPACITY, DEFAULT_MAX_CAPACITY);
+    }
+
+    public StringAppender(int initCapacity) {
+        this(initCapacity, DEFAULT_MAX_CAPACITY);
+    }
+
+    public StringAppender(int initCapacity, int maxCapacity) {
+        if (initCapacity <= 0 || maxCapacity <= 0) {
+            throw new IllegalArgumentException("initCapacity and maxCapacity must > 0!");
+        }
+        if (initCapacity >= maxCapacity) {
+            throw new IllegalArgumentException("initCapacity must < maxCapacity!");
+        }
+        this.initCapacity = initCapacity;
+        this.maxCapacity = maxCapacity;
+    }
 
     @Override
     public void write(char[] cbuf, int off, int len) {
@@ -54,21 +78,33 @@ public class StringAppender extends Writer implements Appendable {
 
     @Override
     public StringAppender append(CharSequence csq) {
-        return append0(String.valueOf(csq));
+        ensureCapacity(csq.length());
+        for (int i = 0; i < csq.length(); i++) {
+            buffer[bufferOffset++] = csq.charAt(i);
+        }
+        return this;
     }
 
     @Override
     public StringAppender append(CharSequence csq, int start, int end) {
-        return append(csq.subSequence(start, end).toString());
+        if (end - start < 0) {
+            throw new IllegalArgumentException("start must <= end");
+        }
+        if (start == end) {
+            return this;
+        }
+        ensureCapacity(end - start);
+        for (int i = start; i < end; i++) {
+            buffer[bufferOffset++] = csq.charAt(i);
+        }
+        return this;
     }
 
     @Override
     public StringAppender append(char c) {
-        Node charNode = new Node(c, null);
-        if (charStart == null) {
-            charStart = charNode;
-        }
-        return appendNode(charNode);
+        ensureCapacity(1);
+        buffer[bufferOffset++] = c;
+        return this;
     }
 
     /**
@@ -77,7 +113,7 @@ public class StringAppender extends Writer implements Appendable {
      * @param chars given char array
      */
     public StringAppender append(char[] chars) {
-        return append0(Arrays.copyOf(chars, chars.length));
+        return append(chars, 0, chars.length);
     }
 
     /**
@@ -88,7 +124,48 @@ public class StringAppender extends Writer implements Appendable {
      * @param end   end index, exclusive
      */
     public StringAppender append(char[] chars, int start, int end) {
-        return append0(Arrays.copyOfRange(chars, start, end));
+        if (end - start < 0) {
+            throw new IllegalArgumentException("start must <= end");
+        }
+        if (start == end) {
+            return this;
+        }
+        ensureCapacity(end - start);
+        System.arraycopy(chars, start, buffer, bufferOffset, end - start);
+        bufferOffset += (end - start);
+        return this;
+    }
+
+    /**
+     * Appends given string to this appender.
+     *
+     * @param str given string
+     */
+    public StringAppender append(String str) {
+        ensureCapacity(str.length());
+        str.getChars(0, str.length(), buffer, bufferOffset);
+        bufferOffset += str.length();
+        return this;
+    }
+
+    /**
+     * Appends given string to this appender.
+     *
+     * @param str   given string
+     * @param start start index, inclusive
+     * @param end   end index, exclusive
+     */
+    public StringAppender append(String str, int start, int end) {
+        if (end - start < 0) {
+            throw new IllegalArgumentException("start must <= end");
+        }
+        if (start == end) {
+            return this;
+        }
+        ensureCapacity(end - start);
+        str.getChars(start, end, buffer, bufferOffset);
+        bufferOffset += (end - start);
+        return this;
     }
 
     /**
@@ -97,7 +174,7 @@ public class StringAppender extends Writer implements Appendable {
      * @param obj given object
      */
     public StringAppender append(Object obj) {
-        return append0(String.valueOf(obj));
+        return append(String.valueOf(obj));
     }
 
     @Override
@@ -108,75 +185,76 @@ public class StringAppender extends Writer implements Appendable {
     public void close() {
     }
 
-    private StringAppender append0(Object obj) {
-        if (charStart != null && !(obj instanceof Character)) {
-            //concat chars
-            Node charNow = charStart;
-            int charCount = 0;
-            while (charNow != null) {
-                charCount++;
-                charNow = charNow.next;
-            }
-            char[] concatBuf = new char[charCount];
-            charNow = charStart;
-            charCount = 0;
-            while (charNow != null) {
-                concatBuf[charCount++] = (Character) charNow.value;
-                charNow = charNow.next;
-            }
-            charStart.value = concatBuf;
-            cur = charStart;
-            charStart.next = null;
-            charStart = null;
-        }
-        return appendNode(new Node(obj, null));
-    }
-
-    private StringAppender appendNode(Node node) {
-        if (cur == null) {
-            cur = node;
-            head = cur;
-        } else {
-            cur.next = node;
-            cur = node;
-        }
-        return this;
-    }
-
     @Override
     public String toString() {
+        appendLastNode();
+        buffer = null;
+        bufferOffset = 0;
         int size = 0;
-        Node node = head;
-        while (node != null) {
-            if (node.value instanceof char[]) {
-                size += ((char[]) node.value).length;
-            } else {
-                size += String.valueOf(node.value).length();
-            }
-            node = node.next;
+        for (int i = 0; i < dataOffset; i++) {
+            char[] datum = data[i];
+            size += datum.length;
         }
         char[] chars = new char[size];
         int charsOffset = 0;
-        node = head;
-        while (node != null) {
-            if (node.value instanceof char[]) {
-                System.arraycopy(node.value, 0, chars, charsOffset, ((char[]) node.value).length);
-                charsOffset += ((char[]) node.value).length;
-            } else {
-                String value = String.valueOf(node.value);
-                value.getChars(0, value.length(), chars, charsOffset);
-                charsOffset += value.length();
-            }
-            node = node.next;
+        for (int i = 0; i < dataOffset; i++) {
+            char[] datum = data[i];
+            System.arraycopy(datum, 0, chars, charsOffset, datum.length);
+            charsOffset += datum.length;
         }
         return new String(chars);
+    }
+
+    private void ensureCapacity(int appendLength) {
+        if (buffer == null) {
+            buffer = new char[Math.max(initCapacity, appendLength)];
+            return;
+        }
+        int bufferLength = buffer.length;
+        if (appendLength <= bufferLength - bufferOffset) {
+            return;
+        }
+        if (bufferLength == bufferOffset) {
+            appendNode();
+            buffer = new char[Math.max(initCapacity, appendLength)];
+            bufferOffset = 0;
+            return;
+        }
+        int newLength = bufferOffset + appendLength;
+        if (newLength >= maxCapacity) {
+            buffer = Arrays.copyOf(buffer, newLength);
+            return;
+        }
+        buffer = Arrays.copyOf(buffer, Math.max(buffer.length * 2, newLength));
+    }
+
+    private void appendNode() {
+        appendNode(buffer);
+    }
+
+    private void appendLastNode() {
+        if (bufferOffset == 0) {
+            return;
+        }
+        appendNode(Arrays.copyOfRange(buffer, 0, bufferOffset));
+    }
+
+    private void appendNode(char[] node) {
+        if (data == null) {
+            data = new char[8][];
+        } else {
+            if (dataOffset == data.length) {
+                data = Arrays.copyOf(data, data.length * 2);
+            }
+        }
+        data[dataOffset++] = node;
     }
 
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
     private static class Node implements Serializable {
-        private Object value;
+        private char[] value;
         private @Nullable Node next;
     }
 }

@@ -19,5 +19,11 @@ public class StringTest {
             .append('!')
             .toString();
         Assert.assertEquals(word, "hello world!");
+        word = appender.append("qqqqqqqqqqqqqqqqqqqqqqqqqqq")
+            .append("111111111111111111111111111111111111111111111111111111")
+            .append(123)
+            .append(111L)
+            .toString();
+        Assert.assertEquals(word, "hello world!qqqqqqqqqqqqqqqqqqqqqqqqqqq111111111111111111111111111111111111111111111111111111123111");
     }
 }
