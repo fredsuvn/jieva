@@ -3,9 +3,11 @@ package xyz.srclab.common.base;
 import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotations.Nullable;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -26,12 +28,36 @@ public class Fs {
     }
 
     /**
-     * Returns given arguments as an array;
+     * Returns given arguments as an array.
      *
      * @param args given arguments
      */
     public static <T> T[] array(T... args) {
         return args;
+    }
+
+    /**
+     * Returns an array of component type R of which elements are mapped from the source array by given mapper.
+     * If the dest array's length equals to source array, the mapped elements will be put into the dest array,
+     * else put into a new array of component type R.
+     *
+     * @param <T>    component type of source array
+     * @param <R>    component type of dest array
+     * @param source the source array
+     * @param dest   the dest array
+     * @param mapper given mapper
+     */
+    public static <T, R> R[] array(T[] source, R[] dest, Function<T, R> mapper) {
+        R[] result;
+        if (dest.length == source.length) {
+            result = dest;
+        } else {
+            result = (R[]) Array.newInstance(dest.getClass().getComponentType(), source.length);
+        }
+        for (int i = 0; i < source.length; i++) {
+            result[i] = mapper.apply(source[i]);
+        }
+        return result;
     }
 
     /**
@@ -305,12 +331,30 @@ public class Fs {
      *
      * @param args given arguments
      */
-    public static String string(Object... args) {
-        StringBuilder sb = new StringBuilder();
-        for (Object arg : args) {
-            sb.append(arg);
+    public static String string(String... args) {
+        int length = 0;
+        for (String arg : args) {
+            length += arg.length();
         }
-        return sb.toString();
+        char[] chars = new char[length];
+        int offset = 0;
+        for (String arg : args) {
+            arg.getChars(0, arg.length(), chars, offset);
+            offset += arg.length();
+        }
+        return new String(chars);
+    }
+
+    /**
+     * Builds a String concatenated from given arguments
+     *
+     * @param args given arguments
+     */
+    public static String string(Object... args) {
+        if (equals(String.class, args.getClass().getComponentType())) {
+            return string((String[])args);
+        }
+        return string(array(args, new String[args.length], String::valueOf));
     }
 
     /**
@@ -355,9 +399,7 @@ public class Fs {
      * @param obj given object
      */
     public static void checkNull(@Nullable Object obj) throws NullPointerException {
-        if (obj == null) {
-            throw new NullPointerException();
-        }
+         FsCheck.checkNull(obj);
     }
 
     /**
@@ -367,9 +409,7 @@ public class Fs {
      * @param message given message
      */
     public static void checkNull(@Nullable Object obj, CharSequence message) throws NullPointerException {
-        if (obj == null) {
-            throw new NullPointerException(message.toString());
-        }
+        FsCheck.checkNull(obj, message);
     }
 
     /**
@@ -380,9 +420,7 @@ public class Fs {
      * @param messageArgs given message arguments
      */
     public static void checkNull(@Nullable Object obj, Object... messageArgs) throws NullPointerException {
-        if (obj == null) {
-            throw new NullPointerException(Fs.string(messageArgs));
-        }
+        FsCheck.checkNull(obj, messageArgs);
     }
 
     /**
@@ -391,9 +429,7 @@ public class Fs {
      * @param expr given expression
      */
     public static void checkNull(boolean expr) throws NullPointerException {
-        if (!expr) {
-            throw new NullPointerException();
-        }
+        FsCheck.checkNull(expr);
     }
 
     /**
@@ -404,9 +440,7 @@ public class Fs {
      * @param message given message
      */
     public static void checkNull(boolean expr, CharSequence message) throws NullPointerException {
-        if (!expr) {
-            throw new NullPointerException(message.toString());
-        }
+        FsCheck.checkNull(expr, message);
     }
 
     /**
@@ -417,9 +451,7 @@ public class Fs {
      * @param messageArgs given message arguments
      */
     public static void checkNull(boolean expr, Object... messageArgs) throws NullPointerException {
-        if (!expr) {
-            throw new NullPointerException(Fs.string(messageArgs));
-        }
+        FsCheck.checkNull(expr, messageArgs);
     }
 
     /**
@@ -428,9 +460,7 @@ public class Fs {
      * @param expr given expression
      */
     public static void checkArgument(boolean expr) throws IllegalArgumentException {
-        if (!expr) {
-            throw new IllegalArgumentException();
-        }
+        FsCheck.checkArgument(expr);
     }
 
     /**
@@ -441,9 +471,7 @@ public class Fs {
      * @param message given message
      */
     public static void checkArgument(boolean expr, CharSequence message) throws IllegalArgumentException {
-        if (!expr) {
-            throw new IllegalArgumentException(message.toString());
-        }
+        FsCheck.checkArgument(expr, message);
     }
 
     /**
@@ -454,9 +482,7 @@ public class Fs {
      * @param messageArgs given message arguments
      */
     public static void checkArgument(boolean expr, Object... messageArgs) throws IllegalArgumentException {
-        if (!expr) {
-            throw new IllegalArgumentException(Fs.string(messageArgs));
-        }
+        FsCheck.checkArgument(expr, messageArgs);
     }
 
     /**
@@ -465,9 +491,7 @@ public class Fs {
      * @param expr given expression
      */
     public static void checkState(boolean expr) throws IllegalStateException {
-        if (!expr) {
-            throw new IllegalStateException();
-        }
+        FsCheck.checkState(expr);
     }
 
     /**
