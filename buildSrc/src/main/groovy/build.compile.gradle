@@ -16,6 +16,8 @@ project.afterEvaluate {
 
   compileJava {
     options.encoding = 'UTF-8'
+    //options.compilerArgs += ['-Werror', '-Xlint']
+    options.incremental = false
   }
   compileTestJava {
     options.encoding = 'UTF-8'

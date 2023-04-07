@@ -1,6 +1,8 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.build.annotations.JoinFs;
+import xyz.srclab.build.annotations.JoinFsAs;
 
 import java.util.NoSuchElementException;
 
@@ -9,6 +11,7 @@ import java.util.NoSuchElementException;
  *
  * @author fredsuvn
  */
+@JoinFs
 public class FsCheck {
 
     /**
@@ -16,6 +19,7 @@ public class FsCheck {
      *
      * @param obj given object
      */
+    @JoinFsAs("xxxxxxxxxxxx")
     public static void checkNull(@Nullable Object obj) throws NullPointerException {
         if (obj == null) {
             throw new NullPointerException();
@@ -43,7 +47,7 @@ public class FsCheck {
      */
     public static void checkNull(@Nullable Object obj, Object... messageArgs) throws NullPointerException {
         if (obj == null) {
-            throw new NullPointerException(Fs.string(messageArgs));
+            throw new NullPointerException(FsString.string(messageArgs));
         }
     }
 
@@ -80,7 +84,7 @@ public class FsCheck {
      */
     public static void checkNull(boolean expr, Object... messageArgs) throws NullPointerException {
         if (!expr) {
-            throw new NullPointerException(Fs.string(messageArgs));
+            throw new NullPointerException(FsString.string(messageArgs));
         }
     }
 
@@ -117,7 +121,7 @@ public class FsCheck {
      */
     public static void checkArgument(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new IllegalArgumentException(Fs.string(messageArgs));
+            throw new IllegalArgumentException(FsString.string(messageArgs));
         }
     }
 
@@ -154,7 +158,7 @@ public class FsCheck {
      */
     public static void checkState(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new IllegalStateException(Fs.string(messageArgs));
+            throw new IllegalStateException(FsString.string(messageArgs));
         }
     }
 
@@ -191,7 +195,7 @@ public class FsCheck {
      */
     public static void checkSupported(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new UnsupportedOperationException(Fs.string(messageArgs));
+            throw new UnsupportedOperationException(FsString.string(messageArgs));
         }
     }
 
@@ -228,7 +232,7 @@ public class FsCheck {
      */
     public static void checkElement(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new NoSuchElementException(Fs.string(messageArgs));
+            throw new NoSuchElementException(FsString.string(messageArgs));
         }
     }
 
@@ -439,5 +443,17 @@ public class FsCheck {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
+    }
+
+    public static Dd ss() {
+        return null;
+    }
+
+    public static String ss2() {
+        return null;
+    }
+
+    public static class Dd {
+
     }
 }

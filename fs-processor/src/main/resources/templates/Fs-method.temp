@@ -1,0 +1,6 @@
+/**
+ *{comment}
+ */
+public static {returnType} {methodName}({params}) {
+    {needReturn}{fsName}.{methodName}({args});
+}
