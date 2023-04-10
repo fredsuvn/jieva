@@ -1,6 +1,6 @@
 plugins {
   id 'build.jar'
-  id 'org.jetbrains.kotlin.plugin.lombok' version '1.7.0'
+  //id 'org.jetbrains.kotlin.plugin.lombok' version '1.7.0'
   id 'io.freefair.lombok' version '5.3.0'
 }
 
@@ -12,8 +12,18 @@ java {
   }
 }
 
+sourceSets {
+  main.java.srcDirs += ['src/main/kotlin', 'src/main/java']
+  test.java.srcDirs += ['src/test/kotlin', 'src/test/java']
+}
+
+
+
 dependencies {
   api platform(project(":boat-dependencies"))
+
+  implementation 'org.apache.velocity:velocity-engine-core:2.3'
+  //implementation group: 'org.apache.velocity', name: 'velocity-engine-core', version: '2.3.2'
 
   //compileOnly 'com.google.auto.service:auto-service:1.0-rc7'
   //annotationProcessor 'com.google.auto.service:auto-service:1.0-rc7'

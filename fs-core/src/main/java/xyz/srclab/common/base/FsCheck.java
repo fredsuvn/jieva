@@ -1,8 +1,8 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.build.annotations.JoinFs;
-import xyz.srclab.build.annotations.JoinFsAs;
+import xyz.srclab.build.annotations.FsMethods;
+import xyz.srclab.build.annotations.FsMethod;
 
 import java.util.NoSuchElementException;
 
@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  *
  * @author fredsuvn
  */
-@JoinFs
+@FsMethods
 public class FsCheck {
 
     /**
@@ -19,8 +19,14 @@ public class FsCheck {
      *
      * @param obj given object
      */
-    @JoinFsAs("xxxxxxxxxxxx")
+    @FsMethod("zz")
     public static void checkNull(@Nullable Object obj) throws NullPointerException {
+        if (obj == null) {
+            throw new NullPointerException();
+        }
+    }
+
+    public static <T> void checkNull2(@Nullable Object obj, T t) throws NullPointerException {
         if (obj == null) {
             throw new NullPointerException();
         }

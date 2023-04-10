@@ -6,13 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks this static method will join into Fs as specified name in compile processing.
+ * Marks this static method will be created a shortcut method in the class Fs in compile processing.
  *
  * @author fredsuvn
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-public @interface JoinFsAs {
+public @interface FsMethod {
 
     /**
      * The name in Fs.
