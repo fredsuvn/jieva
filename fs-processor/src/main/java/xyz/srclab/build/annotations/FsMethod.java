@@ -11,11 +11,13 @@ import java.lang.annotation.Target;
  * @author fredsuvn
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE_USE, ElementType.TYPE_PARAMETER, ElementType.PARAMETER})
 public @interface FsMethod {
 
     /**
      * The name in Fs.
      */
-    String value();
+    String name() default "";
+
+    boolean ignored() default false;
 }

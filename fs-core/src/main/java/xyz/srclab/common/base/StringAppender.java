@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import xyz.srclab.annotations.Nullable;
-
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Arrays;
@@ -23,13 +22,19 @@ import java.util.Arrays;
 public class StringAppender extends Writer implements Appendable {
 
     private static final int DEFAULT_INIT_CAPACITY = 16;
+
     private static final int DEFAULT_MAX_CAPACITY = 2048;
 
     private final int initCapacity;
+
     private final int maxCapacity;
+
     private char[][] data;
+
     private int dataOffset = 0;
+
     private char[] buffer;
+
     private int bufferOffset = 0;
 
     public StringAppender() {
@@ -254,7 +259,10 @@ public class StringAppender extends Writer implements Appendable {
     @AllArgsConstructor
     @Data
     private static class Node implements Serializable {
+
         private char[] value;
-        private @Nullable Node next;
+
+        @Nullable
+        private Node next;
     }
 }

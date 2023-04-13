@@ -1,7 +1,6 @@
 package xyz.srclab.common.base;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.util.function.Supplier;
 
 /**
@@ -134,6 +133,7 @@ public class FsString {
         }
 
         private static final class OfArray extends Abs {
+
             private Object[] args;
 
             private OfArray(Object[] args) {
@@ -149,6 +149,7 @@ public class FsString {
         }
 
         private static final class OfIterable extends Abs {
+
             private Iterable<?> args;
 
             private OfIterable(Iterable<?> args) {
@@ -167,6 +168,7 @@ public class FsString {
         }
 
         private static final class OfSupplier extends Abs {
+
             private Supplier<?> supplier;
 
             private OfSupplier(Supplier<?> supplier) {

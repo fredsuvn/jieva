@@ -14,7 +14,9 @@ package xyz.srclab.common.base;
 public abstract class FsFinal {
 
     private int hashCode;
+
     private boolean hashed = false;
+
     private String toString;
 
     /**

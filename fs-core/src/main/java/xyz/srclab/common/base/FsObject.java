@@ -1,7 +1,6 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
@@ -225,7 +224,6 @@ public class FsObject {
         return System.identityHashCode(obj);
     }
 
-
     /**
      * Returns result of equaling follows:
      * <ul>
@@ -318,8 +316,7 @@ public class FsObject {
             if (a instanceof double[] && b instanceof double[]) {
                 return Arrays.equals((double[]) a, (double[]) b);
             }
-            return deepEquals ?
-                Arrays.deepEquals((Object[]) a, (Object[]) b) : Arrays.equals((Object[]) a, (Object[]) b);
+            return deepEquals ? Arrays.deepEquals((Object[]) a, (Object[]) b) : Arrays.equals((Object[]) a, (Object[]) b);
         }
         return Objects.equals(a, b);
     }

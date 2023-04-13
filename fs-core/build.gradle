@@ -23,13 +23,13 @@ dependencies {
   compileOnly "org.springframework:spring-core"
   compileOnly "cglib:cglib"
 
-  implementation project(":fs-processor")
-  annotationProcessor project(":fs-processor")
-
   testImplementation project(":boat-test")
   testImplementation "commons-beanutils:commons-beanutils"
   testImplementation "org.springframework:spring-core"
   testImplementation "cglib:cglib"
+
+  implementation project(":fs-processor")
+  annotationProcessor project(":fs-processor")
 
   testAnnotationProcessor platform(project(":boat-dependencies"))
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
@@ -38,6 +38,12 @@ dependencies {
   testImplementation "io.netty:netty-all"
 
   //testImplementation group: 'cn.hutool', name: 'hutool-all', version: '5.7.14'
+
+  testImplementation 'org.apache.velocity:velocity-engine-core:2.3'
+  // https://mvnrepository.com/artifact/com.github.javaparser/javaparser-core
+  testImplementation group: 'com.github.javaparser', name: 'javaparser-core', version: '3.25.2'
+  // https://mvnrepository.com/artifact/com.github.javaparser/javaparser-symbol-solver-core
+  testImplementation group: 'com.github.javaparser', name: 'javaparser-symbol-solver-core', version: '3.25.2'
 
 }
 
@@ -49,5 +55,5 @@ tasks.register('buildFs') {
 }
 
 task compileFs {
-  dependsOn 'clean','compileJava'
+  dependsOn 'clean', 'compileJava'
 }

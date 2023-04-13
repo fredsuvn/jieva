@@ -13,10 +13,12 @@ import $im;
 public class Fs {
 #foreach($m in $methods)
 
+    #if($m.comment)
     /**
     *$m.comment
     */
-    public static #if($m.typeParams)<#foreach($t in $m.typeParams)$t#if($velocityCount<$foreach.count), #end#end> #end$m.returnType ${m.methodName}({params})} {
+    #end
+    public static #if($m.typeParams)<#foreach($t in $m.typeParams)$t#if(!$foreach.last), #end#end> #end$m.returnType ${m.methodName}(#if($m.params)#foreach($p in $m.params)$p#if(!$foreach.last), #end#end#end)} {
     {needReturn}{fsName}.{methodName}({args});
     }
 #end

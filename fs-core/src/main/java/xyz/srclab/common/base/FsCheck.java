@@ -1,9 +1,10 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.build.annotations.FsMethods;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.build.annotations.FsMethod;
-
+import xyz.srclab.build.annotations.FsMethods;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -19,14 +20,8 @@ public class FsCheck {
      *
      * @param obj given object
      */
-    @FsMethod("zz")
+    @FsMethod(name = "zz2")
     public static void checkNull(@Nullable Object obj) throws NullPointerException {
-        if (obj == null) {
-            throw new NullPointerException();
-        }
-    }
-
-    public static <T> void checkNull2(@Nullable Object obj, T t) throws NullPointerException {
         if (obj == null) {
             throw new NullPointerException();
         }
@@ -38,6 +33,7 @@ public class FsCheck {
      * @param obj     given object
      * @param message given message
      */
+    @FsMethod
     public static void checkNull(@Nullable Object obj, CharSequence message) throws NullPointerException {
         if (obj == null) {
             throw new NullPointerException(message.toString());
@@ -51,6 +47,7 @@ public class FsCheck {
      * @param obj         given object
      * @param messageArgs given message arguments
      */
+    @FsMethod(ignored = true)
     public static void checkNull(@Nullable Object obj, Object... messageArgs) throws NullPointerException {
         if (obj == null) {
             throw new NullPointerException(FsString.string(messageArgs));
@@ -295,8 +292,7 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      * @param message    given message
      */
-    public static void checkInBounds(
-        int index, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
+    public static void checkInBounds(int index, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
         if (!isInBounds(index, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
@@ -312,8 +308,7 @@ public class FsCheck {
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
      */
-    public static void checkInBounds(
-        long index, long startIndex, long endIndex) throws IndexOutOfBoundsException {
+    public static void checkInBounds(long index, long startIndex, long endIndex) throws IndexOutOfBoundsException {
         if (!isInBounds(index, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException("[" + startIndex + ", " + endIndex + "): " + index);
         }
@@ -330,8 +325,7 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      * @param message    given message
      */
-    public static void checkInBounds(
-        long index, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
+    public static void checkInBounds(long index, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
         if (!isInBounds(index, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
@@ -349,8 +343,7 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      */
     public static boolean isRangeInBounds(int startRange, int endRange, int startIndex, int endIndex) {
-        return startRange >= startIndex && endRange <= endIndex && startRange <= endRange
-            && startRange >= 0 && startIndex >= 0;
+        return startRange >= startIndex && endRange <= endIndex && startRange <= endRange && startRange >= 0 && startIndex >= 0;
     }
 
     /**
@@ -365,8 +358,7 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      */
     public static boolean isRangeInBounds(long startRange, long endRange, long startIndex, long endIndex) {
-        return startRange >= startIndex && endRange <= endIndex && startRange <= endRange
-            && startRange >= 0 && startIndex >= 0;
+        return startRange >= startIndex && endRange <= endIndex && startRange <= endRange && startRange >= 0 && startIndex >= 0;
     }
 
     /**
@@ -381,11 +373,9 @@ public class FsCheck {
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
      */
-    public static void checkRangeInBounds(
-        int startRange, int endRange, int startIndex, int endIndex) throws IndexOutOfBoundsException {
+    public static void checkRangeInBounds(int startRange, int endRange, int startIndex, int endIndex) throws IndexOutOfBoundsException {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
-            throw new IndexOutOfBoundsException(
-                "[" + startIndex + ", " + endIndex + "): [" + startRange + ", " + endRange + ")");
+            throw new IndexOutOfBoundsException("[" + startIndex + ", " + endIndex + "): [" + startRange + ", " + endRange + ")");
         }
     }
 
@@ -402,9 +392,7 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      * @param message    given message
      */
-    public static void checkRangeInBounds(
-        int startRange, int endRange, int startIndex, int endIndex, CharSequence message
-    ) throws IndexOutOfBoundsException {
+    public static void checkRangeInBounds(int startRange, int endRange, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
@@ -422,11 +410,9 @@ public class FsCheck {
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
      */
-    public static void checkRangeInBounds(
-        long startRange, long endRange, long startIndex, long endIndex) throws IndexOutOfBoundsException {
+    public static void checkRangeInBounds(long startRange, long endRange, long startIndex, long endIndex) throws IndexOutOfBoundsException {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
-            throw new IndexOutOfBoundsException(
-                "[" + startIndex + ", " + endIndex + "): [" + startRange + ", " + endRange + ")");
+            throw new IndexOutOfBoundsException("[" + startIndex + ", " + endIndex + "): [" + startRange + ", " + endRange + ")");
         }
     }
 
@@ -443,11 +429,15 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      * @param message    given message
      */
-    public static void checkRangeInBounds(
-        long startRange, long endRange, long startIndex, long endIndex, CharSequence message
-    ) throws IndexOutOfBoundsException {
+    public static void checkRangeInBounds(long startRange, long endRange, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
+        }
+    }
+
+    public static <T, @Nullable R, U extends @Nullable String> void checkNull2(@Nullable @ThreadSafe Object obj, @Nullable T t, @Nullable @ThreadSafe List<? extends @Nullable U> lu, @Nullable R r) throws NullPointerException {
+        if (obj == null) {
+            throw new NullPointerException();
         }
     }
 
@@ -460,6 +450,5 @@ public class FsCheck {
     }
 
     public static class Dd {
-
     }
 }
