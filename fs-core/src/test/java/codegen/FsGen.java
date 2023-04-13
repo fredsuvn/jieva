@@ -14,6 +14,7 @@ import com.github.javaparser.ast.expr.MemberValuePair;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
@@ -110,7 +111,7 @@ public class FsGen {
                 for (TypeDeclaration<?> type : types) {
                     for (AnnotationExpr annotation : type.getAnnotations()) {
                         if (Objects.equals(annotation.resolve().getQualifiedName(), FsMethods.class.getName())) {
-                            List<MethodDeclaration> staticMethods = getStaticMethodsForType(type);
+                            List<MethodDeclaration> staticMethods = getStaticMethodsForType(type, imports);
                             methods.addAll(staticMethods);
                             imports.addAll(cu.findAll(ImportDeclaration.class));
                         }
@@ -124,7 +125,7 @@ public class FsGen {
         }
     }
 
-    private static List<MethodDeclaration> getStaticMethodsForType(TypeDeclaration<?> type) {
+    private static List<MethodDeclaration> getStaticMethodsForType(TypeDeclaration<?> type, List<ImportDeclaration> imports) {
         return type
             .findAll(MethodDeclaration.class, it -> it.isStatic() && it.isPublic())
             .stream().filter(method -> {
@@ -139,7 +140,11 @@ public class FsGen {
                 }
                 return true;
             }).peek(method -> {
-                String returnType = method.getType().asString();
+                ResolvedType returnType = method.getType().resolve();
+                if (returnType.isReferenceType()) {
+                    ImportDeclaration returnImport = new ImportDeclaration(returnType.describe(), false, false);
+                    imports.add(returnImport);
+                }
                 BlockStmt body = new BlockStmt();
                 String callState;
                 NodeList<Parameter> parameters = method.getParameters();
@@ -149,8 +154,15 @@ public class FsGen {
                     callState = type.getNameAsString() + "." + method.getNameAsString() + "(" +
                         parameters.stream().map(NodeWithSimpleName::getNameAsString).collect(Collectors.joining(", "))
                         + ");";
+                    for (Parameter parameter : parameters) {
+                        ResolvedType paramType = parameter.resolve().getType();
+                        if (paramType.isReferenceType()) {
+                            ImportDeclaration returnImport = new ImportDeclaration(paramType.asReferenceType().getQualifiedName(), false, false);
+                            imports.add(returnImport);
+                        }
+                    }
                 }
-                if (Objects.equals(returnType, "void")) {
+                if (Objects.equals(returnType.describe(), "void")) {
                     body.addStatement(callState);
                 } else {
                     body.addStatement("return " + callState);
