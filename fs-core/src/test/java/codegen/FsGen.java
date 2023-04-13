@@ -20,6 +20,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.SourceRoot;
+import lombok.Data;
 import org.apache.commons.io.IOUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -68,19 +69,17 @@ public class FsGen {
     }
 
     public static void main(String[] args) throws Exception {
-        List<ImportDeclaration> imports = new LinkedList<>();
-        List<MethodDeclaration> methods = getStaticMethodDeclarations(imports);
-        writeFsJavaFile(methods, imports);
+        List<FsPart> parts = resolveUtils();
+        writeFsJavaFile(parts);
     }
 
-    private static void writeFsJavaFile(List<MethodDeclaration> methods, List<ImportDeclaration> imports) {
+    private static void writeFsJavaFile(List<FsPart> parts) {
         VelocityEngine engine = new VelocityEngine();
         engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         engine.init();
         VelocityContext context = new VelocityContext();
-        context.put("methods", methods.stream().map(Node::toString).collect(Collectors.toList()));
-        context.put("ims", imports.stream().map(it -> it.toString().replaceAll(System.lineSeparator(), "")).collect(Collectors.toList()));
+        context.put("utils", parts.stream().map(FsPart::toUtil).collect(Collectors.toList()));
         StringWriter writer = new StringWriter();
         engine.evaluate(context, writer, "vm", getFsVm());
         if (writeFs) {
@@ -96,8 +95,8 @@ public class FsGen {
         }
     }
 
-    private static List<MethodDeclaration> getStaticMethodDeclarations(List<ImportDeclaration> imports) {
-        List<MethodDeclaration> methods = new LinkedList<>();
+    private static List<FsPart> resolveUtils() {
+        List<FsPart> parts = new LinkedList<>();
         try {
             sourceRoot.parse("", (localPath, absolutePath, result) -> {
                 if (!result.isSuccessful()) {
@@ -111,23 +110,32 @@ public class FsGen {
                 for (TypeDeclaration<?> type : types) {
                     for (AnnotationExpr annotation : type.getAnnotations()) {
                         if (Objects.equals(annotation.resolve().getQualifiedName(), FsMethods.class.getName())) {
-                            List<MethodDeclaration> staticMethods = getStaticMethodsForType(type, imports);
-                            methods.addAll(staticMethods);
+                            List<MethodDeclaration> methods = new LinkedList<>();
+                            List<ImportDeclaration> imports = new LinkedList<>();
+                            resolveForType(type, methods, imports);
+                            FsPart part = new FsPart();
+                            part.setDesc(" Methods from " + type.getNameAsString() + ":");
+                            part.setMethods(methods);
+                            part.setImports(imports);
                             imports.addAll(cu.findAll(ImportDeclaration.class));
+                            parts.add(part);
                         }
                     }
                 }
                 return SourceRoot.Callback.Result.DONT_SAVE;
             });
-            return methods;
+            return parts;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static List<MethodDeclaration> getStaticMethodsForType(TypeDeclaration<?> type, List<ImportDeclaration> imports) {
-        return type
-            .findAll(MethodDeclaration.class, it -> it.isStatic() && it.isPublic())
+    private static void resolveForType(
+        TypeDeclaration<?> type,
+        List<MethodDeclaration> methods,
+        List<ImportDeclaration> imports
+    ) {
+        methods.addAll(type.findAll(MethodDeclaration.class, it -> it.isStatic() && it.isPublic())
             .stream().filter(method -> {
                 for (AnnotationExpr annotation : method.getAnnotations()) {
                     ResolvedAnnotationDeclaration re = annotation.resolve();
@@ -142,7 +150,8 @@ public class FsGen {
             }).peek(method -> {
                 ResolvedType returnType = method.getType().resolve();
                 if (returnType.isReferenceType()) {
-                    ImportDeclaration returnImport = new ImportDeclaration(returnType.describe(), false, false);
+                    ImportDeclaration returnImport =
+                        new ImportDeclaration(returnType.describe(), false, false);
                     imports.add(returnImport);
                 }
                 BlockStmt body = new BlockStmt();
@@ -157,7 +166,8 @@ public class FsGen {
                     for (Parameter parameter : parameters) {
                         ResolvedType paramType = parameter.resolve().getType();
                         if (paramType.isReferenceType()) {
-                            ImportDeclaration returnImport = new ImportDeclaration(paramType.asReferenceType().getQualifiedName(), false, false);
+                            ImportDeclaration returnImport =
+                                new ImportDeclaration(paramType.asReferenceType().getQualifiedName(), false, false);
                             imports.add(returnImport);
                         }
                     }
@@ -182,7 +192,8 @@ public class FsGen {
                         method.setName(newName);
                     }
                 }
-            }).collect(Collectors.toList());
+            }).collect(Collectors.toList())
+        );
     }
 
     @Nullable
@@ -229,5 +240,31 @@ public class FsGen {
 
     private static class NullMember extends MemberValuePair {
         public static final NullMember INSTANCE = new NullMember();
+    }
+
+    @Data
+    public static class FsPart {
+        private String desc;
+        private List<MethodDeclaration> methods;
+        private List<ImportDeclaration> imports;
+
+        public UtilPart toUtil() {
+            UtilPart utilPart = new UtilPart();
+            utilPart.setDesc(desc);
+            if (methods != null) {
+                utilPart.setMethods(methods.stream().map(Node::toString).collect(Collectors.toList()));
+            }
+            if (imports != null) {
+                utilPart.setImports(imports.stream().map(it -> "import " + it.getNameAsString() + ";").collect(Collectors.toList()));
+            }
+            return utilPart;
+        }
+    }
+
+    @Data
+    public static class UtilPart {
+        private String desc;
+        private List<String> methods;
+        private List<String> imports;
     }
 }

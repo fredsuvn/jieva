@@ -15,6 +15,8 @@ import java.util.NoSuchElementException;
  */
 public class Fs {
 
+    // Methods from FsCheck:
+
     /**
      * Checks whether given object is null, if it is, throw a {@link NullPointerException}.
      *

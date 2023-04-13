@@ -1,7 +1,9 @@
 package xyz.srclab.common.base;
 
-#foreach($im in $ims)
+#foreach($u in $utils)
+#foreach($im in $u.imports)
 $im
+#end
 #end
 
 /**
@@ -11,8 +13,12 @@ $im
  * @author fredsuvn
  */
 public class Fs {
-#foreach($m in $methods)
+#foreach($u in $utils)
 
-    $m
+    //$u.desc
+    #foreach($m in $u.methods)
+
+        $m
+    #end
 #end
 }
