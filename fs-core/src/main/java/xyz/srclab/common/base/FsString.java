@@ -1,6 +1,13 @@
 package xyz.srclab.common.base;
 
 import org.jetbrains.annotations.NotNull;
+import xyz.srclab.annotations.Nullable;
+import xyz.srclab.build.annotations.FsMethods;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -8,92 +15,220 @@ import java.util.function.Supplier;
  *
  * @author fredsuvn
  */
+@FsMethods
 public class FsString {
 
     /**
-     * Builds a String concatenated from given arguments
+     * Returns a string follows:
+     * <ul>
+     * <li>returns String.valueOf for given object if it is not an array;</li>
+     * <li>if given object is primitive array, returns Arrays.toString for it;</li>
+     * <li>if given object is Object[], returns Arrays.deepToString for it;</li>
+     * <li>else returns String.valueOf for given object</li>
+     * </ul>
+     * <p>
+     * This method is same as: toString(obj, true, true)
      *
-     * @param args given arguments
+     * @param obj given object
      */
-    public static String string(String... args) {
+    public static String toString(@Nullable Object obj) {
+        return toString(obj, true, true);
+    }
+
+    /**
+     * Returns deep-array-to-string for given objects.
+     *
+     * @param objs given objects
+     */
+    public static String toString(Object... objs) {
+        return Arrays.deepToString(objs);
+    }
+
+    /**
+     * Returns a string follows:
+     * <ul>
+     * <li>if given object is primitive array and array-check is true, returns Arrays.toString for it;</li>
+     * <li>if given object is Object[] and both array-check and deep-to-string are true,
+     * returns Arrays.deepToString for it;</li>
+     * <li>if given object is Object[] and array-check is true and deep-to-string is false,
+     * returns Arrays.toString for it;</li>
+     * <li>else returns String.valueOf for given object</li>
+     * </ul>
+     *
+     * @param obj          given object
+     * @param arrayCheck   the array-check
+     * @param deepToString whether deep-to-string
+     */
+    public static String toString(@Nullable Object obj, boolean arrayCheck, boolean deepToString) {
+        if (obj == null || !arrayCheck) {
+            return String.valueOf(obj);
+        }
+        Class<?> type = obj.getClass();
+        if (!type.isArray()) {
+            return obj.toString();
+        }
+        if (obj instanceof Object[]) {
+            return deepToString ? Arrays.deepToString((Object[]) obj) : Arrays.toString((Object[]) obj);
+        }
+        if (obj instanceof boolean[]) {
+            return Arrays.toString((boolean[]) obj);
+        }
+        if (obj instanceof byte[]) {
+            return Arrays.toString((byte[]) obj);
+        }
+        if (obj instanceof short[]) {
+            return Arrays.toString((short[]) obj);
+        }
+        if (obj instanceof char[]) {
+            return Arrays.toString((char[]) obj);
+        }
+        if (obj instanceof int[]) {
+            return Arrays.toString((int[]) obj);
+        }
+        if (obj instanceof long[]) {
+            return Arrays.toString((long[]) obj);
+        }
+        if (obj instanceof float[]) {
+            return Arrays.toString((float[]) obj);
+        }
+        if (obj instanceof double[]) {
+            return Arrays.toString((double[]) obj);
+        }
+        return obj.toString();
+    }
+
+    /**
+     * Concatenates given strings.
+     *
+     * @param strings given strings
+     */
+    public static String concat(String... strings) {
         int length = 0;
-        for (String arg : args) {
-            length += arg.length();
+        for (String string : strings) {
+            length += string.length();
         }
         char[] chars = new char[length];
         int offset = 0;
-        for (String arg : args) {
-            arg.getChars(0, arg.length(), chars, offset);
-            offset += arg.length();
+        for (String string : strings) {
+            string.getChars(0, string.length(), chars, offset);
+            offset += string.length();
         }
         return new String(chars);
     }
 
     /**
-     * Builds a String concatenated from given arguments
+     * Concatenates toString of given arguments.
      *
      * @param args given arguments
      */
-    public static String string(Object... args) {
+    public static String concat(Object... args) {
         if (FsObject.equals(String.class, args.getClass().getComponentType())) {
-            return string((String[]) args);
+            return concat((String[]) args);
         }
-        return string(FsObject.array(args, new String[args.length], String::valueOf));
+        return concat(FsArray.map(args, new String[args.length], String::valueOf));
     }
 
     /**
-     * Returns a lazy string concatenated from given arguments.
-     * <p>
-     * The returned string is lazy, it only computes the result of concatenating once
-     * when first call the toString() method, before and after this, given arguments just are held and dropped.
+     * Concatenates toString of given arguments.
      *
      * @param args given arguments
      */
-    public static CharSequence lazyString(Object... args) {
-        return LazyString.ofArray(args);
+    public static String concat(Iterable<?> args) {
+        if (args instanceof Collection) {
+            String[] array = new String[((Collection<?>) args).size()];
+            int i = 0;
+            for (Object arg : args) {
+                array[i] = String.valueOf(arg);
+                i++;
+            }
+            return concat(array);
+        } else {
+            List<String> list = new LinkedList<>();
+            for (Object arg : args) {
+                list.add(String.valueOf(arg));
+            }
+            return concat(list);
+        }
     }
 
     /**
-     * Returns a lazy string concatenated from given arguments.
-     * <p>
-     * The returned string is lazy, it only computes the result of concatenating once
-     * when first call the toString() method, before and after this, given arguments just are held and dropped.
+     * Joins given strings with given separator.
      *
-     * @param args given arguments
+     * @param separator given separator
+     * @param strings   given strings
      */
-    public static CharSequence lazyString(Iterable<?> args) {
-        return LazyString.ofIterable(args);
+    public static String join(String separator, String... strings) {
+        int length = 0;
+        for (String string : strings) {
+            length += string.length();
+        }
+        if (strings.length > 1) {
+            length += (strings.length - 1) * separator.length();
+        }
+        char[] chars = new char[length];
+        int offset = 0;
+        for (int i = 0; i < strings.length; i++) {
+            String string = strings[i];
+            string.getChars(0, string.length(), chars, offset);
+            offset += string.length();
+            if (i < strings.length - 1) {
+                separator.getChars(0, separator.length(), chars, offset);
+                offset += separator.length();
+            }
+        }
+        return new String(chars);
     }
 
     /**
-     * Returns a lazy string supplied from given supplier.
+     * Joins toString of given arguments with given separator.
+     *
+     * @param separator given separator
+     * @param args      given arguments
+     */
+    public static String join(String separator, Object... args) {
+        if (FsObject.equals(String.class, args.getClass().getComponentType())) {
+            return join(separator, (String[]) args);
+        }
+        return join(separator, FsArray.map(args, new String[args.length], String::valueOf));
+    }
+
+    /**
+     * Joins toString of given arguments with given separator.
+     *
+     * @param separator given separator
+     * @param args      given arguments
+     */
+    public static String join(String separator, Iterable<?> args) {
+        if (args instanceof Collection) {
+            String[] array = new String[((Collection<?>) args).size()];
+            int i = 0;
+            for (Object arg : args) {
+                array[i] = String.valueOf(arg);
+                i++;
+            }
+            return join(separator, array);
+        } else {
+            List<String> list = new LinkedList<>();
+            for (Object arg : args) {
+                list.add(String.valueOf(arg));
+            }
+            return join(separator, list);
+        }
+    }
+
+    /**
+     * Returns an object which is lazy for executing method {@link Object#toString()},
+     * the executing was provided by given supplier.
      * <p>
-     * The returned string is lazy, it only computes the result of {@link Supplier#get()} once
-     * when first call the toString() method, before and after this, given arguments just are held and dropped.
+     * Note returned {@link CharSequence}'s other methods (such as {@link CharSequence#length()})
+     * were based on its toString() (and the toString() is lazy).
      *
      * @param supplier given supplier
      */
-    public static CharSequence lazyString(Supplier<?> supplier) {
-        return LazyString.ofSupplier(supplier);
-    }
+    public static CharSequence lazyString(Supplier<CharSequence> supplier) {
+        return new CharSequence() {
 
-    private static final class LazyString {
-
-        private static CharSequence ofArray(Object[] args) {
-            return new OfArray(args);
-        }
-
-        private static CharSequence ofIterable(Iterable<?> args) {
-            return new OfIterable(args);
-        }
-
-        private static CharSequence ofSupplier(Supplier<?> supplier) {
-            return new OfSupplier(supplier);
-        }
-
-        private static abstract class Abs implements CharSequence {
-
-            protected String toString;
+            private String toString = null;
 
             @Override
             public int length() {
@@ -114,73 +249,10 @@ public class FsString {
             @Override
             public String toString() {
                 if (toString == null) {
-                    toString = buildString();
+                    toString = String.valueOf(supplier.get());
                 }
                 return toString;
             }
-
-            @Override
-            public boolean equals(Object o) {
-                return this == o;
-            }
-
-            @Override
-            public int hashCode() {
-                return toString().hashCode();
-            }
-
-            protected abstract String buildString();
-        }
-
-        private static final class OfArray extends Abs {
-
-            private Object[] args;
-
-            private OfArray(Object[] args) {
-                this.args = args;
-            }
-
-            @Override
-            protected String buildString() {
-                String result = string(args);
-                args = null;
-                return result;
-            }
-        }
-
-        private static final class OfIterable extends Abs {
-
-            private Iterable<?> args;
-
-            private OfIterable(Iterable<?> args) {
-                this.args = args;
-            }
-
-            @Override
-            protected String buildString() {
-                StringBuilder sb = new StringBuilder();
-                for (Object arg : args) {
-                    sb.append(arg);
-                }
-                args = null;
-                return sb.toString();
-            }
-        }
-
-        private static final class OfSupplier extends Abs {
-
-            private Supplier<?> supplier;
-
-            private OfSupplier(Supplier<?> supplier) {
-                this.supplier = supplier;
-            }
-
-            @Override
-            protected String buildString() {
-                String result = FsObject.toString(supplier.get());
-                supplier = null;
-                return result;
-            }
-        }
+        };
     }
 }

@@ -1,16 +1,17 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import java.lang.reflect.Array;
+import xyz.srclab.build.annotations.FsMethods;
+
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * Utilities for Object.
  *
  * @author fredsuvn
  */
+@FsMethods
 public class FsObject {
 
     /**
@@ -21,119 +22,6 @@ public class FsObject {
      */
     public static <T> T notNull(@Nullable T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
-    }
-
-    /**
-     * Returns given arguments as an array.
-     *
-     * @param args given arguments
-     */
-    @SafeVarargs
-    public static <T> T[] array(T... args) {
-        return args;
-    }
-
-    /**
-     * Returns an array of component type R of which elements are mapped from the source array by given mapper.
-     * If the dest array's length equals to source array, the mapped elements will be put into the dest array,
-     * else put into a new array of component type R.
-     *
-     * @param <T>    component type of source array
-     * @param <R>    component type of dest array
-     * @param source the source array
-     * @param dest   the dest array
-     * @param mapper given mapper
-     */
-    public static <T, R> R[] array(T[] source, R[] dest, Function<T, R> mapper) {
-        R[] result;
-        if (dest.length == source.length) {
-            result = dest;
-        } else {
-            result = (R[]) Array.newInstance(dest.getClass().getComponentType(), source.length);
-        }
-        for (int i = 0; i < source.length; i++) {
-            result[i] = mapper.apply(source[i]);
-        }
-        return result;
-    }
-
-    /**
-     * Returns a string follows:
-     * <ul>
-     * <li>returns String.valueOf for given object if it is not an array;</li>
-     * <li>if given object is primitive array, returns Arrays.toString for it;</li>
-     * <li>if given object is Object[], returns Arrays.deepToString for it;</li>
-     * <li>else returns String.valueOf for given object</li>
-     * </ul>
-     * <p>
-     * This method is same as: toString(obj, true, true)
-     *
-     * @param obj given object
-     */
-    public static String toString(@Nullable Object obj) {
-        return toString(obj, true, true);
-    }
-
-    /**
-     * Returns deep-array-to-string for given objects.
-     *
-     * @param objs given objects
-     */
-    public static String toString(Object... objs) {
-        return Arrays.deepToString(objs);
-    }
-
-    /**
-     * Returns a string follows:
-     * <ul>
-     * <li>if given object is primitive array and array-check is true, returns Arrays.toString for it;</li>
-     * <li>if given object is Object[] and both array-check and deep-to-string are true,
-     * returns Arrays.deepToString for it;</li>
-     * <li>if given object is Object[] and array-check is true and deep-to-string is false,
-     * returns Arrays.toString for it;</li>
-     * <li>else returns String.valueOf for given object</li>
-     * </ul>
-     *
-     * @param obj          given object
-     * @param arrayCheck   the array-check
-     * @param deepToString whether deep-to-string
-     */
-    public static String toString(@Nullable Object obj, boolean arrayCheck, boolean deepToString) {
-        if (obj == null || !arrayCheck) {
-            return String.valueOf(obj);
-        }
-        Class<?> type = obj.getClass();
-        if (!type.isArray()) {
-            return obj.toString();
-        }
-        if (obj instanceof Object[]) {
-            return deepToString ? Arrays.deepToString((Object[]) obj) : Arrays.toString((Object[]) obj);
-        }
-        if (obj instanceof boolean[]) {
-            return Arrays.toString((boolean[]) obj);
-        }
-        if (obj instanceof byte[]) {
-            return Arrays.toString((byte[]) obj);
-        }
-        if (obj instanceof short[]) {
-            return Arrays.toString((short[]) obj);
-        }
-        if (obj instanceof char[]) {
-            return Arrays.toString((char[]) obj);
-        }
-        if (obj instanceof int[]) {
-            return Arrays.toString((int[]) obj);
-        }
-        if (obj instanceof long[]) {
-            return Arrays.toString((long[]) obj);
-        }
-        if (obj instanceof float[]) {
-            return Arrays.toString((float[]) obj);
-        }
-        if (obj instanceof double[]) {
-            return Arrays.toString((double[]) obj);
-        }
-        return obj.toString();
     }
 
     /**

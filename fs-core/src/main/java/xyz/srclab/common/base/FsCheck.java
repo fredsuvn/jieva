@@ -1,10 +1,8 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
-import xyz.srclab.build.annotations.FsMethod;
 import xyz.srclab.build.annotations.FsMethods;
-import java.util.List;
+
 import java.util.NoSuchElementException;
 
 /**
@@ -20,7 +18,6 @@ public class FsCheck {
      *
      * @param obj given object
      */
-    @FsMethod(name = "zz2")
     public static void checkNull(@Nullable Object obj) throws NullPointerException {
         if (obj == null) {
             throw new NullPointerException();
@@ -33,7 +30,6 @@ public class FsCheck {
      * @param obj     given object
      * @param message given message
      */
-    @FsMethod
     public static void checkNull(@Nullable Object obj, CharSequence message) throws NullPointerException {
         if (obj == null) {
             throw new NullPointerException(message.toString());
@@ -47,10 +43,9 @@ public class FsCheck {
      * @param obj         given object
      * @param messageArgs given message arguments
      */
-    @FsMethod(ignored = true)
     public static void checkNull(@Nullable Object obj, Object... messageArgs) throws NullPointerException {
         if (obj == null) {
-            throw new NullPointerException(FsString.string(messageArgs));
+            throw new NullPointerException(FsString.concat(messageArgs));
         }
     }
 
@@ -87,7 +82,7 @@ public class FsCheck {
      */
     public static void checkNull(boolean expr, Object... messageArgs) throws NullPointerException {
         if (!expr) {
-            throw new NullPointerException(FsString.string(messageArgs));
+            throw new NullPointerException(FsString.concat(messageArgs));
         }
     }
 
@@ -124,7 +119,7 @@ public class FsCheck {
      */
     public static void checkArgument(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new IllegalArgumentException(FsString.string(messageArgs));
+            throw new IllegalArgumentException(FsString.concat(messageArgs));
         }
     }
 
@@ -161,7 +156,7 @@ public class FsCheck {
      */
     public static void checkState(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new IllegalStateException(FsString.string(messageArgs));
+            throw new IllegalStateException(FsString.concat(messageArgs));
         }
     }
 
@@ -198,7 +193,7 @@ public class FsCheck {
      */
     public static void checkSupported(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new UnsupportedOperationException(FsString.string(messageArgs));
+            throw new UnsupportedOperationException(FsString.concat(messageArgs));
         }
     }
 
@@ -235,7 +230,7 @@ public class FsCheck {
      */
     public static void checkElement(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new NoSuchElementException(FsString.string(messageArgs));
+            throw new NoSuchElementException(FsString.concat(messageArgs));
         }
     }
 
@@ -433,22 +428,5 @@ public class FsCheck {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
-    }
-
-    public static <T, @Nullable R, U extends @Nullable String> void checkNull2(@Nullable @ThreadSafe Object obj, @Nullable T t, @Nullable @ThreadSafe List<? extends @Nullable U> lu, @Nullable R r) throws NullPointerException {
-        if (obj == null) {
-            throw new NullPointerException();
-        }
-    }
-
-    public static Dd ss() {
-        return null;
-    }
-
-    public static String ss2() {
-        return null;
-    }
-
-    public static class Dd {
     }
 }

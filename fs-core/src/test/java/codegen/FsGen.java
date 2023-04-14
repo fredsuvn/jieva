@@ -148,6 +148,7 @@ public class FsGen {
                 }
                 return true;
             }).peek(method -> {
+                imports.add(new ImportDeclaration(type.resolve().getQualifiedName(), false, false));
                 ResolvedType returnType = method.getType().resolve();
                 if (returnType.isReferenceType()) {
                     ImportDeclaration returnImport =
