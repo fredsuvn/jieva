@@ -147,4 +147,19 @@ public class FsCollect {
     public static <K, V> ConcurrentHashMap<K, V> concurrentHashMap(Object... keyValues) {
         return toMap(new ConcurrentHashMap<>(keyValues.length / 2 + 1), keyValues);
     }
+
+    /**
+     * Returns whether given iterable is null or empty.
+     *
+     * @param iterable given iterable
+     */
+    public static boolean isEmpty(Iterable<?> iterable) {
+        if (iterable == null) {
+            return true;
+        }
+        if (iterable instanceof Collection) {
+            return ((Collection<?>) iterable).isEmpty();
+        }
+        return iterable.iterator().hasNext();
+    }
 }
