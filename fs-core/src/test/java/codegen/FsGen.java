@@ -152,7 +152,7 @@ public class FsGen {
                 ResolvedType returnType = method.getType().resolve();
                 if (returnType.isReferenceType()) {
                     ImportDeclaration returnImport =
-                        new ImportDeclaration(returnType.describe(), false, false);
+                        new ImportDeclaration(returnType.asReferenceType().getQualifiedName(), false, false);
                     imports.add(returnImport);
                 }
                 BlockStmt body = new BlockStmt();

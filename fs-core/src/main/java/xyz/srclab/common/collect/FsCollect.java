@@ -1,5 +1,6 @@
 package xyz.srclab.common.collect;
 
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.base.FsArray;
 
@@ -153,7 +154,7 @@ public class FsCollect {
      *
      * @param iterable given iterable
      */
-    public static boolean isEmpty(Iterable<?> iterable) {
+    public static boolean isEmpty(@Nullable Iterable<?> iterable) {
         if (iterable == null) {
             return true;
         }
@@ -161,5 +162,79 @@ public class FsCollect {
             return ((Collection<?>) iterable).isEmpty();
         }
         return iterable.iterator().hasNext();
+    }
+
+    /**
+     * Returns whether given map is null or empty.
+     *
+     * @param map given map
+     */
+    public static boolean isEmpty(@Nullable Map<?, ?> map) {
+        if (map == null) {
+            return true;
+        }
+        return map.isEmpty();
+    }
+
+    /**
+     * Returns value from given iterable at specified index, if failed to obtain, return null.
+     *
+     * @param iterable given iterable
+     * @param index    specified index
+     */
+    public static <T> T get(@Nullable Iterable<T> iterable, int index) {
+        return get(iterable, index, null);
+    }
+
+    /**
+     * Returns value from given iterable at specified index, if failed to obtain, return default value.
+     *
+     * @param iterable     given iterable
+     * @param index        specified index
+     * @param defaultValue default value
+     */
+    public static <T> T get(@Nullable Iterable<T> iterable, int index, @Nullable T defaultValue) {
+        if (iterable == null || index < 0) {
+            return defaultValue;
+        }
+        if (iterable instanceof List) {
+            List<T> list = (List<T>) iterable;
+            if (list.size() > index) {
+                return list.get(index);
+            }
+            return defaultValue;
+        }
+        int i = 0;
+        for (T t : iterable) {
+            if (index == i) {
+                return t;
+            }
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Returns value from given map at specified key, if failed to obtain, return null.
+     *
+     * @param map given map
+     * @param key specified key
+     */
+    public static <K, V> V get(@Nullable Map<K, V> map, K key) {
+        return get(map, key, null);
+    }
+
+    /**
+     * Returns value from given map at specified key, if failed to obtain, return default value.
+     *
+     * @param map          given map
+     * @param key          specified key
+     * @param defaultValue default value
+     */
+    public static <K, V> V get(@Nullable Map<K, V> map, K key, @Nullable V defaultValue) {
+        if (map == null) {
+            return defaultValue;
+        }
+        V v = map.get(key);
+        return v == null ? defaultValue : v;
     }
 }

@@ -1,5 +1,6 @@
 package xyz.srclab.common.base;
 
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethod;
 import xyz.srclab.build.annotations.FsMethods;
 
@@ -57,5 +58,30 @@ public class FsArray {
      */
     public static <T> T[] newArray(Class<?> componentType, int length) {
         return (T[]) Array.newInstance(componentType, length);
+    }
+
+    /**
+     * Returns value from given array at specified index, if failed to obtain, return null.
+     *
+     * @param array given array
+     * @param index specified index
+     */
+    public static <T> T get(@Nullable T[] array, int index) {
+        return get(array, index, null);
+    }
+
+    /**
+     * Returns value from given array at specified index, if failed to obtain, return default value.
+     *
+     * @param array        given array
+     * @param index        specified index
+     * @param defaultValue default value
+     */
+    public static <T> T get(@Nullable T[] array, int index, @Nullable T defaultValue) {
+        if (array == null || index < 0 || index >= array.length) {
+            return defaultValue;
+        }
+        T value = array[index];
+        return value == null ? defaultValue : value;
     }
 }
