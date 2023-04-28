@@ -1,7 +1,7 @@
 # <span class="image">![logo](../logo.svg)</span> Boat: SrcLab Core Libraries for Java/kotlin
 
-<span id="author" class="author">Sun Qian</span>  
-<span id="email" class="email"><fredsuvn@163.com></span>  
+<span id="author" class="author">Sun Qian</span>
+<span id="email" class="email"><fredsuvn@163.com></span>
 
 Table of Contents
 
@@ -31,7 +31,7 @@ Boat includes:
 
 -   [boat-core](../boat-core/DOCUMENTATION.md): Core lib;
 
--   [boat-serialize](../boat-serialize/DOCUMENTATION.md): Serialization
+-   [boat-data](../boat-data/DOCUMENTATION.md): Serialization
     and deserialization lib (supports `JSON`);
 
 -   [boat-codec](../boat-codec/DOCUMENTATION.md): Codec lib (supports
@@ -138,21 +138,21 @@ Source Code
 
 -   AsciiDoc:
 
-    -   [English](../boat-serialize/docs/DOCUMENTATION_en.adoc)
+    -   [English](../boat-data/docs/DOCUMENTATION_en.adoc)
 
-    -   [简体中文](../boat-serialize/docs/DOCUMENTATION_zh.adoc)
+    -   [简体中文](../boat-data/docs/DOCUMENTATION_zh.adoc)
 
 -   Markdown:
 
-    -   [English](../boat-serialize/docs/DOCUMENTATION_en.md)
+    -   [English](../boat-data/docs/DOCUMENTATION_en.md)
 
-    -   [简体中文](../boat-serialize/docs/DOCUMENTATION_zh.md)
+    -   [简体中文](../boat-data/docs/DOCUMENTATION_zh.md)
 
 -   HTML:
 
-    -   [English](../boat-serialize/docs/DOCUMENTATION_en.html)
+    -   [English](../boat-data/docs/DOCUMENTATION_en.html)
 
-    -   [简体中文](../boat-serialize/docs/DOCUMENTATION_zh.html)
+    -   [简体中文](../boat-data/docs/DOCUMENTATION_zh.html)
 
 ### Boat Codec
 

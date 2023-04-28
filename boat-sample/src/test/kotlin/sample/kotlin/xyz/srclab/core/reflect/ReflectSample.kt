@@ -3,15 +3,13 @@ package sample.kotlin.xyz.srclab.core.reflect
 import org.testng.annotations.Test
 import xyz.srclab.common.reflect.genericArrayType
 import xyz.srclab.common.reflect.invoke
-import xyz.srclab.common.reflect.method
 import xyz.srclab.common.reflect.parameterizedType
-import xyz.srclab.common.test.TestLogger
 
 class ReflectSample {
 
     @Test
     fun testReflects() {
-        val method = Any::class.java.method("toString")
+        val method = Any::class.java.getMethod("toString")
         val s = method.invoke<String>(Any())
         //java.lang.Object@97c879e
         logger.log("s: {}", s)

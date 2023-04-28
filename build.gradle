@@ -38,7 +38,7 @@ def initConfigs() {
       logLevel     : 100,
 
       //Version
-      version      : "0.0.1",
+      version      : "0.2.0",
 
       //Group
       group        : "xyz.srclab.common",

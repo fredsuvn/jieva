@@ -2,7 +2,6 @@ package sample.kotlin.xyz.srclab.core.jvm
 
 import org.testng.annotations.Test
 import xyz.srclab.common.jvm.jvmDescriptor
-import xyz.srclab.common.test.TestLogger
 
 class JvmSample {
 

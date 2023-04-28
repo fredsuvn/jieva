@@ -1,101 +1,57 @@
 package xyz.srclab.common.cache
 
-import xyz.srclab.common.collect.removeAll
-import java.time.Duration
+import java.util.function.Function
 
-class MapCache<K : Any, V : Any>(private val map: MutableMap<K, V>) : Cache<K, V> {
+/**
+ * [Cache] based on [MutableMap].
+ */
+open class MapCache<K : Any, V : Any>(
+    private val map: MutableMap<K, CacheVal<V>>
+) : Cache<K, V> {
 
-    override fun getOrNull(key: K): V? {
+    override fun getVal(key: K): CacheVal<V>? {
+        return getPresentVal(key)
+    }
+
+    override fun getVal(key: K, loader: Function<in K, out V>): CacheVal<V>? {
+        return try {
+            map.computeIfAbsent(key) {
+                CacheVal.of(loader.apply(key))
+            }
+        } catch (e: NoSuchElementException) {
+            null
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
+    }
+
+    override fun getPresentVal(key: K): CacheVal<V>? {
         return map[key]
     }
 
-    override fun getOrElse(key: K, defaultValue: V): V {
-        return map.getOrDefault(key, defaultValue)
-    }
-
-    override fun getOrElse(key: K, defaultValue: (K) -> V): V {
-        return map.getOrElse(key) { defaultValue(key) }
-    }
-
-    override fun getOrLoad(key: K, loader: (K) -> V): V {
-        return map.computeIfAbsent(key, loader)
-    }
-
-    override fun getPresent(keys: Iterable<K>): Map<K, V> {
-        val result = LinkedHashMap<K, V>()
-        for (key in keys) {
-            val value = map[key]
-            if (value !== null) {
-                result[key] = value
-            }
-        }
-        return result
-    }
-
-    override fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        val result = LinkedHashMap<K, V>()
-        for (key in keys) {
-            val value = map[key]
-            if (value !== null) {
-                result[key] = value
-            }
-        }
-        val restKeys = keys.minus(result.keys)
-        val newValues = loader(restKeys)
-        for (restKey in restKeys) {
-            result[restKey] = map.computeIfAbsent(restKey) { newValues[restKey]!! }
-        }
-        return result
-    }
-
     override fun put(key: K, value: V) {
-        map[key] = value
+        map[key] = CacheVal.of(value)
     }
 
-    override fun put(key: K, value: V, expirySeconds: Long) {
-        put(key, value)
-    }
-
-    override fun put(key: K, value: V, expiry: Duration) {
-        put(key, value)
-    }
-
-    override fun putAll(entries: Map<out K, V>) {
-        map.putAll(entries)
-    }
-
-    override fun putAll(entries: Map<out K, V>, expirySeconds: Long) {
-        putAll(entries)
-    }
-
-    override fun putAll(entries: Map<out K, V>, expiry: Duration) {
-        putAll(entries)
-    }
-
-    override fun expiry(key: K, expirySeconds: Long) {
-    }
-
-    override fun expiry(key: K, expirySeconds: Duration) {
-    }
-
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Long) {
-    }
-
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Duration) {
-    }
-
-    override fun invalidate(key: K) {
+    override fun remove(key: K) {
         map.remove(key)
     }
 
-    override fun invalidateAll(keys: Iterable<K>) {
-        map.removeAll(keys)
-    }
-
-    override fun invalidateAll() {
+    override fun clear() {
         map.clear()
     }
 
-    override fun cleanUp() {
+    override fun cleanUp() {}
+}
+
+/**
+ * Loading [Cache] based on [MutableMap].
+ */
+open class LoadingMapCache<K : Any, V : Any> constructor(
+    map: MutableMap<K, CacheVal<V>>,
+    private val loader: Function<in K, out V>
+) : MapCache<K, V>(map) {
+    override fun getVal(key: K): CacheVal<V>? {
+        return getVal(key, loader)
     }
 }

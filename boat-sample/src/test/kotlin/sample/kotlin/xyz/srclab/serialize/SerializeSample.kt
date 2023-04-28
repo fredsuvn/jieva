@@ -3,11 +3,10 @@ package sample.kotlin.xyz.srclab.serialize
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.testng.annotations.Test
 import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.serialize.json.JsonSerializer
-import xyz.srclab.common.serialize.json.jackson.toJsonSerializer
-import xyz.srclab.common.serialize.json.stringifyJson
-import xyz.srclab.common.serialize.json.toJson
-import xyz.srclab.common.test.TestLogger
+import xyz.srclab.common.data.json.JsonParser
+import xyz.srclab.common.data.json.jackson.toJsonSerializer
+import xyz.srclab.common.data.json.stringifyJson
+import xyz.srclab.common.data.json.toJson
 
 class SerializeSample {
 
@@ -26,7 +25,7 @@ class SerializeSample {
 
     @Test
     fun testJsonSerializer() {
-        val serializer = JsonSerializer.DEFAULT
+        val serializer = JsonParser.DEFAULT
         val mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}"
         val map: Map<String, String> =
             serializer.toJson(mapJson).toObject(object : TypeRef<Map<String, String>>() {})
@@ -39,7 +38,7 @@ class SerializeSample {
 
     @Test
     fun testJackson() {
-        val serializer: JsonSerializer = ObjectMapper().toJsonSerializer()
+        val serializer: JsonParser = ObjectMapper().toJsonSerializer()
         val mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}"
         val map: Map<String, String> =
             serializer.toJson(mapJson).toObject(object : TypeRef<Map<String, String>>() {})

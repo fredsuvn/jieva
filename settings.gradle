@@ -12,11 +12,17 @@
 
 rootProject.name = 'boat-build'
 
-//Including Boat projects
+//boat:
 include ":boat"
-file("${rootDir}/").eachDirMatch(~/boat-(?!others).*/) { dir ->
+file("${rootDir}/").eachDirMatch(~/boat-(?!plugins).*/) { dir ->
   include ":${dir.name}"
 }
-file("${rootDir}/boat-others").eachDirMatch(~/boat-.*/) { dir ->
-  include ":boat-others:${dir.name}"
+file("${rootDir}/").eachDirMatch(~/fs-(?!plugins).*/) { dir ->
+  include ":${dir.name}"
 }
+//plugins:
+file("${rootDir}/boat-plugins").eachDirMatch(~/boat-.*/) { dir ->
+  include ":boat-plugins:${dir.name}"
+}
+//processor
+include ":fs-processor"

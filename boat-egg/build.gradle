@@ -12,7 +12,7 @@ java {
 
 dependencies {
   implementation project(":boat-core")
-  implementation project(":boat-serialize")
+  implementation project(":boat-data")
 
-  testCompile project(":boat-test")
+  testImplementation project(":boat-test")
 }

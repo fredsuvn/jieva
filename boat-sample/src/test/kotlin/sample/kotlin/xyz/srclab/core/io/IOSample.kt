@@ -3,7 +3,6 @@ package sample.kotlin.xyz.srclab.core.io
 import org.testng.Assert
 import org.testng.annotations.Test
 import xyz.srclab.common.io.*
-import xyz.srclab.common.test.TestLogger
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 

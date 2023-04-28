@@ -1,10 +1,7 @@
 package sample.kotlin.xyz.srclab.core.convert
 
 import org.testng.annotations.Test
-import xyz.srclab.common.convert.FastConvertMethod
-import xyz.srclab.common.convert.FastConverter
 import xyz.srclab.common.convert.convert
-import xyz.srclab.common.test.TestLogger
 
 class ConvertSample {
 

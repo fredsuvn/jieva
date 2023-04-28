@@ -1,6 +1,5 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.collect.map
 import xyz.srclab.common.lang.loadPropertiesResource
 
 internal object OTypeManager {

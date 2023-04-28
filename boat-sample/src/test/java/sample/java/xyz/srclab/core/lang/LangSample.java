@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.*;
+import xyz.srclab.common.base.*;
 import xyz.srclab.common.test.TestLogger;
 import xyz.srclab.common.utils.Counter;
 
@@ -85,15 +85,15 @@ public class LangSample {
         args.put("name}", "DogX");
         args.put(1, "Cat");
         args.put(2, "Bird");
-        CharsTemplate template1 = CharsTemplate.resolve(
+        StringTemplate template1 = StringTemplate.resolve(
             "This is a {name}, that is a {}", "{", "}");
         //This is a Dog, that is a Cat
         logger.log(template1.process(args));
-        CharsTemplate template2 = CharsTemplate.resolve(
+        StringTemplate template2 = StringTemplate.resolve(
             "This is a } {name}, that is a {}}", "{", "}");
         //This is a } Dog, that is a Cat}
         logger.log(template2.process(args));
-        CharsTemplate template3 = CharsTemplate.resolve(
+        StringTemplate template3 = StringTemplate.resolve(
             "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
         //This is a } {DogX (Dog), that is a Bird\{\
         logger.log(template3.process(args));
@@ -102,14 +102,14 @@ public class LangSample {
     @Test
     public void testNamingCase() {
         String upperCamel = "UpperCamel";
-        String lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL);
+        String lowerCamel = BNamingCase.UPPER_CAMEL.convert(upperCamel, BNamingCase.LOWER_CAMEL);
         //upperCamel
         logger.log("lowerCamel: {}", lowerCamel);
     }
 
     @Test
     public void testLazy() {
-        Lazy<String> lazy = Lazy.of(() -> UUID.randomUUID().toString());
+        LazyGet<String> lazy = LazyGet.of(() -> UUID.randomUUID().toString());
         String value1 = lazy.get();
         String value2 = lazy.get();
         lazy.refresh();
@@ -124,9 +124,9 @@ public class LangSample {
     @Test
     public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyString<Integer> lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
+        BLazyGetterCharSeq<Integer> lazyToString = BLazyGetterCharSeq.of(LazyGet.of(counter::getAndIncrementInt));
         //0
-        logger.log("lazyToString: {}", lazyString);
+        logger.log("lazyToString: {}", lazyToString);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class LangSample {
 
         //Compares example:
         //99
-        logger.log("inBounds: {}", Compares.inBounds(100, 0, 99));
+        logger.log("inBounds: {}", Compares.between(100, 0, 99));
 
         //Checks examples:
         try {
@@ -217,16 +217,16 @@ public class LangSample {
             logger.log("random[10, 20): {}", Randoms.between(10, 20));
         }
 
-        RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
-            .mayBe(20, "A")
-            .mayBe(20, "B")
-            .mayBe(60, "C")
+        Randomer<?> BRandomer = BRandomer.newBuilder()
+            .score(20, "A")
+            .score(20, "B")
+            .score(60, "C")
             .build();
         int countA = 0;
         int countB = 0;
         int countC = 0;
         for (int i = 0; i < 1000; i++) {
-            Object result = randomSupplier.get();
+            Object result = BRandomer.get();
             if (result.equals("A")) {
                 countA++;
             } else if (result.equals("B")) {
@@ -244,14 +244,14 @@ public class LangSample {
     @Test
     public void testCachingProductBuilder() {
 
-        class CachingBuilderSample extends CachingProductBuilder<String> {
+        class CachingBuilderSample extends CacheableBuilder<String> {
 
             private String value = "null";
             private long counter = 0L;
 
             public void setValue(String value) {
                 this.value = value;
-                this.commitModification();
+                this.commit();
             }
 
             @NotNull
@@ -286,7 +286,7 @@ public class LangSample {
     }
 
     private void testProcessing(String... command) {
-        Processing processing = Processing.newProcessing(command);
+        ProcessWork processing = ProcessWork.newProcessing(command);
         processing.waitForTermination();
         String output = processing.outputString();
         //ECHO_CONTENT
@@ -319,14 +319,14 @@ public class LangSample {
 
     @Test
     public void testSingleAccessor() {
-        TestSingleAccessor singleAccessor = new TestSingleAccessor();
+        TestObjectAccessor singleAccessor = new TestObjectAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
         singleAccessor.set("777");
         Assert.assertEquals("777", singleAccessor.get());
 
-        TestGenericSingleAccessor genericSingleAccessor = new TestGenericSingleAccessor();
+        TestBAccessor genericSingleAccessor = new TestBAccessor();
         Assert.assertNull(genericSingleAccessor.getOrNull());
         Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"));
         Assert.assertEquals("666", genericSingleAccessor.getOrElse(() -> "666"));
@@ -340,7 +340,7 @@ public class LangSample {
         mapAccessor.set("1", "777");
         Assert.assertEquals("777", mapAccessor.get("1"));
 
-        TestGenericMapAccessor genericMapAccessor = new TestGenericMapAccessor();
+        TestBMapAccessor genericMapAccessor = new TestBMapAccessor();
         Assert.assertNull(genericMapAccessor.getOrNull("1"));
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"));
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", (k) -> "666"));
@@ -353,7 +353,7 @@ public class LangSample {
         T2
     }
 
-    public static class TestSingleAccessor implements SingleAccessor {
+    public static class TestObjectAccessor implements ObjectAccessor {
 
         private String value;
 
@@ -368,7 +368,7 @@ public class LangSample {
         }
     }
 
-    public static class TestGenericSingleAccessor implements GenericSingleAccessor<String> {
+    public static class TestBAccessor implements BAccessRef<String> {
 
         private String value;
 
@@ -393,7 +393,7 @@ public class LangSample {
         }
     }
 
-    public static class TestGenericMapAccessor implements GenericMapAccessor<String, String> {
+    public static class TestBMapAccessor implements BMapAccessor<String, String> {
 
         private final Map<String, String> values = new HashMap<>();
 

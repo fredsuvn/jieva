@@ -2,9 +2,8 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.reflect.Reflects;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.collect.BCollect;
+import xyz.srclab.common.reflect.BMethod;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -14,8 +13,6 @@ import java.util.Comparator;
  * @author sunqian
  */
 public class MethodTest {
-
-    private static final TestLogger logger = TestLogger.DEFAULT;
 
     Method superPublicMethod = SuperReflectClass.class.getDeclaredMethod("superPublicMethod");
     Method superProtectedMethod = SuperReflectClass.class.getDeclaredMethod("superProtectedMethod");
@@ -36,16 +33,16 @@ public class MethodTest {
     @Test
     public void testFind() throws Exception {
         Assert.assertEquals(
-            Reflects.methods(ReflectClass.class),
+            BMethod.getMethods(ReflectClass.class),
             Arrays.asList(ReflectClass.class.getMethods())
         );
         Assert.assertEquals(
-            Reflects.declaredMethods(ReflectClass.class),
+            BMethod.getDeclaredMethods(ReflectClass.class),
             Arrays.asList(ReflectClass.class.getDeclaredMethods())
         );
         Assert.assertEquals(
-            Collects.sorted(Reflects.ownedMethods(SubReflectClass.class), Comparator.comparing(Method::toString)),
-            Collects.sorted(Arrays.asList(
+            BCollect.sorted(BMethod.getOwnedMethods(SubReflectClass.class), Comparator.comparing(Method::toString)),
+            BCollect.sorted(Arrays.asList(
                 subPublicMethod,
                 publicMethod,
                 ReflectClass.class.getMethod("equals", Object.class),
@@ -65,13 +62,13 @@ public class MethodTest {
         );
 
         Assert.assertEquals(
-            Reflects.ownedMethodOrNull(ReflectClass.class, "protectedMethod"),
+            BMethod.getOwnedMethodOrNull(ReflectClass.class, "protectedMethod"),
             ReflectClass.class.getDeclaredMethod("protectedMethod")
         );
-        Assert.assertNull(Reflects.ownedMethodOrNull(ReflectClass.class, "superProtectedMethod"));
+        Assert.assertNull(BMethod.getOwnedMethodOrNull(ReflectClass.class, "superProtectedMethod"));
 
         Assert.assertEquals(
-            Reflects.searchMethods(SubReflectClass.class, true, m -> m.getName().contains("ackage")),
+            BMethod.searchMethods(SubReflectClass.class, true, m -> m.getName().contains("ackage")),
             Arrays.asList(subPackageMethod, packageMethod, superPackageMethod)
         );
     }
@@ -80,18 +77,18 @@ public class MethodTest {
     public void testInvoke() {
         ReflectClass reflectClass = new ReflectClass();
         Assert.assertEquals(
-            Reflects.invoke(superPublicMethod, reflectClass),
+            BMethod.invoke(superPublicMethod, reflectClass),
             "superPublicField"
         );
         Assert.assertEquals(
-            Reflects.enforce(privateMethod, reflectClass),
+            BMethod.invokeForcibly(privateMethod, reflectClass),
             "privateField"
         );
         Assert.expectThrows(IllegalAccessException.class, () ->
-            Reflects.invoke(superPrivateMethod, reflectClass)
+            BMethod.invoke(superPrivateMethod, reflectClass)
         );
         Assert.assertEquals(
-            Reflects.enforce(superPrivateMethod, reflectClass),
+            BMethod.invokeForcibly(superPrivateMethod, reflectClass),
             "superPrivateField"
         );
     }

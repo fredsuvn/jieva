@@ -1,104 +1,168 @@
 package xyz.srclab.common.cache
 
-import java.time.Duration
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
+import xyz.srclab.common.base.asType
+import java.util.concurrent.ExecutionException
+import java.util.function.Function
 
-open class GuavaCache<K : Any, V : Any>(
-    private val guava: com.google.common.cache.Cache<K, V>
+/**
+ * Base [Cache] implementation using [guava](https://github.com/google/guava).
+ */
+abstract class BaseGuavaCache<K : Any, V : Any>(
+    protected open val cache: com.google.common.cache.Cache<K, CacheVal<V>>
 ) : Cache<K, V> {
 
-    override fun getOrNull(key: K): V? {
-        return guava.getIfPresent(key)
-    }
-
-    override fun getOrElse(key: K, defaultValue: V): V {
-        val value = getOrNull(key)
-        return value ?: defaultValue
-    }
-
-    override fun getOrElse(key: K, defaultValue: (K) -> V): V {
-        val value = getOrNull(key)
-        return value ?: defaultValue(key)
-    }
-
-    override fun getOrLoad(key: K, loader: (K) -> V): V {
-        return guava.get(key) { loader(key) }
-    }
-
-    override fun getPresent(keys: Iterable<K>): Map<K, V> {
-        return guava.getAllPresent(keys)
-    }
-
-    override fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        val resultMap = LinkedHashMap(guava.getAllPresent(keys))
-        val restKeys = keys.minus(resultMap.keys)
-        val newValues = loader(restKeys)
-        for (restKey in restKeys) {
-            resultMap[restKey] = guava.get(restKey) {
-                newValues[restKey]
+    override fun getVal(key: K, loader: Function<in K, out V>): CacheVal<V>? {
+        try {
+            return cache.get(key) {
+                CacheVal.of(loader.apply(key))
             }
+        } catch (e: ExecutionException) {
+            val cause = e.cause
+            if (cause is NoSuchElementException) {
+                return null
+            }
+            throw CacheException(e)
+        } catch (e: Exception) {
+            throw CacheException(e)
         }
-        return resultMap
+    }
+
+    override fun getPresentVal(key: K): CacheVal<V>? {
+        try {
+            return cache.getIfPresent(key)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
     override fun put(key: K, value: V) {
-        guava.put(key, value)
+        try {
+            cache.put(key, CacheVal.of(value))
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
-    override fun put(key: K, value: V, expirySeconds: Long) {
-        put(key, value)
+    override fun remove(key: K) {
+        try {
+            cache.invalidate(key)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
-    override fun put(key: K, value: V, expiry: Duration) {
-        put(key, value)
-    }
-
-    override fun putAll(entries: Map<out K, V>) {
-        guava.putAll(entries)
-    }
-
-    override fun putAll(entries: Map<out K, V>, expirySeconds: Long) {
-        putAll(entries)
-    }
-
-    override fun putAll(entries: Map<out K, V>, expiry: Duration) {
-        putAll(entries)
-    }
-
-    override fun expiry(key: K, expirySeconds: Long) {
-    }
-
-    override fun expiry(key: K, expirySeconds: Duration) {
-    }
-
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Long) {
-    }
-
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Duration) {
-    }
-
-    override fun invalidate(key: K) {
-        guava.invalidate(key)
-    }
-
-    override fun invalidateAll(keys: Iterable<K>) {
-        guava.invalidateAll(keys)
-    }
-
-    override fun invalidateAll() {
-        guava.invalidateAll()
+    override fun clear() {
+        try {
+            cache.invalidateAll()
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
     override fun cleanUp() {
-        guava.cleanUp()
+        try {
+            cache.cleanUp()
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 }
 
-class GuavaLoadingCache<K : Any, V : Any>(
-    private val guava: com.google.common.cache.LoadingCache<K, V>
-) :
-    GuavaCache<K, V>(guava) {
+/**
+ * [Cache] implementation using [guava](https://github.com/google/guava).
+ */
+open class GuavaCache<K : Any, V : Any>(
+    cache: com.google.common.cache.Cache<K, CacheVal<V>>
+) : BaseGuavaCache<K, V>(cache) {
 
-    override fun get(key: K): V {
-        return guava.get(key)
+    /**
+     * Constructs with cache builder.
+     */
+    constructor(builder: Cache.Builder<K, V>) : this(buildGuavaBuilder(builder).build<K, CacheVal<V>>())
+
+    override fun getVal(key: K): CacheVal<V>? {
+        return getPresentVal(key)
     }
+}
+
+/**
+ * Loading [Cache] implementation using [guava](https://github.com/google/guava).
+ */
+open class LoadingGuavaCache<K : Any, V : Any>(
+    override val cache: LoadingCache<K, CacheVal<V>>
+) : BaseGuavaCache<K, V>(cache) {
+
+    /**
+     * Constructs with cache builder.
+     */
+    constructor(builder: Cache.Builder<K, V>) : this(
+        buildLoadingCaffeine(builder)
+    )
+
+    override fun getVal(key: K): CacheVal<V>? {
+        try {
+            return cache.get(key)
+        } catch (e: ExecutionException) {
+            val cause = e.cause
+            if (cause is NoSuchElementException) {
+                return null
+            }
+            throw CacheException(e)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
+    }
+}
+
+private fun <K : Any, V : Any> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheBuilder<K, CacheVal<V>> {
+    val guavaBuilder = CacheBuilder.newBuilder()
+    val initialCapacity = builder.initialCapacity
+    if (initialCapacity !== null) {
+        guavaBuilder.initialCapacity(initialCapacity)
+    }
+    val maxCapacity = builder.maxCapacity
+    if (maxCapacity !== null) {
+        guavaBuilder.maximumSize(maxCapacity)
+    }
+    val concurrencyLevel = builder.concurrencyLevel
+    if (concurrencyLevel !== null) {
+        guavaBuilder.concurrencyLevel(concurrencyLevel)
+    }
+    val expireAfterAccess = builder.expireAfterAccess
+    if (expireAfterAccess !== null) {
+        guavaBuilder.expireAfterAccess(expireAfterAccess)
+    }
+    val expireAfterWrite = builder.expireAfterWrite
+    if (expireAfterWrite !== null) {
+        guavaBuilder.expireAfterWrite(expireAfterWrite)
+    }
+    val refreshAfterWrite = builder.refreshAfterWrite
+    if (refreshAfterWrite !== null) {
+        guavaBuilder.refreshAfterWrite(refreshAfterWrite)
+    }
+    return guavaBuilder.asType()
+}
+
+private fun <K : Any, V : Any> buildGuavaLoader(loader: Function<in K, out V>?): CacheLoader<K, CacheVal<V>> {
+    if (loader === null) {
+        throw IllegalArgumentException("Loader must not be null!")
+    }
+    return object : CacheLoader<K, CacheVal<V>>() {
+        override fun load(key: K): CacheVal<V> {
+            try {
+                return CacheVal.of(loader.apply(key))
+            } catch (e: NoSuchElementException) {
+                throw e
+            }
+        }
+    }
+}
+
+private fun <K : Any, V : Any> buildLoadingCaffeine(builder: Cache.Builder<K, V>): LoadingCache<K, CacheVal<V>> {
+    val guavaBuilder: CacheBuilder<K, CacheVal<V>> = buildGuavaBuilder(builder)
+    val cacheLoader: CacheLoader<K, CacheVal<V>> = buildGuavaLoader(builder.loader)
+    return guavaBuilder.build(cacheLoader)
 }

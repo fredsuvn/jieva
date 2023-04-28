@@ -4,7 +4,6 @@ import org.testng.annotations.Test
 import xyz.srclab.common.id.IdGenerator
 import xyz.srclab.common.id.SnowflakeIdGenerator
 import xyz.srclab.common.lang.toBinaryString
-import xyz.srclab.common.test.TestLogger
 import java.util.*
 
 class IdSample {

@@ -1,97 +1,153 @@
 package xyz.srclab.common.cache
 
-import java.time.Duration
+import com.github.benmanes.caffeine.cache.CacheLoader
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
+import xyz.srclab.common.base.asType
+import java.util.function.Function
 
-open class CaffeineCache<K : Any, V : Any>(
-    private val caffeine: com.github.benmanes.caffeine.cache.Cache<K, V>
-) :
-    Cache<K, V> {
+/**
+ * Base [Cache] implementation using [caffeine](https://github.com/ben-manes/caffeine).
+ */
+abstract class BaseCaffeineCache<K : Any, V : Any>(
+    protected open val cache: com.github.benmanes.caffeine.cache.Cache<K, CacheVal<V>>
+) : Cache<K, V> {
 
-    override fun getOrNull(key: K): V? {
-        return caffeine.getIfPresent(key)
+    override fun getVal(key: K, loader: Function<in K, out V>): CacheVal<V>? {
+        try {
+            return cache.get(key) {
+                try {
+                    CacheVal.of(loader.apply(it))
+                } catch (e: NoSuchElementException) {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
-    override fun getOrElse(key: K, defaultValue: V): V {
-        val value = getOrNull(key)
-        return value ?: defaultValue
-    }
-
-    override fun getOrElse(key: K, defaultValue: (K) -> V): V {
-        val value = getOrNull(key)
-        return value ?: defaultValue(key)
-    }
-
-    override fun getOrLoad(key: K, loader: (K) -> V): V {
-        return caffeine.get(key, loader)!!
-    }
-
-    override fun getPresent(keys: Iterable<K>): Map<K, V> {
-        return caffeine.getAllPresent(keys)
-    }
-
-    override fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        return caffeine.getAll(keys, loader)
+    override fun getPresentVal(key: K): CacheVal<V>? {
+        try {
+            return cache.getIfPresent(key)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
     override fun put(key: K, value: V) {
-        caffeine.put(key, value)
+        try {
+            cache.put(key, CacheVal.of(value))
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
-    override fun put(key: K, value: V, expirySeconds: Long) {
-        put(key, value)
+    override fun remove(key: K) {
+        try {
+            cache.invalidate(key)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
-    override fun put(key: K, value: V, expiry: Duration) {
-        put(key, value)
-    }
-
-    override fun putAll(entries: Map<out K, V>) {
-        caffeine.putAll(entries)
-    }
-
-    override fun putAll(entries: Map<out K, V>, expirySeconds: Long) {
-        putAll(entries)
-    }
-
-    override fun putAll(entries: Map<out K, V>, expiry: Duration) {
-        putAll(entries)
-    }
-
-    override fun expiry(key: K, expirySeconds: Long) {
-    }
-
-    override fun expiry(key: K, expirySeconds: Duration) {
-    }
-
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Long) {
-    }
-
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Duration) {
-    }
-
-    override fun invalidate(key: K) {
-        caffeine.invalidate(key)
-    }
-
-    override fun invalidateAll(keys: Iterable<K>) {
-        caffeine.invalidateAll(keys)
-    }
-
-    override fun invalidateAll() {
-        caffeine.invalidateAll()
+    override fun clear() {
+        try {
+            cache.invalidateAll()
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
     override fun cleanUp() {
-        caffeine.cleanUp()
+        try {
+            cache.cleanUp()
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 }
 
-class CaffeineLoadingCache<K : Any, V : Any>(
-    private val caffeine: com.github.benmanes.caffeine.cache.LoadingCache<K, V>
-) :
-    CaffeineCache<K, V>(caffeine) {
+/**
+ * [Cache] implementation using [caffeine](https://github.com/ben-manes/caffeine).
+ */
+open class CaffeineCache<K : Any, V : Any>(
+    cache: com.github.benmanes.caffeine.cache.Cache<K, CacheVal<V>>
+) : BaseCaffeineCache<K, V>(cache) {
 
-    override fun get(key: K): V {
-        return caffeine.get(key)!!
+    /**
+     * Constructs with cache builder.
+     */
+    constructor(builder: Cache.Builder<K, V>) : this(buildCaffeine(builder).build<K, CacheVal<V>>())
+
+    override fun getVal(key: K): CacheVal<V>? {
+        return getPresentVal(key)
     }
+}
+
+/**
+ * Loading [Cache] implementation using [caffeine](https://github.com/ben-manes/caffeine).
+ */
+open class LoadingCaffeineCache<K : Any, V : Any>(
+    override val cache: LoadingCache<K, CacheVal<V>>
+) : BaseCaffeineCache<K, V>(cache) {
+
+    /**
+     * Constructs with cache builder.
+     */
+    constructor(builder: Cache.Builder<K, V>) : this(
+        buildLoadingCaffeine(builder)
+    )
+
+    override fun getVal(key: K): CacheVal<V>? {
+        try {
+            return cache.get(key)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
+    }
+}
+
+private fun <K : Any, V : Any> buildCaffeine(builder: Cache.Builder<K, V>): Caffeine<K, CacheVal<V>> {
+    val caffeine = Caffeine.newBuilder()
+    val initialCapacity = builder.initialCapacity
+    if (initialCapacity !== null) {
+        caffeine.initialCapacity(initialCapacity)
+    }
+    val maxCapacity = builder.maxCapacity
+    if (maxCapacity !== null) {
+        caffeine.maximumSize(maxCapacity)
+    }
+    val expireAfterAccess = builder.expireAfterAccess
+    if (expireAfterAccess !== null) {
+        caffeine.expireAfterAccess(expireAfterAccess)
+    }
+    val expireAfterWrite = builder.expireAfterWrite
+    if (expireAfterWrite !== null) {
+        caffeine.expireAfterWrite(expireAfterWrite)
+    }
+    val refreshAfterWrite = builder.refreshAfterWrite
+    if (refreshAfterWrite !== null) {
+        caffeine.refreshAfterWrite(refreshAfterWrite)
+    }
+    return caffeine.asType()
+}
+
+private fun <K : Any, V : Any> buildCaffeineLoader(loader: Function<in K, out V>?): CacheLoader<in K, CacheVal<V>> {
+    if (loader === null) {
+        throw IllegalArgumentException("Loader must not be null!")
+    }
+    return CacheLoader {
+        try {
+            CacheVal.of(loader.apply(it))
+        } catch (e: NoSuchElementException) {
+            null
+        }
+    }
+}
+
+private fun <K : Any, V : Any> buildLoadingCaffeine(builder: Cache.Builder<K, V>): LoadingCache<K, CacheVal<V>> {
+    val c: Caffeine<K, CacheVal<V>> = buildCaffeine(builder)
+    val l: CacheLoader<in K, CacheVal<V>> = buildCaffeineLoader(builder.loader)
+    return c.build(l)
 }

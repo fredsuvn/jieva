@@ -1,29 +1,39 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import lombok.EqualsAndHashCode
+import xyz.srclab.common.base.defaultSerialVersion
+import xyz.srclab.common.reflect.rawClass
+import java.io.Serializable
 import java.lang.reflect.Type
 
 /**
- * Represents a bean type.
- *
- * @author sunqian
+ * Represents bean type.
  *
  * @see PropertyType
  */
-interface BeanType {
+@EqualsAndHashCode
+open class BeanType(
+    open val type: Type,
+    open val properties: Map<String, PropertyType>
+) : Serializable {
 
-    @get:JvmName("type")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val type: Type
+    open val classType: Class<*>
+        get() = type.rawClass
 
-    @get:JvmName("properties")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val properties: Map<String, PropertyType>
+    @Throws(NoSuchPropertyException::class)
+    open fun getProperty(name: String): PropertyType {
+        return getPropertyOrNull(name) ?: throw NoSuchPropertyException(name)
+    }
 
-    @JvmDefault
-    @Throws(PropertyNotFoundException::class)
-    fun getProperty(name: CharSequence): PropertyType {
-        val nameString = name.toString()
-        return properties[nameString] ?: throw PropertyNotFoundException(nameString)
+    open fun getPropertyOrNull(name: String): PropertyType? {
+        return properties[name]
+    }
+
+    override fun toString(): String {
+        return "bean ${type.typeName}"
+    }
+
+    companion object {
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

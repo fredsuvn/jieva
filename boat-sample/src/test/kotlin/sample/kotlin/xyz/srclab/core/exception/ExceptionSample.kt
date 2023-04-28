@@ -3,7 +3,6 @@ package sample.kotlin.xyz.srclab.core.exception
 import org.testng.annotations.Test
 import xyz.srclab.common.exception.ExceptionStatus
 import xyz.srclab.common.exception.StatusException
-import xyz.srclab.common.test.TestLogger
 
 class ExceptionSample {
 

@@ -18,11 +18,11 @@ public class RunSample {
     public void testRunner() {
         Runner runner = Runner.SYNC_RUNNER;
         IntRef intRef = IntRef.with(0);
-        Running<?> running = runner.run(() -> {
+        RunWork<?> running = runner.run(() -> {
             intRef.set(666);
             return null;
         });
-        running.get();
+        running.getResult();
         //666
         logger.log("int: {}", intRef.get());
     }
@@ -31,7 +31,7 @@ public class RunSample {
     public void testScheduledRunner() {
         Scheduler scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER;
         IntRef intRef = IntRef.with(0);
-        Scheduling<?> scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
+        ScheduleWork<?> scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
             intRef.set(intRef.get() + 100);
             return null;
         });
@@ -43,13 +43,13 @@ public class RunSample {
 
     @Test
     public void testRunContext() throws Exception {
-        RunContext runContext = RunContext.current();
-        runContext.set("1", "666");
-        Assert.assertEquals("666", runContext.get("1"));
-        RunContext.Attach attach = runContext.attach();
+        RunningContext runningContext = RunningContext.current();
+        runningContext.set("1", "666");
+        Assert.assertEquals("666", runningContext.get("1"));
+        RunningContext.Attach attach = runningContext.attach();
         CountDownLatch countDownLatch = new CountDownLatch(1);
         Runner.ASYNC_RUNNER.run(() -> {
-            RunContext detach = RunContext.current();
+            RunningContext detach = RunningContext.current();
             detach.detach(attach);
             Assert.assertEquals("666", detach.get("1"));
             countDownLatch.countDown();

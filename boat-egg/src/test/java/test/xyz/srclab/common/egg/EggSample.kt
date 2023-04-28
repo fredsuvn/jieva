@@ -2,7 +2,6 @@ package test.xyz.srclab.common.egg
 
 import org.testng.annotations.Test
 import xyz.srclab.common.egg.Egg
-import xyz.srclab.common.test.TestLogger
 import java.awt.GraphicsEnvironment
 
 /**

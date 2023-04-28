@@ -1,199 +1,229 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.annotations.Acceptable
-import xyz.srclab.annotations.Accepted
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.base.FinalClass
+import xyz.srclab.common.base.defaultSerialVersion
+import xyz.srclab.common.reflect.parameterizedType
 import xyz.srclab.common.reflect.rawClass
+import java.io.Serializable
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-interface IterableType : ParameterizedType {
+/**
+ * To describe [Iterable], [Collection], [Set], [List] and other collect types.
+ */
+interface IterableType : Serializable, ParameterizedType {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    val containerType: Class<*>
     val componentType: Type
-        @JvmName("componentType") get
 
     companion object {
 
+        /**
+         * Raw [Iterable] type.
+         */
         @JvmField
-        val RAW_ITERABLE = Iterable::class.java.toIterableType()
-
-        @JvmField
-        val RAW_COLLECTION = Collection::class.java.toIterableType()
-
-        @JvmField
-        val RAW_SET = Set::class.java.toIterableType()
-
-        @JvmField
-        val RAW_LIST = List::class.java.toIterableType()
+        val RAW_ITERABLE: IterableType = of(Iterable::class.java, Any::class.java)
 
         /**
-         * @throws IllegalArgumentException
+         * Raw [Collection] type.
+         */
+        @JvmField
+        val RAW_COLLECTION: IterableType = of(Collection::class.java, Any::class.java)
+
+        /**
+         * Raw [Set] type.
+         */
+        @JvmField
+        val RAW_SET: IterableType = of(Set::class.java, Any::class.java)
+
+        /**
+         * Raw [List] type.
+         */
+        @JvmField
+        val RAW_LIST: IterableType = of(List::class.java, Any::class.java)
+
+        /**
+         * Returns [IterableType] consists of [containerType] and [componentType].
          */
         @JvmStatic
-        @JvmName("from")
-        fun @Acceptable(
-            Accepted(Class::class),
-            Accepted(ParameterizedType::class),
-        ) Type.toIterableType(): IterableType {
-            return when (this) {
-                is Class<*> -> this.toIterableType()
-                is ParameterizedType -> this.toIterableType()
-                else -> throw IllegalArgumentException("Should be Class or ParameterizedType")
-            }
+        fun of(containerType: Class<*>, componentType: Type): IterableType {
+            return parameterizedType(containerType, componentType).toIterableType()
         }
 
+        /**
+         * Converts [ParameterizedType] to [IterableType].
+         */
+        @JvmName("of")
         @JvmStatic
-        @JvmName("from")
-        fun Class<*>.toIterableType(): IterableType {
-            return from(this, Any::class.java, this.declaringClass)
-        }
-
-        @JvmStatic
-        @JvmName("from")
         fun ParameterizedType.toIterableType(): IterableType {
-            return from(this.rawClass, this.actualTypeArguments[0], this.ownerType)
+            return IterableTypeImpl(this)
         }
 
-        @JvmOverloads
+        /**
+         * Converts [Type] to [IterableType], the [Type] must be [ParameterizedType] or [Class].
+         */
+        @JvmName("of")
         @JvmStatic
-        fun from(type: Class<*>, componentType: Type, ownerType: Type? = null): IterableType {
-            return IterableTypeImpl(type, componentType, ownerType)
+        fun Type.toIterableType(): IterableType {
+            return when (this) {
+                is ParameterizedType -> toIterableType()
+                is Class<*> -> of(this, Any::class.java)
+                else -> throw IllegalArgumentException("Must be ParameterizedType or Class.")
+            }
         }
 
         private class IterableTypeImpl(
-            private val rawType: Class<*>,
-            override val componentType: Type,
-            private val ownerType: Type?,
-        ) : IterableType {
+            private val parameterizedType: ParameterizedType
+        ) : IterableType, FinalClass() {
+
+            override val containerType: Class<*>
+            override val componentType: Type
+
+            init {
+                val args = actualTypeArguments
+                if (args.size > 1) {
+                    throw IllegalArgumentException("Number of actual arguments must <= 1.")
+                }
+                containerType = parameterizedType.rawClass
+                componentType = args[0]
+            }
 
             override fun getActualTypeArguments(): Array<Type> {
-                return arrayOf(componentType)
+                return parameterizedType.actualTypeArguments
             }
 
             override fun getRawType(): Type {
-                return rawType
+                return parameterizedType.rawType
             }
 
-            override fun getOwnerType(): Type? {
-                return ownerType
+            override fun getOwnerType(): Type {
+                return parameterizedType.ownerType
             }
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is IterableType) return false
-                if (rawType != other.rawType) return false
+                if (containerType != other.containerType) return false
                 if (componentType != other.componentType) return false
-                if (ownerType != other.ownerType) return false
                 return true
             }
 
-            override fun hashCode(): Int {
-                var result = rawType.hashCode()
+            override fun hashCode0(): Int {
+                var result = containerType.hashCode()
                 result = 31 * result + componentType.hashCode()
-                result = 31 * result + ownerType.hashCode()
                 return result
             }
 
-            override fun toString(): String {
-                return "${rawType.typeName}<${componentType.typeName}>"
+            override fun toString0(): String {
+                return "$containerType<$containerType>"
+            }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }
 }
 
-interface MapType : ParameterizedType {
+/**
+ * To describe [Map] types.
+ */
+interface MapType : Serializable, ParameterizedType {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    val containerType: Class<*>
     val keyType: Type
-        @JvmName("keyType") get
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val valueType: Type
-        @JvmName("valueType") get
 
     companion object {
 
+        /**
+         * Raw [Map] type.
+         */
         @JvmField
-        val RAW = Map::class.java.toMapType()
-
-        @JvmField
-        val BEAN_PATTERN = from(Map::class.java, String::class.java, Any::class.java)
+        val RAW_MAP: MapType = of(Map::class.java, Any::class.java, Any::class.java)
 
         /**
-         * @throws IllegalArgumentException
+         * Returns [MapType] consists of [containerType], [keyType] and [valueType].
          */
         @JvmStatic
-        @JvmName("from")
-        fun @Acceptable(
-            Accepted(Class::class),
-            Accepted(ParameterizedType::class),
-        ) Type.toMapType(): MapType {
-            return when (this) {
-                is Class<*> -> this.toMapType()
-                is ParameterizedType -> this.toMapType()
-                else -> throw IllegalArgumentException("Should be Class or ParameterizedType")
-            }
+        fun of(containerType: Class<*>, keyType: Type, valueType: Type): MapType {
+            return parameterizedType(containerType, keyType, valueType).toMapType()
         }
 
+        /**
+         * Converts [ParameterizedType] to [MapType].
+         */
+        @JvmName("of")
         @JvmStatic
-        @JvmName("from")
-        fun Class<*>.toMapType(): MapType {
-            return from(this, Any::class.java, Any::class.java, this.declaringClass)
-        }
-
-        @JvmStatic
-        @JvmName("from")
         fun ParameterizedType.toMapType(): MapType {
-            val actualTypeArguments = this.actualTypeArguments
-            return from(this.rawClass, actualTypeArguments[0], actualTypeArguments[1], this.ownerType)
+            return MapTypeImpl(this)
         }
 
-        @JvmOverloads
+        /**
+         * Converts [Type] to [MapType], the [Type] must be [ParameterizedType] or [Class].
+         */
+        @JvmName("of")
         @JvmStatic
-        fun from(rawType: Class<*>, keyType: Type, valueType: Type, ownerType: Type? = null): MapType {
-            return MapTypeImpl(rawType, keyType, valueType, ownerType)
+        fun Type.toMapType(): MapType {
+            return when (this) {
+                is ParameterizedType -> toMapType()
+                is Class<*> -> of(this, Any::class.java, Any::class.java)
+                else -> throw IllegalArgumentException("Must be ParameterizedType or Class.")
+            }
         }
 
         private class MapTypeImpl(
-            private val rawType: Class<*>,
-            override val keyType: Type,
-            override val valueType: Type,
-            private val ownerType: Type?,
-        ) : MapType {
+            private val parameterizedType: ParameterizedType
+        ) : MapType, FinalClass() {
+
+            override val containerType: Class<*>
+            override val keyType: Type
+            override val valueType: Type
+
+            init {
+                val args = actualTypeArguments
+                if (args.isNotEmpty() && args.size != 2) {
+                    throw IllegalArgumentException("Number of actual arguments must be 0 or 2.")
+                }
+                containerType = parameterizedType.rawClass
+                keyType = args[0]
+                valueType = args[1]
+            }
 
             override fun getActualTypeArguments(): Array<Type> {
-                return arrayOf(keyType, valueType)
+                return parameterizedType.actualTypeArguments
             }
 
             override fun getRawType(): Type {
-                return rawType
+                return parameterizedType.rawType
             }
 
-            override fun getOwnerType(): Type? {
-                return ownerType
+            override fun getOwnerType(): Type {
+                return parameterizedType.ownerType
             }
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is MapType) return false
-                if (rawType != other.rawType) return false
+                if (containerType != other.containerType) return false
                 if (keyType != other.keyType) return false
                 if (valueType != other.valueType) return false
-                if (ownerType != other.ownerType) return false
                 return true
             }
 
-            override fun hashCode(): Int {
-                var result = rawType.hashCode()
+            override fun hashCode0(): Int {
+                var result = containerType.hashCode()
                 result = 31 * result + keyType.hashCode()
                 result = 31 * result + valueType.hashCode()
-                result = 31 * result + (ownerType?.hashCode() ?: 0)
                 return result
             }
 
-            override fun toString(): String {
-                return "${rawType.typeName}<${keyType.typeName},${valueType.typeName}>"
+            override fun toString0(): String {
+                return "$containerType<$keyType, $valueType>"
+            }
+
+            companion object {
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }

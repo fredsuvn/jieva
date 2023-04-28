@@ -1,0 +1,40 @@
+= image:../../logo.svg[Boat Others] Boat Others -- link:../../README.md[Boat] 第三方支持和扩展库
+:toc:
+:toclevels: 3
+:toc-title: 目录
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+
+== 简介
+
+Boat others 为 link:../../README.md[Boat]提供第三方支持和扩展.
+
+== 支持列表
+
+=== Protobuf: boat-protobuf
+
+boat-protobuf 提供为 `bean`, `convert` 何 `data` 领域的针对 protobuf 类型的处理器:
+
+* `ProtobufBeanResolveHandler`: 支持 protobuf 类型的bean解析器, 从 `BeanResolveHandler` (boat-core) 扩展;
+* `ProtobufBeanCreator`: 支持 protobuf 类型的 `BeanConvertHandler.NewBeanProvider` (boat-core);
+* `ProtobufBeans.PROTOBUF_BEAN_RESOLVER`: 支持 protobuf 类型的bean解析器处理器, 从 `BeanResolver` (boat-core) 扩展;
+* ProtobufConverts.PROTOBUF_CONVERTER: 支持 protobuf 类型的类型转换器, 从 `Converter` (boat-core) 扩展;
+* ProtobufJsons.PROTOBUF_OBJECT_MAPPER: ``Jackson``的 `ObjectMapper` (boat-data), 支持 protobuf 类型;
+* ProtobufJsons.PROTOBUF_JSON_SERIALIZER: `DataParser` (boat-data), 支持 protobuf 类型.
+
+WARNING: `boat-protobuf` 需要 `protoc` 来编译 protobuf 文件, 一些架构并不支持 (如 `ARM`).
+检查你的环境是否支持: link:https://repo1.maven.org/maven2/com/google/protobuf/protoc/[]
+
+.Java Examples
+[source,java]
+----
+include::../boat-others-sample/src/test/java/sample/java/xyz/srclab/common/protobuf/ProtobufSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-others-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/protobuf/ProtobufSample.kt[]
+----

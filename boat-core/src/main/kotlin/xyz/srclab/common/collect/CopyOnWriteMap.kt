@@ -1,15 +1,20 @@
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.defaultSerialVersion
+import java.io.Serializable
 import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
 
-open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
-    map: Map<out K, V> = emptyMap(),
-    private val newMapFun: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
-) : MutableMap<K, V> {
+/**
+ * Copy-On-Write [Map].
+ */
+open class CopyOnWriteMap<K, V>(
+    initMap: Map<out K, V>,
+    private val newMap: Function<Map<out K, V>, out MutableMap<K, V>>
+) : Serializable, MutableMap<K, V> {
 
-    private var currentMap: MutableMap<K, V> = newMapFun(map)
+    private var currentMap: MutableMap<K, V> = newMap(initMap)
 
     override val size: Int
         get() = currentMap.size
@@ -64,7 +69,7 @@ open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
     }
 
     override fun merge(key: K, value: V, remappingFunction: BiFunction<in V, in V, out V?>): V? {
-        return cow { it.merge(key, value, remappingFunction) }
+        return cow { it.merge(key, value!!, remappingFunction) }
     }
 
     override fun put(key: K, value: V): V? {
@@ -100,11 +105,12 @@ open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
     }
 
     private inline fun <T> cow(action: (MutableMap<K, V>) -> T): T {
-        synchronized(this) {
-            val newMap = newMapFun(currentMap)
+        return synchronized(this) {
+            val curMap = currentMap
+            val newMap = newMap.apply(curMap)
             val result = action(newMap)
             currentMap = newMap
-            return result
+            result
         }
     }
 
@@ -118,5 +124,9 @@ open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
 
     override fun toString(): String {
         return currentMap.toString()
+    }
+
+    companion object {
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

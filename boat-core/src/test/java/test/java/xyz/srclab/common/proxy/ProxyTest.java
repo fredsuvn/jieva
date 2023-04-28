@@ -3,69 +3,67 @@ package test.java.xyz.srclab.common.proxy;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Current;
-import xyz.srclab.common.proxy.*;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.func.StaticFunc;
+import xyz.srclab.common.proxy.ClassProxy;
+import xyz.srclab.common.proxy.ClassProxyProvider;
+import xyz.srclab.common.proxy.ProxyInvoker;
+import xyz.srclab.common.reflect.BClass;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public class ProxyTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
-
     @Test
     public void testClassProxy() {
-        Assert.assertEquals(ProxyClassFactory.DEFAULT, SpringProxyClassFactory.INSTANCE);
-        doTestProxy(CglibProxyClassFactory.INSTANCE, TC.class);
+        Assert.assertEquals(ClassProxyProvider.defaultProvider(), ClassProxyProvider.springCglib());
+        doTestProxy(ClassProxyProvider.cglib(), TC.class);
         //doTestProxy(SpringProxyClassFactory.INSTANCE, TC.class);
     }
 
     @Test
     public void testInterfaceProxy() {
-        //doTestProxy(CglibProxyClassFactory.INSTANCE, TI.class);
-        doTestProxy(SpringProxyClassFactory.INSTANCE, TI.class);
-        doTestProxy(JdkProxyClassFactory.INSTANCE, TI.class);
+
+        doTestProxy(ClassProxyProvider.springCglib(), TI.class);
+        doTestProxy(ClassProxyProvider.jdk(), TI.class);
     }
 
-    private <T extends TI> void doTestProxy(ProxyClassFactory proxyClassFactory, Class<T> type) {
+    private <T extends TI> void doTestProxy(ClassProxyProvider factory, Class<T> type) {
 
-        ProxyMethod<T> proxyMethod = new ProxyMethod<T>() {
+        ProxyInvoker proxyInvoker = new ProxyInvoker() {
 
             @Override
-            public boolean proxy(@NotNull Method method) {
+            public boolean isTarget(@NotNull Method method) {
                 return method.getName().equals("hello")
                     && Arrays.equals(method.getParameterTypes(), new Class[]{String.class, String.class});
             }
 
             @Override
-            public Object invoke(
-                @NotNull T proxied,
-                @NotNull Method proxiedMethod,
-                @NotNull SuperInvoke superInvoke,
-                Object @NotNull [] args
+            public Object invokeProxy(
+                @NotNull Object sourceObject,
+                @NotNull Method sourceMethod,
+                @NotNull StaticFunc sourceInvoke,
+                Object[] args
             ) {
-                logger.log("method: {}, declaring class: {}", proxiedMethod, proxiedMethod.getDeclaringClass());
-                return "proxy-> " + (type.isInterface() ? "interface" : superInvoke.invoke(args));
+                BLog.info("method: {}, declaring class: {}", sourceMethod, sourceMethod.getDeclaringClass());
+                return "proxy-> " + (type.isInterface() ? "interface" : sourceInvoke.invoke(args));
             }
         };
 
-        ProxyClass<T> proxyClass = ProxyClass.newProxyClass(
-            type, Arrays.asList(proxyMethod), Current.classLoader(), proxyClassFactory);
+        ClassProxy<T> proxyClass = ClassProxy.generate(type, proxyInvoker, BClass.defaultClassLoader(), factory);
         Assert.assertEquals(
-            proxyClass.newInstance().hello("a", "b"),
+            proxyClass.newInst().hello("a", "b"),
             type.isInterface() ? "proxy-> interface" : "proxy-> hello: a = a, b = b");
     }
 
     public static class TC implements TI {
-
         public String hello(String a, String b) {
             return "hello: a = " + a + ", b = " + b;
         }
     }
 
     public interface TI {
-
         String hello(String a, String b);
     }
 }

@@ -1,7 +1,7 @@
 # <span class="image">![Boat Core](../../logo.svg)</span> `boat-core`: Boat Core — [Boat](../../README.md) 核心库
 
-<span id="author" class="author">Sun Qian</span>  
-<span id="email" class="email"><fredsuvn@163.com></span>  
+<span id="author" class="author">Sun Qian</span>
+<span id="email" class="email"><fredsuvn@163.com></span>
 
 目录
 
@@ -1486,7 +1486,7 @@ Java Examples
     package sample.java.xyz.srclab.core.invoke;
 
     import org.testng.annotations.Test;
-    import xyz.srclab.common.invoke.Invoker;
+    import xyz.srclab.common.func.Invoker;
     import xyz.srclab.common.test.TestLogger;
 
     public class InvokeSample {
@@ -1507,7 +1507,7 @@ Kotlin Examples
     package sample.kotlin.xyz.srclab.core.invoke
 
     import org.testng.annotations.Test
-    import xyz.srclab.common.invoke.Invoker
+    import xyz.srclab.common.func.Invoker
     import xyz.srclab.common.test.TestLogger
 
     class InvokeSample {
@@ -1651,8 +1651,8 @@ Java Examples
     import org.jetbrains.annotations.Nullable;
     import org.testng.annotations.Test;
     import xyz.srclab.annotations.Immutable;
-    import xyz.srclab.common.state.State;
-    import xyz.srclab.common.state.StringState;
+    import xyz.srclab.common.status.State;
+    import xyz.srclab.common.status.StringState;
     import xyz.srclab.common.test.TestLogger;
 
     import java.util.List;
@@ -1720,10 +1720,10 @@ Kotlin Examples
     package sample.kotlin.xyz.srclab.core.state
 
     import org.testng.annotations.Test
-    import xyz.srclab.common.state.State
-    import xyz.srclab.common.state.StringState
-    import xyz.srclab.common.state.StringState.Companion.joinStateDescriptions
-    import xyz.srclab.common.state.StringState.Companion.moreDescriptions
+    import xyz.srclab.common.status.State
+    import xyz.srclab.common.status.StringState
+    import xyz.srclab.common.status.StringState.Companion.joinStateDescriptions
+    import xyz.srclab.common.status.StringState.Companion.moreDescriptions
     import xyz.srclab.common.test.TestLogger
 
     class StateSample {
