@@ -18,15 +18,15 @@ Boat includes:
 
 * link:../boat-annotations/DOCUMENTATION.md[boat-annotations]: Core annotations;
 * link:../boat-core/DOCUMENTATION.md[boat-core]: Core lib;
-* link:../boat-serialize/DOCUMENTATION.md[boat-serialize]: Serialization and deserialization lib (supports `JSON`);
+* link:../boat-data/DOCUMENTATION.md[boat-data]: Serialization and deserialization lib (supports `JSON`);
 * link:../boat-codec/DOCUMENTATION.md[boat-codec]: Codec lib (supports `HEX`, `BASE64`, `SHA`, `MD`, `HMAC`, `AES`, `RSA`, `SM2`, etc.);
 * link:../boat-id/DOCUMENTATION.md[boat-id]: Fast ID generation lib;
-* link:../boat-others/DOCUMENTATION.md[boat-others]: Third party supporting and extension lib (such as `protobuf`);
+* link:../boat-plugins/DOCUMENTATION.md[boat-others]: Third party supporting and extension lib (such as `protobuf`);
 
 * link:../boat-test/[boat-test]: Testing libs dependencies management project;
 * link:../boat-bom/[boat-bom]: BOM (gradle platform) project;
 
-If you want to import common jars at once (`annotations`, `core`, `codec`, `serialize` and `id`), just import:
+If you want to import common jars at once (`annotations`, `core`, `codec`, `data` and `id`), just import:
 
 * link:../boat/[boat].
 
@@ -106,14 +106,14 @@ api implementation("xyz.srclab.common:boat-bom:{boat-version}")
 === Boat Serialize
 
 * AsciiDoc:
-** link:../boat-serialize/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-serialize/docs/DOCUMENTATION_zh.adoc[简体中文]
+** link:../boat-data/docs/DOCUMENTATION_en.adoc[English]
+** link:../boat-data/docs/DOCUMENTATION_zh.adoc[简体中文]
 * Markdown:
-** link:../boat-serialize/docs/DOCUMENTATION_en.md[English]
-** link:../boat-serialize/docs/DOCUMENTATION_zh.md[简体中文]
+** link:../boat-data/docs/DOCUMENTATION_en.md[English]
+** link:../boat-data/docs/DOCUMENTATION_zh.md[简体中文]
 * HTML:
-** link:../boat-serialize/docs/DOCUMENTATION_en.html[English]
-** link:../boat-serialize/docs/DOCUMENTATION_zh.html[简体中文]
+** link:../boat-data/docs/DOCUMENTATION_en.html[English]
+** link:../boat-data/docs/DOCUMENTATION_zh.html[简体中文]
 
 === Boat Codec
 
@@ -142,11 +142,11 @@ api implementation("xyz.srclab.common:boat-bom:{boat-version}")
 === Boat Others
 
 * AsciiDoc:
-** link:../boat-others/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-others/docs/DOCUMENTATION_zh.adoc[简体中文]
+** link:../boat-plugins/docs/DOCUMENTATION_en.adoc[English]
+** link:../boat-plugins/docs/DOCUMENTATION_zh.adoc[简体中文]
 * Markdown:
-** link:../boat-others/docs/DOCUMENTATION_en.md[English]
-** link:../boat-others/docs/DOCUMENTATION_zh.md[简体中文]
+** link:../boat-plugins/docs/DOCUMENTATION_en.md[English]
+** link:../boat-plugins/docs/DOCUMENTATION_zh.md[简体中文]
 * HTML:
-** link:../boat-others/docs/DOCUMENTATION_en.html[English]
-** link:../boat-others/docs/DOCUMENTATION_zh.html[简体中文]
+** link:../boat-plugins/docs/DOCUMENTATION_en.html[English]
+** link:../boat-plugins/docs/DOCUMENTATION_zh.html[简体中文]

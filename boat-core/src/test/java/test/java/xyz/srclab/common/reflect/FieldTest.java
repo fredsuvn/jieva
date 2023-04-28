@@ -2,15 +2,14 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.reflect.Reflects;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.collect.BSet;
+import xyz.srclab.common.reflect.BField;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class FieldTest {
-
-    private static final TestLogger logger = TestLogger.DEFAULT;
 
     Field superPublicField = SuperReflectClass.class.getDeclaredField("superPublicField");
     Field superProtectedField = SuperReflectClass.class.getDeclaredField("superProtectedField");
@@ -31,66 +30,45 @@ public class FieldTest {
     @Test
     public void testField() throws Exception {
         Assert.assertEquals(
-            Reflects.fields(ReflectClass.class),
+            BField.getFields(ReflectClass.class),
             Arrays.asList(ReflectClass.class.getFields())
         );
         Assert.assertEquals(
-            Reflects.declaredFields(ReflectClass.class),
+            BField.getDeclaredFields(ReflectClass.class),
             Arrays.asList(ReflectClass.class.getDeclaredFields())
         );
         Assert.assertEquals(
-            Reflects.ownedFields(SubReflectClass.class),
-            Arrays.asList(
+            new HashSet<>(BField.getOwnedFields(SubReflectClass.class)),
+            BSet.newSet(
                 subPublicField, publicField, superPublicField,
                 subProtectedField, subPrivateField, subPackageField
             )
         );
 
         Assert.assertEquals(
-            Reflects.ownedField(ReflectClass.class, "protectedField"),
+            BField.getOwnedField(ReflectClass.class, "protectedField"),
             ReflectClass.class.getDeclaredField("protectedField")
         );
-        Assert.assertNull(Reflects.ownedFieldOrNull(ReflectClass.class, "superProtectedField"));
+        Assert.assertNull(BField.getOwnedFieldOrNull(ReflectClass.class, "superProtectedField"));
+    }
 
+    @Test
+    public void testSearchField() {
         Assert.assertEquals(
-            Reflects.searchFields(SubReflectClass.class, true, f -> f.getName().contains("ackage")),
-            Arrays.asList(subPackageField, packageField, superPackageField)
+            new HashSet<>(BField.searchFields(SubReflectClass.class, true, f -> f.getName().contains("ackage"))),
+            BSet.newSet(subPackageField, packageField, superPackageField)
         );
     }
 
     @Test
     public void testFieldValue() {
         ReflectClass reflectClass = new ReflectClass();
-
-        Assert.assertEquals(
-            Reflects.getDeepFieldValue(
-                ReflectClass.class, "superPrivateField", reflectClass, true),
-            "superPrivateField"
-        );
-        Reflects.setDeepFieldValue(
-            ReflectClass.class,
-            "superPrivateField",
-            reflectClass,
-            "superPrivateField2",
-            true
-        );
-        Assert.assertEquals(
-            Reflects.getDeepFieldValue(
-                ReflectClass.class, "superPrivateField", reflectClass, true),
-            "superPrivateField2"
-        );
-
-        Assert.expectThrows(IllegalAccessException.class, () ->
-            Reflects.getDeepFieldValue(
-                ReflectClass.class, "superPrivateField", reflectClass, false)
-        );
         Assert.expectThrows(NoSuchFieldException.class, () ->
-            Reflects.getFieldValue(
+            BField.getFieldValue(
                 ReflectClass.class, "superPrivateField", reflectClass, false)
         );
-
         Assert.assertEquals(
-            Reflects.getStaticFieldValue(StaticClass.class, "STATIC_STRING"),
+            BField.getStaticFieldValue(StaticClass.class, "STATIC_STRING"),
             StaticClass.STATIC_STRING
         );
     }

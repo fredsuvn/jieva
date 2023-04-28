@@ -8,13 +8,7 @@ class OTick(
     val now: Long
         get() = count
 
-    @Synchronized
     fun tick() {
         count++
-    }
-
-    @Synchronized
-    fun lock(action: () -> Unit) {
-        action()
     }
 }

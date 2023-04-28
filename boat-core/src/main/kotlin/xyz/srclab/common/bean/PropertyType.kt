@@ -1,7 +1,10 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.invoke.Invoker
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import lombok.EqualsAndHashCode
+import xyz.srclab.common.base.asType
+import xyz.srclab.common.base.defaultSerialVersion
+import xyz.srclab.common.func.InstFunc
+import java.io.Serializable
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
@@ -11,92 +14,53 @@ import java.lang.reflect.Type
  *
  * @see BeanType
  */
-interface PropertyType {
+@EqualsAndHashCode
+open class PropertyType(
+    open val ownerType: BeanType,
+    open val name: String,
+    open val type: Type,
+    open val getter: InstFunc?,
+    open val setter: InstFunc?,
+    open val field: Field?,
+    open val getterMethod: Method?,
+    open val setterMethod: Method?,
+) : Serializable {
 
-    @get:JvmName("name")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val name: String
-
-    @get:JvmName("type")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val type: Type
-
-    @get:JvmName("ownerType")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
-    val ownerType: BeanType
-
-    @get:JvmName("isReadable")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
-    val isReadable: Boolean
+    open val isReadable: Boolean
         get() {
             return getter !== null
         }
 
-    @get:JvmName("isWriteable")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
-    val isWriteable: Boolean
+    open val isWriteable: Boolean
         get() {
             return setter !== null
         }
 
-    @get:JvmName("getter")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val getter: Invoker?
-
-    @get:JvmName("setter")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val setter: Invoker?
-
-    @get:JvmName("field")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val field: Field?
-
-    @get:JvmName("getterMethod")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val getterMethod: Method?
-
-    @get:JvmName("setterMethod")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val setterMethod: Method?
-
-    @get:JvmName("fieldAnnotations")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val fieldAnnotations: List<Annotation>
-        get() {
-            val f = this.field
-            if (f === null) {
-                return emptyList()
-            }
-            return f.annotations.toList()
+    open val fieldAnnotations: List<Annotation> by lazy {
+        val f = this.field
+        if (f === null) {
+            return@lazy emptyList()
         }
+        f.annotations.toList()
+    }
 
-    @get:JvmName("getterAnnotations")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val getterAnnotations: List<Annotation>
-        get() {
-            val getterMethod = this.getterMethod
-            if (getterMethod === null) {
-                return emptyList()
-            }
-            return getterMethod.annotations.toList()
+    open val getterAnnotations: List<Annotation> by lazy {
+        val getterMethod = this.getterMethod
+        if (getterMethod === null) {
+            return@lazy emptyList()
         }
+        getterMethod.annotations.toList()
+    }
 
-    @get:JvmName("setterAnnotations")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val setterAnnotations: List<Annotation>
-        get() {
-            val setterMethod = this.setterMethod
-            if (setterMethod === null) {
-                return emptyList()
-            }
-            return setterMethod.annotations.toList()
+    open val setterAnnotations: List<Annotation> by lazy {
+        val setterMethod = this.setterMethod
+        if (setterMethod === null) {
+            return@lazy emptyList()
         }
+        setterMethod.annotations.toList()
+    }
 
-    @JvmDefault
-    fun <T> getValue(bean: Any): T {
+    open fun getValue(bean: Any): Any? {
         val getter = this.getter
         if (getter === null) {
             throw IllegalStateException("Property is not readable: $name")
@@ -104,19 +68,23 @@ interface PropertyType {
         return getter.invoke(bean)
     }
 
-    @JvmDefault
-    fun setValue(bean: Any, value: Any?) {
+    open fun <T> getValueAsType(bean: Any): T {
+        return getValue(bean).asType()
+    }
+
+    open fun setValue(bean: Any, value: Any?) {
         val setter = this.setter
         if (setter === null) {
             throw IllegalStateException("Property is not writeable: $name")
         }
-        setter.invoke<Any?>(bean, value)
+        setter.invoke(bean, value)
     }
 
-    @JvmDefault
-    fun <T> setValueAndReturnOld(bean: Any, value: Any?): T? {
-        val old = getValue<T?>(bean)
-        setValue(bean, value)
-        return old
+    override fun toString(): String {
+        return "property: ${ownerType.type.typeName}.$name[${type.typeName}]"
+    }
+
+    companion object {
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

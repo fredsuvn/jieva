@@ -1,7 +1,6 @@
 package sample.kotlin.xyz.srclab.core.utils
 
 import org.testng.annotations.Test
-import xyz.srclab.common.test.TestLogger
 import xyz.srclab.common.utils.About
 import xyz.srclab.common.utils.Author
 import xyz.srclab.common.utils.Counter.Companion.counterStarts

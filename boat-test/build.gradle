@@ -13,6 +13,9 @@ java {
 dependencies {
   api platform(project(":boat-dependencies"))
 
-  api "org.jetbrains.kotlin:kotlin-test-testng"
+  api("org.jetbrains.kotlin:kotlin-test-testng") {
+    exclude(group: "org.testng", module: "testng")
+  }
+  api group: 'org.testng', name: 'testng', version: '7.3.0', force: true
   api "org.openjdk.jmh:jmh-core"
 }

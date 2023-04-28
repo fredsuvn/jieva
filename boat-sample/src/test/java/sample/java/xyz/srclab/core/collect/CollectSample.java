@@ -25,7 +25,7 @@ public class CollectSample {
         list.add("1");
         list.add("2");
         list.add("3");
-        Collecting<String> collect = Collects.collect(list);
+        Collecting<String> collect = Collects.collecting(list);
         int sum = collect.addAll(Collects.newArray("4", "5", "6"))
             .removeFirst()
             .map(it -> it + "0")
@@ -37,7 +37,7 @@ public class CollectSample {
 
     @Test
     public void testMultiMap() {
-        SetMap<String, String> setMap = SetMap.newSetMap(
+        MutableSetMap<String, String> setMap = MutableSetMap.newSetMap(
             Collects.newMap(
                 new LinkedHashMap<>(),
                 "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
@@ -57,7 +57,7 @@ public class CollectSample {
         //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
         logger.log("mutableSetMap: {}", mutableSetMap);
 
-        ListMap<String, String> listMap = ListMap.newListMap(
+        MutableListMap<String, String> listMap = MutableListMap.newListMap(
             Collects.newMap(
                 new LinkedHashMap<>(),
                 "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")

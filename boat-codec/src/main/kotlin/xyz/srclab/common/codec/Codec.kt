@@ -1,23 +1,18 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.codec.rsa.RsaCodec
 
 /**
  * Codec interface, represents a type of codec way.
  *
- * Note [Codec] **may not thread-safe**.
- *
- * @author sunqian
- *
- * @see EncodeCodec
  * @see DigestCodec
- * @see MacCodec
+ * @see HmacCodec
  * @see CipherCodec
  * @see CodecAlgorithm
+ * @see RsaCodec
+ * @see SM2Cipher
  */
 interface Codec {
 
-    @get:JvmName("algorithm")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val algorithm: String
+    val algorithm: CodecAlgorithm
 }

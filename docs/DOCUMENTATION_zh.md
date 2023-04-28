@@ -1,7 +1,7 @@
 # <span class="image">![logo](../logo.svg)</span> Boat: SrcLab的Java/kotlin核心基础库
 
-<span id="author" class="author">孙谦</span>  
-<span id="email" class="email"><fredsuvn@163.com></span>  
+<span id="author" class="author">孙谦</span>
+<span id="email" class="email"><fredsuvn@163.com></span>
 
 目录
 
@@ -29,7 +29,7 @@ Boat 包括:
 
 -   [boat-core](../boat-core/DOCUMENTATION.md): 核心库;
 
--   [boat-serialize](../boat-serialize/DOCUMENTATION.md):
+-   [boat-data](../boat-data/DOCUMENTATION.md):
     序列化和反序列化核心库 (支持 `JSON`);
 
 -   [boat-codec](../boat-codec/DOCUMENTATION.md): 编码核心库 (支持
@@ -135,21 +135,21 @@ Source Code
 
 -   AsciiDoc:
 
-    -   [English](../boat-serialize/docs/DOCUMENTATION_en.adoc)
+    -   [English](../boat-data/docs/DOCUMENTATION_en.adoc)
 
-    -   [简体中文](../boat-serialize/docs/DOCUMENTATION_zh.adoc)
+    -   [简体中文](../boat-data/docs/DOCUMENTATION_zh.adoc)
 
 -   Markdown:
 
-    -   [English](../boat-serialize/docs/DOCUMENTATION_en.md)
+    -   [English](../boat-data/docs/DOCUMENTATION_en.md)
 
-    -   [简体中文](../boat-serialize/docs/DOCUMENTATION_zh.md)
+    -   [简体中文](../boat-data/docs/DOCUMENTATION_zh.md)
 
 -   HTML:
 
-    -   [English](../boat-serialize/docs/DOCUMENTATION_en.html)
+    -   [English](../boat-data/docs/DOCUMENTATION_en.html)
 
-    -   [简体中文](../boat-serialize/docs/DOCUMENTATION_zh.html)
+    -   [简体中文](../boat-data/docs/DOCUMENTATION_zh.html)
 
 ### Boat Codec
 

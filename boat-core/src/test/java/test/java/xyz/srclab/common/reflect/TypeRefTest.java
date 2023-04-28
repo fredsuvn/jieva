@@ -2,8 +2,8 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.reflect.BType;
 import xyz.srclab.common.reflect.TypeRef;
-import xyz.srclab.common.reflect.Types;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -20,7 +20,7 @@ public class TypeRefTest {
     public void testTypeRef() {
         TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<Map<String, List<? extends String>>>() {
         };
-        Type type = typeRef.type();
+        Type type = typeRef.getType();
         Assert.assertTrue(type instanceof ParameterizedType);
         ParameterizedType mapType = (ParameterizedType) type;
         Assert.assertEquals(mapType.getRawType(), Map.class);
@@ -38,12 +38,12 @@ public class TypeRefTest {
 
         TypeRef<String> stringTypeRef = new TypeRef<String>() {
         };
-        Assert.assertEquals(stringTypeRef.type(), String.class);
+        Assert.assertEquals(stringTypeRef.getType(), String.class);
 
         Assert.assertEquals(
-            Types.parameterizedType(List.class, String.class),
+            BType.parameterizedType(List.class, String.class),
             new TypeRef<List<String>>() {
-            }.type()
+            }.getType()
         );
     }
 }

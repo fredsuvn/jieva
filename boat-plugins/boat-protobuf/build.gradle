@@ -1,0 +1,70 @@
+plugins {
+  id "com.google.protobuf" version "$protobufPluginVersion"
+  id 'build.jar'
+}
+
+description = "Boat Protobuf: Protobuf support for Boat."
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  api project(":boat-data")
+  api "com.google.protobuf:protobuf-java"
+  api "com.hubspot.jackson:jackson-datatype-protobuf"
+
+  testImplementation project(":boat-test")
+}
+
+def protoGenBaseDir = "generated/proto/"
+
+sourceSets {
+  test {
+    proto {
+      // In addition to the default 'src/test/proto'
+      //srcDir 'src/test/protocolbuffers'
+    }
+    java {
+      srcDirs += "$protoGenBaseDir/test/java"
+    }
+  }
+}
+
+protobuf {
+  // Configure the protoc executable
+  protoc {
+    // Download from repositories
+    artifact = "com.google.protobuf:protoc:$protocVersion"
+
+    generatedFilesBaseDir = "$projectDir/$protoGenBaseDir"
+  }
+
+  plugins {
+    //grpc {
+    //  artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
+    //}
+    //grpckt {
+    //  artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpcKotlinVersion"
+    //}
+  }
+
+  generateProtoTasks {
+    all()*.each { task ->
+      task.plugins {
+        // Generate Java gRPC classes
+        //grpc {
+        //  setOutputSubDir "$protoGenDir"
+        //}
+        // Generate Kotlin gRPC using the custom plugin from library
+        //grpckt {}
+      }
+    }
+  }
+}
+
+clean {
+  delete("${protobuf.generatedFilesBaseDir}")
+}

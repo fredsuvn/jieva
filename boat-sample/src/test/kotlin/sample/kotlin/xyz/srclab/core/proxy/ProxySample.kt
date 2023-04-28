@@ -1,10 +1,8 @@
 package sample.kotlin.xyz.srclab.core.proxy
 
 import org.testng.annotations.Test
-import xyz.srclab.common.proxy.ProxyClass
-import xyz.srclab.common.proxy.ProxyMethod
-import xyz.srclab.common.proxy.SuperInvoke
-import xyz.srclab.common.test.TestLogger
+import xyz.srclab.common.proxy.ClassProxy
+import xyz.srclab.common.proxy.ProxyInvoker
 import java.lang.reflect.Method
 import java.util.*
 
@@ -12,12 +10,12 @@ class ProxySample {
 
     @Test
     fun testProxy() {
-        val proxyClass = ProxyClass.newProxyClass(
+        val proxyClass = ClassProxy.newProxyClass(
             Any::class.java,
             listOf(
-                object : ProxyMethod<Any> {
+                object : ProxyInvoker<Any> {
 
-                    override fun proxy(method: Method): Boolean {
+                    override fun isProxy(method: Method): Boolean {
                         return method.name == "toString" && Arrays.equals(
                             method.parameterTypes,
                             arrayOfNulls<Class<*>>(0)
@@ -27,10 +25,10 @@ class ProxySample {
                     override fun invoke(
                         proxied: Any,
                         proxiedMethod: Method,
-                        superInvoke: SuperInvoke,
+                        sourceInvoke: SourceInvoke,
                         args: Array<out Any?>
                     ): Any {
-                        return "Proxy[super: " + superInvoke.invoke(*args) + "]"
+                        return "Proxy[super: " + sourceInvoke.invoke(*args) + "]"
                     }
                 }
             )

@@ -6,7 +6,6 @@ import java.lang.annotation.*;
  * To specify an accepted type.
  *
  * @author sunqian
- * @see Acceptable
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -18,8 +17,8 @@ import java.lang.annotation.*;
     ElementType.TYPE_PARAMETER,
     ElementType.TYPE_USE,
 })
-@Repeatable(Acceptable.class)
+//@Repeatable(Acceptable.class)
 public @interface Accepted {
 
-    Class<?> value();
+    Class<?>[] value();
 }

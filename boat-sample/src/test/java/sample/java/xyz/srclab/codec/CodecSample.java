@@ -2,7 +2,7 @@ package sample.java.xyz.srclab.codec;
 
 import org.testng.annotations.Test;
 import xyz.srclab.common.codec.Codecs;
-import xyz.srclab.common.codec.EncodeCodec;
+import xyz.srclab.common.codec.EncCodec;
 import xyz.srclab.common.codec.aes.AesKeys;
 import xyz.srclab.common.test.TestLogger;
 
@@ -19,7 +19,7 @@ public class CodecSample {
         SecretKey secretKey = AesKeys.newKey(password);
 
         //Use static
-        String message = EncodeCodec.base64().decodeToString(messageBase64);
+        String message = EncCodec.base64().decodeToString(messageBase64);
         byte[] encrypt = Codecs.aesCodec().encrypt(secretKey, message);
         String decrypt = Codecs.aesCodec().decryptToString(secretKey, encrypt);
         //hei, pengyou, ruguozhendeshiniqingdazhaohu

@@ -2,7 +2,6 @@ package sample.kotlin.xyz.srclab.core.cache
 
 import org.testng.annotations.Test
 import xyz.srclab.common.cache.Cache
-import xyz.srclab.common.test.TestLogger
 
 class CacheSample {
 

@@ -4,7 +4,7 @@ public class SubReflectClass extends ReflectClass {
 
     public String subPublicField = "subPublicField";
     protected String subProtectedField = "subProtectedField";
-    private String subPrivateField = "subPrivateField";
+    private final String subPrivateField = "subPrivateField";
     String subPackageField = "subPackageField";
 
 

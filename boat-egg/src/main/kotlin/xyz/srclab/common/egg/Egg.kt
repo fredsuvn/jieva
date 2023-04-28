@@ -1,46 +1,29 @@
 package xyz.srclab.common.egg
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.loadClass
+import xyz.srclab.common.reflect.classForName
+import xyz.srclab.common.reflect.newInst
 
-/**
- * Egg interface.
- *
- * @author sunqian
- */
 interface Egg {
 
-    @get:JvmName("readme")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val readme: String
+    fun readme()
 
-    /**
-     * Hatches out with spell!
-     */
-    @JvmDefault
-    fun hatchOut(spell: String) {
-        hatchOut(spell, emptyMap())
+    fun hatchOut() {
+        hatchOut(null)
     }
 
-    /**
-     * Hatches out with spell and feed!
-     */
-    fun hatchOut(spell: String, feed: Map<Any, Any>)
+    fun hatchOut(magic: Any?)
 
     companion object {
 
-        /**
-         * Picks an egg!
-         */
         @JvmStatic
         fun pick(egg: String): Egg {
             try {
-                return egg.loadClass<Egg>().newInstance()
+                return egg.classForName<Egg>().newInst()
             } catch (e: Exception) {
-                if (e is EggNotFoundException) {
+                if (e is NoSuchEggException) {
                     throw e
                 }
-                throw EggNotFoundException(egg, e)
+                throw NoSuchEggException(egg, e)
             }
         }
     }

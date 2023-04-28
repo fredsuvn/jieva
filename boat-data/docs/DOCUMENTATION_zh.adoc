@@ -1,0 +1,121 @@
+= image:../../logo.svg[Boat Serialize] `boat-data`: Boat Serialize -- link:../../README.md[Boat] 序列化和反序列化库
+:toc:
+:toclevels: 3
+:toc-title: 目录
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+
+== 简介
+
+Boat Serialize 提供了同意的接口 (`DataParser`, `Data`) 来支持序列化和反序列化.
+
+当前它支持的格式有:
+
+* <<JSON>>
+
+== 用法
+
+=== JSON
+
+Json包提供 `Data` 的JSON格式实现: `Json`.
+
+想要获得一个 `Json`, 我们可以使用 boat-data 的核心工具类: `JsonSerials`.
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
+        Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {
+        });
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val json = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}".toJson()
+        val map: Map<String, String> = json.toObject(object : TypeRef<Map<String, String>>() {})
+    }
+}
+----
+
+`JsonSerials` 使用默认的 `DataParser` -- `DataParser` 针对 `JSON` 格式的核心接口, 来实现它的方法.
+我们也可以直接使用 `DataParser`:
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        JsonSerializer serializer = JsonSerializer.DEFAULT;
+        String mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}";
+        Map<String, String> map = serializer.toJson(mapJson).toObject(new TypeRef<Map<String, String>>() {
+        });
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val serializer = JsonSerializer.DEFAULT
+        val mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}"
+        val map: Map<String, String> =
+            serializer.toJson(mapJson).toObject(object : TypeRef<Map<String, String>>() {})
+    }
+}
+----
+
+默认的, json序列化由 `Jackson` 实现:
+
+* `JacksonJsonParser`: `Jackson` 对 `DataParser` 的实现;
+* `Jacksons`: `Jackson` json工具;
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        JsonSerializer serializer = Jacksons.newJsonSerializer(new ObjectMapper());
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val serializer: JsonSerializer = ObjectMapper().toJsonSerializer()
+    }
+}
+----
+
+== 样例
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/serialize/SerializeSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/serialize/SerializeSample.kt[]
+----

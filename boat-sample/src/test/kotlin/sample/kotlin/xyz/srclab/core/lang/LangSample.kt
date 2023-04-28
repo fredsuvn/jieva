@@ -2,15 +2,11 @@ package sample.kotlin.xyz.srclab.core.lang
 
 import org.testng.Assert
 import org.testng.annotations.Test
+import xyz.srclab.common.base.*
 import xyz.srclab.common.lang.*
-import xyz.srclab.common.lang.CharsFormat.Companion.fastFormat
-import xyz.srclab.common.lang.CharsFormat.Companion.messageFormat
-import xyz.srclab.common.lang.CharsFormat.Companion.printfFormat
-import xyz.srclab.common.lang.CharsTemplate.Companion.resolveTemplate
-import xyz.srclab.common.lang.LazyString.Companion.toLazyString
+import xyz.srclab.common.lang.LazyToString.Companion.lazyToString
 import xyz.srclab.common.lang.Processing.Companion.newProcessing
 import xyz.srclab.common.lang.SpecParser.Companion.parseFirstClassNameToInstance
-import xyz.srclab.common.test.TestLogger
 import xyz.srclab.common.utils.Counter.Companion.counterStarts
 import java.math.BigDecimal
 import java.util.*
@@ -78,7 +74,7 @@ class BaseSample {
     @Test
     fun testNamingCase() {
         val upperCamel = "UpperCamel"
-        val lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL)
+        val lowerCamel = BNamingCase.UPPER_CAMEL.convert(upperCamel, BNamingCase.LOWER_CAMEL)
         //upperCamel
         logger.log("lowerCamel: {}", lowerCamel)
     }
@@ -86,7 +82,7 @@ class BaseSample {
     @Test
     fun testLazyString() {
         val counter = 0.counterStarts()
-        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyString()
+        val lazyToString = lazyOf { counter.getAndIncrementInt() }.lazyToString()
         //0
         logger.log("lazyToString: {}", lazyToString)
     }
@@ -109,12 +105,12 @@ class BaseSample {
     fun testBaseTypes() {
 
         //Anys examples:
-        val lists = arrayOf<List<*>>().asAny<Array<List<String>>>()
+        val lists = arrayOf<List<*>>().asType<Array<List<String>>>()
         val hash = Arrays.asList("", 1).anyOrArrayHash()
         val equals = Arrays.asList("", 1).anyOrArrayEquals(Arrays.asList("", 1))
 
         //Chars examples:
-        val bytes = "message10086".toByteArray()
+        val bytes = "message10086".getBytes()
         val toChars = bytes.toChars()
         val toBytes = toChars.toBytes()
         //message10086
@@ -136,7 +132,7 @@ class BaseSample {
         logger.log("b: {}", b)
 
         //Dates examples:
-        val timestamp = timestamp()
+        val timestamp = currentTimestamp()
         val localDateTime = "2011-12-03T10:15:30".toLocalDateTime()
         //20210207144816045
         logger.log("timestamp: {}", timestamp)
@@ -145,7 +141,7 @@ class BaseSample {
 
         //Compares example:
         //99
-        logger.log("inBounds: {}", 100.inBounds(0, 99))
+        logger.log("inBounds: {}", 100.between(0, 99))
 
         //Checks examples:
         try {
@@ -180,16 +176,16 @@ class BaseSample {
             logger.log("random[10, 20): {}", randomBetween(10, 20))
         }
 
-        val randomSupplier = RandomSupplier.newBuilder<Any>()
-            .mayBe(20, "A")
-            .mayBe(20, "B")
-            .mayBe(60, "C")
+        val BRandomer = Randomer.newBuilder<Any>()
+            .score(20, "A")
+            .score(20, "B")
+            .score(60, "C")
             .build()
         var countA = 0
         var countB = 0
         var countC = 0
         for (i in 0..999) {
-            val result = randomSupplier.get()
+            val result = BRandomer.get()
             if (result == "A") {
                 countA++
             } else if (result == "B") {
@@ -207,14 +203,14 @@ class BaseSample {
     @Test
     fun testCachingProductBuilder() {
 
-        class CachingBuilderSample : CachingProductBuilder<String>() {
+        class CachingBuilderSample : CacheableBuilder<String>() {
 
             private var value = "null"
             private var counter = 0L
 
             fun setValue(value: String) {
                 this.value = value
-                commitModification()
+                commit()
             }
 
             override fun buildNew(): String {
@@ -283,13 +279,13 @@ class BaseSample {
 
     @Test
     fun testSingleAccessor() {
-        val singleAccessor = TestSingleAccessor()
+        val singleAccessor = TestObjectAccessor()
         Assert.assertNull(singleAccessor.getOrNull())
         Assert.assertEquals("666", singleAccessor.getOrElse("666"))
         Assert.assertEquals("666", singleAccessor.getOrElse { "666" })
         singleAccessor.set("777")
         Assert.assertEquals("777", singleAccessor.get())
-        val genericSingleAccessor = TestGenericSingleAccessor()
+        val genericSingleAccessor = TestBAccessor()
         Assert.assertNull(genericSingleAccessor.getOrNull())
         Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"))
         Assert.assertEquals("666", genericSingleAccessor.getOrElse { "666" })
@@ -301,7 +297,7 @@ class BaseSample {
         Assert.assertEquals("666", mapAccessor.getOrElse("1") { k: Any? -> "666" })
         mapAccessor.set("1", "777")
         Assert.assertEquals("777", mapAccessor.get("1"))
-        val genericMapAccessor = TestGenericMapAccessor()
+        val genericMapAccessor = TestBMapAccessor()
         Assert.assertNull(genericMapAccessor.getOrNull("1"))
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"))
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1") { k: String? -> "666" })
@@ -318,7 +314,7 @@ enum class TestEnum {
     T1, T2
 }
 
-class TestSingleAccessor : SingleAccessor {
+class TestObjectAccessor : ObjectAccessor {
     private var value: String? = null
     override fun <T : Any> getOrNull(): T? {
         return value as T?
@@ -329,7 +325,7 @@ class TestSingleAccessor : SingleAccessor {
     }
 }
 
-class TestGenericSingleAccessor : GenericSingleAccessor<String> {
+class TestBAccessor : BAccessRef<String> {
     private var value: String? = null
     override fun getOrNull(): String? {
         return value
@@ -345,7 +341,7 @@ class TestMapAccessor : MapAccessor {
     override val contents: MutableMap<Any, Any?> = values
 }
 
-class TestGenericMapAccessor : GenericMapAccessor<String, String> {
+class TestBMapAccessor : BMapAccessor<String, String> {
     private val values: MutableMap<String, String?> = HashMap()
     override val contents: MutableMap<String, String?> = values
 }
