@@ -135,65 +135,70 @@ public class FsGen {
         List<MethodDeclaration> methods,
         List<ImportDeclaration> imports
     ) {
-        methods.addAll(type.findAll(MethodDeclaration.class, it -> it.isStatic() && it.isPublic())
-            .stream().filter(method -> {
-                for (AnnotationExpr annotation : method.getAnnotations()) {
-                    ResolvedAnnotationDeclaration re = annotation.resolve();
-                    if (Objects.equals(re.getQualifiedName(), FsMethod.class.getName())) {
-                        boolean ignored = isFsMethodIgnored(annotation);
-                        if (ignored) {
-                            return false;
+        methods.addAll(type.findAll(MethodDeclaration.class, it -> {
+                    if (!it.isStatic()) {
+                        return false;
+                    }
+                    return it.isPublic() || type.asClassOrInterfaceDeclaration().isInterface();
+                })
+                .stream().filter(method -> {
+                    for (AnnotationExpr annotation : method.getAnnotations()) {
+                        ResolvedAnnotationDeclaration re = annotation.resolve();
+                        if (Objects.equals(re.getQualifiedName(), FsMethod.class.getName())) {
+                            boolean ignored = isFsMethodIgnored(annotation);
+                            if (ignored) {
+                                return false;
+                            }
                         }
                     }
-                }
-                return true;
-            }).peek(method -> {
-                imports.add(new ImportDeclaration(type.resolve().getQualifiedName(), false, false));
-                ResolvedType returnType = method.getType().resolve();
-                if (returnType.isReferenceType()) {
-                    ImportDeclaration returnImport =
-                        new ImportDeclaration(returnType.asReferenceType().getQualifiedName(), false, false);
-                    imports.add(returnImport);
-                }
-                BlockStmt body = new BlockStmt();
-                String callState;
-                NodeList<Parameter> parameters = method.getParameters();
-                if (parameters.isEmpty()) {
-                    callState = type.getNameAsString() + "." + method.getNameAsString() + "();";
-                } else {
-                    callState = type.getNameAsString() + "." + method.getNameAsString() + "(" +
-                        parameters.stream().map(NodeWithSimpleName::getNameAsString).collect(Collectors.joining(", "))
-                        + ");";
-                    for (Parameter parameter : parameters) {
-                        ResolvedType paramType = parameter.resolve().getType();
-                        if (paramType.isReferenceType()) {
-                            ImportDeclaration returnImport =
-                                new ImportDeclaration(paramType.asReferenceType().getQualifiedName(), false, false);
-                            imports.add(returnImport);
+                    return true;
+                }).peek(method -> {
+                    imports.add(new ImportDeclaration(type.resolve().getQualifiedName(), false, false));
+                    ResolvedType returnType = method.getType().resolve();
+                    if (returnType.isReferenceType()) {
+                        ImportDeclaration returnImport =
+                            new ImportDeclaration(returnType.asReferenceType().getQualifiedName(), false, false);
+                        imports.add(returnImport);
+                    }
+                    BlockStmt body = new BlockStmt();
+                    String callState;
+                    NodeList<Parameter> parameters = method.getParameters();
+                    if (parameters.isEmpty()) {
+                        callState = type.getNameAsString() + "." + method.getNameAsString() + "();";
+                    } else {
+                        callState = type.getNameAsString() + "." + method.getNameAsString() + "(" +
+                            parameters.stream().map(NodeWithSimpleName::getNameAsString).collect(Collectors.joining(", "))
+                            + ");";
+                        for (Parameter parameter : parameters) {
+                            ResolvedType paramType = parameter.resolve().getType();
+                            if (paramType.isReferenceType()) {
+                                ImportDeclaration returnImport =
+                                    new ImportDeclaration(paramType.asReferenceType().getQualifiedName(), false, false);
+                                imports.add(returnImport);
+                            }
                         }
                     }
-                }
-                if (Objects.equals(returnType.describe(), "void")) {
-                    body.addStatement(callState);
-                } else {
-                    body.addStatement("return " + callState);
-                }
-                method.setBody(body);
-            }).peek(method -> {
-                Iterator<AnnotationExpr> it = method.getAnnotations().iterator();
-                while (it.hasNext()) {
-                    AnnotationExpr annotation = it.next();
-                    ResolvedAnnotationDeclaration re = annotation.resolve();
-                    if (Objects.equals(re.getQualifiedName(), FsMethod.class.getName())) {
-                        it.remove();
-                        String newName = getFsMethodName(annotation);
-                        if (newName == null || newName.isEmpty()) {
-                            continue;
-                        }
-                        method.setName(newName);
+                    if (Objects.equals(returnType.describe(), "void")) {
+                        body.addStatement(callState);
+                    } else {
+                        body.addStatement("return " + callState);
                     }
-                }
-            }).collect(Collectors.toList())
+                    method.setBody(body);
+                }).peek(method -> {
+                    Iterator<AnnotationExpr> it = method.getAnnotations().iterator();
+                    while (it.hasNext()) {
+                        AnnotationExpr annotation = it.next();
+                        ResolvedAnnotationDeclaration re = annotation.resolve();
+                        if (Objects.equals(re.getQualifiedName(), FsMethod.class.getName())) {
+                            it.remove();
+                            String newName = getFsMethodName(annotation);
+                            if (newName == null || newName.isEmpty()) {
+                                continue;
+                            }
+                            method.setName(newName);
+                        }
+                    }
+                }).collect(Collectors.toList())
         );
     }
 

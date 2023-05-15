@@ -5,9 +5,7 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.StringJoiner;
 import java.util.function.Supplier;
 
 /**
@@ -17,6 +15,132 @@ import java.util.function.Supplier;
  */
 @FsMethods
 public class FsString {
+
+    /**
+     * Returns whether given chars is null or empty.
+     *
+     * @param chars given chars
+     */
+    public static boolean isEmpty(@Nullable CharSequence chars) {
+        return chars == null || chars.length() == 0;
+    }
+
+    /**
+     * Returns whether given chars is blank: null, empty or whitespace.
+     *
+     * @param chars given chars
+     */
+    public static boolean isBlank(@Nullable CharSequence chars) {
+        if (chars == null || chars.length() == 0) {
+            return true;
+        }
+        for (int i = 0; i < chars.length(); i++) {
+            char c = chars.charAt(i);
+            if (!Character.isWhitespace(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns whether given chars can match given regex.
+     *
+     * @param regex given regex
+     * @param chars given chars
+     */
+    public static boolean matches(CharSequence regex, @Nullable CharSequence chars) {
+        if (chars == null) {
+            return false;
+        }
+        return chars.toString().matches(regex.toString());
+    }
+
+    /**
+     * Returns ture if any given chars is empty.
+     *
+     * @param chars given chars
+     */
+    public static boolean anyEmpty(CharSequence... chars) {
+        for (CharSequence c : chars) {
+            if (isEmpty(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns ture if any given chars is blank: null, empty or whitespace.
+     *
+     * @param chars given chars
+     */
+    public static boolean anyBlank(CharSequence... chars) {
+        for (CharSequence c : chars) {
+            if (isBlank(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns ture if any given chars can match given regex.
+     *
+     * @param chars given chars
+     * @param regex given regex
+     */
+    public static boolean anyMatches(CharSequence regex, CharSequence... chars) {
+        for (CharSequence c : chars) {
+            if (matches(regex, c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns ture if all given chars is empty.
+     *
+     * @param chars given chars
+     */
+    public static boolean allEmpty(CharSequence... chars) {
+        for (CharSequence c : chars) {
+            if (!isEmpty(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns ture if all given chars is blank: null, empty or whitespace.
+     *
+     * @param chars given chars
+     */
+    public static boolean allBlank(CharSequence... chars) {
+        for (CharSequence c : chars) {
+            if (!isBlank(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns ture if all given chars can match given regex.
+     *
+     * @param chars given chars
+     * @param regex given regex
+     */
+    public static boolean allMatches(CharSequence regex, CharSequence... chars) {
+        for (CharSequence c : chars) {
+            if (!matches(regex, c)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Returns a string follows:
@@ -103,17 +227,7 @@ public class FsString {
      * @param strings given strings
      */
     public static String concat(String... strings) {
-        int length = 0;
-        for (String string : strings) {
-            length += string.length();
-        }
-        char[] chars = new char[length];
-        int offset = 0;
-        for (String string : strings) {
-            string.getChars(0, string.length(), chars, offset);
-            offset += string.length();
-        }
-        return new String(chars);
+        return String.join("", strings);
     }
 
     /**
@@ -122,10 +236,11 @@ public class FsString {
      * @param args given arguments
      */
     public static String concat(Object... args) {
-        if (FsObject.equals(String.class, args.getClass().getComponentType())) {
-            return concat((String[]) args);
+        StringJoiner joiner = new StringJoiner("");
+        for (Object arg : args) {
+            joiner.add(String.valueOf(arg));
         }
-        return concat(FsArray.map(args, new String[args.length], String::valueOf));
+        return joiner.toString();
     }
 
     /**
@@ -134,21 +249,11 @@ public class FsString {
      * @param args given arguments
      */
     public static String concat(Iterable<?> args) {
-        if (args instanceof Collection) {
-            String[] array = new String[((Collection<?>) args).size()];
-            int i = 0;
-            for (Object arg : args) {
-                array[i] = String.valueOf(arg);
-                i++;
-            }
-            return concat(array);
-        } else {
-            List<String> list = new LinkedList<>();
-            for (Object arg : args) {
-                list.add(String.valueOf(arg));
-            }
-            return concat(list);
+        StringJoiner joiner = new StringJoiner("");
+        for (Object arg : args) {
+            joiner.add(String.valueOf(arg));
         }
+        return joiner.toString();
     }
 
     /**
@@ -158,25 +263,7 @@ public class FsString {
      * @param strings   given strings
      */
     public static String join(String separator, String... strings) {
-        int length = 0;
-        for (String string : strings) {
-            length += string.length();
-        }
-        if (strings.length > 1) {
-            length += (strings.length - 1) * separator.length();
-        }
-        char[] chars = new char[length];
-        int offset = 0;
-        for (int i = 0; i < strings.length; i++) {
-            String string = strings[i];
-            string.getChars(0, string.length(), chars, offset);
-            offset += string.length();
-            if (i < strings.length - 1) {
-                separator.getChars(0, separator.length(), chars, offset);
-                offset += separator.length();
-            }
-        }
-        return new String(chars);
+        return String.join(separator, strings);
     }
 
     /**
@@ -186,10 +273,11 @@ public class FsString {
      * @param args      given arguments
      */
     public static String join(String separator, Object... args) {
-        if (FsObject.equals(String.class, args.getClass().getComponentType())) {
-            return join(separator, (String[]) args);
+        StringJoiner joiner = new StringJoiner(separator);
+        for (Object arg : args) {
+            joiner.add(String.valueOf(arg));
         }
-        return join(separator, FsArray.map(args, new String[args.length], String::valueOf));
+        return joiner.toString();
     }
 
     /**
@@ -199,21 +287,11 @@ public class FsString {
      * @param args      given arguments
      */
     public static String join(String separator, Iterable<?> args) {
-        if (args instanceof Collection) {
-            String[] array = new String[((Collection<?>) args).size()];
-            int i = 0;
-            for (Object arg : args) {
-                array[i] = String.valueOf(arg);
-                i++;
-            }
-            return join(separator, array);
-        } else {
-            List<String> list = new LinkedList<>();
-            for (Object arg : args) {
-                list.add(String.valueOf(arg));
-            }
-            return join(separator, list);
+        StringJoiner joiner = new StringJoiner(separator);
+        for (Object arg : args) {
+            joiner.add(String.valueOf(arg));
         }
+        return joiner.toString();
     }
 
     /**
@@ -221,7 +299,7 @@ public class FsString {
      * the executing was provided by given supplier.
      * <p>
      * Note returned {@link CharSequence}'s other methods (such as {@link CharSequence#length()})
-     * were based on its toString() (and the toString() is lazy).
+     * were based on its lazy toString().
      *
      * @param supplier given supplier
      */

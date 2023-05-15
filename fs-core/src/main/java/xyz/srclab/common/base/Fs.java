@@ -1,6 +1,7 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
 
 import java.util.*;
@@ -29,7 +30,7 @@ public class Fs {
     }
 
     /**
-     * Maps source array of type T[] to dest array of typeR[].
+     * Maps source array of type T[] to dest array of type R[].
      * If the dest array's length equals to source array, the mapped elements will be put into the dest array,
      * else create and put into a new array.
      *
@@ -48,8 +49,9 @@ public class Fs {
      *
      * @param componentType given component type
      * @param length        given length
+     * @param <A>           type of array, including primitive array
      */
-    public static <T> T[] newArray(Class<?> componentType, int length) {
+    public static <A> A newArray(Class<?> componentType, int length) {
         return FsArray.newArray(componentType, length);
     }
 
@@ -64,7 +66,7 @@ public class Fs {
     }
 
     /**
-     * Returns value from given array at specified index, if failed to obtain, return default value.
+     * Returns value from given array at specified index, if the value is null or failed to obtain, return default value.
      *
      * @param array        given array
      * @param index        specified index
@@ -444,6 +446,16 @@ public class Fs {
     // Methods from FsObject:
 
     /**
+     * Casts given object as given type T.
+     *
+     * @param obj given object
+     * @param <T> given type T
+     */
+    public static <T> T as(@Nullable Object obj) {
+        return FsObject.as(obj);
+    }
+
+    /**
      * Returns default value if given object is null, or given object itself if it is not null.
      *
      * @param obj          given object
@@ -672,6 +684,24 @@ public class Fs {
         return FsString.lazyString(supplier);
     }
 
+    // Methods from FsCache:
+
+    /**
+     * Creates a new Cache based by SoftReference.
+     */
+    static <V> FsCache<V> newCache() {
+        return FsCache.newCache();
+    }
+
+    /**
+     * Creates a new Cache based by SoftReference.
+     *
+     * @param initialCapacity initial capacity
+     */
+    static <V> FsCache<V> newCache(int initialCapacity) {
+        return FsCache.newCache(initialCapacity);
+    }
+
     // Methods from FsCollect:
 
     /**
@@ -807,7 +837,8 @@ public class Fs {
     }
 
     /**
-     * Returns value from given iterable at specified index, if failed to obtain, return default value.
+     * Returns value from given iterable at specified index,
+     * if the value is null or failed to obtain, return default value.
      *
      * @param iterable     given iterable
      * @param index        specified index
@@ -828,7 +859,7 @@ public class Fs {
     }
 
     /**
-     * Returns value from given map at specified key, if failed to obtain, return default value.
+     * Returns value from given map at specified key, if the value is null or failed to obtain, return default value.
      *
      * @param map          given map
      * @param key          specified key

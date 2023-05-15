@@ -26,7 +26,7 @@ public class FsArray {
     }
 
     /**
-     * Maps source array of type T[] to dest array of typeR[].
+     * Maps source array of type T[] to dest array of type R[].
      * If the dest array's length equals to source array, the mapped elements will be put into the dest array,
      * else create and put into a new array.
      *
@@ -55,9 +55,10 @@ public class FsArray {
      *
      * @param componentType given component type
      * @param length        given length
+     * @param <A>           type of array, including primitive array
      */
-    public static <T> T[] newArray(Class<?> componentType, int length) {
-        return (T[]) Array.newInstance(componentType, length);
+    public static <A> A newArray(Class<?> componentType, int length) {
+        return FsObject.as(Array.newInstance(componentType, length));
     }
 
     /**
@@ -71,7 +72,7 @@ public class FsArray {
     }
 
     /**
-     * Returns value from given array at specified index, if failed to obtain, return default value.
+     * Returns value from given array at specified index, if the value is null or failed to obtain, return default value.
      *
      * @param array        given array
      * @param index        specified index

@@ -3,6 +3,7 @@ package xyz.srclab.common.collect;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.base.FsArray;
+import xyz.srclab.common.base.FsObject;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Collection utilities.
  *
- * @author sunq62
+ * @author fresduvn
  */
 @FsMethods
 public class FsCollect {
@@ -56,10 +57,10 @@ public class FsCollect {
         V value;
         for (Object keyValue : keyValues) {
             if (count == 0) {
-                key = (K) keyValue;
+                key = FsObject.as(keyValue);
                 count++;
             } else {
-                value = (V) keyValue;
+                value = FsObject.as(keyValue);
                 dest.put(key, value);
                 count = 0;
             }
@@ -187,7 +188,8 @@ public class FsCollect {
     }
 
     /**
-     * Returns value from given iterable at specified index, if failed to obtain, return default value.
+     * Returns value from given iterable at specified index,
+     * if the value is null or failed to obtain, return default value.
      *
      * @param iterable     given iterable
      * @param index        specified index
@@ -200,15 +202,22 @@ public class FsCollect {
         if (iterable instanceof List) {
             List<T> list = (List<T>) iterable;
             if (list.size() > index) {
-                return list.get(index);
+                T result = list.get(index);
+                if (result != null) {
+                    return result;
+                }
             }
             return defaultValue;
         }
         int i = 0;
         for (T t : iterable) {
             if (index == i) {
-                return t;
+                if (t != null) {
+                    return t;
+                }
+                break;
             }
+            i++;
         }
         return defaultValue;
     }
@@ -224,7 +233,7 @@ public class FsCollect {
     }
 
     /**
-     * Returns value from given map at specified key, if failed to obtain, return default value.
+     * Returns value from given map at specified key, if the value is null or failed to obtain, return default value.
      *
      * @param map          given map
      * @param key          specified key

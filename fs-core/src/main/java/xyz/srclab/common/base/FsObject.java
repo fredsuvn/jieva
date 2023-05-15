@@ -15,6 +15,16 @@ import java.util.Objects;
 public class FsObject {
 
     /**
+     * Casts given object as given type T.
+     *
+     * @param obj given object
+     * @param <T> given type T
+     */
+    public static <T> T as(@Nullable Object obj) {
+        return (T) obj;
+    }
+
+    /**
      * Returns default value if given object is null, or given object itself if it is not null.
      *
      * @param obj          given object
