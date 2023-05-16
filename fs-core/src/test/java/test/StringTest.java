@@ -10,7 +10,7 @@ import java.util.List;
 public class StringTest {
 
     @Test
-    public void test() {
+    public void concat() {
         List<String> list = Arrays.asList(
             "dsfasfas",
             "fsafs",
@@ -26,6 +26,43 @@ public class StringTest {
         Assert.assertEquals(
             FsString.concat(list),
             String.join("", list)
+        );
+    }
+
+    @Test
+    public void startWith() {
+        String a = "123abc123";
+        Assert.assertEquals(
+            FsString.startWith(a, "456"),
+            "456" + a
+        );
+        Assert.assertEquals(
+            FsString.startWith(a, "123"),
+            a
+        );
+        Assert.assertEquals(
+            FsString.endWith(a, "456"),
+            a + "456"
+        );
+        Assert.assertEquals(
+            FsString.endWith(a, "123"),
+            a
+        );
+        Assert.assertEquals(
+            FsString.removeStart(a, "456"),
+            a
+        );
+        Assert.assertEquals(
+            FsString.removeStart(a, "123"),
+            "abc123"
+        );
+        Assert.assertEquals(
+            FsString.removeEnd(a, "456"),
+            a
+        );
+        Assert.assertEquals(
+            FsString.removeEnd(a, "123"),
+            "123abc"
         );
     }
 }

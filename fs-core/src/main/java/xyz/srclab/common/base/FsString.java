@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
@@ -143,6 +144,48 @@ public class FsString {
     }
 
     /**
+     * Returns whether given chars starts with given start chars.
+     *
+     * @param chars given chars
+     * @param start given start chars
+     */
+    public static boolean startsWith(@Nullable CharSequence chars, @Nullable CharSequence start) {
+        if (chars == null || start == null) {
+            return false;
+        }
+        if (chars.length() < start.length()) {
+            return false;
+        }
+        for (int i = 0; i < start.length(); i++) {
+            if (chars.charAt(i) != start.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns whether given chars ends with given start chars.
+     *
+     * @param chars given chars
+     * @param end   given start chars
+     */
+    public static boolean endsWith(@Nullable CharSequence chars, @Nullable CharSequence end) {
+        if (chars == null || end == null) {
+            return false;
+        }
+        if (chars.length() < end.length()) {
+            return false;
+        }
+        for (int i = chars.length() - 1, j = end.length() - 1; j >= 0; i--, j--) {
+            if (chars.charAt(i) != end.charAt(j)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns a string follows:
      * <ul>
      * <li>returns String.valueOf for given object if it is not an array;</li>
@@ -222,12 +265,103 @@ public class FsString {
     }
 
     /**
-     * Concatenates given strings.
+     * Encodes given string to bytes with default charset {@link FsDefault#charset()}.
      *
-     * @param strings given strings
+     * @param chars given string
      */
-    public static String concat(String... strings) {
-        return String.join("", strings);
+    public static byte[] toBytes(CharSequence chars) {
+        return toBytes(chars, FsDefault.charset());
+    }
+
+    /**
+     * Encodes given string to bytes with given charset.
+     *
+     * @param chars   given string
+     * @param charset given charset
+     */
+    public static byte[] toBytes(CharSequence chars, String charset) {
+        Charset cs = Charset.forName(charset);
+        return toBytes(chars, cs);
+    }
+
+    /**
+     * Encodes given string to bytes with given charset.
+     *
+     * @param chars   given string
+     * @param charset given charset
+     */
+    public static byte[] toBytes(CharSequence chars, Charset charset) {
+        return chars.toString().getBytes(charset);
+    }
+
+    /**
+     * Returns a string starts with given start string.
+     * If given source string starts with given start string, return itself;
+     * if not, return start + src.
+     *
+     * @param src   given source string
+     * @param start given start string
+     */
+    public static String startWith(CharSequence src, CharSequence start) {
+        if (startsWith(src, start)) {
+            return src.toString();
+        }
+        return start.toString() + src;
+    }
+
+    /**
+     * Returns a string doesn't start with given start string.
+     * If given source string starts with given start string, remove the start chars and return;
+     * else return source string.
+     *
+     * @param src   given source string
+     * @param start given start string
+     */
+    public static String removeStart(CharSequence src, CharSequence start) {
+        if (src.length() < start.length()) {
+            return src.toString();
+        }
+        for (int i = 0; i < start.length(); i++) {
+            if (src.charAt(i) != start.charAt(i)) {
+                return src.toString();
+            }
+        }
+        return src.subSequence(start.length(), src.length()).toString();
+    }
+
+    /**
+     * Returns a string ends with given end string.
+     * If given source string ends with given end string, return itself;
+     * if not, return src + end.
+     *
+     * @param src given source string
+     * @param end given end string
+     */
+    public static String endWith(CharSequence src, CharSequence end) {
+        if (endsWith(src, end)) {
+            return src.toString();
+        }
+        return src.toString() + end;
+    }
+
+    /**
+     * Returns a string doesn't end with given end string.
+     * If given source string ends with given end string, remove the end chars and return;
+     * else return source string.
+     *
+     * @param src given source string
+     * @param end given end string
+     */
+    public static String removeEnd(CharSequence src, CharSequence end) {
+        if (src.length() < end.length()) {
+            return src.toString();
+        }
+        for (int i = src.length() - 1, j = end.length() - 1; j >= 0; i--, j--) {
+            if (src.charAt(i) != end.charAt(j)) {
+                return src.toString();
+            }
+        }
+        return src.subSequence(0, src.length() - end.length()).toString();
     }
 
     /**
@@ -254,16 +388,6 @@ public class FsString {
             joiner.add(String.valueOf(arg));
         }
         return joiner.toString();
-    }
-
-    /**
-     * Joins given strings with given separator.
-     *
-     * @param separator given separator
-     * @param strings   given strings
-     */
-    public static String join(String separator, String... strings) {
-        return String.join(separator, strings);
     }
 
     /**
