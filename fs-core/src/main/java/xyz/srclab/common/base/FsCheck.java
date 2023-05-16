@@ -287,7 +287,8 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      * @param message    given message
      */
-    public static void checkInBounds(int index, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
+    public static void checkInBounds(
+        int index, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
         if (!isInBounds(index, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
@@ -320,7 +321,8 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      * @param message    given message
      */
-    public static void checkInBounds(long index, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
+    public static void checkInBounds(
+        long index, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
         if (!isInBounds(index, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
@@ -368,7 +370,8 @@ public class FsCheck {
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
      */
-    public static void checkRangeInBounds(int startRange, int endRange, int startIndex, int endIndex) throws IndexOutOfBoundsException {
+    public static void checkRangeInBounds(
+        int startRange, int endRange, int startIndex, int endIndex) throws IndexOutOfBoundsException {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException("[" + startIndex + ", " + endIndex + "): [" + startRange + ", " + endRange + ")");
         }
@@ -387,7 +390,8 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      * @param message    given message
      */
-    public static void checkRangeInBounds(int startRange, int endRange, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
+    public static void checkRangeInBounds(
+        int startRange, int endRange, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
@@ -405,7 +409,8 @@ public class FsCheck {
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
      */
-    public static void checkRangeInBounds(long startRange, long endRange, long startIndex, long endIndex) throws IndexOutOfBoundsException {
+    public static void checkRangeInBounds(
+        long startRange, long endRange, long startIndex, long endIndex) throws IndexOutOfBoundsException {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException("[" + startIndex + ", " + endIndex + "): [" + startRange + ", " + endRange + ")");
         }
@@ -424,7 +429,8 @@ public class FsCheck {
      * @param endIndex   end index (exclusive)
      * @param message    given message
      */
-    public static void checkRangeInBounds(long startRange, long endRange, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
+    public static void checkRangeInBounds(
+        long startRange, long endRange, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
