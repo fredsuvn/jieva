@@ -52,20 +52,19 @@ public class FsCollect {
      * @param keyValues given key-values
      */
     public static <K, V, M extends Map<? super K, ? super V>> M toMap(M dest, Object... keyValues) {
-        int count = 0;
+        boolean isKey = true;
         K key = null;
-        V value;
         for (Object keyValue : keyValues) {
-            if (count == 0) {
+            if (isKey) {
                 key = FsObject.as(keyValue);
-                count++;
+                isKey = false;
             } else {
-                value = FsObject.as(keyValue);
+                V value = FsObject.as(keyValue);
                 dest.put(key, value);
-                count = 0;
+                isKey = true;
             }
         }
-        if (count > 0) {
+        if (!isKey) {
             dest.put(key, null);
         }
         return dest;
