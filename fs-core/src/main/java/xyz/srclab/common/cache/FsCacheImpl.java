@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Default implementation for {@link FsCache}.
  */
-class FsCacheImpl<T> implements FsCache<T> {
+final class FsCacheImpl<T> implements FsCache<T> {
 
     private static final Object NULL = "[null]";
 
