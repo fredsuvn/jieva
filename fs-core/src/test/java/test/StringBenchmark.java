@@ -22,13 +22,13 @@ import java.util.concurrent.TimeUnit;
 public class StringBenchmark {
 
     private static final String xxx = "xxxxxxxx";
-    private static final String[] xxx8 = new String[8];
-    private static final String[] xxx16 = new String[16];
-    private static final String[] xxx32 = new String[32];
-    private static final String[] xxx64 = new String[64];
-    private static final String[] xxx128 = new String[128];
-    private static final String[] xxx512 = new String[512];
-    private static final String[] xxx1024 = new String[1024];
+    private static final Object[] xxx8 = new String[8];
+    private static final Object[] xxx16 = new String[16];
+    private static final Object[] xxx32 = new String[32];
+    private static final Object[] xxx64 = new String[64];
+    private static final Object[] xxx128 = new String[128];
+    private static final Object[] xxx512 = new String[512];
+    private static final Object[] xxx1024 = new String[1024];
 
     /*
      * Benchmark                              Mode  Cnt      Score       Error   Units
@@ -87,7 +87,7 @@ public class StringBenchmark {
     @Group("g8")
     public void useBuilder8() {
         StringBuilder builder = new StringBuilder();
-        for (String s : xxx8) {
+        for (Object s : xxx8) {
             builder.append(s);
         }
         //builder.toString();
@@ -109,7 +109,7 @@ public class StringBenchmark {
     @Group("g16")
     public void useBuilder16() {
         StringBuilder builder = new StringBuilder();
-        for (String s : xxx16) {
+        for (Object s : xxx16) {
             builder.append(s);
         }
         //builder.toString();
@@ -131,7 +131,7 @@ public class StringBenchmark {
     @Group("g32")
     public void useBuilder32() {
         StringBuilder builder = new StringBuilder();
-        for (String s : xxx32) {
+        for (Object s : xxx32) {
             builder.append(s);
         }
         //builder.toString();
@@ -153,7 +153,7 @@ public class StringBenchmark {
     @Group("g64")
     public void useBuilder64() {
         StringBuilder builder = new StringBuilder();
-        for (String s : xxx64) {
+        for (Object s : xxx64) {
             builder.append(s);
         }
         //builder.toString();
@@ -175,7 +175,7 @@ public class StringBenchmark {
     @Group("g128")
     public void useBuilder128() {
         StringBuilder builder = new StringBuilder();
-        for (String s : xxx128) {
+        for (Object s : xxx128) {
             builder.append(s);
         }
         //builder.toString();
@@ -197,7 +197,7 @@ public class StringBenchmark {
     @Group("g512")
     public void useBuilder512() {
         StringBuilder builder = new StringBuilder();
-        for (String s : xxx512) {
+        for (Object s : xxx512) {
             builder.append(s);
         }
         //builder.toString();
@@ -220,7 +220,7 @@ public class StringBenchmark {
     @Group("g1024")
     public void useBuilder1024() {
         StringBuilder builder = new StringBuilder();
-        for (String s : xxx1024) {
+        for (Object s : xxx1024) {
             builder.append(s);
         }
         //builder.toString();
@@ -232,7 +232,7 @@ public class StringBenchmark {
         join(xxx1024);
     }
 
-    private String join(String... strings) {
-        return String.join("", strings);
+    private String join(Object... strings) {
+        return String.join("", (String[]) strings);
     }
 }

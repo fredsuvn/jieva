@@ -1,0 +1,48 @@
+package test;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import xyz.srclab.common.cache.FsCache;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class CacheTest {
+
+    @Test
+    public void cache() {
+        final int[] detected = {0};
+        FsCache<String> fsCache = FsCache.newCache(key -> detected[0]++);
+        Map<Integer, String> map = new HashMap<>();
+        int times = 1000000 * 3;
+        for (int i = 0; i < times; i++) {
+            fsCache.set(i, String.valueOf(i * 10086));
+            map.put(i, String.valueOf(i * 10086));
+        }
+        int removed = 0;
+        for (int i = 0; i < times; i++) {
+            String fsValue = fsCache.get(i);
+            if (fsValue == null) {
+                removed++;
+            } else {
+                Assert.assertEquals(map.get(i), fsValue);
+            }
+        }
+        Out.println("total: " + times +
+            ", removed: " + removed +
+            ", detected: " + detected[0] +
+            ", cached: " + (times - removed));
+        Assert.assertEquals(removed, detected[0]);
+    }
+
+    @Test
+    public void cacheNull() {
+        FsCache<String> fsCache = FsCache.newCache();
+        fsCache.set(1, null);
+        Assert.assertNull(fsCache.get(1));
+        Assert.assertNotNull(fsCache.getOptional(1));
+        fsCache.remove(1);
+        Assert.assertNull(fsCache.get(1));
+        Assert.assertNull(fsCache.getOptional(1));
+    }
+}

@@ -8,9 +8,10 @@ import java.lang.ref.SoftReference;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
- * Implementation for {@link FsCache}.
+ * Default implementation for {@link FsCache}.
  */
 class FsCacheImpl<T> implements FsCache<T> {
 
@@ -18,18 +19,31 @@ class FsCacheImpl<T> implements FsCache<T> {
 
     private final Map<Object, Entry> map;
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+    private final Consumer<Object> removeListener;
 
     FsCacheImpl() {
         this.map = new ConcurrentHashMap<>();
+        this.removeListener = null;
+    }
+
+    FsCacheImpl(Consumer<Object> removeListener) {
+        this.map = new ConcurrentHashMap<>();
+        this.removeListener = removeListener;
     }
 
     FsCacheImpl(int initialCapacity) {
         this.map = new ConcurrentHashMap<>(initialCapacity);
+        this.removeListener = null;
+    }
+
+    FsCacheImpl(int initialCapacity, Consumer<Object> removeListener) {
+        this.map = new ConcurrentHashMap<>(initialCapacity);
+        this.removeListener = removeListener;
     }
 
     @Override
     public @Nullable T get(Object key) {
-        expungeStaleEntries();
+        cleanUp();
         Entry entry = map.get(key);
         if (entry == null) {
             return null;
@@ -43,7 +57,7 @@ class FsCacheImpl<T> implements FsCache<T> {
 
     @Override
     public @Nullable Optional<T> getOptional(Object key) {
-        expungeStaleEntries();
+        cleanUp();
         Entry entry = map.get(key);
         if (entry == null) {
             return null;
@@ -60,13 +74,13 @@ class FsCacheImpl<T> implements FsCache<T> {
 
     @Override
     public void set(Object key, @Nullable T value) {
-        expungeStaleEntries();
-        map.put(key, new Entry(key, value, queue));
+        cleanUp();
+        map.put(key, new Entry(key, value == null ? NULL : value, queue));
     }
 
     @Override
     public void remove(Object key) {
-        expungeStaleEntries();
+        cleanUp();
         Entry entry = map.get(key);
         if (entry != null) {
             entry.clear();
@@ -84,6 +98,24 @@ class FsCacheImpl<T> implements FsCache<T> {
             }
             Entry entry = (Entry) x;
             entry.clear();
+            if (removeListener != null) {
+                removeListener.accept(entry.key);
+            }
+        }
+    }
+
+    @Override
+    public void cleanUp() {
+        while (true) {
+            Object x = queue.poll();
+            if (x == null) {
+                return;
+            }
+            Entry entry = FsObject.as(x);
+            map.remove(entry.key);
+            if (removeListener != null) {
+                removeListener.accept(entry.key);
+            }
         }
     }
 
@@ -93,17 +125,6 @@ class FsCacheImpl<T> implements FsCache<T> {
         public Entry(Object key, Object value, ReferenceQueue<? super Object> q) {
             super(value, q);
             this.key = key;
-        }
-    }
-
-    private void expungeStaleEntries() {
-        while (true) {
-            Object x = queue.poll();
-            if (x == null) {
-                return;
-            }
-            Entry entry = FsObject.as(x);
-            map.remove(entry.key);
         }
     }
 }

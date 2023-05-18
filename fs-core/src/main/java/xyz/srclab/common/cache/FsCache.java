@@ -4,6 +4,7 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Cache interface and static methods.
@@ -23,10 +24,29 @@ public interface FsCache<T> {
     /**
      * Creates a new Cache based by SoftReference.
      *
+     * @param removeListener Listener triggered when value expiry was detected, the first argument is the key of value.
+     */
+    static <V> FsCache<V> newCache(Consumer<Object> removeListener) {
+        return new FsCacheImpl<>(removeListener);
+    }
+
+    /**
+     * Creates a new Cache based by SoftReference.
+     *
      * @param initialCapacity initial capacity
      */
     static <V> FsCache<V> newCache(int initialCapacity) {
         return new FsCacheImpl<>(initialCapacity);
+    }
+
+    /**
+     * Creates a new Cache based by SoftReference.
+     *
+     * @param initialCapacity initial capacity
+     * @param removeListener  Listener triggered when value expiry was detected, the first argument is the key of value.
+     */
+    static <V> FsCache<V> newCache(int initialCapacity, Consumer<Object> removeListener) {
+        return new FsCacheImpl<>(initialCapacity, removeListener);
     }
 
     /**
@@ -64,4 +84,9 @@ public interface FsCache<T> {
      * Removes all values in this cache.
      */
     void clear();
+
+    /**
+     * Removes all expired values.
+     */
+    void cleanUp();
 }
