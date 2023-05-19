@@ -4,6 +4,8 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.cache.FsCache;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -265,5 +267,34 @@ public class Fs {
             return null;
         }
         return (T) enums[index];
+    }
+
+    /**
+     * Returns stack trace info of given throwable as string.
+     *
+     * @param throwable given throwable
+     */
+    public static String stackTraceToString(Throwable throwable) {
+        return stackTraceToString(throwable, null);
+    }
+
+    /**
+     * Returns stack trace info of given throwable as string,
+     * the line separator of return string will be replaced by given line separator if given separator is not null.
+     *
+     * @param throwable     given throwable
+     * @param lineSeparator given separator
+     */
+    public static String stackTraceToString(Throwable throwable, @Nullable String lineSeparator) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        pw.flush();
+        String stackTrace = sw.toString();
+        if (lineSeparator == null) {
+            return stackTrace;
+        }
+        String sysLineSeparator = System.lineSeparator();
+        return stackTrace.replaceAll(sysLineSeparator, lineSeparator);
     }
 }
