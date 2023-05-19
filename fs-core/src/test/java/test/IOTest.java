@@ -4,9 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.io.FsIO;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +14,7 @@ import java.util.Random;
 public class IOTest {
 
     @Test
-    public void read() {
+    public void testRead() {
         String str = "fdasfsaddddddddddddddddddddddddfgsdfeiurqwwwwwwwwwwwwwwwwwwwwwwwfdkjsg";
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
 
@@ -35,14 +33,50 @@ public class IOTest {
     }
 
     @Test
-    public void readerToStream() {
+    public void testConvert() throws IOException {
         String base = "e12阿士大夫撒发顺丰是の2饿额ee所发生的";
         StringBuilder text = new StringBuilder();
         Random random = new Random();
         for (int i = 0; i < 4096; i++) {
             text.append(base.charAt(random.nextInt(base.length())));
         }
-        InputStream in = FsIO.toInputStream(new StringReader(text.toString()), StandardCharsets.UTF_8);
-        Assert.assertEquals(FsIO.readString(in, StandardCharsets.UTF_8, true), text.toString());
+        String string = text.toString();
+        byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+        InputStream in = FsIO.toInputStream(new StringReader(string), StandardCharsets.UTF_8);
+        Assert.assertEquals(FsIO.readString(in, StandardCharsets.UTF_8, true), string);
+
+        InputStream in2 = FsIO.toInputStream(new StringReader(string), StandardCharsets.UTF_8);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        while (true) {
+            int b = in2.read();
+            if (b != -1) {
+                out.write(b);
+            } else {
+                break;
+            }
+        }
+        Assert.assertEquals(new String(out.toByteArray(), StandardCharsets.UTF_8), string);
+
+        StringWriter sw = new StringWriter();
+        OutputStream wo = FsIO.toOutputStream(sw, StandardCharsets.UTF_8);
+        wo.write(bytes);
+        wo.close();
+        Assert.assertEquals(sw.toString(), string);
+        StringWriter sw2 = new StringWriter();
+        OutputStream wo2 = FsIO.toOutputStream(sw2, StandardCharsets.UTF_8);
+        for (byte aByte : bytes) {
+            wo2.write(aByte);
+        }
+        wo2.close();
+        Assert.assertEquals(sw2.toString(), string);
+
+        char[] chars = new char[string.length()];
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        FsIO.toWriter(charBuffer).write(string.toCharArray());
+        Assert.assertEquals(chars, string.toCharArray());
+        byte[] bytes2 = new byte[bytes.length];
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes2);
+        FsIO.toOutputStream(byteBuffer).write(bytes);
+        Assert.assertEquals(bytes2, bytes);
     }
 }

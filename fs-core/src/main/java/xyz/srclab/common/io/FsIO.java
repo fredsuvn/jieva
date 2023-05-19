@@ -1,5 +1,6 @@
 package xyz.srclab.common.io;
 
+import org.apache.commons.io.output.WriterOutputStream;
 import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.base.FsCheck;
 
@@ -274,6 +275,26 @@ public class FsIO {
     }
 
     /**
+     * Wraps given output stream as a writer.
+     *
+     * @param outputStream given out stream
+     * @param charset      charset writer
+     */
+    public static Writer toWriter(OutputStream outputStream, Charset charset) {
+        return new OutputStreamWriter(outputStream, charset);
+    }
+
+    /**
+     * Wraps given writer as an output stream.
+     *
+     * @param writer  given writer
+     * @param charset charset of writer
+     */
+    public static OutputStream toOutputStream(Writer writer, Charset charset) {
+        return new WriterOutputStream(writer, charset);
+    }
+
+    /**
      * Returns a reader of which content from given buffer.
      *
      * @param buffer given buffer
@@ -289,5 +310,23 @@ public class FsIO {
      */
     public static InputStream toInputStream(ByteBuffer buffer) {
         return new ByteBufferInputStream(buffer);
+    }
+
+    /**
+     * Wraps given buffer as a writer.
+     *
+     * @param buffer given buffer
+     */
+    public static Writer toWriter(CharBuffer buffer) {
+        return new CharBufferWriter(buffer);
+    }
+
+    /**
+     * Wraps given buffer as an output stream.
+     *
+     * @param buffer given writer
+     */
+    public static OutputStream toOutputStream(ByteBuffer buffer) {
+        return new ByteBufferOutputStream(buffer);
     }
 }
