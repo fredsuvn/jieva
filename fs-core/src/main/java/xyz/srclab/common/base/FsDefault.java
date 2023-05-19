@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FsDefault {
 
-
     /**
      * Default charset: {@link StandardCharsets#UTF_8}.
      */

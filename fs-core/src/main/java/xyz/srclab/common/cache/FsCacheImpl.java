@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.base.FsObject;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.ref.BooleanRef;
 import xyz.srclab.common.base.ref.Ref;
 
@@ -55,7 +55,7 @@ final class FsCacheImpl<T> implements FsCache<T> {
         if (result == NULL) {
             return null;
         }
-        return FsObject.as(result);
+        return Fs.as(result);
     }
 
     @Override
@@ -72,7 +72,7 @@ final class FsCacheImpl<T> implements FsCache<T> {
         if (result == NULL) {
             return Optional.empty();
         }
-        return Optional.of(FsObject.as(result));
+        return Optional.of(Fs.as(result));
     }
 
     @Override
@@ -81,7 +81,7 @@ final class FsCacheImpl<T> implements FsCache<T> {
         BooleanRef createNew = new BooleanRef(false);
         Ref<T> newValue = new Ref<>();
         Entry entry = map.computeIfAbsent(key, it -> {
-            newValue.set(loader.apply(FsObject.as(it)));
+            newValue.set(loader.apply(Fs.as(it)));
             createNew.set(true);
             return newEntry(it, newValue.get());
         });
@@ -98,7 +98,7 @@ final class FsCacheImpl<T> implements FsCache<T> {
             map.put(key, newEntry(key, newResult));
             return newResult;
         } else {
-            return result == NULL ? null : FsObject.as(result);
+            return result == NULL ? null : Fs.as(result);
         }
     }
 
@@ -154,7 +154,7 @@ final class FsCacheImpl<T> implements FsCache<T> {
             if (x == null) {
                 return;
             }
-            Entry entry = FsObject.as(x);
+            Entry entry = Fs.as(x);
             map.remove(entry.key);
             if (removeListener != null) {
                 removeListener.accept(entry.key);

@@ -58,7 +58,7 @@ public class FsArray {
      * @param <A>           type of array, including primitive array
      */
     public static <A> A newArray(Class<?> componentType, int length) {
-        return FsObject.as(Array.newInstance(componentType, length));
+        return Fs.as(Array.newInstance(componentType, length));
     }
 
     /**

@@ -2,8 +2,8 @@ package xyz.srclab.common.collect;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsArray;
-import xyz.srclab.common.base.FsObject;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,10 +56,10 @@ public class FsCollect {
         K key = null;
         for (Object keyValue : keyValues) {
             if (isKey) {
-                key = FsObject.as(keyValue);
+                key = Fs.as(keyValue);
                 isKey = false;
             } else {
-                V value = FsObject.as(keyValue);
+                V value = Fs.as(keyValue);
                 dest.put(key, value);
                 isKey = true;
             }
