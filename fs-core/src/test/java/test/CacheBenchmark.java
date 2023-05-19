@@ -9,6 +9,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.srclab.common.cache.FsCache;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,21 +26,24 @@ public class CacheBenchmark {
 
     /*
      * Benchmark                     Mode  Cnt   Score    Error   Units
-     * CacheBenchmark.caffeine      thrpt    3   5.894 ± 13.217  ops/ms
-     * CacheBenchmark.caffeineBig   thrpt    3   9.383 ±  3.068  ops/ms
-     * CacheBenchmark.caffeineSoft  thrpt    3  10.356 ±  5.225  ops/ms
-     * CacheBenchmark.fsCache       thrpt    3  18.500 ±  1.771  ops/ms
-     * CacheBenchmark.guava         thrpt    3   5.284 ±  1.654  ops/ms
-     * CacheBenchmark.guavaBig      thrpt    3   4.607 ±  3.366  ops/ms
-     * CacheBenchmark.guavaSoft     thrpt    3   9.927 ±  2.187  ops/ms
+     * CacheBenchmark.caffeine      thrpt    3   7.018 ± 15.397  ops/ms
+     * CacheBenchmark.caffeineBig   thrpt    3   6.350 ± 22.030  ops/ms
+     * CacheBenchmark.caffeineSoft  thrpt    3  14.697 ± 11.022  ops/ms
+     * CacheBenchmark.fsCache       thrpt    3  26.141 ± 12.452  ops/ms
+     * CacheBenchmark.guava         thrpt    3   3.809 ±  0.611  ops/ms
+     * CacheBenchmark.guavaBig      thrpt    3   3.241 ±  1.383  ops/ms
+     * CacheBenchmark.guavaSoft     thrpt    3  13.587 ± 29.465  ops/ms
      */
 
     private static final Integer[] keys;
+    private static final Integer[] keys2;
 
     static {
-        keys = new Integer[1000];
+        keys = new Integer[500];
+        keys2 = new Integer[keys.length];
         for (int i = 0; i < keys.length; i++) {
             keys[i] = i;
+            keys2[i] = keys.length * 2 + i;
         }
     }
 
@@ -87,35 +91,47 @@ public class CacheBenchmark {
         for (Integer key : keys) {
             fsCache.get(key);
         }
+        for (Integer key : keys2) {
+            fsCache.get(key, String::valueOf);
+        }
     }
 
     @Benchmark
-    public void guava() {
+    public void guava() throws ExecutionException {
         for (Integer key : keys) {
             guava.put(key, key.toString());
         }
         for (Integer key : keys) {
             guava.getIfPresent(key);
         }
+        for (Integer key : keys2) {
+            guava.get(key, () -> String.valueOf(key));
+        }
     }
 
     @Benchmark
-    public void guavaSoft() {
+    public void guavaSoft() throws ExecutionException {
         for (Integer key : keys) {
             guavaSoft.put(key, key.toString());
         }
         for (Integer key : keys) {
             guavaSoft.getIfPresent(key);
         }
+        for (Integer key : keys2) {
+            guavaSoft.get(key, () -> String.valueOf(key));
+        }
     }
 
     @Benchmark
-    public void guavaBig() {
+    public void guavaBig() throws ExecutionException {
         for (Integer key : keys) {
             guavaBig.put(key, key.toString());
         }
         for (Integer key : keys) {
             guavaBig.getIfPresent(key);
+        }
+        for (Integer key : keys2) {
+            guavaBig.get(key, () -> String.valueOf(key));
         }
     }
 
@@ -127,6 +143,9 @@ public class CacheBenchmark {
         for (Integer key : keys) {
             caffeine.getIfPresent(key);
         }
+        for (Integer key : keys2) {
+            caffeine.get(key, String::valueOf);
+        }
     }
 
     @Benchmark
@@ -137,6 +156,9 @@ public class CacheBenchmark {
         for (Integer key : keys) {
             caffeineSoft.getIfPresent(key);
         }
+        for (Integer key : keys2) {
+            caffeineSoft.get(key, String::valueOf);
+        }
     }
 
     @Benchmark
@@ -146,6 +168,9 @@ public class CacheBenchmark {
         }
         for (Integer key : keys) {
             caffeineBig.getIfPresent(key);
+        }
+        for (Integer key : keys2) {
+            caffeineBig.get(key, String::valueOf);
         }
     }
 }

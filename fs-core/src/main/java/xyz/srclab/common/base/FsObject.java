@@ -9,15 +9,13 @@ import java.util.Objects;
 
 /**
  * Utilities for Object.
- * <p>
- * It has a cache associated with name: FsEnum.
  *
  * @author fredsuvn
  */
 @FsMethods
 public class FsObject {
 
-    private static final FsCache<Object[]> cache = FsObject.as(FsDefault.FS_CACHE_MAP.get("FsEnum"));
+    private static final FsCache<Object[]> ENUM_CACHE = FsDefault.getCache(FsDefault.Cache.ENUM_CACHE_NAME);
 
     /**
      * Casts given object as given type T.
@@ -241,7 +239,7 @@ public class FsObject {
                 return null;
             }
         }
-        Object[] enums = cache.get(enumClass.getName(), it -> enumClass.getEnumConstants());
+        Object[] enums = ENUM_CACHE.get(enumClass.getName(), it -> enumClass.getEnumConstants());
         FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
         for (Object anEnum : enums) {
             if (name.equalsIgnoreCase(anEnum.toString())) {
@@ -261,7 +259,7 @@ public class FsObject {
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, int index) {
         FsCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
         FsCheck.checkArgument(index >= 0, "index must >= 0.");
-        Object[] enums = cache.get(enumClass.getName(), it -> enumClass.getEnumConstants());
+        Object[] enums = ENUM_CACHE.get(enumClass.getName(), it -> enumClass.getEnumConstants());
         FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
         if (index >= enums.length) {
             return null;
