@@ -38,24 +38,30 @@ final class ReaderInputStream extends InputStream {
             bufferSize);
     }
 
-    ReaderInputStream(Reader reader, final Charset charset) {
+    ReaderInputStream(Reader reader, Charset charset) {
         this(reader, charset, FsIO.DEFAULT_BUFFER_SIZE);
     }
 
     private void fillBuffer() throws IOException {
-        if (!endOfInput && (lastCoderResult == null || lastCoderResult.isUnderflow())) {
+        if (!endOfInput &&
+            (lastCoderResult == null || lastCoderResult.isUnderflow() || lastCoderResult.isOverflow())) {
             inBuffer.compact();
             int position = inBuffer.position();
-            int readSize = reader.read(inBuffer.array(), position, inBuffer.remaining());
-            if (readSize == -1) {
-                endOfInput = true;
-            } else {
-                inBuffer.position(position + readSize);
+            if (position < inBuffer.capacity()) {
+                int readSize = reader.read(inBuffer.array(), position, inBuffer.remaining());
+                if (readSize == -1) {
+                    endOfInput = true;
+                } else {
+                    inBuffer.position(position + readSize);
+                }
+                inBuffer.flip();
             }
-            inBuffer.flip();
         }
         outBuffer.compact();
         lastCoderResult = encoder.encode(inBuffer, outBuffer, endOfInput);
+        if (lastCoderResult.isMalformed() || lastCoderResult.isMalformed()) {
+            throw new IOException("Encoding failed: " + lastCoderResult);
+        }
         outBuffer.flip();
     }
 
@@ -89,7 +95,7 @@ final class ReaderInputStream extends InputStream {
     }
 
     @Override
-    public int read(final byte[] b) throws IOException {
+    public int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
