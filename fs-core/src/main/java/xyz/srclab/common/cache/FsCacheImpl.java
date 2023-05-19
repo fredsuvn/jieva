@@ -2,6 +2,7 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsObject;
+import xyz.srclab.common.base.ref.BooleanRef;
 import xyz.srclab.common.base.ref.Ref;
 
 import java.lang.ref.ReferenceQueue;
@@ -77,16 +78,28 @@ final class FsCacheImpl<T> implements FsCache<T> {
     @Override
     public <K> @Nullable T get(K key, Function<K, T> loader) {
         cleanUp();
+        BooleanRef createNew = new BooleanRef(false);
         Ref<T> newValue = new Ref<>();
-        map.computeIfAbsent(key, it -> {
+        Entry entry = map.computeIfAbsent(key, it -> {
             newValue.set(loader.apply(FsObject.as(it)));
+            createNew.set(true);
             return newEntry(it, newValue.get());
         });
-        T result = newValue.get();
-        if (result == NULL) {
-            return null;
+        if (createNew.get()) {
+            T result = newValue.get();
+            if (result == NULL) {
+                return null;
+            }
+            return result;
         }
-        return result;
+        Object result = entry.get();
+        if (result == null) {
+            T newResult = loader.apply(key);
+            map.put(key, newEntry(key, newResult));
+            return newResult;
+        } else {
+            return result == NULL ? null : FsObject.as(result);
+        }
     }
 
     @Override

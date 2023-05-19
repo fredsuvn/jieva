@@ -51,6 +51,7 @@ public class CacheTest {
         FsCache<String> fsCache = FsCache.newCache();
         Assert.assertNull(fsCache.get(1));
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
+        Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
         Out.println("cacheLoader: 1=" + fsCache.get(1));
     }
 }

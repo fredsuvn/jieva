@@ -2,17 +2,22 @@ package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
+import xyz.srclab.common.cache.FsCache;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 /**
  * Utilities for Object.
+ * <p>
+ * It has a cache associated with name: FsEnum.
  *
  * @author fredsuvn
  */
 @FsMethods
 public class FsObject {
+
+    private static final FsCache<Object[]> cache = FsObject.as(FsDefault.FS_CACHE_MAP.get("FsEnum"));
 
     /**
      * Casts given object as given type T.
@@ -217,5 +222,50 @@ public class FsObject {
             return deepEquals ? Arrays.deepEquals((Object[]) a, (Object[]) b) : Arrays.equals((Object[]) a, (Object[]) b);
         }
         return Objects.equals(a, b);
+    }
+
+    /**
+     * Returns enum object of specified name from given enum class, may be null if not found.
+     *
+     * @param enumClass  given enum class
+     * @param name       specified name
+     * @param ignoreCase whether ignore case for specified name
+     */
+    @Nullable
+    public static <T extends Enum<T>> T findEnum(Class<?> enumClass, String name, boolean ignoreCase) {
+        FsCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
+        if (!ignoreCase) {
+            try {
+                return Enum.valueOf((Class<T>) enumClass, name);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+        Object[] enums = cache.get(enumClass.getName(), it -> enumClass.getEnumConstants());
+        FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
+        for (Object anEnum : enums) {
+            if (name.equalsIgnoreCase(anEnum.toString())) {
+                return (T) anEnum;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns enum object at specified index from given enum class, may be null if not found.
+     *
+     * @param enumClass given enum class
+     * @param index     specified index
+     */
+    @Nullable
+    public static <T extends Enum<T>> T findEnum(Class<?> enumClass, int index) {
+        FsCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
+        FsCheck.checkArgument(index >= 0, "index must >= 0.");
+        Object[] enums = cache.get(enumClass.getName(), it -> enumClass.getEnumConstants());
+        FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
+        if (index >= enums.length) {
+            return null;
+        }
+        return (T) enums[index];
     }
 }
