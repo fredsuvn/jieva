@@ -2,6 +2,7 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsObject;
+import xyz.srclab.common.base.ref.Ref;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Default implementation for {@link FsCache}.
@@ -73,9 +75,37 @@ final class FsCacheImpl<T> implements FsCache<T> {
     }
 
     @Override
+    public <K> @Nullable T get(K key, Function<K, T> loader) {
+        cleanUp();
+        Ref<T> newValue = new Ref<>();
+        map.computeIfAbsent(key, it -> {
+            newValue.set(loader.apply(FsObject.as(it)));
+            return newEntry(it, newValue.get());
+        });
+        T result = newValue.get();
+        if (result == NULL) {
+            return null;
+        }
+        return result;
+    }
+
+    @Override
+    public <K> Optional<T> getOptional(K key, Function<K, T> loader) {
+        T result = get(key, loader);
+        if (result == null) {
+            return Optional.empty();
+        }
+        return Optional.of(result);
+    }
+
+    @Override
     public void set(Object key, @Nullable T value) {
         cleanUp();
-        map.put(key, new Entry(key, value == null ? NULL : value, queue));
+        map.put(key, newEntry(key, value));
+    }
+
+    private Entry newEntry(Object key, @Nullable T value) {
+        return new Entry(key, value == null ? NULL : value, queue);
     }
 
     @Override
