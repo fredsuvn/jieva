@@ -1,7 +1,10 @@
 package test;
 
 public class Out {
-    public static void println(Object any) {
-        System.out.println(any);
+    public static void println(Object... args) {
+        for (Object arg : args) {
+            System.out.print(arg);
+        }
+        System.out.println();
     }
 }
