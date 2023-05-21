@@ -457,4 +457,108 @@ public class FsString {
             }
         };
     }
+
+    /**
+     * Converts given chars to int, if given chars is blank or failed to convert, return 0.
+     *
+     * @param chars given chars
+     */
+    public static int toInt(@Nullable CharSequence chars) {
+        return toInt(chars, 0);
+    }
+
+    /**
+     * Converts given chars to int, if given chars is blank or failed to convert, return default value.
+     *
+     * @param chars        given chars
+     * @param defaultValue default value
+     */
+    public static int toInt(@Nullable CharSequence chars, int defaultValue) {
+        if (isBlank(chars)) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(chars.toString());
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Converts given chars to long, if given chars is blank or failed to convert, return 0.
+     *
+     * @param chars given chars
+     */
+    public static long toLong(@Nullable CharSequence chars) {
+        return toLong(chars, 0);
+    }
+
+    /**
+     * Converts given chars to long, if given chars is blank or failed to convert, return default value.
+     *
+     * @param chars        given chars
+     * @param defaultValue default value
+     */
+    public static long toLong(@Nullable CharSequence chars, long defaultValue) {
+        if (isBlank(chars)) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(chars.toString());
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Converts given chars to float, if given chars is blank or failed to convert, return 0.
+     *
+     * @param chars given chars
+     */
+    public static float toFloat(@Nullable CharSequence chars) {
+        return toFloat(chars, 0);
+    }
+
+    /**
+     * Converts given chars to float, if given chars is blank or failed to convert, return default value.
+     *
+     * @param chars        given chars
+     * @param defaultValue default value
+     */
+    public static float toFloat(@Nullable CharSequence chars, float defaultValue) {
+        if (isBlank(chars)) {
+            return defaultValue;
+        }
+        try {
+            return Float.parseFloat(chars.toString());
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Converts given chars to double, if given chars is blank or failed to convert, return 0.
+     *
+     * @param chars given chars
+     */
+    public static double toDouble(@Nullable CharSequence chars) {
+        return toDouble(chars, 0);
+    }
+
+    /**
+     * Converts given chars to double, if given chars is blank or failed to convert, return default value.
+     *
+     * @param chars        given chars
+     * @param defaultValue default value
+     */
+    public static double toDouble(@Nullable CharSequence chars, double defaultValue) {
+        if (isBlank(chars)) {
+            return defaultValue;
+        }
+        try {
+            return Double.parseDouble(chars.toString());
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
 }
