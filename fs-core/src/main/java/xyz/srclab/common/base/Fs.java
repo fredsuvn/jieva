@@ -4,10 +4,11 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.cache.FsCache;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Objects;
+import java.net.URL;
+import java.util.*;
 
 /**
  * Utilities for Object.
@@ -349,5 +350,34 @@ public class Fs {
         }
         String sysLineSeparator = System.lineSeparator();
         return stackTrace.replaceAll(sysLineSeparator, lineSeparator);
+    }
+
+    /**
+     * Finds resource of given resource path.
+     *
+     * @param resPath given resource
+     */
+    public static URL findRes(String resPath) {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        return classLoader.getResource(FsString.removeStart(resPath, "/"));
+    }
+
+    /**
+     * Finds all resources of given resource path.
+     *
+     * @param resPath given resource
+     */
+    public static Set<URL> findAllRes(String resPath) {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        try {
+            Enumeration<URL> urls = classLoader.getResources(FsString.removeStart(resPath, "/"));
+            Set<URL> result = new LinkedHashSet<>();
+            while (urls.hasMoreElements()) {
+                result.add(urls.nextElement());
+            }
+            return result;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

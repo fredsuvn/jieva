@@ -3,7 +3,13 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
+import xyz.srclab.common.base.FsDefault;
 import xyz.srclab.common.base.FsLogger;
+import xyz.srclab.common.io.FsIO;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Set;
 
 public class FsTest {
 
@@ -40,6 +46,16 @@ public class FsTest {
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}},
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}, false, true
         ));
+    }
+
+    @Test
+    public void testRes() throws IOException {
+        URL f1 = Fs.findRes("/t2/f1.txt");
+        Assert.assertEquals(FsIO.readString(f1.openStream(), FsDefault.charset(), true), "f1.txt");
+        Set<URL> set = Fs.findAllRes("/t2/f2.txt");
+        for (URL url : set) {
+            Assert.assertEquals(FsIO.readString(url.openStream(), FsDefault.charset(), true), "f2.txt");
+        }
     }
 
     private static final class T1 {

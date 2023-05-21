@@ -245,4 +245,23 @@ public class FsCollect {
         V v = map.get(key);
         return v == null ? defaultValue : v;
     }
+
+    /**
+     * Converts given enumeration to iterable.
+     *
+     * @param enumeration given enumeration
+     */
+    public static <T> Iterable<T> toIterable(Enumeration<T> enumeration) {
+        return () -> new Iterator<T>() {
+            @Override
+            public boolean hasNext() {
+                return enumeration.hasMoreElements();
+            }
+
+            @Override
+            public T next() {
+                return enumeration.nextElement();
+            }
+        };
+    }
 }
