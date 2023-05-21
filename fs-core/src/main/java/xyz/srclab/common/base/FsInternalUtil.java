@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  *
  * @author fredsuvn
  */
-class InternalUtil {
+class FsInternalUtil {
 
     @Nullable
     public static void internalLog(FsLogger logger, int level, Object... message) {
@@ -17,8 +17,8 @@ class InternalUtil {
             return;
         }
         LocalDateTime now = LocalDateTime.now();
-        StackTraceElement stackTraceElement = FsThread.findStackTraceCaller(
-            InternalUtil.class.getName(), "internalLog", 1);
+        StackTraceElement stackTraceElement = Fs.findStackTraceCaller(
+            FsInternalUtil.class.getName(), "internalLog", 1);
         FsLogger.Log log = new FsLogger.Log(level, now, stackTraceElement, message);
         logger.output(log);
     }

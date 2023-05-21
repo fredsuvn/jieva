@@ -93,39 +93,39 @@ public interface FsLogger {
      * Logs with {@link FsLogger#TRACE_LEVEL}.
      */
     default void trace(Object... message) {
-        InternalUtil.internalLog(this, TRACE_LEVEL, message);
+        FsInternalUtil.internalLog(this, TRACE_LEVEL, message);
     }
 
     /**
      * Logs with {@link FsLogger#DEBUG_LEVEL}.
      */
     default void debug(Object... message) {
-        InternalUtil.internalLog(this, DEBUG_LEVEL, message);
+        FsInternalUtil.internalLog(this, DEBUG_LEVEL, message);
     }
 
     /**
      * Logs with {@link FsLogger#INFO_LEVEL}.
      */
     default void info(Object... message) {
-        InternalUtil.internalLog(this, INFO_LEVEL, message);
+        FsInternalUtil.internalLog(this, INFO_LEVEL, message);
     }
 
     /**
      * Logs with {@link FsLogger#WARN_LEVEL}.
      */
     default void warn(Object... message) {
-        InternalUtil.internalLog(this, WARN_LEVEL, message);
+        FsInternalUtil.internalLog(this, WARN_LEVEL, message);
     }
 
     /**
      * Logs with {@link FsLogger#ERROR_LEVEL}.
      */
     default void error(Object... message) {
-        InternalUtil.internalLog(this, ERROR_LEVEL, message);
+        FsInternalUtil.internalLog(this, ERROR_LEVEL, message);
     }
 
     default void log(int level, Object... message) {
-        InternalUtil.internalLog(this, level, message);
+        FsInternalUtil.internalLog(this, level, message);
     }
 
     /**
