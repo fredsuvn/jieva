@@ -26,6 +26,45 @@ public class FsArray {
     }
 
     /**
+     * Returns whether given array if null or empty.
+     *
+     * @param array given array
+     */
+    public static boolean isEmpty(@Nullable Object array) {
+        if (array == null) {
+            return true;
+        }
+        if (array instanceof Object[]) {
+            return ((Object[]) array).length == 0;
+        }
+        if (array instanceof boolean[]) {
+            return ((boolean[]) array).length == 0;
+        }
+        if (array instanceof byte[]) {
+            return ((byte[]) array).length == 0;
+        }
+        if (array instanceof short[]) {
+            return ((short[]) array).length == 0;
+        }
+        if (array instanceof char[]) {
+            return ((char[]) array).length == 0;
+        }
+        if (array instanceof int[]) {
+            return ((int[]) array).length == 0;
+        }
+        if (array instanceof long[]) {
+            return ((long[]) array).length == 0;
+        }
+        if (array instanceof float[]) {
+            return ((float[]) array).length == 0;
+        }
+        if (array instanceof double[]) {
+            return ((double[]) array).length == 0;
+        }
+        throw new IllegalArgumentException("Given array is not type of array: " + array.getClass());
+    }
+
+    /**
      * Maps source array of type T[] to dest array of type R[].
      * If the dest array's length equals to source array, the mapped elements will be put into the dest array,
      * else create and put into a new array.
