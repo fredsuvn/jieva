@@ -22,6 +22,25 @@ public class FsTest {
         T1.invoke1();
     }
 
+    @Test
+    public void testEqual() {
+        Assert.assertTrue(Fs.equals(new int[]{1, 2, 3}, new int[]{1, 2, 3}));
+        Assert.assertFalse(Fs.equals(new int[]{1, 2}, new int[]{1, 2, 3}));
+        Assert.assertFalse(Fs.equals(new int[]{1, 2, 3}, new int[]{1, 2, 3}, false, false));
+        Assert.assertTrue(Fs.equals(
+            new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}},
+            new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}
+        ));
+        Assert.assertFalse(Fs.equals(
+            new Object[]{new int[]{1, 2, 3}, new int[]{1, 2}},
+            new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}
+        ));
+        Assert.assertFalse(Fs.equals(
+            new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}},
+            new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}, false, true
+        ));
+    }
+
     private static final class T1 {
         public static void invoke1() {
             T2.invoke2();

@@ -59,7 +59,7 @@ public class Fs {
      *
      * @param objs given objects
      */
-    public static int hash(Object... objs) {
+    public static int hashAll(Object... objs) {
         return Arrays.deepHashCode(objs);
     }
 
@@ -148,7 +148,7 @@ public class Fs {
      *
      * @param objs given objects
      */
-    public static boolean equals(Object... objs) {
+    public static boolean allEquals(Object... objs) {
         if (objs.length <= 1) {
             return true;
         }
