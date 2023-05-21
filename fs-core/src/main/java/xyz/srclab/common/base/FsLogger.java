@@ -16,6 +16,14 @@ import java.util.function.Consumer;
 public interface FsLogger {
 
     /**
+     * Returns system default logger, which using {@link System#out} to output,
+     * and its level is {@link FsLogger#INFO_LEVEL}.
+     */
+    static FsLogger system() {
+        return FsInternalUtil.systemLogger();
+    }
+
+    /**
      * Converts given level to description, for example: {@link #INFO_LEVEL} -> "INFO".
      * <p>
      * If given level cannot match at least one level of {@link FsLogger}, return String.valueOf(level).

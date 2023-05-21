@@ -3,15 +3,16 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
+import xyz.srclab.common.base.FsLogger;
 
 public class FsTest {
 
     @Test
     public void testThrow() {
-        Out.println(Fs.stackTraceToString(
+        FsLogger.system().info(Fs.stackTraceToString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())))
         );
-        Out.println(Fs.stackTraceToString(
+        FsLogger.system().info(Fs.stackTraceToString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())),
             " : ")
         );

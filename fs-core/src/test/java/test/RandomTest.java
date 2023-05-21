@@ -2,6 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.base.FsRandom;
 
 public class RandomTest {
@@ -28,6 +29,6 @@ public class RandomTest {
         }
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
-        Out.println("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
+        FsLogger.system().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
     }
 }

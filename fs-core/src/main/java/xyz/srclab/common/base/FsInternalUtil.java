@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
  */
 class FsInternalUtil {
 
+    private static final FsLogger systemLogger = FsLogger.ofLevel(FsLogger.INFO_LEVEL);
+
     @Nullable
     public static void internalLog(FsLogger logger, int level, Object... message) {
         if (level < logger.getLevel()) {
@@ -21,5 +23,9 @@ class FsInternalUtil {
             FsInternalUtil.class.getName(), "internalLog", 1);
         FsLogger.Log log = new FsLogger.Log(level, now, stackTraceElement, message);
         logger.output(log);
+    }
+
+    public static FsLogger systemLogger() {
+        return systemLogger;
     }
 }
