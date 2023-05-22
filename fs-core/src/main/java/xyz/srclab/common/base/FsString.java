@@ -271,43 +271,137 @@ public class FsString {
 
     /**
      * Splits given chars with given separator.
-     * If chars or separator is empty, or separator is never matched, return source given chars.
+     * If chars or separator is empty, or separator's length is greater than chars' length,
+     * or separator is never matched, return an empty list.
      * <p>
-     * Note empty part will be created there is no char between a separator and the other separator, start or end.
+     * Note empty part will be created there is no char between separator and the next separator,
+     * position of start or end.
      *
      * @param chars     given chars
      * @param separator given separator
      */
     public static List<CharSequence> split(CharSequence chars, CharSequence separator) {
-        if (isEmpty(chars) || isEmpty(separator)) {
-            return Collections.singletonList(chars);
+        if (isEmpty(chars) || isEmpty(separator) || separator.length() > chars.length()) {
+            return Collections.emptyList();
         }
         List<CharSequence> result = new LinkedList<>();
         int wordStart = 0;
-        for (int i = 0; i < chars.length(); ) {
-            boolean matchSeparator = true;
-            for (int j = 0; j < separator.length(); j++) {
-                if (chars.charAt(i + j) != separator.charAt(j)) {
-                    matchSeparator = false;
+        while (true) {
+            int index = indexOf(chars, separator, wordStart);
+            if (index >= 0) {
+                result.add(chars.subSequence(wordStart, index));
+                wordStart = index + separator.length();
+                if (wordStart >= chars.length()) {
+                    result.add(chars.subSequence(wordStart, chars.length()));
+                    return result;
+                }
+            } else {
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+                result.add(chars.subSequence(wordStart, chars.length()));
+                return result;
+            }
+        }
+    }
+
+    /**
+     * Returns first index of given search word in given chars, starts from index 0,
+     * in natural order (0,1,2,3...end).
+     * Returns -1 if not found.
+     *
+     * @param chars  given chars
+     * @param search given search word
+     */
+    public static int indexOf(CharSequence chars, CharSequence search) {
+        return indexOf(chars, search, 0);
+    }
+
+    /**
+     * Returns first index of given search word in given chars, starts from given index,
+     * in natural order (0,1,2,3...end).
+     * Returns -1 if not found.
+     *
+     * @param chars  given chars
+     * @param search given search word
+     * @param from   given index
+     */
+    public static int indexOf(CharSequence chars, CharSequence search, int from) {
+        if (isEmpty(chars) || chars.length() < search.length()) {
+            return -1;
+        }
+        FsCheck.checkArgument(!isEmpty(search), "search string is empty.");
+        FsCheck.checkInBounds(from, 0, chars.length());
+        if (chars.length() - from < search.length()) {
+            return -1;
+        }
+        for (int i = from; i < chars.length(); i++) {
+            if (chars.length() - i < search.length()) {
+                return -1;
+            }
+            boolean match = true;
+            for (int j = 0; j < search.length(); j++) {
+                if (chars.charAt(i + j) != search.charAt(j)) {
+                    match = false;
                     break;
                 }
             }
-            if (matchSeparator) {
-                if (i >= wordStart) {
-                    result.add(chars.subSequence(wordStart, i));
-                }
-                i += separator.length();
-                wordStart = i;
-            } else {
-                i++;
+            if (match) {
+                return i;
             }
         }
-        if (wordStart <= chars.length()) {
-            result.add(chars.subSequence(wordStart, chars.length()));
-        } else {
-            result.add("");
+        return -1;
+    }
+
+    /**
+     * Returns last index of given search word in given chars, starts from last index,
+     * in reversed natural order (end...3,2,1,0).
+     * Returns -1 if not found.
+     *
+     * @param chars  given chars
+     * @param search given search word
+     */
+    public static int lastIndexOf(CharSequence chars, CharSequence search) {
+        if (isEmpty(chars)) {
+            return -1;
         }
-        return result;
+        return lastIndexOf(chars, search, chars.length() - 1);
+    }
+
+    /**
+     * Returns last index of given search word in given chars, starts given index,
+     * in reversed natural order (end...3,2,1,0).
+     * Returns -1 if not found.
+     *
+     * @param chars  given chars
+     * @param search given search word
+     * @param from   given index
+     */
+    public static int lastIndexOf(CharSequence chars, CharSequence search, int from) {
+        if (isEmpty(chars) || chars.length() < search.length()) {
+            return -1;
+        }
+        FsCheck.checkArgument(!isEmpty(search), "search string is empty.");
+        FsCheck.checkInBounds(from, 0, chars.length());
+        if (from + 1 < search.length()) {
+            return -1;
+        }
+        for (int i = from; i >= 0; i--) {
+            if (i + 1 < search.length()) {
+                return -1;
+            }
+            boolean match = true;
+            for (int j = 0; j < search.length(); j++) {
+                if (chars.charAt(i - j) != search.charAt(search.length() - 1 - j)) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                return i - search.length() + 1;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -432,6 +526,25 @@ public class FsString {
             return src.toString();
         }
         return start.toString() + src;
+    }
+
+    /**
+     * Puts chars of specified length from given chars into given dest starts at given offset.
+     *
+     * @param chars  given chars
+     * @param dest   given dest
+     * @param offset given offset
+     * @param length specified length
+     */
+    public static void getChars(CharSequence chars, char[] dest, int offset, int length) {
+        if (chars instanceof String) {
+            ((String) chars).getChars(0, length, dest, offset);
+        } else {
+            FsCheck.checkRangeInBounds(0, chars.length(), 0, length);
+            for (int i = 0; i < length; i++) {
+                dest[offset + i] = chars.charAt(i);
+            }
+        }
     }
 
     /**

@@ -5,12 +5,13 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsString;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class StringTest {
 
     @Test
-    public void concat() {
+    public void testConcat() {
         List<String> list = Arrays.asList(
             "dsfasfas",
             "fsafs",
@@ -30,7 +31,7 @@ public class StringTest {
     }
 
     @Test
-    public void startWith() {
+    public void testStartWith() {
         String a = "123abc123";
         Assert.assertEquals(
             FsString.startWith(a, "456"),
@@ -63,6 +64,78 @@ public class StringTest {
         Assert.assertEquals(
             FsString.removeEnd(a, "123"),
             "123abc"
+        );
+    }
+
+    @Test
+    public void testIndexOf() {
+        Assert.assertEquals(
+            FsString.indexOf("1234567890", "2"),
+            1
+        );
+        Assert.assertEquals(
+            FsString.lastIndexOf("1234567890", "2"),
+            1
+        );
+        Assert.assertEquals(
+            FsString.indexOf("12345678901234567890", "2", 9),
+            11
+        );
+        Assert.assertEquals(
+            FsString.lastIndexOf("12345678901234567890", "2", 9),
+            1
+        );
+        Assert.assertEquals(
+            FsString.indexOf("11", "11"),
+            0
+        );
+        Assert.assertEquals(
+            FsString.lastIndexOf("11", "11"),
+            0
+        );
+        Assert.assertEquals(
+            FsString.indexOf("", ""),
+            -1
+        );
+        Assert.assertEquals(
+            FsString.indexOf("1", "11"),
+            -1
+        );
+        Assert.assertEquals(
+            FsString.lastIndexOf("", ""),
+            -1
+        );
+        Assert.assertEquals(
+            FsString.lastIndexOf("1", "11"),
+            -1
+        );
+    }
+
+    @Test
+    public void testSplit() {
+        Assert.assertEquals(
+            FsString.split("123--123--123--", "--"),
+            Arrays.asList("123", "123", "123", "")
+        );
+        Assert.assertEquals(
+            FsString.split("123", "1234"),
+            Collections.emptyList()
+        );
+        Assert.assertEquals(
+            FsString.split("", "1234"),
+            Collections.emptyList()
+        );
+        Assert.assertEquals(
+            FsString.split("123", "123"),
+            Arrays.asList("", "")
+        );
+        Assert.assertEquals(
+            FsString.split("123--123--123----", "--"),
+            Arrays.asList("123", "123", "123", "", "")
+        );
+        Assert.assertEquals(
+            FsString.split("--123--123--123----", "--"),
+            Arrays.asList("", "123", "123", "123", "", "")
         );
     }
 }
