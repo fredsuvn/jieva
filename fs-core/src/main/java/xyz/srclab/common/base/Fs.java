@@ -52,7 +52,7 @@ public class Fs {
      * @param obj given object
      */
     public static int hash(@Nullable Object obj) {
-        return hash(obj, true, true);
+        return hashWith(obj, true, true);
     }
 
     /**
@@ -60,7 +60,7 @@ public class Fs {
      *
      * @param objs given objects
      */
-    public static int hashAll(Object... objs) {
+    public static int hash(Object... objs) {
         return Arrays.deepHashCode(objs);
     }
 
@@ -79,7 +79,7 @@ public class Fs {
      * @param arrayCheck the array-check
      * @param deepHash   whether deep-hash
      */
-    public static int hash(@Nullable Object obj, boolean arrayCheck, boolean deepHash) {
+    public static int hashWith(@Nullable Object obj, boolean arrayCheck, boolean deepHash) {
         if (obj == null || !arrayCheck) {
             return Objects.hashCode(obj);
         }
@@ -141,7 +141,7 @@ public class Fs {
      * @param b given object b
      */
     public static boolean equals(@Nullable Object a, @Nullable Object b) {
-        return equals(a, b, true, true);
+        return equalsWith(a, b, true, true);
     }
 
     /**
@@ -149,7 +149,7 @@ public class Fs {
      *
      * @param objs given objects
      */
-    public static boolean allEquals(Object... objs) {
+    public static boolean equals(Object... objs) {
         if (objs.length <= 1) {
             return true;
         }
@@ -181,7 +181,7 @@ public class Fs {
      * @param arrayCheck the array-check
      * @param deepEquals whether deep-equals
      */
-    public static boolean equals(@Nullable Object a, @Nullable Object b, boolean arrayCheck, boolean deepEquals) {
+    public static boolean equalsWith(@Nullable Object a, @Nullable Object b, boolean arrayCheck, boolean deepEquals) {
         if (a == null && b == null) {
             return true;
         }

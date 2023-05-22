@@ -5,8 +5,7 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -186,6 +185,132 @@ public class FsString {
     }
 
     /**
+     * Returns whether all chars of given chars are upper case.
+     *
+     * @param chars given chars
+     */
+    public static boolean allUpperCase(CharSequence chars) {
+        for (int i = 0; i < chars.length(); i++) {
+            if (!Character.isUpperCase(chars.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns whether all chars of given chars are lower case.
+     *
+     * @param chars given chars
+     */
+    public static boolean allLowerCase(CharSequence chars) {
+        if (isEmpty(chars)) {
+            return false;
+        }
+        for (int i = 0; i < chars.length(); i++) {
+            if (!Character.isLowerCase(chars.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns a String of which first char is upper or lower (according to given upper) of first char of given chars,
+     * and the rest chars are unchanged.
+     *
+     * @param chars given chars
+     * @param upper given upper
+     */
+    public static String firstCase(CharSequence chars, boolean upper) {
+        if (isEmpty(chars)) {
+            return chars.toString();
+        }
+        if (Fs.equals(Character.isUpperCase(chars.charAt(0)), upper)) {
+            return chars.toString();
+        }
+        char[] cs = new char[chars.length()];
+        cs[0] = upper ? Character.toUpperCase(chars.charAt(0)) : Character.toLowerCase(chars.charAt(0));
+        for (int i = 1; i < chars.length(); i++) {
+            cs[i] = chars.charAt(i);
+        }
+        return new String(cs);
+    }
+
+    /**
+     * Returns a String of which content is upper case of given chars.
+     *
+     * @param chars given chars
+     */
+    public static String upperCase(CharSequence chars) {
+        if (isEmpty(chars)) {
+            return chars.toString();
+        }
+        char[] cs = new char[chars.length()];
+        for (int i = 0; i < chars.length(); i++) {
+            cs[i] = Character.toUpperCase(chars.charAt(i));
+        }
+        return new String(cs);
+    }
+
+    /**
+     * Returns a String of which content is lower case of given chars.
+     *
+     * @param chars given chars
+     */
+    public static String lowerCase(CharSequence chars) {
+        if (isEmpty(chars)) {
+            return chars.toString();
+        }
+        char[] cs = new char[chars.length()];
+        for (int i = 0; i < chars.length(); i++) {
+            cs[i] = Character.toLowerCase(chars.charAt(i));
+        }
+        return new String(cs);
+    }
+
+    /**
+     * Splits given chars with given separator.
+     * If chars or separator is empty, or separator is never matched, return source given chars.
+     * <p>
+     * Note empty part will be created there is no char between a separator and the other separator, start or end.
+     *
+     * @param chars     given chars
+     * @param separator given separator
+     */
+    public static List<CharSequence> split(CharSequence chars, CharSequence separator) {
+        if (isEmpty(chars) || isEmpty(separator)) {
+            return Collections.singletonList(chars);
+        }
+        List<CharSequence> result = new LinkedList<>();
+        int wordStart = 0;
+        for (int i = 0; i < chars.length(); ) {
+            boolean matchSeparator = true;
+            for (int j = 0; j < separator.length(); j++) {
+                if (chars.charAt(i + j) != separator.charAt(j)) {
+                    matchSeparator = false;
+                    break;
+                }
+            }
+            if (matchSeparator) {
+                if (i >= wordStart) {
+                    result.add(chars.subSequence(wordStart, i));
+                }
+                i += separator.length();
+                wordStart = i;
+            } else {
+                i++;
+            }
+        }
+        if (wordStart <= chars.length()) {
+            result.add(chars.subSequence(wordStart, chars.length()));
+        } else {
+            result.add("");
+        }
+        return result;
+    }
+
+    /**
      * Returns a string follows:
      * <ul>
      * <li>returns String.valueOf for given object if it is not an array;</li>
@@ -199,7 +324,7 @@ public class FsString {
      * @param obj given object
      */
     public static String toString(@Nullable Object obj) {
-        return toString(obj, true, true);
+        return toStringWith(obj, true, true);
     }
 
     /**
@@ -226,7 +351,7 @@ public class FsString {
      * @param arrayCheck   the array-check
      * @param deepToString whether deep-to-string
      */
-    public static String toString(@Nullable Object obj, boolean arrayCheck, boolean deepToString) {
+    public static String toStringWith(@Nullable Object obj, boolean arrayCheck, boolean deepToString) {
         if (obj == null || !arrayCheck) {
             return String.valueOf(obj);
         }
@@ -370,11 +495,11 @@ public class FsString {
      * @param args given arguments
      */
     public static String concat(Object... args) {
-        StringJoiner joiner = new StringJoiner("");
+        StringBuilder builder = new StringBuilder();
         for (Object arg : args) {
-            joiner.add(String.valueOf(arg));
+            builder.append(arg);
         }
-        return joiner.toString();
+        return builder.toString();
     }
 
     /**
@@ -383,11 +508,11 @@ public class FsString {
      * @param args given arguments
      */
     public static String concat(Iterable<?> args) {
-        StringJoiner joiner = new StringJoiner("");
+        StringBuilder builder = new StringBuilder();
         for (Object arg : args) {
-            joiner.add(String.valueOf(arg));
+            builder.append(arg);
         }
-        return joiner.toString();
+        return builder.toString();
     }
 
     /**
@@ -396,7 +521,7 @@ public class FsString {
      * @param separator given separator
      * @param args      given arguments
      */
-    public static String join(String separator, Object... args) {
+    public static String join(CharSequence separator, Object... args) {
         StringJoiner joiner = new StringJoiner(separator);
         for (Object arg : args) {
             joiner.add(String.valueOf(arg));
@@ -410,7 +535,7 @@ public class FsString {
      * @param separator given separator
      * @param args      given arguments
      */
-    public static String join(String separator, Iterable<?> args) {
+    public static String join(CharSequence separator, Iterable<?> args) {
         StringJoiner joiner = new StringJoiner(separator);
         for (Object arg : args) {
             joiner.add(String.valueOf(arg));

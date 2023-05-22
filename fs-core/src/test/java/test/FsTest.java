@@ -33,7 +33,7 @@ public class FsTest {
     public void testEqual() {
         Assert.assertTrue(Fs.equals(new int[]{1, 2, 3}, new int[]{1, 2, 3}));
         Assert.assertFalse(Fs.equals(new int[]{1, 2}, new int[]{1, 2, 3}));
-        Assert.assertFalse(Fs.equals(new int[]{1, 2, 3}, new int[]{1, 2, 3}, false, false));
+        Assert.assertFalse(Fs.equalsWith(new int[]{1, 2, 3}, new int[]{1, 2, 3}, false, false));
         Assert.assertTrue(Fs.equals(
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}},
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}
@@ -42,7 +42,7 @@ public class FsTest {
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2}},
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}
         ));
-        Assert.assertFalse(Fs.equals(
+        Assert.assertFalse(Fs.equalsWith(
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}},
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}, false, true
         ));
