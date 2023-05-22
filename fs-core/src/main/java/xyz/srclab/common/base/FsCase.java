@@ -18,19 +18,19 @@ public interface FsCase {
     /**
      * Upper camel case.
      */
-    FsCase UPPER_CASE = camelCase(true);
+    FsCase UPPER_CAMEL = camelCase(true);
     /**
      * Lower camel case.
      */
-    FsCase LOWER_CASE = camelCase(false);
+    FsCase LOWER_CAMEL = camelCase(false);
     /**
-     * Underlying separator case.
+     * Underscore separator case.
      */
-    FsCase UNDERLYING_CASE = separatorCase("_", null);
+    FsCase UNDERSCORE = separatorCase("_", null);
     /**
      * Hyphen separator case.
      */
-    FsCase HYPHEN_CASE = separatorCase("-", null);
+    FsCase HYPHEN = separatorCase("-", null);
 
     /**
      * Returns camel case (upper or lower) with given upper setting.
@@ -168,6 +168,55 @@ public interface FsCase {
                 return chars;
             }
             return FsString.firstCase(chars, true);
+        }
+
+        @Override
+        public String convert(CharSequence chars, FsCase otherCase) {
+            if (otherCase instanceof CamelCase) {
+                CamelCase other = (CamelCase) otherCase;
+                if (other.isUpper == isUpper) {
+                    return chars.toString();
+                }
+                if (FsString.isEmpty(chars)) {
+                    return chars.toString();
+                }
+                int len = chars.length();
+                if (len == 1) {
+                    char c = chars.charAt(0);
+                    return String.valueOf(other.isUpper ? Character.toUpperCase(c) : Character.toLowerCase(c));
+                }
+                if (len == 2) {
+                    char c1 = chars.charAt(0);
+                    char c2 = chars.charAt(1);
+                    boolean u1 = Character.isUpperCase(c1);
+                    boolean u2 = Character.isUpperCase(c2);
+                    if (u1 && u2) {
+                        return chars.toString();
+                    } else {
+                        return new String(new char[]{
+                            other.isUpper ? Character.toUpperCase(c1) : Character.toLowerCase(c1),
+                            c2
+                        });
+                    }
+                }
+                if (len >= 3) {
+                    char c1 = chars.charAt(0);
+                    char c2 = chars.charAt(1);
+                    char c3 = chars.charAt(2);
+                    boolean u1 = Character.isUpperCase(c1);
+                    boolean u2 = Character.isUpperCase(c2);
+                    boolean u3 = Character.isUpperCase(c3);
+                    if (u1 && u2 && u3) {
+                        return chars.toString();
+                    } else {
+                        char[] cs = new char[len];
+                        cs[0] = other.isUpper ? Character.toUpperCase(c1) : Character.toLowerCase(c1);
+                        FsString.getChars(chars.subSequence(1, len), cs, 1, len - 1);
+                        return new String(cs);
+                    }
+                }
+            }
+            return FsCase.super.convert(chars, otherCase);
         }
     }
 
