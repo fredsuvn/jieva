@@ -16,7 +16,7 @@ final class ByteBufferInputStream extends InputStream {
 
     @Override
     public int read(byte[] array, int off, int len) throws IOException {
-        FsCheck.checkRangeInBounds(0, array.length, off, off + len);
+        FsCheck.checkRangeInBounds(off, off + len, 0, array.length);
         if (len == 0) {
             return 0;
         }

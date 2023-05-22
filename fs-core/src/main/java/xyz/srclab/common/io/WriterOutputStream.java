@@ -41,7 +41,7 @@ final class WriterOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        FsCheck.checkRangeInBounds(0, b.length, off, off + len);
+        FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
         int offset = off;
         int remaining = len;
         while (remaining > 0) {

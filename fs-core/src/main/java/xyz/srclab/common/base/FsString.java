@@ -305,6 +305,21 @@ public class FsString {
         }
     }
 
+    // /**
+    //  * Splits given chars with given separator.
+    //  * If chars or separator is empty, or separator's length is greater than chars' length,
+    //  * or separator is never matched, return an empty list.
+    //  * <p>
+    //  * Note empty part will be created there is no char between separator and the next separator,
+    //  * position of start or end.
+    //  *
+    //  * @param chars     given chars
+    //  * @param separator given separator
+    //  */
+    // public static String replace(CharSequence chars, CharSequence matcher, CharSequence replacement) {
+    //     int index = indexOf(chars, matcher);
+    // }
+
     /**
      * Returns first index of given search word in given chars, starts from index 0,
      * in natural order (0,1,2,3...end).
@@ -540,7 +555,8 @@ public class FsString {
         if (chars instanceof String) {
             ((String) chars).getChars(0, length, dest, offset);
         } else {
-            FsCheck.checkRangeInBounds(0, chars.length(), 0, length);
+            FsCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+            FsCheck.checkRangeInBounds(offset, offset + length, 0, chars.length());
             for (int i = 0; i < length; i++) {
                 dest[offset + i] = chars.charAt(i);
             }
@@ -657,46 +673,6 @@ public class FsString {
     }
 
     /**
-     * Returns an object which is lazy for executing method {@link Object#toString()},
-     * the executing was provided by given supplier.
-     * <p>
-     * Note returned {@link CharSequence}'s other methods (such as {@link CharSequence#length()})
-     * were based on its lazy toString().
-     *
-     * @param supplier given supplier
-     */
-    public static CharSequence lazyString(Supplier<CharSequence> supplier) {
-        return new CharSequence() {
-
-            private String toString = null;
-
-            @Override
-            public int length() {
-                return toString().length();
-            }
-
-            @Override
-            public char charAt(int index) {
-                return toString().charAt(index);
-            }
-
-            @NotNull
-            @Override
-            public CharSequence subSequence(int start, int end) {
-                return toString().subSequence(start, end);
-            }
-
-            @Override
-            public String toString() {
-                if (toString == null) {
-                    toString = String.valueOf(supplier.get());
-                }
-                return toString;
-            }
-        };
-    }
-
-    /**
      * Converts given chars to int, if given chars is blank or failed to convert, return 0.
      *
      * @param chars given chars
@@ -798,5 +774,98 @@ public class FsString {
         } catch (Exception e) {
             return defaultValue;
         }
+    }
+
+    /**
+     * Returns an object which is lazy for executing method {@link Object#toString()},
+     * the executing was provided by given supplier.
+     * <p>
+     * Note returned {@link CharSequence}'s other methods (such as {@link CharSequence#length()})
+     * were based on its lazy toString().
+     *
+     * @param supplier given supplier
+     */
+    public static CharSequence lazyString(Supplier<CharSequence> supplier) {
+        return new CharSequence() {
+
+            private String toString = null;
+
+            @Override
+            public int length() {
+                return toString().length();
+            }
+
+            @Override
+            public char charAt(int index) {
+                return toString().charAt(index);
+            }
+
+            @NotNull
+            @Override
+            public CharSequence subSequence(int start, int end) {
+                return toString().subSequence(start, end);
+            }
+
+            @Override
+            public String toString() {
+                if (toString == null) {
+                    toString = String.valueOf(supplier.get());
+                }
+                return toString;
+            }
+        };
+    }
+
+    /**
+     * Returns a sub char sequence of given chars from given start index inclusive to end.
+     * The returned CharSequence doesn't store content data,
+     * it is a reference points given chars and store start and end indexes.
+     * That means, the returned CharSequence has very small overhead,
+     * but also makes it difficult for the held CharSequence to be garbage collected.
+     *
+     * @param chars given chars
+     * @param start given start index inclusive
+     */
+    public static CharSequence subRef(CharSequence chars, int start) {
+        return subRef(chars, start, chars.length());
+    }
+
+    /**
+     * Returns a sub char sequence of given chars from given start index inclusive to given end index exclusive.
+     * The returned CharSequence doesn't store content data,
+     * it is a reference points given chars and store start and end indexes.
+     * That means, the returned CharSequence has very small overhead,
+     * but also makes it difficult for the held CharSequence to be garbage collected.
+     *
+     * @param chars given chars
+     * @param start given start index inclusive
+     * @param end   given end index exclusive
+     */
+    public static CharSequence subRef(CharSequence chars, int start, int end) {
+        FsCheck.checkRangeInBounds(start, end, 0, chars.length());
+        return new CharSequence() {
+            @Override
+            public int length() {
+                return end - start;
+            }
+
+            @Override
+            public char charAt(int index) {
+                FsCheck.checkInBounds(index, 0, length());
+                return chars.charAt(start + index);
+            }
+
+            @NotNull
+            @Override
+            public CharSequence subSequence(int s, int e) {
+                FsCheck.checkRangeInBounds(s, e, 0, length());
+                return chars.subSequence(start + s, start + e);
+            }
+
+            @Override
+            public String toString() {
+                return chars.subSequence(start, end).toString();
+            }
+        };
     }
 }
