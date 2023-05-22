@@ -9,18 +9,18 @@ import java.time.LocalDateTime;
  *
  * @author fredsuvn
  */
-class FsInternalUtil {
+class FsUnsafe {
 
     private static final FsLogger systemLogger = FsLogger.ofLevel(FsLogger.INFO_LEVEL);
 
     @Nullable
-    public static void internalLog(FsLogger logger, int level, Object... message) {
+    public static void log(FsLogger logger, int level, Object... message) {
         if (level < logger.getLevel()) {
             return;
         }
         LocalDateTime now = LocalDateTime.now();
         StackTraceElement stackTraceElement = Fs.findStackTraceCaller(
-            FsInternalUtil.class.getName(), "internalLog", 1);
+            FsUnsafe.class.getName(), "internalLog", 1);
         FsLogger.Log log = new FsLogger.Log(level, now, stackTraceElement, message);
         logger.output(log);
     }

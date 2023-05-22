@@ -20,7 +20,7 @@ public interface FsLogger {
      * and its level is {@link FsLogger#INFO_LEVEL}.
      */
     static FsLogger system() {
-        return FsInternalUtil.systemLogger();
+        return FsUnsafe.systemLogger();
     }
 
     /**
@@ -101,39 +101,39 @@ public interface FsLogger {
      * Logs with {@link FsLogger#TRACE_LEVEL}.
      */
     default void trace(Object... message) {
-        FsInternalUtil.internalLog(this, TRACE_LEVEL, message);
+        FsUnsafe.log(this, TRACE_LEVEL, message);
     }
 
     /**
      * Logs with {@link FsLogger#DEBUG_LEVEL}.
      */
     default void debug(Object... message) {
-        FsInternalUtil.internalLog(this, DEBUG_LEVEL, message);
+        FsUnsafe.log(this, DEBUG_LEVEL, message);
     }
 
     /**
      * Logs with {@link FsLogger#INFO_LEVEL}.
      */
     default void info(Object... message) {
-        FsInternalUtil.internalLog(this, INFO_LEVEL, message);
+        FsUnsafe.log(this, INFO_LEVEL, message);
     }
 
     /**
      * Logs with {@link FsLogger#WARN_LEVEL}.
      */
     default void warn(Object... message) {
-        FsInternalUtil.internalLog(this, WARN_LEVEL, message);
+        FsUnsafe.log(this, WARN_LEVEL, message);
     }
 
     /**
      * Logs with {@link FsLogger#ERROR_LEVEL}.
      */
     default void error(Object... message) {
-        FsInternalUtil.internalLog(this, ERROR_LEVEL, message);
+        FsUnsafe.log(this, ERROR_LEVEL, message);
     }
 
     default void log(int level, Object... message) {
-        FsInternalUtil.internalLog(this, level, message);
+        FsUnsafe.log(this, level, message);
     }
 
     /**
