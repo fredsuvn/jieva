@@ -270,17 +270,34 @@ public class FsString {
     }
 
     /**
-     * Splits given chars with given separator.
+     * Splits given chars by given separator,
+     * using {@link #subRef(CharSequence, int, int)} to generate sub CharSequence.
      * If chars or separator is empty, or separator's length is greater than chars' length,
      * or separator is never matched, return an empty list.
      * <p>
      * Note empty part will be created there is no char between separator and the next separator,
-     * position of start or end.
+     * position of start or end. That means, if the returned list is not empty, its length is at least 2.
      *
      * @param chars     given chars
      * @param separator given separator
      */
     public static List<CharSequence> split(CharSequence chars, CharSequence separator) {
+        return split(chars, separator, FsString::subRef);
+    }
+
+    /**
+     * Splits given chars by given separator, using given sub-sequence function to generate sub CharSequence.
+     * If chars or separator is empty, or separator's length is greater than chars' length,
+     * or separator is never matched, return an empty list.
+     * <p>
+     * Note empty part will be created there is no char between separator and the next separator,
+     * position of start or end. That means, if the returned list is not empty, its length is at least 2.
+     *
+     * @param chars     given chars
+     * @param separator given separator
+     * @param function  given sub-sequence function
+     */
+    public static List<CharSequence> split(CharSequence chars, CharSequence separator, SubSequenceFunction function) {
         if (isEmpty(chars) || isEmpty(separator) || separator.length() > chars.length()) {
             return Collections.emptyList();
         }
@@ -289,36 +306,92 @@ public class FsString {
         while (true) {
             int index = indexOf(chars, separator, wordStart);
             if (index >= 0) {
-                result.add(chars.subSequence(wordStart, index));
+                result.add(function.apply(chars, wordStart, index));
                 wordStart = index + separator.length();
                 if (wordStart >= chars.length()) {
-                    result.add(chars.subSequence(wordStart, chars.length()));
+                    result.add(function.apply(chars, wordStart, chars.length()));
                     return result;
                 }
             } else {
                 if (result.isEmpty()) {
                     return Collections.emptyList();
                 }
-                result.add(chars.subSequence(wordStart, chars.length()));
+                result.add(function.apply(chars, wordStart, chars.length()));
                 return result;
             }
         }
     }
 
-    // /**
-    //  * Splits given chars with given separator.
-    //  * If chars or separator is empty, or separator's length is greater than chars' length,
-    //  * or separator is never matched, return an empty list.
-    //  * <p>
-    //  * Note empty part will be created there is no char between separator and the next separator,
-    //  * position of start or end.
-    //  *
-    //  * @param chars     given chars
-    //  * @param separator given separator
-    //  */
-    // public static String replace(CharSequence chars, CharSequence matcher, CharSequence replacement) {
-    //     int index = indexOf(chars, matcher);
-    // }
+    /**
+     * Replaces all given matcher in given chars with given replacement.
+     *
+     * @param chars       given chars
+     * @param matcher     given matcher (to replace)
+     * @param replacement given replacement
+     */
+    public static String replace(CharSequence chars, CharSequence matcher, CharSequence replacement) {
+        return replace(chars, matcher, replacement, -1);
+    }
+
+    /**
+     * Replaces given matcher in given chars with given replacement.
+     * If given limit &lt; 0, replace all;
+     * if given limit = 0, do nothing and return given chars to string;
+     * If given limit > 0, this method will replace given limit times.
+     * <p>
+     * FOr example, replaceFirst is equivalent to
+     * <pre>
+     *     replace(chars, matcher, replacement, 1);
+     * </pre>
+     *
+     * @param chars       given chars
+     * @param matcher     given matcher (to replace)
+     * @param replacement given replacement
+     * @param limit       given limit
+     */
+    public static String replace(CharSequence chars, CharSequence matcher, CharSequence replacement, int limit) {
+        if (limit == 0 || isEmpty(chars) || chars.length() < matcher.length() || isEmpty(matcher)) {
+            return chars.toString();
+        }
+        if (limit < 0 && matcher.length() == replacement.length()) {
+            char[] result = new char[chars.length()];
+            int s = 0;
+            while (s < chars.length()) {
+                int i = indexOf(chars, matcher, s);
+                if (i >= 0) {
+                    getChars(subRef(chars, s, i), result, s, i - s);
+                    getChars(replacement, result, i, replacement.length());
+                    s = i + matcher.length();
+                } else {
+                    break;
+                }
+            }
+            if (s < chars.length()) {
+                getChars(subRef(chars, s), result, s, chars.length() - s);
+            }
+            return new String(result);
+        }
+        StringBuilder sb = new StringBuilder();
+        int s = 0;
+        int count = 0;
+        while (s < chars.length()) {
+            int i = indexOf(chars, matcher, s);
+            if (i >= 0) {
+                sb.append(chars, s, i);
+                sb.append(replacement);
+                s = i + matcher.length();
+            } else {
+                break;
+            }
+            if (count++ >= limit) {
+                break;
+            }
+        }
+        if (s < chars.length()) {
+            sb.append(chars, s, chars.length());
+        }
+        return sb.toString();
+    }
 
     /**
      * Returns first index of given search word in given chars, starts from index 0,
@@ -556,7 +629,7 @@ public class FsString {
             ((String) chars).getChars(0, length, dest, offset);
         } else {
             FsCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
-            FsCheck.checkRangeInBounds(offset, offset + length, 0, chars.length());
+            FsCheck.checkRangeInBounds(0, length, 0, chars.length());
             for (int i = 0; i < length; i++) {
                 dest[offset + i] = chars.charAt(i);
             }
@@ -822,6 +895,9 @@ public class FsString {
      * it is a reference points given chars and store start and end indexes.
      * That means, the returned CharSequence has very small overhead,
      * but also makes it difficult for the held CharSequence to be garbage collected.
+     * <p>
+     * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence still uses this
+     * {@link #subRef(CharSequence, int, int)} method.
      *
      * @param chars given chars
      * @param start given start index inclusive
@@ -836,6 +912,9 @@ public class FsString {
      * it is a reference points given chars and store start and end indexes.
      * That means, the returned CharSequence has very small overhead,
      * but also makes it difficult for the held CharSequence to be garbage collected.
+     * <p>
+     * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence still uses this
+     * {@link #subRef(CharSequence, int, int)} method.
      *
      * @param chars given chars
      * @param start given start index inclusive
@@ -859,7 +938,7 @@ public class FsString {
             @Override
             public CharSequence subSequence(int s, int e) {
                 FsCheck.checkRangeInBounds(s, e, 0, length());
-                return chars.subSequence(start + s, start + e);
+                return subRef(chars, start + s, start + e);
             }
 
             @Override

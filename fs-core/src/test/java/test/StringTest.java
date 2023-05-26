@@ -7,6 +7,7 @@ import xyz.srclab.common.base.FsString;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StringTest {
 
@@ -114,28 +115,48 @@ public class StringTest {
     @Test
     public void testSplit() {
         Assert.assertEquals(
-            FsString.split("123--123--123--", "--"),
+            toStringList(FsString.split("123--123--123--", "--")),
             Arrays.asList("123", "123", "123", "")
         );
         Assert.assertEquals(
-            FsString.split("123", "1234"),
+            toStringList(FsString.split("123", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            FsString.split("", "1234"),
+            toStringList(FsString.split("", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            FsString.split("123", "123"),
+            toStringList(FsString.split("123", "123")),
             Arrays.asList("", "")
         );
         Assert.assertEquals(
-            FsString.split("123--123--123----", "--"),
+            toStringList(FsString.split("123--123--123----", "--")),
             Arrays.asList("123", "123", "123", "", "")
         );
         Assert.assertEquals(
-            FsString.split("--123--123--123----", "--"),
+            toStringList(FsString.split("--123--123--123----", "--")),
             Arrays.asList("", "123", "123", "123", "", "")
+        );
+    }
+
+    private List<String> toStringList(List<CharSequence> list) {
+        return list.stream().map(CharSequence::toString).collect(Collectors.toList());
+    }
+
+    @Test
+    public void testReplace() {
+        Assert.assertEquals(
+            FsString.replace("123--123--123--", "--", "66"),
+            "123661236612366"
+        );
+        Assert.assertEquals(
+            FsString.replace("----123--123--123----", "--", "+++"),
+            "++++++123+++123+++123++++++"
+        );
+        Assert.assertEquals(
+            FsString.replace("-----123--123---123----", "--", "+++"),
+            "++++++-123+++123+++-123++++++"
         );
     }
 
