@@ -7,6 +7,8 @@ import xyz.srclab.common.base.FsArray;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Collection utilities.
@@ -263,5 +265,31 @@ public class FsCollect {
                 return enumeration.nextElement();
             }
         };
+    }
+
+    /**
+     * Converts given iterable to string list for each element with conversion method {@link String#valueOf(Object)}.
+     *
+     * @param iterable given iterable
+     */
+    public static List<String> toStringList(Iterable<?> iterable) {
+        return toStringList(iterable, String::valueOf);
+    }
+
+    /**
+     * Converts given iterable to string list for each element with given conversion function.
+     *
+     * @param iterable given iterable
+     * @param function given conversion function
+     */
+    public static List<String> toStringList(Iterable<?> iterable, Function<Object, String> function) {
+        if (iterable instanceof Collection) {
+            return ((Collection<?>) iterable).stream().map(function).collect(Collectors.toList());
+        }
+        List<String> result = new LinkedList<>();
+        for (Object o : iterable) {
+            result.add(function.apply(o));
+        }
+        return result;
     }
 }

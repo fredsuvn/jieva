@@ -3,11 +3,11 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsString;
+import xyz.srclab.common.collect.FsCollect;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StringTest {
 
@@ -115,33 +115,29 @@ public class StringTest {
     @Test
     public void testSplit() {
         Assert.assertEquals(
-            toStringList(FsString.split("123--123--123--", "--")),
+            FsCollect.toStringList(FsString.split("123--123--123--", "--")),
             Arrays.asList("123", "123", "123", "")
         );
         Assert.assertEquals(
-            toStringList(FsString.split("123", "1234")),
+            FsCollect.toStringList(FsString.split("123", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            toStringList(FsString.split("", "1234")),
+            FsCollect.toStringList(FsString.split("", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            toStringList(FsString.split("123", "123")),
+            FsCollect.toStringList(FsString.split("123", "123")),
             Arrays.asList("", "")
         );
         Assert.assertEquals(
-            toStringList(FsString.split("123--123--123----", "--")),
+            FsCollect.toStringList(FsString.split("123--123--123----", "--")),
             Arrays.asList("123", "123", "123", "", "")
         );
         Assert.assertEquals(
-            toStringList(FsString.split("--123--123--123----", "--")),
+            FsCollect.toStringList(FsString.split("--123--123--123----", "--")),
             Arrays.asList("", "123", "123", "123", "", "")
         );
-    }
-
-    private List<String> toStringList(List<CharSequence> list) {
-        return list.stream().map(CharSequence::toString).collect(Collectors.toList());
     }
 
     @Test
