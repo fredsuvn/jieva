@@ -355,40 +355,42 @@ public class FsString {
         }
         if (limit < 0 && matcher.length() == replacement.length()) {
             char[] result = new char[chars.length()];
-            int s = 0;
-            while (s < chars.length()) {
-                int i = indexOf(chars, matcher, s);
+            int cs = 0;
+            int rs = 0;
+            while (cs < chars.length()) {
+                int i = indexOf(chars, matcher, cs);
                 if (i >= 0) {
-                    getChars(subRef(chars, s, i), result, s, i - s);
-                    getChars(replacement, result, i, replacement.length());
-                    s = i + matcher.length();
+                    getChars(chars, cs, i, result, rs);
+                    getChars(replacement, result, i);
+                    cs = i + matcher.length();
+                    rs = i + replacement.length();
                 } else {
                     break;
                 }
             }
-            if (s < chars.length()) {
-                getChars(subRef(chars, s), result, s, chars.length() - s);
+            if (cs < chars.length()) {
+                getChars(chars, cs, chars.length(), result, rs);
             }
             return new String(result);
         }
         StringBuilder sb = new StringBuilder();
-        int s = 0;
+        int cs = 0;
         int count = 0;
-        while (s < chars.length()) {
-            int i = indexOf(chars, matcher, s);
+        while (cs < chars.length()) {
+            int i = indexOf(chars, matcher, cs);
             if (i >= 0) {
-                sb.append(chars, s, i);
+                sb.append(chars, cs, i);
                 sb.append(replacement);
-                s = i + matcher.length();
+                cs = i + matcher.length();
             } else {
                 break;
             }
-            if (count++ >= limit) {
+            if (limit > 0 && count++ >= limit) {
                 break;
             }
         }
-        if (s < chars.length()) {
-            sb.append(chars, s, chars.length());
+        if (cs < chars.length()) {
+            sb.append(chars, cs, chars.length());
         }
         return sb.toString();
     }
@@ -617,21 +619,36 @@ public class FsString {
     }
 
     /**
-     * Puts chars of specified length from given chars into given dest starts at given offset.
+     * Puts chars in specified length from given chars into given dest starts at given offset.
      *
      * @param chars  given chars
      * @param dest   given dest
      * @param offset given offset
-     * @param length specified length
      */
-    public static void getChars(CharSequence chars, char[] dest, int offset, int length) {
+    public static void getChars(CharSequence chars, char[] dest, int offset) {
+        getChars(chars, 0, chars.length(), dest, offset);
+    }
+
+    /**
+     * Puts chars in specified length from given chars into given dest starts at given offset.
+     *
+     * @param chars  given chars
+     * @param start  start index of given chars inclusive
+     * @param end    end index of given chars exclusive
+     * @param dest   given dest
+     * @param offset given offset
+     */
+    public static void getChars(CharSequence chars, int start, int end, char[] dest, int offset) {
         if (chars instanceof String) {
-            ((String) chars).getChars(0, length, dest, offset);
+            ((String) chars).getChars(start, end, dest, offset);
         } else {
-            FsCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
-            FsCheck.checkRangeInBounds(0, length, 0, chars.length());
-            for (int i = 0; i < length; i++) {
-                dest[offset + i] = chars.charAt(i);
+            FsCheck.checkRangeInBounds(start, end, 0, chars.length());
+            FsCheck.checkRangeInBounds(offset, end - start, 0, dest.length);
+            if (start == end) {
+                return;
+            }
+            for (int i = 0; i < end - start; i++) {
+                dest[offset + i] = chars.charAt(start + i);
             }
         }
     }
