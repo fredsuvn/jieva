@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsDefault;
 import xyz.srclab.common.base.FsLogger;
+import xyz.srclab.common.base.FsSystem;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.IOException;
@@ -12,6 +13,8 @@ import java.net.URL;
 import java.util.Set;
 
 public class FsTest {
+
+    private static final String ECHO_CONTENT = "hello world!";
 
     @Test
     public void testThrow() {
@@ -56,6 +59,62 @@ public class FsTest {
         for (URL url : set) {
             Assert.assertEquals(FsIO.readString(url.openStream(), FsDefault.charset(), true), "f2.txt");
         }
+    }
+
+    @Test
+    public void testProcess() throws InterruptedException {
+        if (FsSystem.isLinux() || FsSystem.isMac() || FsSystem.isBsd()) {
+            testEcho("echo", ECHO_CONTENT);
+        }
+        if (FsSystem.isWindows()) {
+            testEcho("cmd.exe", "/c", "echo " + ECHO_CONTENT);
+        }
+    }
+
+    @Test
+    public void testPing() throws InterruptedException {
+        Process process = Fs.runProcess("ping", "127.0.0.1");
+        process.waitFor();
+        String output = FsIO.readString(process.getInputStream(), FsSystem.nativeCharset(), false);
+        FsLogger.system().info(output);
+        process.destroy();
+    }
+
+    private void testEcho(String... command) throws InterruptedException {
+        Process process = Fs.runProcess(command);
+        process.waitFor();
+        String output = FsIO.avalaibleString(process.getInputStream(), FsSystem.nativeCharset());
+        FsLogger.system().info(output);
+        Assert.assertEquals(output, ECHO_CONTENT + FsSystem.getLineSeparator());
+        process.destroy();
+    }
+
+    @Test
+    public void testThread() throws InterruptedException {
+        Thread thread = Fs.runThread("hahaha", () -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Assert.assertEquals(thread.getName(), "hahaha");
+        Assert.assertFalse(thread.isDaemon());
+        thread.join();
+        Assert.assertFalse(thread.isAlive());
+    }
+
+    @Test
+    public void testSystem() {
+        FsLogger.system().info(FsSystem.getJavaVersion());
+        FsLogger.system().info(FsSystem.javaMajorVersion());
+        FsLogger.system().info(FsSystem.nativeCharset());
+        FsLogger.system().info(FsSystem.getOsName());
+        FsLogger.system().info(FsSystem.isWindows());
+        FsLogger.system().info(FsSystem.isLinux());
+        FsLogger.system().info(FsSystem.isBsd());
+        FsLogger.system().info(FsSystem.isMac());
+        FsLogger.system().info(FsSystem.isJdk9OrHigher());
     }
 
     private static final class T1 {

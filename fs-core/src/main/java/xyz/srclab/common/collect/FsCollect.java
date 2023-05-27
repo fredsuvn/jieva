@@ -339,4 +339,17 @@ public class FsCollect {
         }
         return result;
     }
+
+    /**
+     * Reads all properties into a new {@link LinkedHashMap}.
+     *
+     * @param properties given properties
+     */
+    public static LinkedHashMap<String, String> toMap(Properties properties) {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        properties.forEach((k, v) -> {
+            map.put(String.valueOf(k), String.valueOf(v));
+        });
+        return map;
+    }
 }

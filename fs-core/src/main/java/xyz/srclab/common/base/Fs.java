@@ -1,9 +1,9 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.cache.FsCache;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,7 +15,6 @@ import java.util.*;
  *
  * @author fredsuvn
  */
-@FsMethods
 public class Fs {
 
     /**
@@ -376,6 +375,103 @@ public class Fs {
                 result.add(urls.nextElement());
             }
             return result;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Runs a new thread.
+     */
+    public static Thread runThread(Runnable runnable) {
+        return runThread(null, false, runnable);
+    }
+
+    /**
+     * Runs a new thread with given thread name.
+     *
+     * @param threadName given thread name
+     * @param runnable   run content
+     */
+    public static Thread runThread(@Nullable String threadName, Runnable runnable) {
+        return runThread(threadName, false, runnable);
+    }
+
+    /**
+     * Runs a new thread with given thread name, whether the thread is daemon.
+     *
+     * @param threadName given thread name
+     * @param daemon     whether the thread is daemon
+     * @param runnable   run content
+     */
+    public static Thread runThread(@Nullable String threadName, boolean daemon, Runnable runnable) {
+        Thread thread = new Thread(runnable);
+        if (threadName != null) {
+            thread.setName(threadName);
+        }
+        if (daemon) {
+            thread.setDaemon(daemon);
+        }
+        thread.start();
+        return thread;
+    }
+
+    /**
+     * Starts a process with given command.
+     *
+     * @param cmd given command
+     */
+    public static Process runProcess(String... cmd) {
+        return runProcess(false, cmd);
+    }
+
+    /**
+     * Starts a process with given command and whether redirect error stream.
+     *
+     * @param redirectErrorStream whether redirect error stream
+     * @param cmd                 given command
+     */
+    public static Process runProcess(boolean redirectErrorStream, String... cmd) {
+        return runProcess(redirectErrorStream, Arrays.asList(cmd));
+    }
+
+    /**
+     * Starts a process with given command and whether redirect error stream.
+     *
+     * @param redirectErrorStream whether redirect error stream
+     * @param cmd                 given command
+     */
+    public static Process runProcess(boolean redirectErrorStream, List<String> cmd) {
+        return runProcess(null, null, redirectErrorStream, cmd);
+    }
+
+    /**
+     * Starts a process with given command, given environment, given directory file, and whether redirect error stream.
+     *
+     * @param env                 given environment
+     * @param dir                 given directory file
+     * @param redirectErrorStream whether redirect error stream
+     * @param cmd                 given command
+     */
+    public static Process runProcess(
+        @Nullable Map<String, String> env,
+        @Nullable File dir,
+        boolean redirectErrorStream,
+        List<String> cmd
+    ) {
+        ProcessBuilder builder = new ProcessBuilder();
+        if (env != null) {
+            builder.environment().putAll(env);
+        }
+        if (dir != null) {
+            builder.directory(dir);
+        }
+        if (redirectErrorStream) {
+            builder.redirectErrorStream(true);
+        }
+        builder.command(cmd);
+        try {
+            return builder.start();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 /**
  * Cache interface and static methods.
@@ -154,6 +155,9 @@ public class FsIO {
             int remain = bytes.length;
             while (remain > 0) {
                 int actual = inputStream.read(bytes, off, remain);
+                if (actual == -1) {
+                    return Arrays.copyOfRange(bytes, 0, off);
+                }
                 remain -= actual;
                 off += actual;
             }
