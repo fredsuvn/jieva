@@ -353,10 +353,11 @@ public class FsString {
         if (limit == 0 || isEmpty(chars) || chars.length() < matcher.length() || isEmpty(matcher)) {
             return chars.toString();
         }
-        if (limit < 0 && matcher.length() == replacement.length()) {
+        if (matcher.length() == replacement.length()) {
             char[] result = new char[chars.length()];
             int cs = 0;
             int rs = 0;
+            int count = 0;
             while (cs < chars.length()) {
                 int i = indexOf(chars, matcher, cs);
                 if (i >= 0) {
@@ -365,6 +366,9 @@ public class FsString {
                     cs = i + matcher.length();
                     rs = i + replacement.length();
                 } else {
+                    break;
+                }
+                if (limit > 0 && count++ >= limit) {
                     break;
                 }
             }
