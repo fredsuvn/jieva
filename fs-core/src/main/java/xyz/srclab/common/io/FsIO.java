@@ -2,7 +2,7 @@ package xyz.srclab.common.io;
 
 import org.apache.commons.io.output.WriterOutputStream;
 import xyz.srclab.build.annotations.FsMethods;
-import xyz.srclab.common.base.FsCheck;
+import xyz.srclab.common.base.FsDefault;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -23,10 +23,19 @@ public class FsIO {
     public static final int DEFAULT_BUFFER_SIZE = 1024;
 
     /**
-     * Reads all bytes from given input stream, then close given input stream if given close is true (else not).
+     * Reads all bytes from given input stream.
      *
      * @param inputStream given input stream
-     * @param close       given close
+     */
+    public static byte[] readBytes(InputStream inputStream) {
+        return readBytes(inputStream, false);
+    }
+
+    /**
+     * Reads all bytes from given input stream, then close the stream if given close is true (else not).
+     *
+     * @param inputStream given input stream
+     * @param close       whether close the stream after reading
      */
     public static byte[] readBytes(InputStream inputStream, boolean close) {
         try {
@@ -42,38 +51,30 @@ public class FsIO {
     }
 
     /**
-     * Reads all bytes from given input stream to given dest stream.
+     * Reads specified limit number of bytes from given input stream.
+     * <p>
+     * If the limit number &lt; 0, read all bytes;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading bytes until it reaches the limit or the end of the stream.
      *
      * @param inputStream given input stream
-     * @param dest        given dest stream
+     * @param limit       specified limit number
      */
-    public static void readBytesTo(InputStream inputStream, OutputStream dest) {
-        try {
-            byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-            while (true) {
-                int readSize = inputStream.read(buffer);
-                if (readSize < 0) {
-                    break;
-                }
-                if (readSize > 0) {
-                    dest.write(buffer, 0, readSize);
-                }
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+    public static byte[] readBytes(InputStream inputStream, int limit) {
+        return readBytes(inputStream, limit, false);
     }
 
     /**
-     * Reads specified number of bytes from given input stream,
-     * then close given input stream if given close is true (else not).
+     * Reads specified limit number of bytes from given input stream,
+     * then close the stream if given close is true (else not).
      * <p>
-     * The number of return read bytes may be less than specified number
-     * if given input stream doesn't have enough bytes to read.
+     * If the limit number &lt; 0, read all bytes;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading bytes until it reaches the limit or the end of the stream.
      *
      * @param inputStream given input stream
-     * @param limit       specified number
-     * @param close       given close
+     * @param limit       specified limit number
+     * @param close       whether close the stream after reading
      */
     public static byte[] readBytes(InputStream inputStream, int limit, boolean close) {
         try {
@@ -89,26 +90,37 @@ public class FsIO {
     }
 
     /**
-     * Reads specified number of bytes from given input stream to given dest stream.
-     * <p>
-     * The number of return read bytes may be less than specified number
-     * if given input stream doesn't have enough bytes to read.
+     * Reads all bytes from given input stream to given dest stream, returns actual read number.
      *
      * @param inputStream given input stream
      * @param dest        given dest stream
-     * @param limit       specified number
      */
-    public static void readBytesTo(InputStream inputStream, OutputStream dest, int limit) {
-        FsCheck.checkArgument(limit >= 0, "limit must >= 0");
+    public static long readBytesTo(InputStream inputStream, OutputStream dest) {
+        return readBytesTo(inputStream, dest, -1);
+    }
+
+    /**
+     * Reads specified limit number of bytes from given input stream to given dest stream, returns actual read number.
+     * <p>
+     * If the limit number &lt; 0, read all bytes;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading bytes until it reaches the limit or the end of the stream.
+     *
+     * @param inputStream given input stream
+     * @param dest        given dest stream
+     * @param limit       specified limit number
+     */
+    public static long readBytesTo(InputStream inputStream, OutputStream dest, int limit) {
         if (limit == 0) {
-            return;
+            return 0;
         }
         try {
-            int readNum = 0;
-            int bufferSize = Math.min(limit, DEFAULT_BUFFER_SIZE);
+            long readNum = 0;
+            int bufferSize = limit < 0 ? DEFAULT_BUFFER_SIZE : Math.min(limit, DEFAULT_BUFFER_SIZE);
             byte[] buffer = new byte[bufferSize];
             while (true) {
-                int readSize = inputStream.read(buffer, 0, Math.min(limit - readNum, buffer.length));
+                int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);
+                int readSize = inputStream.read(buffer, 0, readLen);
                 if (readSize < 0) {
                     break;
                 }
@@ -116,21 +128,70 @@ public class FsIO {
                     dest.write(buffer, 0, readSize);
                     readNum += readSize;
                 }
-                int remaining = limit - readNum;
+                if (limit < 0) {
+                    continue;
+                }
+                long remaining = limit - readNum;
                 if (remaining <= 0) {
                     break;
                 }
             }
+            return readNum;
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
 
     /**
-     * Reads all chars from given reader, then close given reader if given close is true (else not).
+     * Reads available bytes from given input stream.
+     *
+     * @param inputStream given input stream
+     */
+    public static byte[] availableBytes(InputStream inputStream) {
+        try {
+            byte[] bytes = new byte[inputStream.available()];
+            int off = 0;
+            int remain = bytes.length;
+            while (remain > 0) {
+                int actual = inputStream.read(bytes, off, remain);
+                remain -= actual;
+                off += actual;
+            }
+            return bytes;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Reads available bytes from given input stream to given dest stream, returns actual read number.
+     *
+     * @param inputStream given input stream
+     * @param dest        given dest stream
+     */
+    public static long availableBytesTo(InputStream inputStream, OutputStream dest) {
+        try {
+            int available = inputStream.available();
+            return readBytesTo(inputStream, dest, available);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Reads all \chars from given reader.
      *
      * @param reader given reader
-     * @param close  given close
+     */
+    public static String readString(Reader reader) {
+        return readString(reader, false);
+    }
+
+    /**
+     * Reads all \chars from given reader, then close the reader if given close is true (else not).
+     *
+     * @param reader given reader
+     * @param close  whether close the stream after reading
      */
     public static String readString(Reader reader, boolean close) {
         try {
@@ -146,38 +207,30 @@ public class FsIO {
     }
 
     /**
-     * Reads all chars from given reader to given dest.
+     * Reads specified limit number of chars from given reader.
+     * <p>
+     * If the limit number &lt; 0, read all bytes;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading chars until it reaches the limit or the end of the reader.
      *
      * @param reader given reader
-     * @param dest   given dest
+     * @param limit  specified limit number
      */
-    public static void readCharsTo(Reader reader, Appendable dest) {
-        try {
-            char[] buffer = new char[DEFAULT_BUFFER_SIZE];
-            while (true) {
-                int readSize = reader.read(buffer);
-                if (readSize < 0) {
-                    break;
-                }
-                if (readSize > 0) {
-                    append(dest, buffer, 0, readSize);
-                }
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+    public static String readString(Reader reader, int limit) {
+        return readString(reader, limit, false);
     }
 
     /**
-     * Reads specified number of chars from given input reader as String,
-     * then close given reader if given close is true (else not).
+     * Reads specified limit number of chars from given reader,
+     * then close the reader if given close is true (else not).
      * <p>
-     * The number of return read chars may be less than specified number
-     * if given input stream doesn't have enough chars to read.
+     * If the limit number &lt; 0, read all bytes;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading chars until it reaches the limit or the end of the reader.
      *
      * @param reader given reader
-     * @param limit  specified number
-     * @param close  given close
+     * @param limit  specified limit number
+     * @param close  whether close the stream after reading
      */
     public static String readString(Reader reader, int limit, boolean close) {
         try {
@@ -193,26 +246,41 @@ public class FsIO {
     }
 
     /**
-     * Reads specified number of chars from given reader to given dest.
+     * Reads all chars from given reader to given dest output, returns actual read number.
      * <p>
-     * The number of return read chars may be less than specified number
-     * if given input reader doesn't have enough chars to read.
+     * If the limit number &lt; 0, read all chars;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading chars until it reaches the limit or the end of the reader.
      *
      * @param reader given reader
-     * @param dest   given dest
-     * @param limit  specified number
+     * @param dest   given dest stream
      */
-    public static void readCharsTo(Reader reader, Appendable dest, int limit) {
-        FsCheck.checkArgument(limit >= 0, "limit must >= 0");
+    public static long readCharsTo(Reader reader, Appendable dest) {
+        return readCharsTo(reader, dest, -1);
+    }
+
+    /**
+     * Reads specified limit number of chars from given reader to given dest output, returns actual read number.
+     * <p>
+     * If the limit number &lt; 0, read all chars;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading chars until it reaches the limit or the end of the reader.
+     *
+     * @param reader given reader
+     * @param dest   given dest stream
+     * @param limit  specified limit number
+     */
+    public static long readCharsTo(Reader reader, Appendable dest, int limit) {
         if (limit == 0) {
-            return;
+            return 0;
         }
         try {
-            int readNum = 0;
-            int bufferSize = Math.min(limit, DEFAULT_BUFFER_SIZE);
+            long readNum = 0;
+            int bufferSize = limit < 0 ? DEFAULT_BUFFER_SIZE : Math.min(limit, DEFAULT_BUFFER_SIZE);
             char[] buffer = new char[bufferSize];
             while (true) {
-                int readSize = reader.read(buffer, 0, Math.min(limit - readNum, buffer.length));
+                int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);
+                int readSize = reader.read(buffer, 0, readLen);
                 if (readSize < 0) {
                     break;
                 }
@@ -220,11 +288,15 @@ public class FsIO {
                     append(dest, buffer, 0, readSize);
                     readNum += readSize;
                 }
-                int remaining = limit - readNum;
+                if (limit < 0) {
+                    continue;
+                }
+                long remaining = limit - readNum;
                 if (remaining <= 0) {
                     break;
                 }
             }
+            return readNum;
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -243,6 +315,25 @@ public class FsIO {
     }
 
     /**
+     * Reads String encoded by all bytes from given input stream with {@link FsDefault#charset()}.
+     *
+     * @param inputStream given input stream
+     */
+    public static String readString(InputStream inputStream) {
+        return readString(inputStream, FsDefault.charset());
+    }
+
+    /**
+     * Reads String encoded by all bytes from given input stream.
+     *
+     * @param inputStream given input stream
+     * @param charset     charset of the string
+     */
+    public static String readString(InputStream inputStream, Charset charset) {
+        return new String(readBytes(inputStream), charset);
+    }
+
+    /**
      * Reads String encoded by all bytes from given input stream,
      * then close given input stream if given close is true (else not).
      *
@@ -252,6 +343,25 @@ public class FsIO {
      */
     public static String readString(InputStream inputStream, Charset charset, boolean close) {
         return new String(readBytes(inputStream, close), charset);
+    }
+
+    /**
+     * Reads available String encoded by all bytes from given input stream with {@link FsDefault#charset()}.
+     *
+     * @param inputStream given input stream
+     */
+    public static String avalaibleString(InputStream inputStream) {
+        return new String(availableBytes(inputStream), FsDefault.charset());
+    }
+
+    /**
+     * Reads available String encoded by all bytes from given input stream.
+     *
+     * @param inputStream given input stream
+     * @param charset     charset of the string
+     */
+    public static String avalaibleString(InputStream inputStream, Charset charset) {
+        return new String(availableBytes(inputStream), charset);
     }
 
     /**
