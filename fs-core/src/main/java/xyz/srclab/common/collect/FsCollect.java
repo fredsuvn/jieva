@@ -273,22 +273,69 @@ public class FsCollect {
      * @param iterable given iterable
      */
     public static List<String> toStringList(Iterable<?> iterable) {
-        return toStringList(iterable, String::valueOf);
+        return mapList(iterable, String::valueOf);
     }
 
     /**
-     * Converts given iterable to string list for each element with given conversion function.
+     * Converts given iterable of type {@link T} to list of type {@link R}
+     * for each element with given conversion function.
      *
-     * @param iterable given iterable
+     * @param iterable given iterable of type {@link T}
      * @param function given conversion function
      */
-    public static List<String> toStringList(Iterable<?> iterable, Function<Object, String> function) {
+    public static <T, R> List<R> mapList(Iterable<T> iterable, Function<? super T, ? extends R> function) {
         if (iterable instanceof Collection) {
-            return ((Collection<?>) iterable).stream().map(function).collect(Collectors.toList());
+            return ((Collection<T>) iterable).stream().map(function).collect(Collectors.toList());
         }
-        List<String> result = new LinkedList<>();
-        for (Object o : iterable) {
+        List<R> result = new LinkedList<>();
+        for (T o : iterable) {
             result.add(function.apply(o));
+        }
+        return result;
+    }
+
+    /**
+     * Converts given iterable of type {@link T} to set of type {@link R}
+     * for each element with given conversion function.
+     *
+     * @param iterable given iterable of type {@link T}
+     * @param function given conversion function
+     */
+    public static <T, R> Set<R> mapSet(Iterable<T> iterable, Function<? super T, ? extends R> function) {
+        if (iterable instanceof Collection) {
+            return ((Collection<T>) iterable).stream().map(function).collect(Collectors.toSet());
+        }
+        Set<R> result = new LinkedHashSet<>();
+        for (T o : iterable) {
+            result.add(function.apply(o));
+        }
+        return result;
+    }
+
+    /**
+     * Converts given iterable of type {@link T} to map of type &lt;{@link K}, {@link V}>
+     * for each element with given conversion function.
+     * If there exists same key after converting, the latter will override the former.
+     *
+     * @param iterable      given iterable of type {@link T}
+     * @param keyFunction   conversion function from {@link T} to {@link K}
+     * @param valueFunction conversion function from {@link T} to {@link V}
+     */
+    public static <T, K, V> Map<K, V> mapMap(
+        Iterable<T> iterable,
+        Function<? super T, ? extends K> keyFunction,
+        Function<? super T, ? extends V> valueFunction
+    ) {
+        if (iterable instanceof Collection) {
+            return ((Collection<T>) iterable).stream().collect(Collectors.toMap(
+                keyFunction,
+                valueFunction,
+                (v1, v2) -> v2
+            ));
+        }
+        Map<K, V> result = new LinkedHashMap<>();
+        for (T o : iterable) {
+            result.put(keyFunction.apply(o), valueFunction.apply(o));
         }
         return result;
     }
