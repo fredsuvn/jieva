@@ -1,6 +1,7 @@
 package xyz.srclab.common.io;
 
 import org.apache.commons.io.output.WriterOutputStream;
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.base.FsDefault;
 
@@ -144,18 +145,29 @@ public class FsIO {
     }
 
     /**
-     * Reads available bytes from given input stream.
+     * Reads available bytes from given input stream, or null if reaches end of the stream.
      *
      * @param inputStream given input stream
      */
+    @Nullable
     public static byte[] availableBytes(InputStream inputStream) {
         try {
-            byte[] bytes = new byte[inputStream.available()];
+            int available = inputStream.available();
+            if (available < 0) {
+                return null;
+            }
+            if (available == 0) {
+                return new byte[0];
+            }
+            byte[] bytes = new byte[available];
             int off = 0;
             int remain = bytes.length;
             while (remain > 0) {
                 int actual = inputStream.read(bytes, off, remain);
                 if (actual == -1) {
+                    if (off == 0) {
+                        return null;
+                    }
                     return Arrays.copyOfRange(bytes, 0, off);
                 }
                 remain -= actual;
@@ -168,7 +180,8 @@ public class FsIO {
     }
 
     /**
-     * Reads available bytes from given input stream to given dest stream, returns actual read number.
+     * Reads available bytes from given input stream to given dest stream,
+     * returns actual read number (-1 if reaches end of the stream).
      *
      * @param inputStream given input stream
      * @param dest        given dest stream
@@ -176,6 +189,12 @@ public class FsIO {
     public static long availableBytesTo(InputStream inputStream, OutputStream dest) {
         try {
             int available = inputStream.available();
+            if (available < 0) {
+                return -1;
+            }
+            if (available == 0) {
+                return 0;
+            }
             return readBytesTo(inputStream, dest, available);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -350,22 +369,30 @@ public class FsIO {
     }
 
     /**
-     * Reads available String encoded by all bytes from given input stream with {@link FsDefault#charset()}.
+     * Reads available String encoded by all bytes from given input stream with {@link FsDefault#charset()},
+     * returns null if reaches end of the stream.
      *
      * @param inputStream given input stream
      */
+    @Nullable
     public static String avalaibleString(InputStream inputStream) {
-        return new String(availableBytes(inputStream), FsDefault.charset());
+        return avalaibleString(inputStream, FsDefault.charset());
     }
 
     /**
-     * Reads available String encoded by all bytes from given input stream.
+     * Reads available String encoded by all bytes from given input stream,
+     * returns null if reaches end of the stream.
      *
      * @param inputStream given input stream
      * @param charset     charset of the string
      */
+    @Nullable
     public static String avalaibleString(InputStream inputStream, Charset charset) {
-        return new String(availableBytes(inputStream), charset);
+        byte[] bytes = availableBytes(inputStream);
+        if (bytes == null) {
+            return null;
+        }
+        return new String(bytes, charset);
     }
 
     /**

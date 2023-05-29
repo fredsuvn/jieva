@@ -2,15 +2,13 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsDefault;
-import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.base.FsSystem;
+import xyz.srclab.common.base.*;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 public class FsTest {
 
@@ -73,10 +71,26 @@ public class FsTest {
 
     @Test
     public void testPing() throws InterruptedException {
-        Process process = Fs.runProcess("ping", "127.0.0.1");
+        Process process = Fs.runProcess("ping", "-n", "5", "127.0.0.1");
+        Semaphore semaphore = new Semaphore(1);
+        semaphore.acquire();
+        Fs.runThread(() -> {
+            while (true) {
+                String output = FsIO.avalaibleString(process.getInputStream(), FsSystem.nativeCharset());
+                if (output == null) {
+                    semaphore.release();
+                    return;
+                }
+                if (!FsString.isEmpty(output)) {
+                    FsLogger.system().info(output);
+                }
+                Fs.sleep(1);
+            }
+        });
         process.waitFor();
-        String output = FsIO.readString(process.getInputStream(), FsSystem.nativeCharset(), false);
-        FsLogger.system().info(output);
+        while (semaphore.hasQueuedThreads()) {
+            Fs.sleep(1000);
+        }
         process.destroy();
     }
 

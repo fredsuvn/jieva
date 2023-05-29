@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -414,6 +415,32 @@ public class Fs {
         }
         thread.start();
         return thread;
+    }
+
+    /**
+     * Sleeps current thread for specified milliseconds.
+     *
+     * @param millis specified milliseconds
+     */
+    public static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Sleeps current thread for specified duration.
+     *
+     * @param duration specified duration
+     */
+    public static void sleep(Duration duration) {
+        try {
+            Thread.sleep(duration.toMillis(), duration.getNano());
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
