@@ -27,7 +27,7 @@ public abstract class TypeRef<T> {
     /**
      * Actual runtime type.
      */
-    private Type type;
+    private final Type type;
 
     /**
      * Empty constructor, used to get a generic type.
@@ -36,19 +36,28 @@ public abstract class TypeRef<T> {
         type = reflectToActualType();
     }
 
-    private Type reflectToActualType()  {
-        //Type generic = getClass().getGenericSuperclass();
-        //while (generic != null) {
-        //    if (generic instanceof ParameterizedType){
-        //        ParameterizedType p = (ParameterizedType) generic;
-        //        if (Fs.equals(p.getRawType(),TypeRef.class)) {
-        //            return p.getActualTypeArguments()[0];
-        //        }
-        //    }
-        //    generic = generic.get
-        //}
-        //
-        //val typeRefSignature = generic.getTypeSignature(TypeRef::class.java)
-        //return typeRefSignature.actualTypeArguments[0]
+    private Type reflectToActualType() {
+        Type generic = getClass().getGenericSuperclass();
+        if (generic instanceof ParameterizedType) {
+            ParameterizedType p = (ParameterizedType) generic;
+            if (Fs.equals(p.getRawType(), TypeRef.class)) {
+                return p.getActualTypeArguments()[0];
+            }
+        }
+        throw new IllegalStateException();
+    }
+
+    /**
+     * Returns type referenced by this ref.
+     */
+    public Type getType() {
+        return type;
+    }
+
+    /**
+     * Returns type as parameterized type referenced by this ref.
+     */
+    public ParameterizedType getParameterizedType() {
+        return (ParameterizedType) type;
     }
 }

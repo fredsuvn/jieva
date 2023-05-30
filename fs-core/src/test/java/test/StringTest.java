@@ -154,6 +154,10 @@ public class StringTest {
             FsString.replace("-----123--123---123----", "--", "+++"),
             "++++++-123+++123+++-123++++++"
         );
+        Assert.assertEquals(
+            FsString.replace("-----123--123---123----", "--", ""),
+            "-123123-123"
+        );
     }
 
     @Test
