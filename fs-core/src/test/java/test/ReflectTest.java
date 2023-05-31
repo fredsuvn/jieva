@@ -69,6 +69,40 @@ public class ReflectTest {
             t3,
             w1
         );
+        Type t4 = new TypeRef<List<? extends Integer>>() {
+        }.getParameterizedType().getActualTypeArguments()[0];
+        Assert.assertEquals(
+            t4.toString(),
+            "? extends java.lang.Integer"
+        );
+        Type w2 = FsType.wildcardType(Arrays.asList(Integer.class), null);
+        Assert.assertEquals(
+            w2.toString(),
+            "? extends java.lang.Integer"
+        );
+        Assert.assertEquals(
+            t4,
+            w2
+        );
+
+        //generic array
+        Type t5 = new TypeRef<List<? extends Integer>[]>() {
+        }.getType();
+        Assert.assertEquals(
+            t5.toString(),
+            "java.util.List<? extends java.lang.Integer>[]"
+        );
+        Type g1 = FsType.genericArrayType(
+            FsType.parameterizedType(List.class, Arrays.asList(
+                FsType.wildcardType(Arrays.asList(Integer.class), null))));
+        Assert.assertEquals(
+            g1.toString(),
+            "java.util.List<? extends java.lang.Integer>[]"
+        );
+        Assert.assertEquals(
+            t5,
+            g1
+        );
     }
 
     private static final class T1<T> {
