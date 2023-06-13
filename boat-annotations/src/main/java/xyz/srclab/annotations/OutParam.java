@@ -3,7 +3,7 @@ package xyz.srclab.annotations;
 import java.lang.annotation.*;
 
 /**
- * This annotation indicates the parameter is an output parameter that can be modified.
+ * Claims the annotated element is an output parameter that can be modified.
  *
  * @author fredsuvn
  */

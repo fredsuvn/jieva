@@ -3,21 +3,26 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import test.cls.A;
+import xyz.srclab.common.base.Fs;
+import xyz.srclab.common.base.FsLogger;
+import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.FsReflect;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ReflectTest {
 
     @Test
     public void testLastName() {
         Assert.assertEquals(FsReflect.getLastName(ReflectTest.class), "ReflectTest");
-        Assert.assertEquals(FsReflect.getLastName(T1.class), "ReflectTest$T1");
+        Assert.assertEquals(FsReflect.getLastName(T.class), "ReflectTest$T1");
     }
 
     @Test
@@ -113,7 +118,58 @@ public class ReflectTest {
         Assert.assertFalse(FsReflect.isAssignableFrom(int.class, Double.class));
     }
 
-    private static final class T1<T> {
+    @Test
+    public void testParseTypeParameterMapping() throws NoSuchFieldException {
+        Map<TypeVariable<?>, Type> map = FsReflect.getTypeParameterMapping(new TypeRef<X<String>>() {
+        }.getType());
+        // R(1661070039)=V(23805079)
+        // K(532385198)=class java.lang.Integer(33524623)
+        // U(1028083665)=class java.lang.Double(1703953258)
+        // T(261012453)=class java.lang.Float(1367097467)
+        // A(844996153)=A(726237730)
+        // B(1498084403)=A(844996153)
+        // V(23805079)=class java.lang.Long(746023354)
+        FsLogger.system().info(FsCollect.mapMap(
+            map.entrySet(),
+            it -> it.getKey() + "(" + Fs.systemHash(it.getKey()) + ")",
+            it -> it.getValue() + "(" + Fs.systemHash(it.getValue()) + ")"
+        ));
+        Map<TypeVariable<?>, Type> map2 = FsReflect.getTypeParameterMapping(
+            T.class.getDeclaredField("x").getGenericType());
+        // R(1661070039)=V(23805079)
+        // K(532385198)=class java.lang.Integer(33524623)
+        // U(1028083665)=class java.lang.Double(1703953258)
+        // T(261012453)=class java.lang.Float(1367097467)
+        // A(844996153)=A(726237730)
+        // B(1498084403)=A(844996153)
+        // V(23805079)=class java.lang.Long(746023354)
+        FsLogger.system().info(FsCollect.mapMap(
+            map2.entrySet(),
+            it -> it.getKey() + "(" + Fs.systemHash(it.getKey()) + ")",
+            it -> it.getValue() + "(" + Fs.systemHash(it.getValue()) + ")"
+        ));
+    }
+
+    @Test
+    public void testParseTypeParameterMapping2() {
+        ParameterizedType signature = FsReflect.getGenericSuperType(ZS.class, Z.class);
+        FsLogger.system().info(signature);
+    }
+
+    private static final class T<W> {
+        private final X<W> x = null;
+    }
+
+    private static class X<A> extends Y<A, Integer, Long> {
+    }
+
+    private static class Y<A, K, V extends Long> implements Z<A, Float, Double, V> {
+    }
+
+    private static interface Z<B, T, U, R> {
+    }
+
+    private static class ZS implements Z<String, Integer, Long, Boolean> {
     }
 }
 

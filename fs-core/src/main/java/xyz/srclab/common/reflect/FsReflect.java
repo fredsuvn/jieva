@@ -1,10 +1,14 @@
 package xyz.srclab.common.reflect;
 
+import xyz.srclab.annotations.OutParam;
+import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.base.FsString;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Objects;
+import java.lang.reflect.TypeVariable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Reflection utilities.
@@ -83,28 +87,135 @@ public class FsReflect {
     }
 
     /**
-     * Returns whether given class can be assigned by given class 2.
+     * Returns whether given type 1 can be assigned by given type 2 with {@link Class#isAssignableFrom(Class)}.
+     * If given type is primitive, it will be converted to its wrapper type.
      *
-     * @param cls  given class
-     * @param cls2 given class 2
+     * @param t1 given type 1
+     * @param t2 given type 2
      */
-    public static boolean canAssignedBy(Class<?> cls, Class<?> cls2) {
-        if (cls.isAssignableFrom(cls2)) {
+    public static boolean isAssignableFrom(Class<?> t1, Class<?> t2) {
+        if (t1.isAssignableFrom(t2)) {
             return true;
         }
-        return Objects.equals(toWrapperClass(cls), toWrapperClass(cls2));
+        return toWrapperClass(t1).isAssignableFrom(toWrapperClass(t2));
     }
 
-    //public static List<Type> getActualTypeArguments(Type subType, Class<?> superType) {
-    //    Map<Type, Type> typeMap = new HashMap<>();
-    //    if (subType instanceof Class) {
-    //        Class<?> subClass = (Class<?>) subType;
-    //        Type genericSuperClass = subClass.getGenericSuperclass();
-    //
-    //    }
-    //}
+    /**
+     * Returns generic super type with actual arguments for from given type to given target type
+     * (target type is super type of given type).
+     * <p>
+     * For example, these types:
+     * <pre>
+     *     private static interface Z&lt;B, T, U, R> {}
+     *     private static class ZS implements Z&lt;String, Integer, Long, Boolean> {}
+     * </pre>
+     * The result of this method:
+     * <pre>
+     *     getGenericSuperType(ZS.class, Z.class);
+     * </pre>
+     * will be:
+     * <pre>
+     *     Z&lt;String, Integer, Long, Boolean>
+     * </pre>
+     *
+     * @param type   given type
+     * @param target target type
+     */
+    public static ParameterizedType getGenericSuperType(Type type, Class<?> target) {
+        TypeVariable<?>[] typeParameters = target.getTypeParameters();
+        if (FsArray.isEmpty(typeParameters)) {
+            throw new IllegalArgumentException("Given \"to\" type doesn't have type parameter.");
+        }
+        Map<TypeVariable<?>, Type> typeArguments = getTypeParameterMapping(type);
+        List<Type> actualTypeArguments = Arrays.stream(typeParameters)
+            .map(it -> {
+                Type cur = it;
+                while (true) {
+                    Type value = typeArguments.get(cur);
+                    if (value == null) {
+                        return cur;
+                    }
+                    cur = value;
+                }
+            }).collect(Collectors.toList());
+        return FsType.parameterizedType(target, target.getDeclaringClass(), actualTypeArguments);
+    }
 
-    private static void getActualTypeArguments0() {
+    /**
+     * Returns a mapping of type parameters for given type.
+     * The key of mapping is type parameter, and the value is actual type argument
+     * or inherited type parameter of subtype.
+     * <p>
+     * For example, these types:
+     * <pre>
+     *     private static class X extends Y&lt;Integer, Long>{}
+     *     private static class Y&lt;K, V> implements Z&lt;Float, Double, V> {}
+     *     private static interface Z&lt;T, U, R>{}
+     * </pre>
+     * The result of this method
+     * <pre>
+     *     parseActualTypeMapping(x)
+     * </pre>
+     * will be:
+     * <pre>
+     *     T -> Float
+     *     U -> Double
+     *     R -> V
+     *     K -> Integer
+     *     V -> Long
+     * </pre>
+     *
+     * @param type given type
+     */
+    public static Map<TypeVariable<?>, Type> getTypeParameterMapping(Type type) {
+        Map<TypeVariable<?>, Type> result = new HashMap<>();
+        parseTypeParameterMapping(type, result);
+        return result;
+    }
 
+    private static void parseTypeParameterMapping(Type type, @OutParam Map<TypeVariable<?>, Type> typeMap) {
+        if (type instanceof Class) {
+            Class<?> cur = (Class<?>) type;
+            while (true) {
+                Type superClass = cur.getGenericSuperclass();
+                if (superClass != null) {
+                    parseSuperGeneric(superClass, typeMap);
+                }
+                Type[] superTypes = cur.getGenericInterfaces();
+                parseSuperTypes(superTypes, typeMap);
+                cur = cur.getSuperclass();
+                if (cur == null) {
+                    return;
+                }
+            }
+        }
+        if (type instanceof ParameterizedType) {
+            parseTypeParameterMapping(((ParameterizedType) type).getRawType(), typeMap);
+            return;
+        }
+        throw new IllegalArgumentException("Given type must be Class or ParameterizedType.");
+    }
+
+    private static void parseSuperTypes(Type[] superTypes, @OutParam Map<TypeVariable<?>, Type> typeMap) {
+        if (!FsArray.isEmpty(superTypes)) {
+            for (Type superType : superTypes) {
+                parseSuperGeneric(superType, typeMap);
+                Class<?> superRaw = FsReflect.getRawType(superType);
+                Type[] superSuperTypes = superRaw.getGenericInterfaces();
+                parseSuperTypes(superSuperTypes, typeMap);
+            }
+        }
+    }
+
+    private static void parseSuperGeneric(Type superGeneric, @OutParam Map<TypeVariable<?>, Type> typeMap) {
+        if (superGeneric instanceof ParameterizedType) {
+            ParameterizedType superParameterized = (ParameterizedType) superGeneric;
+            Class<?> superRaw = (Class<?>) superParameterized.getRawType();
+            Type[] superActualTypeArgs = superParameterized.getActualTypeArguments();
+            TypeVariable<?>[] superTypeVariables = superRaw.getTypeParameters();
+            for (int i = 0; i < superActualTypeArgs.length; i++) {
+                typeMap.put(superTypeVariables[i], superActualTypeArgs[i]);
+            }
+        }
     }
 }

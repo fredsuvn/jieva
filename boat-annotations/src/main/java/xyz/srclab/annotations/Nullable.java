@@ -6,7 +6,7 @@ import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
 /**
- * Claims the annotated element may be null and should be checked.
+ * Claims the annotated element may be null.
  *
  * @author fredsuvn
  */
