@@ -14,7 +14,7 @@ class AnnotationsTestKt {
         Assert.assertEquals(methodAcceptable.value.size, 1)
         Assert.assertEquals(methodAcceptable.value[0].value.java, String::class.java)
 
-        Assert.assertNotNull(method.parameters[0].getAnnotation(Written::class.java))
+        Assert.assertNotNull(method.parameters[0].getAnnotation(OutParam::class.java))
         val receiverRejectable = method.parameters[0].getAnnotation(Rejectable::class.java)
         Assert.assertNotNull(receiverRejectable)
         Assert.assertEquals(receiverRejectable.value.size, 2)
@@ -31,7 +31,7 @@ class AnnotationsTestKt {
     @Acceptable(
         Accepted(String::class),
     )
-    fun @receiver:Written @receiver:Rejectable(
+    fun @receiver:OutParam @receiver:Rejectable(
         Rejected(String::class),
         Rejected(String::class),
     ) Array<String>.testAnnotations(

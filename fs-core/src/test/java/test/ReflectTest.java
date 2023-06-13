@@ -2,6 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import test.cls.A;
 import xyz.srclab.common.reflect.FsReflect;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
@@ -105,11 +106,15 @@ public class ReflectTest {
         );
     }
 
+    @Test
+    public void testAssignableFrom() {
+        Assert.assertTrue(FsReflect.isAssignableFrom(int.class, Integer.class));
+        Assert.assertTrue(FsReflect.isAssignableFrom(int.class, int.class));
+        Assert.assertFalse(FsReflect.isAssignableFrom(int.class, Double.class));
+    }
+
     private static final class T1<T> {
     }
 }
 
-class A<T> {
-    class B<U> {
-    }
-}
+

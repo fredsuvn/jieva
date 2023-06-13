@@ -62,10 +62,10 @@ public class FsTest {
     @Test
     public void testProcess() throws InterruptedException {
         if (FsSystem.isLinux() || FsSystem.isMac() || FsSystem.isBsd()) {
-            testEcho("echo", ECHO_CONTENT);
+            testEcho("echo " + ECHO_CONTENT);
         }
         if (FsSystem.isWindows()) {
-            testEcho("cmd.exe", "/c", "echo " + ECHO_CONTENT);
+            testEcho("cmd.exe /c echo " + ECHO_CONTENT);
         }
     }
 
@@ -94,7 +94,7 @@ public class FsTest {
         process.destroy();
     }
 
-    private void testEcho(String... command) throws InterruptedException {
+    private void testEcho(String command) throws InterruptedException {
         Process process = Fs.runProcess(command);
         process.waitFor();
         String output = FsIO.avalaibleString(process.getInputStream(), FsSystem.nativeCharset());
