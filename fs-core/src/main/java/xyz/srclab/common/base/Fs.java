@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
  */
 public class Fs {
 
+    private static final FsCache<Object[]> ENUM_CACHE = FsUnsafe.ForCache.getOrCreateCache(FsUnsafe.ForCache.ENUM);
+
     /**
      * Casts given object as given type T.
      *
@@ -241,7 +243,7 @@ public class Fs {
                 return null;
             }
         }
-        Object[] enums = getEnumCache().get(enumClass.getName(), it -> enumClass.getEnumConstants());
+        Object[] enums = ENUM_CACHE.get(enumClass, Class::getEnumConstants);
         FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
         for (Object anEnum : enums) {
             if (name.equalsIgnoreCase(anEnum.toString())) {
@@ -261,16 +263,12 @@ public class Fs {
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, int index) {
         FsCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
         FsCheck.checkArgument(index >= 0, "index must >= 0.");
-        Object[] enums = getEnumCache().get(enumClass.getName(), it -> enumClass.getEnumConstants());
+        Object[] enums = ENUM_CACHE.get(enumClass, Class::getEnumConstants);
         FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
         if (index >= enums.length) {
             return null;
         }
         return (T) enums[index];
-    }
-
-    private static FsCache<Object[]> getEnumCache() {
-        return FsDefault.defaultCache(FsDefault.CacheHolder.ENUM_CACHE_NAME);
     }
 
     /**

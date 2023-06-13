@@ -2,7 +2,6 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import test.cls.A;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.collect.FsCollect;
@@ -22,37 +21,37 @@ public class ReflectTest {
     @Test
     public void testLastName() {
         Assert.assertEquals(FsReflect.getLastName(ReflectTest.class), "ReflectTest");
-        Assert.assertEquals(FsReflect.getLastName(T.class), "ReflectTest$T1");
+        Assert.assertEquals(FsReflect.getLastName(T.class), "ReflectTest$T");
     }
 
     @Test
     public void testType() {
         //parametrized
-        Type t1 = new TypeRef<A<Integer>>() {
+        Type t1 = new TypeRef<T<Integer>>() {
         }.getType();
         Assert.assertEquals(
             t1.toString(),
-            "test.A<java.lang.Integer>"
+            "test.ReflectTest$T<java.lang.Integer>"
         );
-        Type t2 = new TypeRef<A<Integer>.B<String>>() {
+        Type t2 = new TypeRef<T<Integer>.V<String>>() {
         }.getType();
         Assert.assertEquals(
             t2.toString(),
-            "test.A<java.lang.Integer>$B<java.lang.String>"
+            "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
         );
-        ParameterizedType p1 = FsType.parameterizedType(A.class, Arrays.asList(Integer.class));
+        ParameterizedType p1 = FsType.parameterizedType(T.class, Arrays.asList(Integer.class));
         Assert.assertEquals(
             p1.toString(),
-            "test.A<java.lang.Integer>"
+            "test.ReflectTest$T<java.lang.Integer>"
         );
         Assert.assertEquals(
             t1,
             p1
         );
-        ParameterizedType p2 = FsType.parameterizedType(A.B.class, p1, Arrays.asList(String.class));
+        ParameterizedType p2 = FsType.parameterizedType(T.V.class, p1, Arrays.asList(String.class));
         Assert.assertEquals(
             p2.toString(),
-            "test.A<java.lang.Integer>$B<java.lang.String>"
+            "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
         );
         Assert.assertEquals(
             t2,
@@ -119,7 +118,7 @@ public class ReflectTest {
     }
 
     @Test
-    public void testParseTypeParameterMapping() throws NoSuchFieldException {
+    public void testGetTypeParameterMapping() throws NoSuchFieldException {
         Map<TypeVariable<?>, Type> map = FsReflect.getTypeParameterMapping(new TypeRef<X<String>>() {
         }.getType());
         // R(1661070039)=V(23805079)
@@ -151,13 +150,23 @@ public class ReflectTest {
     }
 
     @Test
-    public void testParseTypeParameterMapping2() {
-        ParameterizedType signature = FsReflect.getGenericSuperType(ZS.class, Z.class);
-        FsLogger.system().info(signature);
+    public void testGetGenericSuperType() {
+        ParameterizedType generic = FsReflect.getGenericSuperType(ZS.class, Z.class);
+        FsLogger.system().info(generic);
+        Assert.assertEquals(generic, new TypeRef<Z<String, Integer, Long, Boolean>>() {
+        }.getType());
+        generic = FsReflect.getGenericSuperType(new TypeRef<ZB<String>>() {
+        }.getType(), Z.class);
+        FsLogger.system().info(generic);
+        Assert.assertEquals(generic, new TypeRef<Z<String, String, Long, Boolean>>() {
+        }.getType());
     }
 
     private static final class T<W> {
         private final X<W> x = null;
+
+        public class V<U> {
+        }
     }
 
     private static class X<A> extends Y<A, Integer, Long> {
@@ -170,6 +179,9 @@ public class ReflectTest {
     }
 
     private static class ZS implements Z<String, Integer, Long, Boolean> {
+    }
+
+    private static class ZB<M> implements Z<M, M, Long, Boolean> {
     }
 }
 

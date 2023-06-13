@@ -1,15 +1,10 @@
 package xyz.srclab.common.base;
 
-import xyz.srclab.common.cache.FsCache;
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Default configuration and global setting for fs.
@@ -50,49 +45,5 @@ public class FsDefault {
      */
     public static DateFormat dateFormat() {
         return new SimpleDateFormat(dateTimePattern);
-    }
-
-    /**
-     * Returns default cache of cache name.
-     * <p>
-     * If you need to do something for default cache of fs (such as call the {@link FsCache#cleanUp()}),
-     * find it by its name.
-     * All the name in {@link CacheHolder}.
-     *
-     * @param name cache name
-     * @see CacheHolder
-     */
-    public static <T> FsCache<T> defaultCache(String name) {
-        FsCache<T> result = (FsCache<T>) CacheHolder.FS_CACHE_MAP.get(name);
-        if (result == null) {
-            throw new IllegalArgumentException("Cannot find fs default cache for name: " + name);
-        }
-        return result;
-    }
-
-    /**
-     * Default cache infos: caches map, names, and etc.
-     */
-    public static final class CacheHolder {
-
-        /**
-         * This readonly concurrent map stores all cache for fs.
-         * <p>
-         * If you need to do something for default cache of fs (such as call the {@link FsCache#cleanUp()}),
-         * find it by its name.
-         * All the name in {@link CacheHolder}.
-         */
-        public static final Map<String, FsCache<?>> FS_CACHE_MAP;
-
-        /**
-         * Name of cache for enum.
-         */
-        public static final String ENUM_CACHE_NAME = "fs-enum";
-
-        static {
-            Map<String, FsCache<?>> content = new ConcurrentHashMap<>();
-            content.put(CacheHolder.ENUM_CACHE_NAME, FsCache.newCache());
-            FS_CACHE_MAP = Collections.unmodifiableMap(content);
-        }
     }
 }

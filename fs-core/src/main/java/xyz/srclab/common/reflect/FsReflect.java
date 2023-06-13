@@ -3,6 +3,8 @@ package xyz.srclab.common.reflect;
 import xyz.srclab.annotations.OutParam;
 import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.base.FsString;
+import xyz.srclab.common.base.FsUnsafe;
+import xyz.srclab.common.cache.FsCache;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -16,6 +18,9 @@ import java.util.stream.Collectors;
  * @author fredsuvn
  */
 public class FsReflect {
+
+    private static final FsCache<Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE =
+        FsUnsafe.ForCache.getOrCreateCache(FsUnsafe.ForCache.TYPE_PARAMETER_MAPPING);
 
     /**
      * Returns last name of given class. The last name is sub-string after last dot, for example:
@@ -168,9 +173,11 @@ public class FsReflect {
      * @param type given type
      */
     public static Map<TypeVariable<?>, Type> getTypeParameterMapping(Type type) {
-        Map<TypeVariable<?>, Type> result = new HashMap<>();
-        parseTypeParameterMapping(type, result);
-        return result;
+        return TYPE_PARAMETER_MAPPING_CACHE.get(type, it -> {
+            Map<TypeVariable<?>, Type> result = new HashMap<>();
+            parseTypeParameterMapping(type, result);
+            return Collections.unmodifiableMap(result);
+        });
     }
 
     private static void parseTypeParameterMapping(Type type, @OutParam Map<TypeVariable<?>, Type> typeMap) {
@@ -190,6 +197,7 @@ public class FsReflect {
             }
         }
         if (type instanceof ParameterizedType) {
+            parseSuperGeneric(type, typeMap);
             parseTypeParameterMapping(((ParameterizedType) type).getRawType(), typeMap);
             return;
         }
@@ -214,7 +222,8 @@ public class FsReflect {
             Type[] superActualTypeArgs = superParameterized.getActualTypeArguments();
             TypeVariable<?>[] superTypeVariables = superRaw.getTypeParameters();
             for (int i = 0; i < superActualTypeArgs.length; i++) {
-                typeMap.put(superTypeVariables[i], superActualTypeArgs[i]);
+                Type actualType = superActualTypeArgs[i];
+                typeMap.put(superTypeVariables[i], actualType);
             }
         }
     }
