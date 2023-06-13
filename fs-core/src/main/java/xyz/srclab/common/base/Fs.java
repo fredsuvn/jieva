@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for Object.
@@ -441,6 +442,20 @@ public class Fs {
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    /**
+     * Starts a process with given command.
+     *
+     * @param cmd given command
+     */
+    public static Process runProcess(String cmd) {
+        String[] splits = cmd.split(" ");
+        List<String> actualCmd = Arrays.stream(splits)
+            .filter(it -> !FsString.isBlank(it))
+            .map(String::trim)
+            .collect(Collectors.toList());
+        return runProcess(false, actualCmd);
     }
 
     /**
