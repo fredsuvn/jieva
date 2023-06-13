@@ -26,7 +26,7 @@ public final class FsUnsafe {
             LocalDateTime now = LocalDateTime.now();
             StackTraceElement stackTraceElement = Fs.findStackTraceCaller(
                 ForLogger.class.getName(), "internalLog", 1);
-            FsLogger.Log log = new FsLogger.Log(level, now, stackTraceElement, message);
+            FsLogger.LogMessage log = new FsLogger.LogMessage(level, now, stackTraceElement, message);
             logger.output(log);
         }
     }

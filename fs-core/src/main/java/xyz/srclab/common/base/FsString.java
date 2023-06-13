@@ -578,12 +578,12 @@ public class FsString {
     }
 
     /**
-     * Encodes given string to bytes with default charset {@link FsDefault#charset()}.
+     * Encodes given string to bytes with default charset {@link FsProps#charset()}.
      *
      * @param chars given string
      */
     public static byte[] toBytes(CharSequence chars) {
-        return toBytes(chars, FsDefault.charset());
+        return toBytes(chars, FsProps.charset());
     }
 
     /**

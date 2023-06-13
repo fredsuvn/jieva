@@ -62,7 +62,7 @@ public interface FsLogger {
      * @param level  given level
      * @param output given output
      */
-    static FsLogger newLogger(int level, Consumer<Log> output) {
+    static FsLogger newLogger(int level, Consumer<LogMessage> output) {
         return new FsLogger() {
             @Override
             public int getLevel() {
@@ -70,7 +70,7 @@ public interface FsLogger {
             }
 
             @Override
-            public void output(Log log) {
+            public void output(LogMessage log) {
                 output.accept(log);
             }
         };
@@ -142,15 +142,15 @@ public interface FsLogger {
     int getLevel();
 
     /**
-     * Outputs given log info.
+     * Outputs given log message.
      *
-     * @param log given log info
+     * @param log given log message
      */
-    default void output(Log log) {
+    default void output(LogMessage log) {
         StringBuilder printInfo = new StringBuilder();
         Thread thread = Thread.currentThread();
         printInfo
-            .append(FsDefault.dateTimeFormatter().format(log.date))
+            .append("[").append(FsProps.dateFormatter().format(log.date)).append("]")
             .append("[").append(toLevelDescription(log.level)).append("]");
         if (log.stackTrace != null) {
             printInfo
@@ -173,7 +173,7 @@ public interface FsLogger {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    class Log {
+    class LogMessage {
         private int level;
         private LocalDateTime date;
         @Nullable

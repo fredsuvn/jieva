@@ -12,7 +12,7 @@ public class RandomTest {
         FsRandom<String> fsRandom = FsRandom.newBuilder()
             .score(20, "A")
             .score(20, "B")
-            .score(60, "C")
+            .score(60, () -> "C")
             .build();
         int countA = 0;
         int countB = 0;

@@ -3,7 +3,7 @@ package xyz.srclab.common.io;
 import org.apache.commons.io.output.WriterOutputStream;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.build.annotations.FsMethods;
-import xyz.srclab.common.base.FsDefault;
+import xyz.srclab.common.base.FsProps;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -18,11 +18,6 @@ import java.util.Arrays;
  */
 @FsMethods
 public class FsIO {
-
-    /**
-     * Default buffer size.
-     */
-    public static final int DEFAULT_BUFFER_SIZE = 1024;
 
     /**
      * Reads all bytes from given input stream.
@@ -41,7 +36,7 @@ public class FsIO {
      */
     public static byte[] readBytes(InputStream inputStream, boolean close) {
         try {
-            ByteArrayOutputStream dest = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
+            ByteArrayOutputStream dest = new ByteArrayOutputStream(FsProps.ioBufferSize());
             readBytesTo(inputStream, dest);
             if (close) {
                 inputStream.close();
@@ -80,7 +75,7 @@ public class FsIO {
      */
     public static byte[] readBytes(InputStream inputStream, int limit, boolean close) {
         try {
-            ByteArrayOutputStream dest = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
+            ByteArrayOutputStream dest = new ByteArrayOutputStream(FsProps.ioBufferSize());
             readBytesTo(inputStream, dest, limit);
             if (close) {
                 inputStream.close();
@@ -118,7 +113,7 @@ public class FsIO {
         }
         try {
             long readNum = 0;
-            int bufferSize = limit < 0 ? DEFAULT_BUFFER_SIZE : Math.min(limit, DEFAULT_BUFFER_SIZE);
+            int bufferSize = limit < 0 ? FsProps.ioBufferSize() : Math.min(limit, FsProps.ioBufferSize());
             byte[] buffer = new byte[bufferSize];
             while (true) {
                 int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);
@@ -299,7 +294,7 @@ public class FsIO {
         }
         try {
             long readNum = 0;
-            int bufferSize = limit < 0 ? DEFAULT_BUFFER_SIZE : Math.min(limit, DEFAULT_BUFFER_SIZE);
+            int bufferSize = limit < 0 ? FsProps.ioBufferSize() : Math.min(limit, FsProps.ioBufferSize());
             char[] buffer = new char[bufferSize];
             while (true) {
                 int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);
@@ -338,12 +333,12 @@ public class FsIO {
     }
 
     /**
-     * Reads String encoded by all bytes from given input stream with {@link FsDefault#charset()}.
+     * Reads String encoded by all bytes from given input stream with {@link FsProps#charset()}
      *
      * @param inputStream given input stream
      */
     public static String readString(InputStream inputStream) {
-        return readString(inputStream, FsDefault.charset());
+        return readString(inputStream, FsProps.charset());
     }
 
     /**
@@ -369,14 +364,14 @@ public class FsIO {
     }
 
     /**
-     * Reads available String encoded by all bytes from given input stream with {@link FsDefault#charset()},
+     * Reads available String encoded by all bytes from given input stream with {@link FsProps#charset()},
      * returns null if reaches end of the stream.
      *
      * @param inputStream given input stream
      */
     @Nullable
     public static String avalaibleString(InputStream inputStream) {
-        return avalaibleString(inputStream, FsDefault.charset());
+        return avalaibleString(inputStream, FsProps.charset());
     }
 
     /**
