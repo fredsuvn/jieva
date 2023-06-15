@@ -115,7 +115,8 @@ public class ReflectTest {
             String.class
         );
         Assert.assertEquals(
-            new R2<Integer>(){}.getType(),
+            new R2<Integer>() {
+            }.getType(),
             Integer.class
         );
     }
@@ -170,6 +171,12 @@ public class ReflectTest {
         FsLogger.system().info(generic);
         Assert.assertEquals(generic, new TypeRef<Z<String, String, Long, Boolean>>() {
         }.getType());
+        Assert.assertEquals(
+            FsReflect.getGenericSuperType(new TypeRef<ZB<String>>() {
+            }.getType(), ZB.class),
+            new TypeRef<ZB<String>>() {
+            }.getType()
+        );
     }
 
     private static final class T<W> {
