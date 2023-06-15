@@ -5,6 +5,7 @@ import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.cache.FsCache;
+import xyz.srclab.common.collect.FsCollect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -132,16 +133,12 @@ public class FsReflect {
             throw new IllegalArgumentException("Given \"to\" type doesn't have type parameter.");
         }
         Map<TypeVariable<?>, Type> typeArguments = getTypeParameterMapping(type);
+        Set<Type> stack = new HashSet<>();
         List<Type> actualTypeArguments = Arrays.stream(typeParameters)
             .map(it -> {
-                Type cur = it;
-                while (true) {
-                    Type value = typeArguments.get(cur);
-                    if (value == null) {
-                        return cur;
-                    }
-                    cur = value;
-                }
+                Type nestedValue = FsCollect.nestedGet(typeArguments, it, stack);
+                stack.clear();
+                return nestedValue == null ? it : nestedValue;
             }).collect(Collectors.toList());
         return FsType.parameterizedType(target, target.getDeclaringClass(), actualTypeArguments);
     }

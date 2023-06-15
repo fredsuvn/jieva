@@ -352,4 +352,36 @@ public class FsCollect {
         });
         return map;
     }
+
+    /**
+     * Nested get value from given map with given key.
+     * This method gets value of given key, then let the value as next key to find next value and keep looping.
+     * If last value as key cannot find next value, the last value will be returned.
+     * If given key cannot find at least one value, or a same value in the given stack
+     * (which will cause an infinite loop), return null.
+     *
+     * @param map   given map
+     * @param key   given key
+     * @param stack stack to store the historical values
+     */
+    @Nullable
+    public static <T> T nestedGet(Map<?, T> map, T key, Set<T> stack) {
+        T cur = key;
+        stack.add(cur);
+        while (true) {
+            T result = map.get(cur);
+            if (result == null) {
+                break;
+            }
+            if (stack.contains(result)) {
+                break;
+            }
+            cur = result;
+            stack.add(cur);
+        }
+        if (Objects.equals(key, cur)) {
+            return null;
+        }
+        return cur;
+    }
 }

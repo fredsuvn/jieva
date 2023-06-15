@@ -27,13 +27,12 @@ public abstract class TypeRef<T> {
     /**
      * Actual runtime type.
      */
-    private final Type type;
+    private Type type;
 
     /**
      * Empty constructor, used to get a generic type.
      */
     protected TypeRef() {
-        type = reflectToActualType();
     }
 
     private Type reflectToActualType() {
@@ -44,20 +43,31 @@ public abstract class TypeRef<T> {
                 return p.getActualTypeArguments()[0];
             }
         }
-        throw new IllegalStateException();
+        ParameterizedType parameterizedType = FsReflect.getGenericSuperType(generic, TypeRef.class);
+        return parameterizedType.getActualTypeArguments()[0];
     }
 
     /**
      * Returns type referenced by this ref.
      */
     public Type getType() {
+        if (type == null) {
+            type = reflectToActualType();
+        }
         return type;
     }
 
     /**
-     * Returns type as parameterized type referenced by this ref.
+     * Returns {@link #getType()} as {@link ParameterizedType} referenced by this ref.
      */
-    public ParameterizedType getParameterizedType() {
-        return (ParameterizedType) type;
+    public ParameterizedType asParameterized() {
+        return (ParameterizedType) getType();
+    }
+
+    /**
+     * Returns {@link #getType()} as {@link Class} referenced by this ref.
+     */
+    public Class<T> asClass() {
+        return (Class<T>) getType();
     }
 }

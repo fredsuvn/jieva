@@ -25,7 +25,7 @@ public class ReflectTest {
     }
 
     @Test
-    public void testType() {
+    public void testTypeRef() {
         //parametrized
         Type t1 = new TypeRef<T<Integer>>() {
         }.getType();
@@ -60,7 +60,7 @@ public class ReflectTest {
 
         //wildcard
         Type t3 = new TypeRef<List<? super Integer>>() {
-        }.getParameterizedType().getActualTypeArguments()[0];
+        }.asParameterized().getActualTypeArguments()[0];
         Assert.assertEquals(
             t3.toString(),
             "? super java.lang.Integer"
@@ -75,7 +75,7 @@ public class ReflectTest {
             w1
         );
         Type t4 = new TypeRef<List<? extends Integer>>() {
-        }.getParameterizedType().getActualTypeArguments()[0];
+        }.asParameterized().getActualTypeArguments()[0];
         Assert.assertEquals(
             t4.toString(),
             "? extends java.lang.Integer"
@@ -107,6 +107,16 @@ public class ReflectTest {
         Assert.assertEquals(
             t5,
             g1
+        );
+
+        //R
+        Assert.assertEquals(
+            new R1().getType(),
+            String.class
+        );
+        Assert.assertEquals(
+            new R2<Integer>(){}.getType(),
+            Integer.class
         );
     }
 
@@ -182,6 +192,15 @@ public class ReflectTest {
     }
 
     private static class ZB<M> implements Z<M, M, Long, Boolean> {
+    }
+
+    private static class R1 extends R2<String> {
+    }
+
+    private static class R2<Tx> extends R3<Tx> {
+    }
+
+    private static class R3<Tx> extends TypeRef<Tx> {
     }
 }
 
