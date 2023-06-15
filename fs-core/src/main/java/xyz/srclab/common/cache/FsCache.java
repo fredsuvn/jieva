@@ -2,7 +2,6 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
-import xyz.srclab.build.annotations.FsMethods;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -15,7 +14,6 @@ import java.util.function.Function;
  *
  * @author fresduvn
  */
-@FsMethods
 @ThreadSafe
 public interface FsCache<T> {
 

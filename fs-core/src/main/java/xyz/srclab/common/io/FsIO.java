@@ -2,7 +2,6 @@ package xyz.srclab.common.io;
 
 import org.apache.commons.io.output.WriterOutputStream;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.base.FsProps;
 
 import java.io.*;
@@ -16,7 +15,6 @@ import java.util.Arrays;
  *
  * @author fresduvn
  */
-@FsMethods
 public class FsIO {
 
     /**

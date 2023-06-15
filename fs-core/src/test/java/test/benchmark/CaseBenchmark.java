@@ -1,4 +1,4 @@
-package test;
+package test.benchmark;
 
 import com.google.common.base.CaseFormat;
 import org.openjdk.jmh.annotations.*;

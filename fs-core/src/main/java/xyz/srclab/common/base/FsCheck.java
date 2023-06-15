@@ -1,7 +1,6 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.build.annotations.FsMethods;
 
 import java.util.NoSuchElementException;
 
@@ -10,7 +9,6 @@ import java.util.NoSuchElementException;
  *
  * @author fredsuvn
  */
-@FsMethods
 public class FsCheck {
 
     /**

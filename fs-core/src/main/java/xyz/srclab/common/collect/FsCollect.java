@@ -1,7 +1,6 @@
 package xyz.srclab.common.collect;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.build.annotations.FsMethods;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsArray;
 
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
  *
  * @author fresduvn
  */
-@FsMethods
 public class FsCollect {
 
     /**

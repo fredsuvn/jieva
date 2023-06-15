@@ -28,8 +28,8 @@ dependencies {
   testImplementation "org.springframework:spring-core"
   testImplementation "cglib:cglib"
 
-  implementation project(":fs-processor")
-  annotationProcessor project(":fs-processor")
+//  implementation project(":fs-processor")
+//  annotationProcessor project(":fs-processor")
 
   testAnnotationProcessor platform(project(":boat-dependencies"))
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"

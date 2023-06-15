@@ -1,8 +1,6 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.build.annotations.FsMethod;
-import xyz.srclab.build.annotations.FsMethods;
 
 import java.lang.reflect.Array;
 import java.util.function.Function;
@@ -12,7 +10,6 @@ import java.util.function.Function;
  *
  * @author fredsuvn
  */
-@FsMethods
 public class FsArray {
 
     /**
@@ -75,7 +72,6 @@ public class FsArray {
      * @param dest   the dest array
      * @param mapper given mapper
      */
-    @FsMethod(name = "mapArray")
     public static <T, R> R[] map(T[] source, R[] dest, Function<T, R> mapper) {
         R[] result;
         if (dest.length == source.length) {

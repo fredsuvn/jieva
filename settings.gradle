@@ -25,4 +25,4 @@ file("${rootDir}/boat-plugins").eachDirMatch(~/boat-.*/) { dir ->
   include ":boat-plugins:${dir.name}"
 }
 //processor
-include ":fs-processor"
+//include ":fs-processor"

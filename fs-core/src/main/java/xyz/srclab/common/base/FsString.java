@@ -2,7 +2,6 @@ package xyz.srclab.common.base;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.build.annotations.FsMethods;
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -13,7 +12,6 @@ import java.util.function.Supplier;
  *
  * @author fredsuvn
  */
-@FsMethods
 public class FsString {
 
     /**
