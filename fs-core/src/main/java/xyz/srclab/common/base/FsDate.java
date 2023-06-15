@@ -1,5 +1,6 @@
 package xyz.srclab.common.base;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
@@ -20,7 +21,7 @@ public class FsDate {
      * @param pattern given pattern
      */
     public static String format(Date date, String pattern) {
-        return new SimpleDateFormat(pattern).format(date);
+        return dateFormat(pattern).format(date);
     }
 
     /**
@@ -40,10 +41,17 @@ public class FsDate {
      */
     public static Date parse(String date, String pattern) {
         try {
-            return new SimpleDateFormat(pattern).parse(date);
+            return dateFormat(pattern).parse(date);
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    /**
+     * Returns a new Date format.
+     */
+    public static DateFormat dateFormat(String pattern) {
+        return new SimpleDateFormat(pattern);
     }
 
     /**
