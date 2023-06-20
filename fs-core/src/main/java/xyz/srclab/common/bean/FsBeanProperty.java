@@ -5,6 +5,7 @@ import xyz.srclab.annotations.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -29,6 +30,16 @@ public interface FsBeanProperty {
      * @param value property value
      */
     void set(Object bean, @Nullable Object value);
+
+    /**
+     * Returns type of this property.
+     */
+    Type getType();
+
+    /**
+     * Returns raw type of this property.
+     */
+    Class<?> getRawType();
 
     /**
      * Returns getter method of this property, or null if it doesn't exist.
@@ -59,9 +70,14 @@ public interface FsBeanProperty {
     List<Annotation> getSetterAnnotations();
 
     /**
-     * Returns annotations on field.
+     * Returns annotations on backed field.
      */
     List<Annotation> getFieldAnnotations();
+
+    /**
+     * Returns annotations on getter, setter or backed field.
+     */
+    List<Annotation> getAnnotations();
 
     /**
      * Returns owner bean of this property.

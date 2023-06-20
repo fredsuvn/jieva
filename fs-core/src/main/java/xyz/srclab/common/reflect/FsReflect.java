@@ -7,7 +7,6 @@ import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -105,39 +104,6 @@ public class FsReflect {
             return true;
         }
         return toWrapperClass(t1).isAssignableFrom(toWrapperClass(t2));
-    }
-
-    public static Field findField(
-        Class<?> cls, String name, boolean searchSuperClass, boolean searchSuperInterfaces) {
-        try {
-            return cls.getField(name);
-        } catch (NoSuchFieldException e) {
-            try {
-                return cls.getDeclaredField(name);
-            } catch (NoSuchFieldException ex) {
-                Class<?> cur = cls;
-                while (true) {
-                    if (searchSuperClass) {
-
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private static Field findField0(Class<?> cls, String name, boolean searchSuperInterfaces) {
-        try {
-            return cls.getDeclaredField(name);
-        } catch (NoSuchFieldException e) {
-            if (searchSuperInterfaces) {
-                Class<?>[] interfaces =  cls.getInterfaces();
-
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     /**

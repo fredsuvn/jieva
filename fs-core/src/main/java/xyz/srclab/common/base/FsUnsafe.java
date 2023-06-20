@@ -1,6 +1,7 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.cache.FsCache;
 
 import java.time.LocalDateTime;
@@ -48,5 +49,10 @@ public final class FsUnsafe {
         public static <T> FsCache<T> getCache(String key) {
             return (FsCache<T>) CACHE_MAP.get(key);
         }
+    }
+
+    public static final class ForBean {
+
+        public static final FsBeanResolver DEFAULT_RESOLVER = FsBeanResolver.newBuilder().build();
     }
 }
