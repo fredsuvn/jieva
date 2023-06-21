@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Properties of FS.
  *
- * @author sunq62
+ * @author fredsuvn
  */
 public class FsProps {
 

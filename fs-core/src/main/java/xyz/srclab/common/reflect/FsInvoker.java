@@ -11,7 +11,7 @@ import java.lang.reflect.Modifier;
 /**
  * Invoker interface, to invoke an executable or runnable object.
  *
- * @author sunq62
+ * @author fredsuvn
  */
 public interface FsInvoker {
 

@@ -15,7 +15,7 @@ import java.util.Objects;
 /**
  * Type utilities.
  *
- * @author sunq62
+ * @author fredsuvn
  */
 public class FsType {
 

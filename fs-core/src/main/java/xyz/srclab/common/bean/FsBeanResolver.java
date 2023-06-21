@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Resolver for {@link FsBean}.
  *
- * @author sunq62
+ * @author fredsuvn
  */
 public interface FsBeanResolver {
 

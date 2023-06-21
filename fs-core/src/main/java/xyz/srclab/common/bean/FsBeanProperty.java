@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Represents property in {@link FsBean}.
  *
- * @author sunq62
+ * @author fredsuvn
  */
 public interface FsBeanProperty {
 

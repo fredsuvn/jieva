@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Bean info for java object.
  *
- * @author sunq62
+ * @author fredsuvn
  */
 public interface FsBean {
 
