@@ -2,6 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsCase;
+import xyz.srclab.common.base.FsFinal;
 import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
@@ -11,6 +12,7 @@ import xyz.srclab.common.reflect.FsReflect;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Resolver for {@link FsBean}.
@@ -21,7 +23,8 @@ public interface FsBeanResolver {
 
     /**
      * Returns default bean resolver,
-     * which invoke mode is {@link Builder#USE_REFLECT} and property naming is {@link Builder#BEAN_NAMING}.
+     * which invoke mode is {@link Builder#REFLECT_MODE}, property name mapping is {@link Builder#BEAN_NAMING}
+     * and property/method naming case is {@link FsCase#LOWER_CAMEL}.
      * And this resolver will cache the bean by {@link FsCache#newCache()}.
      */
     static FsBeanResolver defaultResolver() {
@@ -42,16 +45,19 @@ public interface FsBeanResolver {
      */
     FsBean resolve(Type type);
 
+    /**
+     * Builder for {@link FsBeanResolver}.
+     */
     class Builder {
 
         /**
          * Reflect mode.
          */
-        public static final int USE_REFLECT = 1;
+        public static final int REFLECT_MODE = 1;
         /**
          * Un-reflect mode.
          */
-        public static final int USE_UNREFLECT = 2;
+        public static final int UNREFLECT_MODE = 2;
         /**
          * Bean naming.
          */
@@ -61,25 +67,30 @@ public interface FsBeanResolver {
          */
         public static final int RECORD_NAMING = 2;
 
-        private int invokeMode = USE_REFLECT;
-        private int propertyNaming = BEAN_NAMING;
+        private int invokeMode = REFLECT_MODE;
+        private int propertyNameMapping = BEAN_NAMING;
+        private FsCase propertyNamingCase = FsCase.LOWER_CAMEL;
+        private FsCase methodNamingCase = FsCase.LOWER_CAMEL;
+
+        private boolean useCache = true;
 
         /**
          * Sets invoke mode for getter and setter methods:
          * <ul>
          *     <li>
-         *         {@link #USE_REFLECT}: Using reflect to invoke getter and setter methods.
+         *         {@link #REFLECT_MODE}: Using reflect to invoke getter and setter methods.
          *     </li>
          *     <li>
-         *         {@link #USE_UNREFLECT}: Using un-reflect ({@link java.lang.invoke.MethodHandles})
+         *         {@link #UNREFLECT_MODE}: Using un-reflect ({@link java.lang.invoke.MethodHandles})
          *         to invoke getter and setter methods.
          *     </li>
          * </ul>
+         *  Default is {@link #REFLECT_MODE}.
          *
          * @param invokeMode invoke mode
          */
         public Builder invokeMode(int invokeMode) {
-            if (invokeMode != USE_REFLECT && invokeMode != USE_UNREFLECT) {
+            if (invokeMode != REFLECT_MODE && invokeMode != UNREFLECT_MODE) {
                 throw new IllegalArgumentException("Unknown invoke mode: " + invokeMode);
             }
             this.invokeMode = invokeMode;
@@ -87,7 +98,7 @@ public interface FsBeanResolver {
         }
 
         /**
-         * Sets property naming for getter and setter methods:
+         * Sets property name mapping for getter and setter methods:
          * <ul>
          *     <li>
          *         {@link #BEAN_NAMING}: Starting with "get"/"set" for each getter and setter methods.
@@ -97,34 +108,79 @@ public interface FsBeanResolver {
          *         and starting with "set" for setter methods.
          *     </li>
          * </ul>
+         *  Default is {@link #BEAN_NAMING}.
          *
-         * @param propertyNaming property naming
+         * @param propertyNameMapping property naming
          */
-        public Builder propertyNaming(int propertyNaming) {
-            if (propertyNaming != BEAN_NAMING && propertyNaming != RECORD_NAMING) {
-                throw new IllegalArgumentException("Unknown property naming: " + propertyNaming);
+        public Builder propertyNameMapping(int propertyNameMapping) {
+            if (propertyNameMapping != BEAN_NAMING && propertyNameMapping != RECORD_NAMING) {
+                throw new IllegalArgumentException("Unknown property naming: " + propertyNameMapping);
             }
-            this.propertyNaming = propertyNaming;
+            this.propertyNameMapping = propertyNameMapping;
+            return this;
+        }
+
+        /**
+         * Sets property naming case. Default is {@link FsCase#LOWER_CAMEL}.
+         *
+         * @param propertyNamingCase property naming case
+         */
+        public Builder propertyNamingCase(FsCase propertyNamingCase) {
+            this.propertyNamingCase = propertyNamingCase;
+            return this;
+        }
+
+        /**
+         * Sets method naming case. Default is {@link FsCase#LOWER_CAMEL}.
+         *
+         * @param methodNamingCase method naming case
+         */
+        public Builder methodNamingCase(FsCase methodNamingCase) {
+            this.methodNamingCase = methodNamingCase;
+            return this;
+        }
+
+        /**
+         * Sets whether the resolver cache the resolved bean. Default is true.
+         *
+         * @param useCache whether the resolver cache the resolved bean
+         */
+        public Builder useCache(boolean useCache) {
+            this.useCache = useCache;
             return this;
         }
 
         public FsBeanResolver build() {
-            return new FsBeanResolverImpl(invokeMode, propertyNaming);
+            return new FsBeanResolverImpl(
+                invokeMode, propertyNameMapping, propertyNamingCase, methodNamingCase, useCache);
         }
 
         private static final class FsBeanResolverImpl implements FsBeanResolver {
 
             private final int invokeMode;
             private final int propertyNaming;
-            private final FsCache<FsBean> cache = FsCache.newCache();
+            private final FsCase propertyNamingCase;
+            private final FsCase methodNamingCase;
+            private final FsCache<FsBean> cache;
 
-            private FsBeanResolverImpl(int invokeMode, int propertyNaming) {
+            private FsBeanResolverImpl(
+                int invokeMode, int propertyNaming, FsCase propertyNamingCase, FsCase methodNamingCase, boolean useCache) {
                 this.invokeMode = invokeMode;
                 this.propertyNaming = propertyNaming;
+                this.propertyNamingCase = propertyNamingCase;
+                this.methodNamingCase = methodNamingCase;
+                if (useCache) {
+                    cache = FsCache.newCache();
+                } else {
+                    cache = null;
+                }
             }
 
             @Override
             public FsBean resolve(Type type) {
+                if (cache == null) {
+                    return resolve0(type);
+                }
                 return cache.get(type, this::resolve0);
             }
 
@@ -142,6 +198,9 @@ public interface FsBeanResolver {
                 Map<String, Method> getters = new LinkedHashMap<>();
                 Map<String, Method> setters = new LinkedHashMap<>();
                 for (Method method : methods) {
+                    if (method.isBridge()) {
+                        continue;
+                    }
                     String propertyName = isGetter(method);
                     if (propertyName != null) {
                         getters.put(propertyName, method);
@@ -152,7 +211,7 @@ public interface FsBeanResolver {
                         setters.put(propertyName, method);
                     }
                 }
-                FsBeanImpl bean = new FsBeanImpl();
+                FsBeanImpl bean = new FsBeanImpl(type);
                 Set<Type> stack = new HashSet<>();
                 getters.forEach((name, getter) -> {
                     Method setter = setters.get(name);
@@ -160,11 +219,10 @@ public interface FsBeanResolver {
                     // But field's type will not be checked,
                     // because field is only a name holder for adding Annotations conveniently.
                     Type returnType = getter.getGenericReturnType();
-                    returnType = FsCollect.nestedGet(typeParameterMapping, returnType, stack);
+                    returnType = getActualType(returnType, typeParameterMapping, stack);
                     if (setter != null) {
                         Type setType = setter.getGenericParameterTypes()[0];
-                        stack.clear();
-                        setType = FsCollect.nestedGet(typeParameterMapping, setType, stack);
+                        setType = getActualType(setType, typeParameterMapping, stack);
                         if (!Objects.equals(returnType, setType)) {
                             return;
                         }
@@ -176,8 +234,7 @@ public interface FsBeanResolver {
                 setters.forEach((name, setter) -> {
                     Field field = findField(name, rawType);
                     Type setType = setter.getGenericParameterTypes()[0];
-                    stack.clear();
-                    setType = FsCollect.nestedGet(typeParameterMapping, setType, stack);
+                    setType = getActualType(setType, typeParameterMapping, stack);
                     bean.properties.put(name, new FsBeanPropertyImpl(bean, name, null, setter, field, setType));
                 });
                 bean.afterInit();
@@ -192,9 +249,9 @@ public interface FsBeanResolver {
                             && method.getName().length() > 3
                             && method.getName().startsWith("get")
                         ) {
-                            List<CharSequence> words = FsCase.LOWER_CAMEL.split(method.getName());
+                            List<CharSequence> words = methodNamingCase.split(method.getName());
                             if (!FsCollect.isEmpty(words) && words.size() > 1 && Objects.equals(words.get(0).toString(), "get")) {
-                                return FsCase.LOWER_CAMEL.join(words.subList(1, words.size()));
+                                return propertyNamingCase.join(words.subList(1, words.size()));
                             }
                         }
                         return null;
@@ -217,15 +274,27 @@ public interface FsBeanResolver {
                             && method.getName().length() > 3
                             && method.getName().startsWith("set")
                         ) {
-                            List<CharSequence> words = FsCase.LOWER_CAMEL.split(method.getName());
+                            List<CharSequence> words = methodNamingCase.split(method.getName());
                             if (!FsCollect.isEmpty(words) && words.size() > 1 && Objects.equals(words.get(0).toString(), "set")) {
-                                return FsCase.LOWER_CAMEL.join(words.subList(1, words.size()));
+                                return propertyNamingCase.join(words.subList(1, words.size()));
                             }
                         }
                         return null;
                     default:
                         throw new IllegalStateException("Unknown property naming: " + propertyNaming);
                 }
+            }
+
+            private Type getActualType(Type type, Map<TypeVariable<?>, Type> typeParameterMapping, Set<Type> stack) {
+                if (type instanceof Class) {
+                    return type;
+                }
+                stack.clear();
+                Type result = FsCollect.nestedGet(typeParameterMapping, type, stack);
+                if (result == null) {
+                    return type;
+                }
+                return result;
             }
 
             @Nullable
@@ -236,18 +305,28 @@ public interface FsBeanResolver {
                     Class<?> cur = type;
                     while (cur != null) {
                         try {
-                            return type.getDeclaredField(name);
+                            return cur.getDeclaredField(name);
                         } catch (NoSuchFieldException ex) {
-                            cur = type.getSuperclass();
+                            cur = cur.getSuperclass();
                         }
                     }
                 }
                 return null;
             }
 
-            private final class FsBeanImpl implements FsBean {
+            private final class FsBeanImpl extends FsFinal implements FsBean {
 
+                private final Type type;
                 private Map<String, FsBeanProperty> properties = new LinkedHashMap<>();
+
+                private FsBeanImpl(Type type) {
+                    this.type = type;
+                }
+
+                @Override
+                public Type getType() {
+                    return type;
+                }
 
                 @Override
                 public Map<String, FsBeanProperty> getProperties() {
@@ -257,9 +336,34 @@ public interface FsBeanResolver {
                 private void afterInit() {
                     properties = Collections.unmodifiableMap(properties);
                 }
+
+                @Override
+                public boolean equals(Object o) {
+                    if (this == o) {
+                        return true;
+                    }
+                    if (!(o instanceof FsBeanImpl)) {
+                        return false;
+                    }
+                    return Objects.equals(properties, ((FsBeanImpl) o).properties);
+                }
+
+                @Override
+                protected int computeHashCode() {
+                    return Objects.hash(properties);
+                }
+
+                @Override
+                protected String computeToString() {
+                    StringBuilder sb = new StringBuilder("bean(");
+                    sb.append(properties.entrySet().stream()
+                        .map(it -> it.getKey() + ": " + it.getValue()).collect(Collectors.joining(", ")));
+                    sb.append(")");
+                    return sb.toString();
+                }
             }
 
-            private final class FsBeanPropertyImpl implements FsBeanProperty {
+            private final class FsBeanPropertyImpl extends FsFinal implements FsBeanProperty {
 
                 private final FsBean owner;
                 private final String name;
@@ -287,7 +391,7 @@ public interface FsBeanResolver {
                     this.field = field;
                     this.type = type;
                     switch (invokeMode) {
-                        case USE_REFLECT -> {
+                        case REFLECT_MODE:
                             if (getter != null) {
                                 getterInvoker = FsInvoker.reflectMethod(getter);
                             } else {
@@ -298,8 +402,8 @@ public interface FsBeanResolver {
                             } else {
                                 setterInvoker = null;
                             }
-                        }
-                        case USE_UNREFLECT -> {
+                            break;
+                        case UNREFLECT_MODE:
                             if (getter != null) {
                                 getterInvoker = FsInvoker.unreflectMethod(getter);
                             } else {
@@ -310,8 +414,9 @@ public interface FsBeanResolver {
                             } else {
                                 setterInvoker = null;
                             }
-                        }
-                        default -> throw new IllegalStateException("Unknown invoke mode setting: " + invokeMode);
+                            break;
+                        default:
+                            throw new IllegalStateException("Unknown invoke mode setting: " + invokeMode);
                     }
                     getterAnnotations = getter == null ? Collections.emptyList() :
                         Collections.unmodifiableList(Arrays.asList(getter.getAnnotations()));
@@ -345,11 +450,6 @@ public interface FsBeanResolver {
                 @Override
                 public Type getType() {
                     return type;
-                }
-
-                @Override
-                public Class<?> getRawType() {
-                    return FsReflect.getRawType(type);
                 }
 
                 @Override
@@ -390,6 +490,37 @@ public interface FsBeanResolver {
                 @Override
                 public FsBean getOwner() {
                     return owner;
+                }
+
+                @Override
+                public boolean equals(Object o) {
+                    if (this == o) {
+                        return true;
+                    }
+                    if (!(o instanceof FsBeanPropertyImpl)) {
+                        return false;
+                    }
+                    FsBeanPropertyImpl other = (FsBeanPropertyImpl) o;
+                    return Objects.equals(owner.getType(), other.owner.getType())
+                        && Objects.equals(name, other.name)
+                        && Objects.equals(type, other.type);
+                }
+
+                @Override
+                protected int computeHashCode() {
+                    return Objects.hash(owner.getType(), name, type);
+                }
+
+                @Override
+                protected String computeToString() {
+                    String sb = "BeanProperty(name=" +
+                        name +
+                        ", type=" +
+                        type +
+                        ", ownerType=" +
+                        owner.getType() +
+                        ")";
+                    return sb;
                 }
             }
         }

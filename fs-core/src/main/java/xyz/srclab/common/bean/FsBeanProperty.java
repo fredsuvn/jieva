@@ -1,6 +1,7 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.reflect.FsReflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -39,7 +40,9 @@ public interface FsBeanProperty {
     /**
      * Returns raw type of this property.
      */
-    Class<?> getRawType();
+    default Class<?> getRawType() {
+        return FsReflect.getRawType(getType());
+    }
 
     /**
      * Returns getter method of this property, or null if it doesn't exist.
@@ -75,7 +78,7 @@ public interface FsBeanProperty {
     List<Annotation> getFieldAnnotations();
 
     /**
-     * Returns annotations on getter, setter or backed field.
+     * Returns annotations on getter, setter and backed field (in this order).
      */
     List<Annotation> getAnnotations();
 
