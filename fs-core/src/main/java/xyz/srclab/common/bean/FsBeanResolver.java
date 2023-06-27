@@ -7,7 +7,7 @@ import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.FsInvoker;
-import xyz.srclab.common.reflect.FsReflect;
+import xyz.srclab.common.reflect.FsType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -194,7 +194,7 @@ public interface FsBeanResolver {
                     throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType.");
                 }
                 Method[] methods = rawType.getMethods();
-                Map<TypeVariable<?>, Type> typeParameterMapping = FsReflect.getTypeParameterMapping(type);
+                Map<TypeVariable<?>, Type> typeParameterMapping = FsType.getTypeParameterMapping(type);
                 Map<String, Method> getters = new LinkedHashMap<>();
                 Map<String, Method> setters = new LinkedHashMap<>();
                 for (Method method : methods) {

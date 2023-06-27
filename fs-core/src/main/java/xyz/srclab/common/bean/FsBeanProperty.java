@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.reflect.FsReflect;
+import xyz.srclab.common.reflect.FsType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -41,7 +41,7 @@ public interface FsBeanProperty {
      * Returns raw type of this property.
      */
     default Class<?> getRawType() {
-        return FsReflect.getRawType(getType());
+        return FsType.getRawType(getType());
     }
 
     /**

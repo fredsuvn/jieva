@@ -23,7 +23,7 @@ public class FsArray {
     }
 
     /**
-     * Returns whether given array if null or empty.
+     * Returns whether given array is null or empty.
      *
      * @param array given array
      */
@@ -59,6 +59,15 @@ public class FsArray {
             return ((double[]) array).length == 0;
         }
         throw new IllegalArgumentException("Given array is not type of array: " + array.getClass());
+    }
+
+    /**
+     * Returns whether given array is not null and not empty.
+     *
+     * @param array given array
+     */
+    public static boolean isNotEmpty(@Nullable Object array) {
+        return !isEmpty(array);
     }
 
     /**

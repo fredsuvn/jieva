@@ -43,7 +43,7 @@ public abstract class TypeRef<T> {
                 return p.getActualTypeArguments()[0];
             }
         }
-        ParameterizedType parameterizedType = FsReflect.getGenericSuperType(generic, TypeRef.class);
+        ParameterizedType parameterizedType = FsType.getGenericSuperType(generic, TypeRef.class);
         return parameterizedType.getActualTypeArguments()[0];
     }
 

@@ -5,7 +5,6 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.collect.FsCollect;
-import xyz.srclab.common.reflect.FsReflect;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
 
@@ -20,8 +19,8 @@ public class ReflectTest {
 
     @Test
     public void testLastName() {
-        Assert.assertEquals(FsReflect.getLastName(ReflectTest.class), "ReflectTest");
-        Assert.assertEquals(FsReflect.getLastName(T.class), "ReflectTest$T");
+        Assert.assertEquals(FsType.getLastName(ReflectTest.class), "ReflectTest");
+        Assert.assertEquals(FsType.getLastName(T.class), "ReflectTest$T");
     }
 
     @Test
@@ -123,14 +122,14 @@ public class ReflectTest {
 
     @Test
     public void testAssignableFrom() {
-        Assert.assertTrue(FsReflect.isAssignableFrom(int.class, Integer.class));
-        Assert.assertTrue(FsReflect.isAssignableFrom(int.class, int.class));
-        Assert.assertFalse(FsReflect.isAssignableFrom(int.class, Double.class));
+        Assert.assertTrue(FsType.isAssignableFrom(int.class, Integer.class));
+        Assert.assertTrue(FsType.isAssignableFrom(int.class, int.class));
+        Assert.assertFalse(FsType.isAssignableFrom(int.class, Double.class));
     }
 
     @Test
     public void testGetTypeParameterMapping() throws NoSuchFieldException {
-        Map<TypeVariable<?>, Type> map = FsReflect.getTypeParameterMapping(new TypeRef<X<String>>() {
+        Map<TypeVariable<?>, Type> map = FsType.getTypeParameterMapping(new TypeRef<X<String>>() {
         }.getType());
         // R(1661070039)=V(23805079)
         // K(532385198)=class java.lang.Integer(33524623)
@@ -144,7 +143,7 @@ public class ReflectTest {
             it -> it.getKey() + "(" + Fs.systemHash(it.getKey()) + ")",
             it -> it.getValue() + "(" + Fs.systemHash(it.getValue()) + ")"
         ));
-        Map<TypeVariable<?>, Type> map2 = FsReflect.getTypeParameterMapping(
+        Map<TypeVariable<?>, Type> map2 = FsType.getTypeParameterMapping(
             T.class.getDeclaredField("x").getGenericType());
         // R(1661070039)=V(23805079)
         // K(532385198)=class java.lang.Integer(33524623)
@@ -162,17 +161,17 @@ public class ReflectTest {
 
     @Test
     public void testGetGenericSuperType() {
-        ParameterizedType generic = FsReflect.getGenericSuperType(ZS.class, Z.class);
+        ParameterizedType generic = FsType.getGenericSuperType(ZS.class, Z.class);
         FsLogger.system().info(generic);
         Assert.assertEquals(generic, new TypeRef<Z<String, Integer, Long, Boolean>>() {
         }.getType());
-        generic = FsReflect.getGenericSuperType(new TypeRef<ZB<String>>() {
+        generic = FsType.getGenericSuperType(new TypeRef<ZB<String>>() {
         }.getType(), Z.class);
         FsLogger.system().info(generic);
         Assert.assertEquals(generic, new TypeRef<Z<String, String, Long, Boolean>>() {
         }.getType());
         Assert.assertEquals(
-            FsReflect.getGenericSuperType(new TypeRef<ZB<String>>() {
+            FsType.getGenericSuperType(new TypeRef<ZB<String>>() {
             }.getType(), ZB.class),
             new TypeRef<ZB<String>>() {
             }.getType()
