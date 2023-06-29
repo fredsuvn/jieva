@@ -219,7 +219,7 @@ public class FsType {
     }
 
     private static void parseSuperTypes(Type[] superTypes, @OutParam Map<TypeVariable<?>, Type> typeMap) {
-        if (!FsArray.isEmpty(superTypes)) {
+        if (FsArray.isNotEmpty(superTypes)) {
             for (Type superType : superTypes) {
                 parseSuperGeneric(superType, typeMap);
                 Class<?> superRaw = FsType.getRawType(superType);
@@ -399,7 +399,7 @@ public class FsType {
             } else {
                 sb.append(rawType.getName());
             }
-            if (!FsArray.isEmpty(actualTypeArguments)) {
+            if (FsArray.isNotEmpty(actualTypeArguments)) {
                 sb.append("<");
                 boolean first = true;
                 for (Type t : actualTypeArguments) {

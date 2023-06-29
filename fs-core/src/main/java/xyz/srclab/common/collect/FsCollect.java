@@ -165,6 +165,15 @@ public class FsCollect {
     }
 
     /**
+     * Returns whether given iterable is not null and empty.
+     *
+     * @param iterable given iterable
+     */
+    public static boolean isNotEmpty(@Nullable Iterable<?> iterable) {
+        return !isEmpty(iterable);
+    }
+
+    /**
      * Returns whether given map is null or empty.
      *
      * @param map given map
@@ -174,6 +183,15 @@ public class FsCollect {
             return true;
         }
         return map.isEmpty();
+    }
+
+    /**
+     * Returns whether given map is not null and empty.
+     *
+     * @param map given map
+     */
+    public static boolean isNotEmpty(@Nullable Map<?, ?> map) {
+        return !isEmpty(map);
     }
 
     /**

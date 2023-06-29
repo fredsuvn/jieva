@@ -12,6 +12,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -125,6 +126,8 @@ public class ReflectTest {
         Assert.assertTrue(FsType.isAssignableFrom(int.class, Integer.class));
         Assert.assertTrue(FsType.isAssignableFrom(int.class, int.class));
         Assert.assertFalse(FsType.isAssignableFrom(int.class, Double.class));
+
+//        Map<Object, ? extends String> map = new HashMap<String, String>();
     }
 
     @Test

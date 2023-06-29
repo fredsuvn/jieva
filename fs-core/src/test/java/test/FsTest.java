@@ -81,7 +81,7 @@ public class FsTest {
                     semaphore.release();
                     return;
                 }
-                if (!FsString.isEmpty(output)) {
+                if (FsString.isNotEmpty(output)) {
                     FsLogger.system().info(output);
                 }
                 Fs.sleep(1);

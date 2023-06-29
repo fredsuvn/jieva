@@ -24,7 +24,16 @@ public class FsString {
     }
 
     /**
-     * Returns whether given chars is blank: null, empty or whitespace.
+     * Returns whether given chars is not null and empty.
+     *
+     * @param chars given chars
+     */
+    public static boolean isNotEmpty(@Nullable CharSequence chars) {
+        return !isEmpty(chars);
+    }
+
+    /**
+     * Returns whether given chars is blank (null, empty or whitespace).
      *
      * @param chars given chars
      */
@@ -39,6 +48,15 @@ public class FsString {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns whether given chars is not blank (null, empty or whitespace).
+     *
+     * @param chars given chars
+     */
+    public static boolean isNotBlank(@Nullable CharSequence chars) {
+        return !isBlank(chars);
     }
 
     /**
@@ -104,7 +122,7 @@ public class FsString {
      */
     public static boolean allEmpty(CharSequence... chars) {
         for (CharSequence c : chars) {
-            if (!isEmpty(c)) {
+            if (isNotEmpty(c)) {
                 return false;
             }
         }
@@ -118,7 +136,7 @@ public class FsString {
      */
     public static boolean allBlank(CharSequence... chars) {
         for (CharSequence c : chars) {
-            if (!isBlank(c)) {
+            if (isNotBlank(c)) {
                 return false;
             }
         }

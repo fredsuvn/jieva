@@ -450,7 +450,7 @@ public class Fs {
     public static Process runProcess(String cmd) {
         String[] splits = cmd.split(" ");
         List<String> actualCmd = Arrays.stream(splits)
-            .filter(it -> !FsString.isBlank(it))
+            .filter(FsString::isNotBlank)
             .map(String::trim)
             .collect(Collectors.toList());
         return runProcess(false, actualCmd);

@@ -62,7 +62,7 @@ public class FsArray {
     }
 
     /**
-     * Returns whether given array is not null and not empty.
+     * Returns whether given array is not null and empty.
      *
      * @param array given array
      */

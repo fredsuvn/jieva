@@ -250,7 +250,7 @@ public interface FsBeanResolver {
                             && method.getName().startsWith("get")
                         ) {
                             List<CharSequence> words = methodNamingCase.split(method.getName());
-                            if (!FsCollect.isEmpty(words) && words.size() > 1 && Objects.equals(words.get(0).toString(), "get")) {
+                            if (FsCollect.isNotEmpty(words) && words.size() > 1 && Objects.equals(words.get(0).toString(), "get")) {
                                 return propertyNamingCase.join(words.subList(1, words.size()));
                             }
                         }
@@ -275,7 +275,7 @@ public interface FsBeanResolver {
                             && method.getName().startsWith("set")
                         ) {
                             List<CharSequence> words = methodNamingCase.split(method.getName());
-                            if (!FsCollect.isEmpty(words) && words.size() > 1 && Objects.equals(words.get(0).toString(), "set")) {
+                            if (FsCollect.isNotEmpty(words) && words.size() > 1 && Objects.equals(words.get(0).toString(), "set")) {
                                 return propertyNamingCase.join(words.subList(1, words.size()));
                             }
                         }
