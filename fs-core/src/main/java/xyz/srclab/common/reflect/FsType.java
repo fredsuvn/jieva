@@ -243,6 +243,23 @@ public class FsType {
     }
 
     /**
+     * Replaces matched member type of given type with given replacement type. This method can replace for:
+     * <ul>
+     *     <li>
+     *         ParameterizedType:
+     *     </li>
+     * </ul>
+     *
+     * @param type             given type
+     * @param matcher matched member type
+     * @param replacement given replacement type
+     * @param deep whether to recursively replace unmatched types
+     */
+    public static <T extends Type> T replaceType(T type, Type matcher, Type replacement, boolean deep) {
+        return null;
+    }
+
+    /**
      * Returns a ParameterizedType with given raw type, owner type and actual type arguments.
      *
      * @param rawType             given raw type
@@ -322,11 +339,11 @@ public class FsType {
 
     private static final class FsParameterizedType implements ParameterizedType {
 
-        private final Class<?> rawType;
+        private final Type rawType;
         private final @Nullable Type ownerType;
         private final Type[] actualTypeArguments;
 
-        private FsParameterizedType(Class<?> rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
+        private FsParameterizedType(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
             this.rawType = rawType;
             this.ownerType = ownerType == null ? rawType.getDeclaringClass() : ownerType;
             this.actualTypeArguments = actualTypeArguments;
