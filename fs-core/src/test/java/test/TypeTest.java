@@ -11,17 +11,18 @@ import xyz.srclab.common.reflect.TypeRef;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
-public class ReflectTest {
+public class TypeTest {
 
     @Test
     public void testLastName() {
-        Assert.assertEquals(FsType.getLastName(ReflectTest.class), "ReflectTest");
-        Assert.assertEquals(FsType.getLastName(T.class), "ReflectTest$T");
+        Assert.assertEquals(FsType.getLastName(TypeTest.class), "TypeTest");
+        Assert.assertEquals(FsType.getLastName(T.class), "TypeTest$T");
     }
 
     @Test
@@ -31,18 +32,18 @@ public class ReflectTest {
         }.getType();
         Assert.assertEquals(
             t1.toString(),
-            "test.ReflectTest$T<java.lang.Integer>"
+            "test.TypeTest$T<java.lang.Integer>"
         );
         Type t2 = new TypeRef<T<Integer>.V<String>>() {
         }.getType();
         Assert.assertEquals(
             t2.toString(),
-            "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
+            "test.TypeTest$T<java.lang.Integer>$V<java.lang.String>"
         );
         ParameterizedType p1 = FsType.parameterizedType(T.class, Arrays.asList(Integer.class));
         Assert.assertEquals(
             p1.toString(),
-            "test.ReflectTest$T<java.lang.Integer>"
+            "test.TypeTest$T<java.lang.Integer>"
         );
         Assert.assertEquals(
             t1,
@@ -51,7 +52,7 @@ public class ReflectTest {
         ParameterizedType p2 = FsType.parameterizedType(T.V.class, p1, Arrays.asList(String.class));
         Assert.assertEquals(
             p2.toString(),
-            "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
+            "test.TypeTest$T<java.lang.Integer>$V<java.lang.String>"
         );
         Assert.assertEquals(
             t2,
@@ -128,6 +129,73 @@ public class ReflectTest {
         Assert.assertFalse(FsType.isAssignableFrom(int.class, Double.class));
 
 //        Map<Object, ? extends String> map = new HashMap<String, String>();
+        class SSS<K1, F extends String & Function, K2 extends K1, K3 extends List<? extends String>> {
+
+            private List<? super F> f = new ArrayList<CharSequence>();
+            private F ff = null;
+            private F[] ffs = null;
+            private K2 kk2 = null;
+            private K2[] kk2s = null;
+            private String ss = ff;
+            private Function fc = ff;
+            private K1 kk1 = kk2;
+            private Function[] fs = ffs;
+            private String[] strs = ffs;
+            private K3 k3 = null;
+            private List<? extends CharSequence> ll = k3;
+
+
+            public List<? super F> get() {
+                return f;
+            }
+        }
+
+//        List<? extends String> l = new SSS<String>().get();
+    }
+
+    @Test
+    public void testReplaceType() {
+        Type t = new TypeRef<List<Map<String, List<String>>>>() {
+        }.getType();
+        Type tl = new TypeRef<List<String>>() {
+        }.getType();
+        Assert.assertEquals(
+            FsType.replaceType(t, tl, Integer.class, true),
+            new TypeRef<List<Map<String, Integer>>>() {
+            }.getType()
+        );
+        Type tm = new TypeRef<Map<String, List<String>>>() {
+        }.getType();
+        Assert.assertEquals(
+            FsType.replaceType(tm, String.class, Integer.class, true),
+            new TypeRef<Map<Integer, List<Integer>>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            FsType.replaceType(tm, String.class, Integer.class, false),
+            new TypeRef<Map<Integer, List<String>>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            FsType.replaceType(tm, tm, Integer.class, false),
+            Integer.class
+        );
+
+        Type tw = new TypeRef<Map<String, ? extends List<String>>>() {
+        }.getType();
+        Assert.assertEquals(
+            FsType.replaceType(tw, String.class, Integer.class, true),
+            new TypeRef<Map<Integer, ? extends List<Integer>>>() {
+            }.getType()
+        );
+
+        Type tg = new TypeRef<Map<String, ? extends List<String>>[]>() {
+        }.getType();
+        Assert.assertEquals(
+            FsType.replaceType(tg, String.class, Integer.class, true),
+            new TypeRef<Map<Integer, ? extends List<Integer>>[]>() {
+            }.getType()
+        );
     }
 
     @Test

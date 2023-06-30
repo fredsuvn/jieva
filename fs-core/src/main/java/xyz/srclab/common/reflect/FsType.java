@@ -54,21 +54,37 @@ public class FsType {
     }
 
     /**
-     * Returns upper bound (? extends) of given wildcard type.
-     * If given wildcard type has a lower bounds (? super), return null.
+     * Returns upper bound type of given type (? extends).
+     * If given type has lower bounds (? super), return null.
      *
-     * @param wildcardType given wildcard type
+     * @param type given type
      */
     @Nullable
-    public static Type getUpperBound(WildcardType wildcardType) {
-        Type[] bounds = wildcardType.getUpperBounds();
-        if (FsArray.isNotEmpty(wildcardType.getLowerBounds())) {
+    public static Type getUpperBound(WildcardType type) {
+        Type[] lowerBounds = type.getLowerBounds();
+        if (FsArray.isNotEmpty(lowerBounds)) {
             return null;
         }
-        if (FsArray.isEmpty(bounds)) {
+        Type[] upperBounds = type.getUpperBounds();
+        if (FsArray.isEmpty(upperBounds)) {
             return Object.class;
         }
-        return bounds[0];
+        return upperBounds[0];
+    }
+
+    /**
+     * Returns upper bound type of given type (? super).
+     * If given type has no lower bounds, return null.
+     *
+     * @param type given type
+     */
+    @Nullable
+    public static Type getLowerBound(WildcardType type) {
+        Type[] lowerBounds = type.getLowerBounds();
+        if (FsArray.isEmpty(lowerBounds)) {
+            return null;
+        }
+        return lowerBounds[0];
     }
 
     /**
@@ -117,10 +133,108 @@ public class FsType {
      * @param t2 given type 2
      */
     public static boolean isAssignableFrom(Class<?> t1, Class<?> t2) {
-        if (t1.isAssignableFrom(t2)) {
+        if (t1.isPrimitive() || t2.isPrimitive()) {
+            return toWrapperClass(t1).isAssignableFrom(toWrapperClass(t2));
+        }
+        return t1.isAssignableFrom(t2);
+    }
+
+    /**
+     * Returns whether given type 1 can be assigned by given type 2.
+     * If given type is primitive, it will be converted to its wrapper type.
+     * This method is similar as {@link #isAssignableFrom(Class, Class)} but supports {@link Type}.
+     * <p>
+     * Note in this type, {@link Object} can be assigned from any type, {@link WildcardType} can not assign to any type.
+     *
+     * @param t1 given type 1
+     * @param t2 given type 2
+     */
+    public static boolean isAssignableFrom(Type t1, Type t2) {
+        if (Objects.equals(t1, t2) || Objects.equals(t1, Object.class)) {
             return true;
         }
-        return toWrapperClass(t1).isAssignableFrom(toWrapperClass(t2));
+        if (t2 instanceof WildcardType) {
+            return false;
+        }
+        if (t1 instanceof Class<?>) {
+            Class<?> c1 = (Class<?>) t1;
+            if (t2 instanceof Class<?>) {
+                Class<?> c2 = (Class<?>) t2;
+                return isAssignableFrom(c1, c2);
+            }
+            if (t2 instanceof ParameterizedType) {
+                ParameterizedType p2 = (ParameterizedType) t2;
+                Class<?> r2 = getRawType(p2);
+                return isAssignableFrom(c1, r2);
+            }
+            if (t2 instanceof TypeVariable<?>) {
+                TypeVariable<?> v2 = (TypeVariable<?>) t2;
+                Type[] bounds = v2.getBounds();
+                for (Type bound : bounds) {
+                    if (isAssignableFrom(t1, bound)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            if (t2 instanceof GenericArrayType) {
+                if (!c1.isArray()) {
+                    return false;
+                }
+                GenericArrayType g2 = (GenericArrayType) t2;
+                return isAssignableFrom(c1.getComponentType(), g2.getGenericComponentType());
+            }
+            return false;
+        }
+        if (t1 instanceof ParameterizedType) {
+            ParameterizedType p1 = (ParameterizedType) t1;
+            if (t2 instanceof Class<?>) {
+                ParameterizedType p2 = getGenericSuperType(t2, getRawType(p1));
+                if (p2 == null) {
+                    return false;
+                }
+                return isAssignableFrom(p1, p2);
+            }
+            if (t2 instanceof ParameterizedType) {
+                ParameterizedType p2 = (ParameterizedType) t2;
+                if (Objects.equals(p1.getRawType(), p2.getRawType())) {
+                    Type[] a1 = p1.getActualTypeArguments();
+                    Type[] a2 = p2.getActualTypeArguments();
+                    if (a1.length != a2.length) {
+                        return false;
+                    }
+                    return isAssignableFromForParameterizedType(a1, a2);
+                }
+                ParameterizedType pp2 = getGenericSuperType(p2, getRawType(p1));
+                if (pp2 == null) {
+                    return false;
+                }
+                return isAssignableFrom(p1, pp2);
+            }
+            if (t2 instanceof TypeVariable<?>) {
+                TypeVariable<?> v2 = (TypeVariable<?>) t2;
+                Type[] bounds = v2.getBounds();
+                for (Type bound : bounds) {
+                    if (isAssignableFrom(t1, bound)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            if (t2 instanceof GenericArrayType) {
+                if (!c1.isArray()) {
+                    return false;
+                }
+                GenericArrayType g2 = (GenericArrayType) t2;
+                return isAssignableFrom(c1.getComponentType(), g2.getGenericComponentType());
+            }
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isAssignableFromForParameterizedType(Type[] p1, Type[] p2) {
+        return false;
     }
 
     /**
@@ -140,11 +254,32 @@ public class FsType {
      * <pre>
      *     Z&lt;String, Integer, Long, Boolean>
      * </pre>
+     * Note given type must be subtype of target type, if it is not, return null.
      *
      * @param type   given type
      * @param target target type
      */
+    @Nullable
     public static ParameterizedType getGenericSuperType(Type type, Class<?> target) {
+        boolean supportedType = false;
+        if (type instanceof Class<?>) {
+            supportedType = true;
+            Class<?> cType = (Class<?>) type;
+            if (!target.isAssignableFrom(cType)) {
+                return null;
+            }
+        }
+        if (type instanceof ParameterizedType) {
+            supportedType = true;
+            ParameterizedType pType = (ParameterizedType) type;
+            Class<?> rawType = (Class<?>) pType.getRawType();
+            if (!target.isAssignableFrom(rawType)) {
+                return null;
+            }
+        }
+        if (!supportedType) {
+            return null;
+        }
         TypeVariable<?>[] typeParameters = target.getTypeParameters();
         if (FsArray.isEmpty(typeParameters)) {
             throw new IllegalArgumentException("Given \"to\" type doesn't have type parameter.");
@@ -243,20 +378,134 @@ public class FsType {
     }
 
     /**
-     * Replaces matched member type of given type with given replacement type. This method can replace for:
+     * Replaces the types in given {@code type} (including itself) that same with the {@code matcher}
+     * with {@code replacement}.
+     * This method supports:
      * <ul>
      *     <li>
-     *         ParameterizedType:
+     *         ParameterizedType: rawType, ownerType, actualTypeArguments;
+     *     </li>
+     *     <li>
+     *         WildcardType: upperBounds, lowerBounds;
+     *     </li>
+     *     <li>
+     *         GenericArrayType: componentType;
      *     </li>
      * </ul>
+     * If the {@code deep} parameter is true, this method will recursively replace unmatched types.
+     * <p>
+     * If no type is matched or the type is not supported for replacing, return given type itself.
      *
-     * @param type             given type
-     * @param matcher matched member type
-     * @param replacement given replacement type
-     * @param deep whether to recursively replace unmatched types
+     * @param type        type to be replaced
+     * @param matcher     matcher type
+     * @param replacement replacement type
+     * @param deep        whether to recursively replace unmatched types
      */
-    public static <T extends Type> T replaceType(T type, Type matcher, Type replacement, boolean deep) {
-        return null;
+    public static Type replaceType(Type type, Type matcher, Type replacement, boolean deep) {
+        if (Objects.equals(type, matcher)) {
+            return replacement;
+        }
+        boolean matched = false;
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type rawType = parameterizedType.getRawType();
+            if (Objects.equals(rawType, matcher)) {
+                matched = true;
+                rawType = replacement;
+            } else if (deep) {
+                Type newRawType = replaceType(rawType, matcher, replacement, true);
+                if (!Objects.equals(rawType, newRawType)) {
+                    matched = true;
+                    rawType = newRawType;
+                }
+            }
+            Type ownerType = parameterizedType.getOwnerType();
+            if (Objects.equals(ownerType, matcher)) {
+                matched = true;
+                ownerType = replacement;
+            } else if (ownerType != null && deep) {
+                Type newOwnerType = replaceType(ownerType, matcher, replacement, true);
+                if (!Objects.equals(ownerType, newOwnerType)) {
+                    matched = true;
+                    ownerType = newOwnerType;
+                }
+            }
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            for (int i = 0; i < actualTypeArguments.length; i++) {
+                Type actualTypeArgument = actualTypeArguments[i];
+                if (Objects.equals(actualTypeArgument, matcher)) {
+                    matched = true;
+                    actualTypeArguments[i] = replacement;
+                } else if (deep) {
+                    Type newActualTypeArgument = replaceType(actualTypeArgument, matcher, replacement, true);
+                    if (!Objects.equals(actualTypeArgument, newActualTypeArgument)) {
+                        matched = true;
+                        actualTypeArguments[i] = newActualTypeArgument;
+                    }
+                }
+            }
+            if (matched) {
+                return parameterizedType(rawType, ownerType, actualTypeArguments);
+            } else {
+                return type;
+            }
+        }
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            Type[] upperBounds = wildcardType.getUpperBounds();
+            for (int i = 0; i < upperBounds.length; i++) {
+                Type bound = upperBounds[i];
+                if (Objects.equals(bound, matcher)) {
+                    matched = true;
+                    upperBounds[i] = replacement;
+                } else if (deep) {
+                    Type newBound = replaceType(bound, matcher, replacement, true);
+                    if (!Objects.equals(bound, newBound)) {
+                        matched = true;
+                        upperBounds[i] = newBound;
+                    }
+                }
+            }
+            Type[] lowerBounds = wildcardType.getLowerBounds();
+            for (int i = 0; i < lowerBounds.length; i++) {
+                Type bound = lowerBounds[i];
+                if (Objects.equals(bound, matcher)) {
+                    matched = true;
+                    lowerBounds[i] = replacement;
+                } else if (deep) {
+                    Type newBound = replaceType(bound, matcher, replacement, true);
+                    if (!Objects.equals(bound, newBound)) {
+                        matched = true;
+                        lowerBounds[i] = newBound;
+                    }
+                }
+            }
+            if (matched) {
+                return wildcardType(upperBounds, lowerBounds);
+            } else {
+                return type;
+            }
+        }
+        if (type instanceof GenericArrayType) {
+            GenericArrayType genericArrayType = (GenericArrayType) type;
+            Type componentType = genericArrayType.getGenericComponentType();
+            if (Objects.equals(componentType, matcher)) {
+                matched = true;
+                componentType = replacement;
+            } else if (deep) {
+                Type newComponentType = replaceType(componentType, matcher, replacement, true);
+                if (!Objects.equals(componentType, newComponentType)) {
+                    matched = true;
+                    componentType = newComponentType;
+                }
+            }
+            if (matched) {
+                return genericArrayType(componentType);
+            } else {
+                return type;
+            }
+        }
+        return type;
     }
 
     /**
@@ -267,7 +516,7 @@ public class FsType {
      * @param actualTypeArguments actual type arguments
      */
     public static ParameterizedType parameterizedType(
-        Class<?> rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
+        Type rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
         return new FsParameterizedType(rawType, ownerType, FsCollect.toArray(actualTypeArguments, Type.class));
     }
 
@@ -277,7 +526,7 @@ public class FsType {
      * @param rawType             given raw type
      * @param actualTypeArguments actual type arguments
      */
-    public static ParameterizedType parameterizedType(Class<?> rawType, Iterable<Type> actualTypeArguments) {
+    public static ParameterizedType parameterizedType(Type rawType, Iterable<Type> actualTypeArguments) {
         return parameterizedType(rawType, null, actualTypeArguments);
     }
 
@@ -289,7 +538,7 @@ public class FsType {
      * @param actualTypeArguments actual type arguments
      */
     public static ParameterizedType parameterizedType(
-        Class<?> rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
+        Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
         return new FsParameterizedType(rawType, ownerType, actualTypeArguments);
     }
 
@@ -299,7 +548,7 @@ public class FsType {
      * @param rawType             given raw type
      * @param actualTypeArguments actual type arguments
      */
-    public static ParameterizedType parameterizedType(Class<?> rawType, Type[] actualTypeArguments) {
+    public static ParameterizedType parameterizedType(Type rawType, Type[] actualTypeArguments) {
         return parameterizedType(rawType, null, actualTypeArguments);
     }
 
@@ -345,7 +594,8 @@ public class FsType {
 
         private FsParameterizedType(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
             this.rawType = rawType;
-            this.ownerType = ownerType == null ? rawType.getDeclaringClass() : ownerType;
+            this.ownerType = ownerType == null ?
+                ((rawType instanceof Class) ? ((Class<?>) rawType).getDeclaringClass() : null) : ownerType;
             this.actualTypeArguments = actualTypeArguments;
         }
 
@@ -401,7 +651,7 @@ public class FsType {
                 //test.A<String>
                 sb.append(ownerType.getTypeName());
                 //test.A$B
-                String rawTypeName = rawType.getName();
+                String rawTypeName = rawType.getTypeName();
                 //test.A
                 String ownerRawTypeName;
                 if (ownerType instanceof ParameterizedType) {
@@ -414,7 +664,7 @@ public class FsType {
                 //test.A<String>$B
                 sb.append(lastName);
             } else {
-                sb.append(rawType.getName());
+                sb.append(rawType.getTypeName());
             }
             if (FsArray.isNotEmpty(actualTypeArguments)) {
                 sb.append("<");
