@@ -40,9 +40,11 @@ public class FsType {
 
     /**
      * Returns raw type of given type, the given type must be a Class or ParameterizedType.
+     * Returns null if given type neither be Class nor ParameterizedType.
      *
      * @param type given type
      */
+    @Nullable
     public static Class<?> getRawType(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
@@ -50,7 +52,7 @@ public class FsType {
         if (type instanceof ParameterizedType) {
             return (Class<?>) ((ParameterizedType) type).getRawType();
         }
-        throw new IllegalArgumentException("Given type must be Class or ParameterizedType.");
+        return null;
     }
 
     /**
@@ -85,6 +87,55 @@ public class FsType {
             return null;
         }
         return lowerBounds[0];
+    }
+
+    /**
+     * Returns field of specified name from given type (first getField then getDeclaredField).
+     * Returns null if not found.
+     *
+     * @param type given type
+     * @param name specified field name
+     */
+    @Nullable
+    public static Field getField(Type type, String name) {
+        Class<?> rawType = getRawType(type);
+        if (rawType == null) {
+            return null;
+        }
+        try {
+            return rawType.getField(name);
+        } catch (NoSuchFieldException e) {
+            try {
+                return rawType.getDeclaredField(name);
+            } catch (NoSuchFieldException ex) {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Returns method of specified name from given type (first getField then getDeclaredField).
+     * Returns null if not found.
+     *
+     * @param type           given type
+     * @param name           specified method name
+     * @param parameterTypes parameter types
+     */
+    @Nullable
+    public static Method getMethod(Type type, String name, Class<?>... parameterTypes) {
+        Class<?> rawType = getRawType(type);
+        if (rawType == null) {
+            return null;
+        }
+        try {
+            return rawType.getMethod(name, parameterTypes);
+        } catch (NoSuchMethodException e) {
+            try {
+                return rawType.getDeclaredMethod(name, parameterTypes);
+            } catch (NoSuchMethodException ex) {
+                return null;
+            }
+        }
     }
 
     /**
@@ -144,7 +195,8 @@ public class FsType {
      * If given type is primitive, it will be converted to its wrapper type.
      * This method is similar as {@link #isAssignableFrom(Class, Class)} but supports {@link Type}.
      * <p>
-     * Note in this type, {@link Object} can be assigned from any type, {@link WildcardType} can not assign to any type.
+     * Note in this type, {@link Object} can be assigned from any type,
+     * {@link WildcardType} can not assign to or be assigned from any type.
      *
      * @param t1 given type 1
      * @param t2 given type 2
@@ -153,7 +205,9 @@ public class FsType {
         if (Objects.equals(t1, t2) || Objects.equals(t1, Object.class)) {
             return true;
         }
-        if (t2 instanceof WildcardType) {
+        if ((t1 instanceof TypeVariable<?>)
+            || (t1 instanceof WildcardType)
+            || (t2 instanceof WildcardType)) {
             return false;
         }
         if (t1 instanceof Class<?>) {
@@ -165,6 +219,9 @@ public class FsType {
             if (t2 instanceof ParameterizedType) {
                 ParameterizedType p2 = (ParameterizedType) t2;
                 Class<?> r2 = getRawType(p2);
+                if (r2 == null) {
+                    return false;
+                }
                 return isAssignableFrom(c1, r2);
             }
             if (t2 instanceof TypeVariable<?>) {
@@ -182,14 +239,18 @@ public class FsType {
                     return false;
                 }
                 GenericArrayType g2 = (GenericArrayType) t2;
-                return isAssignableFrom(c1.getComponentType(), g2.getGenericComponentType());
+                Class<?> gc2 = getRawType(g2.getGenericComponentType());
+                if (gc2 == null) {
+                    return false;
+                }
+                return isAssignableFrom(c1.getComponentType(), gc2);
             }
             return false;
         }
         if (t1 instanceof ParameterizedType) {
             ParameterizedType p1 = (ParameterizedType) t1;
             if (t2 instanceof Class<?>) {
-                ParameterizedType p2 = getGenericSuperType(t2, getRawType(p1));
+                ParameterizedType p2 = getGenericSuperType(t2, (Class<?>) p1.getRawType());
                 if (p2 == null) {
                     return false;
                 }
@@ -200,16 +261,23 @@ public class FsType {
                 if (Objects.equals(p1.getRawType(), p2.getRawType())) {
                     Type[] a1 = p1.getActualTypeArguments();
                     Type[] a2 = p2.getActualTypeArguments();
-                    if (a1.length != a2.length) {
+                    if (a1 == null || a2 == null || a1.length != a2.length) {
                         return false;
                     }
-                    return isAssignableFromForParameterizedType(a1, a2);
+                    for (int i = 0; i < a1.length; i++) {
+                        Type at1 = a1[i];
+                        Type at2 = a2[i];
+                        if (!isAssignableFromForParameterizedType(at1, at2)) {
+                            return false;
+                        }
+                    }
+                    return true;
                 }
-                ParameterizedType pp2 = getGenericSuperType(p2, getRawType(p1));
-                if (pp2 == null) {
+                ParameterizedType sp2 = getGenericSuperType(p2, (Class<?>) p1.getRawType());
+                if (sp2 == null) {
                     return false;
                 }
-                return isAssignableFrom(p1, pp2);
+                return isAssignableFrom(p1, sp2);
             }
             if (t2 instanceof TypeVariable<?>) {
                 TypeVariable<?> v2 = (TypeVariable<?>) t2;
@@ -221,19 +289,81 @@ public class FsType {
                 }
                 return false;
             }
-            if (t2 instanceof GenericArrayType) {
-                if (!c1.isArray()) {
+            return false;
+        }
+        if (t1 instanceof TypeVariable<?>) {
+            TypeVariable<?> v1 = (TypeVariable<?>) t1;
+            if (t2 instanceof TypeVariable<?>) {
+                TypeVariable<?> v2 = (TypeVariable<?>) t2;
+                Type[] bounds = v2.getBounds();
+                for (Type bound : bounds) {
+                    if (isAssignableFrom(t1, bound)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        if (t1 instanceof GenericArrayType) {
+            GenericArrayType g1 = (GenericArrayType) t1;
+            if (t2 instanceof Class<?>) {
+                Class<?> c2 = (Class<?>) t2;
+                if (!c2.isArray()) {
                     return false;
                 }
+                Class<?> tc1 = getRawType(g1.getGenericComponentType());
+                if (tc1 == null) {
+                    return false;
+                }
+                Class<?> tc2 = c2.getComponentType();
+                return isAssignableFrom(tc1, tc2);
+            }
+            if (t2 instanceof GenericArrayType) {
                 GenericArrayType g2 = (GenericArrayType) t2;
-                return isAssignableFrom(c1.getComponentType(), g2.getGenericComponentType());
+                Type tc1 = g1.getGenericComponentType();
+                Type tc2 = g2.getGenericComponentType();
+                return isAssignableFrom(tc1, tc2);
             }
             return false;
         }
         return false;
     }
 
-    private static boolean isAssignableFromForParameterizedType(Type[] p1, Type[] p2) {
+    private static boolean isAssignableFromForParameterizedType(Type t1, Type t2) {
+        if (Objects.equals(t1, t2)) {
+            return true;
+        }
+        if (t1 instanceof WildcardType) {
+            WildcardType w1 = (WildcardType) t1;
+            Type upperBound = getUpperBound(w1);
+            //? extends
+            if (upperBound != null) {
+                if (t2 instanceof WildcardType) {
+                    WildcardType w2 = (WildcardType) t2;
+                    Type upperBound2 = getUpperBound(w2);
+                    //? extends
+                    if (upperBound2 != null) {
+                        return isAssignableFrom(upperBound, upperBound2);
+                    }
+                    return false;
+                }
+                return isAssignableFrom(upperBound, t2);
+            }
+            Type lowerBound = getLowerBound(w1);
+            //? super
+            if (lowerBound != null) {
+                if (t2 instanceof WildcardType) {
+                    WildcardType w2 = (WildcardType) t2;
+                    Type lowerBound2 = getLowerBound(w2);
+                    //? super
+                    if (lowerBound2 != null) {
+                        return isAssignableFrom(lowerBound2, lowerBound);
+                    }
+                    return false;
+                }
+                return isAssignableFrom(t2, lowerBound);
+            }
+        }
         return false;
     }
 
@@ -357,9 +487,11 @@ public class FsType {
         if (FsArray.isNotEmpty(superTypes)) {
             for (Type superType : superTypes) {
                 parseSuperGeneric(superType, typeMap);
-                Class<?> superRaw = FsType.getRawType(superType);
-                Type[] superSuperTypes = superRaw.getGenericInterfaces();
-                parseSuperTypes(superSuperTypes, typeMap);
+                Class<?> superRaw = getRawType(superType);
+                if (superRaw != null) {
+                    Type[] superSuperTypes = superRaw.getGenericInterfaces();
+                    parseSuperTypes(superSuperTypes, typeMap);
+                }
             }
         }
     }

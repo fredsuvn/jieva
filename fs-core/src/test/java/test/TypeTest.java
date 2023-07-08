@@ -11,11 +11,7 @@ import xyz.srclab.common.reflect.TypeRef;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.*;
 
 public class TypeTest {
 
@@ -128,29 +124,78 @@ public class TypeTest {
         Assert.assertTrue(FsType.isAssignableFrom(int.class, int.class));
         Assert.assertFalse(FsType.isAssignableFrom(int.class, Double.class));
 
-//        Map<Object, ? extends String> map = new HashMap<String, String>();
-        class SSS<K1, F extends String & Function, K2 extends K1, K3 extends List<? extends String>> {
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<List<String>>() {
+            }.getType(),
+            new TypeRef<List<String>>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<List<? extends CharSequence>>() {
+            }.getType(),
+            new TypeRef<List<String>>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<List<? extends CharSequence>>() {
+            }.getType(),
+            new TypeRef<List<? extends String>>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<List<? super String>>() {
+            }.getType(),
+            new TypeRef<List<CharSequence>>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<List<? super String>>() {
+            }.getType(),
+            new TypeRef<List<? super CharSequence>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<List<List<List<List<? super String>>>>>() {
+            }.getType(),
+            new TypeRef<List<List<List<List<? super CharSequence>>>>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<List<? super String>>() {
+            }.getType(),
+            new TypeRef<List<? extends CharSequence>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<List<CharSequence>>() {
+            }.getType(),
+            new TypeRef<List<String>>() {
+            }.getType()
+        ));
+        class TAF<
+            F1,
+            F2 extends F1,
+            F3 extends CharSequence,
+            F4 extends Number & CharSequence,
+            F5 extends Collection<String>,
+            F6 extends Collection<? extends CharSequence>,
+            F7 extends Collection<? super String>
+            > {
 
-            private List<? super F> f = new ArrayList<CharSequence>();
-            private F ff = null;
-            private F[] ffs = null;
-            private K2 kk2 = null;
-            private K2[] kk2s = null;
-            private String ss = ff;
-            private Function fc = ff;
-            private K1 kk1 = kk2;
-            private Function[] fs = ffs;
-            private String[] strs = ffs;
-            private K3 k3 = null;
-            private List<? extends CharSequence> ll = k3;
-
-
-            public List<? super F> get() {
-                return f;
-            }
+            private F1 f1 = null;
+            private F2 f2 = null;
+            private F3 f3 = null;
+            private F4 f4 = null;
+            private F5 f5 = null;
+            private F6 f6 = null;
+            private F7 f7 = null;
+            private F2[] f2s = null;
+            private F1[] f1s = f2s;
+            private F1 f11 = f2;
+            private List<? super CharSequence> ll = null;
+            private List<? super String> list = ll;
         }
 
-//        List<? extends String> l = new SSS<String>().get();
     }
 
     @Test
@@ -247,6 +292,9 @@ public class TypeTest {
             new TypeRef<ZB<String>>() {
             }.getType()
         );
+
+        Assert.assertNull(FsType.getGenericSuperType(Z.class, ZS.class));
+        Assert.assertNull(FsType.getGenericSuperType(ZB.class, ZS.class));
     }
 
     private static final class T<W> {

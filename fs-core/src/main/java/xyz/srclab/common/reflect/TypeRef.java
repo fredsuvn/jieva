@@ -44,6 +44,9 @@ public abstract class TypeRef<T> {
             }
         }
         ParameterizedType parameterizedType = FsType.getGenericSuperType(generic, TypeRef.class);
+        if (parameterizedType == null) {
+            throw new IllegalStateException("Current type is not subtype of TypeRef: " + getClass().getName());
+        }
         return parameterizedType.getActualTypeArguments()[0];
     }
 
