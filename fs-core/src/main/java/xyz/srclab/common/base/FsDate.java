@@ -15,12 +15,22 @@ import java.util.Date;
 public class FsDate {
 
     /**
+     * Returns a new Date format.
+     */
+    public static DateFormat dateFormat(String pattern) {
+        return new SimpleDateFormat(pattern);
+    }
+
+    /**
      * Formats given date with given pattern.
      *
      * @param date    given date
      * @param pattern given pattern
      */
     public static String format(Date date, String pattern) {
+        if (date == null || pattern == null) {
+            return null;
+        }
         return dateFormat(pattern).format(date);
     }
 
@@ -45,13 +55,6 @@ public class FsDate {
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    /**
-     * Returns a new Date format.
-     */
-    public static DateFormat dateFormat(String pattern) {
-        return new SimpleDateFormat(pattern);
     }
 
     /**

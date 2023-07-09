@@ -172,6 +172,54 @@ public class TypeTest {
             new TypeRef<List<String>>() {
             }.getType()
         ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<List<? extends List<? extends List<? extends CharSequence>>>>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends CharSequence>>>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<List<? extends List<? extends List<CharSequence>>>>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<Collection[]>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<Collection<? extends Object>[]>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<Collection<Object>[]>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<Collection[]>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<Collection<Object>[]>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
+            }.getType()
+        ));
         class TAF<
             F1,
             F2 extends F1,
@@ -179,7 +227,8 @@ public class TypeTest {
             F4 extends Number & CharSequence,
             F5 extends Collection<String>,
             F6 extends Collection<? extends CharSequence>,
-            F7 extends Collection<? super String>
+            F7 extends Collection<? super String>,
+            F8 extends F2
             > {
 
             private F1 f1 = null;
@@ -191,11 +240,48 @@ public class TypeTest {
             private F7 f7 = null;
             private F2[] f2s = null;
             private F1[] f1s = f2s;
+            private F8 f8 = null;
             private F1 f11 = f2;
+            private F1 f12 = f8;
             private List<? super CharSequence> ll = null;
             private List<? super String> list = ll;
         }
-
+        TypeVariable<?>[] tvs = TAF.class.getTypeParameters();
+        Assert.assertTrue(FsType.isAssignableFrom(
+            tvs[0],
+            tvs[1]
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            tvs[0],
+            tvs[2]
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            tvs[0],
+            tvs[7]
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            FsType.getField(TAF.class, "f1s").getGenericType(),
+            FsType.getField(TAF.class, "f2s").getGenericType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            FsType.getField(TAF.class, "f2s").getGenericType(),
+            FsType.getField(TAF.class, "f1s").getGenericType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            tvs[5],
+            new TypeRef<List<String>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            tvs[5],
+            new TypeRef<List<Integer>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<Collection<CharSequence>>() {
+            }.getType(),
+            tvs[6]
+        ));
     }
 
     @Test
@@ -240,6 +326,13 @@ public class TypeTest {
             FsType.replaceType(tg, String.class, Integer.class, true),
             new TypeRef<Map<Integer, ? extends List<Integer>>[]>() {
             }.getType()
+        );
+
+        Type ts = new TypeRef<Map<String, ? extends List<String>>[]>() {
+        }.getType();
+        Assert.assertSame(
+            FsType.replaceType(ts, Integer.class, Integer.class, true),
+            ts
         );
     }
 

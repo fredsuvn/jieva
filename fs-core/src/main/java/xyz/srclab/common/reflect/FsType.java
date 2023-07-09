@@ -205,8 +205,7 @@ public class FsType {
         if (Objects.equals(t1, t2) || Objects.equals(t1, Object.class)) {
             return true;
         }
-        if ((t1 instanceof TypeVariable<?>)
-            || (t1 instanceof WildcardType)
+        if ((t1 instanceof WildcardType)
             || (t2 instanceof WildcardType)) {
             return false;
         }
