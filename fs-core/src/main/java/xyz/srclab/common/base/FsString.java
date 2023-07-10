@@ -515,6 +515,24 @@ public class FsString {
     }
 
     /**
+     * Returns whether each char of two char sequence at same index are equal.
+     *
+     * @param cs1 char sequence 1
+     * @param cs2 char sequence 2
+     */
+    public static boolean charEquals(CharSequence cs1, CharSequence cs2) {
+        if (cs1.length() != cs2.length()) {
+            return false;
+        }
+        for (int i = 0; i < cs1.length(); i++) {
+            if (cs1.charAt(i) != cs2.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns a string follows:
      * <ul>
      * <li>returns String.valueOf for given object if it is not an array;</li>

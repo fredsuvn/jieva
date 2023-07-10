@@ -3,24 +3,15 @@ package xyz.srclab.common.convert.handlers;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.convert.FsConvertHandler;
 import xyz.srclab.common.convert.FsConverter;
+import xyz.srclab.common.reflect.FsType;
 
 import java.lang.reflect.Type;
-import java.util.Objects;
 
 /**
- * Convert handler implementation supports converting between assignable types, such as:
- * <ul>
- *     <li>
- *         Same types;
- *     </li>
- *     <li>
- *         Target type is assignable from source type;
- *     </li>
- *     <li>
- *         If source object is null, return null.
- *     </li>
- * </ul>
- * This handler always return source object if the converting is supported.
+ * Convert handler implementation which checks whether {@code targetType} can be assigned from {@code fromType}
+ * (by {@link FsType#isAssignableFrom(Type, Type)}),
+ * if the {@code obj} is null or it can not be assigned, return {@link #NOT_SUPPORTED},
+ * else return the {@code obj} it self.
  *
  * @author fredsuvn
  */
@@ -29,16 +20,11 @@ public class AssignableConvertHandler implements FsConvertHandler {
     @Override
     public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
         if (obj == null) {
-            return null;
+            return NOT_SUPPORTED;
         }
-        if (Objects.equals(fromType, targetType)) {
+        if (FsType.isAssignableFrom(targetType, fromType)) {
             return obj;
         }
-        if (fromType instanceof Class && targetType instanceof Class<?>) {
-            if (((Class<?>) targetType).isAssignableFrom((Class<?>) fromType)) {
-                return obj;
-            }
-        }
-        return FsConvertHandler.NOT_SUPPORTED;
+        return NOT_SUPPORTED;
     }
 }

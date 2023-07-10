@@ -1,5 +1,6 @@
 package test;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsString;
@@ -173,6 +174,47 @@ public class StringTest {
         Assert.assertEquals(
             FsString.subRef("12345678", 2, 7).subSequence(1, 3).toString(),
             "45"
+        );
+    }
+
+    @Test
+    public void testEqual() {
+        Assert.assertTrue(
+            FsString.charEquals("123", "123")
+        );
+        Assert.assertTrue(
+            FsString.charEquals("123", "1123".substring(1))
+        );
+        Assert.assertFalse(
+            FsString.charEquals("1234", "123")
+        );
+        Assert.assertTrue(
+            FsString.charEquals("123", new CharSequence() {
+                @Override
+                public int length() {
+                    return 3;
+                }
+
+                @Override
+                public char charAt(int index) {
+                    if (index == 0) {
+                        return '1';
+                    }
+                    if (index == 1) {
+                        return '2';
+                    }
+                    if (index == 2) {
+                        return '3';
+                    }
+                    return ' ';
+                }
+
+                @NotNull
+                @Override
+                public CharSequence subSequence(int start, int end) {
+                    return null;
+                }
+            })
         );
     }
 }

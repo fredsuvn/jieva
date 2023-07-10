@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -17,8 +18,15 @@ public class FsDate {
     /**
      * Returns a new Date format.
      */
-    public static DateFormat dateFormat(String pattern) {
-        return new SimpleDateFormat(pattern);
+    public static DateFormat dateFormat(CharSequence pattern) {
+        return new SimpleDateFormat(pattern.toString());
+    }
+
+    /**
+     * Returns default date time formatter : {@link FsProps#DATE_FORMATTER}.
+     */
+    public static DateTimeFormatter dateFormatter() {
+        return DATE_FORMATTER;
     }
 
     /**
@@ -27,7 +35,7 @@ public class FsDate {
      * @param date    given date
      * @param pattern given pattern
      */
-    public static String format(Date date, String pattern) {
+    public static String format(Date date, CharSequence pattern) {
         if (date == null || pattern == null) {
             return null;
         }
@@ -49,9 +57,9 @@ public class FsDate {
      * @param date    given date string
      * @param pattern given pattern
      */
-    public static Date parse(String date, String pattern) {
+    public static Date parse(CharSequence date, CharSequence pattern) {
         try {
-            return dateFormat(pattern).parse(date);
+            return dateFormat(pattern).parse(date.toString());
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
@@ -62,7 +70,7 @@ public class FsDate {
      *
      * @param date given date string
      */
-    public static Date parse(String date) {
+    public static Date parse(CharSequence date) {
         return parse(date, FsProps.DATE_PATTERN);
     }
 

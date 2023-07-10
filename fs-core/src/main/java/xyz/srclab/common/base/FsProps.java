@@ -43,13 +43,6 @@ public class FsProps {
     }
 
     /**
-     * Returns default date time formatter : {@link #DATE_FORMATTER}.
-     */
-    public static DateTimeFormatter dateFormatter() {
-        return DATE_FORMATTER;
-    }
-
-    /**
      * Returns default IO buffer size: {@link #IO_BUFFER_SIZE}.
      */
     public static int ioBufferSize() {
