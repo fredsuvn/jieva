@@ -381,7 +381,7 @@ public class FsCollect {
      * @param stack stack to store the historical values
      */
     @Nullable
-    public static <T> T nestedGet(Map<?, T> map, T key, Set<T> stack) {
+    public static <T> T getNested(Map<?, T> map, T key, Set<T> stack) {
         T cur = key;
         stack.add(cur);
         while (true) {

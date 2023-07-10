@@ -185,12 +185,8 @@ public interface FsBeanResolver {
             }
 
             public FsBean resolve0(Type type) {
-                Class<?> rawType;
-                if (type instanceof Class) {
-                    rawType = (Class<?>) type;
-                } else if (type instanceof ParameterizedType) {
-                    rawType = ((Class<?>) ((ParameterizedType) type).getRawType());
-                } else {
+                Class<?> rawType = FsType.getRawType(type);
+                if (rawType == null)  {
                     throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType.");
                 }
                 Method[] methods = rawType.getMethods();
@@ -290,7 +286,7 @@ public interface FsBeanResolver {
                     return type;
                 }
                 stack.clear();
-                Type result = FsCollect.nestedGet(typeParameterMapping, type, stack);
+                Type result = FsCollect.getNested(typeParameterMapping, type, stack);
                 if (result == null) {
                     return type;
                 }
@@ -345,7 +341,8 @@ public interface FsBeanResolver {
                     if (!(o instanceof FsBeanImpl)) {
                         return false;
                     }
-                    return Objects.equals(properties, ((FsBeanImpl) o).properties);
+                    return Objects.equals(type, ((FsBeanImpl) o).type)
+                        && Objects.equals(properties, ((FsBeanImpl) o).properties);
                 }
 
                 @Override
@@ -424,7 +421,8 @@ public interface FsBeanResolver {
                         Collections.unmodifiableList(Arrays.asList(setter.getAnnotations()));
                     fieldAnnotations = field == null ? Collections.emptyList() :
                         Collections.unmodifiableList(Arrays.asList(field.getAnnotations()));
-                    List<Annotation> annotations = new ArrayList<>(getterAnnotations.size() + setterAnnotations.size() + fieldAnnotations.size());
+                    List<Annotation> annotations = new ArrayList<>(
+                        getterAnnotations.size() + setterAnnotations.size() + fieldAnnotations.size());
                     annotations.addAll(getterAnnotations);
                     annotations.addAll(setterAnnotations);
                     annotations.addAll(fieldAnnotations);

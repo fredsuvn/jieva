@@ -417,7 +417,7 @@ public class FsType {
         Set<Type> stack = new HashSet<>();
         List<Type> actualTypeArguments = Arrays.stream(typeParameters)
             .map(it -> {
-                Type nestedValue = FsCollect.nestedGet(typeArguments, it, stack);
+                Type nestedValue = FsCollect.getNested(typeArguments, it, stack);
                 stack.clear();
                 return nestedValue == null ? it : nestedValue;
             }).collect(Collectors.toList());
