@@ -223,6 +223,11 @@ public class TypeTest {
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
             }.getType()
         ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<Map<String, String>>() {
+            }.getType(),
+            Map.class
+        ));
         class TAF<
             F1,
             F2 extends F1,

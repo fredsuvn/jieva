@@ -6,12 +6,13 @@ import xyz.srclab.common.cache.FsCache;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.*;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
 import java.util.Date;
 
 /**
@@ -27,6 +28,11 @@ public class FsDate {
     public static final String PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
 
     /**
+     * Default date pattern: "yyyy-MM-dd HH:mm:ss".
+     */
+    public static final String PATTERN_SECOND = "yyyy-MM-dd HH:mm:ss";
+
+    /**
      * Default date pattern with offset: "yyyy-MM-dd HH:mm:ss.SSS ZZZ".
      */
     public static final String PATTERN_OFFSET = "yyyy-MM-dd HH:mm:ss.SSS ZZZ";
@@ -35,6 +41,11 @@ public class FsDate {
      * Default date formatter of {@link #PATTERN}.
      */
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(PATTERN);
+
+    /**
+     * Default date formatter of {@link #PATTERN_SECOND}.
+     */
+    public static final DateTimeFormatter FORMATTER_SECOND = DateTimeFormatter.ofPattern(PATTERN_SECOND);
 
     /**
      * Default date formatter of {@link #PATTERN_OFFSET}.
@@ -61,6 +72,8 @@ public class FsDate {
     public static DateTimeFormatter toFormatter(CharSequence pattern) {
         if (FsString.charEquals(PATTERN, pattern)) {
             return FORMATTER;
+        } else if (FsString.charEquals(PATTERN_SECOND, pattern)) {
+            return FORMATTER_SECOND;
         } else if (FsString.charEquals(PATTERN_OFFSET, pattern)) {
             return FORMATTER_OFFSET;
         } else {
@@ -170,6 +183,15 @@ public class FsDate {
     }
 
     /**
+     * Returns zone offset from given zone id.
+     *
+     * @param zoneId given zone id
+     */
+    public static ZoneOffset toZoneOffset(ZoneId zoneId) {
+        return zoneId.getRules().getOffset(Instant.now());
+    }
+
+    /**
      * Guesses and returns pattern of given date string.
      * It can match these pattern:
      * <ul>
@@ -183,7 +205,7 @@ public class FsDate {
      *     <li>10:15:30+01:00: HH:mm:ssZZZZZ</li>
      *     <li>10:15:30 +0100: HH:mm:ss ZZZ</li>
      *     <li>2011-12-03T10:15:30: yyyy-MM-dd'T'HH:mm:ss</li>
-     *     <li>2011-12-03 10:15:30: yyyy-MM-dd HH:mm:ss</li>
+     *     <li>2011-12-03 10:15:30: {@link #PATTERN_SECOND}</li>
      *     <li>2011-12-03T10:15:30+01:00: yyyy-MM-dd'T'HH:mm:ssZZZZZ</li>
      *     <li>2011-12-03T10:15:30 +0100: yyyy-MM-dd'T'HH:mm:ss ZZZ</li>
      *     <li>2011-12-03 10:15:30 +0100: yyyy-MM-dd HH:mm:ss ZZZ</li>
@@ -230,7 +252,7 @@ public class FsDate {
                 if (date.charAt(10) == 'T') {
                     return "yyyy-MM-dd'T'HH:mm:ss";
                 }
-                return "yyyy-MM-dd HH:mm:ss";
+                return PATTERN_SECOND;
             //2011-12-03T10:15:30+01:00 / 2011-12-03T10:15:30 +0100 / 2011-12-03 10:15:30 +0100
             case 25:
                 if (date.charAt(10) == 'T') {
@@ -254,23 +276,27 @@ public class FsDate {
     }
 
     /**
-     * Returns Instant from given temporal.
+     * Returns Instant from given temporal, or null if failed.
+     *
      * @param temporal given temporal
      */
+    @Nullable
     public static Instant toInstant(TemporalAccessor temporal) {
         if (temporal instanceof Instant) {
             return (Instant) temporal;
         }
-        long seconds = 0;
-        long nanos = 0;
-        if (temporal.isSupported(ChronoField.INSTANT_SECONDS)){
+        long seconds;
+        if (temporal.isSupported(ChronoField.INSTANT_SECONDS)) {
             seconds = temporal.getLong(ChronoField.INSTANT_SECONDS);
+        } else {
+            return null;
         }
-        if (temporal.isSupported(ChronoField.NANO_OF_SECOND)){
+        long nanos = 0;
+        if (temporal.isSupported(ChronoField.NANO_OF_SECOND)) {
             nanos = temporal.getLong(ChronoField.NANO_OF_SECOND);
         } else if (temporal.isSupported(ChronoField.MICRO_OF_SECOND)) {
             nanos = temporal.getLong(ChronoField.MICRO_OF_SECOND) * 1000;
-        }else if (temporal.isSupported(ChronoField.MILLI_OF_SECOND)) {
+        } else if (temporal.isSupported(ChronoField.MILLI_OF_SECOND)) {
             nanos = temporal.getLong(ChronoField.MILLI_OF_SECOND) * 1000_000;
         }
         return Instant.ofEpochSecond(seconds, nanos);
