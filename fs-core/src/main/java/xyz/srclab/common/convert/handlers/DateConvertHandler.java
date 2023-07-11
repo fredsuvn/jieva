@@ -85,12 +85,21 @@
 //    private final PatternFunction pattern;
 //
 //    /**
-//     * Constructs with default pattern function:
+//     * Constructs with default pattern function.
+//     * The default pattern function will attempt to match patterns in:
+//     * <ul>
+//     *     <li>yyyyMMdd</li>
+//     *     <li>yyyy-MM-dd</li>
+//     *     <li>hh:mm:ss</li>
+//     *     <li>hh:mm:ss.SSS</li>
+//     *     <li>yyyy-MM-dd hh:mm:ss.SSS</li>
+//     * </ul>
 //     * If length of date string is 8, pattern is "yyyyMMdd";
 //     * If length of date string is 12, pattern is "hh:mm:ss.SSS";
 //     * Else pattern is {@link FsProps#DATE_PATTERN}.
 //     */
 //    public DateConvertHandler() {
+//        DateTimeFormatter.ISO_DATE
 //        this.pattern =
 //            cs -> {
 //            switch (cs.length()) {

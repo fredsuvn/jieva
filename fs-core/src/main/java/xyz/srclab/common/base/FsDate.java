@@ -23,39 +23,19 @@ public class FsDate {
     public static final String PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
 
     /**
-     * Date pattern: "yyyy-MM-dd".
+     * Default date pattern with offset: "yyyy-MM-dd HH:mm:ss.SSS ZZZ".
      */
-    public static final String PATTERN_yyyyMMdd = "yyyy-MM-dd";
+    public static final String PATTERN_OFFSET = "yyyy-MM-dd HH:mm:ss.SSS ZZZ";
 
     /**
-     * Date pattern: "HH:mm:ss".
-     */
-    public static final String PATTERN_HHmmss = "HH:mm:ss";
-
-    /**
-     * Date pattern: "HH:mm:ss.SSS".
-     */
-    public static final String PATTERN_HHmmssSSS = "HH:mm:ss.SSS";
-
-    /**
-     * Default date formatter: "yyyy-MM-dd HH:mm:ss.SSS".
+     * Default date formatter of {@link #PATTERN}.
      */
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(PATTERN);
 
     /**
-     * Date formatter: "yyyy-MM-dd".
+     * Default date formatter of {@link #PATTERN_OFFSET}.
      */
-    public static final DateTimeFormatter FORMATTER_yyyyMMdd = DateTimeFormatter.ofPattern(PATTERN_yyyyMMdd);
-
-    /**
-     * Date formatter: "HH:mm:ss".
-     */
-    public static final DateTimeFormatter FORMATTER_HHmmss = DateTimeFormatter.ofPattern(PATTERN_HHmmss);
-
-    /**
-     * Date formatter: "HH:mm:ss.SSS".
-     */
-    public static final DateTimeFormatter FORMATTER_HHmmssSSS = DateTimeFormatter.ofPattern(PATTERN_HHmmssSSS);
+    public static final DateTimeFormatter FORMATTER_OFFSET = DateTimeFormatter.ofPattern(PATTERN_OFFSET);
 
     /**
      * Returns a new Date format.
@@ -118,7 +98,7 @@ public class FsDate {
         if (date == null || FsString.isEmpty(pattern)) {
             return null;
         }
-        return dateFormat(pattern).format(date);
+        return format(date, pattern);
     }
 
     /**
@@ -129,7 +109,7 @@ public class FsDate {
      */
     @Nullable
     public static String toString(@Nullable Date date) {
-        return format(date, PATTERN);
+        return toString(date, PATTERN);
     }
 
     /**
@@ -144,11 +124,7 @@ public class FsDate {
         if (FsString.isEmpty(date) || FsString.isEmpty(pattern)) {
             return null;
         }
-        try {
-            return dateFormat(pattern).parse(date.toString());
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return parse(date, pattern);
     }
 
     /**
@@ -159,7 +135,7 @@ public class FsDate {
      */
     @Nullable
     public static Date toDate(@Nullable CharSequence date) {
-        return parse(date, PATTERN);
+        return toDate(date, PATTERN);
     }
 
     /**
@@ -167,5 +143,85 @@ public class FsDate {
      */
     public static ZoneOffset currentZoneOffset() {
         return ZonedDateTime.now().getOffset();
+    }
+
+    /**
+     * Guesses and returns pattern of given date string.
+     * It can match these pattern:
+     * <ul>
+     *     <li>20111203: yyyyMMdd</li>
+     *     <li>10:15:30: HH:mm:ss</li>
+     *     <li>2011-12-03: yyyy-MM-dd</li>
+     *     <li>2011-12-03+01:00: yyyy-MM-ddZZZZZ</li>
+     *     <li>2011-12-03 +0100: yyyy-MM-dd ZZZ</li>
+     *     <li>10:15: HH:mm</li>
+     *     <li>10:15:30.500: HH:mm:ss.SSS</li>
+     *     <li>10:15:30+01:00: HH:mm:ssZZZZZ</li>
+     *     <li>10:15:30 +0100: HH:mm:ss ZZZ</li>
+     *     <li>2011-12-03T10:15:30: yyyy-MM-dd'T'HH:mm:ss</li>
+     *     <li>2011-12-03 10:15:30: yyyy-MM-dd HH:mm:ss</li>
+     *     <li>2011-12-03T10:15:30+01:00: yyyy-MM-dd'T'HH:mm:ssZZZZZ</li>
+     *     <li>2011-12-03T10:15:30 +0100: yyyy-MM-dd'T'HH:mm:ss ZZZ</li>
+     *     <li>2011-12-03 10:15:30 +0100: yyyy-MM-dd HH:mm:ss ZZZ</li>
+     *     <li>2011-12-03 10:15:30.500: {@link #PATTERN}</li>
+     *     <li>2011-12-03 10:15:30.500 +0100: {@link #PATTERN_OFFSET}</li>
+     * </ul>
+     * Return null if no matched pattern.
+     *
+     * @param date date string
+     */
+    @Nullable
+    public static String toPattern(String date) {
+        switch (date.length()) {
+            //20111203, 10:15:30
+            case 8:
+                if (date.charAt(2) == ':' && date.charAt(5) == ':') {
+                    return "HH:mm:ss";
+                }
+                return "yyyyMMdd";
+            //2011-12-03
+            case 10:
+                return "yyyy-MM-dd";
+            //2011-12-03+01:00 / 2011-12-03 +0100
+            case 16:
+                if (date.charAt(10) == ' ') {
+                    return "yyyy-MM-dd ZZZ";
+                }
+                return "yyyy-MM-ddZZZZZ";
+            //10:15
+            case 5:
+                return "HH:mm";
+            //10:15:30.500
+            case 12:
+                return "HH:mm:ss.SSS";
+            //10:15:30+01:00 / 10:15:30 +0100
+            case 14:
+                if (date.charAt(8) == ' ') {
+                    return "HH:mm:ss ZZZ";
+                }
+                return "HH:mm:ssZZZZZ";
+            //2011-12-03T10:15:30 / 2011-12-03 10:15:30
+            case 19:
+                if (date.charAt(10) == 'T') {
+                    return "yyyy-MM-dd'T'HH:mm:ss";
+                }
+                return "yyyy-MM-dd HH:mm:ss";
+            //2011-12-03T10:15:30+01:00 / 2011-12-03T10:15:30 +0100 / 2011-12-03 10:15:30 +0100
+            case 25:
+                if (date.charAt(10) == 'T') {
+                    if (date.charAt(19) == ' ') {
+                        return "yyyy-MM-dd'T'HH:mm:ss ZZZ";
+                    }
+                    return "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
+                }
+                return "yyyy-MM-dd HH:mm:ss ZZZ";
+            //2011-12-03 10:15:30.500
+            case 23:
+                return PATTERN;
+            //2011-12-03 10:15:30.500 +0100
+            case 29:
+                return PATTERN_OFFSET;
+        }
+        return null;
     }
 }
