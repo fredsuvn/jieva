@@ -1,7 +1,6 @@
 package xyz.srclab.common.io;
 
 import xyz.srclab.common.base.FsCheck;
-import xyz.srclab.common.base.FsProps;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,7 +36,7 @@ final class WriterOutputStream extends OutputStream {
     }
 
     WriterOutputStream(Writer writer, Charset charset) {
-        this(writer, charset, FsProps.ioBufferSize());
+        this(writer, charset, FsIO.IO_BUFFER_SIZE);
     }
 
     @Override

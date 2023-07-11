@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotations.Nullable;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -13,6 +14,11 @@ import java.util.function.Supplier;
  * @author fredsuvn
  */
 public class FsString {
+
+    /**
+     * Default charset: UTF-8.
+     */
+    public static final Charset CHARSET = StandardCharsets.UTF_8;
 
     /**
      * Returns whether given chars is null or empty.
@@ -612,12 +618,12 @@ public class FsString {
     }
 
     /**
-     * Encodes given string to bytes with default charset {@link FsProps#charset()}.
+     * Encodes given string to bytes with default charset {@link #CHARSET}.
      *
      * @param chars given string
      */
     public static byte[] toBytes(CharSequence chars) {
-        return toBytes(chars, FsProps.charset());
+        return toBytes(chars, CHARSET);
     }
 
     /**

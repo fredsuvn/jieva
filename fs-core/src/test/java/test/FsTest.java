@@ -2,7 +2,10 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.*;
+import xyz.srclab.common.base.Fs;
+import xyz.srclab.common.base.FsLogger;
+import xyz.srclab.common.base.FsString;
+import xyz.srclab.common.base.FsSystem;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.IOException;
@@ -52,10 +55,10 @@ public class FsTest {
     @Test
     public void testRes() throws IOException {
         URL f1 = Fs.findRes("/t2/f1.txt");
-        Assert.assertEquals(FsIO.readString(f1.openStream(), FsProps.charset(), true), "f1.txt");
+        Assert.assertEquals(FsIO.readString(f1.openStream(), FsString.CHARSET, true), "f1.txt");
         Set<URL> set = Fs.findAllRes("/t2/f2.txt");
         for (URL url : set) {
-            Assert.assertEquals(FsIO.readString(url.openStream(), FsProps.charset(), true), "f2.txt");
+            Assert.assertEquals(FsIO.readString(url.openStream(), FsString.CHARSET, true), "f2.txt");
         }
     }
 

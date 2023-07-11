@@ -150,7 +150,7 @@ public interface FsLogger {
         StringBuilder printInfo = new StringBuilder();
         Thread thread = Thread.currentThread();
         printInfo
-            .append("[").append(FsProps.dateFormatter().format(log.date)).append("]")
+            .append("[").append(FsDate.FORMATTER.format(log.date)).append("]")
             .append("[").append(toLevelDescription(log.level)).append("]");
         if (log.stackTrace != null) {
             printInfo

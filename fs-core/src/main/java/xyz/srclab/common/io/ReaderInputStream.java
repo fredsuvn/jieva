@@ -1,7 +1,6 @@
 package xyz.srclab.common.io;
 
 import xyz.srclab.common.base.FsCheck;
-import xyz.srclab.common.base.FsProps;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +39,7 @@ final class ReaderInputStream extends InputStream {
     }
 
     ReaderInputStream(Reader reader, Charset charset) {
-        this(reader, charset, FsProps.ioBufferSize());
+        this(reader, charset, FsIO.IO_BUFFER_SIZE);
     }
 
     private void fillBuffer() throws IOException {
