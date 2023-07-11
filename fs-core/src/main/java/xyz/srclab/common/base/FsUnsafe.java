@@ -37,6 +37,7 @@ public final class FsUnsafe {
         private static final Map<String, FsCache<?>> CACHE_MAP = new ConcurrentHashMap<>();
         public static final String ENUM = "ENUM";
         public static final String TYPE_PARAMETER_MAPPING = "TYPE_PARAMETER_MAPPING";
+        public static final String DATE_TIME_FORMATTER = "DATE_TIME_FORMATTER";
 
         public static void registerCache(String key, FsCache<?> cache) {
             CACHE_MAP.put(key, cache);
