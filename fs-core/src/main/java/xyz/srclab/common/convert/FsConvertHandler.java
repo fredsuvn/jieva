@@ -18,10 +18,17 @@ public interface FsConvertHandler {
 
     /**
      * Convert given object from specified type to target type.
-     * If current handler cannot convert or convert failed, it will return {@link #NOT_SUPPORTED},
-     * otherwise, it returns converted value.
+     * If current handler doesn't support this converting, return {@link #NOT_SUPPORTED}.
      * <p>
-     * Note given object and the return value may be null.
+     * <b>NOTE:</b>
+     * <ul>
+     *     <li>
+     *         Given object may be null;
+     *     </li>
+     *     <li>
+     *         Converting result may be null;
+     *     </li>
+     * </ul>
      *
      * @param obj        given object
      * @param fromType   specified type

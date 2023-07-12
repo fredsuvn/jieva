@@ -228,6 +228,15 @@ public class TypeTest {
             }.getType(),
             Map.class
         ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            Object[].class,
+            new TypeRef<Map<String, String>[]>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            Object[].class,
+            Object[][].class
+        ));
         class TAF<
             F1,
             F2 extends F1,
