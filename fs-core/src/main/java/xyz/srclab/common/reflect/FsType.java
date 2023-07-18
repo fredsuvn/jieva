@@ -57,6 +57,17 @@ public class FsType {
     }
 
     /**
+     * Returns actual type argument of given parameterized type at specified index
+     *
+     * @param type  given parameterized type
+     * @param index specified index
+     */
+    public static Type getActualTypeArgument(ParameterizedType type, int index) {
+        Type[] args = type.getActualTypeArguments();
+        return args[index];
+    }
+
+    /**
      * Returns upper bound type of given type (? extends).
      * If given type has lower bounds (? super), return null.
      *

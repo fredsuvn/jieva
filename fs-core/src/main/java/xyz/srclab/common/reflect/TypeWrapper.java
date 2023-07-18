@@ -92,7 +92,7 @@ public abstract class TypeWrapper<T extends Type> {
     }
 
     /**
-     * Returns actual type argument at specified index of wrapped type.
+     * Returns actual type argument of wrapped type at specified index.
      * This method is only supported for {@link ParameterizedType}.
      *
      * @param index specified index
@@ -146,7 +146,7 @@ public abstract class TypeWrapper<T extends Type> {
     }
 
     /**
-     * Returns type variable upper bound ({@link TypeVariable#getBounds()}) at specified index of wrapped type.
+     * Returns type variable upper bound ({@link TypeVariable#getBounds()}) of wrapped type at specified index.
      * This method is only supported for {@link TypeVariable}.
      *
      * @param index specified index
@@ -172,8 +172,8 @@ public abstract class TypeWrapper<T extends Type> {
     }
 
     /**
-     * Returns type variable annotated bound ({@link TypeVariable#getAnnotatedBounds()})
-     * at specified index of wrapped type.
+     * Returns type variable annotated bound ({@link TypeVariable#getAnnotatedBounds()}) of wrapped type
+     * at specified index.
      * This method is only supported for {@link TypeVariable}.
      *
      * @param index specified index

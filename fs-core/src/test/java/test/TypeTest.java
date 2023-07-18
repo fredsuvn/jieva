@@ -493,6 +493,11 @@ public class TypeTest {
 
         Assert.assertNull(FsType.getGenericSuperType(Z.class, ZS.class));
         Assert.assertNull(FsType.getGenericSuperType(ZB.class, ZS.class));
+
+        Assert.assertEquals(
+            FsType.getGenericSuperType(Iterable.class, Iterable.class),
+            FsType.parameterizedType(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
+        );
     }
 
     private static final class T<W> {

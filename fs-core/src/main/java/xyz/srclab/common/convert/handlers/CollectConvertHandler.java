@@ -1,18 +1,18 @@
-//package xyz.srclab.common.convert.handlers;
+// package xyz.srclab.common.convert.handlers;
 //
-//import xyz.srclab.annotations.Nullable;
-//import xyz.srclab.common.base.FsArray;
-//import xyz.srclab.common.convert.FsConvertHandler;
-//import xyz.srclab.common.convert.FsConverter;
-//import xyz.srclab.common.reflect.FsType;
+// import xyz.srclab.annotations.Nullable;
+// import xyz.srclab.common.base.FsArray;
+// import xyz.srclab.common.convert.FsConvertHandler;
+// import xyz.srclab.common.convert.FsConverter;
+// import xyz.srclab.common.reflect.FsType;
 //
-//import java.lang.reflect.Array;
-//import java.lang.reflect.GenericArrayType;
-//import java.lang.reflect.ParameterizedType;
-//import java.lang.reflect.Type;
-//import java.util.*;
+// import java.lang.reflect.Array;
+// import java.lang.reflect.GenericArrayType;
+// import java.lang.reflect.ParameterizedType;
+// import java.lang.reflect.Type;
+// import java.util.*;
 //
-///**
+// /**
 // * Convert handler implementation supports converting collections.
 // * It supports target type in:
 // * <ul>
@@ -22,7 +22,7 @@
 // *
 // * @author fredsuvn
 // */
-//public class CollectConvertHandler implements FsConvertHandler {
+// public class CollectConvertHandler implements FsConvertHandler {
 //
 //    @Override
 //    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
@@ -53,7 +53,7 @@
 //                    if (itType == null) {
 //                        return NOT_SUPPORTED;
 //                    }
-////                    Type fromComponentType = itType.get
+// //                    Type fromComponentType = itType.get
 //                    return convertArray(obj, )
 //                }
 //            } else if (fromType instanceof GenericArrayType) {
@@ -189,4 +189,4 @@
 //        }
 //        return null;
 //    }
-//}
+// }

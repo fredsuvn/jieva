@@ -10,10 +10,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Converter to convert object from original type to specified type.
+ * Converter to convert object from one type to another.
  * <p>
- * The {@link FsConverter} uses a list of handler: {@link #convertHandlers()} to convert objects.
- * It will try one by one from the handlers util one return target value.
+ * A {@link FsConverter} consists of a list of handlers -- {@link FsConvertHandler}.
+ * The conversion operation is performed by the handlers one by one in the order of the list,
+ * until a non-{@link FsConvertHandler#NOT_SUPPORTED} result is obtained or all the handlers have been exhausted.
+ * If any handler returns a non-{@link FsConvertHandler#NOT_SUPPORTED} result, the result will be obtained by converter
+ * and remaining handlers will not be called.
+ * If all handlers return {@link FsConvertHandler#NOT_SUPPORTED}, it indicates that the operation is
+ * not supported by that converter.
  *
  * @author fredsuvn
  */
