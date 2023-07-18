@@ -2,6 +2,7 @@ package xyz.srclab.common.reflect;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.OutParam;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.base.FsUnsafe;
@@ -136,6 +137,82 @@ public class FsType {
                 return null;
             }
         }
+    }
+
+    /**
+     * Returns array class of given component type.
+     *
+     * @param componentType given component type
+     */
+    public static Class<?> arrayClass(Type componentType) {
+        return arrayClass(componentType, Fs.getClassLoader());
+    }
+
+    /**
+     * Returns array class of given component type.
+     *
+     * @param componentType given component type
+     * @param classLoader   class loader
+     */
+    public static Class<?> arrayClass(Type componentType, ClassLoader classLoader) {
+        if (componentType instanceof Class) {
+            String name;
+            if (((Class<?>) componentType).isArray()) {
+                name = "[" + ((Class<?>) componentType).getName();
+            } else if (Objects.equals(boolean.class, componentType)) {
+                name = "[Z";
+            } else if (Objects.equals(byte.class, componentType)) {
+                name = "[B";
+            } else if (Objects.equals(short.class, componentType)) {
+                name = "[S";
+            } else if (Objects.equals(char.class, componentType)) {
+                name = "[C";
+            } else if (Objects.equals(int.class, componentType)) {
+                name = "[I";
+            } else if (Objects.equals(long.class, componentType)) {
+                name = "[J";
+            } else if (Objects.equals(float.class, componentType)) {
+                name = "[F";
+            } else if (Objects.equals(double.class, componentType)) {
+                name = "[D";
+            } else if (Objects.equals(void.class, componentType)) {
+                name = "[V";
+            } else {
+                name = "[L" + ((Class<?>) componentType).getName() + ";";
+            }
+            try {
+                return Class.forName(name, true, classLoader);
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        if (componentType instanceof ParameterizedType) {
+            return arrayClass(((ParameterizedType) componentType).getRawType(), classLoader);
+        }
+        if (componentType instanceof GenericArrayType) {
+            String name = "";
+            Type cur = componentType;
+            do {
+                name += "[";
+                if (cur instanceof GenericArrayType) {
+                    cur = ((GenericArrayType) cur).getGenericComponentType();
+                } else if (cur instanceof Class) {
+                    name += "L" + ((Class<?>) cur).getName() + ";";
+                    break;
+                } else if (cur instanceof ParameterizedType) {
+                    name += "L" + ((Class<?>) ((ParameterizedType) cur).getRawType()).getName() + ";";
+                    break;
+                } else {
+                    throw new IllegalArgumentException("Unsupported component type: " + componentType);
+                }
+            } while (true);
+            try {
+                return Class.forName(name, true, classLoader);
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        throw new IllegalArgumentException("Unsupported component type: " + componentType);
     }
 
     /**

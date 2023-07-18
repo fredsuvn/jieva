@@ -3,6 +3,9 @@ package xyz.srclab.common.base;
 import xyz.srclab.annotations.Nullable;
 
 import java.lang.reflect.Array;
+import java.util.AbstractList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -128,5 +131,294 @@ public class FsArray {
         }
         T value = array[index];
         return value == null ? defaultValue : value;
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static <T> List<T> asList(T[] array) {
+        return Arrays.asList(array);
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static List<Boolean> asList(boolean[] array) {
+        return new BooleanArrayList(array);
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static List<Byte> asList(byte[] array) {
+        return new ByteArrayList(array);
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static List<Short> asList(short[] array) {
+        return new ShortArrayList(array);
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static List<Character> asList(char[] array) {
+        return new CharacterArrayList(array);
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static List<Integer> asList(int[] array) {
+        return new IntegerArrayList(array);
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static List<Long> asList(long[] array) {
+        return new LongArrayList(array);
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static List<Float> asList(float[] array) {
+        return new FloatArrayList(array);
+    }
+
+    /**
+     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     *
+     * @param array given array
+     */
+    public static List<Double> asList(double[] array) {
+        return new DoubleArrayList(array);
+    }
+
+    private static final class BooleanArrayList extends AbstractList<Boolean> {
+
+        private final boolean[] array;
+
+        private BooleanArrayList(boolean[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Boolean get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public Boolean set(int index, Boolean element) {
+            Boolean old = array[index];
+            array[index] = element;
+            return old;
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+    }
+
+    private static final class ByteArrayList extends AbstractList<Byte> {
+
+        private final byte[] array;
+
+        private ByteArrayList(byte[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Byte get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public Byte set(int index, Byte element) {
+            Byte old = array[index];
+            array[index] = element;
+            return old;
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+    }
+
+    private static final class ShortArrayList extends AbstractList<Short> {
+
+        private final short[] array;
+
+        private ShortArrayList(short[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Short get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public Short set(int index, Short element) {
+            short old = array[index];
+            array[index] = element;
+            return old;
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+    }
+
+    private static final class CharacterArrayList extends AbstractList<Character> {
+
+        private final char[] array;
+
+        private CharacterArrayList(char[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Character get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public Character set(int index, Character element) {
+            Character old = array[index];
+            array[index] = element;
+            return old;
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+    }
+
+    private static final class IntegerArrayList extends AbstractList<Integer> {
+
+        private final int[] array;
+
+        private IntegerArrayList(int[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Integer get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public Integer set(int index, Integer element) {
+            Integer old = array[index];
+            array[index] = element;
+            return old;
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+    }
+
+    private static final class LongArrayList extends AbstractList<Long> {
+
+        private final long[] array;
+
+        private LongArrayList(long[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Long get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public Long set(int index, Long element) {
+            Long old = array[index];
+            array[index] = element;
+            return old;
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+    }
+
+    private static final class FloatArrayList extends AbstractList<Float> {
+
+        private final float[] array;
+
+        private FloatArrayList(float[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Float get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public Float set(int index, Float element) {
+            Float old = array[index];
+            array[index] = element;
+            return old;
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+    }
+
+    private static final class DoubleArrayList extends AbstractList<Double> {
+
+        private final double[] array;
+
+        private DoubleArrayList(double[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Double get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public Double set(int index, Double element) {
+            Double old = array[index];
+            array[index] = element;
+            return old;
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
     }
 }

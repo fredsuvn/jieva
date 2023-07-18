@@ -516,4 +516,11 @@ public class Fs {
             throw new IllegalStateException(e);
         }
     }
+
+    /**
+     * Returns default class loader: {@link Thread#getContextClassLoader()}.
+     */
+    public static ClassLoader getClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
 }

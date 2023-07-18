@@ -7,6 +7,7 @@ import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
+import xyz.srclab.common.reflect.TypeWrapper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -22,6 +23,67 @@ public class TypeTest {
     public void testLastName() {
         Assert.assertEquals(FsType.getLastName(TypeTest.class), "TypeTest");
         Assert.assertEquals(FsType.getLastName(T.class), "TypeTest$T");
+    }
+
+    @Test
+    public void testArrayClass() {
+        Assert.assertEquals(
+            FsType.arrayClass(Object.class),
+            Object[].class
+        );
+        Assert.assertEquals(
+            FsType.arrayClass(new TypeRef<List<? extends String>>() {
+            }.getType()),
+            List[].class
+        );
+        Assert.assertEquals(
+            FsType.arrayClass(new TypeRef<List<? extends String>[]>() {
+            }.getType()),
+            List[][].class
+        );
+        Assert.assertEquals(
+            FsType.arrayClass(new TypeRef<List<? extends String>[][]>() {
+            }.getType()),
+            List[][][].class
+        );
+    }
+
+    @Test
+    public void testWrapper() {
+        Assert.assertEquals(
+            TypeWrapper.from(new TypeRef<List<?>>() {
+            }.getType()),
+            TypeWrapper.from(new TypeRef<List<?>>() {
+            }.getType())
+        );
+        Assert.assertSame(
+            TypeWrapper.from(new TypeRef<List<?>>() {
+            }.getType()),
+            TypeWrapper.from(new TypeRef<List<?>>() {
+            }.getType())
+        );
+        Assert.assertNotSame(
+            TypeWrapper.from(new TypeRef<List<?>>() {
+            }.getType()),
+            TypeWrapper.newWrapper(new TypeRef<List<?>>() {
+            }.getType())
+        );
+        Assert.assertEquals(
+            TypeWrapper.from(new TypeRef<List<?>>() {
+            }.getType()),
+            TypeWrapper.newWrapper(new TypeRef<List<?>>() {
+            }.getType())
+        );
+        TypeWrapper<?> typeWrapper = TypeWrapper.from(new TypeRef<Map<String, Integer>>() {
+        }.getType());
+        Assert.assertEquals(
+            typeWrapper.getActualTypeArgument(0),
+            String.class
+        );
+        Assert.assertEquals(
+            typeWrapper.getActualTypeArgument(1),
+            Integer.class
+        );
     }
 
     @Test
@@ -176,6 +238,24 @@ public class TypeTest {
             }.getType()
         ));
         Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<Collection<?>>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<Collection<?>>() {
+            }.getType(),
+            new TypeRef<Collection<?>>() {
+            }.getType()
+        ));
+        Assert.assertFalse(FsType.isAssignableFrom(
+            new TypeRef<Collection<Object>>() {
+            }.getType(),
+            new TypeRef<Collection<?>>() {
+            }.getType()
+        ));
+        Assert.assertTrue(FsType.isAssignableFrom(
             new TypeRef<List<? extends List<? extends List<? extends CharSequence>>>>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
@@ -223,6 +303,14 @@ public class TypeTest {
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
             }.getType()
         ));
+        Assert.assertTrue(FsType.isAssignableFrom(
+            new TypeRef<Collection<?>[][]>() {
+            }.getType(),
+            new TypeRef<List<? extends List<? extends List<? extends String>>>[][]>() {
+            }.getType()
+        ));
+//        List<? extends List<? extends List<? extends String>>>[][] l = null;
+//        Collection<? extends Object>[][] c = l;
         Assert.assertFalse(FsType.isAssignableFrom(
             new TypeRef<Map<String, String>>() {
             }.getType(),
