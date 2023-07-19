@@ -42,6 +42,19 @@ public class FsCollect {
     }
 
     /**
+     * If given element is collection, return itself as collection type, else puts all given elements into a new
+     * {@link LinkedList} and returns.
+     *
+     * @param elements given elements
+     */
+    public static <T> Collection<T> asOrToCollection(Iterable<T> elements) {
+        if (elements instanceof Collection) {
+            return (Collection<T>) elements;
+        }
+        return toCollection(new LinkedList<>(), elements);
+    }
+
+    /**
      * Puts all given key-values into dest map, and returns the dest map.
      * <p>
      * The key-values is an array of which elements are in order of key followed by value,

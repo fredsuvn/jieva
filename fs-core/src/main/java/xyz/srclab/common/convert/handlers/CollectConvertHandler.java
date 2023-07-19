@@ -1,192 +1,231 @@
-// package xyz.srclab.common.convert.handlers;
-//
-// import xyz.srclab.annotations.Nullable;
-// import xyz.srclab.common.base.FsArray;
-// import xyz.srclab.common.convert.FsConvertHandler;
-// import xyz.srclab.common.convert.FsConverter;
-// import xyz.srclab.common.reflect.FsType;
-//
-// import java.lang.reflect.Array;
-// import java.lang.reflect.GenericArrayType;
-// import java.lang.reflect.ParameterizedType;
-// import java.lang.reflect.Type;
-// import java.util.*;
-//
-// /**
-// * Convert handler implementation supports converting collections.
-// * It supports target type in:
-// * <ul>
-// *     <li>{@link Iterable}</li>
-// * </ul>
-// * Note if the {@code obj} is null, return {@link #NOT_SUPPORTED}.
-// *
-// * @author fredsuvn
-// */
-// public class CollectConvertHandler implements FsConvertHandler {
-//
-//    @Override
-//    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
-//        if (obj == null) {
-//            return NOT_SUPPORTED;
-//        }
-//        if (targetType instanceof Class) {
-//            return convertClass(obj, fromType, (Class<?>) targetType, converter);
-//        }
-//        if (targetType instanceof ParameterizedType) {
-//            return convertParameterized(obj, fromType, (ParameterizedType) targetType, converter);
-//        }
-//        if (targetType instanceof GenericArrayType) {
-//            return convertGenericArray(obj, fromType, (GenericArrayType) targetType, converter);
-//        }
-//        return NOT_SUPPORTED;
-//    }
-//
-//    @Nullable
-//    private Object convertClass(Object obj, Type fromType, Class<?> targetType, FsConverter converter) {
-//        if (targetType.isArray()) {
-//            if (fromType instanceof Class) {
-//                if (((Class<?>) fromType).isArray()) {
-//                    Class<?> targetComponentType = targetType.getComponentType();
-//                    return convertArray(arrayAsList(obj), ((Class<?>) fromType).getComponentType(), targetComponentType, converter);
-//                } else {
-//                    ParameterizedType itType = FsType.getGenericSuperType(fromType, Iterable.class);
-//                    if (itType == null) {
-//                        return NOT_SUPPORTED;
-//                    }
-// //                    Type fromComponentType = itType.get
-//                    return convertArray(obj, )
-//                }
-//            } else if (fromType instanceof GenericArrayType) {
-//                Class<?> targetComponentType = targetType.getComponentType();
-//                return convertArray(arrayAsList(obj), ((GenericArrayType) fromType).getGenericComponentType(), targetComponentType, converter);
-//            } else {
-//                return NOT_SUPPORTED;
-//            }
-//        } else if (Objects.equals(targetType, List.class)
-//            || Objects.equals(targetType, ArrayList.class)
-//            || Objects.equals(targetType, Collection.class)
-//            || Objects.equals(targetType, Iterable.class)) {
-//            if (obj instanceof Collection) {
-//                Collection<?> collection = (Collection<?>) obj;
-//                return new ArrayList<>(collection);
-//            }
-//            if (obj instanceof Iterable) {
-//                Iterable<?> it = (Iterable<?>) obj;
-//                LinkedList<? super Object> list = new LinkedList<>();
-//                for (Object o : it) {
-//                    list.add(o);
-//                }
-//                return new ArrayList<>(list);
-//            }
-//        } else if (Objects.equals(targetType, LinkedList.class)) {
-//            if (obj instanceof Collection) {
-//                Collection<?> collection = (Collection<?>) obj;
-//                return new LinkedList<>(collection);
-//            }
-//            if (obj instanceof Iterable) {
-//                Iterable<?> it = (Iterable<?>) obj;
-//                LinkedList<? super Object> list = new LinkedList<>();
-//                for (Object o : it) {
-//                    list.add(o);
-//                }
-//                return list;
-//            }
-//        } else if (Objects.equals(targetType, Set.class)
-//            || Objects.equals(targetType, LinkedHashSet.class)) {
-//            if (obj instanceof Collection) {
-//                Collection<?> collection = (Collection<?>) obj;
-//                return new LinkedHashSet<>(collection);
-//            }
-//            if (obj instanceof Iterable) {
-//                Iterable<?> it = (Iterable<?>) obj;
-//                LinkedHashSet<? super Object> set = new LinkedHashSet<>();
-//                for (Object o : it) {
-//                    set.add(o);
-//                }
-//                return set;
-//            }
-//        } else if (Objects.equals(targetType, HashSet.class)) {
-//            if (obj instanceof Collection) {
-//                Collection<?> collection = (Collection<?>) obj;
-//                return new HashSet<>(collection);
-//            }
-//            if (obj instanceof Iterable) {
-//                Iterable<?> it = (Iterable<?>) obj;
-//                HashSet<? super Object> set = new HashSet<>();
-//                for (Object o : it) {
-//                    set.add(o);
-//                }
-//                return set;
-//            }
-//        } else if (Objects.equals(targetType, TreeSet.class)) {
-//            if (obj instanceof Collection) {
-//                Collection<?> collection = (Collection<?>) obj;
-//                return new TreeSet<>(collection);
-//            }
-//            if (obj instanceof Iterable) {
-//                Iterable<?> it = (Iterable<?>) obj;
-//                TreeSet<? super Object> set = new TreeSet<>();
-//                for (Object o : it) {
-//                    set.add(o);
-//                }
-//                return set;
-//            }
-//        }
-//        return NOT_SUPPORTED;
-//    }
-//
-//    @Nullable
-//    private Object convertCollection(Object obj, Type fromType, Type targetType, FsConverter converter) {
-//        return NOT_SUPPORTED;
-//    }
-//
-//    @Nullable
-//    private Object convertArray(List<?> srcList, Type fromComponentType, Type targetComponentType, FsConverter converter) {
-//        if (srcList == null) {
-//            return NOT_SUPPORTED;
-//        }
-//        Class<?> targetArrayClass = FsType.arrayClass(targetComponentType);
-//        Object targetArray = FsArray.newArray(targetArrayClass.getComponentType(), srcList.size());
-//        for (int i = 0; i < srcList.size(); i++) {
-//            Object srcValue = srcList.get(i);
-//            Object targetValue = converter.convert(srcValue, fromComponentType, targetComponentType);
-//            if (targetValue == NOT_SUPPORTED) {
-//                return NOT_SUPPORTED;
-//            }
-//            Array.set(targetArray, i, targetValue);
-//        }
-//        return targetArray;
-//    }
-//
-//    @Nullable
-//    private List<?> arrayAsList(Object array) {
-//        if (array instanceof Object[]) {
-//            return FsArray.asList((Object[]) array);
-//        }
-//        if (array instanceof boolean[]) {
-//            return FsArray.asList((boolean[]) array);
-//        }
-//        if (array instanceof byte[]) {
-//            return FsArray.asList((byte[]) array);
-//        }
-//        if (array instanceof short[]) {
-//            return FsArray.asList((short[]) array);
-//        }
-//        if (array instanceof char[]) {
-//            return FsArray.asList((char[]) array);
-//        }
-//        if (array instanceof int[]) {
-//            return FsArray.asList((int[]) array);
-//        }
-//        if (array instanceof long[]) {
-//            return FsArray.asList((long[]) array);
-//        }
-//        if (array instanceof float[]) {
-//            return FsArray.asList((float[]) array);
-//        }
-//        if (array instanceof double[]) {
-//            return FsArray.asList((double[]) array);
-//        }
-//        return null;
-//    }
-// }
+package xyz.srclab.common.convert.handlers;
+
+import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.FsArray;
+import xyz.srclab.common.collect.FsCollect;
+import xyz.srclab.common.convert.FsConvertHandler;
+import xyz.srclab.common.convert.FsConverter;
+import xyz.srclab.common.reflect.FsType;
+import xyz.srclab.common.reflect.GenericInfo;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.IntFunction;
+
+/**
+ * Convert handler implementation which is used to support the conversion of collection types.
+ * It supports target type in:
+ * <ul>
+ *     <li>{@link Iterable}</li>
+ * </ul>
+ * Note if the {@code obj} is null, return {@link #CONTINUE}.
+ *
+ * @author fredsuvn
+ */
+public class CollectConvertHandler implements FsConvertHandler {
+
+    private static final Map<Class<?>, Generator> GENERATOR_MAP = new ConcurrentHashMap<>();
+
+    static {
+        GENERATOR_MAP.put(Iterable.class, new Generator(true, ArrayList::new));
+        GENERATOR_MAP.put(Collection.class, new Generator(true, LinkedHashSet::new));
+        GENERATOR_MAP.put(List.class, new Generator(true, ArrayList::new));
+        GENERATOR_MAP.put(ArrayList.class, new Generator(true, ArrayList::new));
+        GENERATOR_MAP.put(LinkedList.class, new Generator(false, size -> new LinkedList<>()));
+        GENERATOR_MAP.put(CopyOnWriteArrayList.class, new Generator(false, size -> new CopyOnWriteArrayList<>()));
+        GENERATOR_MAP.put(Set.class, new Generator(true, LinkedHashSet::new));
+        GENERATOR_MAP.put(LinkedHashSet.class, new Generator(true, LinkedHashSet::new));
+        GENERATOR_MAP.put(HashSet.class, new Generator(false, size -> new HashSet<>()));
+        GENERATOR_MAP.put(TreeSet.class, new Generator(false, size -> new TreeSet<>()));
+        GENERATOR_MAP.put(ConcurrentSkipListSet.class, new Generator(false, size -> new ConcurrentSkipListSet<>()));
+    }
+
+    @Override
+    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
+        if (obj == null) {
+            return CONTINUE;
+        }
+        if (targetType instanceof Class) {
+            if (((Class<?>) targetType).isArray()) {
+                GenericInfo<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
+                if (fromInfo == null) {
+                    return CONTINUE;
+                }
+                return convertArray(fromInfo, ((Class<?>) targetType).getComponentType(), converter);
+            }
+            return convertIterableType(obj, fromType, targetType, converter);
+        } else if (targetType instanceof GenericArrayType) {
+            GenericInfo<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
+            if (fromInfo == null) {
+                return CONTINUE;
+            }
+            return convertArray(fromInfo, ((GenericArrayType) targetType).getGenericComponentType(), converter);
+        }
+        return convertIterableType(obj, fromType, targetType, converter);
+    }
+
+    @Nullable
+    private Object convertIterableType(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
+        ParameterizedType targetItType = FsType.getGenericSuperType(targetType, Iterable.class);
+        if (targetItType == null) {
+            return CONTINUE;
+        }
+        GenericInfo<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
+        if (fromInfo == null) {
+            return CONTINUE;
+        }
+        if (fromInfo.getRawType().isArray()) {
+            return convertArray(fromInfo, targetItType.getActualTypeArguments()[0], converter);
+        }
+        Generator generator = GENERATOR_MAP.get(fromInfo.getRawType());
+        if (generator == null) {
+            return CONTINUE;
+        }
+        if (generator.needSize()) {
+            Collection<?> srcList = FsCollect.asOrToCollection(fromInfo.getObject());
+            return convertCollection(
+                srcList,
+                generator.generate(srcList.size()),
+                fromInfo.getTypeArgument(0),
+                targetItType.getActualTypeArguments()[0],
+                converter
+            );
+        } else {
+            return convertCollection(
+                fromInfo.getObject(),
+                generator.generate(0),
+                fromInfo.getTypeArgument(0),
+                targetItType.getActualTypeArguments()[0],
+                converter
+            );
+        }
+    }
+
+    @Nullable
+    private Object convertCollection(
+        Iterable<?> src, Collection<Object> dest, Type fromComponentType, Type targetComponentType, FsConverter converter) {
+        for (Object srcValue : src) {
+            Object targetValue = converter.convert(srcValue, fromComponentType, targetComponentType);
+            if (targetValue == CONTINUE) {
+                return CONTINUE;
+            }
+            dest.add(targetValue);
+        }
+        return dest;
+    }
+
+    @Nullable
+    private Object convertArray(GenericInfo<Iterable<?>> fromInfo, Type targetComponentType, FsConverter converter) {
+        Collection<?> srcList;
+        if (fromInfo.getObject() instanceof Collection) {
+            srcList = (Collection<?>) fromInfo.getObject();
+        } else {
+            srcList = FsCollect.toCollection(new LinkedList<>(), fromInfo.getObject());
+        }
+        Class<?> targetArrayClass = FsType.arrayClass(targetComponentType);
+        Object targetArray = FsArray.newArray(targetArrayClass.getComponentType(), srcList.size());
+        int i = 0;
+        for (Object srcValue : srcList) {
+            Object targetValue = converter.convert(srcValue, fromInfo.getTypeArgument(0), targetComponentType);
+            if (targetValue == CONTINUE) {
+                return CONTINUE;
+            }
+            Array.set(targetArray, i, targetValue);
+            i++;
+        }
+        return targetArray;
+    }
+
+    @Nullable
+    private GenericInfo<Iterable<?>> toGenericInfo(Object obj, Type type) {
+        if (type instanceof Class && ((Class<?>) type).isArray()) {
+            Iterable<?> it = asIterable(obj);
+            if (it == null) {
+                return null;
+            }
+            return new GenericInfo<>(
+                it,
+                FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+            );
+        }
+        if (type instanceof GenericArrayType) {
+            Iterable<?> it = asIterable(obj);
+            if (it == null) {
+                return null;
+            }
+            return new GenericInfo<>(
+                it,
+                FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+            );
+        }
+        ParameterizedType itType = FsType.getGenericSuperType(type, Iterable.class);
+        if (itType == null) {
+            return null;
+        }
+        Iterable<?> it = asIterable(obj);
+        if (it == null) {
+            return null;
+        }
+        return new GenericInfo<>(it, itType);
+    }
+
+    @Nullable
+    private Iterable<?> asIterable(Object obj) {
+        if (obj instanceof Iterable) {
+            return (Iterable<?>) obj;
+        }
+        if (obj instanceof Object[]) {
+            return FsArray.asList((Object[]) obj);
+        }
+        if (obj instanceof boolean[]) {
+            return FsArray.asList((boolean[]) obj);
+        }
+        if (obj instanceof byte[]) {
+            return FsArray.asList((byte[]) obj);
+        }
+        if (obj instanceof short[]) {
+            return FsArray.asList((short[]) obj);
+        }
+        if (obj instanceof char[]) {
+            return FsArray.asList((char[]) obj);
+        }
+        if (obj instanceof int[]) {
+            return FsArray.asList((int[]) obj);
+        }
+        if (obj instanceof long[]) {
+            return FsArray.asList((long[]) obj);
+        }
+        if (obj instanceof float[]) {
+            return FsArray.asList((float[]) obj);
+        }
+        if (obj instanceof double[]) {
+            return FsArray.asList((double[]) obj);
+        }
+        return null;
+    }
+
+    private static final class Generator {
+
+        private final boolean needSize;
+        private final IntFunction<Collection<Object>> generator;
+
+        private Generator(boolean needSize, IntFunction<Collection<Object>> generator) {
+            this.needSize = needSize;
+            this.generator = generator;
+        }
+
+        public boolean needSize() {
+            return needSize;
+        }
+
+        public Collection<Object> generate(int size) {
+            return generator.apply(size);
+        }
+    }
+}

@@ -15,35 +15,36 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 /**
- * Convert handler implementation supports converting object to date or date to object.
- * These types are supported for date converting:
+ * Convert handler implementation which is used to support conversion of date, duration and zone types.
+ * <p>
+ * Supported conversion of date types:
  * <ul>
- *     <li>{@link String}</li>
- *     <li>{@link StringBuilder}</li>
- *     <li>{@link StringBuffer}</li>
- *     <li>long and {@link Long} (as milliseconds)</li>
- *     <li>{@link Date}</li>
- *     <li>{@link Instant}</li>
- *     <li>{@link LocalDateTime}</li>
- *     <li>{@link OffsetDateTime}</li>
- *     <li>{@link ZonedDateTime}</li>
+ *     <li>{@link String};</li>
+ *     <li>{@link StringBuilder};</li>
+ *     <li>{@link StringBuffer};</li>
+ *     <li>long and {@link Long} (as milliseconds);</li>
+ *     <li>{@link Date};</li>
+ *     <li>{@link Instant};</li>
+ *     <li>{@link LocalDateTime};</li>
+ *     <li>{@link OffsetDateTime};</li>
+ *     <li>{@link ZonedDateTime};</li>
  * </ul>
- * These types are supported for duration converting:
+ * Supported conversion of duration types:
  * <ul>
- *     <li>{@link String}</li>
- *     <li>{@link StringBuilder}</li>
- *     <li>{@link StringBuffer}</li>
- *     <li>long and {@link Long} (as milliseconds)</li>
- *     <li>{@link Duration}</li>
+ *     <li>{@link String};</li>
+ *     <li>{@link StringBuilder};</li>
+ *     <li>{@link StringBuffer};</li>
+ *     <li>long and {@link Long} (as milliseconds);</li>
+ *     <li>{@link Duration};</li>
  * </ul>
- * These types are supported for zone converting:
+ * Supported conversion of zone types:
  * <ul>
- *     <li>{@link String}</li>
- *     <li>{@link StringBuilder}</li>
- *     <li>{@link StringBuffer}</li>
- *     <li>{@link TimeZone}</li>
- *     <li>{@link ZoneId}</li>
- *     <li>{@link ZoneOffset}</li>
+ *     <li>{@link String};</li>
+ *     <li>{@link StringBuilder};</li>
+ *     <li>{@link StringBuffer};</li>
+ *     <li>{@link TimeZone};</li>
+ *     <li>{@link ZoneId};</li>
+ *     <li>{@link ZoneOffset};</li>
  * </ul>
  * Pattern of this handler can be assigned from constructors:
  * <ul>
@@ -52,7 +53,7 @@ import java.util.TimeZone;
  *     <li>{@link #DateConvertHandler(PatternFunction)};</li>
  * </ul>
  * <p>
- * Note if the {@code obj} is null, return {@link #NOT_SUPPORTED}.
+ * Note if the {@code obj} is null, return {@link #CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -152,7 +153,7 @@ public class DateConvertHandler implements FsConvertHandler {
     public @Nullable Object convert0(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter)
         throws ParseException {
         if (obj == null) {
-            return NOT_SUPPORTED;
+            return CONTINUE;
         }
         if (Objects.equals(targetType, String.class)) {
             Date date = tryDate(obj, fromType);
@@ -181,7 +182,7 @@ public class DateConvertHandler implements FsConvertHandler {
                 || Objects.equals(ZoneOffset.class, fromType)) {
                 return obj.toString();
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, StringBuilder.class)) {
             Object result = convert0(obj, fromType, String.class, converter);
             if (result != null && Objects.equals(result.getClass(), String.class)) {
@@ -217,7 +218,7 @@ public class DateConvertHandler implements FsConvertHandler {
             if (offsetDateTime != null) {
                 return Date.from(offsetDateTime.toInstant());
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, Instant.class)) {
             String str = tryString(obj, fromType);
             if (str != null) {
@@ -243,7 +244,7 @@ public class DateConvertHandler implements FsConvertHandler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toInstant();
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, LocalDateTime.class)) {
             String str = tryString(obj, fromType);
             if (str != null) {
@@ -269,7 +270,7 @@ public class DateConvertHandler implements FsConvertHandler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toLocalDateTime();
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, ZonedDateTime.class)) {
             String str = tryString(obj, fromType);
             if (str != null) {
@@ -295,7 +296,7 @@ public class DateConvertHandler implements FsConvertHandler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toZonedDateTime();
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, OffsetDateTime.class)) {
             String str = tryString(obj, fromType);
             if (str != null) {
@@ -321,7 +322,7 @@ public class DateConvertHandler implements FsConvertHandler {
             if (zonedDateTime != null) {
                 return zonedDateTime.toOffsetDateTime();
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, Duration.class)) {
             String str = tryString(obj, fromType);
             if (str != null) {
@@ -331,7 +332,7 @@ public class DateConvertHandler implements FsConvertHandler {
             if (l != null) {
                 return Duration.ofMillis(l);
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, TimeZone.class)) {
             String str = tryString(obj, fromType);
             if (str != null) {
@@ -345,7 +346,7 @@ public class DateConvertHandler implements FsConvertHandler {
             if (zoneOffset != null) {
                 return TimeZone.getTimeZone(zoneOffset);
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, ZoneId.class)) {
             String str = tryString(obj, fromType);
             if (str != null) {
@@ -359,7 +360,7 @@ public class DateConvertHandler implements FsConvertHandler {
             if (zoneOffset != null) {
                 return zoneOffset;
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         } else if (Objects.equals(targetType, ZoneOffset.class)) {
             String str = tryString(obj, fromType);
             if (str != null) {
@@ -373,9 +374,9 @@ public class DateConvertHandler implements FsConvertHandler {
             if (zoneId != null) {
                 return FsDate.toZoneOffset(zoneId);
             }
-            return NOT_SUPPORTED;
+            return CONTINUE;
         }
-        return NOT_SUPPORTED;
+        return CONTINUE;
     }
 
     @Nullable

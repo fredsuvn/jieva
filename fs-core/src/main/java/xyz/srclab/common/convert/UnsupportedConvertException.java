@@ -1,5 +1,7 @@
 package xyz.srclab.common.convert;
 
+import java.lang.reflect.Type;
+
 /**
  * Represents the converting is unsupported.
  *
@@ -20,5 +22,9 @@ public class UnsupportedConvertException extends RuntimeException {
 
     public UnsupportedConvertException(Throwable cause) {
         super(cause);
+    }
+
+    public UnsupportedConvertException(Type fromType, Type targetType) {
+        this("Unsupported convert from " + fromType.getTypeName() + " to " + targetType.getTypeName() + ".");
     }
 }

@@ -11,8 +11,9 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 /**
- * Convert handler implementation supports converting any object to number.
- * It supports target type in:
+ * Convert handler implementation which is used to support the conversion from any object to number types.
+ * <p>
+ * Supported target types:
  * <ul>
  *     <li>Primitive number: byte, short, int, long, float, double;</li>
  *     <li>Primitive wrapper: {@link Byte}, {@link Short},
@@ -21,7 +22,7 @@ import java.util.Objects;
  *     <li>{@link BigDecimal};</li>
  *     <li>{@link BigInteger};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link #NOT_SUPPORTED}.
+ * Note if the {@code obj} is null, return {@link #CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -30,7 +31,7 @@ public class NumberConvertHandler implements FsConvertHandler {
     @Override
     public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
         if (obj == null) {
-            return NOT_SUPPORTED;
+            return CONTINUE;
         }
         if (Objects.equals(targetType, byte.class) || Objects.equals(targetType, Byte.class)) {
             if (FsType.isAssignableFrom(Number.class, fromType)) {
@@ -79,7 +80,7 @@ public class NumberConvertHandler implements FsConvertHandler {
         } else if (Objects.equals(targetType, BigInteger.class)) {
             return new BigInteger(obj.toString());
         } else {
-            return NOT_SUPPORTED;
+            return CONTINUE;
         }
     }
 }

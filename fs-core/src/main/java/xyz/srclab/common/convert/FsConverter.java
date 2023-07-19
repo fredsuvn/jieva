@@ -10,19 +10,38 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Converter to convert object from one type to another.
+ * Converter to convert object from specified type to target type.
  * <p>
- * A {@link FsConverter} consists of a list of handlers -- {@link FsConvertHandler}.
- * The conversion operation is performed by the handlers one by one in the order of the list,
- * until a non-{@link FsConvertHandler#NOT_SUPPORTED} result is obtained or all the handlers have been exhausted.
- * If any handler returns a non-{@link FsConvertHandler#NOT_SUPPORTED} result, the result will be obtained by converter
- * and remaining handlers will not be called.
- * If all handlers return {@link FsConvertHandler#NOT_SUPPORTED}, it indicates that the operation is
- * not supported by that converter.
+ * A {@link FsConverter} consists of a list of {@link Handler}s.
+ * More specifically, the converter is composed of a prefix handler (maybe null), a list of common handlers,
+ * and a suffix handler (maybe null).
+ * <p>
+ * The conversion is performed in the order of the prefix handler (if not null), common handlers,
+ * and suffix converter (if not null). If any handler returns a non-{@link #CONTINUE} and non-{@link #BREAK} value,
+ * the conversion is successful and that value will be returned.
+ * <p>
+ * If a handler returns {@link #CONTINUE}, it means that handler doesn't support current conversion and hand off to
+ * next handler; If returns {@link #BREAK}, it means this converter doesn't support current conversion.
  *
  * @author fredsuvn
+ * @see Handler
  */
 public interface FsConverter {
+
+    /**
+     * Represents current conversion is not supported by this handler and will be handed off to next handler.
+     */
+    Object CONTINUE = new Object();
+
+    /**
+     * Represents current conversion is not supported by current converter and the conversion will be finished.
+     */
+    Object BREAK = new Object();
+
+    /**
+     * Represents current conversion is not supported by current converter.
+     */
+    Object UNSUPPORTED = new Object();
 
     /**
      * Returns a converters with given handlers.
@@ -37,9 +56,21 @@ public interface FsConverter {
     }
 
     /**
-     * Returns convert handlers of this converter.
+     * Returns prefix handler.
      */
-    List<FsConvertHandler> convertHandlers();
+    @Nullable
+    Handler getPrefixHandler();
+
+    /**
+     * Returns prefix handler.
+     */
+    @Nullable
+    Handler getSuffixHandler();
+
+    /**
+     * Returns common handlers.
+     */
+    List<Handler> getCommonHandlers();
 
     /**
      * Converts given object to target type.
@@ -74,26 +105,54 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convert(Object obj, Type targetType) throws UnsupportedConvertException {
-        return convert(obj, obj.getClass(), targetType);
+        Object value = convert(obj, obj.getClass(), targetType);
+        if (value == UNSUPPORTED) {
+            throw new UnsupportedConvertException(obj.getClass(), targetType);
+        }
+        return (T) value;
     }
 
     /**
      * Converts given object from specified type to target type.
-     * If the converting is unsupported, an {@link UnsupportedConvertException} thrown.
+     * If the converting is unsupported, return {@link #UNSUPPORTED}, any other return value means the conversion is
+     * successful.
      *
      * @param obj        given object
      * @param fromType   specified type
      * @param targetType target type
      */
     @Nullable
-    default <T> T convert(@Nullable Object obj, Type fromType, Type targetType) throws UnsupportedConvertException {
-        for (FsConvertHandler convertHandler : convertHandlers()) {
-            Object result = convertHandler.convert(obj, fromType, targetType, this);
-            if (result != FsConvertHandler.NOT_SUPPORTED) {
-                return (T) result;
+    default Object convert(@Nullable Object obj, Type fromType, Type targetType) {
+        Handler prefix = getPrefixHandler();
+        if (prefix != null) {
+            Object value = prefix.convert(obj, fromType, targetType, this);
+            if (value == BREAK) {
+                return UNSUPPORTED;
+            }
+            if (value != CONTINUE) {
+                return value;
             }
         }
-        throw new UnsupportedConvertException("Unsupported converting from " + fromType + " to " + targetType + ".");
+        for (Handler commonHandler : getCommonHandlers()) {
+            Object value = commonHandler.convert(obj, fromType, targetType, this);
+            if (value == BREAK) {
+                return UNSUPPORTED;
+            }
+            if (value != CONTINUE) {
+                return value;
+            }
+        }
+        Handler suffix = getSuffixHandler();
+        if (suffix != null) {
+            Object value = suffix.convert(obj, fromType, targetType, this);
+            if (value == BREAK) {
+                throw new UnsupportedConvertException(fromType, targetType);
+            }
+            if (value != CONTINUE) {
+                return value;
+            }
+        }
+        return UNSUPPORTED;
     }
 
     /**
@@ -107,5 +166,35 @@ public interface FsConverter {
         List<FsConvertHandler> handlers = new ArrayList<>(old.size() + 1);
         handlers.add(0, handler);
         return withHandlers(Collections.unmodifiableList(handlers));
+    }
+
+    /**
+     * Handler of {@link FsConvert}.
+     *
+     * @author fredsuvn
+     * @see FsConverter
+     */
+    interface Handler {
+
+        /**
+         * Converts given object from specified type to target type.
+         * <p>
+         * If this method returns {@link #CONTINUE}, it means that this handler doesn't support current conversion,
+         * but it will hand off to next handler.
+         * <p>
+         * If this method returns {@link #BREAK}, it means that this handler doesn't support current conversion,
+         * and the converter will break current conversion. This indicates that the converter does not support current
+         * conversion.
+         * <p>
+         * Otherwise, any other return value are considered as the final conversion result, returned by current
+         * converter.
+         *
+         * @param obj        given object
+         * @param fromType   specified type
+         * @param targetType target type
+         * @param converter  context converter
+         */
+        @Nullable
+        Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter);
     }
 }

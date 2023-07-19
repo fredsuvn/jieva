@@ -8,16 +8,18 @@ import java.lang.reflect.Type;
 import java.util.Objects;
 
 /**
- * Convert handler implementation supports converting any object to string with {@link Object#toString()}.
- * It supports target type in:
+ * Convert handler implementation which is used to support the conversion from any object to string with
+ * {@link Object#toString()}.
+ * <p>
+ * Supported target types:
  * <ul>
- *     <li>{@link String}</li>
- *     <li>{@link CharSequence}</li>
- *     <li>Char array (primitive or wrapper)</li>
- *     <li>{@link StringBuilder}</li>
- *     <li>{@link StringBuffer}</li>
+ *     <li>{@link String};</li>
+ *     <li>{@link CharSequence};</li>
+ *     <li>Char array (primitive or wrapper);</li>
+ *     <li>{@link StringBuilder};</li>
+ *     <li>{@link StringBuffer};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link #NOT_SUPPORTED}.
+ * Note if the {@code obj} is null, return {@link #CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -26,7 +28,7 @@ public class StringConvertHandler implements FsConvertHandler {
     @Override
     public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
         if (obj == null) {
-            return NOT_SUPPORTED;
+            return CONTINUE;
         }
         if (Objects.equals(targetType, String.class) || Objects.equals(targetType, CharSequence.class)) {
             return obj.toString();
@@ -44,7 +46,7 @@ public class StringConvertHandler implements FsConvertHandler {
         } else if (Objects.equals(targetType, StringBuffer.class)) {
             return new StringBuffer(obj.toString());
         } else {
-            return NOT_SUPPORTED;
+            return CONTINUE;
         }
     }
 }

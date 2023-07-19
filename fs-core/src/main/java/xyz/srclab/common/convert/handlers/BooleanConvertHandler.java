@@ -8,12 +8,14 @@ import java.lang.reflect.Type;
 import java.util.Objects;
 
 /**
- * Convert handler implementation supports converting any object to boolean with {@link Boolean#parseBoolean(String)}.
- * It supports target type in:
+ * Convert handler implementation which is used to support conversion from any object to boolean types with
+ * {@link Boolean#parseBoolean(String)}.
+ * <p>
+ * Supports target types:
  * <ul>
  *     <li>boolean and {@link Boolean};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link #NOT_SUPPORTED}.
+ * Note if the {@code obj} is null, return {@link #CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -22,12 +24,12 @@ public class BooleanConvertHandler implements FsConvertHandler {
     @Override
     public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
         if (obj == null) {
-            return NOT_SUPPORTED;
+            return CONTINUE;
         }
         if (Objects.equals(targetType, boolean.class) || Objects.equals(targetType, Boolean.class)) {
             return Boolean.parseBoolean(obj.toString());
         } else {
-            return NOT_SUPPORTED;
+            return CONTINUE;
         }
     }
 }
