@@ -59,17 +59,19 @@ public class AssignableConvertHandler implements FsConverter.Handler {
         if (targetType instanceof TypeVariable<?>) {
             return BREAK;
         }
+        Type targetBound = targetType;
         if (targetType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) targetType;
-            if (FsType.getUpperBound(wildcardType) != null) {
-                return BREAK;
+            Type targetUpper = FsType.getUpperBound(wildcardType);
+            if (targetUpper != null) {
+                targetBound = targetUpper;
             } else {
-                return obj;
+                return BREAK;
             }
         }
         Type fromBound = fromBound(obj, fromType);
-        if (fromBound != fromType) {
-            Object value = converter.convert(obj, fromBound, targetType);
+        if (fromBound != fromType || targetBound != targetType) {
+            Object value = converter.convert(obj, fromBound, targetBound);
             if (value == UNSUPPORTED) {
                 return BREAK;
             }

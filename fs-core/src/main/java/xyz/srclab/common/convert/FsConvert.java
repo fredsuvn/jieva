@@ -60,4 +60,21 @@ public class FsConvert {
     public static <T> T convert(@Nullable Object obj, Type targetType) {
         return FsConverter.defaultConverter().convert(obj, targetType);
     }
+
+    /**
+     * Converts given object from specified type to target type.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>
+     * Note the return value itself may also be null.
+     * </b>
+     *
+     * @param obj        given object
+     * @param fromType   specified type
+     * @param targetType target type
+     */
+    @Nullable
+    public static <T> T convertByType(@Nullable Object obj, Type fromType, Type targetType) {
+        return FsConverter.defaultConverter().convertByType(obj, fromType, targetType);
+    }
 }

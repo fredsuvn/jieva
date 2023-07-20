@@ -196,6 +196,27 @@ public interface FsConverter {
 
     /**
      * Converts given object from specified type to target type.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>
+     * Note the return value itself may also be null.
+     * </b>
+     *
+     * @param obj        given object
+     * @param fromType   specified type
+     * @param targetType target type
+     */
+    @Nullable
+    default <T> T convertByType(@Nullable Object obj, Type fromType, Type targetType) {
+        Object value = convert(obj, fromType, targetType);
+        if (value == UNSUPPORTED) {
+            return null;
+        }
+        return (T) value;
+    }
+
+    /**
+     * Converts given object from specified type to target type.
      * If return value is {@link #UNSUPPORTED}, it indicates current conversion is unsupported.
      * Any other return value indicates current conversion is successful and the return value is valid, including null.
      *
