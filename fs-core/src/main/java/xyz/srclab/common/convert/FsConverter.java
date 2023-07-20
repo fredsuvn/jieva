@@ -1,12 +1,12 @@
 package xyz.srclab.common.convert;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,6 +29,27 @@ import java.util.List;
 public interface FsConverter {
 
     /**
+     * Returns default converter, of which handlers are:
+     * <ul>
+     *     <li>Prefix: {@link xyz.srclab.common.convert.handlers.AssignableConvertHandler};</li>
+     *     <li>Suffix: {@link xyz.srclab.common.convert.handlers.BeanConvertHandler};</li>
+     *     <li>Common:
+     *     <ul>
+     *         <li>{@link xyz.srclab.common.convert.handlers.DateConvertHandler};</li>
+     *         <li>{@link xyz.srclab.common.convert.handlers.BooleanConvertHandler};</li>
+     *         <li>{@link xyz.srclab.common.convert.handlers.NumberConvertHandler};</li>
+     *         <li>{@link xyz.srclab.common.convert.handlers.StringConvertHandler};</li>
+     *         <li>{@link xyz.srclab.common.convert.handlers.CollectConvertHandler};</li>
+     *     </ul>
+     *     </li>
+     * </ul>
+     * Those construct from empty constructor and in the order listed.
+     */
+    static FsConverter defaultConverter() {
+        return FsUnsafe.ForConvert.DEFAULT_CONVERTER;
+    }
+
+    /**
      * Represents current conversion is not supported by this handler and will be handed off to next handler.
      */
     Object CONTINUE = new Object();
@@ -44,15 +65,64 @@ public interface FsConverter {
     Object UNSUPPORTED = new Object();
 
     /**
-     * Returns a converters with given handlers.
+     * Returns a converters with given prefix, suffix and common handlers.
      *
-     * @param handlers given handlers
+     * @param prefix prefix handler
+     * @param suffix suffix handler
+     * @param common common handlers
      */
-    static FsConverter withHandlers(Iterable<FsConvertHandler> handlers) {
-        List<FsConvertHandler> list = Collections.unmodifiableList(
-            FsCollect.toCollection(new ArrayList<>(), handlers)
-        );
-        return () -> list;
+    static FsConverter withHandlers(
+        @Nullable Handler prefix,
+        @Nullable Handler suffix,
+        Iterable<Handler> common
+    ) {
+        class FsConverterImpl implements FsConverter, Handler {
+
+            private final List<Handler> commonHandlers;
+
+            FsConverterImpl(List<Handler> commonHandlers) {
+                this.commonHandlers = commonHandlers;
+            }
+
+            @Override
+            public @Nullable Handler getPrefixHandler() {
+                return prefix;
+            }
+
+            @Override
+            public @Nullable Handler getSuffixHandler() {
+                return suffix;
+            }
+
+            @Override
+            public List<Handler> getCommonHandlers() {
+                return commonHandlers;
+            }
+
+            @Override
+            public Handler asHandler() {
+                return this;
+            }
+
+            @Override
+            public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
+                Object value = convert(obj, fromType, targetType);
+                if (value == UNSUPPORTED) {
+                    return BREAK;
+                }
+                return value;
+            }
+        }
+        return new FsConverterImpl(FsCollect.immutableList(common));
+    }
+
+    /**
+     * Returns a converters with given common handlers.
+     *
+     * @param common common handlers
+     */
+    static FsConverter withHandlers(Iterable<Handler> common) {
+        return withHandlers(null, null, common);
     }
 
     /**
@@ -74,48 +144,60 @@ public interface FsConverter {
 
     /**
      * Converts given object to target type.
-     * If the converting is unsupported, an {@link UnsupportedConvertException} thrown.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>
+     * Note the return value itself may also be null.
+     * </b>
      *
      * @param obj        given object
      * @param targetType target type
      */
     @Nullable
-    default <T> T convert(Object obj, Class<T> targetType) throws UnsupportedConvertException {
+    default <T> T convert(@Nullable Object obj, Class<T> targetType) {
         return convert(obj, (Type) targetType);
     }
 
     /**
      * Converts given object to target type.
-     * If the converting is unsupported, an {@link UnsupportedConvertException} thrown.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>
+     * Note the return value itself may also be null.
+     * </b>
      *
      * @param obj        given object
-     * @param targetType target type
+     * @param targetType ref of target type
      */
     @Nullable
-    default <T> T convert(Object obj, TypeRef<T> targetType) throws UnsupportedConvertException {
+    default <T> T convert(@Nullable Object obj, TypeRef<T> targetType) {
         return convert(obj, targetType.getType());
     }
 
     /**
      * Converts given object to target type.
-     * If the converting is unsupported, an {@link UnsupportedConvertException} thrown.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>
+     * Note the return value itself may also be null.
+     * </b>
      *
      * @param obj        given object
      * @param targetType target type
      */
     @Nullable
-    default <T> T convert(Object obj, Type targetType) throws UnsupportedConvertException {
+    default <T> T convert(@Nullable Object obj, Type targetType) {
         Object value = convert(obj, obj.getClass(), targetType);
         if (value == UNSUPPORTED) {
-            throw new UnsupportedConvertException(obj.getClass(), targetType);
+            return null;
         }
         return (T) value;
     }
 
     /**
      * Converts given object from specified type to target type.
-     * If the converting is unsupported, return {@link #UNSUPPORTED}, any other return value means the conversion is
-     * successful.
+     * If return value is {@link #UNSUPPORTED}, it indicates current conversion is unsupported.
+     * Any other return value indicates current conversion is successful and the return value is valid, including null.
      *
      * @param obj        given object
      * @param fromType   specified type
@@ -145,28 +227,50 @@ public interface FsConverter {
         Handler suffix = getSuffixHandler();
         if (suffix != null) {
             Object value = suffix.convert(obj, fromType, targetType, this);
-            if (value == BREAK) {
-                throw new UnsupportedConvertException(fromType, targetType);
+            if (value == BREAK || value == CONTINUE) {
+                return UNSUPPORTED;
             }
-            if (value != CONTINUE) {
-                return value;
-            }
+            return value;
         }
         return UNSUPPORTED;
     }
 
     /**
+     * Converts given object from specified type to target type.
+     * If current conversion is unsupported, an {@link UnsupportedConvertException} will be thrown
+     *
+     * @param obj        given object
+     * @param fromType   specified type
+     * @param targetType target type
+     */
+    @Nullable
+    default Object convertOrThrow(@Nullable Object obj, Type fromType, Type targetType)
+        throws UnsupportedConvertException {
+        Object value = convert(obj, fromType, targetType);
+        if (value == UNSUPPORTED) {
+            throw new UnsupportedConvertException(fromType, targetType);
+        }
+        return value;
+    }
+
+    /**
      * Returns a new converter with handlers consist of the handlers from the current converter,
-     * and given handler added at the head.
+     * but inserts given handler at first index of common handlers.
      *
      * @param handler given handler
      */
-    default FsConverter addHeadHandler(FsConvertHandler handler) {
-        List<FsConvertHandler> old = convertHandlers();
-        List<FsConvertHandler> handlers = new ArrayList<>(old.size() + 1);
-        handlers.add(0, handler);
-        return withHandlers(Collections.unmodifiableList(handlers));
+    default FsConverter withCommonHandler(Handler handler) {
+        List<Handler> common = getCommonHandlers();
+        List<Handler> newCommon = new ArrayList<>(common.size() + 1);
+        newCommon.add(handler);
+        newCommon.addAll(common);
+        return withHandlers(getPrefixHandler(), getSuffixHandler(), newCommon);
     }
+
+    /**
+     * Returns this converter as handler type.
+     */
+    Handler asHandler();
 
     /**
      * Handler of {@link FsConvert}.
@@ -192,7 +296,7 @@ public interface FsConverter {
          * @param obj        given object
          * @param fromType   specified type
          * @param targetType target type
-         * @param converter  context converter
+         * @param converter  current converter context
          */
         @Nullable
         Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter);

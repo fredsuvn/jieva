@@ -86,4 +86,14 @@ public interface FsBeanProperty {
      * Returns owner bean of this property.
      */
     FsBean getOwner();
+
+    /**
+     * Returns whether this property is readable.
+     */
+    boolean isReadable();
+
+    /**
+     * Returns whether this property is writeable.
+     */
+    boolean isWriteable();
 }

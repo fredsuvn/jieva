@@ -2,7 +2,6 @@ package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsDate;
-import xyz.srclab.common.convert.FsConvertHandler;
 import xyz.srclab.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
@@ -13,6 +12,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
+
+import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 
 /**
  * Convert handler implementation which is used to support conversion of date, duration and zone types.
@@ -53,11 +54,11 @@ import java.util.TimeZone;
  *     <li>{@link #DateConvertHandler(PatternFunction)};</li>
  * </ul>
  * <p>
- * Note if the {@code obj} is null, return {@link #CONTINUE}.
+ * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
  *
  * @author fredsuvn
  */
-public class DateConvertHandler implements FsConvertHandler {
+public class DateConvertHandler implements FsConverter.Handler {
 
     private static PatternFunction DEFAULT_PATTERN_FUNCTION = new PatternFunction() {
 

@@ -1,7 +1,6 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.convert.FsConvertHandler;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
 
@@ -9,6 +8,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
+
+import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 
 /**
  * Convert handler implementation which is used to support the conversion from any object to number types.
@@ -22,11 +23,11 @@ import java.util.Objects;
  *     <li>{@link BigDecimal};</li>
  *     <li>{@link BigInteger};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link #CONTINUE}.
+ * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
  *
  * @author fredsuvn
  */
-public class NumberConvertHandler implements FsConvertHandler {
+public class NumberConvertHandler implements FsConverter.Handler {
 
     @Override
     public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {

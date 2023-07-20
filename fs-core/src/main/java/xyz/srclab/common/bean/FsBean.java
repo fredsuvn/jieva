@@ -1,6 +1,7 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
 
 import java.lang.reflect.Type;
@@ -12,6 +13,23 @@ import java.util.Map;
  * @author fredsuvn
  */
 public interface FsBean {
+
+    /**
+     * Creates new dest object and copies properties from given source object to dest object.
+     * <p>
+     * Returns null if failed.
+     *
+     * @param src       given source object
+     * @param srcType   type of source object
+     * @param destType  type of dest object
+     * @param resolver  bean resolver to resolve object
+     * @param converter converter to convert different property's types
+     */
+    @Nullable
+    static <T> T copyProperties(
+        Object src, Type srcType, Type destType, FsBeanResolver resolver, FsConverter converter) {
+        return null;
+    }
 
     /**
      * Resolves given type to bean structure by {@link FsBeanResolver#defaultResolver()}.

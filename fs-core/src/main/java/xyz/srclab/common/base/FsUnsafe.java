@@ -3,8 +3,11 @@ package xyz.srclab.common.base;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.cache.FsCache;
+import xyz.srclab.common.convert.FsConverter;
+import xyz.srclab.common.convert.handlers.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,7 +57,20 @@ public final class FsUnsafe {
     }
 
     public static final class ForBean {
-
         public static final FsBeanResolver DEFAULT_RESOLVER = FsBeanResolver.newBuilder().build();
+    }
+
+    public static final class ForConvert {
+        public static final FsConverter DEFAULT_CONVERTER = FsConverter.withHandlers(
+            new AssignableConvertHandler(),
+            new BeanConvertHandler(),
+            Arrays.asList(
+                new DateConvertHandler(),
+                new BooleanConvertHandler(),
+                new NumberConvertHandler(),
+                new StringConvertHandler(),
+                new CollectConvertHandler()
+            )
+        );
     }
 }

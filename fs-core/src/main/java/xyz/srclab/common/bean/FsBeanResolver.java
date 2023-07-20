@@ -10,7 +10,10 @@ import xyz.srclab.common.reflect.FsInvoker;
 import xyz.srclab.common.reflect.FsType;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,9 +26,9 @@ public interface FsBeanResolver {
 
     /**
      * Returns default bean resolver,
-     * which invoke mode is {@link Builder#REFLECT_MODE}, property name mapping is {@link Builder#BEAN_NAMING}
+     * of which invoke mode is {@link Builder#REFLECT_MODE}, property name mapping is {@link Builder#BEAN_NAMING}
      * and property/method naming case is {@link FsCase#LOWER_CAMEL}.
-     * And this resolver will cache the bean by {@link FsCache#newCache()}.
+     * And this resolver will cache the resolving result by {@link FsCache#newCache()}.
      */
     static FsBeanResolver defaultResolver() {
         return FsUnsafe.ForBean.DEFAULT_RESOLVER;
@@ -186,7 +189,7 @@ public interface FsBeanResolver {
 
             public FsBean resolve0(Type type) {
                 Class<?> rawType = FsType.getRawType(type);
-                if (rawType == null)  {
+                if (rawType == null) {
                     throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType.");
                 }
                 Method[] methods = rawType.getMethods();
@@ -488,6 +491,16 @@ public interface FsBeanResolver {
                 @Override
                 public FsBean getOwner() {
                     return owner;
+                }
+
+                @Override
+                public boolean isReadable() {
+                    return getterInvoker != null;
+                }
+
+                @Override
+                public boolean isWriteable() {
+                    return setterInvoker != null;
                 }
 
                 @Override

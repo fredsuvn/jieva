@@ -3,7 +3,6 @@ package xyz.srclab.common.convert.handlers;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.collect.FsCollect;
-import xyz.srclab.common.convert.FsConvertHandler;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.GenericInfo;
@@ -18,17 +17,19 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntFunction;
 
+import static xyz.srclab.common.convert.FsConverter.*;
+
 /**
  * Convert handler implementation which is used to support the conversion of collection types.
  * It supports target type in:
  * <ul>
  *     <li>{@link Iterable}</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link #CONTINUE}.
+ * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
  *
  * @author fredsuvn
  */
-public class CollectConvertHandler implements FsConvertHandler {
+public class CollectConvertHandler implements FsConverter.Handler {
 
     private static final Map<Class<?>, Generator> GENERATOR_MAP = new ConcurrentHashMap<>();
 
@@ -88,7 +89,7 @@ public class CollectConvertHandler implements FsConvertHandler {
             return CONTINUE;
         }
         if (generator.needSize()) {
-            Collection<?> srcList = FsCollect.asOrToCollection(fromInfo.getObject());
+            Collection<?> srcList = FsCollect.asOrToList(fromInfo.getObject());
             return convertCollection(
                 srcList,
                 generator.generate(srcList.size()),
@@ -112,8 +113,8 @@ public class CollectConvertHandler implements FsConvertHandler {
         Iterable<?> src, Collection<Object> dest, Type fromComponentType, Type targetComponentType, FsConverter converter) {
         for (Object srcValue : src) {
             Object targetValue = converter.convert(srcValue, fromComponentType, targetComponentType);
-            if (targetValue == CONTINUE) {
-                return CONTINUE;
+            if (targetValue == UNSUPPORTED) {
+                return BREAK;
             }
             dest.add(targetValue);
         }
@@ -133,8 +134,8 @@ public class CollectConvertHandler implements FsConvertHandler {
         int i = 0;
         for (Object srcValue : srcList) {
             Object targetValue = converter.convert(srcValue, fromInfo.getTypeArgument(0), targetComponentType);
-            if (targetValue == CONTINUE) {
-                return CONTINUE;
+            if (targetValue == UNSUPPORTED) {
+                return BREAK;
             }
             Array.set(targetArray, i, targetValue);
             i++;
@@ -163,6 +164,9 @@ public class CollectConvertHandler implements FsConvertHandler {
                 it,
                 FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
             );
+        }
+        if (!(obj instanceof Iterable)) {
+            return null;
         }
         ParameterizedType itType = FsType.getGenericSuperType(type, Iterable.class);
         if (itType == null) {

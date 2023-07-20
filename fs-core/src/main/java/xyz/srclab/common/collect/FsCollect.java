@@ -42,16 +42,78 @@ public class FsCollect {
     }
 
     /**
-     * If given element is collection, return itself as collection type, else puts all given elements into a new
-     * {@link LinkedList} and returns.
+     * If given element is list, return itself as list type, else puts all given elements into a new
+     * list and returns.
      *
      * @param elements given elements
      */
-    public static <T> Collection<T> asOrToCollection(Iterable<T> elements) {
+    public static <T> List<T> asOrToList(Iterable<T> elements) {
+        if (elements instanceof List) {
+            return (List<T>) elements;
+        }
         if (elements instanceof Collection) {
-            return (Collection<T>) elements;
+            return new ArrayList<>((Collection<T>) elements);
         }
         return toCollection(new LinkedList<>(), elements);
+    }
+
+    /**
+     * If given element is set, return itself as set type, else puts all given elements into a new
+     * set and returns.
+     *
+     * @param elements given elements
+     */
+    public static <T> Set<T> asOrToSet(Iterable<T> elements) {
+        if (elements instanceof Set) {
+            return (Set<T>) elements;
+        }
+        if (elements instanceof Collection) {
+            return new LinkedHashSet<>((Collection<T>) elements);
+        }
+        return toCollection(new LinkedHashSet<>(), elements);
+    }
+
+    /**
+     * Returns immutable list of which elements were put from given iterable.
+     *
+     * @param iterable given iterable
+     */
+    public static <T> List<T> immutableList(@Nullable Iterable<? extends T> iterable) {
+        if (iterable == null) {
+            return Collections.emptyList();
+        }
+        Object[] array = asOrToList(iterable).toArray();
+        return (List<T>) Collections.unmodifiableList(FsArray.asList(array));
+    }
+
+    /**
+     * Returns immutable set of which elements were put from given iterable.
+     *
+     * @param iterable given iterable
+     */
+    public static <T> Set<T> immutableSet(@Nullable Iterable<? extends T> iterable) {
+        if (iterable == null) {
+            return Collections.emptySet();
+        }
+        LinkedHashSet<T> set;
+        if (iterable instanceof Collection) {
+            set = new LinkedHashSet<>(((Collection<? extends T>) iterable).size());
+        } else {
+            set = new LinkedHashSet<>();
+        }
+        return Collections.unmodifiableSet(toCollection(set, iterable));
+    }
+
+    /**
+     * Returns immutable map of which elements were put from given map.
+     *
+     * @param map given map
+     */
+    public static <K, V> Map<K, V> immutableMap(@Nullable Map<? extends K, ? extends V> map) {
+        if (map == null) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(new LinkedHashMap<>(map));
     }
 
     /**

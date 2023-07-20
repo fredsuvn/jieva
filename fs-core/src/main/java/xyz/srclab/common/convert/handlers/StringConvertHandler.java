@@ -1,11 +1,12 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.convert.FsConvertHandler;
 import xyz.srclab.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
+
+import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 
 /**
  * Convert handler implementation which is used to support the conversion from any object to string with
@@ -19,11 +20,11 @@ import java.util.Objects;
  *     <li>{@link StringBuilder};</li>
  *     <li>{@link StringBuffer};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link #CONTINUE}.
+ * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
  *
  * @author fredsuvn
  */
-public class StringConvertHandler implements FsConvertHandler {
+public class StringConvertHandler implements FsConverter.Handler {
 
     @Override
     public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
