@@ -72,5 +72,7 @@ public final class FsUnsafe {
                 new CollectConvertHandler()
             )
         );
+        public static final FsConverter.Options DEFAULT_OPTIONS = FsConverter.Options
+            .withCompatibilityPolicy(FsConverter.Options.NEED_ASSIGNABLE);
     }
 }

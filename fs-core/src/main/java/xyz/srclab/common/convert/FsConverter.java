@@ -65,7 +65,7 @@ public interface FsConverter {
     Object UNSUPPORTED = new Object();
 
     /**
-     * Returns a converters with given prefix, suffix and common handlers.
+     * Returns a converters with given prefix, suffix, common handlers, and default conversion options.
      *
      * @param prefix prefix handler
      * @param suffix suffix handler
@@ -75,6 +75,32 @@ public interface FsConverter {
         @Nullable Handler prefix,
         @Nullable Handler suffix,
         Iterable<Handler> common
+    ) {
+        return newConverter(prefix, suffix, common, Options.defaultOptions());
+    }
+
+    /**
+     * Returns a converters with given common handlers and default conversion options.
+     *
+     * @param common common handlers
+     */
+    static FsConverter withHandlers(Iterable<Handler> common) {
+        return withHandlers(null, null, common);
+    }
+
+    /**
+     * Returns a converters with given prefix, suffix, common handlers and conversion options.
+     *
+     * @param prefix prefix handler
+     * @param suffix suffix handler
+     * @param common common handlers
+     * @param options conversion options
+     */
+    static FsConverter newConverter(
+        @Nullable Handler prefix,
+        @Nullable Handler suffix,
+        Iterable<Handler> common,
+        Options options
     ) {
         class FsConverterImpl implements FsConverter, Handler {
 
@@ -100,6 +126,11 @@ public interface FsConverter {
             }
 
             @Override
+            public Options getOptions() {
+                return options;
+            }
+
+            @Override
             public Handler asHandler() {
                 return this;
             }
@@ -114,15 +145,6 @@ public interface FsConverter {
             }
         }
         return new FsConverterImpl(FsCollect.immutableList(common));
-    }
-
-    /**
-     * Returns a converters with given common handlers.
-     *
-     * @param common common handlers
-     */
-    static FsConverter withHandlers(Iterable<Handler> common) {
-        return withHandlers(null, null, common);
     }
 
     /**
@@ -141,6 +163,11 @@ public interface FsConverter {
      * Returns common handlers.
      */
     List<Handler> getCommonHandlers();
+
+    /**
+     * Returns conversion options.
+     */
+    Options getOptions();
 
     /**
      * Converts given object to target type.
@@ -321,5 +348,61 @@ public interface FsConverter {
          */
         @Nullable
         Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter);
+    }
+
+    /**
+     * Options for convert.
+     *
+     * @author fredsuvn
+     */
+    interface Options {
+
+        /**
+         * Returns default options:
+         * <ul>
+         *     <li>
+         *         Compatibility policy: {@link #NEED_ASSIGNABLE};
+         *     </li>
+         * </ul>
+         */
+        static FsConverter.Options defaultOptions() {
+            return FsUnsafe.ForConvert.DEFAULT_OPTIONS;
+        }
+
+        /**
+         * Returns options with given compatibility policy.
+         *
+         * @param policy given compatibility policy, see {@link #compatibilityPolicy()}
+         */
+        static Options withCompatibilityPolicy(int policy) {
+            return new Options() {
+                @Override
+                public int compatibilityPolicy() {
+                    return policy;
+                }
+            };
+        }
+
+        int NEED_ASSIGNABLE = 1;
+
+        int NEED_EQUAL = 2;
+
+        int ALWAYS_NEW = 3;
+
+        /**
+         * Returns compatibility policy for conversion:
+         * <ul>
+         *     <li>
+         *         {@link #NEED_ASSIGNABLE}: only if target type is assignable from source type, return source object;
+         *     </li>
+         *     <li>
+         *         {@link #NEED_EQUAL}: only if target type is equal to source type, return source object;
+         *     </li>
+         *     <li>
+         *         {@link #ALWAYS_NEW}: always return new instance of target type;
+         *     </li>
+         * </ul>
+         */
+        int compatibilityPolicy();
     }
 }
