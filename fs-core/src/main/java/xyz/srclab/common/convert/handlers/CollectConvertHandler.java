@@ -5,7 +5,7 @@ import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
-import xyz.srclab.common.reflect.GenericInfo;
+import xyz.srclab.common.reflect.ObjectType;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -54,7 +54,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         }
         if (targetType instanceof Class) {
             if (((Class<?>) targetType).isArray()) {
-                GenericInfo<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
+                ObjectType<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
                 if (fromInfo == null) {
                     return CONTINUE;
                 }
@@ -62,7 +62,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             }
             return convertIterableType(obj, fromType, targetType, converter);
         } else if (targetType instanceof GenericArrayType) {
-            GenericInfo<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
+            ObjectType<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
             if (fromInfo == null) {
                 return CONTINUE;
             }
@@ -77,7 +77,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (targetItType == null) {
             return CONTINUE;
         }
-        GenericInfo<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
+        ObjectType<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
         if (fromInfo == null) {
             return CONTINUE;
         }
@@ -93,7 +93,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             return convertCollection(
                 srcList,
                 generator.generate(srcList.size()),
-                fromInfo.getTypeArgument(0),
+                fromInfo.getActualTypeArgument(0),
                 targetItType.getActualTypeArguments()[0],
                 converter
             );
@@ -101,7 +101,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             return convertCollection(
                 fromInfo.getObject(),
                 generator.generate(0),
-                fromInfo.getTypeArgument(0),
+                fromInfo.getActualTypeArgument(0),
                 targetItType.getActualTypeArguments()[0],
                 converter
             );
@@ -122,7 +122,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Nullable
-    private Object convertArray(GenericInfo<Iterable<?>> fromInfo, Type targetComponentType, FsConverter converter) {
+    private Object convertArray(ObjectType<Iterable<?>> fromInfo, Type targetComponentType, FsConverter converter) {
         Collection<?> srcList;
         if (fromInfo.getObject() instanceof Collection) {
             srcList = (Collection<?>) fromInfo.getObject();
@@ -133,7 +133,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         Object targetArray = FsArray.newArray(targetArrayClass.getComponentType(), srcList.size());
         int i = 0;
         for (Object srcValue : srcList) {
-            Object targetValue = converter.convert(srcValue, fromInfo.getTypeArgument(0), targetComponentType);
+            Object targetValue = converter.convert(srcValue, fromInfo.getActualTypeArgument(0), targetComponentType);
             if (targetValue == UNSUPPORTED) {
                 return BREAK;
             }
@@ -144,13 +144,13 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Nullable
-    private GenericInfo<Iterable<?>> toGenericInfo(Object obj, Type type) {
+    private ObjectType<Iterable<?>> toGenericInfo(Object obj, Type type) {
         if (type instanceof Class && ((Class<?>) type).isArray()) {
             Iterable<?> it = asIterable(obj);
             if (it == null) {
                 return null;
             }
-            return new GenericInfo<>(
+            return ObjectType.of(
                 it,
                 FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
             );
@@ -160,7 +160,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             if (it == null) {
                 return null;
             }
-            return new GenericInfo<>(
+            return ObjectType.of(
                 it,
                 FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
             );
@@ -176,7 +176,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (it == null) {
             return null;
         }
-        return new GenericInfo<>(it, itType);
+        return ObjectType.of(it, itType);
     }
 
     @Nullable

@@ -6,16 +6,14 @@ import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.FsType;
+import xyz.srclab.common.reflect.ObjectType;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.reflect.TypeWrapper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TypeTest {
 
@@ -45,6 +43,75 @@ public class TypeTest {
             FsType.arrayClass(new TypeRef<List<? extends String>[][]>() {
             }.getType()),
             List[][][].class
+        );
+    }
+
+    @Test
+    public void testObjectType() {
+        Assert.assertEquals(
+            ObjectType.of(null, new TypeRef<List<?>>() {
+            }.getType()),
+            ObjectType.of(null, new TypeRef<List<?>>() {
+            }.getType())
+        );
+        ObjectType<?> cType = ObjectType.of(null, String.class);
+        Assert.assertEquals(
+            cType.getClassType(),
+            String.class
+        );
+        ObjectType<?> pType = ObjectType.of(null, new TypeRef<Map<String, Integer>>() {
+        }.getType());
+        Assert.assertEquals(
+            pType.getParameterizedType(),
+            new TypeRef<Map<String, Integer>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            pType.getActualTypeArgument(0),
+            String.class
+        );
+        Assert.assertEquals(
+            pType.getActualTypeArgument(1),
+            Integer.class
+        );
+        ObjectType<?> wType = ObjectType.of(null,
+            FsType.wildcardType(Collections.singletonList(String.class), null));
+        Assert.assertEquals(
+            wType.getWildcardType(),
+            FsType.wildcardType(Collections.singletonList(String.class), null)
+        );
+        Assert.assertEquals(
+            wType.getUpperBound(),
+            String.class
+        );
+        wType = ObjectType.of(null,
+            FsType.wildcardType(null, Collections.singletonList(Integer.class)));
+        Assert.assertEquals(
+            wType.getLowerBound(),
+            Integer.class
+        );
+        ObjectType<?> gType = ObjectType.of(null, new TypeRef<Map<String, Integer>[]>() {
+        }.getType());
+        Assert.assertEquals(
+            gType.getGenericArrayType(),
+            new TypeRef<Map<String, Integer>[]>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            gType.getGenericComponentType(),
+            new TypeRef<Map<String, Integer>>() {
+            }.getType()
+        );
+        class OT<OTP extends Float> {
+        }
+        ObjectType<?> tType = ObjectType.of(null, OT.class.getTypeParameters()[0]);
+        Assert.assertEquals(
+            tType.getTypeVariable(),
+            OT.class.getTypeParameters()[0]
+        );
+        Assert.assertEquals(
+            tType.getTypeVariableBound(0),
+            Float.class
         );
     }
 
