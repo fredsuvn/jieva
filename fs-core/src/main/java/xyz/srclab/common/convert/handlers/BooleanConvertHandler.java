@@ -9,28 +9,39 @@ import java.util.Objects;
 import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 
 /**
- * Convert handler implementation which is used to support conversion from any object to boolean types with
- * {@link Boolean#parseBoolean(String)}.
- * <p>
- * Supports target types:
+ * Convert handler implementation which is used to support conversion from any object to boolean types:
  * <ul>
- *     <li>boolean and {@link Boolean};</li>
+ *     <li>
+ *         If source is instance of {@link Boolean}, return itself;
+ *     </li>
+ *     <li>
+ *         If source object is instance of {@link Number}, return true if {@link Number#intValue()} is 1, else false;
+ *     </li>
+ *     <li>
+ *         If source object is not instance of {@link Number}, return {@link Boolean#parseBoolean(String)}.
+ *     </li>
  * </ul>
- * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
+ * Note if source object is null, return {@link FsConverter#CONTINUE}.
  *
  * @author fredsuvn
  */
 public class BooleanConvertHandler implements FsConverter.Handler {
 
     @Override
-    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
-        if (obj == null) {
+    public @Nullable Object convert(
+        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+        if (source == null) {
             return CONTINUE;
         }
-        if (Objects.equals(targetType, boolean.class) || Objects.equals(targetType, Boolean.class)) {
-            return Boolean.parseBoolean(obj.toString());
-        } else {
+        if (!Objects.equals(targetType, boolean.class) && !Objects.equals(targetType, Boolean.class)) {
             return CONTINUE;
         }
+        if (source instanceof Boolean) {
+            return source;
+        }
+        if (source instanceof Number) {
+            return ((Number) source).intValue() == 1;
+        }
+        return Boolean.parseBoolean(source.toString());
     }
 }

@@ -12,31 +12,41 @@ import java.util.Objects;
 import static xyz.srclab.common.convert.FsConverter.*;
 
 /**
- * Convert handler implementation which is used to check type compatibility, it follows:
+ * Convert handler implementation which is used to check type compatibility, it follows in order:
  * <ul>
  *     <li>
- *         If the {@code obj} is null, return {@link FsConverter#BREAK};
+ *         If source object is null, return {@link FsConverter#BREAK};
  *     </li>
  *     <li>
- *         If {@code fromType} is equals to {@code targetType}, return {@code obj};
+ *         If object generation policy is {@link Options#ALWAYS_NEW}, return {@link FsConverter#CONTINUE};
  *     </li>
  *     <li>
- *         If {@code targetType} is assignable from {@code fromType} with {@link FsType#isAssignableFrom(Type, Type)},
- *         return {@code obj};
+ *         If target type is equal to source type, return source object;
  *     </li>
  *     <li>
- *         If {@code targetType} is {@link TypeVariable}, return {@link FsConverter#BREAK};
+ *         If object generation policy is {@link Options#NEED_ASSIGNABLE}
+ *         and target type is assignable from source type, return source object;
  *     </li>
  *     <li>
- *         If {@code targetType} is {@link WildcardType} and has an upper bound (? extends),
- *         return {@link FsConverter#BREAK};
+ *         If target type is {@link TypeVariable}, return {@link FsConverter#BREAK};
  *     </li>
  *     <li>
- *         If {@code targetType} is {@link WildcardType} and has an lower bound (? super), return {@code obj};
+ *         If target type is {@link WildcardType} and has an upper bound (? extends),
+ *         return
+ *         <pre>
+ *             converter.convert(source, sourceType, targetUpper, options);
+ *         </pre>
  *     </li>
  *     <li>
- *         If {@code fromType} is {@link TypeVariable} or {@link WildcardType}, the {@code fromType} will be replaced by
- *         {@link Object#getClass()} of {@code obj};
+ *         If target type is {@link WildcardType} and has a lower bound (? super),
+ *         return
+ *         <pre>
+ *             converter.convert(
+ *                     source, sourceType, targetLower, options.replaceObjectGenerationPolicy(Options.NEED_EQUAL));
+ *         </pre>
+ *     </li>
+ *     <li>
+ *         Else return {@link FsConverter#CONTINUE};
  *     </li>
  * </ul>
  * This handler is system default prefix handler.
@@ -46,44 +56,36 @@ import static xyz.srclab.common.convert.FsConverter.*;
 public class AssignableConvertHandler implements FsConverter.Handler {
 
     @Override
-    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
-        if (obj == null) {
+    public @Nullable Object convert(
+        @Nullable Object source, Type sourceType, Type targetType, Options options, FsConverter converter) {
+        if (source == null) {
             return BREAK;
         }
-        if (Objects.equals(targetType, fromType)) {
-            return obj;
+        if (options.objectGenerationPolicy() == Options.ALWAYS_NEW) {
+            return CONTINUE;
         }
-        if (FsType.isAssignableFrom(targetType, fromType)) {
-            return obj;
+        if (Objects.equals(targetType, sourceType)) {
+            return source;
+        }
+        if (options.objectGenerationPolicy() == Options.NEED_ASSIGNABLE
+            && FsType.isAssignableFrom(targetType, sourceType)) {
+            return source;
         }
         if (targetType instanceof TypeVariable<?>) {
             return BREAK;
         }
-        Type targetBound = targetType;
         if (targetType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) targetType;
             Type targetUpper = FsType.getUpperBound(wildcardType);
             if (targetUpper != null) {
-                targetBound = targetUpper;
-            } else {
-                return BREAK;
+                return converter.convert(source, sourceType, targetUpper, options);
             }
-        }
-        Type fromBound = fromBound(obj, fromType);
-        if (fromBound != fromType || targetBound != targetType) {
-            Object value = converter.convert(obj, fromBound, targetBound);
-            if (value == UNSUPPORTED) {
-                return BREAK;
+            Type targetLower = FsType.getLowerBound(wildcardType);
+            if (targetLower != null) {
+                return converter.convert(
+                    source, sourceType, targetLower, options.replaceObjectGenerationPolicy(Options.NEED_EQUAL));
             }
-            return value;
         }
         return CONTINUE;
-    }
-
-    private Type fromBound(Object obj, Type fromType) {
-        if (fromType instanceof TypeVariable || fromType instanceof WildcardType) {
-            return obj.getClass();
-        }
-        return fromType;
     }
 }

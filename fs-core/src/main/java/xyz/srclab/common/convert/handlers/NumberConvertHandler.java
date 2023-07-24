@@ -30,56 +30,60 @@ import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 public class NumberConvertHandler implements FsConverter.Handler {
 
     @Override
-    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
-        if (obj == null) {
+    public @Nullable Object convert(
+        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+        if (source == null) {
             return CONTINUE;
         }
         if (Objects.equals(targetType, byte.class) || Objects.equals(targetType, Byte.class)) {
-            if (FsType.isAssignableFrom(Number.class, fromType)) {
-                return ((Number) obj).byteValue();
+            if (source instanceof Number) {
+                return ((Number) source).byteValue();
             } else {
-                return Byte.parseByte(obj.toString());
+                return Byte.parseByte(source.toString());
             }
         } else if (Objects.equals(targetType, short.class) || Objects.equals(targetType, Short.class)) {
-            if (FsType.isAssignableFrom(Number.class, fromType)) {
-                return ((Number) obj).shortValue();
+            if (source instanceof Number) {
+                return ((Number) source).shortValue();
             } else {
-                return Short.parseShort(obj.toString());
+                return Short.parseShort(source.toString());
             }
         } else if (Objects.equals(targetType, int.class) || Objects.equals(targetType, Integer.class)) {
-            if (FsType.isAssignableFrom(Number.class, fromType)) {
-                return ((Number) obj).intValue();
+            if (source instanceof Number) {
+                return ((Number) source).intValue();
             } else {
-                return Integer.parseInt(obj.toString());
+                return Integer.parseInt(source.toString());
             }
         } else if (Objects.equals(targetType, long.class) || Objects.equals(targetType, Long.class)) {
-            if (FsType.isAssignableFrom(Number.class, fromType)) {
-                return ((Number) obj).longValue();
+            if (source instanceof Number) {
+                return ((Number) source).longValue();
             } else {
-                return Long.parseLong(obj.toString());
+                return Long.parseLong(source.toString());
             }
         } else if (Objects.equals(targetType, float.class) || Objects.equals(targetType, Float.class)) {
-            if (FsType.isAssignableFrom(Number.class, fromType)) {
-                return ((Number) obj).floatValue();
+            if (source instanceof Number) {
+                return ((Number) source).floatValue();
             } else {
-                return Float.parseFloat(obj.toString());
+                return Float.parseFloat(source.toString());
             }
         } else if (Objects.equals(targetType, double.class) || Objects.equals(targetType, Double.class)) {
-            if (FsType.isAssignableFrom(Number.class, fromType)) {
-                return ((Number) obj).doubleValue();
+            if (source instanceof Number) {
+                return ((Number) source).doubleValue();
             } else {
-                return Double.parseDouble(obj.toString());
+                return Double.parseDouble(source.toString());
             }
         } else if (Objects.equals(targetType, char.class) || Objects.equals(targetType, Character.class)) {
-            if (FsType.isAssignableFrom(Number.class, fromType)) {
-                return (char) (((Number) obj).intValue());
+            if (source instanceof Number) {
+                return (char) (((Number) source).intValue());
             } else {
-                return (char) (Integer.parseInt(obj.toString()));
+                return (char) (Integer.parseInt(source.toString()));
             }
         } else if (Objects.equals(targetType, BigDecimal.class)) {
-            return new BigDecimal(obj.toString());
+            if (source instanceof BigDecimal) {
+                return options.objectGenerationPolicy() == Op;
+            }
+            return new BigDecimal(source.toString());
         } else if (Objects.equals(targetType, BigInteger.class)) {
-            return new BigInteger(obj.toString());
+            return new BigInteger(source.toString());
         } else {
             return CONTINUE;
         }

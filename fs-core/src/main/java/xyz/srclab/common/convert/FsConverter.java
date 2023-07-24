@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Converter to convert object from specified type to target type.
+ * Converter to convert source object from source type to target type.
  * <p>
  * A {@link FsConverter} consists of a list of {@link Handler}s.
  * More specifically, the converter is composed of a prefix handler (maybe null), a list of common handlers,
@@ -18,10 +18,10 @@ import java.util.List;
  * <p>
  * The conversion is performed in the order of the prefix handler (if not null), common handlers,
  * and suffix converter (if not null). If any handler returns a non-{@link #CONTINUE} and non-{@link #BREAK} value,
- * the conversion is successful and that value will be returned.
+ * the conversion is successful and that return value will be returned.
  * <p>
- * If a handler returns {@link #CONTINUE}, it means that handler doesn't support current conversion and hand off to
- * next handler; If returns {@link #BREAK}, it means this converter doesn't support current conversion.
+ * If a handler returns {@link #CONTINUE}, it means that handler doesn't support current conversion and hands off to
+ * next handler; If it returns {@link #BREAK}, means this converter doesn't support current conversion.
  *
  * @author fredsuvn
  * @see Handler
@@ -50,12 +50,12 @@ public interface FsConverter {
     }
 
     /**
-     * Represents current conversion is not supported by this handler and will be handed off to next handler.
+     * Represents current conversion is unsupported by this handler and will be handed off to next handler.
      */
     Object CONTINUE = new Object();
 
     /**
-     * Represents current conversion is not supported by current converter and the conversion will be finished.
+     * Represents current conversion is unsupported by this handler and will be broken out the conversion will be finished.
      */
     Object BREAK = new Object();
 
@@ -91,9 +91,9 @@ public interface FsConverter {
     /**
      * Returns a converters with given prefix, suffix, common handlers and conversion options.
      *
-     * @param prefix prefix handler
-     * @param suffix suffix handler
-     * @param common common handlers
+     * @param prefix  prefix handler
+     * @param suffix  suffix handler
+     * @param common  common handlers
      * @param options conversion options
      */
     static FsConverter newConverter(
@@ -136,8 +136,8 @@ public interface FsConverter {
             }
 
             @Override
-            public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
-                Object value = convert(obj, fromType, targetType);
+            public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, Options options1, FsConverter converter) {
+                Object value = convert(source, sourceType, targetType, options1);
                 if (value == UNSUPPORTED) {
                     return BREAK;
                 }
@@ -214,7 +214,7 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convert(@Nullable Object obj, Type targetType) {
-        Object value = convert(obj, obj.getClass(), targetType);
+        Object value = convert(obj, obj.getClass(), targetType, getOptions());
         if (value == UNSUPPORTED) {
             return null;
         }
@@ -235,7 +235,7 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convertByType(@Nullable Object obj, Type fromType, Type targetType) {
-        Object value = convert(obj, fromType, targetType);
+        Object value = convert(obj, fromType, targetType, getOptions());
         if (value == UNSUPPORTED) {
             return null;
         }
@@ -243,20 +243,20 @@ public interface FsConverter {
     }
 
     /**
-     * Converts given object from specified type to target type.
+     * Converts source object from source type to target type.
      * If return value is {@link #UNSUPPORTED}, it indicates current conversion is unsupported.
      * Any other return value indicates current conversion is successful and the return value is valid, including null.
      *
-     * @param obj        given object
-     * @param fromType   specified type
+     * @param source     source object
+     * @param sourceType source type
      * @param targetType target type
      */
     @Nullable
-    default Object convert(@Nullable Object obj, Type fromType, Type targetType) {
+    default Object convert(@Nullable Object source, Type sourceType, Type targetType, Options options) {
         Handler prefix = getPrefixHandler();
         if (prefix != null) {
-            Object value = prefix.convert(obj, fromType, targetType, this);
-            if (value == BREAK) {
+            Object value = prefix.convert(source, sourceType, targetType, options, this);
+            if (value == BREAK || value == UNSUPPORTED) {
                 return UNSUPPORTED;
             }
             if (value != CONTINUE) {
@@ -264,8 +264,8 @@ public interface FsConverter {
             }
         }
         for (Handler commonHandler : getCommonHandlers()) {
-            Object value = commonHandler.convert(obj, fromType, targetType, this);
-            if (value == BREAK) {
+            Object value = commonHandler.convert(source, sourceType, targetType, options, this);
+            if (value == BREAK || value == UNSUPPORTED) {
                 return UNSUPPORTED;
             }
             if (value != CONTINUE) {
@@ -274,8 +274,8 @@ public interface FsConverter {
         }
         Handler suffix = getSuffixHandler();
         if (suffix != null) {
-            Object value = suffix.convert(obj, fromType, targetType, this);
-            if (value == BREAK || value == CONTINUE) {
+            Object value = suffix.convert(source, sourceType, targetType, options, this);
+            if (value == BREAK || value == CONTINUE || value == UNSUPPORTED) {
                 return UNSUPPORTED;
             }
             return value;
@@ -284,19 +284,19 @@ public interface FsConverter {
     }
 
     /**
-     * Converts given object from specified type to target type.
+     * Converts source object from source type to target type.
      * If current conversion is unsupported, an {@link UnsupportedConvertException} will be thrown
      *
-     * @param obj        given object
-     * @param fromType   specified type
+     * @param source     source object
+     * @param sourceType source type
      * @param targetType target type
      */
     @Nullable
-    default Object convertOrThrow(@Nullable Object obj, Type fromType, Type targetType)
+    default Object convertOrThrow(@Nullable Object source, Type sourceType, Type targetType, Options options)
         throws UnsupportedConvertException {
-        Object value = convert(obj, fromType, targetType);
+        Object value = convert(source, sourceType, targetType, options);
         if (value == UNSUPPORTED) {
-            throw new UnsupportedConvertException(fromType, targetType);
+            throw new UnsupportedConvertException(sourceType, targetType);
         }
         return value;
     }
@@ -329,7 +329,7 @@ public interface FsConverter {
     interface Handler {
 
         /**
-         * Converts given object from specified type to target type.
+         * Converts source object from source type to target type.
          * <p>
          * If this method returns {@link #CONTINUE}, it means that this handler doesn't support current conversion,
          * but it will hand off to next handler.
@@ -338,16 +338,16 @@ public interface FsConverter {
          * and the converter will break current conversion. This indicates that the converter does not support current
          * conversion.
          * <p>
-         * Otherwise, any other return value are considered as the final conversion result, returned by current
-         * converter.
+         * Otherwise, any other return value is considered as the final conversion result.
          *
-         * @param obj        given object
-         * @param fromType   specified type
+         * @param source     source object
+         * @param sourceType source type
          * @param targetType target type
-         * @param converter  current converter context
+         * @param converter  converter in which this handler is located.
          */
         @Nullable
-        Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter);
+        Object convert(
+            @Nullable Object source, Type sourceType, Type targetType, Options options, FsConverter converter);
     }
 
     /**
@@ -372,37 +372,65 @@ public interface FsConverter {
         /**
          * Returns options with given compatibility policy.
          *
-         * @param policy given compatibility policy, see {@link #compatibilityPolicy()}
+         * @param policy given compatibility policy, see {@link #objectGenerationPolicy()}
          */
         static Options withCompatibilityPolicy(int policy) {
             return new Options() {
                 @Override
-                public int compatibilityPolicy() {
+                public int objectGenerationPolicy() {
                     return policy;
                 }
             };
         }
 
+        /**
+         * Policy value for object generation:
+         * If and only if target type is assignable from source type,
+         * return source object, else return new instance of target type;
+         */
         int NEED_ASSIGNABLE = 1;
 
+        /**
+         * Policy value for object generation:
+         * If and only if target type is equal to source type, return source object,
+         * else return new instance of target type;
+         */
         int NEED_EQUAL = 2;
 
+        /**
+         * Policy value for object generation:
+         * Always return new instance of target type;
+         */
         int ALWAYS_NEW = 3;
 
         /**
-         * Returns compatibility policy for conversion:
+         * Returns object generation policy:
          * <ul>
          *     <li>
-         *         {@link #NEED_ASSIGNABLE}: only if target type is assignable from source type, return source object;
+         *         {@link #NEED_ASSIGNABLE}: If and only if target type is assignable from source type,
+         *         return source object, else return new instance of target type;
          *     </li>
          *     <li>
-         *         {@link #NEED_EQUAL}: only if target type is equal to source type, return source object;
+         *         {@link #NEED_EQUAL}: If and only if target type is equal to source type, return source object,
+         *         else return new instance of target type;
          *     </li>
          *     <li>
-         *         {@link #ALWAYS_NEW}: always return new instance of target type;
+         *         {@link #ALWAYS_NEW}: Always return new instance of target type;
          *     </li>
          * </ul>
          */
-        int compatibilityPolicy();
+        int objectGenerationPolicy();
+
+        /**
+         * Returns an Options of which {@link #objectGenerationPolicy()} is replaced by given policy.
+         *
+         * @param policy given policy
+         */
+        default Options replaceObjectGenerationPolicy(int policy) {
+            if (objectGenerationPolicy() == policy) {
+                return this;
+            }
+            return withCompatibilityPolicy(policy);
+        }
     }
 }

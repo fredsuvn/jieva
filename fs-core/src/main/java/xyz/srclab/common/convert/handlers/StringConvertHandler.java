@@ -27,25 +27,25 @@ import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 public class StringConvertHandler implements FsConverter.Handler {
 
     @Override
-    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
-        if (obj == null) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+        if (source == null) {
             return CONTINUE;
         }
         if (Objects.equals(targetType, String.class) || Objects.equals(targetType, CharSequence.class)) {
-            return obj.toString();
+            return source.toString();
         } else if (Objects.equals(targetType, char[].class)) {
-            return obj.toString().toCharArray();
+            return source.toString().toCharArray();
         } else if (Objects.equals(targetType, Character[].class)) {
-            String str = obj.toString();
+            String str = source.toString();
             Character[] result = new Character[str.length()];
             for (int i = 0; i < result.length; i++) {
                 result[i] = str.charAt(i);
             }
             return result;
         } else if (Objects.equals(targetType, StringBuilder.class)) {
-            return new StringBuilder(obj.toString());
+            return new StringBuilder(source.toString());
         } else if (Objects.equals(targetType, StringBuffer.class)) {
-            return new StringBuffer(obj.toString());
+            return new StringBuffer(source.toString());
         } else {
             return CONTINUE;
         }

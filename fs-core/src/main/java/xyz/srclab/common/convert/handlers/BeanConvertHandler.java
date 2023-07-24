@@ -41,11 +41,11 @@ public class BeanConvertHandler implements Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
-        if (obj == null) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+        if (source == null) {
             return CONTINUE;
         }
-        Object result = FsBean.copyProperties(obj, fromType, targetType, resolver, converter);
+        Object result = FsBean.copyProperties(source, sourceType, targetType, resolver, converter);
         if (result == null) {
             return CONTINUE;
         }

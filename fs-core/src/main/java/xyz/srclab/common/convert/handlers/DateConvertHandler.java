@@ -143,9 +143,9 @@ public class DateConvertHandler implements FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         try {
-            return convert0(obj, fromType, targetType, converter);
+            return convert0(source, sourceType, targetType, converter);
         } catch (ParseException e) {
             throw new IllegalStateException(e);
         }

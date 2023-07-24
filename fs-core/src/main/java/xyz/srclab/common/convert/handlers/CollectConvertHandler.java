@@ -48,27 +48,27 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
-        if (obj == null) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+        if (source == null) {
             return CONTINUE;
         }
         if (targetType instanceof Class) {
             if (((Class<?>) targetType).isArray()) {
-                ObjectType<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
+                ObjectType<Iterable<?>> fromInfo = toGenericInfo(source, sourceType);
                 if (fromInfo == null) {
                     return CONTINUE;
                 }
                 return convertArray(fromInfo, ((Class<?>) targetType).getComponentType(), converter);
             }
-            return convertIterableType(obj, fromType, targetType, converter);
+            return convertIterableType(source, sourceType, targetType, converter);
         } else if (targetType instanceof GenericArrayType) {
-            ObjectType<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
+            ObjectType<Iterable<?>> fromInfo = toGenericInfo(source, sourceType);
             if (fromInfo == null) {
                 return CONTINUE;
             }
             return convertArray(fromInfo, ((GenericArrayType) targetType).getGenericComponentType(), converter);
         }
-        return convertIterableType(obj, fromType, targetType, converter);
+        return convertIterableType(source, sourceType, targetType, converter);
     }
 
     @Nullable
