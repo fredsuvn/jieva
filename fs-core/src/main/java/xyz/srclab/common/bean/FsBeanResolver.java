@@ -313,7 +313,7 @@ public interface FsBeanResolver {
                 return null;
             }
 
-            private final class FsBeanInfoImpl extends FsFinal implements FsBeanInfo {
+            private static final class FsBeanInfoImpl extends FsFinal implements FsBeanInfo {
 
                 private final Type type;
                 private Map<String, FsBeanProperty> properties = new LinkedHashMap<>();
@@ -355,11 +355,9 @@ public interface FsBeanResolver {
 
                 @Override
                 protected String computeToString() {
-                    StringBuilder sb = new StringBuilder("bean(");
-                    sb.append(properties.entrySet().stream()
-                        .map(it -> it.getKey() + ": " + it.getValue()).collect(Collectors.joining(", ")));
-                    sb.append(")");
-                    return sb.toString();
+                    return "bean(" + properties.entrySet().stream()
+                        .map(it -> it.getKey() + ": " + it.getValue()).collect(Collectors.joining(", ")) +
+                        ")";
                 }
             }
 
@@ -524,14 +522,13 @@ public interface FsBeanResolver {
 
                 @Override
                 protected String computeToString() {
-                    String sb = "BeanProperty(name=" +
+                    return "BeanProperty(name=" +
                         name +
                         ", type=" +
                         type +
                         ", ownerType=" +
                         owner.getType() +
                         ")";
-                    return sb;
                 }
             }
         }

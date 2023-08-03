@@ -15,10 +15,10 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class BeanConvertTest {
+public class BeanTest {
 
     @Test
-    public void testTypeBean() {
+    public void testTypeBean() throws Exception {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
         FsBeanInfo ccBean = FsBeanInfo.resolve(ccType);
@@ -35,27 +35,27 @@ public class BeanConvertTest {
         Assert.assertNull(c1);
         Assert.assertEquals(
             c2.getFieldAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
-            Arrays.asList("@test.BeanConvertTest$Ann(value=c2)")
+            Arrays.asList(C2.class.getDeclaredField("c2").getAnnotations()[0].toString())
         );
         Assert.assertEquals(
             c2.getGetterAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
-            Arrays.asList("@test.BeanConvertTest$Ann(value=getC2)")
+            Arrays.asList(C2.class.getMethod("getC2").getAnnotations()[0].toString())
         );
         Assert.assertEquals(
             c2.getSetterAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
-            Arrays.asList("@test.BeanConvertTest$Ann(value=setC2)")
+            Arrays.asList(C2.class.getMethod("setC2", Object.class).getAnnotations()[0].toString())
         );
         Assert.assertEquals(
             c2.getAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
             Arrays.asList(
-                "@test.BeanConvertTest$Ann(value=getC2)",
-                "@test.BeanConvertTest$Ann(value=setC2)",
-                "@test.BeanConvertTest$Ann(value=c2)"
+                C2.class.getMethod("getC2").getAnnotations()[0].toString(),
+                C2.class.getMethod("setC2", Object.class).getAnnotations()[0].toString(),
+                C2.class.getDeclaredField("c2").getAnnotations()[0].toString()
             ));
     }
 
     @Test
-    public void testClassBean() {
+    public void testClassBean() throws Exception {
         Type ccType = Cc.class;
         FsBeanInfo ccBean = FsBeanInfo.resolve(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
@@ -71,22 +71,22 @@ public class BeanConvertTest {
         Assert.assertNull(c1);
         Assert.assertEquals(
             c2.getFieldAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
-            Arrays.asList("@test.BeanConvertTest$Ann(value=c2)")
+            Arrays.asList(C2.class.getDeclaredField("c2").getAnnotations()[0].toString())
         );
         Assert.assertEquals(
             c2.getGetterAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
-            Arrays.asList("@test.BeanConvertTest$Ann(value=getC2)")
+            Arrays.asList(C2.class.getMethod("getC2").getAnnotations()[0].toString())
         );
         Assert.assertEquals(
             c2.getSetterAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
-            Arrays.asList("@test.BeanConvertTest$Ann(value=setC2)")
+            Arrays.asList(C2.class.getMethod("setC2", Object.class).getAnnotations()[0].toString())
         );
         Assert.assertEquals(
             c2.getAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
             Arrays.asList(
-                "@test.BeanConvertTest$Ann(value=getC2)",
-                "@test.BeanConvertTest$Ann(value=setC2)",
-                "@test.BeanConvertTest$Ann(value=c2)"
+                C2.class.getMethod("getC2").getAnnotations()[0].toString(),
+                C2.class.getMethod("setC2", Object.class).getAnnotations()[0].toString(),
+                C2.class.getDeclaredField("c2").getAnnotations()[0].toString()
             ));
     }
 
