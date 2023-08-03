@@ -8,7 +8,6 @@ import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.ObjectType;
 import xyz.srclab.common.reflect.TypeRef;
-import xyz.srclab.common.reflect.TypeWrapper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -112,44 +111,6 @@ public class TypeTest {
         Assert.assertEquals(
             tType.getTypeVariableBound(0),
             Float.class
-        );
-    }
-
-    @Test
-    public void testWrapper() {
-        Assert.assertEquals(
-            TypeWrapper.from(new TypeRef<List<?>>() {
-            }.getType()),
-            TypeWrapper.from(new TypeRef<List<?>>() {
-            }.getType())
-        );
-        Assert.assertSame(
-            TypeWrapper.from(new TypeRef<List<?>>() {
-            }.getType()),
-            TypeWrapper.from(new TypeRef<List<?>>() {
-            }.getType())
-        );
-        Assert.assertNotSame(
-            TypeWrapper.from(new TypeRef<List<?>>() {
-            }.getType()),
-            TypeWrapper.newWrapper(new TypeRef<List<?>>() {
-            }.getType())
-        );
-        Assert.assertEquals(
-            TypeWrapper.from(new TypeRef<List<?>>() {
-            }.getType()),
-            TypeWrapper.newWrapper(new TypeRef<List<?>>() {
-            }.getType())
-        );
-        TypeWrapper<?> typeWrapper = TypeWrapper.from(new TypeRef<Map<String, Integer>>() {
-        }.getType());
-        Assert.assertEquals(
-            typeWrapper.getActualTypeArgument(0),
-            String.class
-        );
-        Assert.assertEquals(
-            typeWrapper.getActualTypeArgument(1),
-            Integer.class
         );
     }
 
