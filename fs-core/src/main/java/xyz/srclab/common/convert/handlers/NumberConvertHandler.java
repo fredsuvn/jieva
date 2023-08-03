@@ -2,7 +2,6 @@ package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.convert.FsConverter;
-import xyz.srclab.common.reflect.FsType;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -79,10 +78,13 @@ public class NumberConvertHandler implements FsConverter.Handler {
             }
         } else if (Objects.equals(targetType, BigDecimal.class)) {
             if (source instanceof BigDecimal) {
-                return options.objectGenerationPolicy() == Op;
+                return source;
             }
             return new BigDecimal(source.toString());
         } else if (Objects.equals(targetType, BigInteger.class)) {
+            if (source instanceof BigInteger) {
+                return source;
+            }
             return new BigInteger(source.toString());
         } else {
             return CONTINUE;

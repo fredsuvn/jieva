@@ -31,7 +31,7 @@ public interface FsConverter {
     /**
      * Returns default converter, of which handlers are:
      * <ul>
-     *     <li>Prefix: {@link xyz.srclab.common.convert.handlers.AssignableConvertHandler};</li>
+     *     <li>Prefix: {@link xyz.srclab.common.convert.handlers.ReuseConvertHandler};</li>
      *     <li>Suffix: {@link xyz.srclab.common.convert.handlers.BeanConvertHandler};</li>
      *     <li>Common:
      *     <ul>
@@ -43,7 +43,7 @@ public interface FsConverter {
      *     </ul>
      *     </li>
      * </ul>
-     * Those construct from empty constructor and in the order listed.
+     * Those are constructed from empty constructor and in the order listed.
      */
     static FsConverter defaultConverter() {
         return FsUnsafe.ForConvert.DEFAULT_CONVERTER;
@@ -65,69 +65,75 @@ public interface FsConverter {
     Object UNSUPPORTED = new Object();
 
     /**
-     * Returns a converters with given prefix, suffix, common handlers, and default conversion options.
+     * Returns a converters with given common handlers.
      *
-     * @param prefix prefix handler
-     * @param suffix suffix handler
-     * @param common common handlers
+     * @param commonHandlers common handlers
+     */
+    static FsConverter withHandlers(Iterable<Handler> commonHandlers) {
+        return withHandlers(null, null, commonHandlers);
+    }
+
+    /**
+     * Returns a converters with given prefix, suffix, common handlers.
+     *
+     * @param prefix         prefix handler
+     * @param suffix         suffix handler
+     * @param commonHandlers common handlers
      */
     static FsConverter withHandlers(
         @Nullable Handler prefix,
         @Nullable Handler suffix,
-        Iterable<Handler> common
+        Iterable<Handler> commonHandlers
     ) {
-        return newConverter(prefix, suffix, common, Options.defaultOptions());
-    }
-
-    /**
-     * Returns a converters with given common handlers and default conversion options.
-     *
-     * @param common common handlers
-     */
-    static FsConverter withHandlers(Iterable<Handler> common) {
-        return withHandlers(null, null, common);
+        return newConverter(prefix, suffix, commonHandlers, Options.defaultOptions());
     }
 
     /**
      * Returns a converters with given prefix, suffix, common handlers and conversion options.
      *
-     * @param prefix  prefix handler
-     * @param suffix  suffix handler
-     * @param common  common handlers
-     * @param options conversion options
+     * @param prefix         prefix handler
+     * @param suffix         suffix handler
+     * @param commonHandlers common handlers
+     * @param options        conversion options
      */
     static FsConverter newConverter(
         @Nullable Handler prefix,
         @Nullable Handler suffix,
-        Iterable<Handler> common,
+        Iterable<Handler> commonHandlers,
         Options options
     ) {
         class FsConverterImpl implements FsConverter, Handler {
 
-            private final List<Handler> commonHandlers;
+            private final @Nullable Handler pf;
+            private final @Nullable Handler sf;
+            private final List<Handler> chs;
+            private final Options opts;
 
-            FsConverterImpl(List<Handler> commonHandlers) {
-                this.commonHandlers = commonHandlers;
+            FsConverterImpl(@Nullable Handler pf, @Nullable Handler sf, List<Handler> chs, Options opts) {
+                this.pf = pf;
+                this.sf = sf;
+                this.chs = chs;
+                this.opts = opts;
             }
 
             @Override
             public @Nullable Handler getPrefixHandler() {
-                return prefix;
+                return pf;
             }
 
             @Override
             public @Nullable Handler getSuffixHandler() {
-                return suffix;
+                return sf;
             }
 
             @Override
             public List<Handler> getCommonHandlers() {
-                return commonHandlers;
+                return chs;
             }
 
             @Override
             public Options getOptions() {
-                return options;
+                return opts;
             }
 
             @Override
@@ -136,15 +142,16 @@ public interface FsConverter {
             }
 
             @Override
-            public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, Options options1, FsConverter converter) {
-                Object value = convert(source, sourceType, targetType, options1);
+            public @Nullable Object convert(
+                @Nullable Object source, Type sourceType, Type targetType, Options opts, FsConverter converter) {
+                Object value = convert(source, sourceType, targetType, opts);
                 if (value == UNSUPPORTED) {
                     return BREAK;
                 }
                 return value;
             }
         }
-        return new FsConverterImpl(FsCollect.immutableList(common));
+        return new FsConverterImpl(prefix, suffix, FsCollect.immutableList(commonHandlers), options);
     }
 
     /**
@@ -173,69 +180,118 @@ public interface FsConverter {
      * Converts given object to target type.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>
-     * Note the return value itself may also be null.
-     * </b>
+     * <b>Note the return value itself may also be null.</b>
      *
      * @param obj        given object
      * @param targetType target type
      */
     @Nullable
     default <T> T convert(@Nullable Object obj, Class<T> targetType) {
-        return convert(obj, (Type) targetType);
+        return convert(obj, targetType, getOptions());
+    }
+
+    /**
+     * Converts given object to target type with given options.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>Note the return value itself may also be null.</b>
+     *
+     * @param obj        given object
+     * @param targetType target type
+     * @param options    given options
+     */
+    @Nullable
+    default <T> T convert(@Nullable Object obj, Class<T> targetType, Options options) {
+        return convertByType(obj, obj == null ? Object.class : obj.getClass(), targetType, options);
     }
 
     /**
      * Converts given object to target type.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>
-     * Note the return value itself may also be null.
-     * </b>
+     * <b>Note the return value itself may also be null.</b>
      *
      * @param obj        given object
-     * @param targetType ref of target type
+     * @param targetType type reference of target type
      */
     @Nullable
     default <T> T convert(@Nullable Object obj, TypeRef<T> targetType) {
-        return convert(obj, targetType.getType());
+        return convert(obj, targetType, getOptions());
+    }
+
+    /**
+     * Converts given object to target type with given options.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>Note the return value itself may also be null.</b>
+     *
+     * @param obj        given object
+     * @param targetType type reference target type
+     * @param options    given options
+     */
+    @Nullable
+    default <T> T convert(@Nullable Object obj, TypeRef<T> targetType, Options options) {
+        return convertByType(obj, obj == null ? Object.class : obj.getClass(), targetType.getType(), options);
     }
 
     /**
      * Converts given object to target type.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>
-     * Note the return value itself may also be null.
-     * </b>
+     * <b>Note the return value itself may also be null.</b>
      *
      * @param obj        given object
      * @param targetType target type
      */
     @Nullable
     default <T> T convert(@Nullable Object obj, Type targetType) {
-        Object value = convert(obj, obj.getClass(), targetType, getOptions());
-        if (value == UNSUPPORTED) {
-            return null;
-        }
-        return (T) value;
+        return convert(obj, targetType, getOptions());
     }
 
     /**
-     * Converts given object from specified type to target type.
+     * Converts given object to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>
-     * Note the return value itself may also be null.
-     * </b>
+     * <b>Note the return value itself may also be null.</b>
      *
      * @param obj        given object
-     * @param fromType   specified type
+     * @param targetType target type
+     * @param options    given options
+     */
+    @Nullable
+    default <T> T convert(@Nullable Object obj, Type targetType, Options options) {
+        return convertByType(obj, obj == null ? Object.class : obj.getClass(), targetType, options);
+    }
+
+    /**
+     * Converts given object from source type to target type.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>Note the return value itself may also be null.</b>
+     *
+     * @param obj        given object
+     * @param sourceType source type
      * @param targetType target type
      */
     @Nullable
-    default <T> T convertByType(@Nullable Object obj, Type fromType, Type targetType) {
-        Object value = convert(obj, fromType, targetType, getOptions());
+    default <T> T convertByType(@Nullable Object obj, Type sourceType, Type targetType) {
+        return convertByType(obj, sourceType, targetType, getOptions());
+    }
+
+    /**
+     * Converts given object from source type to target type with given options.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>Note the return value itself may also be null.</b>
+     *
+     * @param obj        given object
+     * @param sourceType source type
+     * @param targetType target type
+     * @param options    given options
+     */
+    @Nullable
+    default <T> T convertByType(@Nullable Object obj, Type sourceType, Type targetType, Options options) {
+        Object value = convert(obj, sourceType, targetType, options);
         if (value == UNSUPPORTED) {
             return null;
         }
@@ -361,7 +417,7 @@ public interface FsConverter {
          * Returns default options:
          * <ul>
          *     <li>
-         *         Compatibility policy: {@link #NEED_ASSIGNABLE};
+         *         Compatibility policy: {@link #REUSE_ASSIGNABLE};
          *     </li>
          * </ul>
          */
@@ -370,67 +426,64 @@ public interface FsConverter {
         }
 
         /**
-         * Returns options with given compatibility policy.
+         * Returns options with given object reuse policy.
          *
-         * @param policy given compatibility policy, see {@link #objectGenerationPolicy()}
+         * @param reusePolicy given reuse policy, see {@link #reusePolicy()}
          */
-        static Options withCompatibilityPolicy(int policy) {
+        static Options withReusePolicy(int reusePolicy) {
             return new Options() {
                 @Override
-                public int objectGenerationPolicy() {
-                    return policy;
+                public int reusePolicy() {
+                    return reusePolicy;
                 }
             };
         }
 
         /**
-         * Policy value for object generation:
-         * If and only if target type is assignable from source type,
-         * return source object, else return new instance of target type;
+         * Policy value for object reuse:
+         * <li>
+         * If and only if target type is assignable from source type, return the source object.
+         * </li>
          */
-        int NEED_ASSIGNABLE = 1;
+        int REUSE_ASSIGNABLE = 1;
 
         /**
-         * Policy value for object generation:
-         * If and only if target type is equal to source type, return source object,
-         * else return new instance of target type;
+         * Policy value for object reuse:
+         * <li>
+         * If and only if target type is equal to source type, return the source object.
+         * </li>
          */
-        int NEED_EQUAL = 2;
+        int REUSE_EQUAL = 2;
 
         /**
-         * Policy value for object generation:
-         * Always return new instance of target type;
+         * Policy value for object reuse:
+         * <li>
+         * Never return the source object if the source object is not immutable.
+         * If the source object is immutable, it may still be returned.
+         * </li>
          */
-        int ALWAYS_NEW = 3;
+        int NO_REUSE = 3;
 
         /**
-         * Returns object generation policy:
+         * Returns object reuse policy:
          * <ul>
-         *     <li>
-         *         {@link #NEED_ASSIGNABLE}: If and only if target type is assignable from source type,
-         *         return source object, else return new instance of target type;
-         *     </li>
-         *     <li>
-         *         {@link #NEED_EQUAL}: If and only if target type is equal to source type, return source object,
-         *         else return new instance of target type;
-         *     </li>
-         *     <li>
-         *         {@link #ALWAYS_NEW}: Always return new instance of target type;
-         *     </li>
+         *     <li>{@link #REUSE_ASSIGNABLE};</li>
+         *     <li>{@link #REUSE_EQUAL};</li>
+         *     <li>{@link #NO_REUSE};</li>
          * </ul>
          */
-        int objectGenerationPolicy();
+        int reusePolicy();
 
         /**
-         * Returns an Options of which {@link #objectGenerationPolicy()} is replaced by given policy.
+         * Returns an Options of which {@link #reusePolicy()} is replaced by given policy.
          *
-         * @param policy given policy
+         * @param reusePolicy given reuse policy
          */
-        default Options replaceObjectGenerationPolicy(int policy) {
-            if (objectGenerationPolicy() == policy) {
+        default Options replaceReusePolicy(int reusePolicy) {
+            if (reusePolicy() == reusePolicy) {
                 return this;
             }
-            return withCompatibilityPolicy(policy);
+            return withReusePolicy(reusePolicy);
         }
     }
 }

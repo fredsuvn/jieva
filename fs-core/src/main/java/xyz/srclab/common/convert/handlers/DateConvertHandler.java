@@ -60,7 +60,7 @@ import static xyz.srclab.common.convert.FsConverter.CONTINUE;
  */
 public class DateConvertHandler implements FsConverter.Handler {
 
-    private static PatternFunction DEFAULT_PATTERN_FUNCTION = new PatternFunction() {
+    private static final PatternFunction DEFAULT_PATTERN_FUNCTION = new PatternFunction() {
 
         @Override
         public DateFormat getDateFormat() {
@@ -143,235 +143,237 @@ public class DateConvertHandler implements FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(
+        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         try {
-            return convert0(source, sourceType, targetType, converter);
+            return convert0(source, sourceType, targetType);
         } catch (ParseException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public @Nullable Object convert0(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter)
-        throws ParseException {
-        if (obj == null) {
+    public @Nullable Object convert0(@Nullable Object source, Type sourceType, Type targetType) throws ParseException {
+        if (source == null) {
             return CONTINUE;
         }
         if (Objects.equals(targetType, String.class)) {
-            Date date = tryDate(obj, fromType);
+            Date date = tryDate(source, sourceType);
             if (date != null) {
                 return pattern.getDateFormat().format(date);
             }
-            Instant instant = tryInstant(obj, fromType);
+            Instant instant = tryInstant(source, sourceType);
             if (instant != null) {
                 return pattern.getFormatter().format(instant);
             }
-            LocalDateTime localDateTime = tryLocalDateTime(obj, fromType);
+            LocalDateTime localDateTime = tryLocalDateTime(source, sourceType);
             if (localDateTime != null) {
                 return pattern.getFormatter().format(localDateTime);
             }
-            ZonedDateTime zonedDateTime = tryZonedDateTime(obj, fromType);
+            ZonedDateTime zonedDateTime = tryZonedDateTime(source, sourceType);
             if (zonedDateTime != null) {
                 return pattern.getFormatter().format(zonedDateTime);
             }
-            OffsetDateTime offsetDateTime = tryOffsetDateTime(obj, fromType);
+            OffsetDateTime offsetDateTime = tryOffsetDateTime(source, sourceType);
             if (offsetDateTime != null) {
                 return pattern.getFormatter().format(offsetDateTime);
             }
-            if (Objects.equals(Duration.class, fromType)
-                || Objects.equals(TimeZone.class, fromType)
-                || Objects.equals(ZoneId.class, fromType)
-                || Objects.equals(ZoneOffset.class, fromType)) {
-                return obj.toString();
+            if (Objects.equals(Duration.class, sourceType)
+                || Objects.equals(TimeZone.class, sourceType)
+                || Objects.equals(ZoneId.class, sourceType)
+                || Objects.equals(ZoneOffset.class, sourceType)) {
+                return source.toString();
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, StringBuilder.class)) {
-            Object result = convert0(obj, fromType, String.class, converter);
+            Object result = convert0(source, sourceType, String.class);
             if (result != null && Objects.equals(result.getClass(), String.class)) {
                 return new StringBuilder(result.toString());
             }
+            return CONTINUE;
         } else if (Objects.equals(targetType, StringBuffer.class)) {
-            Object result = convert0(obj, fromType, String.class, converter);
+            Object result = convert0(source, sourceType, String.class);
             if (result != null && Objects.equals(result.getClass(), String.class)) {
                 return new StringBuffer(result.toString());
             }
+            return CONTINUE;
         } else if (Objects.equals(targetType, Date.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return pattern.getDateFormat(str).parse(str);
             }
-            Long l = tryLong(obj, fromType);
+            Long l = tryLong(source, sourceType);
             if (l != null) {
                 return new Date(l);
             }
-            Instant instant = tryInstant(obj, fromType);
+            Instant instant = tryInstant(source, sourceType);
             if (instant != null) {
                 return Date.from(instant);
             }
-            LocalDateTime localDateTime = tryLocalDateTime(obj, fromType);
+            LocalDateTime localDateTime = tryLocalDateTime(source, sourceType);
             if (localDateTime != null) {
                 return Date.from(localDateTime.toInstant(FsDate.currentZoneOffset()));
             }
-            ZonedDateTime zonedDateTime = tryZonedDateTime(obj, fromType);
+            ZonedDateTime zonedDateTime = tryZonedDateTime(source, sourceType);
             if (zonedDateTime != null) {
                 return Date.from(zonedDateTime.toInstant());
             }
-            OffsetDateTime offsetDateTime = tryOffsetDateTime(obj, fromType);
+            OffsetDateTime offsetDateTime = tryOffsetDateTime(source, sourceType);
             if (offsetDateTime != null) {
                 return Date.from(offsetDateTime.toInstant());
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, Instant.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return FsDate.toInstant(pattern.getFormatter(str).parse(str));
             }
-            Long l = tryLong(obj, fromType);
+            Long l = tryLong(source, sourceType);
             if (l != null) {
                 return Instant.ofEpochMilli(l);
             }
-            Date date = tryDate(obj, fromType);
+            Date date = tryDate(source, sourceType);
             if (date != null) {
                 return date.toInstant();
             }
-            LocalDateTime localDateTime = tryLocalDateTime(obj, fromType);
+            LocalDateTime localDateTime = tryLocalDateTime(source, sourceType);
             if (localDateTime != null) {
                 return localDateTime.toInstant(FsDate.currentZoneOffset());
             }
-            ZonedDateTime zonedDateTime = tryZonedDateTime(obj, fromType);
+            ZonedDateTime zonedDateTime = tryZonedDateTime(source, sourceType);
             if (zonedDateTime != null) {
                 return zonedDateTime.toInstant();
             }
-            OffsetDateTime offsetDateTime = tryOffsetDateTime(obj, fromType);
+            OffsetDateTime offsetDateTime = tryOffsetDateTime(source, sourceType);
             if (offsetDateTime != null) {
                 return offsetDateTime.toInstant();
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, LocalDateTime.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return LocalDateTime.from(pattern.getFormatter(str).parse(str));
             }
-            Long l = tryLong(obj, fromType);
+            Long l = tryLong(source, sourceType);
             if (l != null) {
                 return LocalDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault());
             }
-            Date date = tryDate(obj, fromType);
+            Date date = tryDate(source, sourceType);
             if (date != null) {
                 return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
             }
-            Instant instant = tryInstant(obj, fromType);
+            Instant instant = tryInstant(source, sourceType);
             if (instant != null) {
                 return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
             }
-            ZonedDateTime zonedDateTime = tryZonedDateTime(obj, fromType);
+            ZonedDateTime zonedDateTime = tryZonedDateTime(source, sourceType);
             if (zonedDateTime != null) {
                 return zonedDateTime.toLocalDateTime();
             }
-            OffsetDateTime offsetDateTime = tryOffsetDateTime(obj, fromType);
+            OffsetDateTime offsetDateTime = tryOffsetDateTime(source, sourceType);
             if (offsetDateTime != null) {
                 return offsetDateTime.toLocalDateTime();
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, ZonedDateTime.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return ZonedDateTime.from(pattern.getFormatter(str).parse(str));
             }
-            Long l = tryLong(obj, fromType);
+            Long l = tryLong(source, sourceType);
             if (l != null) {
                 return ZonedDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault());
             }
-            Date date = tryDate(obj, fromType);
+            Date date = tryDate(source, sourceType);
             if (date != null) {
                 return ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
             }
-            Instant instant = tryInstant(obj, fromType);
+            Instant instant = tryInstant(source, sourceType);
             if (instant != null) {
                 return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
             }
-            LocalDateTime localDateTime = tryLocalDateTime(obj, fromType);
+            LocalDateTime localDateTime = tryLocalDateTime(source, sourceType);
             if (localDateTime != null) {
                 return localDateTime.atZone(ZoneId.systemDefault());
             }
-            OffsetDateTime offsetDateTime = tryOffsetDateTime(obj, fromType);
+            OffsetDateTime offsetDateTime = tryOffsetDateTime(source, sourceType);
             if (offsetDateTime != null) {
                 return offsetDateTime.toZonedDateTime();
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, OffsetDateTime.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return OffsetDateTime.from(pattern.getFormatter(str).parse(str));
             }
-            Long l = tryLong(obj, fromType);
+            Long l = tryLong(source, sourceType);
             if (l != null) {
                 return OffsetDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault());
             }
-            Date date = tryDate(obj, fromType);
+            Date date = tryDate(source, sourceType);
             if (date != null) {
                 return OffsetDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
             }
-            Instant instant = tryInstant(obj, fromType);
+            Instant instant = tryInstant(source, sourceType);
             if (instant != null) {
                 return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
             }
-            LocalDateTime localDateTime = tryLocalDateTime(obj, fromType);
+            LocalDateTime localDateTime = tryLocalDateTime(source, sourceType);
             if (localDateTime != null) {
                 return localDateTime.atZone(ZoneId.systemDefault()).toOffsetDateTime();
             }
-            ZonedDateTime zonedDateTime = tryZonedDateTime(obj, fromType);
+            ZonedDateTime zonedDateTime = tryZonedDateTime(source, sourceType);
             if (zonedDateTime != null) {
                 return zonedDateTime.toOffsetDateTime();
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, Duration.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return Duration.parse(str);
             }
-            Long l = tryLong(obj, fromType);
+            Long l = tryLong(source, sourceType);
             if (l != null) {
                 return Duration.ofMillis(l);
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, TimeZone.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return TimeZone.getTimeZone(str);
             }
-            ZoneId zoneId = tryZoneId(obj, fromType);
+            ZoneId zoneId = tryZoneId(source, sourceType);
             if (zoneId != null) {
                 return TimeZone.getTimeZone(zoneId);
             }
-            ZoneOffset zoneOffset = tryZoneOffset(obj, fromType);
+            ZoneOffset zoneOffset = tryZoneOffset(source, sourceType);
             if (zoneOffset != null) {
                 return TimeZone.getTimeZone(zoneOffset);
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, ZoneId.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return ZoneId.of(str);
             }
-            TimeZone timeZone = tryTimeZone(obj, fromType);
+            TimeZone timeZone = tryTimeZone(source, sourceType);
             if (timeZone != null) {
                 return timeZone.toZoneId();
             }
-            ZoneOffset zoneOffset = tryZoneOffset(obj, fromType);
+            ZoneOffset zoneOffset = tryZoneOffset(source, sourceType);
             if (zoneOffset != null) {
                 return zoneOffset;
             }
             return CONTINUE;
         } else if (Objects.equals(targetType, ZoneOffset.class)) {
-            String str = tryString(obj, fromType);
+            String str = tryString(source, sourceType);
             if (str != null) {
                 return ZoneOffset.of(str);
             }
-            TimeZone timeZone = tryTimeZone(obj, fromType);
+            TimeZone timeZone = tryTimeZone(source, sourceType);
             if (timeZone != null) {
                 return FsDate.toZoneOffset(timeZone.toZoneId());
             }
-            ZoneId zoneId = tryZoneId(obj, fromType);
+            ZoneId zoneId = tryZoneId(source, sourceType);
             if (zoneId != null) {
                 return FsDate.toZoneOffset(zoneId);
             }
@@ -383,6 +385,7 @@ public class DateConvertHandler implements FsConverter.Handler {
     @Nullable
     private String tryString(Object obj, Type type) {
         if (Objects.equals(type, String.class)
+            || Objects.equals(type, CharSequence.class)
             || Objects.equals(type, StringBuilder.class)
             || Objects.equals(type, StringBuffer.class)) {
             return obj.toString();

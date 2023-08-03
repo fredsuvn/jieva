@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Resolver for {@link FsBean}.
+ * Resolver for {@link FsBeanInfo}.
  *
  * @author fredsuvn
  */
@@ -42,11 +42,11 @@ public interface FsBeanResolver {
     }
 
     /**
-     * Resolves given type to {@link FsBean}.
+     * Resolves given type to {@link FsBeanInfo}.
      *
      * @param type given type
      */
-    FsBean resolve(Type type);
+    FsBeanInfo resolve(Type type);
 
     /**
      * Builder for {@link FsBeanResolver}.
@@ -164,7 +164,7 @@ public interface FsBeanResolver {
             private final int propertyNaming;
             private final FsCase propertyNamingCase;
             private final FsCase methodNamingCase;
-            private final FsCache<FsBean> cache;
+            private final FsCache<FsBeanInfo> cache;
 
             private FsBeanResolverImpl(
                 int invokeMode, int propertyNaming, FsCase propertyNamingCase, FsCase methodNamingCase, boolean useCache) {
@@ -180,14 +180,14 @@ public interface FsBeanResolver {
             }
 
             @Override
-            public FsBean resolve(Type type) {
+            public FsBeanInfo resolve(Type type) {
                 if (cache == null) {
                     return resolve0(type);
                 }
                 return cache.get(type, this::resolve0);
             }
 
-            public FsBean resolve0(Type type) {
+            public FsBeanInfo resolve0(Type type) {
                 Class<?> rawType = FsType.getRawType(type);
                 if (rawType == null) {
                     throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType.");
@@ -210,7 +210,7 @@ public interface FsBeanResolver {
                         setters.put(propertyName, method);
                     }
                 }
-                FsBeanImpl bean = new FsBeanImpl(type);
+                FsBeanInfoImpl bean = new FsBeanInfoImpl(type);
                 Set<Type> stack = new HashSet<>();
                 getters.forEach((name, getter) -> {
                     Method setter = setters.get(name);
@@ -313,12 +313,12 @@ public interface FsBeanResolver {
                 return null;
             }
 
-            private final class FsBeanImpl extends FsFinal implements FsBean {
+            private final class FsBeanInfoImpl extends FsFinal implements FsBeanInfo {
 
                 private final Type type;
                 private Map<String, FsBeanProperty> properties = new LinkedHashMap<>();
 
-                private FsBeanImpl(Type type) {
+                private FsBeanInfoImpl(Type type) {
                     this.type = type;
                 }
 
@@ -341,11 +341,11 @@ public interface FsBeanResolver {
                     if (this == o) {
                         return true;
                     }
-                    if (!(o instanceof FsBeanImpl)) {
+                    if (!(o instanceof FsBeanInfoImpl)) {
                         return false;
                     }
-                    return Objects.equals(type, ((FsBeanImpl) o).type)
-                        && Objects.equals(properties, ((FsBeanImpl) o).properties);
+                    return Objects.equals(type, ((FsBeanInfoImpl) o).type)
+                        && Objects.equals(properties, ((FsBeanInfoImpl) o).properties);
                 }
 
                 @Override
@@ -365,7 +365,7 @@ public interface FsBeanResolver {
 
             private final class FsBeanPropertyImpl extends FsFinal implements FsBeanProperty {
 
-                private final FsBean owner;
+                private final FsBeanInfo owner;
                 private final String name;
                 private final Method getter;
                 private final Method setter;
@@ -380,7 +380,7 @@ public interface FsBeanResolver {
                 private final List<Annotation> allAnnotations;
 
                 private FsBeanPropertyImpl(
-                    FsBean owner, String name,
+                    FsBeanInfo owner, String name,
                     @Nullable Method getter, @Nullable Method setter,
                     @Nullable Field field, Type type
                 ) {
@@ -489,7 +489,7 @@ public interface FsBeanResolver {
                 }
 
                 @Override
-                public FsBean getOwner() {
+                public FsBeanInfo getOwner() {
                     return owner;
                 }
 

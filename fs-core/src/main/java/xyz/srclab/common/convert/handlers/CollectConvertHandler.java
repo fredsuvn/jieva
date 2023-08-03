@@ -48,61 +48,65 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(
+        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         if (source == null) {
             return CONTINUE;
         }
         if (targetType instanceof Class) {
             if (((Class<?>) targetType).isArray()) {
-                ObjectType<Iterable<?>> fromInfo = toGenericInfo(source, sourceType);
-                if (fromInfo == null) {
+                ObjectType<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
+                if (sourceInfo == null) {
                     return CONTINUE;
                 }
-                return convertArray(fromInfo, ((Class<?>) targetType).getComponentType(), converter);
+                return convertArray(sourceInfo, ((Class<?>) targetType).getComponentType(), options, converter);
             }
-            return convertIterableType(source, sourceType, targetType, converter);
+            return convertIterableType(source, sourceType, targetType, options, converter);
         } else if (targetType instanceof GenericArrayType) {
-            ObjectType<Iterable<?>> fromInfo = toGenericInfo(source, sourceType);
-            if (fromInfo == null) {
+            ObjectType<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
+            if (sourceInfo == null) {
                 return CONTINUE;
             }
-            return convertArray(fromInfo, ((GenericArrayType) targetType).getGenericComponentType(), converter);
+            return convertArray(sourceInfo, ((GenericArrayType) targetType).getGenericComponentType(), options, converter);
         }
-        return convertIterableType(source, sourceType, targetType, converter);
+        return convertIterableType(source, sourceType, targetType, options, converter);
     }
 
     @Nullable
-    private Object convertIterableType(@Nullable Object obj, Type fromType, Type targetType, FsConverter converter) {
+    private Object convertIterableType(
+        @Nullable Object obj, Type fromType, Type targetType, FsConverter.Options options, FsConverter converter) {
         ParameterizedType targetItType = FsType.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
             return CONTINUE;
         }
-        ObjectType<Iterable<?>> fromInfo = toGenericInfo(obj, fromType);
-        if (fromInfo == null) {
+        ObjectType<Iterable<?>> sourceInfo = toGenericInfo(obj, fromType);
+        if (sourceInfo == null) {
             return CONTINUE;
         }
-        if (fromInfo.getRawType().isArray()) {
-            return convertArray(fromInfo, targetItType.getActualTypeArguments()[0], converter);
+        if (sourceInfo.getRawType().isArray()) {
+            return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], options, converter);
         }
-        Generator generator = GENERATOR_MAP.get(fromInfo.getRawType());
+        Generator generator = GENERATOR_MAP.get(sourceInfo.getRawType());
         if (generator == null) {
             return CONTINUE;
         }
         if (generator.needSize()) {
-            Collection<?> srcList = FsCollect.asOrToList(fromInfo.getObject());
+            Collection<?> srcList = FsCollect.asOrToList(sourceInfo.getObject());
             return convertCollection(
                 srcList,
                 generator.generate(srcList.size()),
-                fromInfo.getActualTypeArgument(0),
+                sourceInfo.getActualTypeArgument(0),
                 targetItType.getActualTypeArguments()[0],
+                options,
                 converter
             );
         } else {
             return convertCollection(
-                fromInfo.getObject(),
+                sourceInfo.getObject(),
                 generator.generate(0),
-                fromInfo.getActualTypeArgument(0),
+                sourceInfo.getActualTypeArgument(0),
                 targetItType.getActualTypeArguments()[0],
+                options,
                 converter
             );
         }
@@ -110,9 +114,15 @@ public class CollectConvertHandler implements FsConverter.Handler {
 
     @Nullable
     private Object convertCollection(
-        Iterable<?> src, Collection<Object> dest, Type fromComponentType, Type targetComponentType, FsConverter converter) {
+        Iterable<?> src,
+        Collection<Object> dest,
+        Type fromComponentType,
+        Type targetComponentType,
+        FsConverter.Options options,
+        FsConverter converter
+    ) {
         for (Object srcValue : src) {
-            Object targetValue = converter.convert(srcValue, fromComponentType, targetComponentType);
+            Object targetValue = converter.convert(srcValue, fromComponentType, targetComponentType, options);
             if (targetValue == UNSUPPORTED) {
                 return BREAK;
             }
@@ -122,18 +132,24 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Nullable
-    private Object convertArray(ObjectType<Iterable<?>> fromInfo, Type targetComponentType, FsConverter converter) {
+    private Object convertArray(
+        ObjectType<Iterable<?>> sourceInfo,
+        Type targetComponentType,
+        FsConverter.Options options,
+        FsConverter converter
+    ) {
         Collection<?> srcList;
-        if (fromInfo.getObject() instanceof Collection) {
-            srcList = (Collection<?>) fromInfo.getObject();
+        if (sourceInfo.getObject() instanceof Collection) {
+            srcList = (Collection<?>) sourceInfo.getObject();
         } else {
-            srcList = FsCollect.toCollection(new LinkedList<>(), fromInfo.getObject());
+            srcList = FsCollect.toCollection(new LinkedList<>(), sourceInfo.getObject());
         }
         Class<?> targetArrayClass = FsType.arrayClass(targetComponentType);
         Object targetArray = FsArray.newArray(targetArrayClass.getComponentType(), srcList.size());
         int i = 0;
         for (Object srcValue : srcList) {
-            Object targetValue = converter.convert(srcValue, fromInfo.getActualTypeArgument(0), targetComponentType);
+            Object targetValue = converter.convert(
+                srcValue, sourceInfo.getActualTypeArgument(0), targetComponentType, options);
             if (targetValue == UNSUPPORTED) {
                 return BREAK;
             }

@@ -265,67 +265,67 @@ public class FsType {
     }
 
     /**
-     * Returns whether given type 1 can be assigned by given type 2 with {@link Class#isAssignableFrom(Class)}.
+     * Returns whether target type can be assigned by source type with {@link Class#isAssignableFrom(Class)}.
      * If given type is primitive, it will be converted to its wrapper type.
      *
-     * @param t1 given type 1
-     * @param t2 given type 2
+     * @param targetType target type
+     * @param sourceType source type
      */
-    public static boolean isAssignableFrom(Class<?> t1, Class<?> t2) {
-        if (t1.isPrimitive() || t2.isPrimitive()) {
-            return toWrapperClass(t1).isAssignableFrom(toWrapperClass(t2));
+    public static boolean isAssignableFrom(Class<?> targetType, Class<?> sourceType) {
+        if (targetType.isPrimitive() || sourceType.isPrimitive()) {
+            return toWrapperClass(targetType).isAssignableFrom(toWrapperClass(sourceType));
         }
-        return t1.isAssignableFrom(t2);
+        return targetType.isAssignableFrom(sourceType);
     }
 
     /**
-     * Returns whether given type 1 can be assigned by given type 2.
+     * Returns whether target type can be assigned by source type.
      * If given type is primitive, it will be converted to its wrapper type.
      * This method is similar as {@link #isAssignableFrom(Class, Class)} but supports {@link Type}.
      * <p>
      * Note in this type, {@link Object} can be assigned from any type,
      * {@link WildcardType} can not assign to or be assigned from any type.
      *
-     * @param t1 given type 1
-     * @param t2 given type 2
+     * @param targetType target type
+     * @param sourceType source type
      */
-    public static boolean isAssignableFrom(Type t1, Type t2) {
-        if (Objects.equals(t1, t2) || Objects.equals(t1, Object.class)) {
+    public static boolean isAssignableFrom(Type targetType, Type sourceType) {
+        if (Objects.equals(targetType, sourceType) || Objects.equals(targetType, Object.class)) {
             return true;
         }
-        if ((t1 instanceof WildcardType)
-            || (t2 instanceof WildcardType)) {
+        if ((targetType instanceof WildcardType)
+            || (sourceType instanceof WildcardType)) {
             return false;
         }
-        if (t1 instanceof Class<?>) {
-            Class<?> c1 = (Class<?>) t1;
-            if (t2 instanceof Class<?>) {
-                Class<?> c2 = (Class<?>) t2;
+        if (targetType instanceof Class<?>) {
+            Class<?> c1 = (Class<?>) targetType;
+            if (sourceType instanceof Class<?>) {
+                Class<?> c2 = (Class<?>) sourceType;
                 return isAssignableFrom(c1, c2);
             }
-            if (t2 instanceof ParameterizedType) {
-                ParameterizedType p2 = (ParameterizedType) t2;
+            if (sourceType instanceof ParameterizedType) {
+                ParameterizedType p2 = (ParameterizedType) sourceType;
                 Class<?> r2 = getRawType(p2);
                 if (r2 == null) {
                     return false;
                 }
                 return isAssignableFrom(c1, r2);
             }
-            if (t2 instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) t2;
+            if (sourceType instanceof TypeVariable<?>) {
+                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
                 Type[] bounds = v2.getBounds();
                 for (Type bound : bounds) {
-                    if (isAssignableFrom(t1, bound)) {
+                    if (isAssignableFrom(targetType, bound)) {
                         return true;
                     }
                 }
                 return false;
             }
-            if (t2 instanceof GenericArrayType) {
+            if (sourceType instanceof GenericArrayType) {
                 if (!c1.isArray()) {
                     return false;
                 }
-                GenericArrayType g2 = (GenericArrayType) t2;
+                GenericArrayType g2 = (GenericArrayType) sourceType;
                 Class<?> gc2 = getRawType(g2.getGenericComponentType());
                 if (gc2 == null) {
                     return false;
@@ -334,17 +334,17 @@ public class FsType {
             }
             return false;
         }
-        if (t1 instanceof ParameterizedType) {
-            ParameterizedType p1 = (ParameterizedType) t1;
-            if (t2 instanceof Class<?>) {
-                ParameterizedType p2 = getGenericSuperType(t2, (Class<?>) p1.getRawType());
+        if (targetType instanceof ParameterizedType) {
+            ParameterizedType p1 = (ParameterizedType) targetType;
+            if (sourceType instanceof Class<?>) {
+                ParameterizedType p2 = getGenericSuperType(sourceType, (Class<?>) p1.getRawType());
                 if (p2 == null) {
                     return false;
                 }
                 return isAssignableFrom(p1, p2);
             }
-            if (t2 instanceof ParameterizedType) {
-                ParameterizedType p2 = (ParameterizedType) t2;
+            if (sourceType instanceof ParameterizedType) {
+                ParameterizedType p2 = (ParameterizedType) sourceType;
                 if (Objects.equals(p1.getRawType(), p2.getRawType())) {
                     Type[] a1 = p1.getActualTypeArguments();
                     Type[] a2 = p2.getActualTypeArguments();
@@ -366,11 +366,11 @@ public class FsType {
                 }
                 return isAssignableFrom(p1, sp2);
             }
-            if (t2 instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) t2;
+            if (sourceType instanceof TypeVariable<?>) {
+                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
                 Type[] bounds = v2.getBounds();
                 for (Type bound : bounds) {
-                    if (isAssignableFrom(t1, bound)) {
+                    if (isAssignableFrom(targetType, bound)) {
                         return true;
                     }
                 }
@@ -378,23 +378,23 @@ public class FsType {
             }
             return false;
         }
-        if (t1 instanceof TypeVariable<?>) {
-            TypeVariable<?> v1 = (TypeVariable<?>) t1;
-            if (t2 instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) t2;
+        if (targetType instanceof TypeVariable<?>) {
+            TypeVariable<?> v1 = (TypeVariable<?>) targetType;
+            if (sourceType instanceof TypeVariable<?>) {
+                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
                 Type[] bounds = v2.getBounds();
                 for (Type bound : bounds) {
-                    if (isAssignableFrom(t1, bound)) {
+                    if (isAssignableFrom(targetType, bound)) {
                         return true;
                     }
                 }
                 return false;
             }
         }
-        if (t1 instanceof GenericArrayType) {
-            GenericArrayType g1 = (GenericArrayType) t1;
-            if (t2 instanceof Class<?>) {
-                Class<?> c2 = (Class<?>) t2;
+        if (targetType instanceof GenericArrayType) {
+            GenericArrayType g1 = (GenericArrayType) targetType;
+            if (sourceType instanceof Class<?>) {
+                Class<?> c2 = (Class<?>) sourceType;
                 if (!c2.isArray()) {
                     return false;
                 }
@@ -405,8 +405,8 @@ public class FsType {
                 Class<?> tc2 = c2.getComponentType();
                 return isAssignableFrom(tc1, tc2);
             }
-            if (t2 instanceof GenericArrayType) {
-                GenericArrayType g2 = (GenericArrayType) t2;
+            if (sourceType instanceof GenericArrayType) {
+                GenericArrayType g2 = (GenericArrayType) sourceType;
                 Type tc1 = g1.getGenericComponentType();
                 Type tc2 = g2.getGenericComponentType();
                 return isAssignableFrom(tc1, tc2);

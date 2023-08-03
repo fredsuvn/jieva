@@ -27,7 +27,8 @@ import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 public class StringConvertHandler implements FsConverter.Handler {
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(
+        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         if (source == null) {
             return CONTINUE;
         }

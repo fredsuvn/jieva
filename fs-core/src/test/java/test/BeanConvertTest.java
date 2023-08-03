@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.bean.FsBean;
+import xyz.srclab.common.bean.FsBeanInfo;
 import xyz.srclab.common.bean.FsBeanProperty;
 import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.reflect.TypeRef;
@@ -21,7 +21,7 @@ public class BeanConvertTest {
     public void testTypeBean() {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
-        FsBean ccBean = FsBean.resolve(ccType);
+        FsBeanInfo ccBean = FsBeanInfo.resolve(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
         FsBeanProperty cc = ccBean.getProperty("cc");
         FsBeanProperty c1 = ccBean.getProperty("c1");
@@ -57,7 +57,7 @@ public class BeanConvertTest {
     @Test
     public void testClassBean() {
         Type ccType = Cc.class;
-        FsBean ccBean = FsBean.resolve(ccType);
+        FsBeanInfo ccBean = FsBeanInfo.resolve(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
         FsBeanProperty cc = ccBean.getProperty("cc");
         FsBeanProperty c1 = ccBean.getProperty("c1");
@@ -94,14 +94,14 @@ public class BeanConvertTest {
     public void testBeanResolver() {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
-        FsBean ccBean1 = FsBean.resolve(ccType);
-        FsBean ccBean2 = FsBean.resolve(ccType);
+        FsBeanInfo ccBean1 = FsBeanInfo.resolve(ccType);
+        FsBeanInfo ccBean2 = FsBeanInfo.resolve(ccType);
         Assert.assertSame(ccBean1, ccBean2);
         FsBeanResolver resolver = FsBeanResolver.newBuilder().useCache(false).build();
-        FsBean ccBean3 = resolver.resolve(ccType);
+        FsBeanInfo ccBean3 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean1, ccBean3);
         Assert.assertEquals(ccBean1, ccBean3);
-        FsBean ccBean4 = resolver.resolve(ccType);
+        FsBeanInfo ccBean4 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean4, ccBean3);
         Assert.assertEquals(ccBean4, ccBean3);
     }

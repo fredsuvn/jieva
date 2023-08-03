@@ -62,7 +62,7 @@ public final class FsUnsafe {
 
     public static final class ForConvert {
         public static final FsConverter DEFAULT_CONVERTER = FsConverter.withHandlers(
-            new AssignableConvertHandler(),
+            new ReuseConvertHandler(),
             new BeanConvertHandler(),
             Arrays.asList(
                 new DateConvertHandler(),
@@ -72,7 +72,7 @@ public final class FsUnsafe {
                 new CollectConvertHandler()
             )
         );
-        public static final FsConverter.Options DEFAULT_OPTIONS = FsConverter.Options
-            .withCompatibilityPolicy(FsConverter.Options.NEED_ASSIGNABLE);
+        public static final FsConverter.Options DEFAULT_OPTIONS =
+            FsConverter.Options.withReusePolicy(FsConverter.Options.REUSE_ASSIGNABLE);
     }
 }

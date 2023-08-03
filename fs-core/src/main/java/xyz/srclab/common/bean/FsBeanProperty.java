@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Represents property in {@link FsBean}.
+ * Represents property in {@link FsBeanInfo}.
  *
  * @author fredsuvn
  */
@@ -85,7 +85,7 @@ public interface FsBeanProperty {
     /**
      * Returns owner bean of this property.
      */
-    FsBean getOwner();
+    FsBeanInfo getOwner();
 
     /**
      * Returns whether this property is readable.
