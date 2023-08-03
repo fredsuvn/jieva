@@ -61,7 +61,7 @@ public class ConvertTest {
             )
         );
         Assert.assertEquals(
-            Arrays.asList("1", "2", "3"),
+            Arrays.asList(1, 2, 3),
             FsConvert.convertByType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
@@ -69,11 +69,40 @@ public class ConvertTest {
                 }.getType()
             )
         );
-        Assert.assertNull(
+        Assert.assertEquals(
+            Arrays.asList(1, 2, 3),
             FsConvert.convertByType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? extends Integer>>() {
+                }.getType()
+            )
+        );
+        List<String> strList = Arrays.asList("1", "2", "3");
+        Assert.assertSame(
+            strList,
+            FsConvert.convertByType(
+                strList, new TypeRef<List<? super CharSequence>>() {
+                }.getType(),
+                new TypeRef<List<? super String>>() {
+                }.getType()
+            )
+        );
+        Assert.assertNotSame(
+            strList,
+            FsConvert.convertByType(
+                strList, new TypeRef<List<? super String>>() {
+                }.getType(),
+                new TypeRef<List<? super CharSequence>>() {
+                }.getType()
+            )
+        );
+        Assert.assertEquals(
+            strList,
+            FsConvert.convertByType(
+                strList, new TypeRef<List<? super String>>() {
+                }.getType(),
+                new TypeRef<List<? super CharSequence>>() {
                 }.getType()
             )
         );

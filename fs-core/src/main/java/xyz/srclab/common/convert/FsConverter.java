@@ -177,121 +177,121 @@ public interface FsConverter {
     Options getOptions();
 
     /**
-     * Converts given object to target type.
+     * Converts source object to target type.
      * If the conversion is unsupported, return null.
      * <p>
      * <b>Note the return value itself may also be null.</b>
      *
-     * @param obj        given object
+     * @param source     source object
      * @param targetType target type
      */
     @Nullable
-    default <T> T convert(@Nullable Object obj, Class<T> targetType) {
-        return convert(obj, targetType, getOptions());
+    default <T> T convert(@Nullable Object source, Class<T> targetType) {
+        return convert(source, targetType, getOptions());
     }
 
     /**
-     * Converts given object to target type with given options.
+     * Converts source object to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
      * <b>Note the return value itself may also be null.</b>
      *
-     * @param obj        given object
+     * @param source     source object
      * @param targetType target type
      * @param options    given options
      */
     @Nullable
-    default <T> T convert(@Nullable Object obj, Class<T> targetType, Options options) {
-        return convertByType(obj, obj == null ? Object.class : obj.getClass(), targetType, options);
+    default <T> T convert(@Nullable Object source, Class<T> targetType, Options options) {
+        return convertByType(source, source == null ? Object.class : source.getClass(), targetType, options);
     }
 
     /**
-     * Converts given object to target type.
+     * Converts source object to target type.
      * If the conversion is unsupported, return null.
      * <p>
      * <b>Note the return value itself may also be null.</b>
      *
-     * @param obj        given object
+     * @param source     source object
      * @param targetType type reference of target type
      */
     @Nullable
-    default <T> T convert(@Nullable Object obj, TypeRef<T> targetType) {
-        return convert(obj, targetType, getOptions());
+    default <T> T convert(@Nullable Object source, TypeRef<T> targetType) {
+        return convert(source, targetType, getOptions());
     }
 
     /**
-     * Converts given object to target type with given options.
+     * Converts source object to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
      * <b>Note the return value itself may also be null.</b>
      *
-     * @param obj        given object
+     * @param source     source object
      * @param targetType type reference target type
      * @param options    given options
      */
     @Nullable
-    default <T> T convert(@Nullable Object obj, TypeRef<T> targetType, Options options) {
-        return convertByType(obj, obj == null ? Object.class : obj.getClass(), targetType.getType(), options);
+    default <T> T convert(@Nullable Object source, TypeRef<T> targetType, Options options) {
+        return convertByType(source, source == null ? Object.class : source.getClass(), targetType.getType(), options);
     }
 
     /**
-     * Converts given object to target type.
+     * Converts source object to target type.
      * If the conversion is unsupported, return null.
      * <p>
      * <b>Note the return value itself may also be null.</b>
      *
-     * @param obj        given object
+     * @param source     source object
      * @param targetType target type
      */
     @Nullable
-    default <T> T convert(@Nullable Object obj, Type targetType) {
-        return convert(obj, targetType, getOptions());
+    default <T> T convert(@Nullable Object source, Type targetType) {
+        return convert(source, targetType, getOptions());
     }
 
     /**
-     * Converts given object to target type with given options.
+     * Converts source object to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
      * <b>Note the return value itself may also be null.</b>
      *
-     * @param obj        given object
-     * @param targetType target type
-     * @param options    given options
-     */
-    @Nullable
-    default <T> T convert(@Nullable Object obj, Type targetType, Options options) {
-        return convertByType(obj, obj == null ? Object.class : obj.getClass(), targetType, options);
-    }
-
-    /**
-     * Converts given object from source type to target type.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note the return value itself may also be null.</b>
-     *
-     * @param obj        given object
-     * @param sourceType source type
-     * @param targetType target type
-     */
-    @Nullable
-    default <T> T convertByType(@Nullable Object obj, Type sourceType, Type targetType) {
-        return convertByType(obj, sourceType, targetType, getOptions());
-    }
-
-    /**
-     * Converts given object from source type to target type with given options.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note the return value itself may also be null.</b>
-     *
-     * @param obj        given object
-     * @param sourceType source type
+     * @param source     source object
      * @param targetType target type
      * @param options    given options
      */
     @Nullable
-    default <T> T convertByType(@Nullable Object obj, Type sourceType, Type targetType, Options options) {
-        Object value = convert(obj, sourceType, targetType, options);
+    default <T> T convert(@Nullable Object source, Type targetType, Options options) {
+        return convertByType(source, source == null ? Object.class : source.getClass(), targetType, options);
+    }
+
+    /**
+     * Converts source object from source type to target type.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>Note the return value itself may also be null.</b>
+     *
+     * @param source     source object
+     * @param sourceType source type
+     * @param targetType target type
+     */
+    @Nullable
+    default <T> T convertByType(@Nullable Object source, Type sourceType, Type targetType) {
+        return convertByType(source, sourceType, targetType, getOptions());
+    }
+
+    /**
+     * Converts source object from source type to target type with given options.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>Note the return value itself may also be null.</b>
+     *
+     * @param source     source object
+     * @param sourceType source type
+     * @param targetType target type
+     * @param options    given options
+     */
+    @Nullable
+    default <T> T convertByType(@Nullable Object source, Type sourceType, Type targetType, Options options) {
+        Object value = convert(source, sourceType, targetType, options);
         if (value == UNSUPPORTED) {
             return null;
         }

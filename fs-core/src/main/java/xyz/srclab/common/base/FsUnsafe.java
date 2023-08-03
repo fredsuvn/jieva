@@ -61,6 +61,8 @@ public final class FsUnsafe {
     }
 
     public static final class ForConvert {
+        public static final FsConverter.Options DEFAULT_OPTIONS =
+            FsConverter.Options.withReusePolicy(FsConverter.Options.REUSE_ASSIGNABLE);
         public static final FsConverter DEFAULT_CONVERTER = FsConverter.withHandlers(
             new ReuseConvertHandler(),
             new BeanConvertHandler(),
@@ -72,7 +74,5 @@ public final class FsUnsafe {
                 new CollectConvertHandler()
             )
         );
-        public static final FsConverter.Options DEFAULT_OPTIONS =
-            FsConverter.Options.withReusePolicy(FsConverter.Options.REUSE_ASSIGNABLE);
     }
 }
