@@ -404,31 +404,51 @@ public class FsCollect {
     }
 
     /**
-     * Converts given iterable of type {@link T} to map of type &lt;{@link K}, {@link V}>
-     * for each element with given conversion function.
-     * If there exists same key after converting, the latter will override the former.
+     * Converts source iterable to map, each element of source map will be converted to a map entry
+     * with given conversion function and finally collected into a map.
      *
-     * @param iterable      given iterable of type {@link T}
-     * @param keyFunction   conversion function from {@link T} to {@link K}
-     * @param valueFunction conversion function from {@link T} to {@link V}
+     * @param source        source iterable
+     * @param keyFunction   key conversion function
+     * @param valueFunction value conversion function
      */
     public static <T, K, V> Map<K, V> mapMap(
-        Iterable<T> iterable,
+        Iterable<T> source,
         Function<? super T, ? extends K> keyFunction,
         Function<? super T, ? extends V> valueFunction
     ) {
-        if (iterable instanceof Collection) {
-            return ((Collection<T>) iterable).stream().collect(Collectors.toMap(
+        if (source instanceof Collection) {
+            return ((Collection<T>) source).stream().collect(Collectors.toMap(
                 keyFunction,
                 valueFunction,
                 (v1, v2) -> v2
             ));
         }
         Map<K, V> result = new LinkedHashMap<>();
-        for (T o : iterable) {
+        for (T o : source) {
             result.put(keyFunction.apply(o), valueFunction.apply(o));
         }
         return result;
+    }
+
+    /**
+     * Converts source map into dest map, each element of source map will be converted into dest map
+     * with given conversion function.
+     *
+     * @param source        source map
+     * @param dest          dest map
+     * @param keyFunction   key conversion function
+     * @param valueFunction value conversion function
+     */
+    public static <KS, VS, KR, VR> Map<KR, VR> mapMap(
+        Map<KS, VS> source,
+        Map<KR, VR> dest,
+        Function<? super KS, ? extends KR> keyFunction,
+        Function<? super VS, ? extends VR> valueFunction
+    ) {
+        source.forEach((k, v) -> {
+            dest.put(keyFunction.apply(k), valueFunction.apply(v));
+        });
+        return dest;
     }
 
     /**

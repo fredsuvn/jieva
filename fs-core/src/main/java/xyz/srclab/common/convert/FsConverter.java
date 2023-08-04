@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.TypeRef;
@@ -26,6 +27,7 @@ import java.util.List;
  * @author fredsuvn
  * @see Handler
  */
+@ThreadSafe
 public interface FsConverter {
 
     /**

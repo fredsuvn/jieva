@@ -12,6 +12,8 @@ import xyz.srclab.common.reflect.TypeRef;
 import java.lang.annotation.*;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BeanTest {
@@ -87,6 +89,38 @@ public class BeanTest {
                 C2.class.getMethod("setC2", Object.class).getAnnotations()[0].toString(),
                 C2.class.getDeclaredField("c2").getAnnotations()[0].toString()
             ));
+    }
+
+    @Test
+    public void testMapBean() {
+        Type mapType = new TypeRef<Map<Integer, Long>>() {
+        }.getType();
+        Map<Integer, Long> map = new LinkedHashMap<>();
+        map.put(1, 10086L);
+        map.put(2, 10010L);
+        map.put(3, 10000L);
+        FsBean mapBean = FsBean.wrapMap(map, mapType);
+        FsLogger.system().info("mapBean: ", mapBean);
+        FsBeanProperty p1 = mapBean.getProperty("1");
+        FsBeanProperty p2 = mapBean.getProperty("2");
+        FsBeanProperty p3 = mapBean.getProperty("3");
+        FsBeanProperty p4 = mapBean.getProperty("4");
+        Assert.assertEquals(p1.getType(), Long.class);
+        Assert.assertEquals(p2.getType(), Long.class);
+        Assert.assertEquals(p3.getType(), Long.class);
+        Assert.assertNull(p4);
+        Map<String, FsBeanProperty> properties = mapBean.getProperties();
+        Assert.assertSame(properties, mapBean.getProperties());
+        map.put(4, 12345L);
+        Assert.assertNotEquals(properties, mapBean.getProperties());
+        Assert.assertNull(p4);
+        FsBeanProperty p42 = mapBean.getProperty("4");
+        Assert.assertEquals(p42.getType(), Long.class);
+        Assert.assertSame(p1, mapBean.getProperties().get("1"));
+        Assert.assertSame(p1, mapBean.getProperty("1"));
+        map.remove(2);
+        Assert.assertNull(mapBean.getProperty("2"));
+        FsLogger.system().info("mapBean: ", mapBean);
     }
 
     @Test

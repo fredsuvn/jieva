@@ -151,6 +151,25 @@ public class FsType {
     }
 
     /**
+     * Creates a new instance of given type with empty constructor.
+     * Return null if failed.
+     */
+    @Nullable
+    public static <T> T newInstance(Class<?> type) {
+        Constructor<?>[] constructors = type.getConstructors();
+        for (Constructor<?> constructor : constructors) {
+            if (constructor.getParameterCount() == 0) {
+                try {
+                    return (T) constructor.newInstance();
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns array class of given component type.
      *
      * @param componentType given component type
