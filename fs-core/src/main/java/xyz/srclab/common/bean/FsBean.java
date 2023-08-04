@@ -10,6 +10,7 @@ import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.convert.FsConverter;
+import xyz.srclab.common.convert.UnsupportedConvertException;
 import xyz.srclab.common.reflect.FsInvoker;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
@@ -126,13 +127,23 @@ public interface FsBean {
     interface Copier {
 
         /**
+         * Conversion fail policy: ignore failed property.
+         */
+        int IGNORE = 1;
+
+        /**
+         * Conversion fail policy: throw {@link xyz.srclab.common.convert.UnsupportedConvertException}.
+         */
+        int THROW = 2;
+
+        /**
          * Copies properties from source object to dest object.
          *
          * @param source source object
          * @param dest   dest object
          */
-        default void copyProperties(Object source, Object dest) {
-            copyProperties(source, source.getClass(), dest, dest.getClass());
+        default <T> T copyProperties(Object source, T dest) {
+            return copyProperties(source, source.getClass(), dest, dest.getClass());
         }
 
         /**
@@ -143,18 +154,7 @@ public interface FsBean {
          * @param dest       dest object
          * @param destType   type of dest object
          */
-        void copyProperties(Object source, Type sourceType, Object dest, Type destType);
-
-        /**
-         * Creates a new object as dest object of dest type,
-         * and copies properties from source object to dest object.
-         * <p>
-         * If failed to create or copy, return null.
-         *
-         * @param source   source object
-         * @param destType dest type
-         */
-        @Nullable <T> T copyProperties(Object source, Type destType);
+        <T> T copyProperties(Object source, Type sourceType, T dest, Type destType);
 
         /**
          * Builder for {@link Copier}.
@@ -253,7 +253,7 @@ public interface FsBean {
                 private final @Nullable FsConverter valueConverter;
                 private final @Nullable BiPredicate<FsBeanProperty, FsBeanProperty> propertyFilter;
                 private final @Nullable BiPredicate<@Nullable Object, FsBeanProperty> destValueFilter;
-                private final @Nullable Function<Type, Object> objectGenerator;
+                private final int conversionFailPolicy;
 
                 private CopierImpl(
                     Resolver beanResolver,
@@ -261,17 +261,18 @@ public interface FsBean {
                     @Nullable FsConverter valueConverter,
                     @Nullable BiPredicate<FsBeanProperty, FsBeanProperty> propertyFilter,
                     @Nullable BiPredicate<@Nullable Object, FsBeanProperty> destValueFilter,
-                    @Nullable Function<Type, Object> objectGenerator) {
+                    int conversionFailPolicy
+                ) {
                     this.beanResolver = beanResolver;
                     this.nameConverter = nameConverter;
                     this.valueConverter = valueConverter;
                     this.propertyFilter = propertyFilter;
                     this.destValueFilter = destValueFilter;
-                    this.objectGenerator = objectGenerator;
+                    this.conversionFailPolicy = conversionFailPolicy;
                 }
 
                 @Override
-                public void copyProperties(Object source, Type sourceType, Object dest, Type destType) {
+                public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
                     FsBean sourceBean = (source instanceof Map) ?
                         beanResolver.wrapMap((Map<?, ?>) source, sourceType) : beanResolver.resolve(sourceType);
                     FsBean destBean = (dest instanceof Map) ?
@@ -290,8 +291,11 @@ public interface FsBean {
                         }
                         Object destValue;
                         if (valueConverter != null) {
-                            destValue = valueConverter.convertByType(
-                                srcProperty.get(source), srcProperty.getType(), destProperty.getType());
+                            destValue = valueConverter.convert(
+                                srcProperty.get(source), srcProperty.getType(), destProperty.getType(), valueConverter.getOptions());
+                            if (destValue == FsConverter.UNSUPPORTED) {
+                                throw new UnsupportedConvertException()
+                            }
                         } else {
                             if (Objects.equals(srcProperty.getType(), destProperty.getType())) {
                                 destValue = srcProperty.get(source);
@@ -304,22 +308,6 @@ public interface FsBean {
                         }
                         destProperty.set(dest, destValue);
                     });
-                }
-
-                @Override
-                public <T> @Nullable T copyProperties(Object source, Type destType) {
-                    Object dest;
-                    if (objectGenerator == null) {
-                        Class<?> rawTargetType = FsType.getRawType(destType);
-                        if (rawTargetType == null) {
-                            throw new IllegalArgumentException("Can not get raw class: " + destType + ".");
-                        }
-                        dest = FsType.newInstance(rawTargetType);
-                    } else {
-                        dest = objectGenerator.apply(destType);
-                    }
-                    copyProperties(source, dest);
-                    return (T) dest;
                 }
             }
         }
