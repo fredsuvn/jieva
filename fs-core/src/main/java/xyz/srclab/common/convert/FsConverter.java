@@ -31,9 +31,9 @@ public interface FsConverter {
     /**
      * Returns default converter, of which handlers are:
      * <ul>
-     *     <li>Prefix: {@link xyz.srclab.common.convert.handlers.ReuseConvertHandler};</li>
-     *     <li>Suffix: {@link xyz.srclab.common.convert.handlers.BeanConvertHandler};</li>
-     *     <li>Common:
+     *     <li>Prefix handler: {@link xyz.srclab.common.convert.handlers.ReuseConvertHandler};</li>
+     *     <li>Suffix handler: {@link xyz.srclab.common.convert.handlers.BeanConvertHandler};</li>
+     *     <li>Common handlers:
      *     <ul>
      *         <li>{@link xyz.srclab.common.convert.handlers.DateConvertHandler};</li>
      *         <li>{@link xyz.srclab.common.convert.handlers.BooleanConvertHandler};</li>

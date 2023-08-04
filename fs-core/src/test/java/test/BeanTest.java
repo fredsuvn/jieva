@@ -5,9 +5,8 @@ import lombok.EqualsAndHashCode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.bean.FsBeanInfo;
+import xyz.srclab.common.bean.FsBean;
 import xyz.srclab.common.bean.FsBeanProperty;
-import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
@@ -21,7 +20,7 @@ public class BeanTest {
     public void testTypeBean() throws Exception {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
-        FsBeanInfo ccBean = FsBeanInfo.resolve(ccType);
+        FsBean ccBean = FsBean.resolve(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
         FsBeanProperty cc = ccBean.getProperty("cc");
         FsBeanProperty c1 = ccBean.getProperty("c1");
@@ -57,7 +56,7 @@ public class BeanTest {
     @Test
     public void testClassBean() throws Exception {
         Type ccType = Cc.class;
-        FsBeanInfo ccBean = FsBeanInfo.resolve(ccType);
+        FsBean ccBean = FsBean.resolve(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
         FsBeanProperty cc = ccBean.getProperty("cc");
         FsBeanProperty c1 = ccBean.getProperty("c1");
@@ -94,14 +93,14 @@ public class BeanTest {
     public void testBeanResolver() {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
-        FsBeanInfo ccBean1 = FsBeanInfo.resolve(ccType);
-        FsBeanInfo ccBean2 = FsBeanInfo.resolve(ccType);
+        FsBean ccBean1 = FsBean.resolve(ccType);
+        FsBean ccBean2 = FsBean.resolve(ccType);
         Assert.assertSame(ccBean1, ccBean2);
-        FsBeanResolver resolver = FsBeanResolver.newBuilder().useCache(false).build();
-        FsBeanInfo ccBean3 = resolver.resolve(ccType);
+        FsBean.Resolver resolver = FsBean.resolverBuilder().useCache(false).build();
+        FsBean ccBean3 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean1, ccBean3);
         Assert.assertEquals(ccBean1, ccBean3);
-        FsBeanInfo ccBean4 = resolver.resolve(ccType);
+        FsBean ccBean4 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean4, ccBean3);
         Assert.assertEquals(ccBean4, ccBean3);
     }

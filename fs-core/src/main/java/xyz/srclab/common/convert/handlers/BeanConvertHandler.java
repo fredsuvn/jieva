@@ -1,7 +1,7 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.bean.FsBeanCopier;
+import xyz.srclab.common.bean.FsBean;
 import xyz.srclab.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
@@ -11,7 +11,7 @@ import static xyz.srclab.common.convert.FsConverter.Handler;
 
 /**
  * Convert handler implementation which is used to support the conversion of bean types with
- * {@link FsBeanCopier#copyProperties(Object, Type, Type)}.
+ * {@link xyz.srclab.common.bean.FsBean.Copier#copyProperties(Object, Type, Type)}.
  * <p>
  * This handler is system default suffix handler (with {@link #BeanConvertHandler()}),
  * any object will be seen as "bean", and the conversion means create new object and copy properties.
@@ -22,16 +22,16 @@ import static xyz.srclab.common.convert.FsConverter.Handler;
  */
 public class BeanConvertHandler implements Handler {
 
-    private final FsBeanCopier copier;
+    private final FsBean.Copier copier;
 
     /**
      * Constructs with default bean resolver and copier:
      * <ul>
-     *     <li>{@link FsBeanCopier#defaultCopier()}</li>
+     *     <li>{@link xyz.srclab.common.bean.FsBean.Copier#defaultCopier()}</li>
      * </ul>
      */
     public BeanConvertHandler() {
-        this(FsBeanCopier.defaultCopier());
+        this(FsBean.Copier.defaultCopier());
     }
 
     /**
@@ -39,7 +39,7 @@ public class BeanConvertHandler implements Handler {
      *
      * @param copier given bean copier
      */
-    public BeanConvertHandler(FsBeanCopier copier) {
+    public BeanConvertHandler(FsBean.Copier copier) {
         this.copier = copier;
     }
 
