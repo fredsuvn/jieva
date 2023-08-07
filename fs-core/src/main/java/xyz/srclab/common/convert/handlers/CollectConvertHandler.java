@@ -122,7 +122,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         FsConverter converter
     ) {
         for (Object srcValue : src) {
-            Object targetValue = converter.convert(srcValue, fromComponentType, targetComponentType, options);
+            Object targetValue = converter.convertObject(srcValue, fromComponentType, targetComponentType, options);
             if (targetValue == UNSUPPORTED) {
                 return BREAK;
             }
@@ -148,7 +148,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         Object targetArray = FsArray.newArray(targetArrayClass.getComponentType(), srcList.size());
         int i = 0;
         for (Object srcValue : srcList) {
-            Object targetValue = converter.convert(
+            Object targetValue = converter.convertObject(
                 srcValue, sourceInfo.getActualTypeArgument(0), targetComponentType, options);
             if (targetValue == UNSUPPORTED) {
                 return BREAK;

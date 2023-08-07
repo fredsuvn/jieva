@@ -93,12 +93,12 @@ public class BeanTest {
 
     @Test
     public void testMapBean() {
-        Type mapType = new TypeRef<Map<Integer, Long>>() {
+        Type mapType = new TypeRef<Map<String, Long>>() {
         }.getType();
-        Map<Integer, Long> map = new LinkedHashMap<>();
-        map.put(1, 10086L);
-        map.put(2, 10010L);
-        map.put(3, 10000L);
+        Map<String, Long> map = new LinkedHashMap<>();
+        map.put("1", 10086L);
+        map.put("2", 10010L);
+        map.put("3", 10000L);
         FsBean mapBean = FsBean.wrapMap(map, mapType);
         FsLogger.system().info("mapBean: ", mapBean);
         FsBeanProperty p1 = mapBean.getProperty("1");
@@ -111,16 +111,29 @@ public class BeanTest {
         Assert.assertNull(p4);
         Map<String, FsBeanProperty> properties = mapBean.getProperties();
         Assert.assertSame(properties, mapBean.getProperties());
-        map.put(4, 12345L);
+        map.put("4", 12345L);
         Assert.assertNotEquals(properties, mapBean.getProperties());
         Assert.assertNull(p4);
         FsBeanProperty p42 = mapBean.getProperty("4");
         Assert.assertEquals(p42.getType(), Long.class);
         Assert.assertSame(p1, mapBean.getProperties().get("1"));
         Assert.assertSame(p1, mapBean.getProperty("1"));
-        map.remove(2);
+        map.remove("2");
         Assert.assertNull(mapBean.getProperty("2"));
         FsLogger.system().info("mapBean: ", mapBean);
+
+        FsBean mapObjBean = FsBean.wrapMap(map);
+        FsBeanProperty p1Obj = mapObjBean.getProperty("1");
+        Assert.assertEquals(p1Obj.getType(), Object.class);
+        Assert.assertEquals(
+            p1.get(map),
+            p1Obj.get(map)
+        );
+
+        Assert.assertThrows(IllegalArgumentException.class, () -> {
+            FsBean.wrapMap(map, new TypeRef<Map<Object, Long>>() {
+            }.getType());
+        });
     }
 
     @Test

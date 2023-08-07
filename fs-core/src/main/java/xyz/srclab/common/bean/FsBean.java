@@ -9,8 +9,9 @@ import xyz.srclab.common.base.FsFinal;
 import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
+import xyz.srclab.common.convert.FsConvert;
 import xyz.srclab.common.convert.FsConverter;
-import xyz.srclab.common.convert.UnsupportedConvertException;
+import xyz.srclab.common.convert.FsConvertException;
 import xyz.srclab.common.reflect.FsInvoker;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
@@ -67,7 +68,7 @@ public interface FsBean {
     }
 
     /**
-     * Resolves given type to bean structure by {@link Resolver#defaultResolver()}.
+     * Resolves given type to {@link FsBean}.
      *
      * @param type given type
      */
@@ -76,11 +77,22 @@ public interface FsBean {
     }
 
     /**
-     * Wraps given map with given map type,
-     * If the given map type is null, the map type will be seen as Map&lt;Object, Object>.
-     * <p>
-     * Name of property is map key converted by {@link String#valueOf(Object)},
-     * if more than one keys are transformed into the same name, the latter key-value pair will overwrite the former.
+     * Wraps given map as a {@link FsBean}, of which type will be seen as Map&lt;String, Object>.
+     * This method is same with:
+     * <pre>
+     *     wrapMap(map, null);
+     * </pre>
+     *
+     * @param map given map
+     * @see #wrapMap(Map, Type)
+     */
+    static FsBean wrapMap(Map<String, ?> map) {
+        return wrapMap(map, null);
+    }
+
+    /**
+     * Wraps given map as a {@link FsBean}, the key type of map type must be {@link String}.
+     * If the given map type is null, the map type will be seen as Map&lt;String, Object>.
      * <p>
      * Result of {@link FsBean#getProperties()} is immutable, but content may be different for each time calling.
      * Because of the changes in given map, contents of return property map are also changed accordingly.
@@ -88,8 +100,76 @@ public interface FsBean {
      * @param map     given map
      * @param mapType given map type
      */
-    static FsBean wrapMap(Map<?, ?> map, @Nullable Type mapType) {
+    static FsBean wrapMap(Map<String, ?> map, @Nullable Type mapType) {
         return defaultResolver().wrapMap(map, mapType);
+    }
+
+    static <T> T copyProperties(
+        Object source, Type sourceType, T dest, Type destType,
+        boolean copyNull, @Nullable FsConverter converter, boolean throwIfConvertFailed,
+        @Nullable Function<? super String, ? extends String> propertyNameMapper
+    ) {
+        if (source instanceof Map) {
+            ParameterizedType sourceMapType = FsType.getGenericSuperType(sourceType, Map.class);
+            if (sourceMapType == null) {
+                throw new FsBeanException("Not a map type: " + sourceType + ".");
+            }
+            Type[] sourceActualTypes = sourceMapType.getActualTypeArguments();
+            if (!Objects.equals(String.class, sourceActualTypes[0])) {
+                throw new FsBeanException("Source key type is not String: " + sourceActualTypes[0] + ".");
+            }
+            Type sourceValueType = sourceActualTypes[1];
+            if (dest instanceof Map) {
+                ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
+                if (destMapType == null) {
+                    throw new FsBeanException("Not a map type: " + destType + ".");
+                }
+                Type[] destActualTypes = destMapType.getActualTypeArguments();
+                if (!Objects.equals(String.class, destActualTypes[0])) {
+                    throw new FsBeanException("Dest key type is not String: " + destActualTypes[0] + ".");
+                }
+                Type destValueType = destActualTypes[1];
+                if (converter == null && !Objects.equals(sourceValueType, destValueType)) {
+                    if (throwIfConvertFailed) {
+                        throw new FsBeanException(
+                            "No converter to convert " + sourceValueType.getTypeName() + " to " + destValueType.getTypeName() + ".");
+                    } else {
+                        return dest;
+                    }
+                }
+                Map<String, Object> sourceMap = (Map<String, Object>) source;
+                Map<String, Object> destMap = (Map<String, Object>) dest;
+                sourceMap.forEach((key, value) -> {
+                    String propertyName = propertyNameMapper == null ? key : propertyNameMapper.apply(key);
+                    if (propertyName == null) {
+                        return;
+                    }
+                    if (converter == null) {
+                        if (value == null && !copyNull) {
+                            return;
+                        }
+                        destMap.put(propertyName, value);
+                    } else {
+                        Object newValue = converter.convertObject(value, sourceValueType, destValueType);
+                        if (newValue != FsConverter.UNSUPPORTED) {
+                            if (newValue == null && !copyNull) {
+                                return;
+                            }
+                            destMap.put(propertyName, newValue);
+                        }
+                    }
+                });
+            } else {
+
+            }
+        } else {
+            if (dest instanceof Map) {
+
+            } else {
+
+            }
+        }
+        return dest;
     }
 
     /**
@@ -132,7 +212,7 @@ public interface FsBean {
         int IGNORE = 1;
 
         /**
-         * Conversion fail policy: throw {@link xyz.srclab.common.convert.UnsupportedConvertException}.
+         * Conversion fail policy: throw {@link FsConvertException}.
          */
         int THROW = 2;
 
@@ -162,11 +242,9 @@ public interface FsBean {
         class Builder {
 
             private Resolver beanResolver;
-            private @Nullable Function<CharSequence, String> nameConverter;
-            private @Nullable FsConverter valueConverter;
+            private @Nullable Function<? extends CharSequence, String> nameConverter;
             private @Nullable BiPredicate<FsBeanProperty, FsBeanProperty> propertyFilter;
-            private @Nullable BiPredicate<@Nullable Object, FsBeanProperty> destValueFilter;
-            private @Nullable Function<Type, Object> objectGenerator;
+            // private
 
             /**
              * Sets bean resolver.
@@ -196,7 +274,7 @@ public interface FsBean {
              * only properties have same type between source and dest bean can be copied.
              */
             Builder valueConverter(@Nullable FsConverter valueConverter) {
-                this.valueConverter = valueConverter;
+                // this.valueConverter = valueConverter;
                 return this;
             }
 
@@ -224,7 +302,7 @@ public interface FsBean {
              * only the non-null values will be set into corresponding dest property.
              */
             Builder destValueFilter(@Nullable BiPredicate<@Nullable Object, FsBeanProperty> destValueFilter) {
-                this.destValueFilter = destValueFilter;
+                // this.destValueFilter = destValueFilter;
                 return this;
             }
 
@@ -234,7 +312,7 @@ public interface FsBean {
              * If this generator is null, the copier will use empty constructor to generate new instance.
              */
             Builder objectGenerator(@Nullable Function<Type, Object> objectGenerator) {
-                this.objectGenerator = objectGenerator;
+                // this.objectGenerator = objectGenerator;
                 return this;
             }
 
@@ -243,7 +321,7 @@ public interface FsBean {
              */
             Copier build() {
                 return new CopierImpl(
-                    beanResolver, nameConverter, valueConverter, propertyFilter, destValueFilter, 1);
+                    beanResolver, null, null, propertyFilter, null, 1);
             }
 
             private final class CopierImpl implements Copier {
@@ -273,41 +351,41 @@ public interface FsBean {
 
                 @Override
                 public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
-                    FsBean sourceBean = (source instanceof Map) ?
-                        beanResolver.wrapMap((Map<?, ?>) source, sourceType) : beanResolver.resolve(sourceType);
-                    FsBean destBean = (dest instanceof Map) ?
-                        beanResolver.wrapMap((Map<?, ?>) dest, destType) : beanResolver.resolve(destType);
-                    sourceBean.getProperties().forEach((name, srcProperty) -> {
-                        String destPropertyName = nameConverter == null ? name : nameConverter.apply(name);
-                        if (destPropertyName == null) {
-                            return;
-                        }
-                        FsBeanProperty destProperty = destBean.getProperty(destPropertyName);
-                        if (destProperty == null) {
-                            return;
-                        }
-                        if (propertyFilter != null && !propertyFilter.test(srcProperty, destProperty)) {
-                            return;
-                        }
-                        Object destValue;
-                        if (valueConverter != null) {
-                            destValue = valueConverter.convert(
-                                srcProperty.get(source), srcProperty.getType(), destProperty.getType(), valueConverter.getOptions());
-                            if (destValue == FsConverter.UNSUPPORTED) {
-                                // throw new UnsupportedConvertException()
-                            }
-                        } else {
-                            if (Objects.equals(srcProperty.getType(), destProperty.getType())) {
-                                destValue = srcProperty.get(source);
-                            } else {
-                                return;
-                            }
-                        }
-                        if (destValueFilter != null && !destValueFilter.test(destValue, destProperty)) {
-                            return;
-                        }
-                        destProperty.set(dest, destValue);
-                    });
+                    // FsBean sourceBean = (source instanceof Map) ?
+                    //     beanResolver.wrapMap((Map<?, ?>) source, sourceType) : beanResolver.resolve(sourceType);
+                    // FsBean destBean = (dest instanceof Map) ?
+                    //     beanResolver.wrapMap((Map<?, ?>) dest, destType) : beanResolver.resolve(destType);
+                    // sourceBean.getProperties().forEach((name, srcProperty) -> {
+                    //     String destPropertyName = nameConverter == null ? name : nameConverter.apply(name);
+                    //     if (destPropertyName == null) {
+                    //         return;
+                    //     }
+                    //     FsBeanProperty destProperty = destBean.getProperty(destPropertyName);
+                    //     if (destProperty == null) {
+                    //         return;
+                    //     }
+                    //     if (propertyFilter != null && !propertyFilter.test(srcProperty, destProperty)) {
+                    //         return;
+                    //     }
+                    //     Object destValue;
+                    //     if (valueConverter != null) {
+                    //         destValue = valueConverter.convert(
+                    //             srcProperty.get(source), srcProperty.getType(), destProperty.getType(), valueConverter.getOptions());
+                    //         if (destValue == FsConverter.UNSUPPORTED) {
+                    //             // throw new UnsupportedConvertException()
+                    //         }
+                    //     } else {
+                    //         if (Objects.equals(srcProperty.getType(), destProperty.getType())) {
+                    //             destValue = srcProperty.get(source);
+                    //         } else {
+                    //             return;
+                    //         }
+                    //     }
+                    //     if (destValueFilter != null && !destValueFilter.test(destValue, destProperty)) {
+                    //         return;
+                    //     }
+                    //     destProperty.set(dest, destValue);
+                    // });
                     return null;
                 }
             }
@@ -327,11 +405,22 @@ public interface FsBean {
         FsBean resolve(Type type);
 
         /**
-         * Wraps given map with given map type,
-         * If the given map type is null, the map type will be seen as Map&lt;Object, Object>.
-         * <p>
-         * Name of property is map key converted by {@link String#valueOf(Object)},
-         * if more than one keys are transformed into the same name, the latter key-value pair will overwrite the former.
+         * Wraps given map as a {@link FsBean}, of which type will be seen as Map&lt;String, Object>.
+         * This method is same with:
+         * <pre>
+         *     wrapMap(map, null);
+         * </pre>
+         *
+         * @param map given map
+         * @see #wrapMap(Map, Type)
+         */
+        default FsBean wrapMap(Map<String, ?> map) {
+            return wrapMap(map, null);
+        }
+
+        /**
+         * Wraps given map as a {@link FsBean}, the key type of map type must be {@link String}.
+         * If the given map type is null, the map type will be seen as Map&lt;String, Object>.
          * <p>
          * Result of {@link FsBean#getProperties()} is immutable, but content may be different for each time calling.
          * Because of the changes in given map, contents of return property map are also changed accordingly.
@@ -339,7 +428,7 @@ public interface FsBean {
          * @param map     given map
          * @param mapType given map type
          */
-        FsBean wrapMap(Map<?, ?> map, @Nullable Type mapType);
+        FsBean wrapMap(Map<String, ?> map, @Nullable Type mapType);
 
         /**
          * Builder for {@link Resolver}.
@@ -606,8 +695,8 @@ public interface FsBean {
                 }
 
                 @Override
-                public FsBean wrapMap(Map<?, ?> map, @Nullable Type mapType) {
-                    return new FsMapBeanImpl((Map<Object, Object>) map, mapType);
+                public FsBean wrapMap(Map<String, ?> map, @Nullable Type mapType) {
+                    return new FsMapBeanImpl((Map<String, Object>) map, mapType);
                 }
 
                 private static final class FsBeanImpl extends FsFinal implements FsBean {
@@ -831,18 +920,18 @@ public interface FsBean {
 
                 private static final class FsMapBeanImpl implements FsBean {
 
-                    private static final Type DEFAULT_MAP_TYPE = new TypeRef<Map<Object, Object>>() {
+                    private static final Type DEFAULT_MAP_TYPE = new TypeRef<Map<String, Object>>() {
                     }.getType();
 
-                    private final Map<Object, Object> map;
+                    private final Map<String, Object> map;
                     private final Type mapType;
                     private final Type valueType;
-                    private final Map<Object, Node> propertyNodes = new LinkedHashMap<>();
+                    private final Map<String, Node> propertyNodes = new LinkedHashMap<>();
                     private int propertyVersion = 0;
 
                     private Map<String, FsBeanProperty> properties;
 
-                    private FsMapBeanImpl(Map<Object, Object> map, @Nullable Type mapType) {
+                    private FsMapBeanImpl(Map<String, Object> map, @Nullable Type mapType) {
                         this.map = map;
                         this.mapType = mapType == null ? DEFAULT_MAP_TYPE : mapType;
                         if (this.mapType == DEFAULT_MAP_TYPE) {
@@ -853,6 +942,9 @@ public interface FsBean {
                                 throw new IllegalArgumentException("Not a map type: " + mapType + ".");
                             }
                             Type[] types = parameterizedType.getActualTypeArguments();
+                            if (!Objects.equals(String.class, types[0])) {
+                                throw new IllegalArgumentException("Key type is not String: " + types[0] + ".");
+                            }
                             this.valueType = types[1];
                         }
                     }
@@ -871,15 +963,15 @@ public interface FsBean {
                                 propertyNodes.put(k, new Node(propertyVersion, property));
                             });
                             properties = Collections.unmodifiableMap(
-                                FsCollect.mapMap(propertyNodes, new LinkedHashMap<>(), String::valueOf, Node::getProperty)
+                                FsCollect.mapMap(propertyNodes, new LinkedHashMap<>(), name->name, Node::getProperty)
                             );
                             return properties;
                         }
 
                         propertyVersion++;
                         boolean hasNewNode = false;
-                        Set<Object> keySet = map.keySet();
-                        for (Object key : keySet) {
+                        Set<String> keySet = map.keySet();
+                        for (String key : keySet) {
                             Node node = propertyNodes.get(key);
                             if (node == null) {
                                 FsBeanProperty property = new FsMapBeanPropertyImpl(key);
@@ -893,19 +985,16 @@ public interface FsBean {
                             return properties;
                         } else {
                             //remove expired nodes
-                            Set<Object> nodeKeys = new HashSet<>(propertyNodes.keySet());
-                            for (Object nodeKey : nodeKeys) {
-                                Node node = propertyNodes.get(nodeKey);
-                                if (node == null) {
-                                    continue;
-                                }
+                            Set<Map.Entry<String, Node>> nodes = new HashSet<>(propertyNodes.entrySet());
+                            for (Map.Entry<String, Node> entry : nodes) {
+                                Node node = entry.getValue();
                                 if (node.version != propertyVersion) {
-                                    propertyNodes.remove(nodeKey);
+                                    propertyNodes.remove(entry.getKey());
                                 }
                             }
                         }
                         properties = Collections.unmodifiableMap(
-                            FsCollect.mapMap(propertyNodes, new LinkedHashMap<>(), String::valueOf, Node::getProperty)
+                            FsCollect.mapMap(propertyNodes, new LinkedHashMap<>(), name->name, Node::getProperty)
                         );
                         return properties;
                     }
@@ -936,16 +1025,16 @@ public interface FsBean {
 
                     @Data
                     @AllArgsConstructor
-                    private final class Node {
+                    private static final class Node {
                         private int version;
                         private FsBeanProperty property;
                     }
 
                     private final class FsMapBeanPropertyImpl implements FsBeanProperty {
 
-                        private final Object key;
+                        private final String key;
 
-                        private FsMapBeanPropertyImpl(Object key) {
+                        private FsMapBeanPropertyImpl(String key) {
                             this.key = key;
                         }
 

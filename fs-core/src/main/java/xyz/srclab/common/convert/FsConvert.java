@@ -144,12 +144,12 @@ public class FsConvert {
     @Nullable
     public static Object convert(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options) {
-        return FsConverter.defaultConverter().convert(source, sourceType, targetType, options);
+        return FsConverter.defaultConverter().convertObject(source, sourceType, targetType, options);
     }
 
     /**
      * Converts source object from source type to target type.
-     * If current conversion is unsupported, an {@link UnsupportedConvertException} will be thrown
+     * If current conversion is unsupported, an {@link FsConvertException} will be thrown
      *
      * @param source     source object
      * @param sourceType source type
@@ -158,7 +158,7 @@ public class FsConvert {
     @Nullable
     public static Object convertOrThrow(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options
-    ) throws UnsupportedConvertException {
+    ) throws FsConvertException {
         return FsConverter.defaultConverter().convertOrThrow(source, sourceType, targetType, options);
     }
 }

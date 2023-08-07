@@ -93,11 +93,11 @@ public class ReuseConvertHandler implements FsConverter.Handler {
             WildcardType wildcardType = (WildcardType) targetType;
             Type targetUpper = FsType.getUpperBound(wildcardType);
             if (targetUpper != null) {
-                return converter.convert(source, sourceType, targetUpper, options);
+                return converter.convertObject(source, sourceType, targetUpper, options);
             }
             Type targetLower = FsType.getLowerBound(wildcardType);
             if (targetLower != null) {
-                return converter.convert(source, sourceType, targetLower, options.replaceReusePolicy(Options.REUSE_EQUAL));
+                return converter.convertObject(source, sourceType, targetLower, options.replaceReusePolicy(Options.REUSE_EQUAL));
             }
         }
         return CONTINUE;
