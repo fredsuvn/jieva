@@ -2,10 +2,10 @@ package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsArray;
+import xyz.srclab.common.base.FsObj;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
-import xyz.srclab.common.reflect.ObjectType;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -55,7 +55,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         }
         if (targetType instanceof Class) {
             if (((Class<?>) targetType).isArray()) {
-                ObjectType<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
+                FsObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
                 if (sourceInfo == null) {
                     return CONTINUE;
                 }
@@ -63,7 +63,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             }
             return convertIterableType(source, sourceType, targetType, options, converter);
         } else if (targetType instanceof GenericArrayType) {
-            ObjectType<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
+            FsObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
             if (sourceInfo == null) {
                 return CONTINUE;
             }
@@ -79,7 +79,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (targetItType == null) {
             return CONTINUE;
         }
-        ObjectType<Iterable<?>> sourceInfo = toGenericInfo(obj, fromType);
+        FsObj<Iterable<?>> sourceInfo = toGenericInfo(obj, fromType);
         if (sourceInfo == null) {
             return CONTINUE;
         }
@@ -133,7 +133,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
 
     @Nullable
     private Object convertArray(
-        ObjectType<Iterable<?>> sourceInfo,
+        FsObj<Iterable<?>> sourceInfo,
         Type targetComponentType,
         FsConverter.Options options,
         FsConverter converter
@@ -160,13 +160,13 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Nullable
-    private ObjectType<Iterable<?>> toGenericInfo(Object obj, Type type) {
+    private FsObj<Iterable<?>> toGenericInfo(Object obj, Type type) {
         if (type instanceof Class && ((Class<?>) type).isArray()) {
             Iterable<?> it = asIterable(obj);
             if (it == null) {
                 return null;
             }
-            return ObjectType.of(
+            return FsObj.of(
                 it,
                 FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
             );
@@ -176,7 +176,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             if (it == null) {
                 return null;
             }
-            return ObjectType.of(
+            return FsObj.of(
                 it,
                 FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
             );
@@ -192,7 +192,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (it == null) {
             return null;
         }
-        return ObjectType.of(it, itType);
+        return FsObj.of(it, itType);
     }
 
     @Nullable

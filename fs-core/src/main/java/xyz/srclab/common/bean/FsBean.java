@@ -243,7 +243,7 @@ public interface FsBean {
              */
             Copier build() {
                 return new CopierImpl(
-                    beanResolver, nameConverter, valueConverter, propertyFilter, destValueFilter, objectGenerator);
+                    beanResolver, nameConverter, valueConverter, propertyFilter, destValueFilter, 1);
             }
 
             private final class CopierImpl implements Copier {
@@ -294,7 +294,7 @@ public interface FsBean {
                             destValue = valueConverter.convert(
                                 srcProperty.get(source), srcProperty.getType(), destProperty.getType(), valueConverter.getOptions());
                             if (destValue == FsConverter.UNSUPPORTED) {
-                                throw new UnsupportedConvertException()
+                                // throw new UnsupportedConvertException()
                             }
                         } else {
                             if (Objects.equals(srcProperty.getType(), destProperty.getType())) {
@@ -308,6 +308,7 @@ public interface FsBean {
                         }
                         destProperty.set(dest, destValue);
                     });
+                    return null;
                 }
             }
         }

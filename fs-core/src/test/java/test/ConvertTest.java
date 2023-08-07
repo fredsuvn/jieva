@@ -106,5 +106,19 @@ public class ConvertTest {
                 }.getType()
             )
         );
+        Assert.assertEquals(
+            strList,
+            FsConvert.convert(
+                strList, List.class
+            )
+        );
+        Assert.assertEquals(
+            Arrays.asList(1, 2, 3),
+            FsConvert.convert(
+                strList,
+                new TypeRef<List<? super Integer>>() {
+                }.getType()
+            )
+        );
     }
 }
