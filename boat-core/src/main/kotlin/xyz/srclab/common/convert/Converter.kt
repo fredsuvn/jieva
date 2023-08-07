@@ -29,7 +29,7 @@ interface Converter {
      * Converts [from] to [toType].
      * The result may be null if the conversion is unsupported, or the value of result is null.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, toType: Class<T>): T? {
         return convert(from, from?.javaClass ?: Any::class.java, toType)
     }
@@ -38,7 +38,7 @@ interface Converter {
      * Converts [from] to [toType].
      * The result may be null if the conversion is unsupported, or the value of result is null.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, toType: Type): T? {
         return convert(from, from?.javaClass ?: Any::class.java, toType)
     }
@@ -47,7 +47,7 @@ interface Converter {
      * Converts [from] to [toType].
      * The result may be null if the conversion is unsupported, or the value of result is null.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, toType: TypeRef<T>): T? {
         return convert(from, from?.javaClass ?: Any::class.java, toType)
     }
@@ -56,7 +56,7 @@ interface Converter {
      * Converts [from] of which type is [fromType] to [toType].
      * The result may be null if the conversion is unsupported, or the value of result is null.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, fromType: Type, toType: Class<T>): T? {
         return convert(from, fromType, toType as Type)
     }
@@ -65,7 +65,7 @@ interface Converter {
      * Converts [from] of which type is [fromType] to [toType].
      * The result may be null if the conversion is unsupported, or the value of result is null.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, fromType: Type, toType: Type): T? {
         try {
             val result = convert0(from, fromType, toType)
@@ -74,7 +74,7 @@ interface Converter {
             }
             return result.asType()
         } catch (e: Exception) {
-            throw BtConvertException(fromType, toType, e)
+            throw ConvertException(fromType, toType, e)
         }
     }
 
@@ -82,7 +82,7 @@ interface Converter {
      * Converts [from] of which type is [fromType] to [toType].
      * The result may be null if the conversion is unsupported, or the value of result is null.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, fromType: Type, toType: TypeRef<T>): T? {
         return convert(from, fromType, toType.type)
     }
@@ -91,7 +91,7 @@ interface Converter {
      * Converts [from] to [toType].
      * The result may be null if the conversion is unsupported.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convertVal(from: Any?, toType: Class<T>): Val<T>? {
         return convertVal(from, from?.javaClass ?: Any::class.java, toType)
     }
@@ -100,7 +100,7 @@ interface Converter {
      * Converts [from] to [toType].
      * The result may be null if the conversion is unsupported.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convertVal(from: Any?, toType: Type): Val<T>? {
         return convertVal(from, from?.javaClass ?: Any::class.java, toType)
     }
@@ -109,7 +109,7 @@ interface Converter {
      * Converts [from] to [toType].
      * The result may be null if the conversion is unsupported.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convertVal(from: Any?, toType: TypeRef<T>): Val<T>? {
         return convertVal(from, from?.javaClass ?: Any::class.java, toType.type)
     }
@@ -118,7 +118,7 @@ interface Converter {
      * Converts [from] of which type is [fromType] to [toType].
      * The result may be null if the conversion is unsupported.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convertVal(from: Any?, fromType: Type, toType: Class<T>): Val<T>? {
         return convertVal(from, fromType, toType as Type)
     }
@@ -127,7 +127,7 @@ interface Converter {
      * Converts [from] of which type is [fromType] to [toType].
      * The result may be null if the conversion is unsupported.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convertVal(from: Any?, fromType: Type, toType: Type): Val<T>? {
         try {
             val result = convert0(from, fromType, toType)
@@ -136,7 +136,7 @@ interface Converter {
             }
             return result.toVal().asType()
         } catch (e: Exception) {
-            throw BtConvertException(fromType, toType, e)
+            throw ConvertException(fromType, toType, e)
         }
     }
 
@@ -144,7 +144,7 @@ interface Converter {
      * Converts [from] of which type is [fromType] to [toType].
      * The result may be null if the conversion is unsupported.
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convertVal(from: Any?, fromType: Type, toType: TypeRef<T>): Val<T>? {
         return convertVal(from, fromType, toType.type)
     }

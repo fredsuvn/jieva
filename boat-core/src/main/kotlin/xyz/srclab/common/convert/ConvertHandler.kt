@@ -44,7 +44,7 @@ interface ConvertHandler {
      * @param toType target type
      * @param converter converter where this handler on
      */
-    @Throws(BtConvertException::class)
+    @Throws(ConvertException::class)
     fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
     companion object {
