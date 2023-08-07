@@ -166,7 +166,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             if (it == null) {
                 return null;
             }
-            return FsObj.of(
+            return FsObj.wrap(
                 it,
                 FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
             );
@@ -176,7 +176,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             if (it == null) {
                 return null;
             }
-            return FsObj.of(
+            return FsObj.wrap(
                 it,
                 FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
             );
@@ -192,7 +192,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (it == null) {
             return null;
         }
-        return FsObj.of(it, itType);
+        return FsObj.wrap(it, itType);
     }
 
     @Nullable

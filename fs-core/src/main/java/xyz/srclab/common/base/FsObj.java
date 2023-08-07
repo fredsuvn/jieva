@@ -19,12 +19,12 @@ import java.util.List;
 public abstract class FsObj<T> {
 
     /**
-     * Returns a new ObjectType with given object and its type.
+     * Wraps with given object and its type.
      *
      * @param object given object
-     * @param type   type
+     * @param type   type of given object
      */
-    public static <T> FsObj<T> of(T object, Type type) {
+    public static <T> FsObj<T> wrap(T object, Type type) {
         if (type instanceof Class) {
             return new OfClass<>(object, type);
         }

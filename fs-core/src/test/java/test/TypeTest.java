@@ -48,17 +48,17 @@ public class TypeTest {
     @Test
     public void testFsObj() {
         Assert.assertEquals(
-            FsObj.of(null, new TypeRef<List<?>>() {
+            FsObj.wrap(null, new TypeRef<List<?>>() {
             }.getType()),
-            FsObj.of(null, new TypeRef<List<?>>() {
+            FsObj.wrap(null, new TypeRef<List<?>>() {
             }.getType())
         );
-        FsObj<?> cType = FsObj.of(null, String.class);
+        FsObj<?> cType = FsObj.wrap(null, String.class);
         Assert.assertEquals(
             cType.getClassType(),
             String.class
         );
-        FsObj<?> pType = FsObj.of(null, new TypeRef<Map<String, Integer>>() {
+        FsObj<?> pType = FsObj.wrap(null, new TypeRef<Map<String, Integer>>() {
         }.getType());
         Assert.assertEquals(
             pType.getParameterizedType(),
@@ -73,7 +73,7 @@ public class TypeTest {
             pType.getActualTypeArgument(1),
             Integer.class
         );
-        FsObj<?> wType = FsObj.of(null,
+        FsObj<?> wType = FsObj.wrap(null,
             FsType.wildcardType(Collections.singletonList(String.class), null));
         Assert.assertEquals(
             wType.getWildcardType(),
@@ -83,13 +83,13 @@ public class TypeTest {
             wType.getUpperBound(),
             String.class
         );
-        wType = FsObj.of(null,
+        wType = FsObj.wrap(null,
             FsType.wildcardType(null, Collections.singletonList(Integer.class)));
         Assert.assertEquals(
             wType.getLowerBound(),
             Integer.class
         );
-        FsObj<?> gType = FsObj.of(null, new TypeRef<Map<String, Integer>[]>() {
+        FsObj<?> gType = FsObj.wrap(null, new TypeRef<Map<String, Integer>[]>() {
         }.getType());
         Assert.assertEquals(
             gType.getGenericArrayType(),
@@ -103,7 +103,7 @@ public class TypeTest {
         );
         class OT<OTP extends Float> {
         }
-        FsObj<?> tType = FsObj.of(null, OT.class.getTypeParameters()[0]);
+        FsObj<?> tType = FsObj.wrap(null, OT.class.getTypeParameters()[0]);
         Assert.assertEquals(
             tType.getTypeVariable(),
             OT.class.getTypeParameters()[0]
