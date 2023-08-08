@@ -74,6 +74,19 @@ public class FsCollect {
     }
 
     /**
+     * If given element is collection, return itself as collection type, else puts all given elements into a new
+     * collection and returns.
+     *
+     * @param elements given elements
+     */
+    public static <T> Collection<T> asOrToCollection(Iterable<T> elements) {
+        if (elements instanceof Collection) {
+            return (Collection<T>) elements;
+        }
+        return asOrToSet(elements);
+    }
+
+    /**
      * Returns immutable list of which elements were put from given iterable.
      *
      * @param iterable given iterable
