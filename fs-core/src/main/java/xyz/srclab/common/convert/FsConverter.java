@@ -379,8 +379,8 @@ public interface FsConverter {
      * @param options    given options
      */
     @Nullable
-    default <T> T convertOrThrow(@Nullable Object source, Type sourceType, Type targetType, Options options)
-        throws FsConvertException {
+    default <T> T convertOrThrow(
+        @Nullable Object source, Type sourceType, Type targetType, Options options) throws FsConvertException {
         Object value = convertObject(source, sourceType, targetType, options);
         if (value == UNSUPPORTED) {
             throw new FsConvertException(sourceType, targetType);

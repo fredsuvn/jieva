@@ -15,7 +15,7 @@ import static xyz.srclab.common.convert.FsConverter.*;
  * Convert handler implementation which is used to check type compatibility and reusability, it follows in order:
  * <ul>
  *     <li>
- *         If source object is null, return {@link FsConverter#BREAK};
+ *         If source object is null, return {@link FsConverter#CONTINUE};
  *     </li>
  *     <li>
  *         If target type and source type are equal:
@@ -71,7 +71,7 @@ public class ReuseConvertHandler implements FsConverter.Handler {
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, Options options, FsConverter converter) {
         if (source == null) {
-            return BREAK;
+            return CONTINUE;
         }
         int reusePolicy = options.reusePolicy();
         if (Objects.equals(targetType, sourceType)) {

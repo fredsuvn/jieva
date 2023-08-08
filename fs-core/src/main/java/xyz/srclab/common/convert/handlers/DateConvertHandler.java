@@ -2,6 +2,7 @@ package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsDate;
+import xyz.srclab.common.convert.FsConvertException;
 import xyz.srclab.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
@@ -148,7 +149,7 @@ public class DateConvertHandler implements FsConverter.Handler {
         try {
             return convert0(source, sourceType, targetType);
         } catch (ParseException e) {
-            throw new IllegalStateException(e);
+            throw new FsConvertException(e);
         }
     }
 
