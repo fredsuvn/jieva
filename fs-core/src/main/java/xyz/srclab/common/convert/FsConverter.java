@@ -407,7 +407,7 @@ public interface FsConverter {
     Handler asHandler();
 
     /**
-     * Handler of {@link FsConvert}.
+     * Handler of {@link FsConverter}.
      *
      * @author fredsuvn
      * @see FsConverter

@@ -165,17 +165,13 @@ public class FsCollect {
      * @param type     array's component type
      */
     public static <T> T[] toArray(Iterable<? extends T> iterable, Class<T> type) {
-        if (iterable instanceof Collection) {
-            T[] array = FsArray.newArray(type, ((Collection<? extends T>) iterable).size());
-            int i = 0;
-            for (T t : iterable) {
-                array[i++] = t;
-            }
-            return array;
-        } else {
-            LinkedList<T> list = toCollection(new LinkedList<>(), iterable);
-            return toArray(list, type);
+        Collection<? extends T> collection = asOrToCollection(iterable);
+        T[] array = FsArray.newArray(type, collection.size());
+        int i = 0;
+        for (T t : collection) {
+            array[i++] = t;
         }
+        return array;
     }
 
     /**

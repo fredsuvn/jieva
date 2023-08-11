@@ -2,6 +2,7 @@ package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.bean.FsBean;
+import xyz.srclab.common.bean.FsBeanCopier;
 import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.convert.FsConverter;
@@ -713,304 +714,155 @@ public class Fs {
         return FsBeanResolver.defaultResolver().wrapMap(map, mapType);
     }
 
-    // /**
-    //  * Copies bean properties from source object (of which type is specified by {@code sourceType})
-    //  * to dest object (of which type is specified by {@code destType}). This method is equivalent to
-    //  * {@link #copyProperties(Object, Type, Object, Type, FsBean.Resolver, boolean, boolean, FsConverter, boolean, Function)}:
-    //  * <pre>
-    //  *     Collection<String> coll = FsCollect.asOrToCollection(ignoreProperties);
-    //  *     return copyProperties(
-    //  *             source, source.getClass(), dest, dest.getClass(), FsBean.defaultResolver(),
-    //  *             copyNull, true, FsConverter.defaultConverter(), true, (name)->{
-    //  *                 if (coll.contains(name)) {
-    //  *                     return null;
-    //  *                 }
-    //  *                 return name;
-    //  *             });
-    //  * </pre>
-    //  *
-    //  * @param source               source object
-    //  * @param dest                 dest object
-    //  * @param copyNull             whether copy null value
-    //  */
-    // public static <T> T copyProperties(Object source, T dest, boolean copyNull, Iterable<String> ignoreProperties){
-    //     Collection<String> coll = FsCollect.asOrToCollection(ignoreProperties);
-    //     return copyProperties(
-    //         source, source.getClass(), dest, dest.getClass(), FsBean.defaultResolver(),
-    //         copyNull, true, FsConverter.defaultConverter(), true, (name)->{
-    //             if (coll.contains(name)) {
-    //                 return null;
-    //             }
-    //             return name;
-    //         });
-    // }
-    //
-    // /**
-    //  * Copies bean properties from source object (of which type is specified by {@code sourceType})
-    //  * to dest object (of which type is specified by {@code destType}). This method is equivalent to
-    //  * {@link #copyProperties(Object, Type, Object, Type, FsBean.Resolver, boolean, boolean, FsConverter, boolean, Function)}:
-    //  * <pre>
-    //  *     return copyProperties(
-    //  *             source, sourceType, dest, destType, FsBean.defaultResolver(),
-    //  *             copyNull, true, converter, throwIfConvertFailed, propertyNameMapper);
-    //  * </pre>
-    //  *
-    //  * @param source               source object
-    //  * @param sourceType           specified type of source object
-    //  * @param dest                 dest object
-    //  * @param destType             specified type of dest object
-    //  * @param copyNull             whether copy null value
-    //  * @param converter            given converter
-    //  * @param throwIfConvertFailed whether throw {@link FsConvertException} if conversion failed
-    //  * @param propertyNameMapper   given property name mapper
-    //  */
-    // public static <T> T copyProperties(
-    //     Object source, Type sourceType, T dest, Type destType,
-    //     boolean copyNull,
-    //     @Nullable FsConverter converter, boolean throwIfConvertFailed,
-    //     @Nullable Function<? super String, ? extends String> propertyNameMapper
-    // ){
-    //     return copyProperties(
-    //         source, sourceType, dest, destType, FsBean.defaultResolver(),
-    //         copyNull, true, converter, throwIfConvertFailed, propertyNameMapper);
-    // }
-    //
-    // /**
-    //  * Copies bean properties from source object (of which type is specified by {@code sourceType})
-    //  * to dest object (of which type is specified by {@code destType}). The copying in following:
-    //  * <ol>
-    //  *     <li>
-    //  *         Checks and resolve given source and dest objects: If an object is instance of {@link Map},
-    //  *         it will be used directly without resolving (its specified type's key type is {@link String}.
-    //  *         Otherwise, it will be resolved to {@link FsBean}.
-    //  *     </li>
-    //  *     <li>
-    //  *         Checks whether source property is readable (for map the properties are always readable),
-    //  *         if it is not, ignore the property.
-    //  *     </li>
-    //  *     <li>
-    //  *         Computes dest property name: Source property names will be seen as dest property names if given property
-    //  *         name mapper is null.
-    //  *         Otherwise, each source property name will be transformed to a new property name as dest property name.
-    //  *     </li>
-    //  *     <li>
-    //  *         Checks whether dest property exists
-    //  *         (for map the properties always exists if param {@code put} is true,
-    //  *         otherwise uses {@link Map#containsKey(Object)} to check),
-    //  *         if it is not, ignore the property.
-    //  *     </li>
-    //  *     <li>
-    //  *         In case the source property value is null, if param {@code copyNull} is true, the null value will be set
-    //  *         to dest property. Otherwise ignored.
-    //  *     </li>
-    //  *     <li>
-    //  *         If given converter is not null, the source property value will be converted by given converter first,
-    //  *         then be set to the dest property. Otherwise, only when the types of the source object property and the
-    //  *         dest object property are the same, the copying occurs.
-    //  *     </li>
-    //  *     <li>
-    //  *         If param {@code throwIfConvertFailed} is true,
-    //  *         throw {@link FsConvertException} when conversion is failed.
-    //  *     </li>
-    //  * </ol>>
-    //  *
-    //  * @param source               source object
-    //  * @param sourceType           specified type of source object
-    //  * @param dest                 dest object
-    //  * @param destType             specified type of dest object
-    //  * @param beanResolver         given bean resolver
-    //  * @param copyNull             whether copy null value
-    //  * @param put                  whether put the value if dest map doesn't contain the property
-    //  * @param converter            given converter
-    //  * @param throwIfConvertFailed whether throw {@link FsConvertException} if conversion failed
-    //  * @param propertyNameMapper   given property name mapper
-    //  */
-    // public static <T> T copyProperties(
-    //     Object source, Type sourceType, T dest, Type destType, FsBean.Resolver beanResolver,
-    //     boolean copyNull, boolean put,
-    //     @Nullable FsConverter converter, boolean throwIfConvertFailed,
-    //     @Nullable Function<? super String, ? extends String> propertyNameMapper
-    // ) {
-    //     if (source instanceof Map) {
-    //         ParameterizedType sourceMapType = FsType.getGenericSuperType(sourceType, Map.class);
-    //         if (sourceMapType == null) {
-    //             throw new IllegalArgumentException("Not a map type: " + sourceType + ".");
-    //         }
-    //         Type[] sourceActualTypes = sourceMapType.getActualTypeArguments();
-    //         if (!Objects.equals(String.class, sourceActualTypes[0])) {
-    //             throw new IllegalArgumentException("Source key type is not String: " + sourceActualTypes[0] + ".");
-    //         }
-    //         Type sourceValueType = sourceActualTypes[1];
-    //         if (dest instanceof Map) {
-    //             ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
-    //             if (destMapType == null) {
-    //                 throw new IllegalArgumentException("Not a map type: " + destType + ".");
-    //             }
-    //             Type[] destActualTypes = destMapType.getActualTypeArguments();
-    //             if (!Objects.equals(String.class, destActualTypes[0])) {
-    //                 throw new IllegalArgumentException("Dest key type is not String: " + destActualTypes[0] + ".");
-    //             }
-    //             Type destValueType = destActualTypes[1];
-    //             if (converter == null && !Objects.equals(sourceValueType, destValueType)) {
-    //                 if (throwIfConvertFailed) {
-    //                     throw new FsConvertException(sourceValueType, destValueType);
-    //                 } else {
-    //                     return dest;
-    //                 }
-    //             }
-    //             Map<String, Object> sourceMap = (Map<String, Object>) source;
-    //             Map<String, Object> destMap = (Map<String, Object>) dest;
-    //             sourceMap.forEach((key, value) -> {
-    //                 String propertyName = propertyNameMapper == null ? key : propertyNameMapper.apply(key);
-    //                 if (propertyName == null) {
-    //                     return;
-    //                 }
-    //                 if (!put && !destMap.containsKey(propertyName)) {
-    //                     return;
-    //                 }
-    //                 if (converter == null) {
-    //                     if (value == null && !copyNull) {
-    //                         return;
-    //                     }
-    //                     destMap.put(propertyName, value);
-    //                 } else {
-    //                     Object newValue = converter.convertObject(value, sourceValueType, destValueType);
-    //                     if (newValue != FsConverter.UNSUPPORTED) {
-    //                         if (newValue == null && !copyNull) {
-    //                             return;
-    //                         }
-    //                         destMap.put(propertyName, newValue);
-    //                     } else {
-    //                         if (throwIfConvertFailed) {
-    //                             throw new FsConvertException(sourceValueType, destValueType);
-    //                         }
-    //                     }
-    //                 }
-    //             });
-    //         } else {
-    //             FsBean destBean = beanResolver.resolve(destType);
-    //             Map<String, Object> sourceMap = (Map<String, Object>) source;
-    //             sourceMap.forEach((key, value) -> {
-    //                 String propertyName = propertyNameMapper == null ? key : propertyNameMapper.apply(key);
-    //                 if (propertyName == null) {
-    //                     return;
-    //                 }
-    //                 FsProperty destProperty = destBean.getProperty(propertyName);
-    //                 if (destProperty == null || !destProperty.isWriteable()) {
-    //                     return;
-    //                 }
-    //                 if (converter == null) {
-    //                     if (value == null && !copyNull) {
-    //                         return;
-    //                     }
-    //                     destProperty.set(dest, value);
-    //                 } else {
-    //                     Object newValue = converter.convertObject(value, sourceValueType, destProperty.getType());
-    //                     if (newValue != FsConverter.UNSUPPORTED) {
-    //                         if (newValue == null && !copyNull) {
-    //                             return;
-    //                         }
-    //                         destProperty.set(dest, newValue);
-    //                     } else {
-    //                         if (throwIfConvertFailed) {
-    //                             throw new FsConvertException(sourceValueType, destProperty.getType());
-    //                         }
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     } else {
-    //         FsBean sourceBean = beanResolver.resolve(sourceType);
-    //         if (dest instanceof Map) {
-    //             ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
-    //             if (destMapType == null) {
-    //                 throw new IllegalArgumentException("Not a map type: " + destType + ".");
-    //             }
-    //             Type[] destActualTypes = destMapType.getActualTypeArguments();
-    //             if (!Objects.equals(String.class, destActualTypes[0])) {
-    //                 throw new IllegalArgumentException("Dest key type is not String: " + destActualTypes[0] + ".");
-    //             }
-    //             Type destValueType = destActualTypes[1];
-    //             Map<String, Object> destMap = (Map<String, Object>) dest;
-    //             sourceBean.getProperties().forEach((name, sourceProperty) -> {
-    //                 if (!sourceProperty.isReadable()) {
-    //                     return;
-    //                 }
-    //                 String propertyName = propertyNameMapper == null ? name : propertyNameMapper.apply(name);
-    //                 if (propertyName == null) {
-    //                     return;
-    //                 }
-    //                 if (!put && !destMap.containsKey(propertyName)) {
-    //                     return;
-    //                 }
-    //                 Object sourceValue = sourceProperty.get(source);
-    //                 if (converter == null) {
-    //                     if (sourceValue == null && !copyNull) {
-    //                         return;
-    //                     }
-    //                     if (Objects.equals(sourceProperty.getType(), destValueType)) {
-    //                         destMap.put(propertyName, sourceValue);
-    //                     } else {
-    //                         if (throwIfConvertFailed) {
-    //                             throw new FsConvertException(sourceProperty.getType(), destValueType);
-    //                         }
-    //                     }
-    //                 } else {
-    //                     Object newValue = converter.convertObject(sourceValue, sourceProperty.getType(), destValueType);
-    //                     if (newValue != FsConverter.UNSUPPORTED) {
-    //                         if (newValue == null && !copyNull) {
-    //                             return;
-    //                         }
-    //                         destMap.put(propertyName, newValue);
-    //                     } else {
-    //                         if (throwIfConvertFailed) {
-    //                             throw new FsConvertException(sourceProperty.getType(), destValueType);
-    //                         }
-    //                     }
-    //                 }
-    //             });
-    //         } else {
-    //             FsBean destBean = beanResolver.resolve(destType);
-    //             sourceBean.getProperties().forEach((name, sourceProperty) -> {
-    //                 if (!sourceProperty.isReadable()) {
-    //                     return;
-    //                 }
-    //                 String propertyName = propertyNameMapper == null ? name : propertyNameMapper.apply(name);
-    //                 if (propertyName == null) {
-    //                     return;
-    //                 }
-    //                 FsProperty destProperty = destBean.getProperty(propertyName);
-    //                 if (destProperty == null || !destProperty.isWriteable()) {
-    //                     return;
-    //                 }
-    //                 Object sourceValue = sourceProperty.get(source);
-    //                 if (converter == null) {
-    //                     if (sourceValue == null && !copyNull) {
-    //                         return;
-    //                     }
-    //                     if (Objects.equals(sourceProperty.getType(), destProperty.getType())) {
-    //                         destProperty.set(dest, sourceValue);
-    //                     } else {
-    //                         if (throwIfConvertFailed) {
-    //                             throw new FsConvertException(sourceProperty.getType(), destProperty.getType());
-    //                         }
-    //                     }
-    //                 } else {
-    //                     Object newValue = converter.convertObject(sourceValue, sourceProperty.getType(), destProperty.getType());
-    //                     if (newValue != FsConverter.UNSUPPORTED) {
-    //                         if (newValue == null && !copyNull) {
-    //                             return;
-    //                         }
-    //                         destProperty.set(dest, newValue);
-    //                     } else {
-    //                         if (throwIfConvertFailed) {
-    //                             throw new FsConvertException(sourceProperty.getType(), destProperty.getType());
-    //                         }
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     }
-    //     return dest;
-    // }
+    /**
+     * Copies properties from source object to dest object by {@link FsBeanCopier#defaultCopier()}.
+     *
+     * @param source source object
+     * @param dest   dest object
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(Object source, T dest) {
+        return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+    }
+
+    /**
+     * Copies properties from source object to dest object by {@link FsBeanCopier}.
+     * The properties with null value will not be copied if {@code copyNull} is true.
+     *
+     * @param source   source object
+     * @param dest     dest object
+     * @param copyNull whether copy null properties
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(Object source, T dest, boolean copyNull) {
+        if (copyNull) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.newBuilder()
+            .sourcePropertyFilter((name, value) -> value != null)
+            .build()
+            .copyProperties(source, dest);
+    }
+
+    /**
+     * Copies properties from source object to dest object by {@link FsBeanCopier#defaultCopier()}.
+     * The properties that are specified to ignore will not be copied.
+     *
+     * @param source            source object
+     * @param dest              dest object
+     * @param ignoredProperties property names that are specified to ignore
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(Object source, T dest, String... ignoredProperties) {
+        if (FsArray.isEmpty(ignoredProperties)) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.newBuilder()
+            .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .build()
+            .copyProperties(source, dest);
+    }
+
+    /**
+     * Copies properties from source object to dest object by {@link FsBeanCopier#defaultCopier()}.
+     * The properties with null value will not be copied if {@code copyNull} is true,
+     * and the properties that are specified to ignore will not be copied.
+     *
+     * @param source            source object
+     * @param dest              dest object
+     * @param copyNull          whether copy null properties
+     * @param ignoredProperties property names that are specified to ignore
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(Object source, T dest, boolean copyNull, String... ignoredProperties) {
+        if (copyNull && FsArray.isEmpty(ignoredProperties)) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.newBuilder()
+            .sourcePropertyFilter((name, value) -> value != null)
+            .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .build()
+            .copyProperties(source, dest);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types by {@link FsBeanCopier#defaultCopier()}.
+     *
+     * @param source     source object
+     * @param sourceType specified type of source object
+     * @param dest       dest object
+     * @param destType   specified type of dest type
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
+        return FsBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types by {@link FsBeanCopier}.
+     * The properties with null value will not be copied if {@code copyNull} is true.
+     *
+     * @param source     source object
+     * @param sourceType specified type of source object
+     * @param dest       dest object
+     * @param destType   specified type of dest type
+     * @param copyNull   whether copy null properties
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, boolean copyNull) {
+        if (copyNull) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.newBuilder()
+            .sourcePropertyFilter((name, value) -> value != null)
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types by {@link FsBeanCopier#defaultCopier()}.
+     * The properties that are specified to ignore will not be copied.
+     *
+     * @param source            source object
+     * @param sourceType        specified type of source object
+     * @param dest              dest object
+     * @param destType          specified type of dest type
+     * @param ignoredProperties property names that are specified to ignore
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(
+        Object source, Type sourceType, T dest, Type destType, String... ignoredProperties) {
+        if (FsArray.isEmpty(ignoredProperties)) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.newBuilder()
+            .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types by {@link FsBeanCopier#defaultCopier()}.
+     * The properties with null value will not be copied if {@code copyNull} is true,
+     * and the properties that are specified to ignore will not be copied.
+     *
+     * @param source            source object
+     * @param sourceType        specified type of source object
+     * @param dest              dest object
+     * @param destType          specified type of dest type
+     * @param copyNull          whether copy null properties
+     * @param ignoredProperties property names that are specified to ignore
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(
+        Object source, Type sourceType, T dest, Type destType, boolean copyNull, String... ignoredProperties) {
+        if (copyNull && FsArray.isEmpty(ignoredProperties)) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.newBuilder()
+            .sourcePropertyFilter((name, value) -> value != null)
+            .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
+    }
 }

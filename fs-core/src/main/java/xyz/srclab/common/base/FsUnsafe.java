@@ -1,6 +1,7 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.bean.FsBeanCopier;
 import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.bean.handlers.DefaultBeanResolveHandler;
 import xyz.srclab.common.cache.FsCache;
@@ -62,6 +63,7 @@ public final class FsUnsafe {
         public static final FsBeanResolver DEFAULT_RESOLVER = FsBeanResolver.newResolver(
             Collections.singletonList(new DefaultBeanResolveHandler())
         );
+        public static final FsBeanCopier DEFAULT_COPIER = FsBeanCopier.newBuilder().build();
     }
 
     public static final class ForConvert {

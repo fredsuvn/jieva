@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -131,6 +132,21 @@ public class FsArray {
         }
         T value = array[index];
         return value == null ? defaultValue : value;
+    }
+
+    /**
+     * Returns index of given element at given array, or -1 if not found.
+     *
+     * @param array   given array
+     * @param element given element
+     */
+    public static <T> int indexOf(T[] array, T element) {
+        for (int i = 0; i < array.length; i++) {
+            if (Objects.equals(element, array[i])) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
