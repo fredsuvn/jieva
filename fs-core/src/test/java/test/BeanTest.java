@@ -7,12 +7,15 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.bean.FsBean;
+import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.bean.FsProperty;
+import xyz.srclab.common.bean.handlers.DefaultBeanResolveHandler;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -144,7 +147,10 @@ public class BeanTest {
         FsBean ccBean1 = Fs.resolveBean(ccType);
         FsBean ccBean2 = Fs.resolveBean(ccType);
         Assert.assertSame(ccBean1, ccBean2);
-        FsBean.Resolver resolver = FsBean.resolverBuilder().useCache(false).build();
+        FsBeanResolver resolver = FsBeanResolver.newResolver(
+            Collections.singletonList(new DefaultBeanResolveHandler()),
+            false
+        );
         FsBean ccBean3 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean1, ccBean3);
         Assert.assertEquals(ccBean1, ccBean3);

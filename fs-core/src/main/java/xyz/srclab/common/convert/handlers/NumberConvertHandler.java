@@ -1,14 +1,13 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
-
-import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 
 /**
  * Convert handler implementation which is used to support the conversion from any object to number types.
@@ -22,7 +21,7 @@ import static xyz.srclab.common.convert.FsConverter.CONTINUE;
  *     <li>{@link BigDecimal};</li>
  *     <li>{@link BigInteger};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
+ * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -32,7 +31,7 @@ public class NumberConvertHandler implements FsConverter.Handler {
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         if (source == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (Objects.equals(targetType, byte.class) || Objects.equals(targetType, Byte.class)) {
             if (source instanceof Number) {
@@ -87,7 +86,7 @@ public class NumberConvertHandler implements FsConverter.Handler {
             }
             return new BigInteger(source.toString());
         } else {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
     }
 }

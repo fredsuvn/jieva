@@ -1,12 +1,11 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.bean.FsBean;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
 
-import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 import static xyz.srclab.common.convert.FsConverter.Handler;
 
 /**
@@ -16,13 +15,13 @@ import static xyz.srclab.common.convert.FsConverter.Handler;
  * This handler is system default suffix handler (with {@link #BeanConvertHandler()}),
  * any object will be seen as "bean", and the conversion means create new object and copy properties.
  * <p>
- * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
+ * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
  *
  * @author fredsuvn
  */
 public class BeanConvertHandler implements Handler {
 
-    private final FsBean.Copier copier;
+    // private final FsBean.Copier copier;
 
     /**
      * Constructs with default bean resolver and copier:
@@ -31,7 +30,7 @@ public class BeanConvertHandler implements Handler {
      * </ul>
      */
     public BeanConvertHandler() {
-        this(FsBean.defaultCopier());
+        // this(FsBean.defaultCopier());
     }
 
     /**
@@ -39,20 +38,20 @@ public class BeanConvertHandler implements Handler {
      *
      * @param copier given bean copier
      */
-    public BeanConvertHandler(FsBean.Copier copier) {
-        this.copier = copier;
-    }
-
+    // public BeanConvertHandler(FsBean.Copier copier) {
+    //     this.copier = copier;
+    // }
     @Override
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         if (source == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
-        Object result = copier.copyProperties(source, targetType);
-        if (result == null) {
-            return CONTINUE;
-        }
-        return result;
+        // Object result = copier.copyProperties(source, targetType);
+        // if (result == null) {
+        //     return CONTINUE;
+        // }
+        // return result;
+        return Fs.CONTINUE;
     }
 }

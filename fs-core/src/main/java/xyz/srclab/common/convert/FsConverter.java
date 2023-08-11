@@ -2,6 +2,7 @@ package xyz.srclab.common.convert;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.TypeRef;
@@ -18,11 +19,12 @@ import java.util.List;
  * and a suffix handler (maybe null).
  * <p>
  * The conversion is performed in the order of the prefix handler (if not null), common handlers,
- * and suffix converter (if not null). If any handler returns a non-{@link #CONTINUE} and non-{@link #BREAK} value,
- * the conversion is successful and that return value will be returned.
+ * and suffix converter (if not null). If any handler returns a non-{@link Fs#CONTINUE} and non-{@link Fs#BREAK} value,
+ * that means the conversion is successful and that return value will be returned.
  * <p>
- * If a handler returns {@link #CONTINUE}, it means that handler doesn't support current conversion and hands off to
- * next handler; If it returns {@link #BREAK}, means this converter doesn't support current conversion.
+ * If the handler returns {@link Fs#CONTINUE},
+ * it means that handler doesn't support current conversion and hands off to next handler;
+ * If it returns {@link Fs#BREAK}, means this converter doesn't support current conversion.
  *
  * @author fredsuvn
  * @see Handler
@@ -59,51 +61,12 @@ public interface FsConverter {
      *     </li>
      * </ul>
      */
-    static FsConverter.Options defaultOptions() {
+    static Options defaultOptions() {
         return FsUnsafe.ForConvert.DEFAULT_OPTIONS;
     }
 
     /**
-     * Represents current conversion is unsupported by this handler and will be handed off to next handler.
-     */
-    Object CONTINUE = new Object();
-
-    /**
-     * Represents current conversion is unsupported by this handler and will be broken out the conversion will be finished.
-     */
-    Object BREAK = new Object();
-
-    /**
-     * Represents current conversion is not supported by current converter.
-     */
-    Object UNSUPPORTED = new Object();
-
-    /**
-     * Returns a converters with given common handlers.
-     *
-     * @param commonHandlers common handlers
-     */
-    static FsConverter withHandlers(Iterable<Handler> commonHandlers) {
-        return withHandlers(null, null, commonHandlers);
-    }
-
-    /**
-     * Returns a converters with given prefix, suffix, common handlers.
-     *
-     * @param prefix         prefix handler
-     * @param suffix         suffix handler
-     * @param commonHandlers common handlers
-     */
-    static FsConverter withHandlers(
-        @Nullable Handler prefix,
-        @Nullable Handler suffix,
-        Iterable<Handler> commonHandlers
-    ) {
-        return newConverter(prefix, suffix, commonHandlers, FsConverter.defaultOptions());
-    }
-
-    /**
-     * Returns a converters with given prefix, suffix, common handlers and conversion options.
+     * Returns new converters with given prefix, suffix, common handlers and conversion options.
      *
      * @param prefix         prefix handler
      * @param suffix         suffix handler
@@ -159,13 +122,37 @@ public interface FsConverter {
             public @Nullable Object convert(
                 @Nullable Object source, Type sourceType, Type targetType, Options opts, FsConverter converter) {
                 Object value = convertObject(source, sourceType, targetType, opts);
-                if (value == UNSUPPORTED) {
-                    return BREAK;
+                if (value == Fs.RETURN) {
+                    return Fs.BREAK;
                 }
                 return value;
             }
         }
         return new FsConverterImpl(prefix, suffix, FsCollect.immutableList(commonHandlers), options);
+    }
+
+    /**
+     * Returns a converters with given common handlers.
+     *
+     * @param commonHandlers common handlers
+     */
+    static FsConverter withHandlers(Iterable<Handler> commonHandlers) {
+        return withHandlers(null, null, commonHandlers);
+    }
+
+    /**
+     * Returns a converters with given prefix, suffix, common handlers.
+     *
+     * @param prefix         prefix handler
+     * @param suffix         suffix handler
+     * @param commonHandlers common handlers
+     */
+    static FsConverter withHandlers(
+        @Nullable Handler prefix,
+        @Nullable Handler suffix,
+        Iterable<Handler> commonHandlers
+    ) {
+        return newConverter(prefix, suffix, commonHandlers, FsConverter.defaultOptions());
     }
 
     /**
@@ -306,7 +293,7 @@ public interface FsConverter {
     @Nullable
     default <T> T convertType(@Nullable Object source, Type sourceType, Type targetType, Options options) {
         Object value = convertObject(source, sourceType, targetType, options);
-        if (value == UNSUPPORTED) {
+        if (value == Fs.RETURN) {
             return null;
         }
         return (T) value;
@@ -314,7 +301,7 @@ public interface FsConverter {
 
     /**
      * Converts source object from source type to target type.
-     * If return value is {@link #UNSUPPORTED}, it indicates current conversion is unsupported.
+     * If return value is {@link Fs#RETURN}, it indicates current conversion is unsupported.
      * Any other return value indicates current conversion is successful and the return value is valid, including null.
      *
      * @param source     source object
@@ -328,7 +315,7 @@ public interface FsConverter {
 
     /**
      * Converts source object from source type to target type with given options.
-     * If return value is {@link #UNSUPPORTED}, it indicates current conversion is unsupported.
+     * If return value is {@link Fs#RETURN}, it indicates current conversion is unsupported.
      * Any other return value indicates current conversion is successful and the return value is valid, including null.
      *
      * @param source     source object
@@ -341,31 +328,31 @@ public interface FsConverter {
         Handler prefix = getPrefixHandler();
         if (prefix != null) {
             Object value = prefix.convert(source, sourceType, targetType, options, this);
-            if (value == BREAK || value == UNSUPPORTED) {
-                return UNSUPPORTED;
+            if (value == Fs.BREAK || value == Fs.RETURN) {
+                return Fs.RETURN;
             }
-            if (value != CONTINUE) {
+            if (value != Fs.CONTINUE) {
                 return value;
             }
         }
         for (Handler commonHandler : getCommonHandlers()) {
             Object value = commonHandler.convert(source, sourceType, targetType, options, this);
-            if (value == BREAK || value == UNSUPPORTED) {
-                return UNSUPPORTED;
+            if (value == Fs.BREAK || value == Fs.RETURN) {
+                return Fs.RETURN;
             }
-            if (value != CONTINUE) {
+            if (value != Fs.CONTINUE) {
                 return value;
             }
         }
         Handler suffix = getSuffixHandler();
         if (suffix != null) {
             Object value = suffix.convert(source, sourceType, targetType, options, this);
-            if (value == BREAK || value == CONTINUE || value == UNSUPPORTED) {
-                return UNSUPPORTED;
+            if (value == Fs.BREAK || value == Fs.CONTINUE || value == Fs.RETURN) {
+                return Fs.RETURN;
             }
             return value;
         }
-        return UNSUPPORTED;
+        return Fs.RETURN;
     }
 
     /**
@@ -394,7 +381,7 @@ public interface FsConverter {
     default <T> T convertThrow(
         @Nullable Object source, Type sourceType, Type targetType, Options options) throws FsConvertException {
         Object value = convertObject(source, sourceType, targetType, options);
-        if (value == UNSUPPORTED) {
+        if (value == Fs.RETURN) {
             throw new FsConvertException(sourceType, targetType);
         }
         return (T) value;
@@ -430,12 +417,13 @@ public interface FsConverter {
         /**
          * Converts source object from source type to target type.
          * <p>
-         * If this method returns {@link #CONTINUE}, it means that this handler doesn't support current conversion,
-         * but it will hand off to next handler.
+         * If this method returns {@link Fs#CONTINUE},
+         * it means that this handler doesn't support current conversion, but it will hand off to next handler.
          * <p>
-         * If this method returns {@link #BREAK}, it means that this handler doesn't support current conversion,
-         * and the converter will break current conversion. This indicates that the converter does not support current
-         * conversion.
+         * If this method returns {@link Fs#BREAK},
+         * it means that this handler doesn't support current conversion,
+         * and the converter will break out from the conversion.
+         * This indicates that the converter does not support current conversion.
          * <p>
          * Otherwise, any other return value is considered as the final conversion result.
          *
@@ -450,9 +438,7 @@ public interface FsConverter {
     }
 
     /**
-     * Options for convert.
-     *
-     * @author fredsuvn
+     * Options for conversion.
      */
     interface Options {
 

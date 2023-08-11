@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsDate;
 import xyz.srclab.common.convert.FsConvertException;
 import xyz.srclab.common.convert.FsConverter;
@@ -13,8 +14,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
-
-import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 
 /**
  * Convert handler implementation which is used to support conversion of date, duration and zone types.
@@ -55,7 +54,7 @@ import static xyz.srclab.common.convert.FsConverter.CONTINUE;
  *     <li>{@link #DateConvertHandler(PatternFunction)};</li>
  * </ul>
  * <p>
- * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
+ * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -155,7 +154,7 @@ public class DateConvertHandler implements FsConverter.Handler {
 
     public @Nullable Object convert0(@Nullable Object source, Type sourceType, Type targetType) throws ParseException {
         if (source == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (Objects.equals(targetType, String.class)) {
             Date date = tryDate(source, sourceType);
@@ -184,19 +183,19 @@ public class DateConvertHandler implements FsConverter.Handler {
                 || Objects.equals(ZoneOffset.class, sourceType)) {
                 return source.toString();
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, StringBuilder.class)) {
             Object result = convert0(source, sourceType, String.class);
             if (result != null && Objects.equals(result.getClass(), String.class)) {
                 return new StringBuilder(result.toString());
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, StringBuffer.class)) {
             Object result = convert0(source, sourceType, String.class);
             if (result != null && Objects.equals(result.getClass(), String.class)) {
                 return new StringBuffer(result.toString());
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, Date.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -222,7 +221,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (offsetDateTime != null) {
                 return Date.from(offsetDateTime.toInstant());
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, Instant.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -248,7 +247,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toInstant();
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, LocalDateTime.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -274,7 +273,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toLocalDateTime();
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, ZonedDateTime.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -300,7 +299,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toZonedDateTime();
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, OffsetDateTime.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -326,7 +325,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (zonedDateTime != null) {
                 return zonedDateTime.toOffsetDateTime();
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, Duration.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -336,7 +335,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (l != null) {
                 return Duration.ofMillis(l);
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, TimeZone.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -350,7 +349,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (zoneOffset != null) {
                 return TimeZone.getTimeZone(zoneOffset);
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, ZoneId.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -364,7 +363,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (zoneOffset != null) {
                 return zoneOffset;
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         } else if (Objects.equals(targetType, ZoneOffset.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -378,9 +377,9 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (zoneId != null) {
                 return FsDate.toZoneOffset(zoneId);
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
-        return CONTINUE;
+        return Fs.CONTINUE;
     }
 
     @Nullable

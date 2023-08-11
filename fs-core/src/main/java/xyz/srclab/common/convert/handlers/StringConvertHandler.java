@@ -1,12 +1,11 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
-
-import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 
 /**
  * Convert handler implementation which is used to support the conversion from any object to string with
@@ -20,7 +19,7 @@ import static xyz.srclab.common.convert.FsConverter.CONTINUE;
  *     <li>{@link StringBuilder};</li>
  *     <li>{@link StringBuffer};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
+ * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -30,7 +29,7 @@ public class StringConvertHandler implements FsConverter.Handler {
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         if (source == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (Objects.equals(targetType, String.class) || Objects.equals(targetType, CharSequence.class)) {
             return source.toString();
@@ -48,7 +47,7 @@ public class StringConvertHandler implements FsConverter.Handler {
         } else if (Objects.equals(targetType, StringBuffer.class)) {
             return new StringBuffer(source.toString());
         } else {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
     }
 }

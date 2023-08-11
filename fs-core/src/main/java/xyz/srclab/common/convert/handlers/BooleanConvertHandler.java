@@ -1,12 +1,11 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
-
-import static xyz.srclab.common.convert.FsConverter.CONTINUE;
 
 /**
  * Convert handler implementation which is used to support conversion from any object to boolean types:
@@ -21,7 +20,7 @@ import static xyz.srclab.common.convert.FsConverter.CONTINUE;
  *         If source object is not instance of {@link Number}, return {@link Boolean#parseBoolean(String)}.
  *     </li>
  * </ul>
- * Note if source object is null, return {@link FsConverter#CONTINUE}.
+ * Note if source object is null, return {@link Fs#CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -31,10 +30,10 @@ public class BooleanConvertHandler implements FsConverter.Handler {
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         if (source == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (!Objects.equals(targetType, boolean.class) && !Objects.equals(targetType, Boolean.class)) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (source instanceof Boolean) {
             return source;

@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
 
@@ -9,20 +10,20 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Objects;
 
-import static xyz.srclab.common.convert.FsConverter.*;
+import static xyz.srclab.common.convert.FsConverter.Options;
 
 /**
  * Convert handler implementation which is used to check type compatibility and reusability, it follows in order:
  * <ul>
  *     <li>
- *         If source object is null, return {@link FsConverter#CONTINUE};
+ *         If source object is null, return {@link Fs#CONTINUE};
  *     </li>
  *     <li>
  *         If target type and source type are equal:
  *         <ul>
  *             <li>
  *                 If {@link Options#reusePolicy()} is not {@link Options#NO_REUSE},
- *                 return source object, else return {@link FsConverter#CONTINUE};
+ *                 return source object, else return {@link Fs#CONTINUE};
  *             </li>
  *         </ul>
  *     </li>
@@ -31,12 +32,12 @@ import static xyz.srclab.common.convert.FsConverter.*;
  *         <ul>
  *             <li>
  *                 If {@link Options#reusePolicy()} is {@link Options#REUSE_ASSIGNABLE},
- *                 return source object, else return {@link FsConverter#CONTINUE};
+ *                 return source object, else return {@link Fs#CONTINUE};
  *             </li>
  *         </ul>
  *     </li>
  *     <li>
- *         If target type is {@link TypeVariable}, return {@link FsConverter#BREAK};
+ *         If target type is {@link TypeVariable}, return {@link Fs#BREAK};
  *     </li>
  *     <li>
  *         If target type is {@link WildcardType}:
@@ -58,7 +59,7 @@ import static xyz.srclab.common.convert.FsConverter.*;
  *         </ul>
  *     </li>
  *     <li>
- *         Else return {@link FsConverter#CONTINUE};
+ *         Else return {@link Fs#CONTINUE};
  *     </li>
  * </ul>
  * This handler is system default prefix handler.
@@ -71,23 +72,23 @@ public class ReuseConvertHandler implements FsConverter.Handler {
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, Options options, FsConverter converter) {
         if (source == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         int reusePolicy = options.reusePolicy();
         if (Objects.equals(targetType, sourceType)) {
             if (reusePolicy != Options.NO_REUSE) {
                 return source;
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (FsType.isAssignableFrom(targetType, sourceType)) {
             if (reusePolicy == Options.REUSE_ASSIGNABLE) {
                 return source;
             }
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (targetType instanceof TypeVariable<?>) {
-            return BREAK;
+            return Fs.BREAK;
         }
         if (targetType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) targetType;
@@ -100,6 +101,6 @@ public class ReuseConvertHandler implements FsConverter.Handler {
                 return converter.convertObject(source, sourceType, targetLower, options.replaceReusePolicy(Options.REUSE_EQUAL));
             }
         }
-        return CONTINUE;
+        return Fs.CONTINUE;
     }
 }

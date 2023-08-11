@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.base.FsObj;
 import xyz.srclab.common.collect.FsCollect;
@@ -17,15 +18,13 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntFunction;
 
-import static xyz.srclab.common.convert.FsConverter.*;
-
 /**
  * Convert handler implementation which is used to support the conversion of collection types.
  * It supports target type in:
  * <ul>
  *     <li>{@link Iterable}</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link FsConverter#CONTINUE}.
+ * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
  *
  * @author fredsuvn
  */
@@ -51,13 +50,13 @@ public class CollectConvertHandler implements FsConverter.Handler {
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         if (source == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (targetType instanceof Class) {
             if (((Class<?>) targetType).isArray()) {
                 FsObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
                 if (sourceInfo == null) {
-                    return CONTINUE;
+                    return Fs.CONTINUE;
                 }
                 return convertArray(sourceInfo, ((Class<?>) targetType).getComponentType(), options, converter);
             }
@@ -65,7 +64,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         } else if (targetType instanceof GenericArrayType) {
             FsObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
             if (sourceInfo == null) {
-                return CONTINUE;
+                return Fs.CONTINUE;
             }
             return convertArray(sourceInfo, ((GenericArrayType) targetType).getGenericComponentType(), options, converter);
         }
@@ -77,18 +76,18 @@ public class CollectConvertHandler implements FsConverter.Handler {
         @Nullable Object obj, Type fromType, Type targetType, FsConverter.Options options, FsConverter converter) {
         ParameterizedType targetItType = FsType.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         FsObj<Iterable<?>> sourceInfo = toGenericInfo(obj, fromType);
         if (sourceInfo == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (sourceInfo.getRawType().isArray()) {
             return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], options, converter);
         }
         Generator generator = GENERATOR_MAP.get(sourceInfo.getRawType());
         if (generator == null) {
-            return CONTINUE;
+            return Fs.CONTINUE;
         }
         if (generator.needSize()) {
             Collection<?> srcList = FsCollect.asOrToList(sourceInfo.getObject());
@@ -123,8 +122,8 @@ public class CollectConvertHandler implements FsConverter.Handler {
     ) {
         for (Object srcValue : src) {
             Object targetValue = converter.convertObject(srcValue, fromComponentType, targetComponentType, options);
-            if (targetValue == UNSUPPORTED) {
-                return BREAK;
+            if (targetValue == Fs.RETURN) {
+                return Fs.BREAK;
             }
             dest.add(targetValue);
         }
@@ -150,8 +149,8 @@ public class CollectConvertHandler implements FsConverter.Handler {
         for (Object srcValue : srcList) {
             Object targetValue = converter.convertObject(
                 srcValue, sourceInfo.getActualTypeArgument(0), targetComponentType, options);
-            if (targetValue == UNSUPPORTED) {
-                return BREAK;
+            if (targetValue == Fs.RETURN) {
+                return Fs.BREAK;
             }
             Array.set(targetArray, i, targetValue);
             i++;
