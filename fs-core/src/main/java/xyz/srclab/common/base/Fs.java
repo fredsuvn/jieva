@@ -2,7 +2,7 @@ package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.bean.FsBean;
-import xyz.srclab.common.bean.FsBeanProperty;
+import xyz.srclab.common.bean.FsProperty;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.convert.FsConvertException;
@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -753,7 +752,7 @@ public class Fs {
                     if (propertyName == null) {
                         return;
                     }
-                    FsBeanProperty destProperty = destBean.getProperty(propertyName);
+                    FsProperty destProperty = destBean.getProperty(propertyName);
                     if (destProperty == null || !destProperty.isWriteable()) {
                         return;
                     }
@@ -837,7 +836,7 @@ public class Fs {
                     if (propertyName == null) {
                         return;
                     }
-                    FsBeanProperty destProperty = destBean.getProperty(propertyName);
+                    FsProperty destProperty = destBean.getProperty(propertyName);
                     if (destProperty == null || !destProperty.isWriteable()) {
                         return;
                     }

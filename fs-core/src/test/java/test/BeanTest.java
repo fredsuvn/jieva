@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.bean.FsBean;
-import xyz.srclab.common.bean.FsBeanProperty;
+import xyz.srclab.common.bean.FsProperty;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
@@ -25,11 +25,11 @@ public class BeanTest {
         }.getType();
         FsBean ccBean = Fs.resolveBean(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
-        FsBeanProperty cc = ccBean.getProperty("cc");
-        FsBeanProperty c1 = ccBean.getProperty("c1");
-        FsBeanProperty c2 = ccBean.getProperty("c2");
-        FsBeanProperty i1 = ccBean.getProperty("i1");
-        FsBeanProperty i2 = ccBean.getProperty("i2");
+        FsProperty cc = ccBean.getProperty("cc");
+        FsProperty c1 = ccBean.getProperty("c1");
+        FsProperty c2 = ccBean.getProperty("c2");
+        FsProperty i1 = ccBean.getProperty("i1");
+        FsProperty i2 = ccBean.getProperty("i2");
         Assert.assertEquals(cc.getType(), Double.class);
         Assert.assertEquals(c2.getType(), Long.class);
         Assert.assertEquals(i1.getType(), String.class);
@@ -61,11 +61,11 @@ public class BeanTest {
         Type ccType = Cc.class;
         FsBean ccBean = Fs.resolveBean(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
-        FsBeanProperty cc = ccBean.getProperty("cc");
-        FsBeanProperty c1 = ccBean.getProperty("c1");
-        FsBeanProperty c2 = ccBean.getProperty("c2");
-        FsBeanProperty i1 = ccBean.getProperty("i1");
-        FsBeanProperty i2 = ccBean.getProperty("i2");
+        FsProperty cc = ccBean.getProperty("cc");
+        FsProperty c1 = ccBean.getProperty("c1");
+        FsProperty c2 = ccBean.getProperty("c2");
+        FsProperty i1 = ccBean.getProperty("i1");
+        FsProperty i2 = ccBean.getProperty("i2");
         Assert.assertEquals(cc.getType().toString(), "T");
         Assert.assertEquals(c2.getType(), Long.class);
         Assert.assertEquals(i1.getType(), String.class);
@@ -102,20 +102,20 @@ public class BeanTest {
         map.put("3", 10000L);
         FsBean mapBean = Fs.wrapBean(map, mapType);
         FsLogger.system().info("mapBean: ", mapBean);
-        FsBeanProperty p1 = mapBean.getProperty("1");
-        FsBeanProperty p2 = mapBean.getProperty("2");
-        FsBeanProperty p3 = mapBean.getProperty("3");
-        FsBeanProperty p4 = mapBean.getProperty("4");
+        FsProperty p1 = mapBean.getProperty("1");
+        FsProperty p2 = mapBean.getProperty("2");
+        FsProperty p3 = mapBean.getProperty("3");
+        FsProperty p4 = mapBean.getProperty("4");
         Assert.assertEquals(p1.getType(), Long.class);
         Assert.assertEquals(p2.getType(), Long.class);
         Assert.assertEquals(p3.getType(), Long.class);
         Assert.assertNull(p4);
-        Map<String, FsBeanProperty> properties = mapBean.getProperties();
+        Map<String, FsProperty> properties = mapBean.getProperties();
         Assert.assertSame(properties, mapBean.getProperties());
         map.put("4", 12345L);
         Assert.assertNotEquals(properties, mapBean.getProperties());
         Assert.assertNull(p4);
-        FsBeanProperty p42 = mapBean.getProperty("4");
+        FsProperty p42 = mapBean.getProperty("4");
         Assert.assertEquals(p42.getType(), Long.class);
         Assert.assertSame(p1, mapBean.getProperties().get("1"));
         Assert.assertSame(p1, mapBean.getProperty("1"));
@@ -124,7 +124,7 @@ public class BeanTest {
         FsLogger.system().info("mapBean: ", mapBean);
 
         FsBean mapObjBean = Fs.wrapBean(map);
-        FsBeanProperty p1Obj = mapObjBean.getProperty("1");
+        FsProperty p1Obj = mapObjBean.getProperty("1");
         Assert.assertEquals(p1Obj.getType(), Object.class);
         Assert.assertEquals(
             p1.get(map),

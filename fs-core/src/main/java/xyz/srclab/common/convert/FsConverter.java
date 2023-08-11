@@ -99,7 +99,7 @@ public interface FsConverter {
         @Nullable Handler suffix,
         Iterable<Handler> commonHandlers
     ) {
-        return newConverter(prefix, suffix, commonHandlers, Options.defaultOptions());
+        return newConverter(prefix, suffix, commonHandlers, FsConverter.defaultOptions());
     }
 
     /**

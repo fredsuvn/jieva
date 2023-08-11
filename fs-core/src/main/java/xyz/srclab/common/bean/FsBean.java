@@ -9,9 +9,8 @@ import xyz.srclab.common.base.FsFinal;
 import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
-import xyz.srclab.common.convert.FsConvert;
-import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.convert.FsConvertException;
+import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsInvoker;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
@@ -68,9 +67,6 @@ public interface FsBean {
     }
 
 
-
-
-
     /**
      * Returns type of this bean.
      */
@@ -86,7 +82,7 @@ public interface FsBean {
     /**
      * Returns all properties in this bean.
      */
-    Map<String, FsBeanProperty> getProperties();
+    Map<String, FsProperty> getProperties();
 
     /**
      * Returns property with given name in this bean.
@@ -94,7 +90,7 @@ public interface FsBean {
      * @param name given name
      */
     @Nullable
-    default FsBeanProperty getProperty(String name) {
+    default FsProperty getProperty(String name) {
         return getProperties().get(name);
     }
 
@@ -142,7 +138,7 @@ public interface FsBean {
 
             private Resolver beanResolver;
             private @Nullable Function<? extends CharSequence, String> nameConverter;
-            private @Nullable BiPredicate<FsBeanProperty, FsBeanProperty> propertyFilter;
+            private @Nullable BiPredicate<FsProperty, FsProperty> propertyFilter;
             // private
 
             /**
@@ -184,7 +180,7 @@ public interface FsBean {
              * If property filter is not null,
              * only the properties that pass through this filter (return true) will be copied.
              */
-            Builder propertyFilter(@Nullable BiPredicate<FsBeanProperty, FsBeanProperty> propertyFilter) {
+            Builder propertyFilter(@Nullable BiPredicate<FsProperty, FsProperty> propertyFilter) {
                 this.propertyFilter = propertyFilter;
                 return this;
             }
@@ -200,7 +196,7 @@ public interface FsBean {
              * If dest value filter is null,
              * only the non-null values will be set into corresponding dest property.
              */
-            Builder destValueFilter(@Nullable BiPredicate<@Nullable Object, FsBeanProperty> destValueFilter) {
+            Builder destValueFilter(@Nullable BiPredicate<@Nullable Object, FsProperty> destValueFilter) {
                 // this.destValueFilter = destValueFilter;
                 return this;
             }
@@ -228,16 +224,16 @@ public interface FsBean {
                 private final Resolver beanResolver;
                 private final @Nullable Function<CharSequence, String> nameConverter;
                 private final @Nullable FsConverter valueConverter;
-                private final @Nullable BiPredicate<FsBeanProperty, FsBeanProperty> propertyFilter;
-                private final @Nullable BiPredicate<@Nullable Object, FsBeanProperty> destValueFilter;
+                private final @Nullable BiPredicate<FsProperty, FsProperty> propertyFilter;
+                private final @Nullable BiPredicate<@Nullable Object, FsProperty> destValueFilter;
                 private final int conversionFailPolicy;
 
                 private CopierImpl(
                     Resolver beanResolver,
                     @Nullable Function<CharSequence, String> nameConverter,
                     @Nullable FsConverter valueConverter,
-                    @Nullable BiPredicate<FsBeanProperty, FsBeanProperty> propertyFilter,
-                    @Nullable BiPredicate<@Nullable Object, FsBeanProperty> destValueFilter,
+                    @Nullable BiPredicate<FsProperty, FsProperty> propertyFilter,
+                    @Nullable BiPredicate<@Nullable Object, FsProperty> destValueFilter,
                     int conversionFailPolicy
                 ) {
                     this.beanResolver = beanResolver;
@@ -374,7 +370,7 @@ public interface FsBean {
              */
             public Builder invokeMode(int invokeMode) {
                 if (invokeMode != REFLECT_MODE && invokeMode != UNREFLECT_MODE) {
-                    throw new IllegalArgumentException("Unknown invoke mode: " + invokeMode);
+                    throw new IllegalArgumentException("Unknown invoke mode: " + invokeMode + ".");
                 }
                 this.invokeMode = invokeMode;
                 return this;
@@ -397,7 +393,7 @@ public interface FsBean {
              */
             public Builder propertyNameMapping(int propertyNameMapping) {
                 if (propertyNameMapping != BEAN_NAMING && propertyNameMapping != RECORD_NAMING) {
-                    throw new IllegalArgumentException("Unknown property naming: " + propertyNameMapping);
+                    throw new IllegalArgumentException("Unknown property naming: " + propertyNameMapping + ".");
                 }
                 this.propertyNameMapping = propertyNameMapping;
                 return this;
@@ -507,14 +503,14 @@ public interface FsBean {
                             }
                         }
                         Field field = findField(name, rawType);
-                        bean.properties.put(name, new FsBeanPropertyImpl(bean, name, getter, setter, field, returnType));
+                        bean.properties.put(name, new FsPropertyImpl(bean, name, getter, setter, field, returnType));
                         setters.remove(name);
                     });
                     setters.forEach((name, setter) -> {
                         Field field = findField(name, rawType);
                         Type setType = setter.getGenericParameterTypes()[0];
                         setType = getActualType(setType, typeParameterMapping, stack);
-                        bean.properties.put(name, new FsBeanPropertyImpl(bean, name, null, setter, field, setType));
+                        bean.properties.put(name, new FsPropertyImpl(bean, name, null, setter, field, setType));
                     });
                     bean.afterInit();
                     return bean;
@@ -540,7 +536,7 @@ public interface FsBean {
                             }
                             return null;
                         default:
-                            throw new IllegalStateException("Unknown property naming: " + propertyNaming);
+                            throw new IllegalArgumentException("Unknown property naming: " + propertyNaming + ".");
                     }
                 }
 
@@ -560,7 +556,7 @@ public interface FsBean {
                             }
                             return null;
                         default:
-                            throw new IllegalStateException("Unknown property naming: " + propertyNaming);
+                            throw new IllegalArgumentException("Unknown property naming: " + propertyNaming + ".");
                     }
                 }
 
@@ -601,7 +597,7 @@ public interface FsBean {
                 private static final class FsBeanImpl extends FsFinal implements FsBean {
 
                     private final Type type;
-                    private Map<String, FsBeanProperty> properties = new LinkedHashMap<>();
+                    private Map<String, FsProperty> properties = new LinkedHashMap<>();
 
                     private FsBeanImpl(Type type) {
                         this.type = type;
@@ -613,7 +609,7 @@ public interface FsBean {
                     }
 
                     @Override
-                    public Map<String, FsBeanProperty> getProperties() {
+                    public Map<String, FsProperty> getProperties() {
                         return properties;
                     }
 
@@ -646,7 +642,7 @@ public interface FsBean {
                     }
                 }
 
-                private final class FsBeanPropertyImpl extends FsFinal implements FsBeanProperty {
+                private final class FsPropertyImpl extends FsFinal implements FsProperty {
 
                     private final FsBean owner;
                     private final String name;
@@ -654,7 +650,6 @@ public interface FsBean {
                     private final Method setter;
                     private final Field field;
                     private final Type type;
-
                     private final FsInvoker getterInvoker;
                     private final FsInvoker setterInvoker;
                     private final List<Annotation> getterAnnotations;
@@ -662,7 +657,7 @@ public interface FsBean {
                     private final List<Annotation> fieldAnnotations;
                     private final List<Annotation> allAnnotations;
 
-                    private FsBeanPropertyImpl(
+                    private FsPropertyImpl(
                         FsBean owner, String name,
                         @Nullable Method getter, @Nullable Method setter,
                         @Nullable Field field, Type type
@@ -699,7 +694,7 @@ public interface FsBean {
                                 }
                                 break;
                             default:
-                                throw new IllegalStateException("Unknown invoke mode setting: " + invokeMode);
+                                throw new IllegalStateException("Unknown invoke mode setting: " + invokeMode + ".");
                         }
                         getterAnnotations = getter == null ? Collections.emptyList() :
                             Collections.unmodifiableList(Arrays.asList(getter.getAnnotations()));
@@ -718,7 +713,7 @@ public interface FsBean {
                     @Override
                     public @Nullable Object get(Object bean) {
                         if (getterInvoker == null) {
-                            throw new IllegalStateException("Property is not readable: " + name);
+                            throw new FsBeanException("Property is not readable: " + name + ".");
                         }
                         return getterInvoker.invoke(bean);
                     }
@@ -726,7 +721,7 @@ public interface FsBean {
                     @Override
                     public void set(Object bean, @Nullable Object value) {
                         if (setterInvoker == null) {
-                            throw new IllegalStateException("Property is not writeable: " + name);
+                            throw new FsBeanException("Property is not writeable: " + name + ".");
                         }
                         setterInvoker.invoke(bean, value);
                     }
@@ -791,10 +786,10 @@ public interface FsBean {
                         if (this == o) {
                             return true;
                         }
-                        if (!(o instanceof FsBeanPropertyImpl)) {
+                        if (!(o instanceof FsPropertyImpl)) {
                             return false;
                         }
-                        FsBeanPropertyImpl other = (FsBeanPropertyImpl) o;
+                        FsPropertyImpl other = (FsPropertyImpl) o;
                         return Objects.equals(owner.getType(), other.owner.getType())
                             && Objects.equals(name, other.name)
                             && Objects.equals(type, other.type);
@@ -828,7 +823,7 @@ public interface FsBean {
                     private final Map<String, Node> propertyNodes = new LinkedHashMap<>();
                     private int propertyVersion = 0;
 
-                    private Map<String, FsBeanProperty> properties;
+                    private Map<String, FsProperty> properties;
 
                     private FsMapBeanImpl(Map<String, Object> map, @Nullable Type mapType) {
                         this.map = map;
@@ -854,15 +849,15 @@ public interface FsBean {
                     }
 
                     @Override
-                    public synchronized Map<String, FsBeanProperty> getProperties() {
+                    public synchronized Map<String, FsProperty> getProperties() {
                         // first init
                         if (properties == null) {
                             map.forEach((k, v) -> {
-                                FsBeanProperty property = new FsMapBeanPropertyImpl(k);
+                                FsProperty property = new FsMapPropertyImpl(k);
                                 propertyNodes.put(k, new Node(propertyVersion, property));
                             });
                             properties = Collections.unmodifiableMap(
-                                FsCollect.mapMap(propertyNodes, new LinkedHashMap<>(), name->name, Node::getProperty)
+                                FsCollect.mapMap(propertyNodes, new LinkedHashMap<>(), name -> name, Node::getProperty)
                             );
                             return properties;
                         }
@@ -873,7 +868,7 @@ public interface FsBean {
                         for (String key : keySet) {
                             Node node = propertyNodes.get(key);
                             if (node == null) {
-                                FsBeanProperty property = new FsMapBeanPropertyImpl(key);
+                                FsProperty property = new FsMapPropertyImpl(key);
                                 propertyNodes.put(key, new Node(propertyVersion, property));
                                 hasNewNode = true;
                             } else {
@@ -893,7 +888,7 @@ public interface FsBean {
                             }
                         }
                         properties = Collections.unmodifiableMap(
-                            FsCollect.mapMap(propertyNodes, new LinkedHashMap<>(), name->name, Node::getProperty)
+                            FsCollect.mapMap(propertyNodes, new LinkedHashMap<>(), name -> name, Node::getProperty)
                         );
                         return properties;
                     }
@@ -926,14 +921,14 @@ public interface FsBean {
                     @AllArgsConstructor
                     private static final class Node {
                         private int version;
-                        private FsBeanProperty property;
+                        private FsProperty property;
                     }
 
-                    private final class FsMapBeanPropertyImpl implements FsBeanProperty {
+                    private final class FsMapPropertyImpl implements FsProperty {
 
                         private final String key;
 
-                        private FsMapBeanPropertyImpl(String key) {
+                        private FsMapPropertyImpl(String key) {
                             this.key = key;
                         }
 
@@ -1007,11 +1002,11 @@ public interface FsBean {
                             if (this == o) {
                                 return true;
                             }
-                            if (!(o instanceof FsMapBeanPropertyImpl)) {
+                            if (!(o instanceof FsMapPropertyImpl)) {
                                 return false;
                             }
-                            return Objects.equals(key, ((FsMapBeanPropertyImpl) o).key)
-                                && Objects.equals(FsMapBeanImpl.this, ((FsMapBeanPropertyImpl) o).getOwner());
+                            return Objects.equals(key, ((FsMapPropertyImpl) o).key)
+                                && Objects.equals(FsMapBeanImpl.this, ((FsMapPropertyImpl) o).getOwner());
                         }
 
                         @Override

@@ -9,14 +9,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Represents property in {@link FsBean}.
+ * Represents property of {@link FsBean}.
  *
  * @author fredsuvn
  */
 @ThreadSafe
-public interface FsBeanProperty {
+public interface FsProperty {
 
     /**
      * Returns property value of given bean instance.
@@ -83,6 +84,22 @@ public interface FsBeanProperty {
      * Returns annotations on getter, setter and backed field (in this order).
      */
     List<Annotation> getAnnotations();
+
+    /**
+     * Returns first annotation of {@link #getAnnotations()} of which type is specified annotation type.
+     * Return null if not found.
+     *
+     * @param annotationType specified annotation type
+     */
+    @Nullable
+    default Annotation getAnnotation(Class<?> annotationType) {
+        for (Annotation annotation : getAnnotations()) {
+            if (Objects.equals(annotationType, annotation.getClass())) {
+                return annotation;
+            }
+        }
+        return null;
+    }
 
     /**
      * Returns owner bean of this property.
