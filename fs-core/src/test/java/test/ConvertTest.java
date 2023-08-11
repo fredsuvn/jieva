@@ -2,9 +2,12 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.convert.FsConvert;
+import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.Fs;
+import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.TypeRef;
 
+import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,16 +20,16 @@ public class ConvertTest {
         long now = System.currentTimeMillis();
         Assert.assertEquals(
             Instant.ofEpochMilli(now),
-            FsConvert.convert(new Date(now), Instant.class)
+            Fs.convert(new Date(now), Instant.class)
         );
         Instant instant = Instant.ofEpochMilli(now);
         Assert.assertSame(
             instant,
-            FsConvert.convert(instant, Instant.class)
+            Fs.convert(instant, Instant.class)
         );
         Assert.assertEquals(
             Arrays.asList("1", "2", "3"),
-            FsConvert.convertByType(
+            Fs.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<String>>() {
                 }.getType(),
                 new TypeRef<List<String>>() {
@@ -35,7 +38,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            FsConvert.convertByType(
+            Fs.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -44,7 +47,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            FsConvert.convertByType(
+            Fs.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -53,7 +56,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            FsConvert.convertByType(
+            Fs.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? extends String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -62,7 +65,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            FsConvert.convertByType(
+            Fs.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super Integer>>() {
@@ -71,7 +74,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            FsConvert.convertByType(
+            Fs.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? extends Integer>>() {
@@ -81,7 +84,7 @@ public class ConvertTest {
         List<String> strList = Arrays.asList("1", "2", "3");
         Assert.assertSame(
             strList,
-            FsConvert.convertByType(
+            Fs.convertType(
                 strList, new TypeRef<List<? super CharSequence>>() {
                 }.getType(),
                 new TypeRef<List<? super String>>() {
@@ -90,7 +93,7 @@ public class ConvertTest {
         );
         Assert.assertNotSame(
             strList,
-            FsConvert.convertByType(
+            Fs.convertType(
                 strList, new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super CharSequence>>() {
@@ -99,7 +102,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             strList,
-            FsConvert.convertByType(
+            Fs.convertType(
                 strList, new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super CharSequence>>() {
@@ -108,14 +111,35 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             strList,
-            FsConvert.convert(
+            Fs.convert(
                 strList, List.class
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            FsConvert.convert(
+            Fs.convert(
                 strList,
+                new TypeRef<List<? super Integer>>() {
+                }.getType()
+            )
+        );
+    }
+
+    @Test
+    public void testConvertHandler() {
+        Object x = new Object();
+        FsConverter.Handler handler = new FsConverter.Handler() {
+            @Override
+            public @Nullable Object convert(
+                @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+                return x;
+            }
+        };
+        FsConverter converter = FsConverter.defaultConverter().withCommonHandler(handler);
+        Assert.assertSame(
+            x,
+            converter.convert(
+                "123",
                 new TypeRef<List<? super Integer>>() {
                 }.getType()
             )

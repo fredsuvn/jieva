@@ -42,8 +42,6 @@
 //         return copyProperties(source, source.getClass(), dest, dest.getClass());
 //     }
 //
-//
-//
 //     /**
 //      * Copies properties from source object to dest object.
 //      *
