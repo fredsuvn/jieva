@@ -112,7 +112,7 @@ public class FsConvert {
      */
     @Nullable
     public static <T> T convertByType(@Nullable Object source, Type sourceType, Type targetType) {
-        return FsConverter.defaultConverter().convertByType(source, sourceType, targetType);
+        return FsConverter.defaultConverter().convertType(source, sourceType, targetType);
     }
 
     /**
@@ -129,7 +129,7 @@ public class FsConvert {
     @Nullable
     public static <T> T convertByType(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options) {
-        return FsConverter.defaultConverter().convertByType(source, sourceType, targetType, options);
+        return FsConverter.defaultConverter().convertType(source, sourceType, targetType, options);
     }
 
     /**
@@ -159,6 +159,6 @@ public class FsConvert {
     public static Object convertOrThrow(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options
     ) throws FsConvertException {
-        return FsConverter.defaultConverter().convertOrThrow(source, sourceType, targetType, options);
+        return FsConverter.defaultConverter().convertThrow(source, sourceType, targetType, options);
     }
 }

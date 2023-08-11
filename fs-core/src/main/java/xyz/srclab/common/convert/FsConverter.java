@@ -52,6 +52,18 @@ public interface FsConverter {
     }
 
     /**
+     * Returns default conversion options with:
+     * <ul>
+     *     <li>
+     *         Compatibility policy: {@link Options#REUSE_ASSIGNABLE};
+     *     </li>
+     * </ul>
+     */
+    static FsConverter.Options defaultOptions() {
+        return FsUnsafe.ForConvert.DEFAULT_OPTIONS;
+    }
+
+    /**
      * Represents current conversion is unsupported by this handler and will be handed off to next handler.
      */
     Object CONTINUE = new Object();
@@ -182,7 +194,7 @@ public interface FsConverter {
      * Converts source object to target type.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>Note the return value itself may also be null.</b>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
      * @param source     source object
      * @param targetType target type
@@ -196,7 +208,7 @@ public interface FsConverter {
      * Converts source object to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>Note the return value itself may also be null.</b>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
      * @param source     source object
      * @param targetType target type
@@ -204,14 +216,14 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convert(@Nullable Object source, Class<T> targetType, Options options) {
-        return convertByType(source, source == null ? Object.class : source.getClass(), targetType, options);
+        return convertType(source, source == null ? Object.class : source.getClass(), targetType, options);
     }
 
     /**
      * Converts source object to target type.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>Note the return value itself may also be null.</b>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
      * @param source     source object
      * @param targetType type reference of target type
@@ -225,7 +237,7 @@ public interface FsConverter {
      * Converts source object to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>Note the return value itself may also be null.</b>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
      * @param source     source object
      * @param targetType type reference target type
@@ -233,14 +245,14 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convert(@Nullable Object source, TypeRef<T> targetType, Options options) {
-        return convertByType(source, source == null ? Object.class : source.getClass(), targetType.getType(), options);
+        return convertType(source, source == null ? Object.class : source.getClass(), targetType.getType(), options);
     }
 
     /**
      * Converts source object to target type.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>Note the return value itself may also be null.</b>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
      * @param source     source object
      * @param targetType target type
@@ -254,7 +266,7 @@ public interface FsConverter {
      * Converts source object to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>Note the return value itself may also be null.</b>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
      * @param source     source object
      * @param targetType target type
@@ -262,29 +274,29 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convert(@Nullable Object source, Type targetType, Options options) {
-        return convertByType(source, source == null ? Object.class : source.getClass(), targetType, options);
+        return convertType(source, source == null ? Object.class : source.getClass(), targetType, options);
     }
 
     /**
      * Converts source object from source type to target type.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>Note the return value itself may also be null.</b>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
      */
     @Nullable
-    default <T> T convertByType(@Nullable Object source, Type sourceType, Type targetType) {
-        return convertByType(source, sourceType, targetType, getOptions());
+    default <T> T convertType(@Nullable Object source, Type sourceType, Type targetType) {
+        return convertType(source, sourceType, targetType, getOptions());
     }
 
     /**
      * Converts source object from source type to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
-     * <b>Note the return value itself may also be null.</b>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
      * @param source     source object
      * @param sourceType source type
@@ -292,7 +304,7 @@ public interface FsConverter {
      * @param options    given options
      */
     @Nullable
-    default <T> T convertByType(@Nullable Object source, Type sourceType, Type targetType, Options options) {
+    default <T> T convertType(@Nullable Object source, Type sourceType, Type targetType, Options options) {
         Object value = convertObject(source, sourceType, targetType, options);
         if (value == UNSUPPORTED) {
             return null;
@@ -358,20 +370,20 @@ public interface FsConverter {
 
     /**
      * Converts source object from source type to target type.
-     * If current conversion is unsupported, an {@link FsConvertException} will be thrown
+     * If the conversion is unsupported, an {@link FsConvertException} will be thrown
      *
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
      */
     @Nullable
-    default <T> T convertOrThrow(@Nullable Object source, Type sourceType, Type targetType) {
-        return convertOrThrow(source, sourceType, targetType, getOptions());
+    default <T> T convertThrow(@Nullable Object source, Type sourceType, Type targetType) {
+        return convertThrow(source, sourceType, targetType, getOptions());
     }
 
     /**
      * Converts source object from source type to target type with given options.
-     * If current conversion is unsupported, an {@link FsConvertException} will be thrown
+     * If the conversion is unsupported, an {@link FsConvertException} will be thrown
      *
      * @param source     source object
      * @param sourceType source type
@@ -379,7 +391,7 @@ public interface FsConverter {
      * @param options    given options
      */
     @Nullable
-    default <T> T convertOrThrow(
+    default <T> T convertThrow(
         @Nullable Object source, Type sourceType, Type targetType, Options options) throws FsConvertException {
         Object value = convertObject(source, sourceType, targetType, options);
         if (value == UNSUPPORTED) {
@@ -443,18 +455,6 @@ public interface FsConverter {
      * @author fredsuvn
      */
     interface Options {
-
-        /**
-         * Returns default options:
-         * <ul>
-         *     <li>
-         *         Compatibility policy: {@link #REUSE_ASSIGNABLE};
-         *     </li>
-         * </ul>
-         */
-        static FsConverter.Options defaultOptions() {
-            return FsUnsafe.ForConvert.DEFAULT_OPTIONS;
-        }
 
         /**
          * Returns options with given object reuse policy.
