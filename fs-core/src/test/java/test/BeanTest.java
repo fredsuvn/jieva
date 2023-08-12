@@ -1,23 +1,25 @@
 package test;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.bean.FsBean;
+import xyz.srclab.common.bean.FsBeanCopier;
 import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.bean.FsProperty;
 import xyz.srclab.common.bean.handlers.DefaultBeanResolveHandler;
+import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BeanTest {
@@ -161,6 +163,7 @@ public class BeanTest {
 
     @Test
     public void testCopyProperties() {
+        //bean -> bean
         Cc<Long> cc1 = new Cc<>();
         cc1.setI1("i1");
         cc1.setI2(2);
@@ -207,6 +210,64 @@ public class BeanTest {
             new Cc<>(), new TypeRef<Cc<String>>() {
             }.getType());
         Assert.assertEquals(ccs.getCc(), cc1.getCc().toString());
+
+        FsConverter kConverter = FsConverter.defaultConverter().withCommonHandler(new FsConverter.Handler() {
+            @Override
+            public @Nullable Object convert(
+                @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+                if (Objects.equals(targetType, Kk.class)) {
+                    return new Kk(String.valueOf(source));
+                }
+                return Fs.CONTINUE;
+            }
+        });
+        FsBeanCopier copier = FsBeanCopier.defaultCopier();
+
+        //bean -> map
+        Map<Kk, String> map1 = copier.copyProperties(
+            cc1,
+            new TypeRef<Cc<Long>>() {
+            }.getType(),
+            new HashMap<>(),
+            new TypeRef<Map<Kk, String>>() {
+            }.getType(),
+            kConverter
+        );
+        Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(cc1.getI1(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(cc1.getI2(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("cc")), Fs.orNull(cc1.getCc(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("c2")), Fs.orNull(cc1.getC2(), String::valueOf));
+
+        // map -> bean
+        map1.put(new Kk("i1"), "88888");
+        Cc<String> cs2 = copier.copyProperties(
+            map1,
+            new TypeRef<Map<Kk, String>>() {
+            }.getType(),
+            new Cc<>(),
+            new TypeRef<Cc<String>>() {
+            }.getType(),
+            kConverter
+        );
+        Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(cs2.getI1(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(cs2.getI2(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("cc")), Fs.orNull(cs2.getCc(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("c2")), Fs.orNull(cs2.getC2(), String::valueOf));
+
+        // map -> map
+        Map<String, Kk> map2 = copier.copyProperties(
+            map1,
+            new TypeRef<Map<Kk, String>>() {
+            }.getType(),
+            new HashMap<>(),
+            new TypeRef<Map<String, Kk>>() {
+            }.getType(),
+            kConverter
+        );
+        Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(map2.get("i1"), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(map2.get("i2"), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("cc")), Fs.orNull(map2.get("cc"), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("c2")), Fs.orNull(map2.get("c2"), String::valueOf));
     }
 
     @EqualsAndHashCode(callSuper = true)
@@ -269,5 +330,19 @@ public class BeanTest {
     @Inherited
     public @interface Ann {
         String value();
+    }
+
+    @Data
+    @EqualsAndHashCode
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Kk {
+
+        private String value;
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 }

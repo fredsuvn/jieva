@@ -16,6 +16,7 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -58,13 +59,44 @@ public class Fs {
     }
 
     /**
-     * Returns default value if given object is null, or given object itself if it is not null.
+     * Returns default value if given object is null, or given object itself if it is not null:
+     * <pre>
+     *     return obj == null ? defaultValue : obj;
+     * </pre>
      *
      * @param obj          given object
      * @param defaultValue default value
      */
     public static <T> T notNull(@Nullable T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
+    }
+
+    /**
+     * Returns default value if given object is null, or the value computed by given function if it is not null:
+     * <pre>
+     *     return obj == null ? defaultValue : function.apply(obj);
+     * </pre>
+     *
+     * @param obj          given object
+     * @param defaultValue default value
+     * @param function     given function
+     */
+    public static <K, V> V notNull(@Nullable K obj, V defaultValue, Function<? super K, ? extends V> function) {
+        return obj == null ? defaultValue : function.apply(obj);
+    }
+
+    /**
+     * Returns the value computed by given function if it is not null, or null if it is null:
+     * <pre>
+     *     return obj == null ? null : function.apply(obj);
+     * </pre>
+     *
+     * @param obj      given object
+     * @param function given function
+     */
+    @Nullable
+    public static <K, V> V orNull(@Nullable K obj, Function<? super K, ? extends V> function) {
+        return obj == null ? null : function.apply(obj);
     }
 
     /**

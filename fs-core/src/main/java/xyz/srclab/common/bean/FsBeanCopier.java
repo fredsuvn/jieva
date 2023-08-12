@@ -10,12 +10,13 @@ import xyz.srclab.common.reflect.FsType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
  * Properties copier for {@link FsBean}, to copy properties from source object to dest object.
+ * The copier supports object bean of which property name's type is {@link String},
+ * and map as bean of which key's type is any type.
  *
  * @author fredsuvn
  */
@@ -75,9 +76,9 @@ public interface FsBeanCopier {
 
         private @Nullable FsBeanResolver beanResolver;
         private boolean throwIfConvertFailed = false;
-        private @Nullable Function<? super String, ? extends String> propertyNameMapper;
-        private @Nullable BiPredicate<String, @Nullable Object> sourcePropertyFilter;
-        private @Nullable BiPredicate<String, @Nullable Object> destPropertyFilter;
+        private @Nullable Function<Object, Object> propertyNameMapper;
+        private @Nullable BiPredicate<Object, @Nullable Object> sourcePropertyFilter;
+        private @Nullable BiPredicate<Object, @Nullable Object> destPropertyFilter;
         private boolean putNotContained = true;
 
         /**
@@ -100,8 +101,12 @@ public interface FsBeanCopier {
         /**
          * Sets property name mapper, to map property names of source object to new property names of dest object.
          * The property will be ignored if new name is null or not found in dest bean.
+         * <p>
+         * For object bean, property name's type is {@link String};
+         * for map as bean, key's type is any type.
+         * Whatever, the types before and after the conversion <b>must be equal</b>.
          */
-        public Builder propertyNameMapper(@Nullable Function<? super String, ? extends String> propertyNameMapper) {
+        public Builder propertyNameMapper(@Nullable Function<Object, Object> propertyNameMapper) {
             this.propertyNameMapper = propertyNameMapper;
             return this;
         }
@@ -110,21 +115,26 @@ public interface FsBeanCopier {
          * Sets source property filter,
          * the first param is source property name, second is source property value (maybe null).
          * <p>
+         * For object bean, property name's type is {@link String};
+         * for map as bean, key's type is any type.
+         * <p>
          * Only the source properties that pass through this filter (return true) will be copied from.
          */
-        public Builder sourcePropertyFilter(@Nullable BiPredicate<String, @Nullable Object> sourcePropertyFilter) {
+        public Builder sourcePropertyFilter(@Nullable BiPredicate<Object, @Nullable Object> sourcePropertyFilter) {
             this.sourcePropertyFilter = sourcePropertyFilter;
             return this;
         }
 
         /**
          * Sets dest property filter,
-         * the first param is dest property name, second is corresponding source property value after conversion
-         * (maybe null).
+         * the first param is dest property name, second is dest property value after conversion (maybe null).
+         * <p>
+         * For object bean, property name's type is {@link String};
+         * for map as bean, key's type is any type.
          * <p>
          * Only the dest properties that pass through this filter (return true) will be copied into.
          */
-        public Builder destPropertyFilter(@Nullable BiPredicate<String, @Nullable Object> destPropertyFilter) {
+        public Builder destPropertyFilter(@Nullable BiPredicate<Object, @Nullable Object> destPropertyFilter) {
             this.destPropertyFilter = destPropertyFilter;
             return this;
         }
@@ -156,17 +166,17 @@ public interface FsBeanCopier {
 
             private final FsBeanResolver beanResolver;
             private final boolean throwIfConvertFailed;
-            private final Function<? super String, ? extends String> propertyNameMapper;
-            private final BiPredicate<String, @Nullable Object> sourcePropertyFilter;
-            private final BiPredicate<String, @Nullable Object> destPropertyFilter;
+            private final Function<Object, Object> propertyNameMapper;
+            private final BiPredicate<Object, @Nullable Object> sourcePropertyFilter;
+            private final BiPredicate<Object, @Nullable Object> destPropertyFilter;
             private final boolean putNotContained;
 
             private FsBeanCopierImpl(
                 FsBeanResolver beanResolver,
                 boolean throwIfConvertFailed,
-                Function<? super String, ? extends String> propertyNameMapper,
-                BiPredicate<String, @Nullable Object> sourcePropertyFilter,
-                BiPredicate<String, @Nullable Object> destPropertyFilter,
+                Function<Object, Object> propertyNameMapper,
+                BiPredicate<Object, @Nullable Object> sourcePropertyFilter,
+                BiPredicate<Object, @Nullable Object> destPropertyFilter,
                 boolean putNotContained
             ) {
                 this.beanResolver = beanResolver;
@@ -185,9 +195,7 @@ public interface FsBeanCopier {
                         throw new IllegalArgumentException("Not a map type: " + sourceType + ".");
                     }
                     Type[] sourceActualTypes = sourceMapType.getActualTypeArguments();
-                    if (!Objects.equals(String.class, sourceActualTypes[0])) {
-                        throw new IllegalArgumentException("Source key type is not String: " + sourceActualTypes[0] + ".");
-                    }
+                    Type sourceKeyType = sourceActualTypes[0];
                     Type sourceValueType = sourceActualTypes[1];
                     if (dest instanceof Map) {
                         ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
@@ -195,63 +203,78 @@ public interface FsBeanCopier {
                             throw new IllegalArgumentException("Not a map type: " + destType + ".");
                         }
                         Type[] destActualTypes = destMapType.getActualTypeArguments();
-                        if (!Objects.equals(String.class, destActualTypes[0])) {
-                            throw new IllegalArgumentException("Dest key type is not String: " + destActualTypes[0] + ".");
-                        }
+                        Type destKeyType = destActualTypes[0];
                         Type destValueType = destActualTypes[1];
-                        Map<String, Object> sourceMap = (Map<String, Object>) source;
-                        Map<String, Object> destMap = (Map<String, Object>) dest;
+                        Map<Object, Object> sourceMap = (Map<Object, Object>) source;
+                        Map<Object, Object> destMap = (Map<Object, Object>) dest;
                         sourceMap.forEach((key, value) -> {
                             if (!sourcePropertyFilter.test(key, value)) {
                                 return;
                             }
-                            String destKey = propertyNameMapper.apply(key);
+                            Object destKey = propertyNameMapper.apply(key);
                             if (destKey == null) {
                                 return;
                             }
-                            if (!putNotContained && !destMap.containsKey(destKey)) {
+                            Object newDestKey = converter.convertObject(destKey, sourceKeyType, destKeyType);
+                            if (newDestKey == Fs.RETURN) {
+                                if (throwIfConvertFailed) {
+                                    throw new FsConvertException(sourceKeyType, destKeyType);
+                                } else {
+                                    return;
+                                }
+                            }
+                            if (!putNotContained && !destMap.containsKey(newDestKey)) {
                                 return;
                             }
-                            Object newValue = converter.convertObject(value, sourceValueType, destValueType);
-                            if (newValue == Fs.RETURN) {
+                            Object newDestValue = converter.convertObject(value, sourceValueType, destValueType);
+                            if (newDestValue == Fs.RETURN) {
                                 if (throwIfConvertFailed) {
                                     throw new FsConvertException(sourceValueType, destValueType);
                                 } else {
                                     return;
                                 }
                             }
-                            if (!destPropertyFilter.test(destKey, newValue)) {
+                            if (!destPropertyFilter.test(newDestKey, newDestValue)) {
                                 return;
                             }
-                            destMap.put(destKey, newValue);
+                            destMap.put(newDestKey, newDestValue);
                         });
                     } else {
                         FsBean destBean = beanResolver.resolve(destType);
-                        Map<String, Object> sourceMap = (Map<String, Object>) source;
+                        Map<Object, Object> sourceMap = (Map<Object, Object>) source;
                         sourceMap.forEach((key, value) -> {
                             if (!sourcePropertyFilter.test(key, value)) {
                                 return;
                             }
-                            String destPropertyName = propertyNameMapper.apply(key);
-                            if (destPropertyName == null) {
+                            Object destNameObj = propertyNameMapper.apply(key);
+                            if (destNameObj == null) {
                                 return;
                             }
-                            FsProperty destProperty = destBean.getProperty(destPropertyName);
+                            Object destNameCvt = converter.convertObject(destNameObj, sourceKeyType, String.class);
+                            if (destNameCvt == Fs.RETURN) {
+                                if (throwIfConvertFailed) {
+                                    throw new FsConvertException(sourceKeyType, String.class);
+                                } else {
+                                    return;
+                                }
+                            }
+                            String destName = (String) destNameCvt;
+                            FsProperty destProperty = destBean.getProperty(destName);
                             if (destProperty == null || !destProperty.isWriteable()) {
                                 return;
                             }
-                            Object newValue = converter.convertObject(value, sourceValueType, destProperty.getType());
-                            if (newValue == Fs.RETURN) {
+                            Object newDestValue = converter.convertObject(value, sourceValueType, destProperty.getType());
+                            if (newDestValue == Fs.RETURN) {
                                 if (throwIfConvertFailed) {
                                     throw new FsConvertException(sourceValueType, destProperty.getType());
                                 } else {
                                     return;
                                 }
                             }
-                            if (!destPropertyFilter.test(destPropertyName, newValue)) {
+                            if (!destPropertyFilter.test(destName, newDestValue)) {
                                 return;
                             }
-                            destProperty.set(dest, newValue);
+                            destProperty.set(dest, newDestValue);
                         });
                     }
                 } else {
@@ -262,70 +285,85 @@ public interface FsBeanCopier {
                             throw new IllegalArgumentException("Not a map type: " + destType + ".");
                         }
                         Type[] destActualTypes = destMapType.getActualTypeArguments();
-                        if (!Objects.equals(String.class, destActualTypes[0])) {
-                            throw new IllegalArgumentException("Dest key type is not String: " + destActualTypes[0] + ".");
-                        }
+                        Type destKeyType = destActualTypes[0];
                         Type destValueType = destActualTypes[1];
-                        Map<String, Object> destMap = (Map<String, Object>) dest;
-                        sourceBean.getProperties().forEach((sourcePropertyName, sourceProperty) -> {
+                        Map<Object, Object> destMap = (Map<Object, Object>) dest;
+                        sourceBean.getProperties().forEach((sourceName, sourceProperty) -> {
                             if (!sourceProperty.isReadable()) {
                                 return;
                             }
                             Object sourceValue = sourceProperty.get(source);
-                            if (!sourcePropertyFilter.test(sourcePropertyName, sourceValue)) {
+                            if (!sourcePropertyFilter.test(sourceName, sourceValue)) {
                                 return;
                             }
-                            String destKey = propertyNameMapper.apply(sourcePropertyName);
+                            Object destKey = propertyNameMapper.apply(sourceName);
                             if (destKey == null) {
                                 return;
                             }
-                            if (!putNotContained && !destMap.containsKey(destKey)) {
+                            Object newDestKey = converter.convertObject(destKey, sourceProperty.getType(), destKeyType);
+                            if (newDestKey == Fs.RETURN) {
+                                if (throwIfConvertFailed) {
+                                    throw new FsConvertException(sourceProperty.getType(), destKeyType);
+                                } else {
+                                    return;
+                                }
+                            }
+                            if (!putNotContained && !destMap.containsKey(newDestKey)) {
                                 return;
                             }
-                            Object newValue = converter.convertObject(sourceValue, sourceProperty.getType(), destValueType);
-                            if (newValue == Fs.RETURN) {
+                            Object newDestValue = converter.convertObject(sourceValue, sourceProperty.getType(), destValueType);
+                            if (newDestValue == Fs.RETURN) {
                                 if (throwIfConvertFailed) {
                                     throw new FsConvertException(sourceProperty.getType(), destValueType);
                                 } else {
                                     return;
                                 }
                             }
-                            if (!destPropertyFilter.test(destKey, newValue)) {
+                            if (!destPropertyFilter.test(newDestKey, newDestValue)) {
                                 return;
                             }
-                            destMap.put(destKey, newValue);
+                            destMap.put(newDestKey, newDestValue);
                         });
                     } else {
                         FsBean destBean = beanResolver.resolve(destType);
-                        sourceBean.getProperties().forEach((sourcePropertyName, sourceProperty) -> {
+                        sourceBean.getProperties().forEach((sourceName, sourceProperty) -> {
                             if (!sourceProperty.isReadable()) {
                                 return;
                             }
                             Object sourceValue = sourceProperty.get(source);
-                            if (!sourcePropertyFilter.test(sourcePropertyName, sourceValue)) {
+                            if (!sourcePropertyFilter.test(sourceName, sourceValue)) {
                                 return;
                             }
-                            String destPropertyName = propertyNameMapper.apply(sourcePropertyName);
-                            if (destPropertyName == null) {
+                            Object destNameObj = propertyNameMapper.apply(sourceName);
+                            if (destNameObj == null) {
                                 return;
                             }
-                            FsProperty destProperty = destBean.getProperty(destPropertyName);
+                            Object destNameCvt = converter.convertObject(destNameObj, sourceProperty.getType(), String.class);
+                            if (destNameCvt == Fs.RETURN) {
+                                if (throwIfConvertFailed) {
+                                    throw new FsConvertException(sourceProperty.getType(), String.class);
+                                } else {
+                                    return;
+                                }
+                            }
+                            String destName = (String) destNameCvt;
+                            FsProperty destProperty = destBean.getProperty(destName);
                             if (destProperty == null || !destProperty.isWriteable()) {
                                 return;
                             }
-                            Object newValue = converter.convertObject(
+                            Object newDestValue = converter.convertObject(
                                 sourceValue, sourceProperty.getType(), destProperty.getType());
-                            if (newValue == Fs.RETURN) {
+                            if (newDestValue == Fs.RETURN) {
                                 if (throwIfConvertFailed) {
                                     throw new FsConvertException(sourceProperty.getType(), destProperty.getType());
                                 } else {
                                     return;
                                 }
                             }
-                            if (!destPropertyFilter.test(destPropertyName, newValue)) {
+                            if (!destPropertyFilter.test(destName, newDestValue)) {
                                 return;
                             }
-                            destProperty.set(dest, newValue);
+                            destProperty.set(dest, newDestValue);
                         });
                     }
                 }
