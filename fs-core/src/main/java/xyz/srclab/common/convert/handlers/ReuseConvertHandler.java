@@ -40,6 +40,24 @@ import static xyz.srclab.common.convert.FsConverter.Options;
  *         If target type is {@link TypeVariable}, return {@link Fs#BREAK};
  *     </li>
  *     <li>
+ *         If source type is {@link WildcardType}:
+ *         <ul>
+ *             <li>
+ *                 If source type has an upper bound (? extends), return:
+ *                 <pre>
+ *                     //sourceUpper is upper bound of source type
+ *                     converter.convertObject(source, sourceUpper, targetType, options);
+ *                 </pre>
+ *             </li>
+ *             <li>
+ *                 If source type has a lower bound (? super), return:
+ *                 <pre>
+ *                     converter.convertObject(source, Object.class, targetType, options);
+ *                 </pre>
+ *             </li>
+ *         </ul>
+ *     </li>
+ *     <li>
  *         If target type is {@link WildcardType}:
  *         <ul>
  *             <li>
@@ -90,15 +108,28 @@ public class ReuseConvertHandler implements FsConverter.Handler {
         if (targetType instanceof TypeVariable<?>) {
             return Fs.BREAK;
         }
+        if (sourceType instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) sourceType;
+            Type sourceUpper = FsType.getUpperBound(wildcardType);
+            if (sourceUpper != null) {
+                return converter.convertObject(source, sourceUpper, targetType, options);
+            } else {
+                Type sourceLower = FsType.getLowerBound(wildcardType);
+                if (sourceLower != null) {
+                    return converter.convertObject(source, Object.class, targetType, options);
+                }
+            }
+        }
         if (targetType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) targetType;
             Type targetUpper = FsType.getUpperBound(wildcardType);
             if (targetUpper != null) {
                 return converter.convertObject(source, sourceType, targetUpper, options);
-            }
-            Type targetLower = FsType.getLowerBound(wildcardType);
-            if (targetLower != null) {
-                return converter.convertObject(source, sourceType, targetLower, options.replaceReusePolicy(Options.REUSE_EQUAL));
+            } else {
+                Type targetLower = FsType.getLowerBound(wildcardType);
+                if (targetLower != null) {
+                    return converter.convertObject(source, sourceType, targetLower, options.replaceReusePolicy(Options.REUSE_EQUAL));
+                }
             }
         }
         return Fs.CONTINUE;

@@ -86,19 +86,19 @@ public class CollectConvertHandler implements FsConverter.Handler {
 
     @Nullable
     private Object convertIterableType(
-        @Nullable Object obj, Type fromType, Type targetType, FsConverter.Options options, FsConverter converter) {
+        @Nullable Object obj, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
         ParameterizedType targetItType = FsType.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
             return Fs.CONTINUE;
         }
-        FsObj<Iterable<?>> sourceInfo = toGenericInfo(obj, fromType);
+        FsObj<Iterable<?>> sourceInfo = toGenericInfo(obj, sourceType);
         if (sourceInfo == null) {
             return Fs.CONTINUE;
         }
         if (sourceInfo.getRawType().isArray()) {
             return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], options, converter);
         }
-        Generator generator = GENERATOR_MAP.get(sourceInfo.getRawType());
+        Generator generator = GENERATOR_MAP.get(FsType.getRawType(targetItType));
         if (generator == null) {
             return Fs.CONTINUE;
         }
@@ -126,15 +126,15 @@ public class CollectConvertHandler implements FsConverter.Handler {
 
     @Nullable
     private Object convertCollection(
-        Iterable<?> src,
+        Iterable<?> source,
         Collection<Object> dest,
-        Type fromComponentType,
-        Type targetComponentType,
+        Type sourceComponentType,
+        Type destComponentType,
         FsConverter.Options options,
         FsConverter converter
     ) {
-        for (Object srcValue : src) {
-            Object targetValue = converter.convertObject(srcValue, fromComponentType, targetComponentType, options);
+        for (Object srcValue : source) {
+            Object targetValue = converter.convertObject(srcValue, sourceComponentType, destComponentType, options);
             if (targetValue == Fs.RETURN) {
                 return Fs.BREAK;
             }

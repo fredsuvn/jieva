@@ -7,10 +7,10 @@ import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
 
 import java.lang.reflect.Type;
+import java.time.*;
+import java.time.zone.ZoneRules;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 import static xyz.srclab.common.convert.FsConverter.Handler;
@@ -42,6 +42,19 @@ import static xyz.srclab.common.convert.FsConverter.Handler;
 public class BeanConvertHandler implements Handler {
 
     private static final Map<Class<?>, Supplier<Object>> GENERATOR_MAP = new ConcurrentHashMap<>();
+
+    private static final Collection<Class<?>> UNSUPPORTED_TYPES = Arrays.asList(
+        String.class, StringBuilder.class, StringBuffer.class,
+        Boolean.class, boolean.class, Void.class, void.class,
+        Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class,
+        byte.class, short.class, char.class, int.class, long.class, float.class, double.class,
+        Date.class, Instant.class, LocalDateTime.class, LocalDate.class, LocalTime.class,
+        OffsetDateTime.class, ZonedDateTime.class, Locale.class,
+        ZoneId.class, ZoneOffset.class, ZoneRules.class, TimeZone.class, Duration.class,
+        Iterable.class, Collection.class, List.class, AbstractList.class, ArrayList.class, LinkedList.class,
+        CopyOnWriteArrayList.class, Set.class, LinkedHashSet.class,
+        HashSet.class, TreeSet.class, ConcurrentSkipListSet.class
+    );
 
     static {
         GENERATOR_MAP.put(Map.class, LinkedHashMap::new);
@@ -81,16 +94,16 @@ public class BeanConvertHandler implements Handler {
         if (source == null) {
             return null;
         }
-        Class<?> rawType = FsType.getRawType(targetType);
-        if (rawType == null) {
+        Class<?> targetRawType = FsType.getRawType(targetType);
+        if (targetRawType == null || targetRawType.isArray() || UNSUPPORTED_TYPES.contains(targetRawType)) {
             return Fs.CONTINUE;
         }
-        Supplier<Object> generator = GENERATOR_MAP.get(rawType);
+        Supplier<Object> generator = GENERATOR_MAP.get(targetRawType);
         Object dest;
         if (generator != null) {
             dest = generator.get();
         } else {
-            dest = FsType.newInstance(rawType);
+            dest = FsType.newInstance(targetRawType);
         }
         return beanCopier.copyProperties(source, sourceType, dest, targetType, converter);
     }

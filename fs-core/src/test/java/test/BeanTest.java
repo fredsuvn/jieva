@@ -19,6 +19,8 @@ import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -270,6 +272,26 @@ public class BeanTest {
         Assert.assertEquals(map1.get(new Kk("c2")), Fs.orNull(map2.get("c2"), String::valueOf));
     }
 
+    @Test
+    public void testCopyPropertiesComplex() {
+        Map<? extends Number, ? extends String> pm = new HashMap<>();
+        pm.put(Fs.as(1), Fs.as("11"));
+        CopyP1 p1 = new CopyP1("22", new List[]{Arrays.asList(pm)});
+        Map<String, ? extends CopyP1> cm = new HashMap<>();
+        cm.put("33", Fs.as(p1));
+        CopyA ca = new CopyA("44", new List[]{Arrays.asList(55)}, cm, p1);
+        CopyB cb = Fs.copyProperties(ca, new CopyB());
+        Assert.assertEquals(cb.getS(), new Long(44L));
+        Assert.assertEquals(cb.getList().get(0), new int[]{55});
+        Map<? super BigDecimal, ? super BigInteger> bm = new LinkedHashMap<>();
+        bm.put(new BigDecimal("1"), new BigInteger("11"));
+        CopyP2 p2 = new CopyP2(22L, new List[]{Arrays.asList(bm)});
+        Assert.assertEquals(cb.getP(), p2);
+        Map<Integer, ? super CopyP2> cm2 = new LinkedHashMap<>();
+        cm2.put(33, p2);
+        Assert.assertEquals(cb.getMap(), cm2);
+    }
+
     @EqualsAndHashCode(callSuper = true)
     @Data
     public static class Cc<T> extends C2<Long> implements I1, I2<Integer> {
@@ -344,5 +366,42 @@ public class BeanTest {
         public String toString() {
             return value;
         }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CopyP1 {
+        private String p;
+        private List<Map<? extends Number, ? extends String>>[] list;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @EqualsAndHashCode
+    public static class CopyP2 {
+        private Long p;
+        private List<Map<? super BigDecimal, ? super BigInteger>>[] list;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CopyA {
+        private String s;
+        private List<? extends Number>[] list;
+        private Map<String, ? extends CopyP1> map;
+        private CopyP1 p;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CopyB {
+        private Long s;
+        private List<int[]> list;
+        private Map<Integer, ? super CopyP2> map;
+        private CopyP2 p;
     }
 }
