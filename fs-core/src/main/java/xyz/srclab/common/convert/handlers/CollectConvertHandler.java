@@ -20,9 +20,21 @@ import java.util.function.IntFunction;
 
 /**
  * Convert handler implementation which is used to support the conversion of collection types.
- * It supports target type in:
+ * It supports target types in:
  * <ul>
- *     <li>{@link Iterable}</li>
+ *     <li>Array;</li>
+ *     <li>{@link Iterable};</li>
+ *     <li>{@link Collection};</li>
+ *     <li>{@link List};</li>
+ *     <li>{@link AbstractList};</li>
+ *     <li>{@link ArrayList};</li>
+ *     <li>{@link LinkedList};</li>
+ *     <li>{@link CopyOnWriteArrayList};</li>
+ *     <li>{@link Set};</li>
+ *     <li>{@link LinkedHashSet};</li>
+ *     <li>{@link HashSet};</li>
+ *     <li>{@link TreeSet};</li>
+ *     <li>{@link ConcurrentSkipListSet};</li>
  * </ul>
  * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
  *
@@ -36,6 +48,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         GENERATOR_MAP.put(Iterable.class, new Generator(true, ArrayList::new));
         GENERATOR_MAP.put(Collection.class, new Generator(true, LinkedHashSet::new));
         GENERATOR_MAP.put(List.class, new Generator(true, ArrayList::new));
+        GENERATOR_MAP.put(AbstractList.class, new Generator(true, ArrayList::new));
         GENERATOR_MAP.put(ArrayList.class, new Generator(true, ArrayList::new));
         GENERATOR_MAP.put(LinkedList.class, new Generator(false, size -> new LinkedList<>()));
         GENERATOR_MAP.put(CopyOnWriteArrayList.class, new Generator(false, size -> new CopyOnWriteArrayList<>()));

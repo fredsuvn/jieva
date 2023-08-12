@@ -53,7 +53,20 @@ public interface FsBeanCopier {
      * @param dest       dest object
      * @param destType   specified type of dest type
      */
-    <T> T copyProperties(Object source, Type sourceType, T dest, Type destType);
+    default <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
+        return copyProperties(source, sourceType, dest, destType, FsConverter.defaultConverter());
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types and converter.
+     *
+     * @param source     source object
+     * @param sourceType specified type of source object
+     * @param dest       dest object
+     * @param destType   specified type of dest type
+     * @param converter  specified converter
+     */
+    <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, FsConverter converter);
 
     /**
      * Builder for {@link FsBeanCopier}.
@@ -61,7 +74,6 @@ public interface FsBeanCopier {
     class Builder {
 
         private @Nullable FsBeanResolver beanResolver;
-        private @Nullable FsConverter converter;
         private boolean throwIfConvertFailed = false;
         private @Nullable Function<? super String, ? extends String> propertyNameMapper;
         private @Nullable BiPredicate<String, @Nullable Object> sourcePropertyFilter;
@@ -73,14 +85,6 @@ public interface FsBeanCopier {
          */
         public Builder beanResolver(@Nullable FsBeanResolver beanResolver) {
             this.beanResolver = beanResolver;
-            return this;
-        }
-
-        /**
-         * Sets object converter. If it is null (default), use {@link FsConverter#defaultConverter()}.
-         */
-        public Builder converter(@Nullable FsConverter converter) {
-            this.converter = converter;
             return this;
         }
 
@@ -140,7 +144,6 @@ public interface FsBeanCopier {
         public FsBeanCopier build() {
             return new FsBeanCopierImpl(
                 beanResolver == null ? FsBeanResolver.defaultResolver() : beanResolver,
-                converter == null ? FsConverter.defaultConverter() : converter,
                 throwIfConvertFailed,
                 propertyNameMapper == null ? it -> it : propertyNameMapper,
                 sourcePropertyFilter == null ? (a, b) -> true : sourcePropertyFilter,
@@ -149,10 +152,9 @@ public interface FsBeanCopier {
             );
         }
 
-        private final class FsBeanCopierImpl implements FsBeanCopier {
+        private static final class FsBeanCopierImpl implements FsBeanCopier {
 
             private final FsBeanResolver beanResolver;
-            private final FsConverter converter;
             private final boolean throwIfConvertFailed;
             private final Function<? super String, ? extends String> propertyNameMapper;
             private final BiPredicate<String, @Nullable Object> sourcePropertyFilter;
@@ -161,14 +163,13 @@ public interface FsBeanCopier {
 
             private FsBeanCopierImpl(
                 FsBeanResolver beanResolver,
-                FsConverter converter,
                 boolean throwIfConvertFailed,
                 Function<? super String, ? extends String> propertyNameMapper,
                 BiPredicate<String, @Nullable Object> sourcePropertyFilter,
                 BiPredicate<String, @Nullable Object> destPropertyFilter,
-                boolean putNotContained) {
+                boolean putNotContained
+            ) {
                 this.beanResolver = beanResolver;
-                this.converter = converter;
                 this.throwIfConvertFailed = throwIfConvertFailed;
                 this.propertyNameMapper = propertyNameMapper;
                 this.sourcePropertyFilter = sourcePropertyFilter;
@@ -177,7 +178,7 @@ public interface FsBeanCopier {
             }
 
             @Override
-            public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
+            public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, FsConverter converter) {
                 if (source instanceof Map) {
                     ParameterizedType sourceMapType = FsType.getGenericSuperType(sourceType, Map.class);
                     if (sourceMapType == null) {

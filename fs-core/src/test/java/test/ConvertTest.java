@@ -1,5 +1,9 @@
 package test;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.annotations.Nullable;
@@ -123,6 +127,26 @@ public class ConvertTest {
                 }.getType()
             )
         );
+        Assert.assertEquals(
+            Arrays.asList(new T1("1"), new T1("2")),
+            Fs.convertType(
+                Arrays.asList(new T2("1"), new T2("2")),
+                new TypeRef<List<T2>>() {
+                }.getType(),
+                new TypeRef<List<? super T1>>() {
+                }.getType()
+            )
+        );
+        Assert.assertNotEquals(
+            Arrays.asList(new T1("1"), new T1("2")),
+            Fs.convertType(
+                Arrays.asList(new T2("1"), new T2("2")),
+                new TypeRef<List<T2>>() {
+                }.getType(),
+                new TypeRef<List<? extends T1>>() {
+                }.getType()
+            )
+        );
     }
 
     @Test
@@ -144,5 +168,25 @@ public class ConvertTest {
                 }.getType()
             )
         );
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    @Data
+    public static class T1 {
+        private String value;
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    public static class T2 extends T1 {
+
+        public T2() {
+        }
+
+        public T2(String value) {
+            super(value);
+        }
     }
 }

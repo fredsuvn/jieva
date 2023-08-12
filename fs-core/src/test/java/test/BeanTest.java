@@ -159,24 +159,76 @@ public class BeanTest {
         Assert.assertEquals(ccBean4, ccBean3);
     }
 
+    @Test
+    public void testCopyProperties() {
+        Cc<Long> cc1 = new Cc<>();
+        cc1.setI1("i1");
+        cc1.setI2(2);
+        cc1.setC2(22L);
+        cc1.setCc(33L);
+        Cc<Long> cc2 = Fs.copyProperties(cc1, new Cc<>());
+        Assert.assertEquals(cc2, cc1);
+        cc1.setI1(null);
+        cc2.setI1("888");
+        Fs.copyProperties(cc1, cc2);
+        Assert.assertEquals(cc2, cc1);
+        Assert.assertEquals(cc2.getI1(), cc1.getI1());
+        Assert.assertNull(cc2.getI1());
+        cc2.setI1("888");
+        Fs.copyProperties(cc1, cc2, false);
+        Assert.assertEquals("888", cc2.getI1());
+        cc1.setI1("aaaa");
+        cc2 = Fs.copyProperties(cc1, new Cc<>(), "c2");
+        Assert.assertEquals(cc1.getI1(), cc2.getI1());
+        Assert.assertEquals(cc1.getI2(), cc2.getI2());
+        Assert.assertEquals(cc1.getCc(), cc2.getCc());
+        Assert.assertNull(cc2.getC2());
+        Assert.assertEquals(cc1.getC2().longValue(), 22);
+        cc1.setI1(null);
+        cc2 = Fs.copyProperties(cc1, new Cc<>(), false, "c2");
+        cc2.setI1("qqqq");
+        Fs.copyProperties(cc1, new Cc<>(), false, "c2");
+        Assert.assertEquals("qqqq", cc2.getI1());
+        Assert.assertEquals(cc1.getI2(), cc2.getI2());
+        Assert.assertEquals(cc1.getCc(), cc2.getCc());
+        Assert.assertNull(cc2.getC2());
+        Assert.assertEquals(cc1.getC2().longValue(), 22);
+        Assert.expectThrows(ClassCastException.class, () -> {
+            Cc<Long> ccl = new Cc<>();
+            Fs.copyProperties(cc1, new TypeRef<Cc<Double>>() {
+                }.getType(),
+                ccl, new TypeRef<Cc<String>>() {
+                }.getType());
+            Long l = ccl.getCc();
+            System.out.println(l);
+        });
+        Cc<String> ccs = Fs.copyProperties(cc1, new TypeRef<Cc<Double>>() {
+            }.getType(),
+            new Cc<>(), new TypeRef<Cc<String>>() {
+            }.getType());
+        Assert.assertEquals(ccs.getCc(), cc1.getCc().toString());
+    }
+
     @EqualsAndHashCode(callSuper = true)
     @Data
     public static class Cc<T> extends C2<Long> implements I1, I2<Integer> {
 
+        private String i1;
         private T cc;
         private Integer i2;
 
         @Override
         public String getI1() {
-            return null;
+            return i1;
         }
 
         @Override
         public void setI1(String i1) {
-
+            this.i1 = i1;
         }
     }
 
+    @EqualsAndHashCode
     public static class C2<T> {
 
         @Ann("c2")
