@@ -5,7 +5,6 @@ import xyz.srclab.annotations.OutParam;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
 
@@ -20,8 +19,7 @@ import java.util.stream.Collectors;
  */
 public class FsType {
 
-    private static final FsCache<Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE =
-        FsUnsafe.ForCache.getOrCreateCache(FsUnsafe.ForCache.TYPE_PARAMETER_MAPPING);
+    private static final FsCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = FsCache.newCache();
 
     /**
      * Returns last name of given class. The last name is sub-string after last dot, for example:

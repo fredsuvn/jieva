@@ -4,7 +4,6 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.bean.FsBean;
 import xyz.srclab.common.bean.FsBeanCopier;
 import xyz.srclab.common.bean.FsBeanResolver;
-import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.TypeRef;
 
@@ -25,8 +24,6 @@ import java.util.stream.Collectors;
  * @author fredsuvn
  */
 public class Fs {
-
-    private static final FsCache<Object[]> ENUM_CACHE = FsUnsafe.ForCache.getOrCreateCache(FsUnsafe.ForCache.ENUM);
 
     /**
      * A flag object that represents 'continue' to continue a loop.
@@ -301,7 +298,7 @@ public class Fs {
                 return null;
             }
         }
-        Object[] enums = ENUM_CACHE.get(enumClass, Class::getEnumConstants);
+        Object[] enums = enumClass.getEnumConstants();
         FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
         for (Object anEnum : enums) {
             if (name.equalsIgnoreCase(anEnum.toString())) {
@@ -321,7 +318,7 @@ public class Fs {
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, int index) {
         FsCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
         FsCheck.checkArgument(index >= 0, "index must >= 0.");
-        Object[] enums = ENUM_CACHE.get(enumClass, Class::getEnumConstants);
+        Object[] enums = enumClass.getEnumConstants();
         FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
         if (index >= enums.length) {
             return null;
@@ -410,7 +407,7 @@ public class Fs {
     }
 
     /**
-     * Finds resource of given resource path.
+     * Finds resource of given resource path (starts with "/").
      *
      * @param resPath given resource
      */
@@ -420,7 +417,7 @@ public class Fs {
     }
 
     /**
-     * Finds all resources of given resource path.
+     * Finds all resources of given resource path (starts with "/").
      *
      * @param resPath given resource
      */

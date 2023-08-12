@@ -13,7 +13,7 @@ public class CacheTest {
     @Test
     public void cache() {
         final int[] detected = {0};
-        FsCache<String> fsCache = FsCache.newCache(key -> detected[0]++);
+        FsCache<Integer, String> fsCache = FsCache.newCache((cache,key) -> detected[0]++);
         Map<Integer, String> map = new HashMap<>();
         int times = 1000000 * 3;
         for (int i = 0; i < times; i++) {
@@ -42,7 +42,7 @@ public class CacheTest {
 
     @Test
     public void cacheNull() {
-        FsCache<String> fsCache = FsCache.newCache();
+        FsCache<Integer, String> fsCache = FsCache.newCache();
         fsCache.set(1, null);
         Assert.assertNull(fsCache.get(1));
         Assert.assertNotNull(fsCache.getOptional(1));
@@ -53,7 +53,7 @@ public class CacheTest {
 
     @Test
     public void cacheLoader() {
-        FsCache<String> fsCache = FsCache.newCache();
+        FsCache<Integer, String> fsCache = FsCache.newCache();
         Assert.assertNull(fsCache.get(1));
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");

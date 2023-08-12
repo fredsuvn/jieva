@@ -67,7 +67,7 @@ public interface FsBeanResolver {
         final class FsBeanResolverImpl implements FsBeanResolver {
 
             private final Iterable<Handler> handlers;
-            private final FsCache<FsBean> cache;
+            private final FsCache<Type, FsBean> cache;
 
             FsBeanResolverImpl(Iterable<Handler> handlers, boolean useCache) {
                 this.handlers = FsCollect.toCollection(new LinkedList<>(), handlers);
@@ -86,7 +86,7 @@ public interface FsBeanResolver {
                 FsBeanBuilderImpl builder = new FsBeanBuilderImpl(type);
                 for (Handler handler : handlers) {
                     Object result = handler.resolve(builder);
-                    if (!Objects.equals(Fs.CONTINUE, result)) {
+                    if (Fs.CONTINUE != result) {
                         break;
                     }
                 }

@@ -52,8 +52,7 @@ public class FsDate {
      */
     public static final DateTimeFormatter FORMATTER_OFFSET = DateTimeFormatter.ofPattern(PATTERN_OFFSET);
 
-    private static final FsCache<DateTimeFormatter> FORMATTER_CACHE =
-        FsUnsafe.ForCache.getOrCreateCache(FsUnsafe.ForCache.DATE_TIME_FORMATTER);
+    private static final FsCache<CharSequence, DateTimeFormatter> FORMATTER_CACHE = FsCache.newCache();
 
     /**
      * Returns DateFormat of given pattern.

@@ -4,7 +4,6 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -15,12 +14,12 @@ import java.util.function.Function;
  * @author fresduvn
  */
 @ThreadSafe
-public interface FsCache<T> {
+public interface FsCache<K, V> {
 
     /**
      * Creates a new thread-safe Cache based by SoftReference.
      */
-    static <V> FsCache<V> newCache() {
+    static <K, V> FsCache<K, V> newCache() {
         return new FsCacheImpl<>();
     }
 
@@ -29,7 +28,7 @@ public interface FsCache<T> {
      *
      * @param removeListener Listener triggered when value expiry was detected, the first argument is the key of value.
      */
-    static <V> FsCache<V> newCache(Consumer<Object> removeListener) {
+    static <K, V> FsCache<K, V> newCache(RemoveListener<K, V> removeListener) {
         return new FsCacheImpl<>(removeListener);
     }
 
@@ -38,7 +37,7 @@ public interface FsCache<T> {
      *
      * @param initialCapacity initial capacity
      */
-    static <V> FsCache<V> newCache(int initialCapacity) {
+    static <K, V> FsCache<K, V> newCache(int initialCapacity) {
         return new FsCacheImpl<>(initialCapacity);
     }
 
@@ -48,7 +47,7 @@ public interface FsCache<T> {
      * @param initialCapacity initial capacity
      * @param removeListener  Listener triggered when value expiry was detected, the first argument is the key of value.
      */
-    static <V> FsCache<V> newCache(int initialCapacity, Consumer<Object> removeListener) {
+    static <K, V> FsCache<K, V> newCache(int initialCapacity, RemoveListener<K, V> removeListener) {
         return new FsCacheImpl<>(initialCapacity, removeListener);
     }
 
@@ -59,7 +58,7 @@ public interface FsCache<T> {
      *
      * @param key given key
      */
-    @Nullable T get(Object key);
+    @Nullable V get(K key);
 
     /**
      * Returns value associating with given key from this cache.
@@ -71,7 +70,7 @@ public interface FsCache<T> {
      * @param key    given key
      * @param loader given loader
      */
-    @Nullable <K> T get(K key, Function<K, T> loader);
+    @Nullable V get(K key, Function<? super K, ? extends V> loader);
 
     /**
      * Returns value associating with given key from this cache, the return value will be wrapped by {@link Optional}.
@@ -79,7 +78,7 @@ public interface FsCache<T> {
      *
      * @param key given key
      */
-    @Nullable Optional<T> getOptional(Object key);
+    @Nullable Optional<V> getOptional(K key);
 
     /**
      * Returns value associating with given key from this cache, the return value will be wrapped by {@link Optional}.
@@ -89,7 +88,7 @@ public interface FsCache<T> {
      * @param key    given key
      * @param loader given loader
      */
-    <K> Optional<T> getOptional(K key, Function<K, T> loader);
+    Optional<V> getOptional(K key, Function<? super K, ? extends V> loader);
 
     /**
      * Sets the value associated with given key.
@@ -97,14 +96,19 @@ public interface FsCache<T> {
      * @param key   given key
      * @param value the value
      */
-    void set(Object key, @Nullable T value);
+    void set(K key, @Nullable V value);
 
     /**
      * Removes the value associated with given key.
      *
      * @param key given key
      */
-    void remove(Object key);
+    void remove(K key);
+
+    /**
+     * Returns current size.
+     */
+    int size();
 
     /**
      * Removes all values in this cache.
@@ -115,4 +119,18 @@ public interface FsCache<T> {
      * Removes all expired values.
      */
     void cleanUp();
+
+    /**
+     * Removing listener of {@link FsCache}.
+     */
+    interface RemoveListener<K, V> {
+
+        /**
+         * This method will be called when a removing event occurs.
+         *
+         * @param cache current cache
+         * @param key   key of removed value
+         */
+        void onRemove(FsCache<K, V> cache, K key);
+    }
 }

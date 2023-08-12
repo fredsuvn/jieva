@@ -2,34 +2,29 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.ref.BooleanRef;
-import xyz.srclab.common.base.ref.Ref;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * Default implementation for {@link FsCache}.
  */
-final class FsCacheImpl<T> implements FsCache<T> {
+final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
-    private static final Object NULL = "[null]";
-
-    private final Map<Object, Entry> map;
+    private final Map<K, Entry<K>> map;
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
-    private final Consumer<Object> removeListener;
+    private final FsCache.RemoveListener<K, V> removeListener;
 
     FsCacheImpl() {
         this.map = new ConcurrentHashMap<>();
         this.removeListener = null;
     }
 
-    FsCacheImpl(Consumer<Object> removeListener) {
+    FsCacheImpl(FsCache.RemoveListener<K, V> removeListener) {
         this.map = new ConcurrentHashMap<>();
         this.removeListener = removeListener;
     }
@@ -39,29 +34,29 @@ final class FsCacheImpl<T> implements FsCache<T> {
         this.removeListener = null;
     }
 
-    FsCacheImpl(int initialCapacity, Consumer<Object> removeListener) {
+    FsCacheImpl(int initialCapacity, FsCache.RemoveListener<K, V> removeListener) {
         this.map = new ConcurrentHashMap<>(initialCapacity);
         this.removeListener = removeListener;
     }
 
     @Override
-    public @Nullable T get(Object key) {
+    public @Nullable V get(K key) {
         cleanUp();
-        Entry entry = map.get(key);
+        Entry<K> entry = map.get(key);
         if (entry == null) {
             return null;
         }
         Object result = entry.get();
-        if (result == NULL) {
+        if (result instanceof Null) {
             return null;
         }
-        return Fs.as(result);
+        return (V) result;
     }
 
     @Override
-    public @Nullable Optional<T> getOptional(Object key) {
+    public @Nullable Optional<V> getOptional(K key) {
         cleanUp();
-        Entry entry = map.get(key);
+        Entry<K> entry = map.get(key);
         if (entry == null) {
             return null;
         }
@@ -69,66 +64,75 @@ final class FsCacheImpl<T> implements FsCache<T> {
         if (result == null) {
             return null;
         }
-        if (result == NULL) {
+        if (result instanceof Null) {
             return Optional.empty();
         }
-        return Optional.of(Fs.as(result));
+        return (Optional<V>) Optional.of(result);
     }
 
     @Override
-    public <K> @Nullable T get(K key, Function<K, T> loader) {
+    public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
         cleanUp();
-        BooleanRef createNew = new BooleanRef(false);
-        Ref<T> newValue = new Ref<>();
-        Entry entry = map.computeIfAbsent(key, it -> {
-            newValue.set(loader.apply(Fs.as(it)));
-            createNew.set(true);
-            return newEntry(it, newValue.get());
+        // BooleanRef createNew = new BooleanRef(false);
+        // Ref<Object> newValueRef = new Ref<>();
+        Entry<K> entry = map.computeIfAbsent(key, it -> {
+            // V v = loader.apply(it);
+            // newValueRef.set(v);
+            // createNew.set(true);
+            return newEntry(it, loader.apply(it));
         });
-        if (createNew.get()) {
-            T result = newValue.get();
-            if (result == NULL) {
-                return null;
-            }
-            return result;
-        }
+        // if (createNew.get()) {
+        //     Object result = newValueRef.get();
+        //     if (result instanceof Null) {
+        //         return null;
+        //     }
+        //     return (V) result;
+        // }
         Object result = entry.get();
-        if (result == null) {
-            T newResult = loader.apply(key);
-            map.put(key, newEntry(key, newResult));
-            return newResult;
-        } else {
-            return result == NULL ? null : Fs.as(result);
+        if (result instanceof Null) {
+            // T newResult = loader.apply(key);
+            // map.put(key, newEntry(key, newResult));
+            // return newResult;
+            return null;
         }
+        return (V) result;
     }
 
     @Override
-    public <K> Optional<T> getOptional(K key, Function<K, T> loader) {
-        T result = get(key, loader);
-        if (result == null) {
+    public Optional<V> getOptional(K key, Function<? super K, ? extends V> loader) {
+        cleanUp();
+        Entry<K> entry = map.computeIfAbsent(key, it -> newEntry(it, loader.apply(it)));
+        Object result = entry.get();
+        if (result instanceof Null) {
             return Optional.empty();
         }
-        return Optional.of(result);
+        return (Optional<V>) Optional.of(result);
     }
 
     @Override
-    public void set(Object key, @Nullable T value) {
+    public void set(K key, @Nullable V value) {
         cleanUp();
         map.put(key, newEntry(key, value));
     }
 
-    private Entry newEntry(Object key, @Nullable T value) {
-        return new Entry(key, value == null ? NULL : value, queue);
+    private Entry<K> newEntry(K key, @Nullable Object value) {
+        return new Entry<>(key, value == null ? new Null() : value, queue);
     }
 
     @Override
-    public void remove(Object key) {
+    public void remove(K key) {
         cleanUp();
-        Entry entry = map.get(key);
+        Entry<K> entry = map.get(key);
         if (entry != null) {
             entry.clear();
             map.remove(key);
         }
+    }
+
+    @Override
+    public int size() {
+        cleanUp();
+        return map.size();
     }
 
     @Override
@@ -139,10 +143,10 @@ final class FsCacheImpl<T> implements FsCache<T> {
             if (x == null) {
                 return;
             }
-            Entry entry = (Entry) x;
+            Entry<K> entry = (Entry) x;
             entry.clear();
             if (removeListener != null) {
-                removeListener.accept(entry.key);
+                removeListener.onRemove(this, entry.key);
             }
         }
     }
@@ -154,20 +158,24 @@ final class FsCacheImpl<T> implements FsCache<T> {
             if (x == null) {
                 return;
             }
-            Entry entry = Fs.as(x);
+            Entry<K> entry = Fs.as(x);
             map.remove(entry.key);
             if (removeListener != null) {
-                removeListener.accept(entry.key);
+                removeListener.onRemove(this, entry.key);
             }
         }
     }
 
-    private static final class Entry extends SoftReference<Object> {
-        private final Object key;
+    private static final class Entry<K> extends SoftReference<Object> {
 
-        public Entry(Object key, Object value, ReferenceQueue<? super Object> q) {
+        private final K key;
+
+        public Entry(K key, Object value, ReferenceQueue<? super Object> q) {
             super(value, q);
             this.key = key;
         }
+    }
+
+    private static final class Null {
     }
 }

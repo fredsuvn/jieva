@@ -47,7 +47,7 @@ public class CacheBenchmark {
         }
     }
 
-    private FsCache<String> fsCache;
+    private FsCache<Integer, String> fsCache;
     private Cache<Integer, String> guava;
     private Cache<Integer, String> guavaSoft;
     private Cache<Integer, String> guavaBig;

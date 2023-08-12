@@ -394,7 +394,7 @@ public class FsIO {
     }
 
     /**
-     * Returns a reader of which content from given input stream.
+     * Wraps given input stream as a reader.
      *
      * @param inputStream given input stream
      * @param charset     charset of return reader
@@ -404,13 +404,43 @@ public class FsIO {
     }
 
     /**
-     * Returns an input stream of which content from given reader.
+     * Wraps given buffer as a reader.
+     *
+     * @param buffer given buffer
+     */
+    public static Reader toReader(CharBuffer buffer) {
+        return new CharBufferReader(buffer);
+    }
+
+    /**
+     * Wraps given reader as an input stream.
      *
      * @param reader  given reader
      * @param charset charset of given reader
      */
     public static InputStream toInputStream(Reader reader, Charset charset) {
         return new ReaderInputStream(reader, charset);
+    }
+
+    /**
+     * Wraps given buffer as an input stream.
+     *
+     * @param buffer given buffer
+     */
+    public static InputStream toInputStream(ByteBuffer buffer) {
+        return new ByteBufferInputStream(buffer);
+    }
+
+    /**
+     * Wraps given random access file as an input stream.
+     * <p>
+     * Note this method will seek position of random access file to given offset immediately.
+     *
+     * @param random given random access file
+     * @param offset offset of random access file
+     */
+    public static InputStream toInputStream(RandomAccessFile random, long offset) {
+        return new RandomInputStream(random, offset);
     }
 
     /**
@@ -424,6 +454,15 @@ public class FsIO {
     }
 
     /**
+     * Wraps given buffer as a writer.
+     *
+     * @param buffer given buffer
+     */
+    public static Writer toWriter(CharBuffer buffer) {
+        return new CharBufferWriter(buffer);
+    }
+
+    /**
      * Wraps given writer as an output stream.
      *
      * @param writer  given writer
@@ -434,38 +473,23 @@ public class FsIO {
     }
 
     /**
-     * Returns a reader of which content from given buffer.
-     *
-     * @param buffer given buffer
-     */
-    public static Reader toReader(CharBuffer buffer) {
-        return new CharBufferReader(buffer);
-    }
-
-    /**
-     * Returns an input stream of which content from given buffer.
-     *
-     * @param buffer given buffer
-     */
-    public static InputStream toInputStream(ByteBuffer buffer) {
-        return new ByteBufferInputStream(buffer);
-    }
-
-    /**
-     * Wraps given buffer as a writer.
-     *
-     * @param buffer given buffer
-     */
-    public static Writer toWriter(CharBuffer buffer) {
-        return new CharBufferWriter(buffer);
-    }
-
-    /**
      * Wraps given buffer as an output stream.
      *
      * @param buffer given writer
      */
     public static OutputStream toOutputStream(ByteBuffer buffer) {
         return new ByteBufferOutputStream(buffer);
+    }
+
+    /**
+     * Wraps given random access file as an output stream.
+     * <p>
+     * Note this method will seek position of random access file to given offset immediately.
+     *
+     * @param random given random access file
+     * @param offset offset of random access file
+     */
+    public static OutputStream toOutputStream(RandomAccessFile random, long offset) {
+        return new RandomOutputStream(random, offset);
     }
 }
