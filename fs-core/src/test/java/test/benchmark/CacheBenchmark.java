@@ -86,7 +86,7 @@ public class CacheBenchmark {
     @Benchmark
     public void fsCache() {
         for (Integer key : keys) {
-            fsCache.set(key, key.toString());
+            fsCache.put(key, key.toString());
         }
         for (Integer key : keys) {
             fsCache.get(key);

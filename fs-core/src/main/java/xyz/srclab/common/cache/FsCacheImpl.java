@@ -18,6 +18,7 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     private final Map<K, Entry<K>> map;
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
     private final FsCache.RemoveListener<K, V> removeListener;
+    private volatile boolean inCleanUp = false;
 
     FsCacheImpl() {
         this.map = new ConcurrentHashMap<>();
@@ -110,7 +111,7 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     }
 
     @Override
-    public void set(K key, @Nullable V value) {
+    public void put(K key, @Nullable V value) {
         cleanUp();
         map.put(key, newEntry(key, value));
     }
@@ -131,7 +132,6 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
     @Override
     public int size() {
-        cleanUp();
         return map.size();
     }
 
@@ -153,10 +153,19 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
     @Override
     public void cleanUp() {
+        if (inCleanUp) {
+            return;
+        }
+        synchronized (this) {
+            if (inCleanUp) {
+                return;
+            }
+            inCleanUp = true;
+        }
         while (true) {
             Object x = queue.poll();
             if (x == null) {
-                return;
+                break;
             }
             Entry<K> entry = Fs.as(x);
             map.remove(entry.key);
@@ -164,6 +173,7 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
                 removeListener.onRemove(this, entry.key);
             }
         }
+        inCleanUp = false;
     }
 
     private static final class Entry<K> extends SoftReference<Object> {

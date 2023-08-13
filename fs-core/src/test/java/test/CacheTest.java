@@ -11,13 +11,16 @@ import java.util.Map;
 public class CacheTest {
 
     @Test
-    public void cache() {
+    public void testCache() {
         final int[] detected = {0};
-        FsCache<Integer, String> fsCache = FsCache.newCache((cache,key) -> detected[0]++);
+        FsCache<Integer, String> fsCache = FsCache.newCache((cache, key) -> {
+            detected[0]++;
+            cache.cleanUp();
+        });
         Map<Integer, String> map = new HashMap<>();
         int times = 1000000 * 3;
         for (int i = 0; i < times; i++) {
-            fsCache.set(i, String.valueOf(i * 10086));
+            fsCache.put(i, String.valueOf(i * 10086));
             //map.put(i, String.valueOf(i * 10086));
         }
         int removed = 0;
@@ -41,9 +44,9 @@ public class CacheTest {
     }
 
     @Test
-    public void cacheNull() {
+    public void testCacheNull() {
         FsCache<Integer, String> fsCache = FsCache.newCache();
-        fsCache.set(1, null);
+        fsCache.put(1, null);
         Assert.assertNull(fsCache.get(1));
         Assert.assertNotNull(fsCache.getOptional(1));
         fsCache.remove(1);
@@ -52,11 +55,20 @@ public class CacheTest {
     }
 
     @Test
-    public void cacheLoader() {
+    public void testCacheLoader() {
         FsCache<Integer, String> fsCache = FsCache.newCache();
         Assert.assertNull(fsCache.get(1));
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
         FsLogger.system().info("cacheLoader: 1=", fsCache.get(1));
+    }
+
+    @Test
+    public void testCleanUp() {
+        FsCache<Integer, Integer> fsCache = FsCache.newCache((c, k) -> c.cleanUp());
+        for (int i = 0; i < 10000; i++) {
+            fsCache.put(i, i);
+        }
+        fsCache.cleanUp();
     }
 }

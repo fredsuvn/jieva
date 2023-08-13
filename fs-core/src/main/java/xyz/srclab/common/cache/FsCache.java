@@ -96,7 +96,7 @@ public interface FsCache<K, V> {
      * @param key   given key
      * @param value the value
      */
-    void set(K key, @Nullable V value);
+    void put(K key, @Nullable V value);
 
     /**
      * Removes the value associated with given key.
