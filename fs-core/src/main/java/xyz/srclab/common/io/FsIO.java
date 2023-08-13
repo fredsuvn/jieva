@@ -46,7 +46,7 @@ public class FsIO {
             }
             return dest.toByteArray();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 
@@ -85,7 +85,7 @@ public class FsIO {
             }
             return dest.toByteArray();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 
@@ -138,7 +138,7 @@ public class FsIO {
             }
             return readNum;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 
@@ -173,7 +173,7 @@ public class FsIO {
             }
             return bytes;
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 
@@ -195,7 +195,7 @@ public class FsIO {
             }
             return readBytesTo(inputStream, dest, available);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 
@@ -223,7 +223,7 @@ public class FsIO {
             }
             return dest.toString();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 
@@ -262,7 +262,7 @@ public class FsIO {
             }
             return dest.toString();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 
@@ -319,7 +319,7 @@ public class FsIO {
             }
             return readNum;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 

@@ -19,6 +19,7 @@ import java.util.function.Function;
  * and map as bean of which key's type is any type.
  *
  * @author fredsuvn
+ * @see Builder
  */
 public interface FsBeanCopier {
 

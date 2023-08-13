@@ -19,31 +19,31 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     private final Map<K, Entry<K>> map;
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
     private final FsCache.RemoveListener<K, V> removeListener;
-    private final boolean isWeak;
+    private final boolean isSoft;
     private volatile boolean inCleanUp = false;
 
-    FsCacheImpl(boolean isWeak) {
+    FsCacheImpl(boolean isSoft) {
         this.map = new ConcurrentHashMap<>();
         this.removeListener = null;
-        this.isWeak = isWeak;
+        this.isSoft = isSoft;
     }
 
-    FsCacheImpl(boolean isWeak, FsCache.RemoveListener<K, V> removeListener) {
+    FsCacheImpl(boolean isSoft, FsCache.RemoveListener<K, V> removeListener) {
         this.map = new ConcurrentHashMap<>();
         this.removeListener = removeListener;
-        this.isWeak = isWeak;
+        this.isSoft = isSoft;
     }
 
-    FsCacheImpl(boolean isWeak, int initialCapacity) {
+    FsCacheImpl(boolean isSoft, int initialCapacity) {
         this.map = new ConcurrentHashMap<>(initialCapacity);
         this.removeListener = null;
-        this.isWeak = isWeak;
+        this.isSoft = isSoft;
     }
 
-    FsCacheImpl(boolean isWeak, int initialCapacity, FsCache.RemoveListener<K, V> removeListener) {
+    FsCacheImpl(boolean isSoft, int initialCapacity, FsCache.RemoveListener<K, V> removeListener) {
         this.map = new ConcurrentHashMap<>(initialCapacity);
         this.removeListener = removeListener;
-        this.isWeak = isWeak;
+        this.isSoft = isSoft;
     }
 
     @Override
@@ -123,10 +123,10 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     }
 
     private Entry<K> newEntry(K key, @Nullable Object value) {
-        return isWeak ?
-            new WeakEntry<>(key, value == null ? new Null() : value, queue)
+        return isSoft ?
+            new SoftEntry<>(key, value == null ? new Null() : value, queue)
             :
-            new SoftEntry<>(key, value == null ? new Null() : value, queue);
+            new WeakEntry<>(key, value == null ? new Null() : value, queue);
     }
 
     @Override

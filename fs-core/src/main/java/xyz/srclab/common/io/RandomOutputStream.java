@@ -7,15 +7,13 @@ import java.io.RandomAccessFile;
 final class RandomOutputStream extends OutputStream {
 
     private final RandomAccessFile random;
-    private final long offset;
 
     RandomOutputStream(RandomAccessFile random, long offset) {
         this.random = random;
-        this.offset = offset;
         try {
             this.random.seek(offset);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new FsIOException(e);
         }
     }
 

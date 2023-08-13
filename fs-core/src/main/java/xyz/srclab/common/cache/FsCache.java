@@ -22,7 +22,7 @@ public interface FsCache<K, V> {
      * Creates a new thread-safe Cache based by {@link SoftReference}.
      */
     static <K, V> FsCache<K, V> softCache() {
-        return new FsCacheImpl<>(false);
+        return new FsCacheImpl<>(true);
     }
 
     /**
@@ -33,7 +33,7 @@ public interface FsCache<K, V> {
      *                       the first argument is current cache and second is the key.
      */
     static <K, V> FsCache<K, V> softCache(RemoveListener<K, V> removeListener) {
-        return new FsCacheImpl<>(false, removeListener);
+        return new FsCacheImpl<>(true, removeListener);
     }
 
     /**
@@ -42,7 +42,7 @@ public interface FsCache<K, V> {
      * @param initialCapacity initial capacity
      */
     static <K, V> FsCache<K, V> softCache(int initialCapacity) {
-        return new FsCacheImpl<>(false, initialCapacity);
+        return new FsCacheImpl<>(true, initialCapacity);
     }
 
     /**
@@ -54,7 +54,7 @@ public interface FsCache<K, V> {
      *                        the first argument is current cache and second is the key.
      */
     static <K, V> FsCache<K, V> softCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new FsCacheImpl<>(false, initialCapacity, removeListener);
+        return new FsCacheImpl<>(true, initialCapacity, removeListener);
     }
 
     /**

@@ -36,7 +36,7 @@ public class IOTest {
     }
 
     @Test
-    public void testConvert() throws IOException {
+    public void testWrap() throws IOException {
         String base = "e12阿士fds大夫撒fsdf发顺丰是の2饿额ee所发生fsd的法师fasfas法师法师法师";
         StringBuilder text = new StringBuilder();
         Random random = new Random();
