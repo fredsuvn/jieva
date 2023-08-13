@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public class FsType {
 
-    private static final FsCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = FsCache.newCache();
+    private static final FsCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = FsCache.softCache();
 
     /**
      * Returns last name of given class. The last name is sub-string after last dot, for example:

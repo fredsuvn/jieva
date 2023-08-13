@@ -52,7 +52,7 @@ public class FsDate {
      */
     public static final DateTimeFormatter FORMATTER_OFFSET = DateTimeFormatter.ofPattern(PATTERN_OFFSET);
 
-    private static final FsCache<CharSequence, DateTimeFormatter> FORMATTER_CACHE = FsCache.newCache();
+    private static final FsCache<CharSequence, DateTimeFormatter> FORMATTER_CACHE = FsCache.softCache();
 
     /**
      * Returns DateFormat of given pattern.

@@ -57,7 +57,7 @@ public interface FsBeanResolver {
 
     /**
      * Returns new bean resolver with given handler and cache option.
-     * If the cache option is true, returned resolver will hold a cache from {@link FsCache#newCache()}
+     * If the cache option is true, returned resolver will hold a cache from {@link FsCache#softCache()}
      * and cache the resolved bean.
      *
      * @param handlers given handler
@@ -71,7 +71,7 @@ public interface FsBeanResolver {
 
             FsBeanResolverImpl(Iterable<Handler> handlers, boolean useCache) {
                 this.handlers = FsCollect.toCollection(new LinkedList<>(), handlers);
-                this.cache = useCache ? FsCache.newCache() : null;
+                this.cache = useCache ? FsCache.softCache() : null;
             }
 
             @Override

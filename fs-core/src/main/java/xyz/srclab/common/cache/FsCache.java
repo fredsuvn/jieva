@@ -3,6 +3,8 @@ package xyz.srclab.common.cache;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -17,38 +19,81 @@ import java.util.function.Function;
 public interface FsCache<K, V> {
 
     /**
-     * Creates a new thread-safe Cache based by SoftReference.
+     * Creates a new thread-safe Cache based by {@link SoftReference}.
      */
-    static <K, V> FsCache<K, V> newCache() {
-        return new FsCacheImpl<>();
+    static <K, V> FsCache<K, V> softCache() {
+        return new FsCacheImpl<>(false);
     }
 
     /**
-     * Creates a new thread-safe Cache based by SoftReference.
+     * Creates a new thread-safe Cache based by {@link SoftReference} with remove listener,
+     * the listener will be called <b>after</b> removing from the cache.
      *
-     * @param removeListener Listener triggered when value expiry was detected, the first argument is the key of value.
+     * @param removeListener remove listener called <b>after</b> removing from the cache,
+     *                       the first argument is current cache and second is the key.
      */
-    static <K, V> FsCache<K, V> newCache(RemoveListener<K, V> removeListener) {
-        return new FsCacheImpl<>(removeListener);
+    static <K, V> FsCache<K, V> softCache(RemoveListener<K, V> removeListener) {
+        return new FsCacheImpl<>(false, removeListener);
     }
 
     /**
-     * Creates a new thread-safe Cache based by SoftReference.
+     * Creates a new thread-safe Cache based by {@link SoftReference} with initial capacity.
+     *
+     * @param initialCapacity initial capacity
+     */
+    static <K, V> FsCache<K, V> softCache(int initialCapacity) {
+        return new FsCacheImpl<>(false, initialCapacity);
+    }
+
+    /**
+     * Creates a new thread-safe Cache based by {@link SoftReference} with initial capacity and remove listener,
+     * the listener will be called <b>after</b> removing from the cache.
+     *
+     * @param initialCapacity initial capacity
+     * @param removeListener  remove listener called <b>after</b> removing from the cache,
+     *                        the first argument is current cache and second is the key.
+     */
+    static <K, V> FsCache<K, V> softCache(int initialCapacity, RemoveListener<K, V> removeListener) {
+        return new FsCacheImpl<>(false, initialCapacity, removeListener);
+    }
+
+    /**
+     * Creates a new thread-safe Cache based by {@link WeakReference}.
+     */
+    static <K, V> FsCache<K, V> weakCache() {
+        return new FsCacheImpl<>(false);
+    }
+
+    /**
+     * Creates a new thread-safe Cache based by {@link WeakReference} with remove listener,
+     * the listener will be called <b>after</b> removing from the cache.
+     *
+     * @param removeListener remove listener called <b>after</b> removing from the cache,
+     *                       the first argument is current cache and second is the key.
+     */
+    static <K, V> FsCache<K, V> weakCache(RemoveListener<K, V> removeListener) {
+        return new FsCacheImpl<>(false, removeListener);
+    }
+
+    /**
+     * Creates a new thread-safe Cache based by {@link WeakReference} with initial capacity.
      *
      * @param initialCapacity initial capacity
      */
-    static <K, V> FsCache<K, V> newCache(int initialCapacity) {
-        return new FsCacheImpl<>(initialCapacity);
+    static <K, V> FsCache<K, V> weakCache(int initialCapacity) {
+        return new FsCacheImpl<>(false, initialCapacity);
     }
 
     /**
-     * Creates a new thread-safe Cache based by SoftReference.
+     * Creates a new thread-safe Cache based by {@link WeakReference} with initial capacity and remove listener,
+     * the listener will be called <b>after</b> removing from the cache.
      *
      * @param initialCapacity initial capacity
-     * @param removeListener  Listener triggered when value expiry was detected, the first argument is the key of value.
+     * @param removeListener  remove listener called <b>after</b> removing from the cache,
+     *                        the first argument is current cache and second is the key.
      */
-    static <K, V> FsCache<K, V> newCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new FsCacheImpl<>(initialCapacity, removeListener);
+    static <K, V> FsCache<K, V> weakCache(int initialCapacity, RemoveListener<K, V> removeListener) {
+        return new FsCacheImpl<>(false, initialCapacity, removeListener);
     }
 
     /**

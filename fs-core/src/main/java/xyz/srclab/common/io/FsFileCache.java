@@ -13,7 +13,7 @@
 // public class FsFileCache {
 //
 //     private final int segmentSize;
-//     private final Map<String, FsCache<BytesValue>> cache = new ConcurrentHashMap<>();
+//     private final Map<String, FsCache<BytesKey, BytesValue>> cache = new ConcurrentHashMap<>();
 //     private final AtomicLong bytesCount = new AtomicLong(0);
 //
 //     public FsFileCache(int segmentSize) {
@@ -22,17 +22,15 @@
 //
 //     @Nullable
 //     private BytesValue getBytesValue(String path, BytesKey bytesKey) {
-//         FsCache<BytesValue> fileCache = cache.get(path);
+//         FsCache<BytesKey, BytesValue> fileCache = cache.get(path);
 //         if (fileCache == null) {
 //             return null;
 //         }
 //         return fileCache.get(bytesKey);
 //     }
 //
-//     private FsCache<BytesValue> buildFileCache() {
-//         return FsCache.newCache(key -> {
-//             BytesKey bytesKey = (BytesKey) key;
-//
+//     private FsCache<BytesKey, BytesValue> buildFileCache() {
+//         return FsCache.softCache((cache, key) -> {
 //         });
 //     }
 //

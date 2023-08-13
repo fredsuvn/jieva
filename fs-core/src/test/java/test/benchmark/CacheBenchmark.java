@@ -62,7 +62,7 @@ public class CacheBenchmark {
 
     @Setup(Level.Iteration)
     public void init() {
-        fsCache = FsCache.newCache();
+        fsCache = FsCache.softCache();
         guava = CacheBuilder.newBuilder()
             .maximumSize(keys.length / 10)
             .build();

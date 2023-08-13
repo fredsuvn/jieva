@@ -1,10 +1,11 @@
 package xyz.srclab.common.cache;
 
+import lombok.Getter;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.base.Fs;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,26 +19,31 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     private final Map<K, Entry<K>> map;
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
     private final FsCache.RemoveListener<K, V> removeListener;
+    private final boolean isWeak;
     private volatile boolean inCleanUp = false;
 
-    FsCacheImpl() {
+    FsCacheImpl(boolean isWeak) {
         this.map = new ConcurrentHashMap<>();
         this.removeListener = null;
+        this.isWeak = isWeak;
     }
 
-    FsCacheImpl(FsCache.RemoveListener<K, V> removeListener) {
+    FsCacheImpl(boolean isWeak, FsCache.RemoveListener<K, V> removeListener) {
         this.map = new ConcurrentHashMap<>();
         this.removeListener = removeListener;
+        this.isWeak = isWeak;
     }
 
-    FsCacheImpl(int initialCapacity) {
+    FsCacheImpl(boolean isWeak, int initialCapacity) {
         this.map = new ConcurrentHashMap<>(initialCapacity);
         this.removeListener = null;
+        this.isWeak = isWeak;
     }
 
-    FsCacheImpl(int initialCapacity, FsCache.RemoveListener<K, V> removeListener) {
+    FsCacheImpl(boolean isWeak, int initialCapacity, FsCache.RemoveListener<K, V> removeListener) {
         this.map = new ConcurrentHashMap<>(initialCapacity);
         this.removeListener = removeListener;
+        this.isWeak = isWeak;
     }
 
     @Override
@@ -117,7 +123,10 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     }
 
     private Entry<K> newEntry(K key, @Nullable Object value) {
-        return new Entry<>(key, value == null ? new Null() : value, queue);
+        return isWeak ?
+            new WeakEntry<>(key, value == null ? new Null() : value, queue)
+            :
+            new SoftEntry<>(key, value == null ? new Null() : value, queue);
     }
 
     @Override
@@ -146,7 +155,7 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
             Entry<K> entry = (Entry) x;
             entry.clear();
             if (removeListener != null) {
-                removeListener.onRemove(this, entry.key);
+                removeListener.onRemove(this, entry.getKey());
             }
         }
     }
@@ -167,20 +176,41 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
             if (x == null) {
                 break;
             }
-            Entry<K> entry = Fs.as(x);
-            map.remove(entry.key);
+            Entry<K> entry = (Entry<K>) x;
+            map.remove(entry.getKey());
             if (removeListener != null) {
-                removeListener.onRemove(this, entry.key);
+                removeListener.onRemove(this, entry.getKey());
             }
         }
         inCleanUp = false;
     }
 
-    private static final class Entry<K> extends SoftReference<Object> {
+    private interface Entry<K> {
+
+        K getKey();
+
+        void clear();
+
+        Object get();
+    }
+
+    @Getter
+    private static class SoftEntry<K> extends SoftReference<Object> implements Entry<K> {
 
         private final K key;
 
-        public Entry(K key, Object value, ReferenceQueue<? super Object> q) {
+        public SoftEntry(K key, Object value, ReferenceQueue<? super Object> q) {
+            super(value, q);
+            this.key = key;
+        }
+    }
+
+    @Getter
+    private static class WeakEntry<K> extends WeakReference<Object> implements Entry<K> {
+
+        private final K key;
+
+        public WeakEntry(K key, Object value, ReferenceQueue<? super Object> q) {
             super(value, q);
             this.key = key;
         }
