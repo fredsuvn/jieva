@@ -13,7 +13,7 @@ package xyz.srclab.common.base;
  */
 public abstract class FsFinal {
 
-    private Integer hash;
+    private int hash;
     private String toString;
 
     /**
@@ -28,14 +28,17 @@ public abstract class FsFinal {
 
     @Override
     public int hashCode() {
-        if (hash != null) {
+        if (hash != 0) {
             return hash;
         }
         synchronized (this) {
-            if (hash != null) {
+            if (hash != 0) {
                 return hash;
             }
             int newHash = computeHashCode();
+            if (newHash == 0) {
+                newHash = 1;
+            }
             hash = newHash;
             return newHash;
         }

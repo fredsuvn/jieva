@@ -98,7 +98,7 @@ public interface FsBeanResolver {
                 private final Type type;
                 private volatile Map<String, FsProperty> properties = new LinkedHashMap<>();
                 private volatile boolean built = false;
-                private Integer hash = null;
+                private int hash = 0;
                 private String toString = null;
 
                 FsBeanBuilderImpl(Type type) {
@@ -132,8 +132,11 @@ public interface FsBeanResolver {
                     if (!built) {
                         return Objects.hash(type, properties);
                     }
-                    if (hash == null) {
+                    if (hash == 0) {
                         int finalHash = Objects.hash(type, properties);
+                        if (finalHash == 0) {
+                            finalHash = 1;
+                        }
                         hash = finalHash;
                         return finalHash;
                     }
