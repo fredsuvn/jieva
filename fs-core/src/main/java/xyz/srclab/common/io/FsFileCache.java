@@ -6,6 +6,7 @@
 // import xyz.srclab.common.cache.FsCache;
 //
 // import java.io.*;
+// import java.nio.file.Path;
 //
 // /**
 //  * Cache for file, provides methods about IO streams to read/write files between cache and underlying.
@@ -36,17 +37,41 @@
 //     OutputStream getOutputStream(File file, long offset);
 //
 //     /**
+//      * Cache interface used for {@link FsFileCache}.
+//      */
+//     interface Cache<K, V> {
+//
+//         /**
+//          * Gets cached value, may be null if expired or not found.
+//          *
+//          * @param key key of the value
+//          */
+//         @Nullable
+//         V get(K key);
+//
+//         /**
+//          * Puts new value of specified key
+//          *
+//          * @param key   specified key
+//          * @param value new value
+//          */
+//         void put(K key, V value);
+//     }
+//
+//     /**
 //      * Underlying file reader.
 //      */
 //     interface FileReader {
 //
 //         /**
-//          * Returns an underlying file input stream for given file seeks from given offset.
+//          * Returns an un-cached underlying file input stream to read file.
+//          * The start read point will be set at given offset, and readable bytes is given length.
 //          *
-//          * @param file   given file
-//          * @param offset seek position of the file
+//          * @param path   path of file
+//          * @param offset the offset position, measured in bytes from the beginning of the file
+//          * @param length readable bytes
 //          */
-//         InputStream getInputStream(File file, long offset);
+//         InputStream getInputStream(Path path, long offset, long length);
 //     }
 //
 //     /**
@@ -55,12 +80,14 @@
 //     interface FileWriter {
 //
 //         /**
-//          * Returns an underlying file output stream for given file seeks from given offset.
+//          * Returns an un-cached underlying file out stream to write file.
+//          * The start write point will be set at given offset, and writeable bytes is given length.
 //          *
-//          * @param file   given file
-//          * @param offset seek position of the file
+//          * @param path   path of file
+//          * @param offset the offset position, measured in bytes from the beginning of the file
+//          * @param length writeable bytes
 //          */
-//         OutputStream getOutputStream(File file, long offset);
+//         OutputStream getOutputStream(Path path, long offset, long length);
 //     }
 //
 //     /**
@@ -130,6 +157,7 @@
 //
 //         private static final FileReader DEFAULT_FILE_READER = (file, offset) -> {
 //             try {
+//                 new RandomAccessFile(file, "r").getChannel().read()
 //                 return FsIO.toInputStream(new RandomAccessFile(file, "r"), offset);
 //             } catch (FileNotFoundException e) {
 //                 throw new FsIOException(e);
@@ -144,7 +172,7 @@
 //         };
 //
 //         private int chunkSize = 1024;
-//         private boolean softCache = true;
+//         // private
 //         private FileReader fileReader = DEFAULT_FILE_READER;
 //         private FileWriter fileWriter = DEFAULT_FILE_WRITER;
 //         private ReadCacheListener readCacheListener = null;

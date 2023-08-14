@@ -50,6 +50,37 @@ final class ByteBufferInputStream extends InputStream {
     }
 
     @Override
+    public long skip(long n) throws IOException {
+        FsCheck.checkArgument(n>=0, "Skip number must > 0");
+        if (n <= buffer.remaining()) {
+            buffer.position((int) (buffer.position() + n));
+            return n;
+        }
+
+        return super.skip(n);
+    }
+
+    @Override
+    public int available() throws IOException {
+        return super.available();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        super.mark(readlimit);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        super.reset();
+    }
+
+    @Override
+    public boolean markSupported() {
+        return true;
+    }
+
+    @Override
     public void close() throws IOException {
     }
 }
