@@ -1,5 +1,6 @@
 package xyz.srclab.common.io;
 
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsCheck;
 
 import java.io.IOException;
@@ -42,6 +43,91 @@ final class ReaderInputStream extends InputStream {
         this(reader, charset, FsIO.IO_BUFFER_SIZE);
     }
 
+    @Override
+    public synchronized int read(byte[] b, int off, int len) throws IOException {
+        try {
+            FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            return read0(b, off, len, true);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public synchronized int read(byte[] b) throws IOException {
+        return read(b, 0, b.length);
+    }
+
+    @Override
+    public synchronized int read() throws IOException {
+        try {
+            while (true) {
+                if (outBuffer.hasRemaining()) {
+                    return outBuffer.get() & 0xFF;
+                }
+                fillBuffer();
+                if (endOfInput && !outBuffer.hasRemaining()) {
+                    return -1;
+                }
+            }
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public synchronized long skip(long n) throws IOException {
+        try {
+            try {
+                if (n <= 0) {
+                    return 0;
+                }
+                return read0(null, 0, n, false);
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        reader.close();
+    }
+
+    private int read0(@Nullable byte[] b, int off, long len, boolean fillBytes) throws IOException {
+        if (len == 0) {
+            return 0;
+        }
+        int readNum = 0;
+        int offset = off;
+        long remaining = len;
+        while (true) {
+            if (outBuffer.hasRemaining()) {
+                long readSize = Math.min(outBuffer.remaining(), remaining);
+                if (fillBytes) {
+                    outBuffer.get(b, offset, (int) readSize);
+                } else {
+                    long newPos = outBuffer.position() + readSize;
+                    outBuffer.position((int) newPos);
+                }
+                offset += readSize;
+                remaining -= readSize;
+                readNum += readSize;
+            } else {
+                fillBuffer();
+                if (endOfInput && !outBuffer.hasRemaining()) {
+                    break;
+                }
+            }
+            if (remaining <= 0) {
+                break;
+            }
+        }
+        return readNum == 0 && endOfInput ? -1 : readNum;
+    }
+
     private void fillBuffer() throws IOException {
         if (!endOfInput &&
             (lastCoderResult == null || lastCoderResult.isUnderflow() || lastCoderResult.isOverflow())) {
@@ -63,57 +149,5 @@ final class ReaderInputStream extends InputStream {
             throw new IOException("Encoding failed: " + lastCoderResult);
         }
         outBuffer.flip();
-    }
-
-    @Override
-    public int read(byte[] array, int off, int len) throws IOException {
-        FsCheck.checkRangeInBounds(off, off + len, 0, array.length);
-        if (len == 0) {
-            return 0;
-        }
-        int readNum = 0;
-        int offset = off;
-        int remaining = len;
-        while (true) {
-            if (outBuffer.hasRemaining()) {
-                int readSize = Math.min(outBuffer.remaining(), remaining);
-                outBuffer.get(array, offset, readSize);
-                offset += readSize;
-                remaining -= readSize;
-                readNum += readSize;
-            } else {
-                fillBuffer();
-                if (endOfInput && !outBuffer.hasRemaining()) {
-                    break;
-                }
-            }
-            if (remaining <= 0) {
-                break;
-            }
-        }
-        return readNum == 0 && endOfInput ? -1 : readNum;
-    }
-
-    @Override
-    public int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
-    }
-
-    @Override
-    public int read() throws IOException {
-        while (true) {
-            if (outBuffer.hasRemaining()) {
-                return outBuffer.get() & 0xFF;
-            }
-            fillBuffer();
-            if (endOfInput && !outBuffer.hasRemaining()) {
-                return -1;
-            }
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        reader.close();
     }
 }

@@ -13,7 +13,7 @@ final class ByteBufferOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public synchronized void write(byte[] b, int off, int len) throws IOException {
         try {
             buffer.put(b, off, len);
         } catch (Exception e) {
@@ -22,12 +22,12 @@ final class ByteBufferOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
+    public synchronized void write(byte[] b) throws IOException {
         write(b, 0, b.length);
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public synchronized void write(int b) throws IOException {
         try {
             buffer.put((byte) b);
         } catch (Exception e) {
@@ -36,10 +36,6 @@ final class ByteBufferOutputStream extends OutputStream {
     }
 
     @Override
-    public void flush() throws IOException {
-    }
-
-    @Override
-    public void close() throws IOException {
+    public void flush() {
     }
 }

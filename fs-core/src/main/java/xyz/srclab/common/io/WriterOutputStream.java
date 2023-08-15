@@ -40,40 +40,52 @@ final class WriterOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
-        int offset = off;
-        int remaining = len;
-        while (remaining > 0) {
-            int writeSize = Math.min(remaining, inBuffer.remaining());
-            inBuffer.put(b, offset, writeSize);
-            encodeBuffer(false);
-            remaining -= writeSize;
-            offset += writeSize;
+    public synchronized void write(byte[] b, int off, int len) throws IOException {
+        try {
+            FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            int offset = off;
+            int remaining = len;
+            while (remaining > 0) {
+                int writeSize = Math.min(remaining, inBuffer.remaining());
+                inBuffer.put(b, offset, writeSize);
+                encodeBuffer(false);
+                remaining -= writeSize;
+                offset += writeSize;
+            }
+        } catch (Exception e) {
+            throw new IOException(e);
         }
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
+    public synchronized void write(byte[] b) throws IOException {
         write(b, 0, b.length);
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public synchronized void write(int b) throws IOException {
         write(new byte[]{(byte) b}, 0, 1);
     }
 
     @Override
-    public void flush() throws IOException {
-        flushOutput();
-        writer.flush();
+    public synchronized void flush() throws IOException {
+        try {
+            flushOutput();
+            writer.flush();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
-    public void close() throws IOException {
-        encodeBuffer(true);
-        flushOutput();
-        writer.close();
+    public synchronized void close() throws IOException {
+        try {
+            encodeBuffer(true);
+            flushOutput();
+            writer.close();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     private void encodeBuffer(boolean endOfInput) throws IOException {

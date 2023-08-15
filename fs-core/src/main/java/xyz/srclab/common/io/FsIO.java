@@ -1,6 +1,5 @@
 package xyz.srclab.common.io;
 
-import org.apache.commons.io.output.WriterOutputStream;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsString;
 
@@ -394,7 +393,7 @@ public class FsIO {
     }
 
     /**
-     * Wraps given input stream as a reader.
+     * Wraps given input stream as a reader with {@link InputStreamReader}.
      *
      * @param inputStream given input stream
      * @param charset     charset of return reader
@@ -404,7 +403,7 @@ public class FsIO {
     }
 
     /**
-     * Wraps given buffer as a reader.
+     * Wraps given buffer as a reader, supports mark/reset.
      *
      * @param buffer given buffer
      */
@@ -413,7 +412,7 @@ public class FsIO {
     }
 
     /**
-     * Wraps given reader as an input stream.
+     * Wraps given reader as an input stream, doesn't support mark/reset.
      *
      * @param reader  given reader
      * @param charset charset of given reader
@@ -423,7 +422,7 @@ public class FsIO {
     }
 
     /**
-     * Wraps given buffer as an input stream.
+     * Wraps given buffer as an input stream, supports mark/reset.
      *
      * @param buffer given buffer
      */
@@ -432,15 +431,16 @@ public class FsIO {
     }
 
     /**
-     * Wraps given random access file as an input stream.
+     * Wraps given random access file as an input stream, supports mark/reset.
      * <p>
      * Note this method will seek position of random access file to given offset immediately.
      *
      * @param random given random access file
      * @param offset offset of random access file
+     * @param length max readable bytes count
      */
-    public static InputStream toInputStream(RandomAccessFile random, long offset) {
-        return new RandomInputStream(random, offset);
+    public static InputStream toInputStream(RandomAccessFile random, long offset, long length) {
+        return new RandomInputStream(random, offset, length);
     }
 
     /**
@@ -488,8 +488,9 @@ public class FsIO {
      *
      * @param random given random access file
      * @param offset offset of random access file
+     * @param length max readable bytes count
      */
-    public static OutputStream toOutputStream(RandomAccessFile random, long offset) {
-        return new RandomOutputStream(random, offset);
+    public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) {
+        return new RandomOutputStream(random, offset, length);
     }
 }

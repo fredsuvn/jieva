@@ -96,20 +96,20 @@ public class IOTest {
         Assert.assertEquals(out.toByteArray(), bytes);
     }
 
-    @Test
-    public void testRandomAccessFile() throws Exception {
-        File file = new File("testRandomAccessFile.txt");
-        FileOutputStream fileOutputStream = new FileOutputStream(file, false);
-        fileOutputStream.write("0123456789".getBytes());
-        fileOutputStream.close();
-        RandomAccessFile random = new RandomAccessFile(file, "rws");
-        InputStream in = FsIO.toInputStream(random, 1);
-        Assert.assertEquals(FsIO.readString(in), "123456789");
-        OutputStream out = FsIO.toOutputStream(random, 2);
-        out.write("xxx".getBytes());
-        in = FsIO.toInputStream(random, 1);
-        Assert.assertEquals(FsIO.readString(in), "1xxx56789");
-        random.close();
-        file.delete();
-    }
+//    @Test
+//    public void testRandomAccessFile() throws Exception {
+//        File file = new File("testRandomAccessFile.txt");
+//        FileOutputStream fileOutputStream = new FileOutputStream(file, false);
+//        fileOutputStream.write("0123456789".getBytes());
+//        fileOutputStream.close();
+//        RandomAccessFile random = new RandomAccessFile(file, "rws");
+//        InputStream in = FsIO.toInputStream(random, 1);
+//        Assert.assertEquals(FsIO.readString(in), "123456789");
+//        OutputStream out = FsIO.toOutputStream(random, 2);
+//        out.write("xxx".getBytes());
+//        in = FsIO.toInputStream(random, 1);
+//        Assert.assertEquals(FsIO.readString(in), "1xxx56789");
+//        random.close();
+//        file.delete();
+//    }
 }

@@ -15,17 +15,17 @@ final class ByteBufferInputStream extends InputStream {
     }
 
     @Override
-    public int read(byte[] array, int off, int len) throws IOException {
-        FsCheck.checkRangeInBounds(off, off + len, 0, array.length);
-        if (len == 0) {
-            return 0;
-        }
+    public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
+            FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            if (len == 0) {
+                return 0;
+            }
             int actualLength = Math.min(buffer.remaining(), len);
             if (actualLength <= 0) {
                 return -1;
             }
-            buffer.get(array, off, actualLength);
+            buffer.get(b, off, actualLength);
             return actualLength;
         } catch (Exception e) {
             throw new IOException(e);
@@ -33,12 +33,12 @@ final class ByteBufferInputStream extends InputStream {
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
+    public synchronized int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
     @Override
-    public int read() throws IOException {
+    public synchronized int read() throws IOException {
         try {
             if (buffer.remaining() <= 0) {
                 return -1;
@@ -50,37 +50,45 @@ final class ByteBufferInputStream extends InputStream {
     }
 
     @Override
-    public long skip(long n) throws IOException {
-        FsCheck.checkArgument(n>=0, "Skip number must > 0");
-        if (n <= buffer.remaining()) {
-            buffer.position((int) (buffer.position() + n));
-            return n;
+    public synchronized long skip(long n) throws IOException {
+        try {
+            int remaining = buffer.remaining();
+            if (remaining <= 0) {
+                return 0;
+            }
+            if (n >= remaining) {
+                buffer.position(buffer.limit());
+                return remaining;
+            }
+            long k = buffer.position() + n;
+            buffer.position((int) k);
+            return k;
+        } catch (Exception e) {
+            throw new IOException(e);
         }
-
-        return super.skip(n);
     }
 
     @Override
-    public int available() throws IOException {
-        return super.available();
+    public synchronized int available() {
+        return buffer.remaining();
     }
 
     @Override
     public synchronized void mark(int readlimit) {
-        super.mark(readlimit);
+        buffer.mark();
     }
 
     @Override
     public synchronized void reset() throws IOException {
-        super.reset();
+        try {
+            buffer.reset();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public boolean markSupported() {
         return true;
-    }
-
-    @Override
-    public void close() throws IOException {
     }
 }
