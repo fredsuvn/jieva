@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
- * Cache interface and static methods.
+ * Input/Output utilities.
  *
  * @author fresduvn
  */
@@ -456,21 +456,7 @@ public class FsIO {
      * @param random given random access file
      */
     public static InputStream toInputStream(RandomAccessFile random) {
-        return toInputStream(random, 0);
-    }
-
-    /**
-     * Wraps given random access file as an input stream,
-     * readable bytes from {@code offset} position to end of the file,
-     * supports mark/reset.
-     * <p>
-     * Note this method will seek position of random access file to given offset immediately.
-     *
-     * @param random given random access file
-     * @param offset offset position to start read
-     */
-    public static InputStream toInputStream(RandomAccessFile random, long offset) {
-        return toInputStream(random, offset, -1);
+        return toInputStream(random, 0, -1);
     }
 
     /**
@@ -490,7 +476,7 @@ public class FsIO {
     }
 
     /**
-     * Wraps given output stream as a writer with {@link FsString#CHARSET}.
+     * Wraps given output stream as a writer with {@link OutputStreamWriter} and {@link FsString#CHARSET}.
      *
      * @param outputStream given out stream
      */
@@ -499,7 +485,7 @@ public class FsIO {
     }
 
     /**
-     * Wraps given output stream as a writer.
+     * Wraps given output stream as a writer with {@link OutputStreamWriter}.
      *
      * @param outputStream given out stream
      * @param charset      charset writer
@@ -553,19 +539,7 @@ public class FsIO {
      * @param random given random access file
      */
     public static OutputStream toOutputStream(RandomAccessFile random) {
-        return toOutputStream(random, 0);
-    }
-
-    /**
-     * Wraps given random access file as an output stream, written bytes from {@code offset} position to unlimited.
-     * <p>
-     * Note this method will seek position of random access file to given offset immediately.
-     *
-     * @param random given random access file
-     * @param offset offset position to start write
-     */
-    public static OutputStream toOutputStream(RandomAccessFile random, long offset) {
-        return toOutputStream(random, offset, -1);
+        return toOutputStream(random, 0, -1);
     }
 
     /**

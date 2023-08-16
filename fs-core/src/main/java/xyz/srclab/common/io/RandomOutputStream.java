@@ -14,9 +14,13 @@ final class RandomOutputStream extends OutputStream {
 
     RandomOutputStream(RandomAccessFile random, long offset, long length) {
         try {
-            FsCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
+            if (length != -1) {
+                FsCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
+                this.limit = offset + length;
+            } else {
+                this.limit = length;
+            }
             this.random = random;
-            this.limit = offset + length;
             this.pos = offset;
             this.random.seek(pos);
         } catch (IOException e) {
@@ -28,7 +32,9 @@ final class RandomOutputStream extends OutputStream {
     public synchronized void write(byte[] b, int off, int len) throws IOException {
         try {
             FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
-            FsCheck.checkInBounds(pos + len - 1, pos, limit);
+            if (limit != -1) {
+                FsCheck.checkInBounds(pos + len - 1, pos, limit);
+            }
             random.write(b, off, len);
         } catch (IOException e) {
             throw e;
@@ -45,7 +51,9 @@ final class RandomOutputStream extends OutputStream {
     @Override
     public synchronized void write(int b) throws IOException {
         try {
-            FsCheck.checkInBounds(pos, pos, limit);
+            if (limit != -1) {
+                FsCheck.checkInBounds(pos, pos, limit);
+            }
             random.write(b);
         } catch (IOException e) {
             throw e;
@@ -55,7 +63,8 @@ final class RandomOutputStream extends OutputStream {
     }
 
     @Override
-    public void flush() {
+    public void flush() throws IOException {
+        random.getChannel().force(true);
     }
 
     @Override

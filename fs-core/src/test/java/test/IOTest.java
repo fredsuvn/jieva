@@ -71,6 +71,14 @@ public class IOTest {
         testOutStream(data, FsIO.toOutputStream(buffer), (off, len) -> Arrays.copyOfRange(bytes, off, off + len));
         StringBuilder sb = new StringBuilder();
         testOutStream(data, FsIO.toOutputStream(sb), (off, len) -> Arrays.copyOfRange(sb.toString().getBytes(FsString.CHARSET), off, off + len));
+        // testOutStream(data, FsIO.toOutputStream(random), (off, len) -> {
+        //
+        // });
+        // testOutStream(data, FsIO.toOutputStream(random, 2, 66), (off, len) -> Arrays.copyOfRange(bytes, off, off + len));
+        testWriter(data, FsIO.toWriter(CharBuffer.wrap(chars)), (off, len) -> Arrays.copyOfRange(chars, off, off + len));
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024);
+        testWriter(data, FsIO.toWriter(outputStream), (off, len) ->
+            new String(outputStream.toByteArray(), FsString.CHARSET).substring(off, off + len).toCharArray());
         random.close();
         file.delete();
     }
@@ -134,24 +142,30 @@ public class IOTest {
     ) throws IOException {
         byte[] bytes = data.getBytes(FsString.CHARSET);
         outputStream.write(bytes, 0, 66);
+        outputStream.flush();
         Assert.assertEquals(dest.apply(0, 66), Arrays.copyOfRange(bytes, 0, 66));
         outputStream.write(22);
+        outputStream.flush();
         Assert.assertEquals(dest.apply(66, 1), new byte[]{22});
         outputStream.write(bytes, 0, bytes.length);
+        outputStream.flush();
         Assert.assertEquals(dest.apply(67, bytes.length), Arrays.copyOfRange(bytes, 0, bytes.length));
     }
 
     private void testWriter(
-        String data, int offset,
+        String data,
         Writer writer, BiFunction<Integer, Integer, char[]> dest
     ) throws IOException {
         char[] chars = data.toCharArray();
-        writer.write(chars, offset, 66);
-        Assert.assertEquals(dest.apply(offset, 66), Arrays.copyOfRange(chars, offset, 66 + offset));
+        writer.write(chars, 0, 66);
+        writer.flush();
+        Assert.assertEquals(dest.apply(0, 66), Arrays.copyOfRange(chars, 0, 66));
         writer.write(22);
-        Assert.assertEquals(dest.apply(0, 1), new char[]{22});
-        writer.write(chars, offset, chars.length - offset);
-        Assert.assertEquals(dest.apply(offset, chars.length - offset), Arrays.copyOfRange(chars, offset, chars.length));
+        writer.flush();
+        Assert.assertEquals(dest.apply(66, 1), new char[]{22});
+        writer.write(chars, 0, chars.length);
+        writer.flush();
+        Assert.assertEquals(dest.apply(67, chars.length), Arrays.copyOfRange(chars, 0, chars.length));
     }
 
     @Test
