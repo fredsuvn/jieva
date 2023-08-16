@@ -1,12 +1,13 @@
 package xyz.srclab.common.base;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
 /**
- * Random to obtain specified value of type {@link T} in given rules. Using {@link Builder} to build.
+ * Random to obtain value of type {@link T} in given rules. Using {@link Builder} to build.
  *
  * @author fredsuvn
  */
@@ -20,9 +21,22 @@ public interface FsRandom<T> {
     }
 
     /**
-     * Returns specified value in given rules.
+     * Returns next random value in given rules.
      */
     T next();
+
+    /**
+     * Returns next {@code length} random values in given rules.
+     *
+     * @param length number of next random values
+     */
+    default List<T> nextList(int length) {
+        ArrayList<T> result = new ArrayList<>(length);
+        for (int i = 0; i < length; i++) {
+            result.add(next());
+        }
+        return result;
+    }
 
     /**
      * Builder to create {@link FsRandom}.

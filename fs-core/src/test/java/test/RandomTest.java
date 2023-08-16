@@ -8,7 +8,7 @@ import xyz.srclab.common.base.FsRandom;
 public class RandomTest {
 
     @Test
-    public void testRandomSupplier() {
+    public void testRandom() {
         FsRandom<String> fsRandom = FsRandom.newBuilder()
             .score(20, "A")
             .score(20, "B")
@@ -30,5 +30,9 @@ public class RandomTest {
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
         FsLogger.system().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
+
+        String randomStr = String.join("", fsRandom.nextList(100));
+        FsLogger.system().info("randomStr: ", randomStr);
+        Assert.assertEquals(randomStr.length(), 100);
     }
 }
