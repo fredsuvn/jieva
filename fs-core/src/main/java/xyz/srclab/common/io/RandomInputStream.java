@@ -15,9 +15,13 @@ final class RandomInputStream extends InputStream {
 
     RandomInputStream(RandomAccessFile random, long offset, long length) {
         try {
-            FsCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
+            if (length != -1) {
+                FsCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
+                this.limit = offset + length;
+            } else {
+                this.limit = length;
+            }
             this.random = random;
-            this.limit = offset + length;
             this.pos = offset;
             this.random.seek(pos);
         } catch (IOException e) {
@@ -29,12 +33,16 @@ final class RandomInputStream extends InputStream {
     public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
             FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
-            if (pos >= limit) {
+            if (limit != -1 && pos >= limit) {
                 return -1;
             }
             int result = random.read(b, off, len);
             if (result == -1) {
-                pos = limit;
+                if (limit != -1) {
+                    pos = limit;
+                } else {
+                    return -1;
+                }
             } else {
                 pos += result;
             }
@@ -54,12 +62,16 @@ final class RandomInputStream extends InputStream {
     @Override
     public synchronized int read() throws IOException {
         try {
-            if (pos >= limit) {
+            if (limit != -1 && pos >= limit) {
                 return -1;
             }
             int result = random.read();
             if (result == -1) {
-                pos = limit;
+                if (limit != -1) {
+                    pos = limit;
+                } else {
+                    return -1;
+                }
             } else {
                 pos++;
             }
@@ -77,12 +89,16 @@ final class RandomInputStream extends InputStream {
     }
 
     @Override
-    public synchronized int available() {
-        long remainder = limit - pos;
-        if (remainder > Integer.MIN_VALUE) {
-            return Integer.MIN_VALUE;
+    public synchronized int available() throws IOException {
+        long remainder = (limit == -1 ? random.length() - pos : limit - pos);
+        if (remainder > Integer.MAX_VALUE) {
+            return Integer.MAX_VALUE;
         }
-        return (int) remainder;
+        if (remainder <= 0L) {
+            return 0;
+        } else {
+            return (int) remainder;
+        }
     }
 
     @Override

@@ -63,7 +63,7 @@ final class ReaderInputStream extends InputStream {
         try {
             while (true) {
                 if (outBuffer.hasRemaining()) {
-                    return outBuffer.get() & 0xFF;
+                    return outBuffer.get() & 0x000000FF;
                 }
                 fillBuffer();
                 if (endOfInput && !outBuffer.hasRemaining()) {

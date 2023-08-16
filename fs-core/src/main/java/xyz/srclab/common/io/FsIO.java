@@ -393,6 +393,15 @@ public class FsIO {
     }
 
     /**
+     * Wraps given input stream as a reader with {@link InputStreamReader} and {@link FsString#CHARSET}.
+     *
+     * @param inputStream given input stream
+     */
+    public static Reader toReader(InputStream inputStream) {
+        return toReader(inputStream, FsString.CHARSET);
+    }
+
+    /**
      * Wraps given input stream as a reader with {@link InputStreamReader}.
      *
      * @param inputStream given input stream
@@ -409,6 +418,15 @@ public class FsIO {
      */
     public static Reader toReader(CharBuffer buffer) {
         return new CharBufferReader(buffer);
+    }
+
+    /**
+     * Wraps given reader as an input stream with {@link FsString#CHARSET}, doesn't support mark/reset.
+     *
+     * @param reader given reader
+     */
+    public static InputStream toInputStream(Reader reader) {
+        return toInputStream(reader, FsString.CHARSET);
     }
 
     /**
@@ -436,11 +454,48 @@ public class FsIO {
      * Note this method will seek position of random access file to given offset immediately.
      *
      * @param random given random access file
-     * @param offset offset of random access file
-     * @param length max readable bytes count
+     */
+    public static InputStream toInputStream(RandomAccessFile random) {
+        return toInputStream(random, 0);
+    }
+
+    /**
+     * Wraps given random access file as an input stream,
+     * readable bytes from {@code offset} position to end of the file,
+     * supports mark/reset.
+     * <p>
+     * Note this method will seek position of random access file to given offset immediately.
+     *
+     * @param random given random access file
+     * @param offset offset position to start read
+     */
+    public static InputStream toInputStream(RandomAccessFile random, long offset) {
+        return toInputStream(random, offset, -1);
+    }
+
+    /**
+     * Wraps given random access file as an input stream,
+     * readable bytes from {@code offset} position to {@code (offset + length)},
+     * supports mark/reset.
+     * {@code length} can be set to -1 if to read to end of the file.
+     * <p>
+     * Note this method will seek position of random access file to given offset immediately.
+     *
+     * @param random given random access file
+     * @param offset offset position to start read
+     * @param length length of readable bytes, or -1 to read to end of file
      */
     public static InputStream toInputStream(RandomAccessFile random, long offset, long length) {
         return new RandomInputStream(random, offset, length);
+    }
+
+    /**
+     * Wraps given output stream as a writer with {@link FsString#CHARSET}.
+     *
+     * @param outputStream given out stream
+     */
+    public static Writer toWriter(OutputStream outputStream) {
+        return toWriter(outputStream, FsString.CHARSET);
     }
 
     /**
@@ -463,13 +518,22 @@ public class FsIO {
     }
 
     /**
-     * Wraps given writer as an output stream.
+     * Wraps given appendable as an output stream with {@link FsString#CHARSET}.
      *
-     * @param writer  given writer
-     * @param charset charset of writer
+     * @param appendable given appendable
      */
-    public static OutputStream toOutputStream(Writer writer, Charset charset) {
-        return new WriterOutputStream(writer, charset);
+    public static OutputStream toOutputStream(Appendable appendable) {
+        return toOutputStream(appendable, FsString.CHARSET);
+    }
+
+    /**
+     * Wraps given appendable as an output stream.
+     *
+     * @param appendable given appendable
+     * @param charset    charset of writer
+     */
+    public static OutputStream toOutputStream(Appendable appendable, Charset charset) {
+        return new AppendableOutputStream(appendable, charset);
     }
 
     /**
@@ -487,8 +551,33 @@ public class FsIO {
      * Note this method will seek position of random access file to given offset immediately.
      *
      * @param random given random access file
-     * @param offset offset of random access file
-     * @param length max readable bytes count
+     */
+    public static OutputStream toOutputStream(RandomAccessFile random) {
+        return toOutputStream(random, 0);
+    }
+
+    /**
+     * Wraps given random access file as an output stream, written bytes from {@code offset} position to unlimited.
+     * <p>
+     * Note this method will seek position of random access file to given offset immediately.
+     *
+     * @param random given random access file
+     * @param offset offset position to start write
+     */
+    public static OutputStream toOutputStream(RandomAccessFile random, long offset) {
+        return toOutputStream(random, offset, -1);
+    }
+
+    /**
+     * Wraps given random access file as an output stream,
+     * written bytes from {@code offset} position to {@code (offset + length)}.
+     * {@code length} can be set to -1 if to write unlimitedly.
+     * <p>
+     * Note this method will seek position of random access file to given offset immediately.
+     *
+     * @param random given random access file
+     * @param offset offset position to start write
+     * @param length length of written bytes, or -1 to write unlimitedly
      */
     public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) {
         return new RandomOutputStream(random, offset, length);

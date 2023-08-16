@@ -43,7 +43,7 @@ final class ByteBufferInputStream extends InputStream {
             if (buffer.remaining() <= 0) {
                 return -1;
             }
-            return buffer.get() & 0xFF;
+            return buffer.get() & 0x000000FF;
         } catch (Exception e) {
             throw new IOException(e);
         }

@@ -12,21 +12,21 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
-final class WriterOutputStream extends OutputStream {
+final class AppendableOutputStream extends OutputStream {
 
-    private final Writer writer;
+    private final Appendable appendable;
     private final CharsetDecoder decoder;
     private final ByteBuffer inBuffer = ByteBuffer.allocate(128);
     private final CharBuffer outBuffer;
 
-    private WriterOutputStream(Writer writer, CharsetDecoder decoder, int bufferSize) {
-        this.writer = writer;
+    private AppendableOutputStream(Appendable appendable, CharsetDecoder decoder, int bufferSize) {
+        this.appendable = appendable;
         this.decoder = decoder;
         outBuffer = CharBuffer.allocate(bufferSize);
     }
 
-    private WriterOutputStream(Writer writer, Charset charset, int bufferSize) {
-        this(writer,
+    private AppendableOutputStream(Appendable appendable, Charset charset, int bufferSize) {
+        this(appendable,
             charset.newDecoder()
                 .onMalformedInput(CodingErrorAction.REPLACE)
                 .onUnmappableCharacter(CodingErrorAction.REPLACE)
@@ -35,8 +35,8 @@ final class WriterOutputStream extends OutputStream {
         );
     }
 
-    WriterOutputStream(Writer writer, Charset charset) {
-        this(writer, charset, FsIO.IO_BUFFER_SIZE);
+    AppendableOutputStream(Appendable appendable, Charset charset) {
+        this(appendable, charset, FsIO.IO_BUFFER_SIZE);
     }
 
     @Override
@@ -71,7 +71,9 @@ final class WriterOutputStream extends OutputStream {
     public synchronized void flush() throws IOException {
         try {
             flushOutput();
-            writer.flush();
+            if (appendable instanceof Writer) {
+                ((Writer) appendable).flush();
+            }
         } catch (Exception e) {
             throw new IOException(e);
         }
@@ -82,7 +84,9 @@ final class WriterOutputStream extends OutputStream {
         try {
             encodeBuffer(true);
             flushOutput();
-            writer.close();
+            if (appendable instanceof Writer) {
+                ((Writer) appendable).close();
+            }
         } catch (Exception e) {
             throw new IOException(e);
         }
@@ -106,7 +110,11 @@ final class WriterOutputStream extends OutputStream {
 
     private void flushOutput() throws IOException {
         if (outBuffer.position() > 0) {
-            writer.write(outBuffer.array(), 0, outBuffer.position());
+            if (appendable instanceof Writer) {
+                ((Writer) appendable).write(outBuffer.array(), 0, outBuffer.position());
+            } else {
+                appendable.append(new String(outBuffer.array(), 0, outBuffer.position()));
+            }
             outBuffer.rewind();
         }
     }
