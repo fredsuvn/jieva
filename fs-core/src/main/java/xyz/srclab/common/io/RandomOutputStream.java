@@ -36,6 +36,7 @@ final class RandomOutputStream extends OutputStream {
                 FsCheck.checkInBounds(pos + len - 1, pos, limit);
             }
             random.write(b, off, len);
+            pos += len;
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -55,6 +56,7 @@ final class RandomOutputStream extends OutputStream {
                 FsCheck.checkInBounds(pos, pos, limit);
             }
             random.write(b);
+            pos += 1;
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {

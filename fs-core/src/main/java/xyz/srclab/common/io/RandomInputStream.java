@@ -33,10 +33,16 @@ final class RandomInputStream extends InputStream {
     public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
             FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
-            if (limit != -1 && pos >= limit) {
-                return -1;
+            int result;
+            if (limit == -1) {
+                result = random.read(b, off, len);
+            } else {
+                if (pos >= limit) {
+                    return -1;
+                }
+                long remainder = limit - pos;
+                result = random.read(b, off, (int) Math.min(len, remainder));
             }
-            int result = random.read(b, off, len);
             if (result == -1) {
                 if (limit != -1) {
                     pos = limit;
@@ -62,10 +68,13 @@ final class RandomInputStream extends InputStream {
     @Override
     public synchronized int read() throws IOException {
         try {
-            if (limit != -1 && pos >= limit) {
-                return -1;
+            int result;
+            if (limit != -1) {
+                if (pos >= limit) {
+                    return -1;
+                }
             }
-            int result = random.read();
+            result = random.read();
             if (result == -1) {
                 if (limit != -1) {
                     pos = limit;

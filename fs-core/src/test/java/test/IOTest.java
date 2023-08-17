@@ -3,6 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsString;
+import xyz.srclab.common.io.FsFile;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.*;
@@ -51,40 +52,45 @@ public class IOTest {
     @Test
     public void testWrapper() throws IOException {
         String data = DATA;
-        File file = new File("IOTest.txt");
+        byte[] dataBytes = data.getBytes(FsString.CHARSET);
+        File file = new File("IOTest-testWrapper.txt");
         FileOutputStream fileOutputStream = new FileOutputStream(file, false);
         fileOutputStream.write(DATA.getBytes(FsString.CHARSET));
         fileOutputStream.close();
         RandomAccessFile random = new RandomAccessFile(file, "rws");
 
-        testInputStream(data, 0, new ByteArrayInputStream(data.getBytes(FsString.CHARSET)), true);
-        testInputStream(data, 0, FsIO.toInputStream(ByteBuffer.wrap(data.getBytes(FsString.CHARSET))), true);
-        testInputStream(data, 0, FsIO.toInputStream(new StringReader(DATA)), false);
-        testInputStream(data, 0, FsIO.toInputStream(random), true);
-        testInputStream(data, 2, FsIO.toInputStream(random, 2, 66), true);
-        testReader(data, FsIO.toReader(CharBuffer.wrap(DATA)), true);
-        testReader(data, FsIO.toReader(new ByteArrayInputStream(DATA.getBytes(FsString.CHARSET))), false);
+        testInputStream(data, 3, 100, new ByteArrayInputStream(data.getBytes(FsString.CHARSET), 3, 100), true);
+        testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(ByteBuffer.wrap(data.getBytes(FsString.CHARSET))), true);
+        testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(new StringReader(DATA)), false);
+        testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(random), true);
+        testInputStream(data, 2, 66, FsIO.toInputStream(random, 2, 66), true);
+        testReader(data, 5, 55, new StringReader(data.substring(5, 5 + 55)), true);
+        testReader(data, 0, data.length(), FsIO.toReader(CharBuffer.wrap(DATA)), true);
+        testReader(data, 0, data.length(), FsIO.toReader(new ByteArrayInputStream(DATA.getBytes(FsString.CHARSET))), false);
 
         byte[] bytes = new byte[1024];
         char[] chars = new char[1024];
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        testOutStream(data, FsIO.toOutputStream(buffer), (off, len) -> Arrays.copyOfRange(bytes, off, off + len));
         StringBuilder sb = new StringBuilder();
-        testOutStream(data, FsIO.toOutputStream(sb), (off, len) -> Arrays.copyOfRange(sb.toString().getBytes(FsString.CHARSET), off, off + len));
-        // testOutStream(data, FsIO.toOutputStream(random), (off, len) -> {
-        //
-        // });
-        // testOutStream(data, FsIO.toOutputStream(random, 2, 66), (off, len) -> Arrays.copyOfRange(bytes, off, off + len));
-        testWriter(data, FsIO.toWriter(CharBuffer.wrap(chars)), (off, len) -> Arrays.copyOfRange(chars, off, off + len));
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024);
-        testWriter(data, FsIO.toWriter(outputStream), (off, len) ->
+        testOutStream(bytes.length, FsIO.toOutputStream(buffer), (off, len) ->
+            Arrays.copyOfRange(bytes, off, off + len));
+        testOutStream(-1, FsIO.toOutputStream(sb), (off, len) ->
+            Arrays.copyOfRange(sb.toString().getBytes(FsString.CHARSET), off, off + len));
+        testOutStream(-1, FsIO.toOutputStream(random), (off, len) ->
+            FsFile.readBytes(file.toPath(), off, len));
+        testOutStream(88, FsIO.toOutputStream(random, 8, 88), (off, len) ->
+            FsFile.readBytes(file.toPath(), off + 8, len));
+        testWriter(FsIO.toWriter(CharBuffer.wrap(chars)), (off, len) ->
+            Arrays.copyOfRange(chars, off, off + len));
+        testWriter(FsIO.toWriter(outputStream), (off, len) ->
             new String(outputStream.toByteArray(), FsString.CHARSET).substring(off, off + len).toCharArray());
         random.close();
         file.delete();
     }
 
     private void testInputStream(
-        String data, int offset,
+        String data, int offset, int length,
         InputStream inputStream,
         boolean testMark
     ) throws IOException {
@@ -92,7 +98,8 @@ public class IOTest {
         if (testMark) {
             Assert.assertTrue(inputStream.markSupported());
             long available = inputStream.available();
-            inputStream.mark(Integer.MIN_VALUE);
+            Assert.assertEquals(available, length);
+            inputStream.mark(length);
             byte[] readBytes = FsIO.readBytes(inputStream, 6);
             Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, offset, 6 + offset));
             Assert.assertEquals(inputStream.available(), available - 6);
@@ -102,7 +109,7 @@ public class IOTest {
             Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, offset, 6 + offset));
             Assert.assertEquals(inputStream.available(), available - 6);
             readBytes = FsIO.readBytes(inputStream);
-            Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, 6 + offset, bytes.length));
+            Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, 6 + offset, offset + length));
             Assert.assertEquals(inputStream.available(), 0);
             Assert.assertEquals(inputStream.read(), -1);
             Assert.assertEquals(inputStream.available(), 0);
@@ -110,53 +117,54 @@ public class IOTest {
         }
         Assert.assertEquals(inputStream.read(), bytes[offset] & 0x000000ff);
         Assert.assertEquals(FsIO.readBytes(inputStream, 12), Arrays.copyOfRange(bytes, 1 + offset, 13 + offset));
-        Assert.assertEquals(FsIO.readBytes(inputStream), Arrays.copyOfRange(bytes, 13 + offset, bytes.length));
+        Assert.assertEquals(FsIO.readBytes(inputStream), Arrays.copyOfRange(bytes, 13 + offset, offset + length));
     }
 
     private void testReader(
-        String data,
+        String data, int offset, int length,
         Reader reader,
         boolean testMark
     ) throws IOException {
         if (testMark) {
             Assert.assertTrue(reader.markSupported());
-            reader.mark(Integer.MIN_VALUE);
+            reader.mark(length);
             String readString = FsIO.readString(reader, 6);
-            Assert.assertEquals(readString, data.substring(0, 6));
+            Assert.assertEquals(readString, data.substring(offset, 6 + offset));
             reader.reset();
             readString = FsIO.readString(reader, 6);
-            Assert.assertEquals(readString, data.substring(0, 6));
+            Assert.assertEquals(readString, data.substring(offset, 6 + offset));
             readString = FsIO.readString(reader);
-            Assert.assertEquals(readString, data.substring(6));
+            Assert.assertEquals(readString, data.substring(6 + offset, offset + length));
             Assert.assertEquals(reader.read(), -1);
             reader.reset();
         }
-        Assert.assertEquals(reader.read(), data.charAt(0));
-        Assert.assertEquals(FsIO.readString(reader, 12), data.substring(1, 13));
-        Assert.assertEquals(FsIO.readString(reader), data.substring(13));
+        Assert.assertEquals(reader.read(), data.charAt(offset));
+        Assert.assertEquals(FsIO.readString(reader, 12), data.substring(1 + offset, 13 + offset));
+        Assert.assertEquals(FsIO.readString(reader), data.substring(13 + offset, offset + length));
     }
 
     private void testOutStream(
-        String data,
-        OutputStream outputStream, BiFunction<Integer, Integer, byte[]> dest
-    ) throws IOException {
-        byte[] bytes = data.getBytes(FsString.CHARSET);
+        long length, OutputStream outputStream, BiFunction<Integer, Integer, byte[]> dest) throws IOException {
+        byte[] bytes = length > 0 ? buildBytes((int) length) : buildBytes(1024);
+        long remainder = length > 0 ? length : 1024;
         outputStream.write(bytes, 0, 66);
         outputStream.flush();
         Assert.assertEquals(dest.apply(0, 66), Arrays.copyOfRange(bytes, 0, 66));
+        remainder -= 66;
         outputStream.write(22);
         outputStream.flush();
         Assert.assertEquals(dest.apply(66, 1), new byte[]{22});
-        outputStream.write(bytes, 0, bytes.length);
+        remainder -= 1;
+        outputStream.write(bytes, 0, (int) remainder);
         outputStream.flush();
-        Assert.assertEquals(dest.apply(67, bytes.length), Arrays.copyOfRange(bytes, 0, bytes.length));
+        Assert.assertEquals(dest.apply(67, (int) remainder), Arrays.copyOfRange(bytes, 0, (int) remainder));
+        if (length > 0) {
+            Assert.expectThrows(IOException.class, () -> outputStream.write(bytes, 0, bytes.length));
+        }
     }
 
-    private void testWriter(
-        String data,
-        Writer writer, BiFunction<Integer, Integer, char[]> dest
-    ) throws IOException {
-        char[] chars = data.toCharArray();
+    private void testWriter(Writer writer, BiFunction<Integer, Integer, char[]> dest) throws IOException {
+        char[] chars = DATA.toCharArray();
         writer.write(chars, 0, 66);
         writer.flush();
         Assert.assertEquals(dest.apply(0, 66), Arrays.copyOfRange(chars, 0, 66));
@@ -214,5 +222,14 @@ public class IOTest {
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes2);
         FsIO.toOutputStream(byteBuffer).write(bytes);
         Assert.assertEquals(bytes2, bytes);
+    }
+
+    private byte[] buildBytes(int size) {
+        long now = System.currentTimeMillis();
+        byte[] bytes = new byte[size];
+        for (int i = 0; i < size; i++) {
+            bytes[i] = (byte) ((now * (i + 888) / 999) % 64);
+        }
+        return bytes;
     }
 }

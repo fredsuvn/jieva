@@ -110,13 +110,29 @@ public class FsIO {
      * @param limit       specified limit number
      */
     public static long readBytesTo(InputStream inputStream, OutputStream dest, int limit) {
+        return readBytesTo(inputStream, dest, limit, IO_BUFFER_SIZE);
+    }
+
+    /**
+     * Reads specified limit number of bytes from given input stream to given dest stream, returns actual read number.
+     * <p>
+     * If the limit number &lt; 0, read all bytes;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading bytes until it reaches the limit or the end of the stream.
+     *
+     * @param inputStream given input stream
+     * @param dest        given dest stream
+     * @param limit       specified limit number
+     * @param bufferSize  buffer size for each reading and writing
+     */
+    public static long readBytesTo(InputStream inputStream, OutputStream dest, int limit, int bufferSize) {
         if (limit == 0) {
             return 0;
         }
         try {
             long readNum = 0;
-            int bufferSize = limit < 0 ? IO_BUFFER_SIZE : Math.min(limit, IO_BUFFER_SIZE);
-            byte[] buffer = new byte[bufferSize];
+            int actualBufferSize = limit < 0 ? bufferSize : Math.min(limit, bufferSize);
+            byte[] buffer = new byte[actualBufferSize];
             while (true) {
                 int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);
                 int readSize = inputStream.read(buffer, 0, readLen);
@@ -126,6 +142,7 @@ public class FsIO {
                 if (readSize > 0) {
                     dest.write(buffer, 0, readSize);
                     readNum += readSize;
+                    dest.flush();
                 }
                 if (limit < 0) {
                     continue;
@@ -291,13 +308,29 @@ public class FsIO {
      * @param limit  specified limit number
      */
     public static long readCharsTo(Reader reader, Appendable dest, int limit) {
+        return readCharsTo(reader, dest, limit, IO_BUFFER_SIZE);
+    }
+
+    /**
+     * Reads specified limit number of chars from given reader to given dest output, returns actual read number.
+     * <p>
+     * If the limit number &lt; 0, read all chars;
+     * els if limit number is 0, no read and return;
+     * else this method will keep reading chars until it reaches the limit or the end of the reader.
+     *
+     * @param reader     given reader
+     * @param dest       given dest stream
+     * @param limit      specified limit number
+     * @param bufferSize buffer size for each reading and writing
+     */
+    public static long readCharsTo(Reader reader, Appendable dest, int limit, int bufferSize) {
         if (limit == 0) {
             return 0;
         }
         try {
             long readNum = 0;
-            int bufferSize = limit < 0 ? IO_BUFFER_SIZE : Math.min(limit, IO_BUFFER_SIZE);
-            char[] buffer = new char[bufferSize];
+            int actualBufferSize = limit < 0 ? bufferSize : Math.min(limit, bufferSize);
+            char[] buffer = new char[actualBufferSize];
             while (true) {
                 int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);
                 int readSize = reader.read(buffer, 0, readLen);
@@ -307,6 +340,9 @@ public class FsIO {
                 if (readSize > 0) {
                     append(dest, buffer, 0, readSize);
                     readNum += readSize;
+                    if (dest instanceof Flushable) {
+                        ((Flushable) dest).flush();
+                    }
                 }
                 if (limit < 0) {
                     continue;
