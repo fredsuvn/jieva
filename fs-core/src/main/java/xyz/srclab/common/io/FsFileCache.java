@@ -1,24 +1,24 @@
-//package xyz.srclab.common.io;
+// package xyz.srclab.common.io;
 //
-//import xyz.srclab.annotations.Nullable;
-//import xyz.srclab.annotations.concurrent.ThreadSafe;
-//import xyz.srclab.common.base.FsCheck;
-//import xyz.srclab.common.cache.FsCache;
+// import xyz.srclab.annotations.Nullable;
+// import xyz.srclab.annotations.concurrent.ThreadSafe;
+// import xyz.srclab.common.base.FsCheck;
+// import xyz.srclab.common.cache.FsCache;
 //
-//import java.io.*;
-//import java.nio.file.Path;
-//import java.util.Map;
-//import java.util.concurrent.ConcurrentHashMap;
-//import java.util.function.Function;
+// import java.io.*;
+// import java.nio.file.Path;
+// import java.util.Map;
+// import java.util.concurrent.ConcurrentHashMap;
+// import java.util.function.Function;
 //
-///**
+// /**
 // * Cache for file, provides methods about IO streams to read/write files between cache and underlying.
 // *
 // * @author fredsuvn
 // * @see Builder
 // */
-//@ThreadSafe
-//public interface FsFileCache {
+// @ThreadSafe
+// public interface FsFileCache {
 //
 //    /**
 //     * Returns an input stream for given file seeks from given offset.
