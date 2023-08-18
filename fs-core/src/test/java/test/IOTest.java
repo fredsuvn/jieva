@@ -29,6 +29,14 @@ public class IOTest {
         Assert.assertEquals(FsIO.readString(new StringReader(str), 11), str.substring(0, 11));
         Assert.assertEquals(FsIO.readString(new ByteArrayInputStream(bytes)), str);
         Assert.assertEquals(FsIO.readString(new ByteArrayInputStream(bytes, 0, 8)), str.substring(0, 8));
+
+        byte[] empty = new byte[0];
+        InputStream emptyInput = new ByteArrayInputStream(empty);
+        Assert.assertNull(FsIO.readBytes(emptyInput));
+        Assert.assertNull(FsIO.availableBytes(emptyInput));
+        Assert.assertNull(FsIO.readString(emptyInput));
+        Assert.assertNull(FsIO.avalaibleString(emptyInput));
+        Assert.assertNull(FsIO.readString(FsIO.toReader(emptyInput)));
     }
 
     @Test
