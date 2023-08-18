@@ -19,7 +19,7 @@ public class FsIO {
     /**
      * Default IO buffer size: 1024.
      */
-    public static final int IO_BUFFER_SIZE = 1024;
+    public static final int IO_BUFFER_SIZE = 1024 * 8;
 
     /**
      * Reads all bytes from given input stream.

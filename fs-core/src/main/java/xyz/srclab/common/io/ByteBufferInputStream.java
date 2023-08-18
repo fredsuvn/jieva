@@ -33,11 +33,6 @@ final class ByteBufferInputStream extends InputStream {
     }
 
     @Override
-    public synchronized int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
-    }
-
-    @Override
     public synchronized int read() throws IOException {
         try {
             if (buffer.remaining() <= 0) {
@@ -52,6 +47,9 @@ final class ByteBufferInputStream extends InputStream {
     @Override
     public synchronized long skip(long n) throws IOException {
         try {
+            if (n <= 0) {
+                return 0;
+            }
             int remaining = buffer.remaining();
             if (remaining <= 0) {
                 return 0;
@@ -62,7 +60,7 @@ final class ByteBufferInputStream extends InputStream {
             }
             long k = buffer.position() + n;
             buffer.position((int) k);
-            return k;
+            return n;
         } catch (Exception e) {
             throw new IOException(e);
         }

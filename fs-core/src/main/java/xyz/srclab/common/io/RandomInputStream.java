@@ -61,11 +61,6 @@ final class RandomInputStream extends InputStream {
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
-    }
-
-    @Override
     public synchronized int read() throws IOException {
         try {
             int result;
@@ -94,7 +89,24 @@ final class RandomInputStream extends InputStream {
 
     @Override
     public synchronized long skip(long n) throws IOException {
-        return super.skip(n);
+        try {
+            if (n <= 0) {
+                return 0;
+            }
+            if (limit == -1) {
+                random.seek(pos + n);
+                pos += n;
+                return n;
+            }
+            long result = Math.min(n, limit - pos);
+            random.seek(pos + result);
+            pos += result;
+            return result;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     @Override

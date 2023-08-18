@@ -22,11 +22,6 @@ final class ByteBufferOutputStream extends OutputStream {
     }
 
     @Override
-    public synchronized void write(byte[] b) throws IOException {
-        write(b, 0, b.length);
-    }
-
-    @Override
     public synchronized void write(int b) throws IOException {
         try {
             buffer.put((byte) b);

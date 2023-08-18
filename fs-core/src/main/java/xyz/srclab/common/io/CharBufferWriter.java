@@ -22,11 +22,6 @@ final class CharBufferWriter extends Writer {
     }
 
     @Override
-    public synchronized void write(char[] b) throws IOException {
-        write(b, 0, b.length);
-    }
-
-    @Override
     public synchronized void write(int b) throws IOException {
         try {
             buffer.put((char) b);

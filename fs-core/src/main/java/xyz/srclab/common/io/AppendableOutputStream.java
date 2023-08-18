@@ -58,11 +58,6 @@ final class AppendableOutputStream extends OutputStream {
     }
 
     @Override
-    public synchronized void write(byte[] b) throws IOException {
-        write(b, 0, b.length);
-    }
-
-    @Override
     public synchronized void write(int b) throws IOException {
         write(new byte[]{(byte) b}, 0, 1);
     }

@@ -171,7 +171,7 @@ public interface FsCache<K, V> {
     interface RemoveListener<K, V> {
 
         /**
-         * This method will be called when a removing event occurs.
+         * This method will be called after removing a key and its value.
          *
          * @param cache current cache
          * @param key   key of removed value

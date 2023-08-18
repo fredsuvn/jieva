@@ -54,11 +54,6 @@ final class ReaderInputStream extends InputStream {
     }
 
     @Override
-    public synchronized int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
-    }
-
-    @Override
     public synchronized int read() throws IOException {
         try {
             while (true) {

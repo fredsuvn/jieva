@@ -32,6 +32,18 @@ public class IOTest {
     }
 
     @Test
+    public void testReadTo() {
+        String str = DATA;
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        FsIO.readBytesTo(new ByteArrayInputStream(bytes), outputStream, -1, 1);
+        Assert.assertEquals(outputStream.toByteArray(), bytes);
+        outputStream.reset();
+        FsIO.readBytesTo(new ByteArrayInputStream(bytes), outputStream, -1, 1024 * 16);
+        Assert.assertEquals(outputStream.toByteArray(), bytes);
+    }
+
+    @Test
     public void testAvailable() {
         String str = DATA;
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
@@ -114,10 +126,16 @@ public class IOTest {
             Assert.assertEquals(inputStream.read(), -1);
             Assert.assertEquals(inputStream.available(), 0);
             inputStream.reset();
+            inputStream.mark(length);
+            inputStream.skip(10);
+            readBytes = FsIO.readBytes(inputStream, 6);
+            Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, 10 + offset, 16 + offset));
+            inputStream.reset();
         }
         Assert.assertEquals(inputStream.read(), bytes[offset] & 0x000000ff);
-        Assert.assertEquals(FsIO.readBytes(inputStream, 12), Arrays.copyOfRange(bytes, 1 + offset, 13 + offset));
-        Assert.assertEquals(FsIO.readBytes(inputStream), Arrays.copyOfRange(bytes, 13 + offset, offset + length));
+        int k = (int) inputStream.skip(10);
+        Assert.assertEquals(FsIO.readBytes(inputStream, 12), Arrays.copyOfRange(bytes, 1 + k + offset, 13 + k + offset));
+        Assert.assertEquals(FsIO.readBytes(inputStream), Arrays.copyOfRange(bytes, 13 + k + offset, offset + length));
     }
 
     private void testReader(
@@ -137,10 +155,16 @@ public class IOTest {
             Assert.assertEquals(readString, data.substring(6 + offset, offset + length));
             Assert.assertEquals(reader.read(), -1);
             reader.reset();
+            reader.mark(length);
+            reader.skip(10);
+            readString = FsIO.readString(reader, 6);
+            Assert.assertEquals(readString, data.substring(10 + offset, 16 + offset));
+            reader.reset();
         }
         Assert.assertEquals(reader.read(), data.charAt(offset));
-        Assert.assertEquals(FsIO.readString(reader, 12), data.substring(1 + offset, 13 + offset));
-        Assert.assertEquals(FsIO.readString(reader), data.substring(13 + offset, offset + length));
+        int k = (int) reader.skip(10);
+        Assert.assertEquals(FsIO.readString(reader, 12), data.substring(1 + k + offset, 13 + k + offset));
+        Assert.assertEquals(FsIO.readString(reader), data.substring(13 + k + offset, offset + length));
     }
 
     private void testOutStream(
