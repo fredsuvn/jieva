@@ -418,7 +418,7 @@
 //                private final Path path;
 //                private long pos;
 //                private long limit;
-//                private long mark = 0;
+//                private InputStream underlying = null;
 //
 //                private CacheInputStream(Path path, long offset, long length) {
 //                    try {
@@ -436,7 +436,7 @@
 //                }
 //
 //                @Override
-//                public int read(byte[] b, int off, int len) throws IOException {
+//                public synchronized int read(byte[] b, int off, int len) throws IOException {
 //                    try {
 //                        FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
 //                        int result;
@@ -466,13 +466,33 @@
 //                    }
 //                }
 //
-//                private int read0(byte[] b, int off, int len) throws IOException {
+//                private synchronized int read0(byte[] b, int off, int len) throws IOException {
 //                    FileCache fileCache = fileCacheMap.computeIfAbsent(path, k -> cacheGenerator.generate(
 //                        path, (path, key, cache) -> {
 //                            if (cache.size() <= 0) {
 //                                fileCacheMap.remove(path);
 //                            }
 //                        }));
+//                    while (true) {
+//                        long chunkIndex = pos / chunkSize;
+//                        long chunkOffset = pos % chunkIndex;
+//                        fileCache.get(chunkIndex, rp -> {
+//                            try {
+//                                if (underlying == null) {
+//                                    underlying = new BufferedInputStream(
+//                                        FsIO.toInputStream(new RandomAccessFile(path.toFile(), "r")),
+//                                        bufferSize
+//                                    );
+//                                }
+//                                byte[] cacheBytes = FsIO.readBytes(underlying, chunkSize);
+//                                if (cacheBytes.length >= chunkSize) {
+//                                    return cacheBytes;
+//                                }
+//                            } catch (Exception e) {
+//                                throw new FsIOException(e);
+//                            }
+//                        });
+//                    }
 //                }
 //
 //                @Override
@@ -491,23 +511,10 @@
 //                }
 //
 //                @Override
-//                public void close() throws IOException {
-//                    super.close();
-//                }
-//
-//                @Override
-//                public synchronized void mark(int readlimit) {
-//                    super.mark(readlimit);
-//                }
-//
-//                @Override
-//                public synchronized void reset() throws IOException {
-//                    super.reset();
-//                }
-//
-//                @Override
-//                public boolean markSupported() {
-//                    return super.markSupported();
+//                public synchronized void close() throws IOException {
+//                    if (random != null) {
+//                        random.close();
+//                    }
 //                }
 //            }
 //        }

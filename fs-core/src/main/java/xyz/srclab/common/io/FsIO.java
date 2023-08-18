@@ -90,6 +90,7 @@ public class FsIO {
 
     /**
      * Reads all bytes from given input stream to given dest stream, returns actual read number.
+     * If -1 is returned upon the first read from the input stream, return -1.
      *
      * @param inputStream given input stream
      * @param dest        given dest stream
@@ -100,6 +101,7 @@ public class FsIO {
 
     /**
      * Reads specified limit number of bytes from given input stream to given dest stream, returns actual read number.
+     * If -1 is returned upon the first read from the input stream, return -1.
      * <p>
      * If the limit number &lt; 0, read all bytes;
      * els if limit number is 0, no read and return;
@@ -115,6 +117,7 @@ public class FsIO {
 
     /**
      * Reads specified limit number of bytes from given input stream to given dest stream, returns actual read number.
+     * If -1 is returned upon the first read from the input stream, return -1.
      * <p>
      * If the limit number &lt; 0, read all bytes;
      * els if limit number is 0, no read and return;
@@ -137,6 +140,9 @@ public class FsIO {
                 int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);
                 int readSize = inputStream.read(buffer, 0, readLen);
                 if (readSize < 0) {
+                    if (readNum == 0) {
+                        return -1;
+                    }
                     break;
                 }
                 if (readSize > 0) {
@@ -195,7 +201,8 @@ public class FsIO {
 
     /**
      * Reads available bytes from given input stream to given dest stream,
-     * returns actual read number (-1 if reaches end of the stream).
+     * returns actual read number.
+     * If -1 is returned upon the first read from the input stream, return -1.
      *
      * @param inputStream given input stream
      * @param dest        given dest stream
