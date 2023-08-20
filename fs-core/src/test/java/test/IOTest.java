@@ -109,7 +109,7 @@ public class IOTest {
         file.delete();
     }
 
-    private void testInputStream(
+    public static void testInputStream(
         String data, int offset, int length,
         InputStream inputStream,
         boolean testMark
@@ -146,7 +146,7 @@ public class IOTest {
         Assert.assertEquals(FsIO.readBytes(inputStream), Arrays.copyOfRange(bytes, 13 + k + offset, offset + length));
     }
 
-    private void testReader(
+    public static void testReader(
         String data, int offset, int length,
         Reader reader,
         boolean testMark
@@ -175,9 +175,9 @@ public class IOTest {
         Assert.assertEquals(FsIO.readString(reader), data.substring(13 + k + offset, offset + length));
     }
 
-    private void testOutStream(
+    public static void testOutStream(
         long length, OutputStream outputStream, BiFunction<Integer, Integer, byte[]> dest) throws IOException {
-        byte[] bytes = length > 0 ? buildBytes((int) length) : buildBytes(1024);
+        byte[] bytes = length > 0 ? buildRandomBytes((int) length) : buildRandomBytes(1024);
         long remainder = length > 0 ? length : 1024;
         outputStream.write(bytes, 0, 66);
         outputStream.flush();
@@ -195,7 +195,7 @@ public class IOTest {
         }
     }
 
-    private void testWriter(Writer writer, BiFunction<Integer, Integer, char[]> dest) throws IOException {
+    public static void testWriter(Writer writer, BiFunction<Integer, Integer, char[]> dest) throws IOException {
         char[] chars = DATA.toCharArray();
         writer.write(chars, 0, 66);
         writer.flush();
@@ -256,7 +256,7 @@ public class IOTest {
         Assert.assertEquals(bytes2, bytes);
     }
 
-    private byte[] buildBytes(int size) {
+    public static byte[] buildRandomBytes(int size) {
         long now = System.currentTimeMillis();
         byte[] bytes = new byte[size];
         for (int i = 0; i < size; i++) {

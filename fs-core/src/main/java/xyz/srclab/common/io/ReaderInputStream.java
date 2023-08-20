@@ -47,6 +47,9 @@ final class ReaderInputStream extends InputStream {
     public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
             FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            if (len == 0) {
+                return 0;
+            }
             return read0(b, off, len, true);
         } catch (Exception e) {
             throw new IOException(e);
@@ -92,9 +95,6 @@ final class ReaderInputStream extends InputStream {
     }
 
     private int read0(@Nullable byte[] b, int off, long len, boolean fillBytes) throws IOException {
-        if (len == 0) {
-            return 0;
-        }
         int readNum = 0;
         int offset = off;
         long remaining = len;

@@ -32,6 +32,9 @@ final class RandomOutputStream extends OutputStream {
     public synchronized void write(byte[] b, int off, int len) throws IOException {
         try {
             FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            if (len == 0) {
+                return;
+            }
             if (limit != -1) {
                 FsCheck.checkInBounds(pos + len - 1, pos, limit);
             }

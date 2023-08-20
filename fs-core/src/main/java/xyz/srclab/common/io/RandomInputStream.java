@@ -33,6 +33,9 @@ final class RandomInputStream extends InputStream {
     public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
             FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            if (len == 0) {
+                return 0;
+            }
             int result;
             if (limit == -1) {
                 result = random.read(b, off, len);
