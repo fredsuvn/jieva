@@ -99,6 +99,15 @@ public class CacheTest {
     }
 
     @Test
+    public void testRemove() {
+        IntRef intRef = new IntRef();
+        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
+        fsCache.put(1, 1);
+        fsCache.remove(1);
+        Assert.assertEquals(intRef.get(), 1);
+    }
+
+    @Test
     public void testClear() {
         IntRef intRef = new IntRef();
         FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());

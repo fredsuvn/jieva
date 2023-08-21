@@ -6,9 +6,9 @@ import xyz.srclab.annotations.Nullable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -22,7 +22,6 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     private final FsCache.RemoveListener<K, V> removeListener;
     private final boolean isSoft;
     private volatile boolean inCleanUp = false;
-    private volatile boolean inClear = false;
 
     FsCacheImpl(boolean isSoft) {
         this.map = new ConcurrentHashMap<>();
@@ -82,26 +81,9 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     @Override
     public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
         cleanUp();
-        // BooleanRef createNew = new BooleanRef(false);
-        // Ref<Object> newValueRef = new Ref<>();
-        Entry<K> entry = map.computeIfAbsent(key, it -> {
-            // V v = loader.apply(it);
-            // newValueRef.set(v);
-            // createNew.set(true);
-            return newEntry(it, loader.apply(it));
-        });
-        // if (createNew.get()) {
-        //     Object result = newValueRef.get();
-        //     if (result instanceof Null) {
-        //         return null;
-        //     }
-        //     return (V) result;
-        // }
+        Entry<K> entry = map.computeIfAbsent(key, it -> newEntry(it, loader.apply(it)));
         Object result = entry.get();
         if (result instanceof Null) {
-            // T newResult = loader.apply(key);
-            // map.put(key, newEntry(key, newResult));
-            // return newResult;
             return null;
         }
         return (V) result;
@@ -133,12 +115,12 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
     @Override
     public void remove(K key) {
-        cleanUp();
         Entry<K> entry = map.get(key);
         if (entry != null) {
-            entry.clear();
+            entry.enqueue();
             map.remove(key);
         }
+        cleanUp();
     }
 
     @Override
@@ -148,10 +130,11 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
     @Override
     public void clear() {
-        Set<K> keys = map.keySet();
-        for (K key : keys) {
-            remove(key);
-        }
+        Map<K, Entry<K>> mapCopy = new HashMap<>(map);
+        mapCopy.forEach((k, v) -> {
+            v.enqueue();
+            map.remove(k);
+        });
         cleanUp();
     }
 
@@ -184,9 +167,9 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
         K getKey();
 
-        void clear();
-
         Object get();
+
+        boolean enqueue();
     }
 
     @Getter
