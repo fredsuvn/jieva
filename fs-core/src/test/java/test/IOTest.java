@@ -70,6 +70,25 @@ public class IOTest {
     }
 
     @Test
+    public void testLimit() throws IOException {
+        String str = DATA;
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+        InputStream in = FsIO.limit(new ByteArrayInputStream(bytes), 6);
+        in.skip(5);
+        in.read();
+        Assert.assertEquals(in.read(), -1);
+        Assert.assertEquals(in.read(bytes), -1);
+        InputStream in2 = FsIO.limit(new ByteArrayInputStream(bytes), 6);
+        Assert.assertEquals(in2.read(bytes), 6);
+        Assert.assertEquals(in2.read(), -1);
+        Assert.assertEquals(in2.read(bytes), -1);
+        OutputStream out = FsIO.limit(new ByteArrayOutputStream(), 6);
+        Assert.expectThrows(IOException.class, () -> out.write(bytes));
+        out.write(bytes, 0, 6);
+        Assert.expectThrows(IOException.class, () -> out.write(1));
+    }
+
+    @Test
     public void testWrapper() throws IOException {
         String data = DATA;
         byte[] dataBytes = data.getBytes(FsString.CHARSET);

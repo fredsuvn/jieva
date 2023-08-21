@@ -8,6 +8,7 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -21,6 +22,7 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     private final FsCache.RemoveListener<K, V> removeListener;
     private final boolean isSoft;
     private volatile boolean inCleanUp = false;
+    private volatile boolean inClear = false;
 
     FsCacheImpl(boolean isSoft) {
         this.map = new ConcurrentHashMap<>();
@@ -146,18 +148,11 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
     @Override
     public void clear() {
-        map.clear();
-        while (true) {
-            Object x = queue.poll();
-            if (x == null) {
-                return;
-            }
-            Entry<K> entry = (Entry) x;
-            entry.clear();
-            if (removeListener != null) {
-                removeListener.onRemove(this, entry.getKey());
-            }
+        Set<K> keys = map.keySet();
+        for (K key : keys) {
+            remove(key);
         }
+        cleanUp();
     }
 
     @Override

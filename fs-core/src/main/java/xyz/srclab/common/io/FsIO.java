@@ -161,7 +161,6 @@ public class FsIO {
                 if (readSize > 0) {
                     dest.write(buffer, 0, readSize);
                     readNum += readSize;
-                    dest.flush();
                 }
                 if (limit < 0) {
                     continue;
@@ -365,9 +364,6 @@ public class FsIO {
                 if (readSize > 0) {
                     append(dest, buffer, 0, readSize);
                     readNum += readSize;
-                    if (dest instanceof Flushable) {
-                        ((Flushable) dest).flush();
-                    }
                 }
                 if (limit < 0) {
                     continue;

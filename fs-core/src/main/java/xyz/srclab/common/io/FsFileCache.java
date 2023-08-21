@@ -7,6 +7,8 @@ import xyz.srclab.common.base.ref.LongRef;
 import xyz.srclab.common.cache.FsCache;
 
 import java.io.*;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,6 +102,11 @@ public interface FsFileCache {
          * Current size of cache.
          */
         int size();
+
+        /**
+         * Removes all data in current cache.
+         */
+        void clear();
     }
 
     /**
@@ -229,6 +236,11 @@ public interface FsFileCache {
             @Override
             public int size() {
                 return cache.size();
+            }
+
+            @Override
+            public void clear() {
+                cache.clear();
             }
         }
 
@@ -450,8 +462,8 @@ public interface FsFileCache {
                             if (pos >= limit) {
                                 return -1;
                             }
-                            long remainder = limit - pos;
-                            result = read0(b, off, (int) Math.min(len, remainder));
+                            long remaining = limit - pos;
+                            result = read0(b, off, (int) Math.min(len, remaining));
                         }
                         if (result == -1) {
                             if (limit != -1) {
@@ -478,7 +490,7 @@ public interface FsFileCache {
                             }
                         }));
                     int offset = off;
-                    int remainder = len;
+                    int remaining = len;
                     final LongRef posIndex = new LongRef(pos / chunkSize);
                     long posOffset = pos % chunkSize;
                     while (true) {
@@ -496,21 +508,21 @@ public interface FsFileCache {
                             return readBytes == null ? EOF : readBytes;
                         });
                         if (bytes.length > 0) {
-                            int copySize = Math.min(remainder, bytes.length - (int) posOffset);
+                            int copySize = Math.min(remaining, bytes.length - (int) posOffset);
                             System.arraycopy(bytes, (int) posOffset, b, offset, copySize);
                             offset += copySize;
-                            remainder -= copySize;
+                            remaining -= copySize;
                         }
-                        if (remainder <= 0 || bytes.length < chunkSize) {
+                        if (remaining <= 0 || bytes.length < chunkSize) {
                             break;
                         }
                         posIndex.incrementAndGet();
                         posOffset = 0;
                     }
-                    if (remainder == len) {
+                    if (remaining == len) {
                         return -1;
                     }
-                    return len - remainder;
+                    return len - remaining;
                 }
 
                 @Override
@@ -614,6 +626,101 @@ public interface FsFileCache {
                         throw e;
                     } catch (Exception e) {
                         throw new IOException(e);
+                    }
+                }
+            }
+
+            private final class CacheOutputStream extends OutputStream {
+
+                private final Path path;
+                private final long limit;
+                private final boolean resize;
+                private long pos;
+                private RandomAccessFile underlying = null;
+
+                CacheOutputStream(Path path, long offset, long length, boolean resize) {
+                    try {
+                        if (length != -1) {
+                            FsCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
+                            this.limit = offset + length;
+                        } else {
+                            FsCheck.checkArgument(!resize, "resize must = false if limit = -1.");
+                            this.limit = length;
+                        }
+                        this.path = path;
+                        this.resize = resize;
+                        this.pos = offset;
+                    } catch (Exception e) {
+                        throw new FsIOException(e);
+                    }
+                }
+
+                @Override
+                public synchronized void write(byte[] b, int off, int len) throws IOException {
+                    try {
+                        FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+                        if (len == 0) {
+                            return;
+                        }
+                        if (limit != -1) {
+                            FsCheck.checkInBounds(pos + len - 1, pos, limit);
+                        }
+                        write0(b, off, len);
+                    } catch (IOException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+
+                private void write0(byte[] b, int off, int len) throws IOException {
+                    if (underlying == null) {
+                        underlying = getUnderlying();
+                    }
+                    FileChannel fileChannel = underlying.getChannel();
+                    FileLock fileLock = fileChannel.lock(pos, len, true);
+                    try {
+                        if (fileLock == null || !fileLock.isValid()) {
+                            throw new IOException("Lock file failed, pos: " + pos + ", len:- " + len + ".");
+                        }
+                        underlying.seek(pos);
+                        underlying.write(b, off, len);
+                        pos += len;
+                        if (resize && pos >= limit) {
+                            underlying.setLength(limit);
+                        }
+                        FileCache fileCache = fileCacheMap.get(path);
+                        if (fileCache != null) {
+                            fileCache.clear();
+                        }
+                        fileCacheMap.remove(path);
+                    } finally {
+                        if (fileLock != null) {
+                            fileLock.release();
+                        }
+                    }
+                }
+
+                private RandomAccessFile getUnderlying() throws IOException {
+                    return new RandomAccessFile(path.toFile(), "rws");
+                }
+
+                @Override
+                public synchronized void write(int b) throws IOException {
+                    write(new byte[]{(byte) b});
+                }
+
+                @Override
+                public void flush() throws IOException {
+                    if (underlying != null) {
+                        underlying.getChannel().force(true);
+                    }
+                }
+
+                @Override
+                public void close() throws IOException {
+                    if (underlying != null) {
+                        underlying.close();
                     }
                 }
             }

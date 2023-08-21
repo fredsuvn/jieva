@@ -3,6 +3,7 @@ package xyz.srclab.common.io;
 import xyz.srclab.common.base.FsString;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -111,7 +112,9 @@ public class FsFile {
      */
     public static void writeBytes(Path path, long offset, long length, InputStream data) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rws")) {
-            FsIO.readBytesTo(data, FsIO.toOutputStream(random, offset, length));
+            OutputStream dest = FsIO.toOutputStream(random, offset, length);
+            FsIO.readBytesTo(data, dest);
+            dest.flush();
         } catch (Exception e) {
             throw new FsIOException(e);
         }

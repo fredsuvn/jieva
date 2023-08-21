@@ -3,6 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsLogger;
+import xyz.srclab.common.base.ref.IntRef;
 import xyz.srclab.common.cache.FsCache;
 
 import java.util.HashMap;
@@ -95,5 +96,16 @@ public class CacheTest {
             fsCache.put(i, i);
         }
         fsCache.cleanUp();
+    }
+
+    @Test
+    public void testClear() {
+        IntRef intRef = new IntRef();
+        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
+        for (int i = 0; i < 10000; i++) {
+            fsCache.put(i, i);
+        }
+        fsCache.clear();
+        Assert.assertEquals(intRef.get(), 10000);
     }
 }
