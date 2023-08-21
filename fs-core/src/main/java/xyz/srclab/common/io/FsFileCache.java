@@ -689,11 +689,12 @@ public interface FsFileCache {
                         if (resize && pos >= limit) {
                             underlying.setLength(limit);
                         }
+                        fileChannel.force(true);
                         FileCache fileCache = fileCacheMap.get(path);
                         if (fileCache != null) {
+                            fileCacheMap.remove(path);
                             fileCache.clear();
                         }
-                        fileCacheMap.remove(path);
                     } finally {
                         if (fileLock != null) {
                             fileLock.release();
