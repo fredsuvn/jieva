@@ -43,8 +43,8 @@ final class RandomInputStream extends InputStream {
                 if (pos >= limit) {
                     return -1;
                 }
-                long remainder = limit - pos;
-                result = random.read(b, off, (int) Math.min(len, remainder));
+                long remaining = limit - pos;
+                result = random.read(b, off, (int) Math.min(len, remaining));
             }
             if (result == -1) {
                 if (limit != -1) {
@@ -114,14 +114,14 @@ final class RandomInputStream extends InputStream {
 
     @Override
     public synchronized int available() throws IOException {
-        long remainder = (limit == -1 ? random.length() - pos : limit - pos);
-        if (remainder > Integer.MAX_VALUE) {
+        long remaining = (limit == -1 ? random.length() - pos : limit - pos);
+        if (remaining > Integer.MAX_VALUE) {
             return Integer.MAX_VALUE;
         }
-        if (remainder <= 0L) {
+        if (remaining <= 0L) {
             return 0;
         } else {
-            return (int) remainder;
+            return (int) remaining;
         }
     }
 

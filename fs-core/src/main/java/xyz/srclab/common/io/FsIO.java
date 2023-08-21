@@ -581,6 +581,9 @@ public class FsIO {
 
     /**
      * Wraps given appendable as an output stream with {@link FsString#CHARSET}.
+     * <p>
+     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid for given {@code appendable}
+     * if it is instance of {@link Writer}.
      *
      * @param appendable given appendable
      */
@@ -590,6 +593,9 @@ public class FsIO {
 
     /**
      * Wraps given appendable as an output stream.
+     * <p>
+     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid for given {@code appendable}
+     * if it is instance of {@link Writer}.
      *
      * @param appendable given appendable
      * @param charset    charset of writer
@@ -631,5 +637,26 @@ public class FsIO {
      */
     public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) {
         return new RandomOutputStream(random, offset, length);
+    }
+
+    /**
+     * Wraps given source stream to limit read length.
+     * Note returned stream doesn't support mark/reset.
+     *
+     * @param source given source stream
+     * @param limit  max read length, must >= 0
+     */
+    public static InputStream limit(InputStream source, long limit) {
+        return new LimitedInputStream(source, limit);
+    }
+
+    /**
+     * Wraps given source stream to limit written length.
+     *
+     * @param source given source stream
+     * @param limit  max written length, must >= 0
+     */
+    public static OutputStream limit(OutputStream source, long limit) {
+        return new LimitedOutputStream(source, limit);
     }
 }

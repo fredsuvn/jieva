@@ -1,140 +1,95 @@
-// package xyz.srclab.common.io;
-//
-// import xyz.srclab.common.base.FsCheck;
-//
-// import java.io.IOException;
-// import java.io.InputStream;
-// import java.io.RandomAccessFile;
-//
-// final class LimitedInputStream extends InputStream {
-//
-//     private final InputStream inputStream;
-//     private long remainder;
-//
-//     LimitedInputStream(InputStream inputStream, long limit) {
-//         try {
-//                 FsCheck.checkArgument(limit >= 0, "limit must >= 0.");
-//                 this.inputStream = inputStream;
-//                 this.limit =limit;
-//         } catch (Exception e) {
-//             throw new FsIOException(e);
-//         }
-//     }
-//
-//     @Override
-//     public synchronized int read(byte[] b, int off, int len) throws IOException {
-//         try {
-//             FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
-//             if (len == 0) {
-//                 return 0;
-//             }
-//             int result;
-//             if (limit == -1) {
-//                 result = random.read(b, off, len);
-//             } else {
-//                 if (pos >= limit) {
-//                     return -1;
-//                 }
-//                 long remainder = limit - pos;
-//                 result = random.read(b, off, (int) Math.min(len, remainder));
-//             }
-//             if (result == -1) {
-//                 if (limit != -1) {
-//                     pos = limit;
-//                 } else {
-//                     return -1;
-//                 }
-//             } else {
-//                 pos += result;
-//             }
-//             return result;
-//         } catch (IOException e) {
-//             throw e;
-//         } catch (Exception e) {
-//             throw new IOException(e);
-//         }
-//     }
-//
-//     @Override
-//     public synchronized int read() throws IOException {
-//         try {
-//             int result;
-//             if (limit != -1) {
-//                 if (pos >= limit) {
-//                     return -1;
-//                 }
-//             }
-//             result = random.read();
-//             if (result == -1) {
-//                 if (limit != -1) {
-//                     pos = limit;
-//                 } else {
-//                     return -1;
-//                 }
-//             } else {
-//                 pos++;
-//             }
-//             return result;
-//         } catch (IOException e) {
-//             throw e;
-//         } catch (Exception e) {
-//             throw new IOException(e);
-//         }
-//     }
-//
-//     @Override
-//     public synchronized long skip(long n) throws IOException {
-//         try {
-//             if (n <= 0) {
-//                 return 0;
-//             }
-//             if (limit == -1) {
-//                 random.seek(pos + n);
-//                 pos += n;
-//                 return n;
-//             }
-//             long result = Math.min(n, limit - pos);
-//             random.seek(pos + result);
-//             pos += result;
-//             return result;
-//         } catch (IOException e) {
-//             throw e;
-//         } catch (Exception e) {
-//             throw new IOException(e);
-//         }
-//     }
-//
-//     @Override
-//     public synchronized int available() throws IOException {
-//         long remainder = (limit == -1 ? random.length() - pos : limit - pos);
-//         if (remainder > Integer.MAX_VALUE) {
-//             return Integer.MAX_VALUE;
-//         }
-//         if (remainder <= 0L) {
-//             return 0;
-//         } else {
-//             return (int) remainder;
-//         }
-//     }
-//
-//     @Override
-//     public synchronized void mark(int readlimit) {
-//         mark = pos;
-//     }
-//
-//     @Override
-//     public synchronized void reset() throws IOException {
-//         pos = mark;
-//         random.seek(pos);
-//     }
-//
-//     @Override
-//     public boolean markSupported() {
-//         return true;
-//     }
-//
-//     @Override
-//     public void close() throws IOException {
-//         random.close();
-//     }
-// }
+package xyz.srclab.common.io;
+
+import xyz.srclab.common.base.FsCheck;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+final class LimitedInputStream extends InputStream {
+
+    private final InputStream source;
+    private long remaining;
+
+    LimitedInputStream(InputStream source, long limit) {
+        try {
+            FsCheck.checkArgument(limit >= 0, "limit must >= 0.");
+            this.source = source;
+            this.remaining = limit;
+        } catch (Exception e) {
+            throw new FsIOException(e);
+        }
+    }
+
+    @Override
+    public synchronized int read(byte[] b, int off, int len) throws IOException {
+        try {
+            FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            if (len == 0) {
+                return 0;
+            }
+            if (remaining <= 0) {
+                return -1;
+            }
+            int readSize = source.read(b, off, (int) Math.min(remaining, len));
+            if (readSize == -1) {
+                remaining = 0;
+                return -1;
+            }
+            remaining -= readSize;
+            return readSize;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public synchronized int read() throws IOException {
+        try {
+            if (remaining <= 0) {
+                return -1;
+            }
+            int read = source.read();
+            if (read == -1) {
+                remaining = 0;
+                return -1;
+            }
+            remaining--;
+            return read;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public synchronized long skip(long n) throws IOException {
+        try {
+            if (n <= 0 || remaining <= 0) {
+                return 0;
+            }
+            long skip = source.skip(Math.min(remaining, n));
+            if (skip > 0) {
+                remaining -= skip;
+            }
+            return skip;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public synchronized int available() throws IOException {
+        int available = source.available();
+        return (int) Math.min(remaining, available);
+    }
+
+    @Override
+    public void close() throws IOException {
+        source.close();
+    }
+}

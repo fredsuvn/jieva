@@ -79,11 +79,12 @@ public class IOTest {
         fileOutputStream.close();
         RandomAccessFile random = new RandomAccessFile(file, "rws");
 
-        testInputStream(data, 3, 100, new ByteArrayInputStream(data.getBytes(FsString.CHARSET), 3, 100), true);
+        testInputStream(data, 3, 100, new ByteArrayInputStream(dataBytes, 3, 100), true);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(ByteBuffer.wrap(data.getBytes(FsString.CHARSET))), true);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(new StringReader(DATA)), false);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(random), true);
         testInputStream(data, 2, 66, FsIO.toInputStream(random, 2, 66), true);
+        testInputStream(data, 2, 66, FsIO.limit(new ByteArrayInputStream(dataBytes, 2, 66), 66), false);
         testReader(data, 5, 55, new StringReader(data.substring(5, 5 + 55)), true);
         testReader(data, 0, data.length(), FsIO.toReader(CharBuffer.wrap(DATA)), true);
         testReader(data, 0, data.length(), FsIO.toReader(new ByteArrayInputStream(DATA.getBytes(FsString.CHARSET))), false);
@@ -95,6 +96,8 @@ public class IOTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024);
         testOutStream(bytes.length, FsIO.toOutputStream(buffer), (off, len) ->
             Arrays.copyOfRange(bytes, off, off + len));
+        testOutStream(bytes.length, FsIO.limit(outputStream, 1024), (off, len) ->
+            Arrays.copyOfRange(outputStream.toByteArray(), off, off + len));
         testOutStream(-1, FsIO.toOutputStream(sb), (off, len) ->
             Arrays.copyOfRange(sb.toString().getBytes(FsString.CHARSET), off, off + len));
         testOutStream(-1, FsIO.toOutputStream(random), (off, len) ->
@@ -103,6 +106,7 @@ public class IOTest {
             FsFile.readBytes(file.toPath(), off + 8, len));
         testWriter(FsIO.toWriter(CharBuffer.wrap(chars)), (off, len) ->
             Arrays.copyOfRange(chars, off, off + len));
+        outputStream.reset();
         testWriter(FsIO.toWriter(outputStream), (off, len) ->
             new String(outputStream.toByteArray(), FsString.CHARSET).substring(off, off + len).toCharArray());
         random.close();
@@ -178,18 +182,18 @@ public class IOTest {
     public static void testOutStream(
         long length, OutputStream outputStream, BiFunction<Integer, Integer, byte[]> dest) throws IOException {
         byte[] bytes = length > 0 ? buildRandomBytes((int) length) : buildRandomBytes(1024);
-        long remainder = length > 0 ? length : 1024;
+        long remaining = length > 0 ? length : 1024;
         outputStream.write(bytes, 0, 66);
         outputStream.flush();
         Assert.assertEquals(dest.apply(0, 66), Arrays.copyOfRange(bytes, 0, 66));
-        remainder -= 66;
+        remaining -= 66;
         outputStream.write(22);
         outputStream.flush();
         Assert.assertEquals(dest.apply(66, 1), new byte[]{22});
-        remainder -= 1;
-        outputStream.write(bytes, 0, (int) remainder);
+        remaining -= 1;
+        outputStream.write(bytes, 0, (int) remaining);
         outputStream.flush();
-        Assert.assertEquals(dest.apply(67, (int) remainder), Arrays.copyOfRange(bytes, 0, (int) remainder));
+        Assert.assertEquals(dest.apply(67, (int) remaining), Arrays.copyOfRange(bytes, 0, (int) remaining));
         if (length > 0) {
             Assert.expectThrows(IOException.class, () -> outputStream.write(bytes, 0, bytes.length));
         }
