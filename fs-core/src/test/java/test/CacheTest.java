@@ -70,23 +70,14 @@ public class CacheTest {
     }
 
     @Test
-    public void testCacheNull() {
-        FsCache<Integer, String> fsCache = FsCache.softCache();
-        fsCache.put(1, null);
-        Assert.assertNull(fsCache.get(1));
-        Assert.assertNotNull(fsCache.getOptional(1));
-        fsCache.remove(1);
-        Assert.assertNull(fsCache.get(1));
-        Assert.assertNull(fsCache.getOptional(1));
-    }
-
-    @Test
     public void testCacheLoader() {
         FsCache<Integer, String> fsCache = FsCache.softCache();
         Assert.assertNull(fsCache.get(1));
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
         FsLogger.system().info("cacheLoader: 1=", fsCache.get(1));
+        fsCache.get(1, k -> null);
+        Assert.assertEquals(fsCache.get(1), "1");
     }
 
     @Test

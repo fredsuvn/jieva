@@ -5,13 +5,11 @@ import xyz.srclab.annotations.concurrent.ThreadSafe;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import java.util.Optional;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Cache interface and static methods.
- * <p>
- * Note the implementation of this FsCache is expected to thread-safe for each interface methods.
+ * Cache interface, is expected to thread-safe and doesn't support null value.
  *
  * @author fresduvn
  */
@@ -98,50 +96,32 @@ public interface FsCache<K, V> {
 
     /**
      * Returns value associating with given key from this cache,
-     * return null if the value is not found or if it is null itself
-     * (use the {@link #getOptional(Object)} to distinguish).
+     * return null if there is no entry for given key.
      *
      * @param key given key
      */
-    @Nullable V get(K key);
+    @Nullable
+    V get(K key);
 
     /**
      * Returns value associating with given key from this cache.
-     * If the value is not found, given loader will be called to create and cache a new value,
-     * that is, the return value is never null if the result of given loader is not null
-     * (but if the result of loader is null then the return value will still be null,
-     * use the {@link #getOptional(Object, Function)} to distinguish).
+     * If there is no entry for given key, a new value will be created by given loader.
+     * <p>
+     * If the loader returns null, the null value will not be put.
      *
      * @param key    given key
      * @param loader given loader
      */
-    @Nullable V get(K key, Function<? super K, ? extends V> loader);
+    @Nullable
+    V get(K key, Function<? super K, ? extends V> loader);
 
     /**
-     * Returns value associating with given key from this cache, the return value will be wrapped by {@link Optional}.
-     * It will return null if the value is not found.
-     *
-     * @param key given key
-     */
-    @Nullable Optional<V> getOptional(K key);
-
-    /**
-     * Returns value associating with given key from this cache, the return value will be wrapped by {@link Optional}.
-     * If the value is not found, given loader will be called to create and cache a new value,
-     * that is, the return value is never null.
-     *
-     * @param key    given key
-     * @param loader given loader
-     */
-    Optional<V> getOptional(K key, Function<? super K, ? extends V> loader);
-
-    /**
-     * Sets the value associated with given key.
+     * Sets the value associated with given key, return old value or null if there is no old value.
      *
      * @param key   given key
      * @param value the value
      */
-    void put(K key, @Nullable V value);
+    V put(K key, V value);
 
     /**
      * Removes the value associated with given key.
@@ -164,6 +144,11 @@ public interface FsCache<K, V> {
      * Removes all expired values.
      */
     void cleanUp();
+
+    /**
+     * Returns a Map as view of this cache. Any change of this cache or view will reflect to each other.
+     */
+    Map<K, V> asMap();
 
     /**
      * Removing listener of {@link FsCache}.
