@@ -494,6 +494,10 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
             this.map = map;
         }
 
+        public K getKey() {
+            return (K) key;
+        }
+
         @Override
         public Object get() {
             return value;
