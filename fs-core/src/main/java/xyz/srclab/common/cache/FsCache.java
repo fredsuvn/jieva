@@ -5,7 +5,7 @@ import xyz.srclab.annotations.concurrent.ThreadSafe;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import java.util.Map;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -131,6 +131,13 @@ public interface FsCache<K, V> {
     void remove(K key);
 
     /**
+     * Removes values of which key and value (first and second param) pass given predicate.
+     *
+     * @param predicate given predicate
+     */
+    void removeIf(BiPredicate<K, V> predicate);
+
+    /**
      * Returns current size.
      */
     int size();
@@ -144,11 +151,6 @@ public interface FsCache<K, V> {
      * Removes all expired values.
      */
     void cleanUp();
-
-    /**
-     * Returns a Map as view of this cache. Any change of this cache or view will reflect to each other.
-     */
-    Map<K, V> asMap();
 
     /**
      * Removing listener of {@link FsCache}.

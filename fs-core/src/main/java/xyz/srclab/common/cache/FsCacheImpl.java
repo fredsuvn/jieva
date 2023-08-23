@@ -1,18 +1,18 @@
 package xyz.srclab.common.cache;
 
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsCheck;
-import xyz.srclab.common.base.ref.BooleanRef;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -23,19 +23,19 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     private final BackMap backMap;
 
     FsCacheImpl(boolean isSoft) {
-        this.backMap = new BackMap(new ConcurrentHashMap<>(), null, isSoft);
+        this.backMap = new BackMap(0, null, isSoft);
     }
 
     FsCacheImpl(boolean isSoft, FsCache.RemoveListener<K, V> removeListener) {
-        this.backMap = new BackMap(new ConcurrentHashMap<>(), removeListener, isSoft);
+        this.backMap = new BackMap(0, removeListener, isSoft);
     }
 
     FsCacheImpl(boolean isSoft, int initialCapacity) {
-        this.backMap = new BackMap(new ConcurrentHashMap<>(initialCapacity), null, isSoft);
+        this.backMap = new BackMap(initialCapacity, null, isSoft);
     }
 
     FsCacheImpl(boolean isSoft, int initialCapacity, FsCache.RemoveListener<K, V> removeListener) {
-        this.backMap = new BackMap(new ConcurrentHashMap<>(initialCapacity), removeListener, isSoft);
+        this.backMap = new BackMap(initialCapacity, removeListener, isSoft);
     }
 
     @Override
@@ -59,6 +59,11 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
     }
 
     @Override
+    public void removeIf(BiPredicate<K, V> predicate) {
+        backMap.removeIf(predicate);
+    }
+
+    @Override
     public int size() {
         return backMap.size();
     }
@@ -73,11 +78,6 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
         backMap.cleanUp();
     }
 
-    @Override
-    public Map<K, V> asMap() {
-        return backMap;
-    }
-
     private final class BackMap implements Map<K, V> {
 
         private final Map<K, CacheEntry<K>> map;
@@ -86,8 +86,8 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
         private final boolean isSoft;
         private volatile boolean inCleanUp = false;
 
-        private BackMap(Map<K, CacheEntry<K>> map, @Nullable RemoveListener<K, V> removeListener, boolean isSoft) {
-            this.map = map;
+        private BackMap(int initialCapacity, @Nullable RemoveListener<K, V> removeListener, boolean isSoft) {
+            this.map = initialCapacity == 0 ? new ConcurrentHashMap<>() : new ConcurrentHashMap<>(initialCapacity);
             this.removeListener = removeListener;
             this.isSoft = isSoft;
         }
@@ -105,34 +105,20 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
         @Override
         public boolean containsKey(Object key) {
-            return get(key) != null;
+            return false;
         }
 
         @Override
         public boolean containsValue(Object value) {
-            if (value == null) {
-                return false;
-            }
-            for (CacheEntry<K> entry : map.values()) {
-                Object result = entry.get();
-                if (result instanceof Removed) {
-                    entry.clean();
-                    continue;
-                }
-                if (Objects.equals(result, value)) {
-                    return true;
-                }
-            }
-            cleanUp();
             return false;
         }
 
         @Override
         public V get(Object key) {
             CacheEntry<K> entry = map.get(key);
-            V result = getValue(entry);
+            V value = getValue(entry);
             cleanUp();
-            return result;
+            return value;
         }
 
         public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
@@ -143,253 +129,72 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
                 }
                 return newEntry(it, newValue);
             });
-            V result = getValue(entry);
+            V value = getValue(entry);
             cleanUp();
-            return result;
+            return value;
         }
 
         @Override
         public V put(K key, V value) {
             FsCheck.checkNull(value);
-            CacheEntry<K> old = map.put(key, newEntry(key, value));
-            V result = getValue(old);
-            if (old != null) {
-                old.clean();
+            CacheEntry<K> oldEntry = map.put(key, newEntry(key, value));
+            V oldValue = getValue(oldEntry);
+            if (oldEntry != null) {
+                oldEntry.invalid();
             }
             cleanUp();
-            return result;
+            return oldValue;
         }
 
         @Override
         public V remove(Object key) {
             CacheEntry<K> entry = map.get(key);
-            V result = getValue(entry);
+            V value = getValue(entry);
             if (entry != null) {
-                entry.clean();
+                entry.invalid();
             }
             cleanUp();
-            return result;
+            return value;
+        }
+
+        public void removeIf(BiPredicate<K, V> predicate) {
+            map.replaceAll((key, entry) -> {
+                V value = getValue(entry);
+                if (value != null && predicate.test(key, value)) {
+                    entry.invalid();
+                    return newEntry(key, null);
+                }
+                return entry;
+            });
+            cleanUp();
         }
 
         @Override
-        public void putAll( Map<? extends K, ? extends V> m) {
-            m.forEach((k,v)->{
-                FsCheck.checkNull(v);
-                CacheEntry<K> old = map.put(k, newEntry(k, v));
-                if (old != null) {
-                    old.clean();
-                }
-            });
-            cleanUp();
+        public void putAll(Map<? extends K, ? extends V> m) {
         }
 
         @Override
         public void clear() {
-            map.replaceAll((key, old) -> {
-                old.clean();
-                return old;
+            map.replaceAll((key, entry) -> {
+                entry.invalid();
+                return newEntry(key, null);
             });
             cleanUp();
         }
 
-        @NotNull
         @Override
         public Set<K> keySet() {
             return map.keySet();
         }
 
-        @NotNull
         @Override
         public Collection<V> values() {
-            return new Collection<V>() {
-                @Override
-                public int size() {
-                    return 0;
-                }
-
-                @Override
-                public boolean isEmpty() {
-                    return false;
-                }
-
-                @Override
-                public boolean contains(Object o) {
-                    return false;
-                }
-
-                @NotNull
-                @Override
-                public Iterator<V> iterator() {
-                    return null;
-                }
-
-                @NotNull
-                @Override
-                public Object[] toArray() {
-                    return new Object[0];
-                }
-
-                @NotNull
-                @Override
-                public <T> T[] toArray(@NotNull T[] a) {
-                    return null;
-                }
-
-                @Override
-                public boolean add(V v) {
-                    return false;
-                }
-
-                @Override
-                public boolean remove(Object o) {
-                    return false;
-                }
-
-                @Override
-                public boolean containsAll(@NotNull Collection<?> c) {
-                    return false;
-                }
-
-                @Override
-                public boolean addAll(@NotNull Collection<? extends V> c) {
-                    return false;
-                }
-
-                @Override
-                public boolean removeAll(@NotNull Collection<?> c) {
-                    return false;
-                }
-
-                @Override
-                public boolean retainAll(@NotNull Collection<?> c) {
-                    return false;
-                }
-
-                @Override
-                public void clear() {
-
-                }
-            };
+            return Collections.emptyList();
         }
 
-        @NotNull
         @Override
         public Set<Entry<K, V>> entrySet() {
-            return null;
-        }
-
-        @Override
-        public V getOrDefault(Object key, V defaultValue) {
-            Object o = new Object();
-            CacheEntry<K> entry = map.getOrDefault(key, new EmptyCacheEntry<>(key, o, map));
-            if (entry instanceof EmptyCacheEntry) {
-                if (entry.get() == o) {
-                    return defaultValue;
-                }
-            }
-            V result = getValue(entry);
-            cleanUp();
-            return result;
-        }
-
-        @Override
-        public void forEach(BiConsumer<? super K, ? super V> action) {
-            map.forEach((k,v)->{
-                V result = getValue(v);
-                if (result != null) {
-                    action.accept(k, result);
-                }
-            });
-            cleanUp();
-        }
-
-        @Override
-        public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
-            map.replaceAll((k,v)->{
-                V result = getValue(v);
-                if (result != null) {
-                    V newValue = function.apply(k, result);
-                    FsCheck.checkNull(newValue);
-                    v.clean();
-                    return newEntry(k, newValue);
-                } else {
-                    return v;
-                }
-            });
-            cleanUp();
-        }
-
-        @Override
-        public V putIfAbsent(K key, V value) {
-            FsCheck.checkNull(value);
-           CacheEntry<K> entry = map.putIfAbsent(key, newEntry(key, value));
-            V result = getValue(entry);
-            cleanUp();
-            return result;
-        }
-
-        @Override
-        public boolean remove(Object key, Object value) {
-            if (value == null) {
-                return false;
-            }
-            BooleanRef ref = new BooleanRef(false);
-            map.forEach((k,v)->{
-                if (!Objects.equals(k, key)) {
-                    return;
-                }
-                V result = getValue(v);
-                if (result != null && Objects.equals(v, value)) {
-                    v.clean();
-                    ref.set(true);
-                }
-            });
-            cleanUp();
-            return ref.get();
-        }
-
-        @Override
-        public boolean replace(K key, V oldValue, V newValue) {
-            FsCheck.checkNull(newValue);
-            BooleanRef ref = new BooleanRef(false);
-            map.forEach((k,v)->{
-                if (!Objects.equals(k, key)) {
-                    return;
-                }
-                V result = getValue(v);
-                if (result != null && Objects.equals(v, oldValue)) {
-                    v.clean();
-                    ref.set(true);
-                }
-            });
-            cleanUp();
-            return ref.get();
-        }
-
-        @org.jetbrains.annotations.Nullable
-        @Override
-        public V replace(K key, V value) {
-            return Map.super.replace(key, value);
-        }
-
-        @Override
-        public V computeIfAbsent(K key, @NotNull Function<? super K, ? extends V> mappingFunction) {
-            return Map.super.computeIfAbsent(key, mappingFunction);
-        }
-
-        @Override
-        public V computeIfPresent(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-            return Map.super.computeIfPresent(key, remappingFunction);
-        }
-
-        @Override
-        public V compute(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-            return Map.super.compute(key, remappingFunction);
-        }
-
-        @Override
-        public V merge(K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-            return Map.super.merge(key, value, remappingFunction);
+            return Collections.emptySet();
         }
 
         public void cleanUp() {
@@ -409,6 +214,7 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
                 }
                 CacheEntry<K> entry = (CacheEntry<K>) x;
                 map.remove(entry.getKey());
+                entry.clear();
                 if (removeListener != null) {
                     removeListener.onRemove(FsCacheImpl.this, entry.getKey());
                 }
@@ -421,15 +227,15 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
             if (entry == null) {
                 return null;
             }
-            Object result = entry.get();
-            if (result == null) {
+            Object value = entry.get();
+            if (value == null) {
                 return null;
             }
-            if (result instanceof Removed) {
-                entry.clean();
+            if (value instanceof Removed) {
+                entry.invalid();
                 return null;
             }
-            return (V) result;
+            return (V) value;
         }
 
         private CacheEntry<K> newEntry(K key, @Nullable Object value) {
@@ -446,11 +252,13 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
 
         Object get();
 
-        void clean();
+        void invalid();
+
+        void clear();
     }
 
     @Getter
-    private static class SoftCacheEntry<K> extends SoftReference<Object> implements CacheEntry<K> {
+    private static final class SoftCacheEntry<K> extends SoftReference<Object> implements CacheEntry<K> {
 
         private final K key;
 
@@ -460,13 +268,13 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
         }
 
         @Override
-        public void clean() {
+        public void invalid() {
             this.enqueue();
         }
     }
 
     @Getter
-    private static class WeakCacheEntry<K> extends WeakReference<Object> implements CacheEntry<K> {
+    private static final class WeakCacheEntry<K> extends WeakReference<Object> implements CacheEntry<K> {
 
         private final K key;
 
@@ -476,36 +284,8 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
         }
 
         @Override
-        public void clean() {
+        public void invalid() {
             this.enqueue();
-        }
-    }
-
-    @Getter
-    private static class EmptyCacheEntry<K> implements CacheEntry<K> {
-
-        private final Object key;
-        private final Object value;
-        private final Map<K, CacheEntry<K>> map ;
-
-        public EmptyCacheEntry(Object key,Object value,Map<K, CacheEntry<K>> map ) {
-            this.key = key;
-            this.value = value;
-            this.map = map;
-        }
-
-        public K getKey() {
-            return (K) key;
-        }
-
-        @Override
-        public Object get() {
-            return value;
-        }
-
-        @Override
-        public void clean() {
-            map.remove(key);
         }
     }
 

@@ -108,4 +108,16 @@ public class CacheTest {
         fsCache.clear();
         Assert.assertEquals(intRef.get(), 10000);
     }
+
+    @Test
+    public void testRemoveIf() {
+        IntRef intRef = new IntRef();
+        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
+        for (int i = 0; i < 10; i++) {
+            fsCache.put(i, i);
+        }
+        fsCache.removeIf((k, v) -> k > 5);
+        Assert.assertEquals(intRef.get(), 4);
+        Assert.assertEquals(fsCache.size(), 6);
+    }
 }
