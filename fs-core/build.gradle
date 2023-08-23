@@ -20,12 +20,12 @@ dependencies {
   compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
-  //compileOnly "org.springframework:spring-core"
-  //compileOnly "cglib:cglib"
+  compileOnly "org.springframework:spring-core"
+  compileOnly "cglib:cglib"
 
   testImplementation project(":boat-test")
   testImplementation "commons-beanutils:commons-beanutils:1.9.4"
-    testImplementation group: 'org.springframework', name: 'spring-core', version: '5.3.29'
+  testImplementation group: 'org.springframework', name: 'spring-core', version: '5.3.29'
   testImplementation group: 'org.springframework', name: 'spring-beans', version: '5.3.29'
   testImplementation "cglib:cglib"
   testImplementation group: 'cn.hutool', name: 'hutool-all', version: '5.8.21'

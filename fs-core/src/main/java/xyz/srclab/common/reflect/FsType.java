@@ -282,6 +282,20 @@ public class FsType {
     }
 
     /**
+     * Returns whether current runtime has specified class.
+     *
+     * @param className specified class name
+     */
+    public static boolean hasClass(String className) {
+        try {
+            Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Returns whether target type can be assigned by source type with {@link Class#isAssignableFrom(Class)}.
      * If given type is primitive, it will be converted to its wrapper type.
      *
