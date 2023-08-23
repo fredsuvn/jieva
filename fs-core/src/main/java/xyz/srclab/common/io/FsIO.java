@@ -655,4 +655,15 @@ public class FsIO {
     public static OutputStream limit(OutputStream source, long limit) {
         return new LimitedOutputStream(source, limit);
     }
+
+    /**
+     * Read all bytes of given buffer into a new byte array and return.
+     *
+     * @param buffer given buffer
+     */
+    public static byte[] toByteArray(ByteBuffer buffer) {
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        return bytes;
+    }
 }
