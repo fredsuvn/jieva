@@ -90,7 +90,7 @@ final class ReaderInputStream extends InputStream {
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         reader.close();
     }
 

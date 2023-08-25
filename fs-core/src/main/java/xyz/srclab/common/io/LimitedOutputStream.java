@@ -55,12 +55,12 @@ final class LimitedOutputStream extends OutputStream {
     }
 
     @Override
-    public void flush() throws IOException {
+    public synchronized void flush() throws IOException {
         source.flush();
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         source.close();
     }
 }

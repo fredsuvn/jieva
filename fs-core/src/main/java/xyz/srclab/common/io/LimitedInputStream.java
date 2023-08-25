@@ -89,7 +89,7 @@ final class LimitedInputStream extends InputStream {
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         source.close();
     }
 }

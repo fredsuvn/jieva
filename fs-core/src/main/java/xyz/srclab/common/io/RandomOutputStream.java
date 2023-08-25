@@ -63,12 +63,12 @@ final class RandomOutputStream extends OutputStream {
     }
 
     @Override
-    public void flush() throws IOException {
+    public synchronized void flush() throws IOException {
         random.getChannel().force(true);
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         random.close();
     }
 }
