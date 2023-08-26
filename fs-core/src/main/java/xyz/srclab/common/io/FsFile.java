@@ -1,178 +1,123 @@
 package xyz.srclab.common.io;
 
-import xyz.srclab.common.base.FsString;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.io.Writer;
-import java.nio.charset.Charset;
+import java.io.*;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 
 /**
- * File utilities.
+ * Interface to operate file, thread-safe.
  *
  * @author fresduvn
  */
-public class FsFile {
+@ThreadSafe
+public interface FsFile {
 
     /**
-     * Using {@link RandomAccessFile} to read all bytes of given file of path.
+     * Creates a {@link FsFile} from given path.
      *
-     * @param path given file of path
+     * @param path given path
      */
-    public static byte[] readBytes(Path path) {
-        return readBytes(path, 0, -1);
+    static FsFile from(Path path) {
+        return new FsFileImpl(path);
     }
 
     /**
-     * Using {@link RandomAccessFile} to read given length bytes of given file of path from offset position,
-     * the given length may be set to -1 to read to end of file.
-     *
-     * @param path   given file of path
-     * @param offset offset position
-     * @param length given length, maybe -1 to read to end of file
+     * Returns path of file.
      */
-    public static byte[] readBytes(Path path, long offset, long length) {
-        try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
-            return FsIO.readBytes(FsIO.toInputStream(random, offset, length));
+    Path getPath();
+
+    /**
+     * Returns file object.
+     */
+    default File getFile() {
+        return getPath().toFile();
+    }
+
+    /**
+     * Opens current file with given mode,
+     * the mode including "r", "rw", "rws", or "rwd", is same with {@link RandomAccessFile}.
+     * <p>
+     * This method will restart the stream from {@link #bindInputStream()} and {@link #bindOutputStream()}.
+     *
+     * @param mode given mode
+     */
+    void open(String mode);
+
+    /**
+     * Closes current file.
+     * <p>
+     * This method will close the stream from {@link #bindInputStream()} and {@link #bindOutputStream()}.
+     */
+    void close();
+
+    /**
+     * Returns position of current file pointer.
+     */
+    long position();
+
+    /**
+     * Sets position of current file pointer. If the new position over the length of file, the file will be extended.
+     * <p>
+     * This method will reset position for the stream from {@link #bindInputStream()} and {@link #bindOutputStream()}.
+     *
+     * @param pos position of file pointer
+     */
+    void position(long pos);
+
+    /**
+     * Returns file length.
+     */
+    long length();
+
+    /**
+     * Sets new file length, truncated or extended.
+     *
+     * @param newLength new length
+     */
+    void setFileLength(long newLength);
+
+    /**
+     * Returns channel of file.
+     */
+    FileChannel getChannel();
+
+    /**
+     * Returns descriptor of file.
+     */
+    FileDescriptor getDescriptor();
+
+    /**
+     * Force all system buffers to synchronize with the underlying device, equivalent to {@link FileDescriptor#sync()}.
+     */
+    default void sync() {
+        try {
+            getDescriptor().sync();
         } catch (Exception e) {
             throw new FsIOException(e);
         }
     }
 
     /**
-     * Using {@link RandomAccessFile} to read all bytes of given file of path.
-     * The read bytes will be encoded to String with {@link FsString#CHARSET}.
-     *
-     * @param path given file of path
+     * Returns an input stream for current file, the read position is {@link #position()}.
+     * Read operations of stream will move the position of file,
+     * and if the position is reset by {@link #position(long)}, the stream's read position will also be reset.
+     * <p>
+     * Returned stream doesn't support {@link InputStream#mark(int)} and {@link InputStream#reset()},
+     * and {@link InputStream#close()} is also invalid. Using {@link #close()  FsFile.close} to close both binding
+     * input/output stream.
      */
-    public static String readString(Path path) {
-        return readString(path, FsString.CHARSET);
-    }
+    InputStream bindInputStream();
 
     /**
-     * Using {@link RandomAccessFile} to read all bytes of given file of path.
-     * The read bytes will be encoded to String with given charset.
-     *
-     * @param path    given file of path
-     * @param charset given charset
+     * Returns an output stream for current file, the written position is {@link #position()}.
+     * Write operations of stream will move the position of file,
+     * and if the position is reset by {@link #position(long)}, the stream's written position will also be reset.
+     * If the written data over the length of file, the file will be auto extended.
+     * <p>
+     * {@link InputStream#close()} is invalid, using {@link #close()  FsFile.close} to close both binding
+     * input/output stream.
      */
-    public static String readString(Path path, Charset charset) {
-        return readString(path, 0, -1, charset);
-    }
-
-    /**
-     * Using {@link RandomAccessFile} to read given length bytes of given file of path from offset position,
-     * the given length may be set to -1 to read to end of file.
-     * The read bytes will be encoded to String with {@link FsString#CHARSET}.
-     *
-     * @param path   given file of path
-     * @param offset offset position
-     * @param length given length, maybe -1 to read to end of file
-     */
-    public static String readString(Path path, long offset, long length) {
-        return readString(path, offset, length, FsString.CHARSET);
-    }
-
-    /**
-     * Using {@link RandomAccessFile} to read given length bytes of given file of path from offset position,
-     * the given length may be set to -1 to read to end of file.
-     * The read bytes will be encoded to String with given charset.
-     *
-     * @param path    given file of path
-     * @param offset  offset position
-     * @param length  given length, maybe -1 to read to end of file
-     * @param charset given charset
-     */
-    public static String readString(Path path, long offset, long length, Charset charset) {
-        try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
-            return FsIO.readString(FsIO.toInputStream(random, offset, length), charset);
-        } catch (Exception e) {
-            throw new FsIOException(e);
-        }
-    }
-
-    /**
-     * Using {@link RandomAccessFile} to write  bytes into given file of path.
-     *
-     * @param path given file of path
-     */
-    public static void writeBytes(Path path, InputStream data) {
-        writeBytes(path, 0, -1, data);
-    }
-
-    /**
-     * Using {@link RandomAccessFile} to write given length bytes into given file of path from offset position,
-     * the given length may be set to -1 to write unlimitedly.
-     *
-     * @param path   given file of path
-     * @param offset offset position
-     * @param length given length, maybe -1 to write unlimitedly
-     */
-    public static void writeBytes(Path path, long offset, long length, InputStream data) {
-        try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
-            OutputStream dest = FsIO.toOutputStream(random, offset, length);
-            FsIO.readBytesTo(data, dest);
-            dest.flush();
-        } catch (Exception e) {
-            throw new FsIOException(e);
-        }
-    }
-
-    /**
-     * Using {@link RandomAccessFile} to write given data into given file.
-     * The written bytes will be decoded from given data with {@link FsString#CHARSET}.
-     *
-     * @param path given file of path
-     */
-    public static void writeString(Path path, CharSequence data) {
-        writeString(path, data, FsString.CHARSET);
-    }
-
-    /**
-     * Using {@link RandomAccessFile} to write given data into given file.
-     * The written bytes will be decoded from given data with given charset.
-     *
-     * @param path    given file of path
-     * @param charset given charset
-     */
-    public static void writeString(Path path, CharSequence data, Charset charset) {
-        writeString(path, 0, -1, data, charset);
-    }
-
-    /**
-     * Using {@link RandomAccessFile} to write given data into given file of path from offset position,
-     * the given length may be set to -1 to write unlimitedly.
-     * The written bytes will be decoded from given data with {@link FsString#CHARSET}.
-     *
-     * @param path   given file of path
-     * @param offset offset position
-     * @param length given length, maybe -1 to write unlimitedly
-     * @param data   given data
-     */
-    public static void writeString(Path path, long offset, long length, CharSequence data) {
-        writeString(path, offset, length, data, FsString.CHARSET);
-    }
-
-    /**
-     * Using {@link RandomAccessFile} to write given data into given file of path from offset position,
-     * the given length may be set to -1 to write unlimitedly.
-     * The written bytes will be decoded from given data with given charset.
-     *
-     * @param path    given file of path
-     * @param offset  offset position
-     * @param length  given length, maybe -1 to write unlimitedly
-     * @param data    given data
-     * @param charset given charset
-     */
-    public static void writeString(Path path, long offset, long length, CharSequence data, Charset charset) {
-        try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
-            Writer writer = FsIO.toWriter(FsIO.toOutputStream(random, offset, length), charset);
-            writer.append(data);
-            writer.flush();
-        } catch (Exception e) {
-            throw new FsIOException(e);
-        }
-    }
+    OutputStream bindOutputStream();
 }

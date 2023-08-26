@@ -81,7 +81,7 @@ final class RandomOutputStream extends OutputStream {
 
     @Override
     public synchronized void flush() throws IOException {
-        random.getChannel().force(true);
+        random.getFD().sync();
     }
 
     @Override
