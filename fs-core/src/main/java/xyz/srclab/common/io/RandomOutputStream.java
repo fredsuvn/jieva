@@ -5,6 +5,7 @@ import xyz.srclab.common.base.FsCheck;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
 
 final class RandomOutputStream extends OutputStream {
 
@@ -38,7 +39,15 @@ final class RandomOutputStream extends OutputStream {
             if (limit != -1) {
                 FsCheck.checkInBounds(pos + len - 1, pos, limit);
             }
-            random.write(b, off, len);
+            FileLock lock = random.getChannel().tryLock(pos, len, false);
+            if (lock == null || !lock.isValid()) {
+                throw new IOException("Failed to lock file at " + pos + ", len: " + len + ".");
+            }
+            try {
+                random.write(b, off, len);
+            } finally {
+                lock.close();
+            }
             pos += len;
         } catch (IOException e) {
             throw e;
@@ -53,7 +62,15 @@ final class RandomOutputStream extends OutputStream {
             if (limit != -1) {
                 FsCheck.checkInBounds(pos, pos, limit);
             }
-            random.write(b);
+            FileLock lock = random.getChannel().tryLock(pos, 1, false);
+            if (lock == null || !lock.isValid()) {
+                throw new IOException("Failed to lock file at " + pos + ", len: 1.");
+            }
+            try {
+                random.write(b);
+            } finally {
+                lock.close();
+            }
             pos += 1;
         } catch (IOException e) {
             throw e;

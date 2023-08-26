@@ -5,19 +5,18 @@ import lombok.EqualsAndHashCode;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsCheck;
+import xyz.srclab.common.base.ref.BooleanRef;
 import xyz.srclab.common.base.ref.LongRef;
 import xyz.srclab.common.cache.FsCache;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
- * Cache for file, provides methods about IO streams to read/write files between cache and underlying.
+ * File cache service, provides cached IO methods.
  *
  * @author fredsuvn
  * @see Builder
@@ -26,51 +25,51 @@ import java.util.function.Function;
 public interface FsFileCache {
 
     /**
-     * Returns an input stream of file on given path seeks from given offset.
-     * <p>
-     * The stream first attempts to read cached data, and if unavailable, it will read from the underlying file.
+     * Returns a new builder for {@link FsFileCache}.
+     */
+    static Builder newBuilder() {
+        return new Builder();
+    }
+
+    /**
+     * Opens an input stream for file of given path at specified file position,
+     * data of the stream comes from cache or underlying file (if cache not found or expired).
      *
      * @param path   given path
-     * @param offset seek position of the file
+     * @param offset specified file position
      */
     InputStream getInputStream(Path path, long offset);
 
     /**
-     * Returns an output stream of file on given path seeks from given offset.
-     * <p>
-     * The stream will update cached data if the underlying file data were changed.
+     * Opens an output stream for file of given path at specified file position,
+     * and cache will be updated after writing.
      *
      * @param path   given path
-     * @param offset seek position of the file
+     * @param offset specified file position
      */
     OutputStream getOutputStream(Path path, long offset);
 
     /**
-     * Returns an output stream of file on given path seeks from given offset,
-     * the underlying file will be truncated at {@code offset + length}.
-     * <p>
-     * The stream will update cached data if the underlying file data were changed.
+     * Sets new file length, truncated or extended.
      *
-     * @param path   given path
-     * @param offset seek position of the file
-     * @param length length of written data
+     * @param newLength new length
      */
-    OutputStream getOutputStream(Path path, long offset, long length);
+    void setFileLength(Path path, long newLength);
 
     /**
-     * Generator for file cache.
+     * Generator for bytes cache.
      */
-    interface CacheGenerator {
+    interface BytesCacheGenerator {
 
         /**
-         * Generates a new file cache with given remove listener.
+         * Generates a new bytes cache with given remove listener.
          *
          * @param removeListener given remove listener
          */
-        FileCache generate(RemoveListener removeListener);
+        BytesCache generate(RemoveListener removeListener);
 
         /**
-         * File cache remove listener.
+         * Bytes cache remove listener.
          */
         interface RemoveListener {
 
@@ -80,7 +79,7 @@ public interface FsFileCache {
              * @param key   key of the cache
              * @param cache cache itself
              */
-            void onCacheRemove(FilePos key, FileCache cache);
+            void onCacheRemove(BytesPos key, BytesCache cache);
         }
     }
 
@@ -88,7 +87,7 @@ public interface FsFileCache {
      * Cache interface used for {@link FsFileCache}, must support remove listener.
      */
     @ThreadSafe
-    interface FileCache {
+    interface BytesCache {
 
         /**
          * Gets cached value, if the value doesn't exist, create and put a new one with given function.
@@ -99,7 +98,7 @@ public interface FsFileCache {
          * @param key key of the value
          */
         @Nullable
-        byte[] get(FilePos key, @Nullable Function<FilePos, byte[]> function);
+        byte[] get(BytesPos key, @Nullable Function<BytesPos, byte[]> function);
 
         /**
          * Puts new value of specified key
@@ -107,29 +106,29 @@ public interface FsFileCache {
          * @param key   specified key
          * @param value new value
          */
-        void put(FilePos key, byte[] value);
+        void put(BytesPos key, byte[] value);
 
         /**
          * Removes the value associated with given key.
          *
          * @param key given key
          */
-        void remove(FilePos key);
+        void remove(BytesPos key);
 
         /**
          * Removes values of which key and value (first and second param) pass given predicate.
          *
          * @param predicate given predicate
          */
-        void removeIf(BiPredicate<FilePos, byte[]> predicate);
+        void removeIf(BiPredicate<BytesPos, byte[]> predicate);
     }
 
     /**
-     * Key for file cache, holds file path and start position of cached file data.
+     * Key for bytes cache, holds file path and start position of cached bytes data.
      */
     @Data
     @EqualsAndHashCode
-    class FilePos {
+    class BytesPos {
         /**
          * File path.
          */
@@ -146,18 +145,16 @@ public interface FsFileCache {
     interface FileReader {
 
         /**
-         * Returns an un-cached underlying file input stream to read file.
-         * The start read point will be set at given offset, and readable bytes is given length.
-         * The length may be set to -1 to read to end of the file.
+         * Opens an un-cache underlying input stream for file of given path at specified file position.
          * <p>
          * The returned input stream doesn't need support {@link InputStream#mark(int)}, {@link InputStream#reset()}
          * and even {@link InputStream#available()}.
          *
-         * @param path   path of file
-         * @param offset the offset position, measured in bytes from the beginning of the file
-         * @param length readable bytes, may be -1 to read to end of the file
+         * @param path       given path
+         * @param offset     specified file position
+         * @param bufferSize buffer size of input stream
          */
-        InputStream getInputStream(Path path, long offset, long length);
+        InputStream getInputStream(Path path, long offset, int bufferSize) throws IOException;
     }
 
     /**
@@ -166,15 +163,13 @@ public interface FsFileCache {
     interface FileWriter {
 
         /**
-         * Returns an un-cached underlying file out stream to write file.
-         * The start write point will be set at given offset, and writeable bytes is given length.
-         * The length may be set to -1 to write unlimitedly.
+         * Opens an un-cache underlying output stream for file of given path at specified file position,
          *
-         * @param path   path of file
-         * @param offset the offset position, measured in bytes from the beginning of the file
-         * @param length writeable bytes, may be -1 to write unlimitedly
+         * @param path       given path
+         * @param offset     specified file position
+         * @param bufferSize buffer size of input stream
          */
-        OutputStream getOutputStream(Path path, long offset, long length);
+        OutputStream getOutputStream(Path path, long offset, int bufferSize) throws IOException;
     }
 
     /**
@@ -238,21 +233,21 @@ public interface FsFileCache {
     }
 
     /**
-     * Builder for {@link  FsFileCache}.
+     * Builder for {@link FsFileCache}.
      */
     class Builder {
 
-        private static final class FileCacheImpl implements FileCache {
+        private static final class BytesCacheImpl implements BytesCache {
 
-            private final FsCache<FilePos, byte[]> cache;
+            private final FsCache<BytesPos, byte[]> cache;
 
-            private FileCacheImpl(CacheGenerator.RemoveListener removeListener) {
+            private BytesCacheImpl(BytesCacheGenerator.RemoveListener removeListener) {
                 this.cache = FsCache.softCache((cache, key) ->
-                    removeListener.onCacheRemove(key, FileCacheImpl.this));
+                    removeListener.onCacheRemove(key, BytesCacheImpl.this));
             }
 
             @Override
-            public @Nullable byte[] get(FilePos key, @Nullable Function<FilePos, byte[]> function) {
+            public @Nullable byte[] get(BytesPos key, @Nullable Function<BytesPos, byte[]> function) {
                 if (function == null) {
                     return cache.get(key);
                 }
@@ -260,42 +255,50 @@ public interface FsFileCache {
             }
 
             @Override
-            public void put(FilePos key, byte[] value) {
+            public void put(BytesPos key, byte[] value) {
                 cache.put(key, value);
             }
 
             @Override
-            public void remove(FilePos key) {
+            public void remove(BytesPos key) {
                 cache.remove(key);
             }
 
             @Override
-            public void removeIf(BiPredicate<FilePos, byte[]> predicate) {
+            public void removeIf(BiPredicate<BytesPos, byte[]> predicate) {
                 cache.removeIf(predicate);
             }
         }
 
-        private static final CacheGenerator DEFAULT_CACHE_GENERATOR = FileCacheImpl::new;
+        private static final BytesCacheGenerator DEFAULT_CACHE_GENERATOR = BytesCacheImpl::new;
 
-        private static final FileReader DEFAULT_FILE_READER = (path, offset, length) -> {
+        private static final FileReader DEFAULT_FILE_READER = (path, offset, bufferSize) -> {
             try {
-                return FsIO.toInputStream(new RandomAccessFile(path.toFile(), "r"), offset, length);
-            } catch (FileNotFoundException e) {
-                throw new FsIOException(e);
+                RandomAccessFile random = new RandomAccessFile(path.toFile(), "r");
+                InputStream randomInput = FsIO.toInputStream(random, offset, -1);
+                return new BufferedInputStream(randomInput, bufferSize);
+            } catch (IOException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new IOException(e);
             }
         };
 
-        private static final FileWriter DEFAULT_FILE_WRITER = (path, offset, length) -> {
+        private static final FileWriter DEFAULT_FILE_WRITER = (path, offset, bufferSize) -> {
             try {
-                return FsIO.toOutputStream(new RandomAccessFile(path.toFile(), "rws"), offset, length);
-            } catch (FileNotFoundException e) {
-                throw new FsIOException(e);
+                RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw");
+                OutputStream randomOutput = FsIO.toOutputStream(random, offset, -1);
+                return new BufferedOutputStream(randomOutput, bufferSize);
+            } catch (IOException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new IOException(e);
             }
         };
 
         private int chunkSize = 1024 * 4;
         private int bufferSize = FsIO.IO_BUFFER_SIZE;
-        private CacheGenerator cacheGenerator = DEFAULT_CACHE_GENERATOR;
+        private BytesCacheGenerator bytesCacheGenerator = DEFAULT_CACHE_GENERATOR;
         private FileReader fileReader = DEFAULT_FILE_READER;
         private FileWriter fileWriter = DEFAULT_FILE_WRITER;
         private CacheReadListener cacheReadListener = null;
@@ -304,32 +307,34 @@ public interface FsFileCache {
         private FileWriteListener fileWriteListener = null;
 
         /**
-         * Sets file chunk size for caching, min is 128, default is {@link FsIO#IO_BUFFER_SIZE}.
+         * Sets file chunk size for caching, default is {@link FsIO#IO_BUFFER_SIZE}.
          *
          * @param chunkSize chunk size
          */
         public Builder chunkSize(int chunkSize) {
-            this.chunkSize = Math.max(chunkSize, 128);
+            FsCheck.checkArgument(chunkSize > 0, "chunkSize must > 0.");
+            this.chunkSize = chunkSize;
             return this;
         }
 
         /**
-         * Sets buffer size for IO operation, min is 128, default is {@link FsIO#IO_BUFFER_SIZE}.
+         * Sets buffer size for IO operation, default is {@link FsIO#IO_BUFFER_SIZE}.
          *
          * @param bufferSize buffer size
          */
         public Builder bufferSize(int bufferSize) {
-            this.bufferSize = Math.max(bufferSize, 128);
+            FsCheck.checkArgument(bufferSize > 0, "bufferSize must > 0.");
+            this.bufferSize = bufferSize;
             return this;
         }
 
         /**
          * Sets cache generator, the default generator uses {@link FsCache#softCache(FsCache.RemoveListener)}.
          *
-         * @param cacheGenerator cache generator
+         * @param bytesCacheGenerator cache generator
          */
-        public Builder cacheGenerator(CacheGenerator cacheGenerator) {
-            this.cacheGenerator = cacheGenerator;
+        public Builder cacheGenerator(BytesCacheGenerator bytesCacheGenerator) {
+            this.bytesCacheGenerator = bytesCacheGenerator;
             return this;
         }
 
@@ -400,7 +405,7 @@ public interface FsFileCache {
             return new FsFileCacheImpl(
                 chunkSize,
                 bufferSize,
-                cacheGenerator,
+                bytesCacheGenerator,
                 fileReader,
                 fileWriter,
                 cacheReadListener,
@@ -422,12 +427,12 @@ public interface FsFileCache {
             private final CacheWriteListener cacheWriteListener;
             private final FileReadListener fileReadListener;
             private final FileWriteListener fileWriteListener;
-            private final FileCache fileCache;
+            private final BytesCache fileCache;
 
             private FsFileCacheImpl(
                 int chunkSize,
                 int bufferSize,
-                CacheGenerator cacheGenerator,
+                BytesCacheGenerator bytesCacheGenerator,
                 FileReader fileReader,
                 FileWriter fileWriter,
                 CacheReadListener cacheReadListener,
@@ -443,9 +448,9 @@ public interface FsFileCache {
                 this.cacheWriteListener = cacheWriteListener;
                 this.fileReadListener = fileReadListener;
                 this.fileWriteListener = fileWriteListener;
-                this.fileCache = cacheGenerator.generate(new CacheGenerator.RemoveListener() {
+                this.fileCache = bytesCacheGenerator.generate(new BytesCacheGenerator.RemoveListener() {
                     @Override
-                    public void onCacheRemove(FilePos key, FileCache cache) {
+                    public void onCacheRemove(BytesPos key, BytesCache cache) {
                         fileCache.remove(key);
                     }
                 });
@@ -453,34 +458,34 @@ public interface FsFileCache {
 
             @Override
             public InputStream getInputStream(Path path, long offset) {
-                return new CacheInputStream(path, offset, -1);
+                return new CacheInputStream(path, offset);
             }
 
             @Override
             public OutputStream getOutputStream(Path path, long offset) {
-                return new CacheOutputStream(path, offset, -1, false);
+                return new CacheOutputStream(path, offset);
             }
 
             @Override
-            public OutputStream getOutputStream(Path path, long offset, long length) {
-                return new CacheOutputStream(path, offset, length, true);
+            public void setFileLength(Path path, long newLength) {
+                try {
+                    RandomAccessFile random = new RandomAccessFile(path.toFile(), "rws");
+                    random.setLength(newLength);
+                    random.close();
+                } catch (Exception e) {
+                    throw new FsIOException(e);
+                }
             }
 
             private final class CacheInputStream extends InputStream {
 
                 private final Path path;
-                private final long limit;
                 private long pos;
                 private InputStream underlying = null;
 
-                CacheInputStream(Path path, long offset, long length) {
+                CacheInputStream(Path path, long offset) {
                     try {
-                        if (length != -1) {
-                            FsCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
-                            this.limit = offset + length;
-                        } else {
-                            this.limit = length;
-                        }
+                        FsCheck.checkArgument(offset >= 0, "offset must >= 0.");
                         this.path = path;
                         this.pos = offset;
                     } catch (Exception e) {
@@ -492,29 +497,20 @@ public interface FsFileCache {
                 public synchronized int read(byte[] b, int off, int len) throws IOException {
                     try {
                         FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+                        if (pos == -1) {
+                            return -1;
+                        }
                         if (len == 0) {
                             return 0;
                         }
-                        int result;
-                        if (limit == -1) {
-                            result = read0(b, off, len);
+                        int readSize = read0(b, off, len);
+                        if (readSize == -1) {
+                            pos = -1;
+                            return -1;
                         } else {
-                            if (pos >= limit) {
-                                return -1;
-                            }
-                            long remaining = limit - pos;
-                            result = read0(b, off, (int) Math.min(len, remaining));
+                            pos += readSize;
                         }
-                        if (result == -1) {
-                            if (limit != -1) {
-                                pos = limit;
-                            } else {
-                                return -1;
-                            }
-                        } else {
-                            pos += result;
-                        }
-                        return result;
+                        return readSize;
                     } catch (IOException e) {
                         throw e;
                     } catch (Exception e) {
@@ -528,27 +524,40 @@ public interface FsFileCache {
                     final LongRef posIndex = new LongRef(pos / chunkSize);
                     long posOffset = pos % chunkSize;
                     String pathString = path.toString();
-                    FilePos filePos;
+                    BytesPos bytesPos;
+                    final BooleanRef cacheFlag = new BooleanRef(true);
                     while (true) {
-                        filePos = new FilePos(pathString, posIndex.get());
-                        byte[] bytes = fileCache.get(filePos, k -> {
+                        bytesPos = new BytesPos(pathString, posIndex.get());
+                        byte[] bytes = fileCache.get(bytesPos, k -> {
+                            cacheFlag.set(false);
                             if (underlying == null) {
                                 try {
-                                    RandomAccessFile random = new RandomAccessFile(path.toFile(), "r");
-                                    InputStream randomInput = FsIO.toInputStream(random, posIndex.get() * chunkSize, -1);
-                                    underlying = new BufferedInputStream(randomInput, bufferSize);
+                                    underlying = fileReader.getInputStream(path, posIndex.get() * chunkSize, bufferSize);
                                 } catch (Exception e) {
                                     throw new FsIOException(e);
                                 }
                             }
                             byte[] readBytes = FsIO.readBytes(underlying, chunkSize);
-                            return readBytes == null ? EOF : readBytes;
+                            if (readBytes == null) {
+                                return EOF;
+                            }
+                            return readBytes;
                         });
                         if (bytes.length > 0) {
                             int copySize = Math.min(remaining, bytes.length - (int) posOffset);
                             System.arraycopy(bytes, (int) posOffset, b, offset, copySize);
                             offset += copySize;
                             remaining -= copySize;
+                            if (cacheFlag.get()) {
+                                if (cacheReadListener != null) {
+                                    cacheReadListener.onCacheRead(path, posIndex.get() * chunkSize + posOffset, copySize);
+                                }
+                            } else {
+                                if (fileReadListener != null) {
+                                    fileReadListener.onFileRead(path, posIndex.get() * chunkSize + posOffset, copySize);
+                                }
+                            }
+                            cacheFlag.set(true);
                         }
                         if (remaining <= 0 || bytes.length < chunkSize) {
                             break;
@@ -564,71 +573,32 @@ public interface FsFileCache {
 
                 @Override
                 public synchronized int read() throws IOException {
-                    try {
-                        int result;
-                        if (limit != -1) {
-                            if (pos >= limit) {
-                                return -1;
-                            }
-                        }
-                        result = read0();
-                        if (result == -1) {
-                            if (limit != -1) {
-                                pos = limit;
-                            } else {
-                                return -1;
-                            }
-                        } else {
-                            pos++;
-                        }
-                        return result;
-                    } catch (IOException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new IOException(e);
+                    byte[] dest = new byte[1];
+                    int read = read(dest, 0, 1);
+                    if (read == -1) {
+                        return -1;
                     }
+                    return dest[0] & 0x000000ff;
                 }
 
-                private int read0() throws IOException {
-                    long posIndex = pos / chunkSize;
-                    long posOffset = pos % chunkSize;
-                    FilePos filePos = new FilePos(path.toString(), posIndex);
-                    byte[] bytes = fileCache.get(filePos, k -> {
-                        if (underlying == null) {
-                            try {
-                                RandomAccessFile random = new RandomAccessFile(path.toFile(), "r");
-                                InputStream randomInput = FsIO.toInputStream(random, posIndex * chunkSize, -1);
-                                underlying = new BufferedInputStream(randomInput, bufferSize);
-                            } catch (Exception e) {
-                                throw new FsIOException(e);
-                            }
-                        }
-                        byte[] readBytes = FsIO.readBytes(underlying, chunkSize);
-                        return readBytes == null ? EOF : readBytes;
-                    });
-                    if (bytes.length > 0 && posOffset < bytes.length) {
-                        return bytes[(int) posOffset] & 0x000000ff;
-                    }
-                    return -1;
-                }
-
-                @Override
-                public synchronized long skip(long n) throws IOException {
-                    try {
-                        if (n <= 0) {
-                            return 0;
-                        }
-                        if (limit == -1) {
-                            pos += n;
-                            return n;
-                        }
-                        long result = Math.min(n, limit - pos);
-                        pos += result;
-                        return result;
-                    } catch (Exception e) {
-                        throw new IOException(e);
-                    }
-                }
+                // @Override
+                // public synchronized long skip(long n) throws IOException {
+                //     try {
+                //         if (n <= 0) {
+                //             return 0;
+                //         }
+                //         if (underlying != null) {
+                //
+                //             long skip = underlying.skip(n);
+                //             pos += skip;
+                //             return skip;
+                //         }
+                //         pos += n;
+                //         return n;
+                //     } catch (Exception e) {
+                //         throw new IOException(e);
+                //     }
+                // }
 
                 @Override
                 public synchronized int available() throws IOException {
@@ -637,7 +607,7 @@ public interface FsFileCache {
                     }
                     long posIndex = pos / chunkSize;
                     long posOffset = pos % chunkSize;
-                    byte[] bytes = fileCache.get(new FilePos(path.toString(), posIndex), null);
+                    byte[] bytes = fileCache.get(new BytesPos(path.toString(), posIndex), null);
                     if (bytes == null || posOffset >= bytes.length) {
                         return 0;
                     }
@@ -645,7 +615,7 @@ public interface FsFileCache {
                 }
 
                 @Override
-                public void close() throws IOException {
+                public synchronized void close() throws IOException {
                     try {
                         if (underlying != null) {
                             underlying.close();
@@ -661,22 +631,13 @@ public interface FsFileCache {
             private final class CacheOutputStream extends OutputStream {
 
                 private final Path path;
-                private final long limit;
-                private final boolean resize;
                 private long pos;
-                private RandomAccessFile underlying = null;
+                private OutputStream underlying = null;
 
-                CacheOutputStream(Path path, long offset, long length, boolean resize) {
+                CacheOutputStream(Path path, long offset) {
                     try {
-                        if (length != -1) {
-                            FsCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
-                            this.limit = offset + length;
-                        } else {
-                            FsCheck.checkArgument(!resize, "resize must = false if limit = -1.");
-                            this.limit = length;
-                        }
+                        FsCheck.checkArgument(offset >= 0, "offset must >= 0.");
                         this.path = path;
-                        this.resize = resize;
                         this.pos = offset;
                     } catch (Exception e) {
                         throw new FsIOException(e);
@@ -690,12 +651,9 @@ public interface FsFileCache {
                         if (len == 0) {
                             return;
                         }
-                        if (limit != -1) {
-                            FsCheck.checkInBounds(pos + len - 1, pos, limit);
-                        }
                         writeUnderlying(b, off, len);
                         String pathString = path.toString();
-                        fileCache.removeIf((filePos, data) -> Objects.equals(filePos.getPath(), pathString));
+                        fileCache.removeIf((bytesPos, data) -> Objects.equals(bytesPos.getPath(), pathString));
                         pos += len;
                     } catch (IOException e) {
                         throw e;
@@ -706,34 +664,12 @@ public interface FsFileCache {
 
                 private void writeUnderlying(byte[] b, int off, int len) throws IOException {
                     if (underlying == null) {
-                        underlying = getUnderlying();
+                        underlying = fileWriter.getOutputStream(path, pos, bufferSize);
                     }
-                    FileChannel fileChannel = underlying.getChannel();
-                    FileLock fileLock = fileChannel.lock(pos, len, false);
-                    try {
-                        if (fileLock == null || !fileLock.isValid()) {
-                            throw new IOException("Lock file failed, pos: " + pos + ", len:- " + len + ".");
-                        }
-                        underlying.seek(pos);
-                        underlying.write(b, off, len);
-                        if (resize && pos + len >= limit) {
-                            underlying.setLength(limit);
-                        }
-                        fileChannel.force(true);
-                    } finally {
-                        if (fileLock != null) {
-                            fileLock.release();
-                        }
+                    underlying.write(b, off, len);
+                    if (fileWriteListener != null) {
+                        fileWriteListener.onFileWrite(path, pos, len);
                     }
-                }
-
-                private RandomAccessFile getUnderlying() throws IOException {
-                    if (underlying == null) {
-                        RandomAccessFile r = new RandomAccessFile(path.toFile(), "rws");
-                        underlying = r;
-                        return r;
-                    }
-                    return underlying;
                 }
 
                 @Override
@@ -744,7 +680,7 @@ public interface FsFileCache {
                 @Override
                 public synchronized void flush() throws IOException {
                     if (underlying != null) {
-                        underlying.getChannel().force(true);
+                        underlying.flush();
                     }
                 }
 

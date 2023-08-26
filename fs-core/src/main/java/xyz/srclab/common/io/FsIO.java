@@ -6,6 +6,7 @@ import xyz.srclab.common.base.FsString;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 
 /**
@@ -611,6 +612,7 @@ public class FsIO {
 
     /**
      * Wraps given random access file as an output stream.
+     * The stream will lock the file with exclusive lock by {@link FileChannel#tryLock(long, long, boolean)}.
      * <p>
      * Note this method will seek position of random access file to given offset immediately.
      *
@@ -624,6 +626,7 @@ public class FsIO {
      * Wraps given random access file as an output stream,
      * written bytes from {@code offset} position to {@code (offset + length)}.
      * {@code length} can be set to -1 if to write unlimitedly.
+     * The stream will lock the file with exclusive lock by {@link FileChannel#tryLock(long, long, boolean)}.
      * <p>
      * Note this method will seek position of random access file to given offset immediately.
      *

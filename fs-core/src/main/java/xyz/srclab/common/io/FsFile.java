@@ -111,7 +111,7 @@ public class FsFile {
      * @param length given length, maybe -1 to write unlimitedly
      */
     public static void writeBytes(Path path, long offset, long length, InputStream data) {
-        try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rws")) {
+        try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
             OutputStream dest = FsIO.toOutputStream(random, offset, length);
             FsIO.readBytesTo(data, dest);
             dest.flush();
@@ -167,7 +167,7 @@ public class FsFile {
      * @param charset given charset
      */
     public static void writeString(Path path, long offset, long length, CharSequence data, Charset charset) {
-        try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rws")) {
+        try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
             Writer writer = FsIO.toWriter(FsIO.toOutputStream(random, offset, length), charset);
             writer.append(data);
             writer.flush();

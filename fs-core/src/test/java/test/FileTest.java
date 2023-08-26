@@ -4,10 +4,13 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.io.FsFile;
+import xyz.srclab.common.io.FsFileCache;
+import xyz.srclab.common.io.FsIO;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class FileTest {
 
@@ -19,7 +22,7 @@ public class FileTest {
         String data = DATA;
         File file = new File("FileTest-testRead.txt");
         FileOutputStream fileOutputStream = new FileOutputStream(file, false);
-        fileOutputStream.write(DATA.getBytes(FsString.CHARSET));
+        fileOutputStream.write(data.getBytes(FsString.CHARSET));
         fileOutputStream.close();
         Assert.assertEquals(FsFile.readString(file.toPath()), data);
         Assert.assertEquals(
@@ -42,6 +45,26 @@ public class FileTest {
         Assert.assertEquals(FsFile.readString(file.toPath()), "lalala122");
         FsFile.writeString(file.toPath(), 7, 100, "3333中文中文");
         Assert.assertEquals(FsFile.readString(file.toPath()), "lalala13333中文中文");
+        file.delete();
+    }
+
+    @Test
+    public void testFileCache() throws IOException {
+        String data = "0123456789" +
+            "0123456789" +
+            "0123456789" +
+            "0123456789" +
+            "0123456789";
+        File file = new File("FileTest-testFileCache.txt");
+        FileOutputStream fileOutputStream = new FileOutputStream(file, false);
+        fileOutputStream.write(data.getBytes(FsString.CHARSET));
+        fileOutputStream.close();
+        FsFileCache fileCache = FsFileCache.newBuilder()
+            .chunkSize(3)
+            .bufferSize(16)
+            .build();
+        InputStream in = FsIO.limit(fileCache.getInputStream(file.toPath(), 5), 30);
+        IOTest.testInputStream(data, 5, 30, in, false);
         file.delete();
     }
 }
