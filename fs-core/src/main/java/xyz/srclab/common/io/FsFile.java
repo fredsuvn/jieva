@@ -36,6 +36,11 @@ public interface FsFile {
     }
 
     /**
+     * Returns whether current file is opened.
+     */
+    boolean isOpened();
+
+    /**
      * Opens current file with given mode,
      * the mode including "r", "rw", "rws", or "rwd", is same with {@link RandomAccessFile}.
      * <p>

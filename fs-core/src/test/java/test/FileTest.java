@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.base.ref.LongRef;
 import xyz.srclab.common.io.FsFile;
+import xyz.srclab.common.io.FsFileCache;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.io.FsIOException;
 
@@ -60,23 +61,17 @@ public class FileTest {
         file.delete();
     }
 
-    // @Test
-    // public void testFileCache() throws IOException {
-    //     String data = "0123456789" +
-    //         "0123456789" +
-    //         "0123456789" +
-    //         "0123456789" +
-    //         "0123456789";
-    //     File file = new File("FileTest-testFileCache.txt");
-    //     FileOutputStream fileOutputStream = new FileOutputStream(file, false);
-    //     fileOutputStream.write(data.getBytes(FsString.CHARSET));
-    //     fileOutputStream.close();
-    //     FsFileCache fileCache = FsFileCache.newBuilder()
-    //         .chunkSize(3)
-    //         .bufferSize(16)
-    //         .build();
-    //     InputStream in = FsIO.limit(fileCache.getInputStream(file.toPath(), 5), 30);
-    //     IOTest.testInputStream(data, 5, 30, in, false);
-    //     file.delete();
-    // }
+    @Test
+    public void testFileCache() throws IOException {
+        String data = DATA;
+        byte[] bytes = data.getBytes(FsString.CHARSET);
+        File file = createFile("FileTest-testFileCache.txt", data);
+        FsFileCache fileCache = FsFileCache.newBuilder()
+            .chunkSize(3)
+            .bufferSize(4)
+            .build();
+        InputStream in = FsIO.limit(fileCache.getInputStream(file.toPath(), 5), 30);
+        IOTest.testInputStream(data, 5, 30, in, false);
+        file.delete();
+    }
 }

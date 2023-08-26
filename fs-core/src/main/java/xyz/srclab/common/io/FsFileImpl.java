@@ -24,8 +24,13 @@ final class FsFileImpl implements FsFile {
     }
 
     @Override
+    public boolean isOpened() {
+        return random != null;
+    }
+
+    @Override
     public synchronized void open(String mode) {
-        if (random != null) {
+        if (isOpened()) {
             throw new FsIOException("The file has already opened.");
         }
         try {
@@ -37,7 +42,7 @@ final class FsFileImpl implements FsFile {
 
     @Override
     public synchronized void close() {
-        if (random == null) {
+        if (!isOpened()) {
             return;
         }
         try {
@@ -231,7 +236,7 @@ final class FsFileImpl implements FsFile {
     }
 
     private void checkOpen() {
-        if (random == null) {
+        if (!isOpened()) {
             throw new FsIOException("The file is closed or not yet open.");
         }
     }
