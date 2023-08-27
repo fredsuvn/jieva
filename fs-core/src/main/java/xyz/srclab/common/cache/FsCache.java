@@ -107,13 +107,13 @@ public interface FsCache<K, V> {
      * Returns value associating with given key from this cache.
      * If there is no entry for given key, a new value will be created by given loader.
      * <p>
-     * If the loader returns null, the null value will not be put.
+     * If the loader returns null, the null value will not be put and return null.
      *
      * @param key    given key
      * @param loader given loader
      */
     @Nullable
-    V get(K key, Function<? super K, ? extends V> loader);
+    V get(K key, Function<? super K, @Nullable ? extends V> loader);
 
     /**
      * Sets the value associated with given key, return old value or null if there is no old value.

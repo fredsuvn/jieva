@@ -15,15 +15,23 @@ import java.util.function.BiFunction;
 
 public class IOTest {
 
-    private static final String DATA = "1qaz2wsx3edc4rfv5tgb6yhn7ujm8ik,!@#$%^&**())$%^&*(*&^<?:LKJHGFDFVGBN" +
-        "阿萨法师房间卡死灵法师福卡上积分算法来释放IE覅偶就偶尔见佛耳机佛诶or";
+    public static final String DATA = "1qaz2wsx3edc4rfv5tgb6yhn7ujm8ik,!@#$%^&**())$%^&*(*&^<?:LKJHGFDFVGBN" +
+        "阿萨法师房间卡死灵法师福卡上积分算法来释放IE覅偶就偶尔见佛耳机佛诶or" +
+        "fasfasfjasdklfhjlasdhflhasdfjhuiwe83490748908" +
+        "发数据快乐风男记录卡说的汉服金坷垃浑身发冷哈涉及到覅uoashfuiopashjfuwehfuwehjfhew" +
+        "fasfbasjkfhjklashfjklasdhfjlkbasd8979023-47UN播放；ljkxkm,vwjik  ,necvsdfav";
 
     public static void testInputStream(
-        String data, int offset, int length,
+        String data,
+        int offset,
+        int length,
         InputStream inputStream,
         boolean testMark
     ) throws IOException {
         byte[] bytes = data.getBytes(FsString.CHARSET);
+        if (length < 128 || bytes.length - offset < length) {
+            throw new IllegalArgumentException("Data length not enough!");
+        }
         if (testMark) {
             Assert.assertTrue(inputStream.markSupported());
             long available = inputStream.available();
@@ -56,10 +64,15 @@ public class IOTest {
     }
 
     public static void testReader(
-        String data, int offset, int length,
+        String data,
+        int offset,
+        int length,
         Reader reader,
         boolean testMark
     ) throws IOException {
+        if (length < 128 || data.length() - offset < length) {
+            throw new IllegalArgumentException("Data length not enough!");
+        }
         if (testMark) {
             Assert.assertTrue(reader.markSupported());
             reader.mark(length);
@@ -85,9 +98,15 @@ public class IOTest {
     }
 
     public static void testOutStream(
-        long limit, OutputStream outputStream, BiFunction<Integer, Integer, byte[]> dest) throws IOException {
+        long limit,
+        OutputStream outputStream,
+        BiFunction<Integer, Integer, byte[]> dest
+    ) throws IOException {
+        if (limit != -1 && limit < 128) {
+            throw new IllegalArgumentException("Written length must >= 128 or -1!");
+        }
         byte[] bytes = limit > 0 ? buildRandomBytes((int) limit) : buildRandomBytes(1024);
-        long remaining = limit > 0 ? limit : 1024;
+        long remaining = bytes.length;
         outputStream.write(bytes, 0, 66);
         outputStream.flush();
         Assert.assertEquals(dest.apply(0, 66), Arrays.copyOfRange(bytes, 0, 66));
@@ -96,15 +115,23 @@ public class IOTest {
         outputStream.flush();
         Assert.assertEquals(dest.apply(66, 1), new byte[]{22});
         remaining -= 1;
+        int writeSize = (int) (remaining - 8);
+        outputStream.write(bytes, 8, writeSize);
+        outputStream.flush();
+        Assert.assertEquals(dest.apply(67, writeSize), Arrays.copyOfRange(bytes, 8, 8 + writeSize));
+        remaining -= writeSize;
         outputStream.write(bytes, 0, (int) remaining);
         outputStream.flush();
-        Assert.assertEquals(dest.apply(67, (int) remaining), Arrays.copyOfRange(bytes, 0, (int) remaining));
+        Assert.assertEquals(dest.apply(67 + writeSize, (int) remaining), Arrays.copyOfRange(bytes, 0, (int) remaining));
         if (limit > 0) {
             Assert.expectThrows(IOException.class, () -> outputStream.write(bytes, 0, bytes.length));
         }
     }
 
-    public static void testWriter(Writer writer, BiFunction<Integer, Integer, char[]> dest) throws IOException {
+    public static void testWriter(
+        Writer writer,
+        BiFunction<Integer, Integer, char[]> dest
+    ) throws IOException {
         char[] chars = DATA.toCharArray();
         writer.write(chars, 0, 66);
         writer.flush();
@@ -202,13 +229,13 @@ public class IOTest {
         File file = FileTest.createFile("IOTest-testWrapper.txt", data);
         RandomAccessFile random = new RandomAccessFile(file, "rws");
 
-        testInputStream(data, 3, 100, new ByteArrayInputStream(dataBytes, 3, 100), true);
+        testInputStream(data, 3, 222, new ByteArrayInputStream(dataBytes, 3, 222), true);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(ByteBuffer.wrap(data.getBytes(FsString.CHARSET))), true);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(new StringReader(DATA)), false);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(random), true);
-        testInputStream(data, 2, 66, FsIO.toInputStream(random, 2, 66), true);
-        testInputStream(data, 2, 66, FsIO.limit(new ByteArrayInputStream(dataBytes, 2, 66), 66), false);
-        testReader(data, 5, 55, new StringReader(data.substring(5, 5 + 55)), true);
+        testInputStream(data, 2, 131, FsIO.toInputStream(random, 2, 131), true);
+        testInputStream(data, 2, 131, FsIO.limit(new ByteArrayInputStream(dataBytes, 2, 131), 131), false);
+        testReader(data, 5, 155, new StringReader(data.substring(5, 5 + 155)), true);
         testReader(data, 0, data.length(), FsIO.toReader(CharBuffer.wrap(DATA)), true);
         testReader(data, 0, data.length(), FsIO.toReader(new ByteArrayInputStream(DATA.getBytes(FsString.CHARSET))), false);
 
@@ -225,7 +252,9 @@ public class IOTest {
             Arrays.copyOfRange(sb.toString().getBytes(FsString.CHARSET), off, off + len));
         testOutStream(-1, FsIO.toOutputStream(random), (off, len) ->
             FsIO.readBytes(file.toPath(), off, len));
-        testOutStream(88, FsIO.toOutputStream(random, 8, 88), (off, len) ->
+        testOutStream(188, FsIO.toOutputStream(random, 8, 188), (off, len) ->
+            FsIO.readBytes(file.toPath(), off + 8, len));
+        testOutStream(-1, FsIO.toOutputStream(random, 8, -1), (off, len) ->
             FsIO.readBytes(file.toPath(), off + 8, len));
         testWriter(FsIO.toWriter(CharBuffer.wrap(chars)), (off, len) ->
             Arrays.copyOfRange(chars, off, off + len));

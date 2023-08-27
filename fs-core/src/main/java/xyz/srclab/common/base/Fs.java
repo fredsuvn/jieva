@@ -894,4 +894,30 @@ public class Fs {
             .build()
             .copyProperties(source, sourceType, dest, destType);
     }
+
+    /**
+     * Returns chunk count of total value and chunk size:
+     * <pre>
+     *     return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+     * </pre>
+     *
+     * @param total     total value
+     * @param chunkSize chunk size
+     */
+    public static int chunkCount(int total, int chunkSize) {
+        return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+    }
+
+    /**
+     * Returns chunk count of total value and chunk size:
+     * <pre>
+     *     return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+     * </pre>
+     *
+     * @param total     total value
+     * @param chunkSize chunk size
+     */
+    public static long chunkCount(long total, long chunkSize) {
+        return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+    }
 }

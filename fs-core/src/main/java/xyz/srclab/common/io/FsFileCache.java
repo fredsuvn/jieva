@@ -1,5 +1,6 @@
 package xyz.srclab.common.io;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import xyz.srclab.annotations.Nullable;
@@ -57,19 +58,24 @@ public interface FsFileCache {
     void setFileLength(Path path, long newLength);
 
     /**
-     * Generator for bytes cache.
+     * Returns cached file chunk count.
      */
-    interface BytesCacheGenerator {
+    int cachedChunkCount();
+
+    /**
+     * Generator for file chunk cache.
+     */
+    interface ChunkCacheGenerator {
 
         /**
-         * Generates a new bytes cache with given remove listener.
+         * Generates a new file chunk cache with given remove listener.
          *
          * @param removeListener given remove listener
          */
-        BytesCache generate(RemoveListener removeListener);
+        ChunkCache generate(RemoveListener removeListener);
 
         /**
-         * Bytes cache remove listener.
+         * Chunk cache remove listener.
          */
         interface RemoveListener {
 
@@ -79,7 +85,7 @@ public interface FsFileCache {
              * @param key   key of the cache
              * @param cache cache itself
              */
-            void onCacheRemove(BytesPos key, BytesCache cache);
+            void onCacheRemove(ChunkIndex key, ChunkCache cache);
         }
     }
 
@@ -87,18 +93,17 @@ public interface FsFileCache {
      * Cache interface used for {@link FsFileCache}, must support remove listener.
      */
     @ThreadSafe
-    interface BytesCache {
+    interface ChunkCache {
 
         /**
-         * Gets cached value, if the value doesn't exist, create and put a new one with given function.
+         * Gets cached file chunk value, if the value doesn't exist, create and put a new one with given function.
          * If the function is null, return null else return cached or new value.
-         * <p>
-         * Note whole operation must be atomic.
+         * If the function returns null, no value will be cached and return null.
          *
          * @param key key of the value
          */
         @Nullable
-        byte[] get(BytesPos key, @Nullable Function<BytesPos, byte[]> function);
+        Chunk get(ChunkIndex key, @Nullable Function<ChunkIndex, @Nullable Chunk> function);
 
         /**
          * Puts new value of specified key
@@ -106,29 +111,34 @@ public interface FsFileCache {
          * @param key   specified key
          * @param value new value
          */
-        void put(BytesPos key, byte[] value);
+        void put(ChunkIndex key, Chunk value);
 
         /**
          * Removes the value associated with given key.
          *
          * @param key given key
          */
-        void remove(BytesPos key);
+        void remove(ChunkIndex key);
 
         /**
          * Removes values of which key and value (first and second param) pass given predicate.
          *
          * @param predicate given predicate
          */
-        void removeIf(BiPredicate<BytesPos, byte[]> predicate);
+        void removeIf(BiPredicate<ChunkIndex, Chunk> predicate);
+
+        /**
+         * Returns cached size.
+         */
+        int size();
     }
 
     /**
-     * Key for bytes cache, holds file path and start position of cached bytes data.
+     * Key for chunk cache, holds file path and index of cached chunk data.
      */
     @Data
     @EqualsAndHashCode
-    class BytesPos {
+    class ChunkIndex {
         /**
          * File path.
          */
@@ -137,6 +147,21 @@ public interface FsFileCache {
          * Start position of cached file data.
          */
         private final long position;
+    }
+
+    /**
+     * Value for chunk cache, holds file chunk data and tail flag.
+     */
+    @AllArgsConstructor
+    class Chunk {
+        /**
+         * File chunk data.
+         */
+        private final byte[] data;
+        /**
+         * Whether this chunk is end of the file
+         */
+        private final boolean eof;
     }
 
     /**
@@ -217,17 +242,17 @@ public interface FsFileCache {
      */
     class Builder {
 
-        private static final class BytesCacheImpl implements BytesCache {
+        private static final class ChunkCacheImpl implements ChunkCache {
 
-            private final FsCache<BytesPos, byte[]> cache;
+            private final FsCache<ChunkIndex, Chunk> cache;
 
-            private BytesCacheImpl(BytesCacheGenerator.RemoveListener removeListener) {
+            private ChunkCacheImpl(ChunkCacheGenerator.RemoveListener removeListener) {
                 this.cache = FsCache.softCache((cache, key) ->
-                    removeListener.onCacheRemove(key, BytesCacheImpl.this));
+                    removeListener.onCacheRemove(key, ChunkCacheImpl.this));
             }
 
             @Override
-            public @Nullable byte[] get(BytesPos key, @Nullable Function<BytesPos, byte[]> function) {
+            public @Nullable Chunk get(ChunkIndex key, @Nullable Function<ChunkIndex, Chunk> function) {
                 if (function == null) {
                     return cache.get(key);
                 }
@@ -235,28 +260,33 @@ public interface FsFileCache {
             }
 
             @Override
-            public void put(BytesPos key, byte[] value) {
+            public void put(ChunkIndex key, Chunk value) {
                 cache.put(key, value);
             }
 
             @Override
-            public void remove(BytesPos key) {
+            public void remove(ChunkIndex key) {
                 cache.remove(key);
             }
 
             @Override
-            public void removeIf(BiPredicate<BytesPos, byte[]> predicate) {
+            public void removeIf(BiPredicate<ChunkIndex, Chunk> predicate) {
                 cache.removeIf(predicate);
+            }
+
+            @Override
+            public int size() {
+                return cache.size();
             }
         }
 
-        private static final BytesCacheGenerator DEFAULT_CACHE_GENERATOR = BytesCacheImpl::new;
+        private static final ChunkCacheGenerator DEFAULT_CACHE_GENERATOR = ChunkCacheImpl::new;
 
         private static final FileAccessGenerator DEFAULT_FILE_ACCESS_GENERATOR = FsFile::from;
 
         private int chunkSize = 1024 * 4;
         private int bufferSize = FsIO.IO_BUFFER_SIZE;
-        private BytesCacheGenerator bytesCacheGenerator = DEFAULT_CACHE_GENERATOR;
+        private ChunkCacheGenerator chunkCacheGenerator = DEFAULT_CACHE_GENERATOR;
         private FileAccessGenerator fileAccessGenerator = DEFAULT_FILE_ACCESS_GENERATOR;
         private CacheReadListener cacheReadListener = null;
         private CacheWriteListener cacheWriteListener = null;
@@ -288,10 +318,10 @@ public interface FsFileCache {
         /**
          * Sets cache generator, default uses {@link FsCache#softCache(FsCache.RemoveListener)}.
          *
-         * @param bytesCacheGenerator cache generator
+         * @param chunkCacheGenerator cache generator
          */
-        public Builder cacheGenerator(BytesCacheGenerator bytesCacheGenerator) {
-            this.bytesCacheGenerator = bytesCacheGenerator;
+        public Builder cacheGenerator(ChunkCacheGenerator chunkCacheGenerator) {
+            this.chunkCacheGenerator = chunkCacheGenerator;
             return this;
         }
 
@@ -352,7 +382,7 @@ public interface FsFileCache {
             return new FsFileCacheImpl(
                 chunkSize,
                 bufferSize,
-                bytesCacheGenerator,
+                chunkCacheGenerator,
                 fileAccessGenerator,
                 cacheReadListener,
                 cacheWriteListener,
@@ -363,7 +393,7 @@ public interface FsFileCache {
 
         private static final class FsFileCacheImpl implements FsFileCache {
 
-            private static final byte[] EOF = new byte[0];
+            private static final Chunk EOF = new Chunk(new byte[0], true);
 
             private final int chunkSize;
             private final int bufferSize;
@@ -372,12 +402,12 @@ public interface FsFileCache {
             private final CacheWriteListener cacheWriteListener;
             private final FileReadListener fileReadListener;
             private final FileWriteListener fileWriteListener;
-            private final BytesCache fileCache;
+            private final ChunkCache chunkCache;
 
             private FsFileCacheImpl(
                 int chunkSize,
                 int bufferSize,
-                BytesCacheGenerator bytesCacheGenerator,
+                ChunkCacheGenerator chunkCacheGenerator,
                 FileAccessGenerator fileAccessGenerator,
                 CacheReadListener cacheReadListener,
                 CacheWriteListener cacheWriteListener,
@@ -391,10 +421,10 @@ public interface FsFileCache {
                 this.cacheWriteListener = cacheWriteListener;
                 this.fileReadListener = fileReadListener;
                 this.fileWriteListener = fileWriteListener;
-                this.fileCache = bytesCacheGenerator.generate(new BytesCacheGenerator.RemoveListener() {
+                this.chunkCache = chunkCacheGenerator.generate(new ChunkCacheGenerator.RemoveListener() {
                     @Override
-                    public void onCacheRemove(BytesPos key, BytesCache cache) {
-                        fileCache.remove(key);
+                    public void onCacheRemove(ChunkIndex key, ChunkCache cache) {
+                        chunkCache.remove(key);
                     }
                 });
             }
@@ -415,9 +445,15 @@ public interface FsFileCache {
                     RandomAccessFile random = new RandomAccessFile(path.toFile(), "rws");
                     random.setLength(newLength);
                     random.close();
+                    chunkCache.removeIf((c, v) -> Objects.equals(path.toString(), c.path));
                 } catch (Exception e) {
                     throw new FsIOException(e);
                 }
+            }
+
+            @Override
+            public int cachedChunkCount() {
+                return chunkCache.size();
             }
 
             private final class CacheInputStream extends InputStream {
@@ -467,23 +503,23 @@ public interface FsFileCache {
                 private int read0(byte[] b, int off, int len) throws IOException {
                     int offset = off;
                     int remaining = len;
-                    final LongRef posIndex = new LongRef(pos / chunkSize);
-                    long posOffset = pos % chunkSize;
+                    final LongRef chunkIndex = new LongRef(pos / chunkSize);
+                    long chunkOffset = pos % chunkSize;
                     String pathString = path.toString();
-                    BytesPos bytesPos;
+                    ChunkIndex chunkIndexKey;
                     final BooleanRef cacheFlag = new BooleanRef(true);
                     while (true) {
-                        bytesPos = new BytesPos(pathString, posIndex.get());
-                        long indexPos = posIndex.get() * chunkSize;
-                        byte[] bytes = fileCache.get(bytesPos, k -> {
+                        chunkIndexKey = new ChunkIndex(pathString, chunkIndex.get());
+                        long chunkPos = chunkIndex.get() * chunkSize;
+                        Chunk chunk = chunkCache.get(chunkIndexKey, k -> {
                             cacheFlag.set(false);
                             if (!underlying.isOpened()) {
                                 underlying.open("r");
                             }
-                            if (underlying.position() != indexPos) {
-                                underlying.position(indexPos);
-                            }
-                            if (buffered == null || bufferedPos != indexPos) {
+                            if (buffered == null || bufferedPos != chunkPos) {
+                                if (underlying.position() != chunkPos) {
+                                    underlying.position(chunkPos);
+                                }
                                 buffered = new BufferedInputStream(underlying.bindInputStream(), bufferSize);
                             }
                             byte[] readBytes = FsIO.readBytes(buffered, chunkSize);
@@ -491,29 +527,34 @@ public interface FsFileCache {
                                 return EOF;
                             }
                             bufferedPos += readBytes.length;
-                            return readBytes;
+                            Chunk newChunk = readBytes.length < chunkSize ?
+                                new Chunk(readBytes, true) : new Chunk(readBytes, false);
+                            if (cacheWriteListener != null) {
+                                cacheWriteListener.onCacheWrite(path, chunkPos, readBytes.length);
+                            }
+                            return newChunk;
                         });
-                        if (bytes.length > 0) {
-                            int copySize = Math.min(remaining, bytes.length - (int) posOffset);
-                            System.arraycopy(bytes, (int) posOffset, b, offset, copySize);
+                        if (chunk.data.length > 0) {
+                            int copySize = Math.min(remaining, chunk.data.length - (int) chunkOffset);
+                            System.arraycopy(chunk.data, (int) chunkOffset, b, offset, copySize);
                             offset += copySize;
                             remaining -= copySize;
                             if (cacheFlag.get()) {
                                 if (cacheReadListener != null) {
-                                    cacheReadListener.onCacheRead(path, indexPos + posOffset, copySize);
+                                    cacheReadListener.onCacheRead(path, chunkPos + chunkOffset, copySize);
                                 }
                             } else {
                                 if (fileReadListener != null) {
-                                    fileReadListener.onFileRead(path, indexPos + posOffset, copySize);
+                                    fileReadListener.onFileRead(path, chunkPos + chunkOffset, copySize);
                                 }
                             }
                         }
-                        if (remaining <= 0 || bytes.length < chunkSize) {
+                        if (remaining <= 0 || chunk.eof) {
                             break;
                         }
                         cacheFlag.set(true);
-                        posIndex.incrementAndGet();
-                        posOffset = 0;
+                        chunkIndex.incrementAndGet();
+                        chunkOffset = 0;
                     }
                     if (remaining == len) {
                         return -1;
@@ -542,11 +583,11 @@ public interface FsFileCache {
                     }
                     long posIndex = pos / chunkSize;
                     long posOffset = pos % chunkSize;
-                    byte[] bytes = fileCache.get(new BytesPos(path.toString(), posIndex), null);
-                    if (bytes == null || posOffset >= bytes.length) {
+                    Chunk chunk = chunkCache.get(new ChunkIndex(path.toString(), posIndex), null);
+                    if (chunk == null || posOffset >= chunk.data.length) {
                         return 0;
                     }
-                    return bytes.length - (int) posIndex;
+                    return chunk.data.length - (int) posIndex;
                 }
 
                 @Override
@@ -587,7 +628,7 @@ public interface FsFileCache {
                         }
                         writeUnderlying(b, off, len);
                         String pathString = path.toString();
-                        fileCache.removeIf((bytesPos, data) -> Objects.equals(bytesPos.getPath(), pathString));
+                        chunkCache.removeIf((chunkPos, data) -> Objects.equals(chunkPos.getPath(), pathString));
                         pos += len;
                     } catch (IOException e) {
                         throw e;
@@ -605,6 +646,7 @@ public interface FsFileCache {
                     }
                     if (buffered == null || bufferedPos != pos) {
                         buffered = new BufferedOutputStream(underlying.bindOutputStream(), bufferSize);
+                        bufferedPos = pos;
                     }
                     if (underlying.position() != pos) {
                         underlying.position(pos);
@@ -623,6 +665,9 @@ public interface FsFileCache {
 
                 @Override
                 public synchronized void flush() throws IOException {
+                    if (buffered != null && bufferedPos == pos) {
+                        buffered.flush();
+                    }
                     if (underlying.isOpened()) {
                         try {
                             underlying.sync();

@@ -2,6 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.base.ref.LongRef;
 import xyz.srclab.common.io.FsFile;
@@ -16,9 +17,6 @@ import java.io.InputStream;
 
 public class FileTest {
 
-    private static final String DATA = "1qaz2wsx3edc4rfv5tgb6yhn7ujm8ik,!@#$%^&**())$%^&*(*&^<?:LKJHGFDFVGBN" +
-        "阿萨法师房间卡死灵法师福卡上积分算法来释放IE覅偶就偶尔见佛耳机佛诶or";
-
     public static File createFile(String path, String data) throws IOException {
         File file = new File(path);
         FileOutputStream fileOutputStream = new FileOutputStream(file, false);
@@ -29,7 +27,7 @@ public class FileTest {
 
     @Test
     public void testFile() throws IOException {
-        String data = DATA;
+        String data = IOTest.DATA;
         byte[] bytes = data.getBytes(FsString.CHARSET);
         File file = createFile("FileTest-testFile.txt", data);
         FsFile fsFile = FsFile.from(file.toPath());
@@ -39,7 +37,7 @@ public class FileTest {
         InputStream bin = fsFile.bindInputStream();
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);
         fsFile.position(2);
-        IOTest.testInputStream(data, 2, 30, FsIO.limit(fsFile.bindInputStream(), 30), false);
+        IOTest.testInputStream(data, 2, 130, FsIO.limit(fsFile.bindInputStream(), 130), false);
         fsFile.close();
         Assert.expectThrows(FsIOException.class, () -> fsFile.bindInputStream());
         Assert.expectThrows(FsIOException.class, () -> bin.read());
@@ -47,9 +45,10 @@ public class FileTest {
         fsFile.position(3);
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);
         fsFile.position(2);
-        IOTest.testInputStream(data, 2, 30, FsIO.limit(fsFile.bindInputStream(), 30), false);
+        IOTest.testInputStream(data, 2, 130, FsIO.limit(fsFile.bindInputStream(), 130), false);
         fsFile.position(4);
-        IOTest.testOutStream(-1, fsFile.bindOutputStream(), (offset, length) -> FsIO.readBytes(file.toPath(), offset + 4, length));
+        IOTest.testOutStream(-1, fsFile.bindOutputStream(), (offset, length) ->
+            FsIO.readBytes(file.toPath(), offset + 4, length));
         long fileLength = fsFile.length();
         fsFile.position(fileLength);
         LongRef newLength = new LongRef(fileLength);
@@ -58,20 +57,105 @@ public class FileTest {
             return FsIO.readBytes(file.toPath(), offset + fileLength, length);
         });
         Assert.assertEquals(fsFile.length(), newLength.get());
+        fsFile.position(8);
+        IOTest.testOutStream(233, FsIO.limit(fsFile.bindOutputStream(), 233), (offset, length) ->
+            FsIO.readBytes(file.toPath(), offset + 8, length));
+        file.delete();
+    }
+
+    @Test
+    public void testFileCacheIO() throws IOException {
+        testFileCacheIO0(3, 4);
+        testFileCacheIO0(4, 3);
+        testFileCacheIO0(3, 40000);
+        testFileCacheIO0(40000, 3);
+    }
+
+    private void testFileCacheIO0(int chunkSize, int bufferSize) throws IOException {
+        String data = IOTest.DATA;
+        byte[] bytes = data.getBytes(FsString.CHARSET);
+        File file = createFile("FileTest-testFileCacheIO.txt", data);
+        FsFileCache fileCache = FsFileCache.newBuilder()
+            .chunkSize(chunkSize)
+            .bufferSize(bufferSize)
+            .build();
+        IOTest.testInputStream(data, 0, bytes.length, fileCache.getInputStream(file.toPath(), 0), false);
+        IOTest.testInputStream(data, 5, 230, FsIO.limit(fileCache.getInputStream(file.toPath(), 5), 230), false);
+        IOTest.testInputStream(data, 0, 230, FsIO.limit(fileCache.getInputStream(file.toPath(), 0), 230), false);
+        IOTest.testInputStream(data, 0, bytes.length, fileCache.getInputStream(file.toPath(), 0), false);
+        IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), 4), (offset, length) ->
+            FsIO.readBytes(file.toPath(), offset + 4, length));
+        long fileLength = file.length();
+        LongRef newLength = new LongRef(fileLength);
+        IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), fileLength), (offset, length) -> {
+            newLength.incrementAndGet(length);
+            return FsIO.readBytes(file.toPath(), offset + fileLength, length);
+        });
+        Assert.assertEquals(file.length(), newLength.get());
+        IOTest.testOutStream(233, FsIO.limit(fileCache.getOutputStream(file.toPath(), 0), 233), (offset, length) ->
+            FsIO.readBytes(file.toPath(), offset, length));
+        IOTest.testOutStream(233, FsIO.limit(fileCache.getOutputStream(file.toPath(), 3), 233), (offset, length) ->
+            FsIO.readBytes(file.toPath(), offset + 3, length));
         file.delete();
     }
 
     @Test
     public void testFileCache() throws IOException {
-        String data = DATA;
-        byte[] bytes = data.getBytes(FsString.CHARSET);
-        File file = createFile("FileTest-testFileCache.txt", data);
+        String data = "01234567890123456789";
+        byte[] bytes1 = data.getBytes(FsString.CHARSET);
+        byte[] bytes2 = (data + data + data).getBytes(FsString.CHARSET);
+        File file1 = createFile("FileTest-testFileCache1.txt", data);
+        File file2 = createFile("FileTest-testFileCache2.txt", data + data + data);
+        LongRef cacheRead = new LongRef();
+        LongRef fileRead = new LongRef();
+        LongRef cacheWrite = new LongRef();
+        LongRef fileWrite = new LongRef();
         FsFileCache fileCache = FsFileCache.newBuilder()
             .chunkSize(3)
             .bufferSize(4)
+            .cacheReadListener((path, offset, length) -> cacheRead.incrementAndGet(length))
+            .fileReadListener((path, offset, length) -> fileRead.incrementAndGet(length))
+            .cacheWriteListener((path, offset, length) -> cacheWrite.incrementAndGet(length))
+            .fileWriteListener((path, offset, length) -> fileWrite.incrementAndGet(length))
             .build();
-        InputStream in = FsIO.limit(fileCache.getInputStream(file.toPath(), 5), 30);
-        IOTest.testInputStream(data, 5, 30, in, false);
-        file.delete();
+        byte[] dest = new byte[bytes1.length * 4];
+        fileCache.getInputStream(file1.toPath(), 0).read(dest);
+        Assert.assertEquals(fileCache.cachedChunkCount(), Fs.chunkCount(bytes1.length, 3));
+        fileCache.getInputStream(file2.toPath(), 0).read(dest);
+        Assert.assertEquals(fileCache.cachedChunkCount(), Fs.chunkCount(bytes1.length + bytes2.length, 3) + 1);
+        Assert.assertEquals(cacheRead.get(), 0);
+        Assert.assertEquals(fileRead.get(), bytes1.length + bytes2.length);
+        Assert.assertEquals(cacheWrite.get(), bytes1.length + bytes2.length);
+
+        fileCache.getInputStream(file1.toPath(), 0).read(dest);
+        Assert.assertEquals(cacheRead.get(), bytes1.length);
+        Assert.assertEquals(fileRead.get(), bytes1.length + bytes2.length);
+
+        fileCache.getInputStream(file2.toPath(), 0).read(dest);
+        Assert.assertEquals(cacheRead.get(), bytes1.length + bytes2.length);
+        Assert.assertEquals(fileRead.get(), bytes1.length + bytes2.length);
+
+        fileCache.getOutputStream(file1.toPath(), 10).write(new byte[5]);
+        Assert.assertEquals(cacheRead.get(), bytes1.length + bytes2.length);
+        Assert.assertEquals(fileRead.get(), bytes1.length + bytes2.length);
+        Assert.assertEquals(cacheWrite.get(), bytes1.length + bytes2.length);
+        Assert.assertEquals(fileWrite.get(), 5);
+
+        fileCache.getInputStream(file1.toPath(), 0).read(dest);
+        Assert.assertEquals(cacheRead.get(), bytes1.length + bytes2.length);
+        Assert.assertEquals(fileRead.get(), bytes1.length + bytes2.length + bytes1.length);
+        Assert.assertEquals(cacheWrite.get(), bytes1.length + bytes2.length + bytes1.length);
+        Assert.assertEquals(fileWrite.get(), 5);
+
+        fileCache.setFileLength(file1.toPath(), 40);
+        fileCache.getOutputStream(file1.toPath(), 10).write(new byte[25]);
+        fileCache.getInputStream(file1.toPath(), 0).read(dest);
+        Assert.assertEquals(cacheRead.get(), bytes1.length + bytes2.length);
+        Assert.assertEquals(fileRead.get(), bytes1.length + bytes2.length + bytes1.length + 40);
+        Assert.assertEquals(cacheWrite.get(), bytes1.length + bytes2.length + bytes1.length + 40);
+        Assert.assertEquals(fileWrite.get(), 5 + 25);
+
+        file1.delete();
+        file2.delete();
     }
 }
