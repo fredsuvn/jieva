@@ -1,16 +1,16 @@
-package xyz.srclab.common.io;
+package xyz.srclab.common.codec;
 
 /**
- * Exception for IO.
+ * Exception for codec.
  *
  * @author fredsuvn
  */
-public class FsIOException extends RuntimeException {
+public class FsCodecException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public FsIOException() {
+    public FsCodecException() {
     }
 
     /**
@@ -18,7 +18,7 @@ public class FsIOException extends RuntimeException {
      *
      * @param message exception message
      */
-    public FsIOException(String message) {
+    public FsCodecException(String message) {
         super(message);
     }
 
@@ -28,7 +28,7 @@ public class FsIOException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public FsIOException(String message, Throwable cause) {
+    public FsCodecException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +37,7 @@ public class FsIOException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public FsIOException(Throwable cause) {
+    public FsCodecException(Throwable cause) {
         super(cause);
     }
 }
