@@ -34,18 +34,13 @@ final class Base64Encoder implements FsEncoder {
     }
 
     @Override
-    public int encodeTo(byte[] source, byte[] dest) {
-        return encoder.encode(source, dest);
-    }
-
-    @Override
-    public int encodeTo(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
+    public int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
             return encoder.encode(source, dest);
         }
         ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
         ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
-        return encodeTo(in, out);
+        return encode(in, out);
     }
 
     @Override
@@ -54,7 +49,7 @@ final class Base64Encoder implements FsEncoder {
     }
 
     @Override
-    public int encodeTo(ByteBuffer source, ByteBuffer dest) {
+    public int encode(ByteBuffer source, ByteBuffer dest) {
         return (int) encode(FsIO.toInputStream(source), FsIO.toOutputStream(dest));
     }
 
@@ -90,18 +85,13 @@ final class Base64Encoder implements FsEncoder {
     }
 
     @Override
-    public int decodeTo(byte[] source, byte[] dest) {
-        return decoder.decode(source, dest);
-    }
-
-    @Override
-    public int decodeTo(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
+    public int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
             return decoder.decode(source, dest);
         }
         ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
         ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
-        return decodeTo(in, out);
+        return decode(in, out);
     }
 
     @Override
@@ -110,7 +100,7 @@ final class Base64Encoder implements FsEncoder {
     }
 
     @Override
-    public int decodeTo(ByteBuffer source, ByteBuffer dest) {
+    public int decode(ByteBuffer source, ByteBuffer dest) {
         return (int) decode(FsIO.toInputStream(source), FsIO.toOutputStream(dest));
     }
 

@@ -9,25 +9,118 @@ import xyz.srclab.common.codec.FsEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class CodecTest {
 
     @Test
-    public void testBase64() {
+    public void testEncoder() {
         testEncoder(FsCodec.base64(), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH", 3, 4);
+        testEncoder(FsCodec.hex(), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687", 1, 2);
     }
 
-    private void testEncoder(FsEncoder encoder, String source, String dest, int sourceChunkSize, int destChunkSize) {
+    private void testEncoder(
+        FsEncoder encoder, String source, String dest, int sourceChunkSize, int destChunkSize) {
         byte[] srcBytes = source.getBytes(FsString.CHARSET);
         byte[] destBytes = dest.getBytes(StandardCharsets.ISO_8859_1);
+        byte[] srcBytesPadding = padBytes(srcBytes);
+        byte[] destBytesPadding = padBytes(destBytes);
+        byte[] bytes = new byte[1024];
+
+        //--------------encode
+
+        Assert.assertEquals(encoder.encode(srcBytes), destBytes);
+        Assert.assertEquals(encoder.encode(srcBytes, 0, srcBytes.length), destBytes);
+        Assert.assertEquals(encoder.encode(srcBytesPadding, 10, srcBytes.length), destBytes);
+        Assert.expectThrows(IndexOutOfBoundsException.class, () -> encoder.encode(srcBytes, 0, 9999999));
+
+        Arrays.fill(bytes, (byte) 0);
+        Assert.assertEquals(
+            encoder.encode(srcBytes, 0, bytes, 0, srcBytes.length),
+            Fs.chunkCount(srcBytes.length, sourceChunkSize) * destChunkSize
+        );
+        Assert.assertEquals(Arrays.copyOf(bytes, destBytes.length), destBytes);
+
+        Arrays.fill(bytes, (byte) 0);
+        Assert.assertEquals(
+            encoder.encode(srcBytesPadding, 10, bytes, 10, srcBytes.length),
+            Fs.chunkCount(srcBytes.length, sourceChunkSize) * destChunkSize
+        );
+        Assert.assertEquals(Arrays.copyOfRange(bytes, 10, 10 + destBytes.length), destBytes);
+
+        Arrays.fill(bytes, (byte) 0);
+        Assert.expectThrows(IndexOutOfBoundsException.class, () ->
+            encoder.encode(srcBytesPadding, 999999, bytes, 10, srcBytes.length));
+
+        Arrays.fill(bytes, (byte) 0);
+        Assert.assertEquals(encoder.encode(ByteBuffer.wrap(srcBytes)), ByteBuffer.wrap(destBytes));
+        Assert.assertEquals(
+            encoder.encode(ByteBuffer.wrap(srcBytes), ByteBuffer.wrap(bytes)),
+            Fs.chunkCount(srcBytes.length, sourceChunkSize) * destChunkSize
+        );
+        Assert.assertEquals(Arrays.copyOf(bytes, destBytes.length), destBytes);
+
+        Arrays.fill(bytes, (byte) 0);
+        ByteArrayOutputStream destOut = new ByteArrayOutputStream();
+        Assert.assertEquals(
+            encoder.encode(new ByteArrayInputStream(srcBytes), destOut),
+            (long) Fs.chunkCount(srcBytes.length, sourceChunkSize) * destChunkSize
+        );
+        Assert.assertEquals(destOut.toByteArray(), destBytes);
 
         Assert.assertEquals(encoder.encodeToString(source), dest);
+        Assert.assertEquals(encoder.encodeToString(srcBytes), dest);
 
-        InputStream in = new ByteArrayInputStream(srcBytes);
-        OutputStream out = new ByteArrayOutputStream();
-        Assert.assertEquals(encoder.encode(in, out), (long) Fs.chunkCount(srcBytes.length, sourceChunkSize) * destChunkSize);
+        //--------------decode
+
+        Assert.assertEquals(encoder.decode(destBytes), srcBytes);
+        Assert.assertEquals(encoder.decode(destBytes, 0, destBytes.length), srcBytes);
+        Assert.assertEquals(encoder.decode(destBytesPadding, 10, destBytes.length), srcBytes);
+        Assert.expectThrows(IndexOutOfBoundsException.class, () -> encoder.decode(destBytes, 0, 9999999));
+
+        Arrays.fill(bytes, (byte) 0);
+        Assert.assertEquals(
+            encoder.decode(destBytes, 0, bytes, 0, destBytes.length),
+            Fs.chunkCount(destBytes.length, destChunkSize) * sourceChunkSize
+        );
+        Assert.assertEquals(Arrays.copyOf(bytes, srcBytes.length), srcBytes);
+
+        Arrays.fill(bytes, (byte) 0);
+        Assert.assertEquals(
+            encoder.decode(destBytesPadding, 10, bytes, 10, destBytes.length),
+            Fs.chunkCount(destBytes.length, destChunkSize) * sourceChunkSize
+        );
+        Assert.assertEquals(Arrays.copyOfRange(bytes, 10, 10 + srcBytes.length), srcBytes);
+
+        Arrays.fill(bytes, (byte) 0);
+        Assert.expectThrows(IndexOutOfBoundsException.class, () ->
+            encoder.decode(destBytesPadding, 999999, bytes, 10, destBytes.length));
+
+        Arrays.fill(bytes, (byte) 0);
+        Assert.assertEquals(encoder.decode(ByteBuffer.wrap(destBytes)), ByteBuffer.wrap(srcBytes));
+        Assert.assertEquals(
+            encoder.decode(ByteBuffer.wrap(destBytes), ByteBuffer.wrap(bytes)),
+            Fs.chunkCount(destBytes.length, destChunkSize) * sourceChunkSize
+        );
+        Assert.assertEquals(Arrays.copyOf(bytes, srcBytes.length), srcBytes);
+
+        Arrays.fill(bytes, (byte) 0);
+        destOut.reset();
+        Assert.assertEquals(
+            encoder.decode(new ByteArrayInputStream(destBytes), destOut),
+            (long) Fs.chunkCount(destBytes.length, destChunkSize) * sourceChunkSize
+        );
+        Assert.assertEquals(destOut.toByteArray(), srcBytes);
+
+        Assert.assertEquals(encoder.decode(dest), source);
+        Assert.assertEquals(encoder.decodeToString(destBytes), source);
+    }
+
+    private byte[] padBytes(byte[] src) {
+        byte[] result = new byte[src.length + 20];
+        System.arraycopy(src, 0, result, 10, src.length);
+        return result;
     }
 }

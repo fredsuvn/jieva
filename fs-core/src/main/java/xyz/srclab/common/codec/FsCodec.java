@@ -17,6 +17,13 @@ public class FsCodec {
     }
 
     /**
+     * Returns hex encoder.
+     */
+    public static FsEncoder hex() {
+        return new HexEncoder();
+    }
+
+    /**
      * Returns encoder with given algorithm name.
      * The supported name come from {@link FsAlgorithm}.
      *
@@ -37,8 +44,8 @@ public class FsCodec {
                 return new Base64Encoder(Base64.getMimeEncoder(), Base64.getMimeDecoder());
             case "base64-mime-no-padding":
                 return new Base64Encoder(Base64.getMimeEncoder().withoutPadding(), Base64.getMimeDecoder());
-            case "url":
-                return new Base64Encoder(Base64.getEncoder(), Base64.getDecoder());
+            case "hex":
+                return new HexEncoder();
         }
         throw new FsCodecException("Unsupported algorithm: " + name + ".");
     }
@@ -63,7 +70,7 @@ public class FsCodec {
             case BASE64_MIME_NO_PADDING:
                 return new Base64Encoder(Base64.getMimeEncoder().withoutPadding(), Base64.getMimeDecoder());
             case HEX:
-                return new Base64Encoder(Base64.getEncoder(), Base64.getDecoder());
+                return new HexEncoder();
         }
         throw new FsCodecException("Unsupported algorithm: " + algorithm.getName() + ".");
     }

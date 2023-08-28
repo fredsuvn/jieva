@@ -16,6 +16,9 @@ public interface FsFile {
 
     /**
      * Creates a {@link FsFile} from given path.
+     * <p>
+     * This method uses {@link RandomAccessFile} to implement {@link FsFile} interface,
+     * and will use {@link FileChannel#tryLock(long, long, boolean)} to lock written part when writing file.
      *
      * @param path given path
      */

@@ -33,16 +33,6 @@ public interface FsEncoder {
     byte[] encode(byte[] source, int offset, int length);
 
     /**
-     * Encodes source array into dest array, return number of bytes written.
-     *
-     * @param source source array
-     * @param dest   dest array
-     */
-    default int encodeTo(byte[] source, byte[] dest) {
-        return encodeTo(source, 0, dest, 0, source.length);
-    }
-
-    /**
      * Encodes source array of specified length from source offset index,
      * into dest array from dest offset index, return number of bytes written.
      *
@@ -52,10 +42,11 @@ public interface FsEncoder {
      * @param destOffset   dest offset index
      * @param length       specified length
      */
-    int encodeTo(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length);
+    int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length);
 
     /**
      * Encodes source byte buffer.
+     * The returned buffer's position will be set to 0 and limit is length of result bytes.
      *
      * @param source source byte buffer
      */
@@ -67,7 +58,7 @@ public interface FsEncoder {
      * @param source source byte buffer
      * @param dest   dest byte buffer
      */
-    int encodeTo(ByteBuffer source, ByteBuffer dest);
+    int encode(ByteBuffer source, ByteBuffer dest);
 
     /**
      * Encodes source stream into dest stream, return number of bytes written.
@@ -82,7 +73,9 @@ public interface FsEncoder {
      *
      * @param source source array
      */
-    String encodeToString(byte[] source);
+    default String encodeToString(byte[] source) {
+        return new String(encode(source), StandardCharsets.ISO_8859_1);
+    }
 
     /**
      * Resolves source string with {@link FsString#CHARSET},
@@ -113,16 +106,6 @@ public interface FsEncoder {
     byte[] decode(byte[] source, int offset, int length);
 
     /**
-     * Decodes source array into dest array, return number of bytes written.
-     *
-     * @param source source array
-     * @param dest   dest array
-     */
-    default int decodeTo(byte[] source, byte[] dest) {
-        return decodeTo(source, 0, dest, 0, source.length);
-    }
-
-    /**
      * Decodes source array of specified length from source offset index,
      * into dest array from dest offset index, return number of bytes written.
      *
@@ -132,10 +115,11 @@ public interface FsEncoder {
      * @param destOffset   dest offset index
      * @param length       specified length
      */
-    int decodeTo(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length);
+    int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length);
 
     /**
      * Decodes source byte buffer.
+     * The returned buffer's position will be set to 0 and limit is length of result bytes.
      *
      * @param source source byte buffer
      */
@@ -147,7 +131,7 @@ public interface FsEncoder {
      * @param source source byte buffer
      * @param dest   dest byte buffer
      */
-    int decodeTo(ByteBuffer source, ByteBuffer dest);
+    int decode(ByteBuffer source, ByteBuffer dest);
 
     /**
      * Decodes source stream into dest stream, return number of bytes written.

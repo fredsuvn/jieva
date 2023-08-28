@@ -290,7 +290,7 @@ public class Fs {
      */
     @Nullable
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, String name, boolean ignoreCase) {
-        FsCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
+        FsCheck.checkArgument(enumClass.isEnum(), "Not an enum class.");
         if (!ignoreCase) {
             try {
                 return Enum.valueOf((Class<T>) enumClass, name);
@@ -299,7 +299,7 @@ public class Fs {
             }
         }
         Object[] enums = enumClass.getEnumConstants();
-        FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
+        FsCheck.checkArgument(enums != null, "Not an enum class.");
         for (Object anEnum : enums) {
             if (name.equalsIgnoreCase(anEnum.toString())) {
                 return (T) anEnum;
