@@ -8,11 +8,17 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Encoder and decoder interface.
+ * Encoder and decoder interface, can get from {@link FsCodec}.
  *
  * @author fredsuvn
+ * @see FsCodec
  */
 public interface FsEncoder {
+
+    /**
+     * Returns encoder algorithm.
+     */
+    FsAlgorithm getAlgorithm();
 
     /**
      * Encodes source array.
@@ -88,6 +94,11 @@ public interface FsEncoder {
     }
 
     /**
+     * Returns block size for encoding.
+     */
+    int getEncodeBlockSize();
+
+    /**
      * Decodes source array.
      *
      * @param source source array
@@ -159,4 +170,9 @@ public interface FsEncoder {
     default String decode(String source) {
         return new String(decode(source.getBytes(StandardCharsets.ISO_8859_1)), FsString.CHARSET);
     }
+
+    /**
+     * Returns block size for decoding.
+     */
+    int getDecodeBlockSize();
 }

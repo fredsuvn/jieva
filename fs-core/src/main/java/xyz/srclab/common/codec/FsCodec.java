@@ -74,4 +74,8 @@ public class FsCodec {
         }
         throw new FsCodecException("Unsupported algorithm: " + algorithm.getName() + ".");
     }
+
+    static FsAlgorithm newAlgorithm(String name) {
+        return () -> name;
+    }
 }
