@@ -19,9 +19,9 @@ public class CodecTest {
 
     @Test
     public void testEncoder() {
-//        testEncoder(FsEncoder.base64(JdkCodecProvider.INSTANCE), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
-//        testEncoder(FsEncoder.base64(BouncyCastleCodecProvider.INSTANCE), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
-//        testEncoder(FsEncoder.base64(), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
+        testEncoder(FsEncoder.base64(JdkCodecProvider.INSTANCE), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
+        testEncoder(FsEncoder.base64(BouncyCastleCodecProvider.INSTANCE), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
+        testEncoder(FsEncoder.base64(), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
         testEncoder(FsEncoder.hex(JdkCodecProvider.INSTANCE), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687");
         testEncoder(FsEncoder.hex(BouncyCastleCodecProvider.INSTANCE), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687");
         testEncoder(FsEncoder.hex(), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687");
