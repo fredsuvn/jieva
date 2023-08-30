@@ -1,10 +1,13 @@
 package xyz.srclab.common.codec;
 
+import xyz.srclab.annotations.concurrent.ThreadSafe;
+
 /**
  * Codec provider, see {@link FsAlgorithm} for commonly used algorithm.
  *
  * @author sunq62
  */
+@ThreadSafe
 public interface FsCodecProvider {
 
     /**
@@ -29,4 +32,11 @@ public interface FsCodecProvider {
      * @param algorithmName specified algorithm name
      */
     FsEncoder getEncoder(String algorithmName);
+
+    /**
+     * Returns encoder of specified algorithm name.
+     *
+     * @param algorithmName specified algorithm name
+     */
+    FsEncryptor getEncryptor(String algorithmName);
 }

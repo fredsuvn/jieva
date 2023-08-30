@@ -1,4 +1,6 @@
-package xyz.srclab.common.codec;
+package xyz.srclab.common.codec.jdk;
+
+import xyz.srclab.common.codec.*;
 
 import java.util.Base64;
 
@@ -39,5 +41,10 @@ public class JdkCodecProvider implements FsCodecProvider {
                 return new JdkHexEncoder();
         }
         throw new FsCodecException("Unsupported algorithm: " + algorithmName + ".");
+    }
+
+    @Override
+    public FsEncryptor getEncryptor(String algorithmName) {
+        return null;
     }
 }

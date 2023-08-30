@@ -1,9 +1,13 @@
-package xyz.srclab.common.codec;
+package xyz.srclab.common.codec.bouncycastle;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import xyz.srclab.common.codec.FsCodecProvider;
+import xyz.srclab.common.codec.FsEncoder;
+import xyz.srclab.common.codec.FsEncryptor;
+import xyz.srclab.common.codec.jdk.JdkCodecProvider;
 
 /**
- * JDK codec provider.
+ * <a href="https://www.bouncycastle.org">Bouncy Castle</a> codec provider.
  *
  * @author fredsuvn
  */
@@ -21,5 +25,10 @@ public class BouncyCastleCodecProvider implements FsCodecProvider {
     public FsEncoder getEncoder(String algorithmName) {
         // Using JDK
         return JdkCodecProvider.INSTANCE.getEncoder(algorithmName);
+    }
+
+    @Override
+    public FsEncryptor getEncryptor(String algorithmName) {
+        return null;
     }
 }

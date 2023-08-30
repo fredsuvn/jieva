@@ -4,10 +4,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.codec.BouncyCastleCodecProvider;
 import xyz.srclab.common.codec.FsCodecException;
 import xyz.srclab.common.codec.FsEncoder;
-import xyz.srclab.common.codec.JdkCodecProvider;
+import xyz.srclab.common.codec.bouncycastle.BouncyCastleCodecProvider;
+import xyz.srclab.common.codec.jdk.JdkCodecProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

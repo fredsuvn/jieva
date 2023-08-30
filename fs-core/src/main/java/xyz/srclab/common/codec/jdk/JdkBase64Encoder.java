@@ -1,6 +1,8 @@
-package xyz.srclab.common.codec;
+package xyz.srclab.common.codec.jdk;
 
 import xyz.srclab.common.base.FsCheck;
+import xyz.srclab.common.codec.FsCodecException;
+import xyz.srclab.common.codec.FsEncoder;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.IOException;

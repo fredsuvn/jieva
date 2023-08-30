@@ -1,5 +1,6 @@
 package xyz.srclab.common.codec;
 
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.io.FsIO;
 
@@ -9,10 +10,11 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Encoder and decoder interface.
+ * Encoder interface for encoding and decoding.
  *
  * @author fredsuvn
  */
+@ThreadSafe
 public interface FsEncoder {
 
     /**

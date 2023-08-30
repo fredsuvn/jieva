@@ -1,5 +1,7 @@
 package xyz.srclab.common.codec;
 
+import xyz.srclab.common.codec.bouncycastle.BouncyCastleCodecProvider;
+import xyz.srclab.common.codec.jdk.JdkCodecProvider;
 import xyz.srclab.common.reflect.FsType;
 
 final class DefaultCodecProvider implements FsCodecProvider {
@@ -19,5 +21,10 @@ final class DefaultCodecProvider implements FsCodecProvider {
     @Override
     public FsEncoder getEncoder(String algorithmName) {
         return provider.getEncoder(algorithmName);
+    }
+
+    @Override
+    public FsEncryptor getEncryptor(String algorithmName) {
+        return provider.getEncryptor(algorithmName);
     }
 }

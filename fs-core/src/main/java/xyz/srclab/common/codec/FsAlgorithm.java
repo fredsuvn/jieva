@@ -1,8 +1,11 @@
 package xyz.srclab.common.codec;
 
+import lombok.Getter;
+
 /**
  * Common supported algorithm info for codec, just commonly used, not all.
  */
+@Getter
 public enum FsAlgorithm {
 
     /**
@@ -35,16 +38,13 @@ public enum FsAlgorithm {
     HEX("Hex"),
     ;
 
+    /**
+     * Algorithm name.
+     */
     private final String name;
 
     FsAlgorithm(String name) {
         this.name = name;
     }
 
-    /**
-     * Returns algorithm name.
-     */
-    public String getName() {
-        return name;
-    }
 }
