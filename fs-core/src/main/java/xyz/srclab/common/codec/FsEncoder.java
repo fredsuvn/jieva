@@ -95,7 +95,9 @@ public interface FsEncoder {
      * @param source source array
      * @param dest   dest array
      */
-    int encode(byte[] source, byte[] dest);
+    default int encode(byte[] source, byte[] dest) {
+        return encode(source, 0, dest, 0, source.length);
+    }
 
     /**
      * Encodes source array of specified length from source offset index,
@@ -109,9 +111,6 @@ public interface FsEncoder {
      */
     default int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
-            if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
-                return encode(source, dest);
-            }
             ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
             ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
             return encode(in, out);
@@ -214,7 +213,9 @@ public interface FsEncoder {
      * @param source source array
      * @param dest   dest array
      */
-    int decode(byte[] source, byte[] dest);
+    default int decode(byte[] source, byte[] dest) {
+        return decode(source, 0, dest, 0, source.length);
+    }
 
     /**
      * Decodes source array of specified length from source offset index,
@@ -228,9 +229,6 @@ public interface FsEncoder {
      */
     default int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
-            if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
-                return decode(source, dest);
-            }
             ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
             ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
             return decode(in, out);

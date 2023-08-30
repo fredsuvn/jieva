@@ -46,10 +46,11 @@ final class BouncyCastleBase64Encoder implements FsEncoder {
     }
 
     @Override
-    public int encode(byte[] source, byte[] dest) {
+    public int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
-            OutputStreamWrapper out = new OutputStreamWrapper(FsIO.toOutputStream(ByteBuffer.wrap(dest)));
-            Base64.encode(source, 0, source.length, out);
+            OutputStreamWrapper out = new OutputStreamWrapper(FsIO.toOutputStream(
+                ByteBuffer.wrap(dest, destOffset, dest.length - destOffset)));
+            Base64.encode(source, sourceOffset, length, out);
             return (int) out.count;
         } catch (FsCodecException e) {
             throw e;
@@ -114,10 +115,11 @@ final class BouncyCastleBase64Encoder implements FsEncoder {
     }
 
     @Override
-    public int decode(byte[] source, byte[] dest) {
+    public int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
-            OutputStreamWrapper out = new OutputStreamWrapper(FsIO.toOutputStream(ByteBuffer.wrap(dest)));
-            Base64.decode(source, 0, source.length, out);
+            OutputStreamWrapper out = new OutputStreamWrapper(FsIO.toOutputStream(
+                ByteBuffer.wrap(dest, destOffset, dest.length - destOffset)));
+            Base64.decode(source, sourceOffset, length, out);
             return (int) out.count;
         } catch (FsCodecException e) {
             throw e;

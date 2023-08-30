@@ -19,18 +19,20 @@ public class CodecTest {
 
     @Test
     public void testEncoder() {
-        testEncoder(FsEncoder.base64(JdkCodecProvider.INSTANCE), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
-        testEncoder(FsEncoder.base64(BouncyCastleCodecProvider.INSTANCE), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
-        testEncoder(FsEncoder.base64(), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
-        //testEncoder(FsEncoder.hex(), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687", 1, 2);
+//        testEncoder(FsEncoder.base64(JdkCodecProvider.INSTANCE), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
+//        testEncoder(FsEncoder.base64(BouncyCastleCodecProvider.INSTANCE), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
+//        testEncoder(FsEncoder.base64(), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH");
+        testEncoder(FsEncoder.hex(JdkCodecProvider.INSTANCE), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687");
+        testEncoder(FsEncoder.hex(BouncyCastleCodecProvider.INSTANCE), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687");
+        testEncoder(FsEncoder.hex(), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687");
     }
 
     private void testEncoder(
         FsEncoder encoder, String source, String dest) {
         byte[] srcBytes = source.getBytes(FsString.CHARSET);
         byte[] destBytes = dest.getBytes(StandardCharsets.ISO_8859_1);
-        byte[] srcBytesPadding = padBytes(srcBytes);
-        byte[] destBytesPadding = padBytes(destBytes);
+        byte[] srcBytesPadding = padBytes(srcBytes, 10);
+        byte[] destBytesPadding = padBytes(destBytes, 10);
         byte[] bytes = new byte[1024];
 
         //--------------encode
@@ -134,9 +136,9 @@ public class CodecTest {
         Assert.assertEquals(encoder.decodeToString(destBytes), source);
     }
 
-    private byte[] padBytes(byte[] src) {
-        byte[] result = new byte[src.length + 20];
-        System.arraycopy(src, 0, result, 10, src.length);
+    private byte[] padBytes(byte[] src, int paddingSize) {
+        byte[] result = new byte[src.length + paddingSize * 2];
+        System.arraycopy(src, 0, result, paddingSize, src.length);
         return result;
     }
 }

@@ -2,7 +2,6 @@ package xyz.srclab.common.codec;
 
 import xyz.srclab.common.base.FsCheck;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -18,50 +17,69 @@ final class JdkHexEncoder implements FsEncoder {
 
     @Override
     public byte[] encode(byte[] source, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
-        byte[] result = new byte[length * 2];
-        encode0(source, offset, result, 0, length);
-        return result;
-    }
-
-    @Override
-    public int encode(byte[] source, byte[] dest) {
-        return 0;
+        try {
+            FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
+            byte[] dest = new byte[length * 2];
+            encode0(source, offset, dest, 0, length);
+            return dest;
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     @Override
     public int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
-        FsCheck.checkInBounds(sourceOffset, 0, source.length);
-        FsCheck.checkRangeInBounds(destOffset, (destOffset + length) * 2, 0, dest.length);
-        return encode0(source, sourceOffset, dest, destOffset, length);
+        try {
+            FsCheck.checkRangeInBounds(sourceOffset, sourceOffset + length, 0, source.length);
+            FsCheck.checkRangeInBounds(destOffset, destOffset + length * 2, 0, dest.length);
+            return encode0(source, sourceOffset, dest, destOffset, length);
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     private int encode0(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
-        for (int i = sourceOffset; i < length; i++) {
+        for (int i = sourceOffset, j = 0; j < length; i++, j++) {
             byte b = source[i];
-            int j1 = destOffset + (i * 2);
-            int j2 = destOffset + (i * 2 + 1);
+            int j1 = destOffset + (j * 2);
+            int j2 = destOffset + (j * 2 + 1);
             dest[j1] = encodeByte(b >>> 4);
-            dest[j2] = encodeByte(b & 0x0f);
+            dest[j2] = encodeByte(b);
         }
         return length * 2;
     }
 
     @Override
     public ByteBuffer encode(ByteBuffer source) {
-        ByteBuffer result = ByteBuffer.allocate(source.remaining() * 2);
-        encode0(source, result);
-        result.flip();
-        return result;
+        try {
+            ByteBuffer result = ByteBuffer.allocate(source.remaining() * 2);
+            encode0(source, result);
+            result.flip();
+            return result;
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     @Override
     public int encode(ByteBuffer source, ByteBuffer dest) {
-        FsCheck.checkArgument(
-            dest.remaining() >= source.remaining() * 2,
-            "Remaining of dest buffer is not enough."
-        );
-        return encode0(source, dest);
+        try {
+            FsCheck.checkArgument(
+                dest.remaining() >= source.remaining() * 2,
+                "Remaining of dest buffer is not enough."
+            );
+            return encode0(source, dest);
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     private int encode0(ByteBuffer source, ByteBuffer dest) {
@@ -69,7 +87,7 @@ final class JdkHexEncoder implements FsEncoder {
         while (source.remaining() > 0) {
             byte b = source.get();
             dest.put(encodeByte(b >>> 4));
-            dest.put(encodeByte(b & 0x0f));
+            dest.put(encodeByte(b));
             count += 2;
         }
         return count;
@@ -85,22 +103,30 @@ final class JdkHexEncoder implements FsEncoder {
                     break;
                 }
                 dest.write(encodeByte(b >>> 4));
-                dest.write(encodeByte(b & 0x0f));
+                dest.write(encodeByte(b));
                 count += 2;
             }
             return count;
-        } catch (IOException e) {
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
             throw new FsCodecException(e);
         }
     }
 
     @Override
     public int encodeBlockSize() {
-        return 1;
+        try {
+            return 1;
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     private byte encodeByte(int b) {
-        switch (b & 0x0000000f) {
+        switch (b & 0x0f) {
             case 0:
                 return '0';
             case 1:
@@ -139,58 +165,78 @@ final class JdkHexEncoder implements FsEncoder {
 
     @Override
     public byte[] decode(byte[] source, int offset, int length) {
-        FsCheck.checkArgument(source.length % 2 == 0, MUST_EVEN);
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
-        byte[] result = new byte[source.length / 2];
-        decode0(source, offset, result, 0, length);
-        return result;
-    }
-
-    @Override
-    public int decode(byte[] source, byte[] dest) {
-        return 0;
+        try {
+            FsCheck.checkArgument(length % 2 == 0, MUST_EVEN);
+            FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
+            byte[] result = new byte[length / 2];
+            decode0(source, offset, result, 0, length);
+            return result;
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     @Override
     public int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
-        FsCheck.checkInBounds(sourceOffset, 0, source.length);
-        FsCheck.checkRangeInBounds(destOffset, (destOffset + length) * 2, 0, dest.length);
-        FsCheck.checkArgument((dest.length - destOffset) % 2 == 0, MUST_EVEN);
-        return decode0(source, sourceOffset, dest, destOffset, length);
+        try {
+            FsCheck.checkArgument(length % 2 == 0, MUST_EVEN);
+            FsCheck.checkRangeInBounds(sourceOffset, sourceOffset + length, 0, source.length);
+            FsCheck.checkRangeInBounds(destOffset, destOffset + length / 2, 0, dest.length);
+            return decode0(source, sourceOffset, dest, destOffset, length);
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     private int decode0(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
-        for (int i = sourceOffset, j = 0; i < length; i += 2, j += 2) {
-            int b1 = decodeByte(source[i]);
-            if (b1 == -1) {
+        for (int i = sourceOffset, j = destOffset, c = 0; c < length; i++, j++, c += 2) {
+            int i1 = decodeByte(source[i]);
+            if (i1 == -1) {
                 throw new FsCodecException("Wrong data at index " + i + ": " + (char) (source[i] & 0x00ff) + ".");
             }
-            int b2 = decodeByte(source[i + 1]);
-            if (b2 == -1) {
-                throw new FsCodecException("Wrong data at index " + (i + 1) + ": " + (char) (source[i + 1] & 0x00ff) + ".");
+            i++;
+            int i2 = decodeByte(source[i]);
+            if (i2 == -1) {
+                throw new FsCodecException("Wrong data at index " + i + ": " + (char) (source[i + 1] & 0x00ff) + ".");
             }
-            dest[destOffset + (j / 2)] = (byte) ((b1 << 4) & b2);
+            dest[j] = mergeByte(i1, i2);
         }
         return length / 2;
     }
 
     @Override
     public ByteBuffer decode(ByteBuffer source) {
-        FsCheck.checkArgument(source.remaining() % 2 == 0, MUST_EVEN);
-        ByteBuffer result = ByteBuffer.allocate(source.remaining() / 2);
-        decode0(source, result);
-        result.flip();
-        return result;
+        try {
+            FsCheck.checkArgument(source.remaining() % 2 == 0, MUST_EVEN);
+            ByteBuffer result = ByteBuffer.allocate(source.remaining() / 2);
+            decode0(source, result);
+            result.flip();
+            return result;
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     @Override
     public int decode(ByteBuffer source, ByteBuffer dest) {
-        FsCheck.checkArgument(source.remaining() % 2 == 0, MUST_EVEN);
-        FsCheck.checkArgument(
-            dest.remaining() >= source.remaining() / 2,
-            "Remaining of dest buffer is not enough."
-        );
-        return decode0(source, dest);
+        try {
+            FsCheck.checkArgument(source.remaining() % 2 == 0, MUST_EVEN);
+            FsCheck.checkArgument(
+                dest.remaining() >= source.remaining() / 2,
+                "Remaining of dest buffer is not enough."
+            );
+            return decode0(source, dest);
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     private int decode0(ByteBuffer source, ByteBuffer dest) {
@@ -202,11 +248,11 @@ final class JdkHexEncoder implements FsEncoder {
                 throw new FsCodecException("Wrong data at position " + source.position() + ": " + (char) (b1 & 0x00ff) + ".");
             }
             byte b2 = source.get();
-            int i2 = decodeByte(b1);
+            int i2 = decodeByte(b2);
             if (i2 == -1) {
                 throw new FsCodecException("Wrong data at position " + source.position() + ": " + (char) (b2 & 0x00ff) + ".");
             }
-            dest.put((byte) ((i1 << 4) & i2));
+            dest.put(mergeByte(i1, i2));
             count++;
         }
         return count;
@@ -233,22 +279,30 @@ final class JdkHexEncoder implements FsEncoder {
                 if (i2 == -1) {
                     throw new FsCodecException("Wrong source data at position " + (count * 2 + 1) + ": " + (char) (b2 & 0x00ff) + ".");
                 }
-                dest.write(((i1 << 4) & i2));
+                dest.write(mergeByte(i1, i2));
                 count++;
             }
             return count;
-        } catch (IOException e) {
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
             throw new FsCodecException(e);
         }
     }
 
     @Override
     public int decodeBlockSize() {
-        return 2;
+        try {
+            return 2;
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
     }
 
     private int decodeByte(byte b) {
-        char c = (char) (b & 0x00ff);
+        int c = b & 0x00ff;
         switch (c) {
             case '0':
                 return 0;
@@ -290,5 +344,11 @@ final class JdkHexEncoder implements FsEncoder {
                 return 15;
         }
         return -1;
+    }
+
+    private byte mergeByte(int i1, int i2) {
+        int b1 = i1 & 0x0f;
+        int b2 = i2 & 0x0f;
+        return (byte) ((b1 << 4) | b2);
     }
 }

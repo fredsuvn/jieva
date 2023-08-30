@@ -63,6 +63,14 @@ final class JdkBase64Encoder implements FsEncoder {
     }
 
     @Override
+    public int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
+        if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
+            return encoder.encode(source, dest);
+        }
+        return FsEncoder.super.encode(source, sourceOffset, dest, destOffset, length);
+    }
+
+    @Override
     public ByteBuffer encode(ByteBuffer source) {
         try {
             return encoder.encode(source);
@@ -138,6 +146,14 @@ final class JdkBase64Encoder implements FsEncoder {
         } catch (Exception e) {
             throw new FsCodecException(e);
         }
+    }
+
+    @Override
+    public int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
+        if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
+            return decoder.decode(source, dest);
+        }
+        return FsEncoder.super.decode(source, sourceOffset, dest, destOffset, length);
     }
 
     @Override
