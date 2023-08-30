@@ -22,12 +22,14 @@ dependencies {
 
   compileOnly "org.springframework:spring-core"
   compileOnly "cglib:cglib"
+  compileOnly "org.bouncycastle:bcprov-jdk15on"
 
   testImplementation project(":boat-test")
   testImplementation "commons-beanutils:commons-beanutils:1.9.4"
   testImplementation group: 'org.springframework', name: 'spring-core', version: '5.3.29'
   testImplementation group: 'org.springframework', name: 'spring-beans', version: '5.3.29'
   testImplementation "cglib:cglib"
+  testImplementation "org.bouncycastle:bcprov-jdk15on"
   testImplementation group: 'cn.hutool', name: 'hutool-all', version: '5.8.21'
 
 //  implementation project(":fs-processor")

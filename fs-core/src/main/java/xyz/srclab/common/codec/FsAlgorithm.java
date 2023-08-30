@@ -1,41 +1,50 @@
 package xyz.srclab.common.codec;
 
 /**
- * Algorithm info for codec.
+ * Common supported algorithm info for codec, just commonly used, not all.
  */
-public interface FsAlgorithm {
+public enum FsAlgorithm {
 
     /**
      * Base64.
      */
-    FsAlgorithm BASE64 = FsCodec.newAlgorithm("Base64");
+    BASE64("Base64"),
     /**
      * Base64.
      */
-    FsAlgorithm BASE64_NO_PADDING = FsCodec.newAlgorithm("Base64/NoPadding");
+    BASE64_NO_PADDING("Base64/NoPadding"),
     /**
      * Base64-URL.
      */
-    FsAlgorithm BASE64_URL = FsCodec.newAlgorithm("Base64/URL");
+    BASE64_URL("Base64/URL"),
     /**
      * Base64-URL without padding.
      */
-    FsAlgorithm BASE64_URL_NO_PADDING = FsCodec.newAlgorithm("Base64/URL/NoPadding");
+    BASE64_URL_NO_PADDING("Base64/URL/NoPadding"),
     /**
      * Base64-MIME.
      */
-    FsAlgorithm BASE64_MIME = FsCodec.newAlgorithm("Base64/MIME");
+    BASE64_MIME("Base64/MIME"),
     /**
      * Base64-MIME without padding.
      */
-    FsAlgorithm BASE64_MIME_NO_PADDING = FsCodec.newAlgorithm("Base64/MIME/NoPadding");
+    BASE64_MIME_NO_PADDING("Base64/MIME/NoPadding"),
     /**
      * Hex.
      */
-    FsAlgorithm HEX = FsCodec.newAlgorithm("Hex");
+    HEX("Hex"),
+    ;
+
+    private final String name;
+
+    FsAlgorithm(String name) {
+        this.name = name;
+    }
 
     /**
      * Returns algorithm name.
      */
-    String getName();
+    public String getName() {
+        return name;
+    }
 }

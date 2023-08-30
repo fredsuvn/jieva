@@ -1,6 +1,7 @@
 package xyz.srclab.common.codec;
 
 import xyz.srclab.common.base.FsString;
+import xyz.srclab.common.io.FsIO;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,17 +9,67 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Encoder and decoder interface, can get from {@link FsCodec}.
+ * Encoder and decoder interface.
  *
  * @author fredsuvn
- * @see FsCodec
  */
 public interface FsEncoder {
 
     /**
-     * Returns encoder algorithm.
+     * Returns encoder of specified algorithm name from {@link FsCodecProvider#defaultProvider()}.
+     *
+     * @param algorithmName specified algorithm name
      */
-    FsAlgorithm getAlgorithm();
+    static FsEncoder getEncoder(String algorithmName) {
+        return FsCodecProvider.defaultProvider().getEncoder(algorithmName);
+    }
+
+    /**
+     * Returns encoder of specified algorithm name from given codec provider.
+     *
+     * @param algorithmName specified algorithm name
+     * @param provider      given codec provider
+     */
+    static FsEncoder getEncoder(String algorithmName, FsCodecProvider provider) {
+        return provider.getEncoder(algorithmName);
+    }
+
+    /**
+     * Returns base64 encoder.
+     */
+    static FsEncoder base64() {
+        return getEncoder(FsAlgorithm.BASE64.getName());
+    }
+
+    /**
+     * Returns base64 encoder from given codec provider.
+     *
+     * @param provider given codec provider
+     */
+    static FsEncoder base64(FsCodecProvider provider) {
+        return getEncoder(FsAlgorithm.BASE64.getName(), provider);
+    }
+
+    /**
+     * Returns hex encoder.
+     */
+    static FsEncoder hex() {
+        return getEncoder(FsAlgorithm.HEX.getName());
+    }
+
+    /**
+     * Returns hex encoder from given codec provider.
+     *
+     * @param provider given codec provider
+     */
+    static FsEncoder hex(FsCodecProvider provider) {
+        return getEncoder(FsAlgorithm.HEX.getName(), provider);
+    }
+
+    /**
+     * Returns algorithm name.
+     */
+    String algorithmName();
 
     /**
      * Encodes source array.
@@ -39,6 +90,14 @@ public interface FsEncoder {
     byte[] encode(byte[] source, int offset, int length);
 
     /**
+     * Encodes source array into dest array, return number of bytes written.
+     *
+     * @param source source array
+     * @param dest   dest array
+     */
+    int encode(byte[] source, byte[] dest);
+
+    /**
      * Encodes source array of specified length from source offset index,
      * into dest array from dest offset index, return number of bytes written.
      *
@@ -48,7 +107,20 @@ public interface FsEncoder {
      * @param destOffset   dest offset index
      * @param length       specified length
      */
-    int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length);
+    default int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
+        try {
+            if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
+                return encode(source, dest);
+            }
+            ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
+            ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
+            return encode(in, out);
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
+    }
 
     /**
      * Encodes source byte buffer.
@@ -56,7 +128,16 @@ public interface FsEncoder {
      *
      * @param source source byte buffer
      */
-    ByteBuffer encode(ByteBuffer source);
+    default ByteBuffer encode(ByteBuffer source) {
+        try {
+            byte[] src = FsIO.getBytes(source);
+            return ByteBuffer.wrap(encode(src));
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
+    }
 
     /**
      * Encodes source byte buffer into dest byte buffer, return number of bytes written.
@@ -64,7 +145,18 @@ public interface FsEncoder {
      * @param source source byte buffer
      * @param dest   dest byte buffer
      */
-    int encode(ByteBuffer source, ByteBuffer dest);
+    default int encode(ByteBuffer source, ByteBuffer dest) {
+        try {
+            OutputStream out = FsIO.toOutputStream(dest);
+            int result = (int) encode(FsIO.toInputStream(source), out);
+            out.flush();
+            return result;
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
+    }
 
     /**
      * Encodes source stream into dest stream, return number of bytes written.
@@ -96,7 +188,7 @@ public interface FsEncoder {
     /**
      * Returns block size for encoding.
      */
-    int getEncodeBlockSize();
+    int encodeBlockSize();
 
     /**
      * Decodes source array.
@@ -117,6 +209,14 @@ public interface FsEncoder {
     byte[] decode(byte[] source, int offset, int length);
 
     /**
+     * Decodes source array into dest array, return number of bytes written.
+     *
+     * @param source source array
+     * @param dest   dest array
+     */
+    int decode(byte[] source, byte[] dest);
+
+    /**
      * Decodes source array of specified length from source offset index,
      * into dest array from dest offset index, return number of bytes written.
      *
@@ -126,7 +226,20 @@ public interface FsEncoder {
      * @param destOffset   dest offset index
      * @param length       specified length
      */
-    int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length);
+    default int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
+        try {
+            if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
+                return decode(source, dest);
+            }
+            ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
+            ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
+            return decode(in, out);
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
+    }
 
     /**
      * Decodes source byte buffer.
@@ -134,7 +247,16 @@ public interface FsEncoder {
      *
      * @param source source byte buffer
      */
-    ByteBuffer decode(ByteBuffer source);
+    default ByteBuffer decode(ByteBuffer source) {
+        try {
+            byte[] src = FsIO.getBytes(source);
+            return ByteBuffer.wrap(decode(src));
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
+    }
 
     /**
      * Decodes source byte buffer into dest byte buffer, return number of bytes written.
@@ -142,7 +264,18 @@ public interface FsEncoder {
      * @param source source byte buffer
      * @param dest   dest byte buffer
      */
-    int decode(ByteBuffer source, ByteBuffer dest);
+    default int decode(ByteBuffer source, ByteBuffer dest) {
+        try {
+            OutputStream out = FsIO.toOutputStream(dest);
+            int result = (int) decode(FsIO.toInputStream(source), out);
+            out.flush();
+            return result;
+        } catch (FsCodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsCodecException(e);
+        }
+    }
 
     /**
      * Decodes source stream into dest stream, return number of bytes written.
@@ -174,5 +307,5 @@ public interface FsEncoder {
     /**
      * Returns block size for decoding.
      */
-    int getDecodeBlockSize();
+    int decodeBlockSize();
 }

@@ -662,10 +662,11 @@ public class FsIO {
 
     /**
      * Read all bytes of given buffer into a new byte array and return.
+     * After reading, the buffer's position will be updated to its limit, its limit will not have been changed.
      *
      * @param buffer given buffer
      */
-    public static byte[] toByteArray(ByteBuffer buffer) {
+    public static byte[] getBytes(ByteBuffer buffer) {
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
         return bytes;

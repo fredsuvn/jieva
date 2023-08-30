@@ -7,9 +7,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-final class HexEncoder implements FsEncoder {
+final class JdkHexEncoder implements FsEncoder {
 
     private static final String MUST_EVEN = "Length of hex data must be even number.";
+
+    @Override
+    public String algorithmName() {
+        return FsAlgorithm.HEX.getName();
+    }
 
     @Override
     public byte[] encode(byte[] source, int offset, int length) {
@@ -17,6 +22,11 @@ final class HexEncoder implements FsEncoder {
         byte[] result = new byte[length * 2];
         encode0(source, offset, result, 0, length);
         return result;
+    }
+
+    @Override
+    public int encode(byte[] source, byte[] dest) {
+        return 0;
     }
 
     @Override
@@ -84,6 +94,11 @@ final class HexEncoder implements FsEncoder {
         }
     }
 
+    @Override
+    public int encodeBlockSize() {
+        return 1;
+    }
+
     private byte encodeByte(int b) {
         switch (b & 0x0000000f) {
             case 0:
@@ -129,6 +144,11 @@ final class HexEncoder implements FsEncoder {
         byte[] result = new byte[source.length / 2];
         decode0(source, offset, result, 0, length);
         return result;
+    }
+
+    @Override
+    public int decode(byte[] source, byte[] dest) {
+        return 0;
     }
 
     @Override
@@ -220,6 +240,11 @@ final class HexEncoder implements FsEncoder {
         } catch (IOException e) {
             throw new FsCodecException(e);
         }
+    }
+
+    @Override
+    public int decodeBlockSize() {
+        return 2;
     }
 
     private int decodeByte(byte b) {
