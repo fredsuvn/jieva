@@ -213,7 +213,16 @@ public class FsIO {
                 return -1;
             }
             if (available == 0) {
-                return readBytesTo(inputStream, dest, 1);
+                byte[] b = new byte[1];
+                int readSize = inputStream.read(b);
+                if (readSize == -1) {
+                    return -1;
+                }
+                if (readSize == 1) {
+                    dest.write(b);
+                    return 1;
+                }
+                return 0;
             }
             return readBytesTo(inputStream, dest, available);
         } catch (IOException e) {
