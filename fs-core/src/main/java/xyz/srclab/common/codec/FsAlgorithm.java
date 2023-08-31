@@ -36,6 +36,10 @@ public enum FsAlgorithm {
      * Hex.
      */
     HEX("Hex"),
+    /**
+     * RSA.
+     */
+    RSA("RSA"),
     ;
 
     /**

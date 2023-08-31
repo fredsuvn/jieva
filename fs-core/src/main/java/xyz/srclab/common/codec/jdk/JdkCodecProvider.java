@@ -45,6 +45,6 @@ public class JdkCodecProvider implements FsCodecProvider {
 
     @Override
     public FsEncryptor getEncryptor(String algorithmName) {
-        return null;
+        return new ProviderEncryptor(algorithmName, null);
     }
 }

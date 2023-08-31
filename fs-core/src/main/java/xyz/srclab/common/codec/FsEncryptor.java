@@ -3,9 +3,12 @@ package xyz.srclab.common.codec;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.io.FsIO;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
-import java.security.*;
-import java.security.spec.AlgorithmParameterSpec;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
  * Encryptor interface for encrypting and decrypting.
@@ -16,116 +19,100 @@ import java.security.spec.AlgorithmParameterSpec;
 @ThreadSafe
 public interface FsEncryptor {
 
-    // /**
-    //  * Returns encryptr of specified algorithm name from {@link FsCodecProvider#defaultProvider()}.
-    //  *
-    //  * @param algorithmName specified algorithm name
-    //  */
-    // static FsCipher getEncryptr(String algorithmName) {
-    //     return FsCodecProvider.defaultProvider().getEncryptr(algorithmName);
-    // }
-    //
-    // /**
-    //  * Returns encryptr of specified algorithm name from given codec provider.
-    //  *
-    //  * @param algorithmName specified algorithm name
-    //  * @param provider      given codec provider
-    //  */
-    // static FsCipher getEncryptr(String algorithmName, FsCodecProvider provider) {
-    //     return provider.getEncryptr(algorithmName);
-    // }
-    //
-    // /**
-    //  * Returns base64 encryptr.
-    //  */
-    // static FsCipher base64() {
-    //     return getEncryptr(FsAlgorithm.BASE64.getName());
-    // }
-    //
-    // /**
-    //  * Returns base64 encryptr from given codec provider.
-    //  *
-    //  * @param provider given codec provider
-    //  */
-    // static FsCipher base64(FsCodecProvider provider) {
-    //     return getEncryptr(FsAlgorithm.BASE64.getName(), provider);
-    // }
-    //
-    // /**
-    //  * Returns hex encryptr.
-    //  */
-    // static FsCipher hex() {
-    //     return getEncryptr(FsAlgorithm.HEX.getName());
-    // }
-    //
-    // /**
-    //  * Returns hex encryptr from given codec provider.
-    //  *
-    //  * @param provider given codec provider
-    //  */
-    // static FsCipher hex(FsCodecProvider provider) {
-    //     return getEncryptr(FsAlgorithm.HEX.getName(), provider);
-    // }
+    /**
+     * Returns encryptor of specified algorithm name from {@link FsCodecProvider#defaultProvider()}.
+     *
+     * @param algorithmName specified algorithm name
+     */
+    static FsEncryptor getEncryptor(String algorithmName) {
+        return FsCodecProvider.defaultProvider().getEncryptor(algorithmName);
+    }
+
+    /**
+     * Returns encryptor of specified algorithm name from given codec provider.
+     *
+     * @param algorithmName specified algorithm name
+     * @param provider      given codec provider
+     */
+    static FsEncryptor getEncryptor(String algorithmName, FsCodecProvider provider) {
+        return provider.getEncryptor(algorithmName);
+    }
+
+    /**
+     * Returns RSA encryptor.
+     */
+    static FsEncryptor rsa() {
+        return getEncryptor(FsAlgorithm.RSA.getName());
+    }
 
     /**
      * Returns algorithm name.
      */
     String algorithmName();
 
-    /**
-     * Initializes this encryptor with parameter specification.
-     *
-     * @param spec parameter specification
-     */
-    void init(AlgorithmParameterSpec spec);
+    //    /**
+    //     * Initializes this encryptor with parameter specification.
+    //     *
+    //     * @param spec parameter specification
+    //     */
+    //    void init(AlgorithmParameterSpec spec);
+    //
+    //    /**
+    //     * Initializes this encryptor with given parameters.
+    //     *
+    //     * @param params given parameters
+    //     */
+    //    void init(AlgorithmParameters params);
+    //
+    //    /**
+    //     * Initializes this encryptor with secure random.
+    //     *
+    //     * @param secureRandom secure random
+    //     */
+    //    void init(SecureRandom secureRandom);
+    //
+    //    /**
+    //     * Initializes this encryptor with parameter specification and secure random.
+    //     *
+    //     * @param spec         parameter specification
+    //     * @param secureRandom secure random
+    //     */
+    //    void init(@Nullable AlgorithmParameterSpec spec, @Nullable SecureRandom secureRandom);
+    //
+    //    /**
+    //     * Initializes this encryptor with given parameters and secure random.
+    //     *
+    //     * @param params       given parameters
+    //     * @param secureRandom secure random
+    //     */
+    //    void init(@Nullable AlgorithmParameters params, @Nullable SecureRandom secureRandom);
 
     /**
-     * Initializes this encryptor with given parameters.
+     * Creates a pair of key.
      *
-     * @param params given parameters
+     * @param params key pair parameters
      */
-    void init(AlgorithmParameters params);
+    KeyPair generateKeyPair(FsEncryptParams params);
 
     /**
-     * Initializes this encryptor with secure random.
+     * Converts key bytes to {@link Key} instance.
      *
-     * @param secureRandom secure random
-     */
-    void init(SecureRandom secureRandom);
-
-    /**
-     * Initializes this encryptor with parameter specification and secure random.
-     *
-     * @param spec         parameter specification
-     * @param secureRandom secure random
-     */
-    void init(AlgorithmParameterSpec spec, SecureRandom secureRandom);
-
-    /**
-     * Initializes this encryptor with given parameters and secure random.
-     *
-     * @param params       given parameters
-     * @param secureRandom secure random
-     */
-    void init(AlgorithmParameters params, SecureRandom secureRandom);
-
-    /**
-     * Converts given key bytes to {@link Key} instance.
-     *
-     * @param keyBytes given key bytes
+     * @param keyBytes key bytes
      */
     default Key toKey(byte[] keyBytes) {
         return toKey(keyBytes, 0, keyBytes.length);
     }
 
     /**
-     * Converts specified length of given key bytes from offset index to {@link Key} instance.
+     * Converts key bytes of specified length from offset index to {@link Key} instance.
      *
-     * @param keyBytes given key bytes
+     * @param keyBytes key bytes
      * @param offset   offset index
      * @param length   specified length
      */
-    Key toKey(byte[] keyBytes, int offset, int length);
+    default Key toKey(byte[] keyBytes, int offset, int length) {
+        return new SecretKeySpec(keyBytes, offset, length, algorithmName());
+    }
 
     /**
      * Converts given key buffer to {@link Key} instance.
@@ -137,18 +124,18 @@ public interface FsEncryptor {
     }
 
     /**
-     * Converts given key bytes to {@link PublicKey} instance.
+     * Converts key bytes to {@link PublicKey} instance.
      *
-     * @param keyBytes given key bytes
+     * @param keyBytes key bytes
      */
     default PublicKey toPublicKey(byte[] keyBytes) {
         return toPublicKey(keyBytes, 0, keyBytes.length);
     }
 
     /**
-     * Converts specified length of given key bytes from offset index to {@link PublicKey} instance.
+     * Converts key bytes of specified length from offset index to {@link PublicKey} instance.
      *
-     * @param keyBytes given key bytes
+     * @param keyBytes key bytes
      * @param offset   offset index
      * @param length   specified length
      */
@@ -164,18 +151,18 @@ public interface FsEncryptor {
     }
 
     /**
-     * Converts given key bytes to {@link PrivateKey} instance.
+     * Converts key bytes to {@link PrivateKey} instance.
      *
-     * @param keyBytes given key bytes
+     * @param keyBytes key bytes
      */
     default PrivateKey toPrivateKey(byte[] keyBytes) {
         return toPrivateKey(keyBytes, 0, keyBytes.length);
     }
 
     /**
-     * Converts specified length of given key bytes from offset index to {@link PrivateKey} instance.
+     * Converts key bytes of specified length from offset index to {@link PrivateKey} instance.
      *
-     * @param keyBytes given key bytes
+     * @param keyBytes key bytes
      * @param offset   offset index
      * @param length   specified length
      */

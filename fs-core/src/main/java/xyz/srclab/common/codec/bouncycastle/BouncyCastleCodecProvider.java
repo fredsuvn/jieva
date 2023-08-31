@@ -4,6 +4,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import xyz.srclab.common.codec.FsCodecProvider;
 import xyz.srclab.common.codec.FsEncoder;
 import xyz.srclab.common.codec.FsEncryptor;
+import xyz.srclab.common.codec.ProviderEncryptor;
 import xyz.srclab.common.codec.jdk.JdkCodecProvider;
 
 /**
@@ -15,10 +16,10 @@ public class BouncyCastleCodecProvider implements FsCodecProvider {
 
     public static final BouncyCastleCodecProvider INSTANCE = new BouncyCastleCodecProvider();
 
-    private BouncyCastleProvider bouncyCastleProvider;
+    private final BouncyCastleProvider bouncyCastleProvider;
 
     private BouncyCastleCodecProvider() {
-        // bouncyCastleProvider = new BouncyCastleProvider();
+        bouncyCastleProvider = new BouncyCastleProvider();
     }
 
     @Override
@@ -29,6 +30,7 @@ public class BouncyCastleCodecProvider implements FsCodecProvider {
 
     @Override
     public FsEncryptor getEncryptor(String algorithmName) {
-        return null;
+        //return new ProviderEncryptor(algorithmName, bouncyCastleProvider);
+        return JdkCodecProvider.INSTANCE.getEncryptor(algorithmName);
     }
 }
