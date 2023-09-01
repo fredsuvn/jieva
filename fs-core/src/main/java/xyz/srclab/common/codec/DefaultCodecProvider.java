@@ -19,11 +19,6 @@ final class DefaultCodecProvider implements FsCodecProvider {
     }
 
     @Override
-    public FsEncoder getEncoder(String algorithmName) {
-        return provider.getEncoder(algorithmName);
-    }
-
-    @Override
     public FsEncryptor getEncryptor(String algorithmName) {
         return provider.getEncryptor(algorithmName);
     }

@@ -50,43 +50,6 @@ public interface FsEncryptor {
      */
     String algorithmName();
 
-    //    /**
-    //     * Initializes this encryptor with parameter specification.
-    //     *
-    //     * @param spec parameter specification
-    //     */
-    //    void init(AlgorithmParameterSpec spec);
-    //
-    //    /**
-    //     * Initializes this encryptor with given parameters.
-    //     *
-    //     * @param params given parameters
-    //     */
-    //    void init(AlgorithmParameters params);
-    //
-    //    /**
-    //     * Initializes this encryptor with secure random.
-    //     *
-    //     * @param secureRandom secure random
-    //     */
-    //    void init(SecureRandom secureRandom);
-    //
-    //    /**
-    //     * Initializes this encryptor with parameter specification and secure random.
-    //     *
-    //     * @param spec         parameter specification
-    //     * @param secureRandom secure random
-    //     */
-    //    void init(@Nullable AlgorithmParameterSpec spec, @Nullable SecureRandom secureRandom);
-    //
-    //    /**
-    //     * Initializes this encryptor with given parameters and secure random.
-    //     *
-    //     * @param params       given parameters
-    //     * @param secureRandom secure random
-    //     */
-    //    void init(@Nullable AlgorithmParameters params, @Nullable SecureRandom secureRandom);
-
     /**
      * Creates a pair of key.
      *

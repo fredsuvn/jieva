@@ -1,22 +1,15 @@
-package xyz.srclab.common.codec.jdk;
+package xyz.srclab.common.encode;
 
 import xyz.srclab.common.base.FsCheck;
-import xyz.srclab.common.codec.FsAlgorithm;
 import xyz.srclab.common.codec.FsCodecException;
-import xyz.srclab.common.codec.FsEncoder;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-final class JdkHexEncoder implements FsEncoder {
+final class HexEncoder implements FsEncoder {
 
     private static final String MUST_EVEN = "Length of hex data must be even number.";
-
-    @Override
-    public String algorithmName() {
-        return FsAlgorithm.HEX.getName();
-    }
 
     @Override
     public byte[] encode(byte[] source, int offset, int length) {

@@ -31,12 +31,5 @@ public interface FsCodecProvider {
      *
      * @param algorithmName specified algorithm name
      */
-    FsEncoder getEncoder(String algorithmName);
-
-    /**
-     * Returns encoder of specified algorithm name.
-     *
-     * @param algorithmName specified algorithm name
-     */
     FsEncryptor getEncryptor(String algorithmName);
 }

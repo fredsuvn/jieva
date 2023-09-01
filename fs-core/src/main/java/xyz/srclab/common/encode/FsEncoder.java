@@ -1,7 +1,8 @@
-package xyz.srclab.common.codec;
+package xyz.srclab.common.encode;
 
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsString;
+import xyz.srclab.common.codec.FsCodecException;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.InputStream;
@@ -10,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Encoder interface for encoding and decoding.
+ * Encoder interface for encoding and decoding (such as Base64 and Hex).
  *
  * @author fredsuvn
  */
@@ -18,60 +19,53 @@ import java.nio.charset.StandardCharsets;
 public interface FsEncoder {
 
     /**
-     * Returns encoder of specified algorithm name from {@link FsCodecProvider#defaultProvider()}.
-     *
-     * @param algorithmName specified algorithm name
-     */
-    static FsEncoder getEncoder(String algorithmName) {
-        return FsCodecProvider.defaultProvider().getEncoder(algorithmName);
-    }
-
-    /**
-     * Returns encoder of specified algorithm name from given codec provider.
-     *
-     * @param algorithmName specified algorithm name
-     * @param provider      given codec provider
-     */
-    static FsEncoder getEncoder(String algorithmName, FsCodecProvider provider) {
-        return provider.getEncoder(algorithmName);
-    }
-
-    /**
      * Returns base64 encoder.
      */
     static FsEncoder base64() {
-        return getEncoder(FsAlgorithm.BASE64.getName());
+        return Encoders.BASE64;
     }
 
     /**
-     * Returns base64 encoder from given codec provider.
-     *
-     * @param provider given codec provider
+     * Returns base64 encoder (without padding).
      */
-    static FsEncoder base64(FsCodecProvider provider) {
-        return getEncoder(FsAlgorithm.BASE64.getName(), provider);
+    static FsEncoder base64NoPadding() {
+        return Encoders.BASE64_NO_PADDING;
+    }
+
+    /**
+     * Returns base64 encoder (URL format).
+     */
+    static FsEncoder base64Url() {
+        return Encoders.BASE64_URL;
+    }
+
+    /**
+     * Returns base64 encoder (URL format without padding).
+     */
+    static FsEncoder base64UrlNoPadding() {
+        return Encoders.BASE64_URL_NO_PADDING;
+    }
+
+    /**
+     * Returns base64 encoder (MIME format).
+     */
+    static FsEncoder base64Mime() {
+        return Encoders.BASE64_MIME;
+    }
+
+    /**
+     * Returns base64 encoder (MIME format without padding).
+     */
+    static FsEncoder base64MimeNoPadding() {
+        return Encoders.BASE64_MIME_NO_PADDING;
     }
 
     /**
      * Returns hex encoder.
      */
     static FsEncoder hex() {
-        return getEncoder(FsAlgorithm.HEX.getName());
+        return Encoders.HEX;
     }
-
-    /**
-     * Returns hex encoder from given codec provider.
-     *
-     * @param provider given codec provider
-     */
-    static FsEncoder hex(FsCodecProvider provider) {
-        return getEncoder(FsAlgorithm.HEX.getName(), provider);
-    }
-
-    /**
-     * Returns algorithm name.
-     */
-    String algorithmName();
 
     /**
      * Encodes source array.

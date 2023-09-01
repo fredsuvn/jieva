@@ -1,8 +1,7 @@
-package xyz.srclab.common.codec.jdk;
+package xyz.srclab.common.encode;
 
 import xyz.srclab.common.base.FsCheck;
 import xyz.srclab.common.codec.FsCodecException;
-import xyz.srclab.common.codec.FsEncoder;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.IOException;
@@ -10,22 +9,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Base64;
 
-final class JdkBase64Encoder implements FsEncoder {
+final class Base64Encoder implements FsEncoder {
 
-    private final String algorithmName;
-    private final java.util.Base64.Encoder encoder;
-    private final java.util.Base64.Decoder decoder;
+    private final Base64.Encoder encoder;
+    private final Base64.Decoder decoder;
 
-    JdkBase64Encoder(String algorithmName, java.util.Base64.Encoder encoder, java.util.Base64.Decoder decoder) {
-        this.algorithmName = algorithmName;
+    Base64Encoder(java.util.Base64.Encoder encoder, java.util.Base64.Decoder decoder) {
         this.encoder = encoder;
         this.decoder = decoder;
-    }
-
-    @Override
-    public String algorithmName() {
-        return algorithmName;
     }
 
     @Override
