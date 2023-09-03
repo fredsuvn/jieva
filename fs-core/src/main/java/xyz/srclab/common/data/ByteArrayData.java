@@ -20,7 +20,7 @@ final class ByteArrayData implements FsData {
     }
 
     @Override
-    public synchronized byte[] toByteArray() {
+    public synchronized byte[] toBytes() {
         return Arrays.copyOfRange(array, offset, offset + length);
     }
 

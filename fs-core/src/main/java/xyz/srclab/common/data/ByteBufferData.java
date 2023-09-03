@@ -15,7 +15,7 @@ final class ByteBufferData implements FsData {
     }
 
     @Override
-    public synchronized byte[] toByteArray() {
+    public synchronized byte[] toBytes() {
         return FsIO.getBytes(buffer);
     }
 
@@ -33,7 +33,13 @@ final class ByteBufferData implements FsData {
         if (len == 0) {
             return 0;
         }
-        dest.put(buffer);
+        ByteBuffer src = buffer;
+        if (len != buffer.remaining()) {
+            src = buffer.slice();
+            src.limit(len);
+        }
+        dest.put(src);
+        buffer.position(buffer.position() + len);
         return len;
     }
 

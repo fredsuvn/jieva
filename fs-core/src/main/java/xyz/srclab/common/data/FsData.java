@@ -2,11 +2,13 @@ package xyz.srclab.common.data;
 
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsCheck;
+import xyz.srclab.common.encode.FsEncoder;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 /**
  * This interface represents a segment of data which is prepared to write.
@@ -51,14 +53,14 @@ public interface FsData {
      *
      * @param inputStream given input stream
      */
-    static FsData fromBuffer(InputStream inputStream) {
+    static FsData fromStream(InputStream inputStream) {
         return new InputStreamData(inputStream);
     }
 
     /**
      * Writes the data into a byte array and returns.
      */
-    byte[] toByteArray();
+    byte[] toBytes();
 
     /**
      * Writes the data into dest byte array, returns actual written count.
@@ -81,8 +83,8 @@ public interface FsData {
     /**
      * Writes the data into a byte buffer and returns.
      */
-    default ByteBuffer toByteBuffer() {
-        return ByteBuffer.wrap(toByteArray());
+    default ByteBuffer toBuffer() {
+        return ByteBuffer.wrap(toBytes());
     }
 
     /**
@@ -106,5 +108,21 @@ public interface FsData {
      */
     default long write(OutputStream dest) {
         return FsIO.readBytesTo(toInputStream(), dest);
+    }
+
+    /**
+     * Returns string with specified charset of this data.
+     *
+     * @param charset specified charset
+     */
+    default String toString(Charset charset) {
+        return new String(toBytes(), charset);
+    }
+
+    /**
+     * Returns base64 string of this data.
+     */
+    default String toBase64String() {
+        return FsEncoder.base64().encodeToString(toBytes());
     }
 }
