@@ -18,23 +18,23 @@ import java.util.function.Function;
 /**
  * Default implementation for {@link FsCache}.
  */
-final class FsCacheImpl<K, V> implements FsCache<K, V> {
+final class CacheImpl<K, V> implements FsCache<K, V> {
 
     private final BackMap backMap;
 
-    FsCacheImpl(boolean isSoft) {
+    CacheImpl(boolean isSoft) {
         this.backMap = new BackMap(0, null, isSoft);
     }
 
-    FsCacheImpl(boolean isSoft, FsCache.RemoveListener<K, V> removeListener) {
+    CacheImpl(boolean isSoft, FsCache.RemoveListener<K, V> removeListener) {
         this.backMap = new BackMap(0, removeListener, isSoft);
     }
 
-    FsCacheImpl(boolean isSoft, int initialCapacity) {
+    CacheImpl(boolean isSoft, int initialCapacity) {
         this.backMap = new BackMap(initialCapacity, null, isSoft);
     }
 
-    FsCacheImpl(boolean isSoft, int initialCapacity, FsCache.RemoveListener<K, V> removeListener) {
+    CacheImpl(boolean isSoft, int initialCapacity, FsCache.RemoveListener<K, V> removeListener) {
         this.backMap = new BackMap(initialCapacity, removeListener, isSoft);
     }
 
@@ -216,7 +216,7 @@ final class FsCacheImpl<K, V> implements FsCache<K, V> {
                 map.remove(entry.getKey());
                 entry.clear();
                 if (removeListener != null) {
-                    removeListener.onRemove(FsCacheImpl.this, entry.getKey());
+                    removeListener.onRemove(CacheImpl.this, entry.getKey());
                 }
             }
             inCleanUp = false;

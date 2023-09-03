@@ -23,7 +23,7 @@ public interface FsFile {
      * @param path given path
      */
     static FsFile from(Path path) {
-        return new FsFileImpl(path);
+        return new FileImpl(path);
     }
 
     /**

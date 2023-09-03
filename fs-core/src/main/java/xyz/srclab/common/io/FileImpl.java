@@ -5,7 +5,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
 
-final class FsFileImpl implements FsFile {
+final class FileImpl implements FsFile {
 
     private final Path path;
 
@@ -13,10 +13,9 @@ final class FsFileImpl implements FsFile {
     private volatile InputStream inputStream;
     private volatile OutputStream outputStream;
 
-    FsFileImpl(Path path) {
+    FileImpl(Path path) {
         this.path = path;
     }
-
 
     @Override
     public Path getPath() {

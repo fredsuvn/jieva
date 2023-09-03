@@ -20,7 +20,7 @@ public interface FsCache<K, V> {
      * Creates a new thread-safe Cache based by {@link SoftReference}.
      */
     static <K, V> FsCache<K, V> softCache() {
-        return new FsCacheImpl<>(true);
+        return new CacheImpl<>(true);
     }
 
     /**
@@ -31,7 +31,7 @@ public interface FsCache<K, V> {
      *                       the first argument is current cache and second is the key.
      */
     static <K, V> FsCache<K, V> softCache(RemoveListener<K, V> removeListener) {
-        return new FsCacheImpl<>(true, removeListener);
+        return new CacheImpl<>(true, removeListener);
     }
 
     /**
@@ -40,7 +40,7 @@ public interface FsCache<K, V> {
      * @param initialCapacity initial capacity
      */
     static <K, V> FsCache<K, V> softCache(int initialCapacity) {
-        return new FsCacheImpl<>(true, initialCapacity);
+        return new CacheImpl<>(true, initialCapacity);
     }
 
     /**
@@ -52,14 +52,14 @@ public interface FsCache<K, V> {
      *                        the first argument is current cache and second is the key.
      */
     static <K, V> FsCache<K, V> softCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new FsCacheImpl<>(true, initialCapacity, removeListener);
+        return new CacheImpl<>(true, initialCapacity, removeListener);
     }
 
     /**
      * Creates a new thread-safe Cache based by {@link WeakReference}.
      */
     static <K, V> FsCache<K, V> weakCache() {
-        return new FsCacheImpl<>(false);
+        return new CacheImpl<>(false);
     }
 
     /**
@@ -70,7 +70,7 @@ public interface FsCache<K, V> {
      *                       the first argument is current cache and second is the key.
      */
     static <K, V> FsCache<K, V> weakCache(RemoveListener<K, V> removeListener) {
-        return new FsCacheImpl<>(false, removeListener);
+        return new CacheImpl<>(false, removeListener);
     }
 
     /**
@@ -79,7 +79,7 @@ public interface FsCache<K, V> {
      * @param initialCapacity initial capacity
      */
     static <K, V> FsCache<K, V> weakCache(int initialCapacity) {
-        return new FsCacheImpl<>(false, initialCapacity);
+        return new CacheImpl<>(false, initialCapacity);
     }
 
     /**
@@ -91,7 +91,7 @@ public interface FsCache<K, V> {
      *                        the first argument is current cache and second is the key.
      */
     static <K, V> FsCache<K, V> weakCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new FsCacheImpl<>(false, initialCapacity, removeListener);
+        return new CacheImpl<>(false, initialCapacity, removeListener);
     }
 
     /**
