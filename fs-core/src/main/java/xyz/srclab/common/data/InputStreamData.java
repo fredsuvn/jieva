@@ -26,7 +26,7 @@ final class InputStreamData implements FsData {
 
     @Override
     public synchronized int write(ByteBuffer dest) {
-        return (int) FsIO.readBytesTo(inputStream, FsIO.toOutputStream(dest));
+        return (int) FsIO.readBytesTo(inputStream, FsIO.toOutputStream(dest), dest.remaining());
     }
 
     @Override

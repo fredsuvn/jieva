@@ -37,9 +37,9 @@ public class DataTest {
 
         //input stream
         testArray(FsData.fromStream(new ByteArrayInputStream(bytes)));
-        //testWriteArray(FsData.fromStream(new ByteArrayInputStream(bytes)));
+        testWriteArray(FsData.fromStream(new ByteArrayInputStream(bytes)));
         testBuffer(FsData.fromStream(new ByteArrayInputStream(bytes)));
-        //testWriteBuffer(FsData.fromStream(new ByteArrayInputStream(bytes)));
+        testWriteBuffer(FsData.fromStream(new ByteArrayInputStream(bytes)));
         testInputStream(FsData.fromStream(new ByteArrayInputStream(bytes)));
         testOutputStream(FsData.fromStream(new ByteArrayInputStream(bytes)));
     }
