@@ -7,6 +7,7 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsCheck;
 import xyz.srclab.common.base.ref.BooleanRef;
+import xyz.srclab.common.base.ref.FsRef;
 import xyz.srclab.common.base.ref.LongRef;
 import xyz.srclab.common.cache.FsCache;
 
@@ -503,11 +504,11 @@ public interface FsFileCache {
                 private int read0(byte[] b, int off, int len) throws IOException {
                     int offset = off;
                     int remaining = len;
-                    final LongRef chunkIndex = new LongRef(pos / chunkSize);
+                    final LongRef chunkIndex = FsRef.ofLong(pos / chunkSize);
                     long chunkOffset = pos % chunkSize;
                     String pathString = path.toString();
                     ChunkIndex chunkIndexKey;
-                    final BooleanRef cacheFlag = new BooleanRef(true);
+                    final BooleanRef cacheFlag = FsRef.ofBoolean(true);
                     while (true) {
                         chunkIndexKey = new ChunkIndex(pathString, chunkIndex.get());
                         long chunkPos = chunkIndex.get() * chunkSize;

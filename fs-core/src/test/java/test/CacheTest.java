@@ -3,6 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsLogger;
+import xyz.srclab.common.base.ref.FsRef;
 import xyz.srclab.common.base.ref.IntRef;
 import xyz.srclab.common.cache.FsCache;
 
@@ -91,7 +92,7 @@ public class CacheTest {
 
     @Test
     public void testRemove() {
-        IntRef intRef = new IntRef();
+        IntRef intRef = FsRef.ofInt(0);
         FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
         fsCache.put(1, 1);
         fsCache.remove(1);
@@ -100,7 +101,7 @@ public class CacheTest {
 
     @Test
     public void testClear() {
-        IntRef intRef = new IntRef();
+        IntRef intRef = FsRef.ofInt(0);
         FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
         for (int i = 0; i < 10000; i++) {
             fsCache.put(i, i);
@@ -111,7 +112,7 @@ public class CacheTest {
 
     @Test
     public void testRemoveIf() {
-        IntRef intRef = new IntRef();
+        IntRef intRef = FsRef.ofInt(0);
         FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
         for (int i = 0; i < 10; i++) {
             fsCache.put(i, i);

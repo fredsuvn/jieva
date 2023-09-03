@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsString;
+import xyz.srclab.common.base.ref.FsRef;
 import xyz.srclab.common.base.ref.LongRef;
 import xyz.srclab.common.io.FsFile;
 import xyz.srclab.common.io.FsFileCache;
@@ -51,7 +52,7 @@ public class FileTest {
             FsIO.readBytes(file.toPath(), offset + 4, length));
         long fileLength = fsFile.length();
         fsFile.position(fileLength);
-        LongRef newLength = new LongRef(fileLength);
+        LongRef newLength = FsRef.ofLong(fileLength);
         IOTest.testOutStream(-1, fsFile.bindOutputStream(), (offset, length) -> {
             newLength.incrementAndGet(length);
             return FsIO.readBytes(file.toPath(), offset + fileLength, length);
@@ -86,7 +87,7 @@ public class FileTest {
         IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), 4), (offset, length) ->
             FsIO.readBytes(file.toPath(), offset + 4, length));
         long fileLength = file.length();
-        LongRef newLength = new LongRef(fileLength);
+        LongRef newLength = FsRef.ofLong(fileLength);
         IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), fileLength), (offset, length) -> {
             newLength.incrementAndGet(length);
             return FsIO.readBytes(file.toPath(), offset + fileLength, length);
@@ -106,10 +107,10 @@ public class FileTest {
         byte[] bytes2 = (data + data + data).getBytes(FsString.CHARSET);
         File file1 = createFile("FileTest-testFileCache1.txt", data);
         File file2 = createFile("FileTest-testFileCache2.txt", data + data + data);
-        LongRef cacheRead = new LongRef();
-        LongRef fileRead = new LongRef();
-        LongRef cacheWrite = new LongRef();
-        LongRef fileWrite = new LongRef();
+        LongRef cacheRead = FsRef.ofLong(0);
+        LongRef fileRead = FsRef.ofLong(0);
+        LongRef cacheWrite = FsRef.ofLong(0);
+        LongRef fileWrite = FsRef.ofLong(0);
         FsFileCache fileCache = FsFileCache.newBuilder()
             .chunkSize(3)
             .bufferSize(4)

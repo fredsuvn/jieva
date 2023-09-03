@@ -1,7 +1,7 @@
 package xyz.srclab.common.base.ref;
 
 /**
- * {@link Ref} for long type.
+ * {@link FsRef} for long type.
  *
  * @author fredsuvn
  */
@@ -9,19 +9,7 @@ public class LongRef {
 
     private long value;
 
-    /**
-     * Constructs with 0.
-     */
-    public LongRef() {
-        this(0);
-    }
-
-    /**
-     * Constructs with given value.
-     *
-     * @param value given value
-     */
-    public LongRef(long value) {
+    LongRef(long value) {
         this.value = value;
     }
 

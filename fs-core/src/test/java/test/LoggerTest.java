@@ -3,6 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsLogger;
+import xyz.srclab.common.base.ref.FsRef;
 import xyz.srclab.common.base.ref.IntRef;
 
 public class LoggerTest {
@@ -15,7 +16,7 @@ public class LoggerTest {
         logger.info("test info");
         logger.warn("test warn");
         logger.error("test error");
-        IntRef count = new IntRef();
+        IntRef count = FsRef.ofInt(0);
         FsLogger logger2 = FsLogger.newLogger(
             FsLogger.INFO_LEVEL,
             it -> count.getAndIncrement()

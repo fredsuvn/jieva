@@ -1,7 +1,7 @@
 package xyz.srclab.common.base.ref;
 
 /**
- * {@link Ref} for float type.
+ * {@link FsRef} for float type.
  *
  * @author fredsuvn
  */
@@ -9,19 +9,7 @@ public class FloatRef {
 
     private float value;
 
-    /**
-     * Constructs with 0.
-     */
-    public FloatRef() {
-        this(0);
-    }
-
-    /**
-     * Constructs with given value.
-     *
-     * @param value given value
-     */
-    public FloatRef(float value) {
+    FloatRef(float value) {
         this.value = value;
     }
 

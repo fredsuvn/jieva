@@ -1,7 +1,7 @@
 package xyz.srclab.common.base.ref;
 
 /**
- * {@link Ref} for double type.
+ * {@link FsRef} for double type.
  *
  * @author fredsuvn
  */
@@ -9,19 +9,7 @@ public class DoubleRef {
 
     private double value;
 
-    /**
-     * Constructs with 0.
-     */
-    public DoubleRef() {
-        this(0);
-    }
-
-    /**
-     * Constructs with given value.
-     *
-     * @param value given value
-     */
-    public DoubleRef(double value) {
+    DoubleRef(double value) {
         this.value = value;
     }
 

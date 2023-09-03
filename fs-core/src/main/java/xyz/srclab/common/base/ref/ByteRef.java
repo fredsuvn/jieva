@@ -1,7 +1,7 @@
 package xyz.srclab.common.base.ref;
 
 /**
- * {@link Ref} for byte type.
+ * {@link FsRef} for byte type.
  *
  * @author fredsuvn
  */
@@ -9,19 +9,7 @@ public class ByteRef {
 
     private byte value;
 
-    /**
-     * Constructs with 0.
-     */
-    public ByteRef() {
-        this((byte) 0);
-    }
-
-    /**
-     * Constructs with given value.
-     *
-     * @param value given value
-     */
-    public ByteRef(byte value) {
+    ByteRef(byte value) {
         this.value = value;
     }
 

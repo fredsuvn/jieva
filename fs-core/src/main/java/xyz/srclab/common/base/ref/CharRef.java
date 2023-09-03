@@ -1,7 +1,7 @@
 package xyz.srclab.common.base.ref;
 
 /**
- * {@link Ref} for char type.
+ * {@link FsRef} for char type.
  *
  * @author fredsuvn
  */
@@ -9,19 +9,7 @@ public class CharRef {
 
     private char value;
 
-    /**
-     * Constructs with 0.
-     */
-    public CharRef() {
-        this((char) 0);
-    }
-
-    /**
-     * Constructs with given value.
-     *
-     * @param value given value
-     */
-    public CharRef(char value) {
+    CharRef(char value) {
         this.value = value;
     }
 

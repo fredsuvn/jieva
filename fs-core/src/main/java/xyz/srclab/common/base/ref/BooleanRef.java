@@ -1,7 +1,7 @@
 package xyz.srclab.common.base.ref;
 
 /**
- * {@link Ref} for boolean type.
+ * {@link FsRef} for boolean type.
  *
  * @author fredsuvn
  */
@@ -9,19 +9,7 @@ public class BooleanRef {
 
     private boolean value;
 
-    /**
-     * Constructs with false.
-     */
-    public BooleanRef() {
-        this(false);
-    }
-
-    /**
-     * Constructs with given value.
-     *
-     * @param value given value
-     */
-    public BooleanRef(boolean value) {
+    BooleanRef(boolean value) {
         this.value = value;
     }
 

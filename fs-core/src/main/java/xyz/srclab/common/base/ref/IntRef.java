@@ -1,7 +1,7 @@
 package xyz.srclab.common.base.ref;
 
 /**
- * {@link Ref} for int type.
+ * {@link FsRef} for int type.
  *
  * @author fredsuvn
  */
@@ -9,19 +9,7 @@ public class IntRef {
 
     private int value;
 
-    /**
-     * Constructs with 0.
-     */
-    public IntRef() {
-        this(0);
-    }
-
-    /**
-     * Constructs with given value.
-     *
-     * @param value given value
-     */
-    public IntRef(int value) {
+    IntRef(int value) {
         this.value = value;
     }
 

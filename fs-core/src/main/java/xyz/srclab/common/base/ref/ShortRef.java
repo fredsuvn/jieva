@@ -1,7 +1,7 @@
 package xyz.srclab.common.base.ref;
 
 /**
- * {@link Ref} for short type.
+ * {@link FsRef} for short type.
  *
  * @author fredsuvn
  */
@@ -9,19 +9,7 @@ public class ShortRef {
 
     private short value;
 
-    /**
-     * Constructs with 0.
-     */
-    public ShortRef() {
-        this((short) 0);
-    }
-
-    /**
-     * Constructs with given value.
-     *
-     * @param value given value
-     */
-    public ShortRef(short value) {
+    ShortRef(short value) {
         this.value = value;
     }
 
