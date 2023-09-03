@@ -319,7 +319,7 @@ public class FsString {
      * @param separator given separator
      * @param function  given sub-sequence function
      */
-    public static List<CharSequence> split(CharSequence chars, CharSequence separator, SubSequenceFunction function) {
+    public static List<CharSequence> split(CharSequence chars, CharSequence separator, StringFunction function) {
         if (isEmpty(chars) || isEmpty(separator) || separator.length() > chars.length()) {
             return Collections.emptyList();
         }

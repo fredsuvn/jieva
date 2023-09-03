@@ -1,17 +1,17 @@
 package xyz.srclab.common.base;
 
 /**
- * A functional interface to create sub CharSequence.
+ * Functional interface to create string.
  *
  * @author fredsuvn
  */
 @FunctionalInterface
-public interface SubSequenceFunction {
+public interface StringFunction {
 
     /**
-     * Returns sub CharSequence of given chars from given start index inclusive to given end index exclusive.
+     * Returns sub-string of given char sequence from given start index inclusive to given end index exclusive.
      *
-     * @param chars given chars
+     * @param chars given char sequence
      * @param start given start index inclusive
      * @param end   given end index exclusive
      */
