@@ -243,6 +243,9 @@ public class IOTest {
             FsIO.readBytes(file.toPath(), off + 8, len));
         testOutStream(-1, FsIO.toOutputStream(random, 8, -1), (off, len) ->
             FsIO.readBytes(file.toPath(), off + 8, len));
+        byte[] back = new byte[2048];
+        testOutStream(bytes.length, FsIO.toOutputStream(back, 111, 1024), (off, len) ->
+            Arrays.copyOfRange(back, off + 111, off + 111 + len));
         testWriter(FsIO.toWriter(CharBuffer.wrap(chars)), (off, len) ->
             Arrays.copyOfRange(chars, off, off + len));
         outputStream.reset();

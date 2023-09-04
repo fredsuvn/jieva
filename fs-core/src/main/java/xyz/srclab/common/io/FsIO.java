@@ -1,6 +1,7 @@
 package xyz.srclab.common.io;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.FsCheck;
 import xyz.srclab.common.base.FsString;
 
 import java.io.*;
@@ -609,6 +610,27 @@ public class FsIO {
      */
     public static OutputStream toOutputStream(Appendable appendable, Charset charset) {
         return new AppendableOutputStream(appendable, charset);
+    }
+
+    /**
+     * Wraps given array as an output stream.
+     *
+     * @param array given array
+     */
+    public static OutputStream toOutputStream(byte[] array) {
+        return new ByteArrayAsOutputStream(array, 0, array.length);
+    }
+
+    /**
+     * Wraps given array as an output stream, the wrapped range of specified length start from given offset.
+     *
+     * @param array  given array
+     * @param offset given offset
+     * @param length specified length
+     */
+    public static OutputStream toOutputStream(byte[] array, int offset, int length) {
+        FsCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
+        return new ByteArrayAsOutputStream(array, offset, length);
     }
 
     /**
