@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.security.AlgorithmParameters;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
@@ -33,6 +34,10 @@ public class AlgorithmParams {
      * Secure random.
      */
     private SecureRandom secureRandom;
+    /**
+     * The certificate.
+     */
+    private Certificate certificate;
     /**
      * Key size.
      */

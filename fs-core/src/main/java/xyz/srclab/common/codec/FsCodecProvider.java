@@ -5,7 +5,7 @@ import xyz.srclab.annotations.concurrent.ThreadSafe;
 /**
  * Codec provider, see {@link FsAlgorithm} for commonly used algorithm.
  *
- * @author sunq62
+ * @author fredsuvn
  */
 @ThreadSafe
 public interface FsCodecProvider {
