@@ -26,6 +26,25 @@ public interface FsCipher {
     Cipher getCipher();
 
     /**
+     * Prepares to encrypt source array.
+     *
+     * @param key    key for encrypting
+     * @param source source array
+     */
+    default CryptoProcess prepare(Key key, byte[] source) {
+        return prepare(key, source, 0, source.length);
+    }
+
+    /**
+     * Prepares to encrypt array of specified length from offset index.
+     * @param key key for encrypting
+     * @param source source array
+     * @param offset offset index
+     * @param length specified length
+     */
+    CryptoProcess prepare(Key key, byte[] source, int offset, int length);
+
+    /**
      * Encrypts source array.
      *
      * @param source source array
