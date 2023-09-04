@@ -216,12 +216,12 @@ public class IOTest {
         File file = FileTest.createFile("IOTest-testWrapper.txt", data);
         RandomAccessFile random = new RandomAccessFile(file, "rws");
 
-        testInputStream(data, 3, 222, new ByteArrayInputStream(dataBytes, 3, 222), true);
+        testInputStream(data, 3, 222, FsIO.toInputStream(dataBytes, 3, 222), true);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(ByteBuffer.wrap(data.getBytes(FsString.CHARSET))), true);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(new StringReader(DATA)), false);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(random), true);
         testInputStream(data, 2, 131, FsIO.toInputStream(random, 2, 131), true);
-        testInputStream(data, 2, 131, FsIO.limit(new ByteArrayInputStream(dataBytes, 2, 131), 131), false);
+        testInputStream(data, 2, 131, FsIO.limit(FsIO.toInputStream(dataBytes, 2, 131), 131), false);
         testReader(data, 5, 155, new StringReader(data.substring(5, 5 + 155)), true);
         testReader(data, 0, data.length(), FsIO.toReader(CharBuffer.wrap(DATA)), true);
         testReader(data, 0, data.length(), FsIO.toReader(new ByteArrayInputStream(DATA.getBytes(FsString.CHARSET))), false);

@@ -107,9 +107,9 @@ public interface FsEncoder {
      */
     default int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
-            ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
-            ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
-            return encode(in, out);
+            InputStream in = FsIO.toInputStream(source, sourceOffset, length);
+            OutputStream out = FsIO.toOutputStream(dest, destOffset, dest.length - destOffset);
+            return (int) encode(in, out);
         } catch (FsCodecException e) {
             throw e;
         } catch (Exception e) {
@@ -225,9 +225,9 @@ public interface FsEncoder {
      */
     default int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
-            ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
-            ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
-            return decode(in, out);
+            InputStream in = FsIO.toInputStream(source, sourceOffset, length);
+            OutputStream out = FsIO.toOutputStream(dest, destOffset, dest.length - destOffset);
+            return (int) decode(in, out);
         } catch (FsCodecException e) {
             throw e;
         } catch (Exception e) {

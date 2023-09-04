@@ -3,6 +3,7 @@ package xyz.srclab.common.data;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 final class InputStreamData implements FsData {
@@ -20,8 +21,8 @@ final class InputStreamData implements FsData {
 
     @Override
     public synchronized int write(byte[] dest, int offset, int length) {
-        ByteBuffer destBuffer = ByteBuffer.wrap(dest, offset, length);
-        return write(destBuffer);
+        OutputStream out = FsIO.toOutputStream(dest, offset, length);
+        return (int) FsIO.readBytesTo(inputStream, out, length);
     }
 
     @Override

@@ -98,9 +98,9 @@ public interface FsCipher {
         @Nullable AlgorithmParams params
     ) {
         try {
-            ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
-            ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
-            return encrypt(key, in, out, params);
+            InputStream in = FsIO.toInputStream(source, sourceOffset, length);
+            OutputStream out = FsIO.toOutputStream(dest, destOffset, dest.length - destOffset);
+            return (int) encrypt(key, in, out, params);
         } catch (FsCodecException e) {
             throw e;
         } catch (Exception e) {
@@ -258,9 +258,9 @@ public interface FsCipher {
         @Nullable AlgorithmParams params
     ) {
         try {
-            ByteBuffer in = ByteBuffer.wrap(source, sourceOffset, length);
-            ByteBuffer out = ByteBuffer.wrap(dest, destOffset, dest.length - destOffset);
-            return decrypt(key, in, out, params);
+            InputStream in = FsIO.toInputStream(source, sourceOffset, length);
+            OutputStream out = FsIO.toOutputStream(dest, destOffset, dest.length - destOffset);
+            return (int) decrypt(key, in, out, params);
         } catch (FsCodecException e) {
             throw e;
         } catch (Exception e) {

@@ -524,6 +524,27 @@ public class FsIO {
     }
 
     /**
+     * Wraps given array to {@link ByteArrayInputStream}.
+     *
+     * @param array given array
+     */
+    public static ByteArrayInputStream toInputStream(byte[] array) {
+        return new ByteArrayInputStream(array);
+    }
+
+    /**
+     * Wraps given array to {@link ByteArrayInputStream}, the wrapped range of specified length start from given offset.
+     *
+     * @param array  given array
+     * @param offset given offset
+     * @param length specified length
+     */
+    public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) {
+        FsCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
+        return new ByteArrayInputStream(array, offset, length);
+    }
+
+    /**
      * Wraps given buffer as an input stream, supports mark/reset.
      *
      * @param buffer given buffer
