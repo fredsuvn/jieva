@@ -18,6 +18,8 @@ import java.io.InputStream;
 
 public class FileTest {
 
+    private static final String DATA = TestUtil.buildRandomString(256, 256);
+
     public static File createFile(String path, String data) throws IOException {
         File file = new File(path);
         FileOutputStream fileOutputStream = new FileOutputStream(file, false);
@@ -28,7 +30,7 @@ public class FileTest {
 
     @Test
     public void testFile() throws IOException {
-        String data = IOTest.DATA;
+        String data = DATA;
         byte[] bytes = data.getBytes(FsString.CHARSET);
         File file = createFile("FileTest-testFile.txt", data);
         FsFile fsFile = FsFile.from(file.toPath());
@@ -73,7 +75,7 @@ public class FileTest {
     }
 
     private void testFileCacheIO0(int chunkSize, int bufferSize) throws IOException {
-        String data = IOTest.DATA;
+        String data = DATA;
         byte[] bytes = data.getBytes(FsString.CHARSET);
         File file = createFile("FileTest-testFileCacheIO.txt", data);
         FsFileCache fileCache = FsFileCache.newBuilder()

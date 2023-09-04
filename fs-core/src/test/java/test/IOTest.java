@@ -15,11 +15,7 @@ import java.util.function.BiFunction;
 
 public class IOTest {
 
-    public static final String DATA = "1qaz2wsx3edc4rfv5tgb6yhn7ujm8ik,!@#$%^&**())$%^&*(*&^<?:LKJHGFDFVGBN" +
-        "阿萨法师房间卡死灵法师福卡上积分算法来释放IE覅偶就偶尔见佛耳机佛诶or" +
-        "fasfasfjasdklfhjlasdhflhasdfjhuiwe83490748908" +
-        "发数据快乐风男记录卡说的汉服金坷垃浑身发冷哈涉及到覅uoashfuiopashjfuwehfuwehjfhew" +
-        "fasfbasjkfhjklashfjklasdhfjlkbasd8979023-47UN播放；ljkxkm,vwjik  ,necvsdfav";
+    private static final String DATA = TestUtil.buildRandomString(256, 256);
 
     public static void testInputStream(
         String data,
@@ -105,7 +101,7 @@ public class IOTest {
         if (limit != -1 && limit < 128) {
             throw new IllegalArgumentException("Written length must >= 128 or -1!");
         }
-        byte[] bytes = limit > 0 ? buildRandomBytes((int) limit) : buildRandomBytes(1024);
+        byte[] bytes = limit > 0 ? TestUtil.buildRandomBytes((int) limit) : TestUtil.buildRandomBytes(1024);
         long remaining = bytes.length;
         outputStream.write(bytes, 0, 66);
         outputStream.flush();
@@ -142,15 +138,6 @@ public class IOTest {
         writer.write(chars, 0, chars.length);
         writer.flush();
         Assert.assertEquals(dest.apply(67, chars.length), Arrays.copyOfRange(chars, 0, chars.length));
-    }
-
-    public static byte[] buildRandomBytes(int size) {
-        long now = System.currentTimeMillis();
-        byte[] bytes = new byte[size];
-        for (int i = 0; i < size; i++) {
-            bytes[i] = (byte) ((now * (i + 888) / 999) % 64);
-        }
-        return bytes;
     }
 
     @Test

@@ -13,9 +13,11 @@ import java.util.Arrays;
 
 public class DataTest {
 
+    private static final String DATA = TestUtil.buildRandomString(256, 256);
+
     @Test
     public void testData() {
-        String data = IOTest.DATA;
+        String data = DATA;
         byte[] bytes = data.getBytes(FsString.CHARSET);
 
         //array
@@ -46,7 +48,7 @@ public class DataTest {
 
     @Test
     public void testMisc() {
-        String data = IOTest.DATA;
+        String data = DATA;
         byte[] bytes = data.getBytes(FsString.CHARSET);
 
         //array
@@ -57,11 +59,11 @@ public class DataTest {
     }
 
     private void testArray(FsData data) {
-        Assert.assertEquals(data.toString(FsString.CHARSET), IOTest.DATA);
+        Assert.assertEquals(data.toString(FsString.CHARSET), DATA);
     }
 
     private void testWriteArray(FsData data) {
-        byte[] bytes = IOTest.DATA.getBytes(FsString.CHARSET);
+        byte[] bytes = DATA.getBytes(FsString.CHARSET);
         byte[] dest = new byte[1024];
         int size = data.write(dest, 8, 88);
         Assert.assertEquals(Arrays.copyOfRange(dest, 8, 8 + 88), Arrays.copyOfRange(bytes, 0, 88));
@@ -69,11 +71,11 @@ public class DataTest {
     }
 
     private void testBuffer(FsData data) {
-        Assert.assertEquals(data.toBuffer(), ByteBuffer.wrap(IOTest.DATA.getBytes(FsString.CHARSET)));
+        Assert.assertEquals(data.toBuffer(), ByteBuffer.wrap(DATA.getBytes(FsString.CHARSET)));
     }
 
     private void testWriteBuffer(FsData data) {
-        byte[] bytes = IOTest.DATA.getBytes(FsString.CHARSET);
+        byte[] bytes = DATA.getBytes(FsString.CHARSET);
         byte[] dest = new byte[1024];
         int size = data.write(ByteBuffer.wrap(dest, 8, 88));
         Assert.assertEquals(Arrays.copyOfRange(dest, 8, 8 + 88), Arrays.copyOfRange(bytes, 0, 88));
@@ -81,13 +83,13 @@ public class DataTest {
     }
 
     private void testInputStream(FsData data) {
-        Assert.assertEquals(FsIO.readString(data.toInputStream()), IOTest.DATA);
+        Assert.assertEquals(FsIO.readString(data.toInputStream()), DATA);
     }
 
     private void testOutputStream(FsData data) {
         ByteArrayOutputStream dest = new ByteArrayOutputStream();
         long size = data.write(dest);
-        Assert.assertEquals(dest.toByteArray(), IOTest.DATA.getBytes(FsString.CHARSET));
-        Assert.assertEquals(size, IOTest.DATA.getBytes(FsString.CHARSET).length);
+        Assert.assertEquals(dest.toByteArray(), DATA.getBytes(FsString.CHARSET));
+        Assert.assertEquals(size, DATA.getBytes(FsString.CHARSET).length);
     }
 }
