@@ -698,7 +698,7 @@ public class FsIO {
      * @param source given source stream
      * @param limit  max read length, must >= 0
      */
-    public static InputStream limit(InputStream source, long limit) {
+    public static InputStream limited(InputStream source, long limit) {
         return new LimitedInputStream(source, limit);
     }
 
@@ -708,7 +708,7 @@ public class FsIO {
      * @param source given source stream
      * @param limit  max written length, must >= 0
      */
-    public static OutputStream limit(OutputStream source, long limit) {
+    public static OutputStream limited(OutputStream source, long limit) {
         return new LimitedOutputStream(source, limit);
     }
 

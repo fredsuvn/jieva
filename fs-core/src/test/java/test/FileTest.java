@@ -40,7 +40,7 @@ public class FileTest {
         InputStream bin = fsFile.bindInputStream();
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);
         fsFile.position(2);
-        IOTest.testInputStream(data, 2, 130, FsIO.limit(fsFile.bindInputStream(), 130), false);
+        IOTest.testInputStream(data, 2, 130, FsIO.limited(fsFile.bindInputStream(), 130), false);
         fsFile.close();
         Assert.expectThrows(FsIOException.class, () -> fsFile.bindInputStream());
         Assert.expectThrows(FsIOException.class, () -> bin.read());
@@ -48,7 +48,7 @@ public class FileTest {
         fsFile.position(3);
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);
         fsFile.position(2);
-        IOTest.testInputStream(data, 2, 130, FsIO.limit(fsFile.bindInputStream(), 130), false);
+        IOTest.testInputStream(data, 2, 130, FsIO.limited(fsFile.bindInputStream(), 130), false);
         fsFile.position(4);
         IOTest.testOutStream(-1, fsFile.bindOutputStream(), (offset, length) ->
             FsIO.readBytes(file.toPath(), offset + 4, length));
@@ -61,7 +61,7 @@ public class FileTest {
         });
         Assert.assertEquals(fsFile.length(), newLength.get());
         fsFile.position(8);
-        IOTest.testOutStream(233, FsIO.limit(fsFile.bindOutputStream(), 233), (offset, length) ->
+        IOTest.testOutStream(233, FsIO.limited(fsFile.bindOutputStream(), 233), (offset, length) ->
             FsIO.readBytes(file.toPath(), offset + 8, length));
         file.delete();
     }
@@ -83,8 +83,8 @@ public class FileTest {
             .bufferSize(bufferSize)
             .build();
         IOTest.testInputStream(data, 0, bytes.length, fileCache.getInputStream(file.toPath(), 0), false);
-        IOTest.testInputStream(data, 5, 230, FsIO.limit(fileCache.getInputStream(file.toPath(), 5), 230), false);
-        IOTest.testInputStream(data, 0, 230, FsIO.limit(fileCache.getInputStream(file.toPath(), 0), 230), false);
+        IOTest.testInputStream(data, 5, 230, FsIO.limited(fileCache.getInputStream(file.toPath(), 5), 230), false);
+        IOTest.testInputStream(data, 0, 230, FsIO.limited(fileCache.getInputStream(file.toPath(), 0), 230), false);
         IOTest.testInputStream(data, 0, bytes.length, fileCache.getInputStream(file.toPath(), 0), false);
         IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), 4), (offset, length) ->
             FsIO.readBytes(file.toPath(), offset + 4, length));
@@ -95,9 +95,9 @@ public class FileTest {
             return FsIO.readBytes(file.toPath(), offset + fileLength, length);
         });
         Assert.assertEquals(file.length(), newLength.get());
-        IOTest.testOutStream(233, FsIO.limit(fileCache.getOutputStream(file.toPath(), 0), 233), (offset, length) ->
+        IOTest.testOutStream(233, FsIO.limited(fileCache.getOutputStream(file.toPath(), 0), 233), (offset, length) ->
             FsIO.readBytes(file.toPath(), offset, length));
-        IOTest.testOutStream(233, FsIO.limit(fileCache.getOutputStream(file.toPath(), 3), 233), (offset, length) ->
+        IOTest.testOutStream(233, FsIO.limited(fileCache.getOutputStream(file.toPath(), 3), 233), (offset, length) ->
             FsIO.readBytes(file.toPath(), offset + 3, length));
         file.delete();
     }

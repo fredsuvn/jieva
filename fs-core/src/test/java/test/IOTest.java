@@ -194,16 +194,16 @@ public class IOTest {
     public void testLimit() throws IOException {
         String str = DATA;
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-        InputStream in = FsIO.limit(new ByteArrayInputStream(bytes), 6);
+        InputStream in = FsIO.limited(new ByteArrayInputStream(bytes), 6);
         in.skip(5);
         in.read();
         Assert.assertEquals(in.read(), -1);
         Assert.assertEquals(in.read(bytes), -1);
-        InputStream in2 = FsIO.limit(new ByteArrayInputStream(bytes), 6);
+        InputStream in2 = FsIO.limited(new ByteArrayInputStream(bytes), 6);
         Assert.assertEquals(in2.read(bytes), 6);
         Assert.assertEquals(in2.read(), -1);
         Assert.assertEquals(in2.read(bytes), -1);
-        OutputStream out = FsIO.limit(new ByteArrayOutputStream(), 6);
+        OutputStream out = FsIO.limited(new ByteArrayOutputStream(), 6);
         Assert.expectThrows(IOException.class, () -> out.write(bytes));
         out.write(bytes, 0, 6);
         Assert.expectThrows(IOException.class, () -> out.write(1));
@@ -221,7 +221,7 @@ public class IOTest {
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(new StringReader(DATA)), false);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(random), true);
         testInputStream(data, 2, 131, FsIO.toInputStream(random, 2, 131), true);
-        testInputStream(data, 2, 131, FsIO.limit(FsIO.toInputStream(dataBytes, 2, 131), 131), false);
+        testInputStream(data, 2, 131, FsIO.limited(FsIO.toInputStream(dataBytes, 2, 131), 131), false);
         testReader(data, 5, 155, new StringReader(data.substring(5, 5 + 155)), true);
         testReader(data, 0, data.length(), FsIO.toReader(CharBuffer.wrap(DATA)), true);
         testReader(data, 0, data.length(), FsIO.toReader(new ByteArrayInputStream(DATA.getBytes(FsString.CHARSET))), false);
@@ -233,7 +233,7 @@ public class IOTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024);
         testOutStream(bytes.length, FsIO.toOutputStream(buffer), (off, len) ->
             Arrays.copyOfRange(bytes, off, off + len));
-        testOutStream(bytes.length, FsIO.limit(outputStream, 1024), (off, len) ->
+        testOutStream(bytes.length, FsIO.limited(outputStream, 1024), (off, len) ->
             Arrays.copyOfRange(outputStream.toByteArray(), off, off + len));
         testOutStream(-1, FsIO.toOutputStream(sb), (off, len) ->
             Arrays.copyOfRange(sb.toString().getBytes(FsString.CHARSET), off, off + len));
