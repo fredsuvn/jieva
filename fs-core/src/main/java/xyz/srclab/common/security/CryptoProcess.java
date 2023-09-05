@@ -3,6 +3,7 @@ package xyz.srclab.common.security;
 import xyz.srclab.common.data.FsData;
 
 import java.security.AlgorithmParameters;
+import java.security.Key;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
@@ -59,7 +60,16 @@ public interface CryptoProcess {
     CryptoProcess blockSize(int blockSize);
 
     /**
-     * Do the crypto operation.
+     * Do the encryption operation.
+     *
+     * @param key the key.
      */
-    FsData process();
+    FsData encrypt(Key key);
+
+    /**
+     * Do the decryption operation.
+     *
+     * @param key the key.
+     */
+    FsData decrypt(Key key);
 }

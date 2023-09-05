@@ -1,9 +1,6 @@
 package xyz.srclab.common.security;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.security.AlgorithmParameters;
 import java.security.SecureRandom;
@@ -18,6 +15,7 @@ import java.security.spec.AlgorithmParameterSpec;
  */
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Data
 @EqualsAndHashCode
 public class AlgorithmParams {
@@ -25,11 +23,11 @@ public class AlgorithmParams {
     /**
      * Specification of cryptographic parameters.
      */
-    private AlgorithmParameterSpec parameterSpec;
+    private AlgorithmParameterSpec algorithmParameterSpec;
     /**
      * Cryptographic parameters.
      */
-    private AlgorithmParameters parameters;
+    private AlgorithmParameters algorithmParameters;
     /**
      * Secure random.
      */
