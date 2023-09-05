@@ -1,5 +1,6 @@
 package xyz.srclab.common.data;
 
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsCheck;
 import xyz.srclab.common.io.FsIO;
 
@@ -46,5 +47,15 @@ final class ByteBufferData implements FsData {
     @Override
     public synchronized InputStream toInputStream() {
         return FsIO.toInputStream(buffer);
+    }
+
+    @Override
+    public boolean hasBackArray() {
+        return false;
+    }
+
+    @Override
+    public @Nullable byte[] backArray() {
+        return null;
     }
 }

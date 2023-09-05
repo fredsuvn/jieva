@@ -65,7 +65,7 @@ final class CipherImpl implements FsCipher {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             FsCrypto.encrypt(
                 cipher, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
-            return FsData.fromBytes(out.toByteArray());
+            return FsData.wrap(out.toByteArray());
         }
 
         @Override
@@ -74,7 +74,7 @@ final class CipherImpl implements FsCipher {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             FsCrypto.decrypt(
                 cipher, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
-            return FsData.fromBytes(out.toByteArray());
+            return FsData.wrap(out.toByteArray());
         }
     }
 
@@ -92,7 +92,7 @@ final class CipherImpl implements FsCipher {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             FsCrypto.encrypt(
                 cipher, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
-            return FsData.fromBytes(out.toByteArray());
+            return FsData.wrap(out.toByteArray());
         }
 
         @Override
@@ -101,7 +101,7 @@ final class CipherImpl implements FsCipher {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             FsCrypto.decrypt(
                 cipher, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
-            return FsData.fromBytes(out.toByteArray());
+            return FsData.wrap(out.toByteArray());
         }
     }
 
@@ -120,9 +120,9 @@ final class CipherImpl implements FsCipher {
             if (blockSize <= 0) {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 FsCrypto.encrypt(cipher, key, in, out, getBlockSize(cipher), params);
-                return FsData.fromBytes(out.toByteArray());
+                return FsData.wrap(out.toByteArray());
             }
-            return FsData.fromStream(new EncryptStream(cipher, key, blockSize, Cipher.ENCRYPT_MODE));
+            return FsData.from(new EncryptStream(cipher, key, blockSize, Cipher.ENCRYPT_MODE));
         }
 
         @Override
@@ -132,9 +132,9 @@ final class CipherImpl implements FsCipher {
             if (blockSize <= 0) {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 FsCrypto.decrypt(cipher, key, in, out, getBlockSize(cipher), params);
-                return FsData.fromBytes(out.toByteArray());
+                return FsData.wrap(out.toByteArray());
             }
-            return FsData.fromStream(new EncryptStream(cipher, key, blockSize, Cipher.DECRYPT_MODE));
+            return FsData.from(new EncryptStream(cipher, key, blockSize, Cipher.DECRYPT_MODE));
         }
 
         private final class EncryptStream extends InputStream {

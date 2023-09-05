@@ -1,5 +1,6 @@
 package xyz.srclab.common.data;
 
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsCheck;
 
 import java.io.ByteArrayInputStream;
@@ -45,5 +46,15 @@ final class ByteArrayData implements FsData {
     @Override
     public synchronized InputStream toInputStream() {
         return new ByteArrayInputStream(array, offset, length);
+    }
+
+    @Override
+    public boolean hasBackArray() {
+        return true;
+    }
+
+    @Override
+    public @Nullable byte[] backArray() {
+        return array;
     }
 }

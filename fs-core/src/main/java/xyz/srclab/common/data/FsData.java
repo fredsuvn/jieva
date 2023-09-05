@@ -1,5 +1,6 @@
 package xyz.srclab.common.data;
 
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsCheck;
 import xyz.srclab.common.encode.FsEncoder;
@@ -20,6 +21,7 @@ public interface FsData {
 
     /**
      * Wraps given array to {@link FsData}.
+     * The given array will be back array of returned data.
      *
      * @param array given array
      */
@@ -29,6 +31,7 @@ public interface FsData {
 
     /**
      * Wraps given array of specified length to {@link FsData}, start from offset index.
+     * The given array will be back array of returned data.
      *
      * @param array  given array
      * @param offset specified length
@@ -125,4 +128,15 @@ public interface FsData {
     default String toBase64String() {
         return FsEncoder.base64().encodeToString(toBytes());
     }
+
+    /**
+     * Returns whether this data is backed by an array.
+     */
+    boolean hasBackArray();
+
+    /**
+     * Returns array which back this data, or null if it hasn't.
+     */
+    @Nullable
+    byte[] backArray();
 }

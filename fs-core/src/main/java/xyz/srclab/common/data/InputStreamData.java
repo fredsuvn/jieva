@@ -1,5 +1,6 @@
 package xyz.srclab.common.data;
 
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.InputStream;
@@ -33,5 +34,15 @@ final class InputStreamData implements FsData {
     @Override
     public synchronized InputStream toInputStream() {
         return inputStream;
+    }
+
+    @Override
+    public boolean hasBackArray() {
+        return false;
+    }
+
+    @Override
+    public @Nullable byte[] backArray() {
+        return null;
     }
 }

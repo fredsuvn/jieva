@@ -26,8 +26,8 @@ public class SecurityTest {
     public void testCipher() throws Exception {
         testCipherAsymmetric(150, 88, 256, "RSA", "RSA/ECB/PKCS1Padding");
         testCipherAsymmetric(1500, 188, 256, "RSA", "RSA");
-        testCipherSymmetric(150, 88, 128, "AES", "AES");
-        testCipherSymmetric(1500, 100, 128, "AES", "AES");
+        testCipherSymmetric(150, 16, 32, "AES", "AES");
+        testCipherSymmetric(1500, 16, 32, "AES", "AES");
     }
 
     private void testCipherAsymmetric(
@@ -56,13 +56,13 @@ public class SecurityTest {
         SecretKey key = keyGenerator.generateKey();
         FsCipher cipher = FsCipher.getCipher(cryptoAlgorithm);
         byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).encrypt(key).toBytes();
-        byte[] deBytes = cipher.prepare(enBytes).blockSize(0).decrypt(key).toBytes();
+        byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).decrypt(key).toBytes();
         Assert.assertEquals(data, deBytes);
         enBytes = cipher.prepare(ByteBuffer.wrap(data)).blockSize(enBlockSize).encrypt(key).toBytes();
-        deBytes = cipher.prepare(ByteBuffer.wrap(enBytes)).blockSize(0).decrypt(key).toBytes();
+        deBytes = cipher.prepare(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).decrypt(key).toBytes();
         Assert.assertEquals(data, deBytes);
         enBytes = cipher.prepare(FsIO.toInputStream(data)).blockSize(enBlockSize).encrypt(key).toBytes();
-        deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(0).decrypt(key).toBytes();
+        deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).decrypt(key).toBytes();
         Assert.assertEquals(data, deBytes);
     }
 
