@@ -150,6 +150,8 @@ public class IOTest {
         Assert.assertEquals(FsIO.readString(new StringReader(str), 11), str.substring(0, 11));
         Assert.assertEquals(FsIO.readString(new ByteArrayInputStream(bytes)), str);
         Assert.assertEquals(FsIO.readString(new ByteArrayInputStream(bytes, 0, 8)), str.substring(0, 8));
+        Assert.assertEquals(FsIO.readBytes(new TestInput(new ByteArrayInputStream(bytes))), bytes);
+        Assert.assertEquals(FsIO.readBytes(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
 
         byte[] empty = new byte[0];
         InputStream emptyInput = new ByteArrayInputStream(empty);
@@ -188,6 +190,7 @@ public class IOTest {
         out.reset();
         FsIO.availableBytesTo(new ByteArrayInputStream(bytes, 1, bytes.length), out);
         Assert.assertEquals(out.toByteArray(), Arrays.copyOfRange(bytes, 1, bytes.length));
+        Assert.assertEquals(FsIO.availableBytes(new TestInput(new ByteArrayInputStream(bytes))), Arrays.copyOf(bytes, 1));
     }
 
     @Test
@@ -329,5 +332,63 @@ public class IOTest {
         FsIO.writeString(file.toPath(), 7, 100, "3333中文中文");
         Assert.assertEquals(FsIO.readString(file.toPath()), "lalala13333中文中文");
         file.delete();
+    }
+
+    private static final class TestInput extends InputStream {
+
+        private final InputStream in;
+
+        private TestInput(InputStream in) {
+            this.in = in;
+        }
+
+        @Override
+        public int read() throws IOException {
+            return in.read();
+        }
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            return in.read(b);
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            return in.read(b, off, len);
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            return in.skip(n);
+        }
+
+        @Override
+        public int available() throws IOException {
+            int a = in.available();
+            if (a <= 0) {
+                return a;
+            }
+            return 1;
+        }
+
+        @Override
+        public void close() throws IOException {
+            in.close();
+        }
+
+        @Override
+        public void mark(int readlimit) {
+            in.mark(readlimit);
+        }
+
+        @Override
+        public void reset() throws IOException {
+            in.reset();
+        }
+
+        @Override
+        public boolean markSupported() {
+            return in.markSupported();
+        }
     }
 }
