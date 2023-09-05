@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 public class DataTest {
 
@@ -17,79 +18,61 @@ public class DataTest {
 
     @Test
     public void testData() {
-        String data = DATA;
-        byte[] bytes = data.getBytes(FsString.CHARSET);
-
-        //array
+        byte[] bytes = DATA.getBytes(FsString.CHARSET);
         FsData fromBytes = FsData.fromBytes(bytes);
-        testArray(fromBytes);
-        testWriteArray(fromBytes);
-        testBuffer(fromBytes);
-        testWriteBuffer(fromBytes);
-        testInputStream(fromBytes);
-        testOutputStream(fromBytes);
-
-        //buffer
-        testArray(FsData.fromBuffer(ByteBuffer.wrap(bytes)));
-        testWriteArray(FsData.fromBuffer(ByteBuffer.wrap(bytes)));
-        testBuffer(FsData.fromBuffer(ByteBuffer.wrap(bytes)));
-        testWriteBuffer(FsData.fromBuffer(ByteBuffer.wrap(bytes)));
-        testInputStream(FsData.fromBuffer(ByteBuffer.wrap(bytes)));
-        testOutputStream(FsData.fromBuffer(ByteBuffer.wrap(bytes)));
-
-        //input stream
-        testArray(FsData.fromStream(new ByteArrayInputStream(bytes)));
-        testWriteArray(FsData.fromStream(new ByteArrayInputStream(bytes)));
-        testBuffer(FsData.fromStream(new ByteArrayInputStream(bytes)));
-        testWriteBuffer(FsData.fromStream(new ByteArrayInputStream(bytes)));
-        testInputStream(FsData.fromStream(new ByteArrayInputStream(bytes)));
-        testOutputStream(FsData.fromStream(new ByteArrayInputStream(bytes)));
+        testData(bytes, () -> fromBytes);
+        testData(bytes, () -> FsData.fromBuffer(ByteBuffer.wrap(bytes)));
+        testData(bytes, () -> FsData.fromStream(new ByteArrayInputStream(bytes)));
     }
 
     @Test
     public void testMisc() {
-        String data = DATA;
-        byte[] bytes = data.getBytes(FsString.CHARSET);
-
-        //array
+        byte[] bytes = DATA.getBytes(FsString.CHARSET);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         FsData fromBuffer = FsData.fromBuffer(buffer);
-        testWriteBuffer(fromBuffer);
+        testWriteBuffer(fromBuffer, bytes);
         Assert.assertEquals(buffer.position(), 88);
     }
 
-    private void testArray(FsData data) {
+    public static void testData(byte[] bytes, Supplier<FsData> supplier) {
+        testArray(supplier.get(), bytes);
+        testWriteArray(supplier.get(), bytes);
+        testBuffer(supplier.get(), bytes);
+        testWriteBuffer(supplier.get(), bytes);
+        testInputStream(supplier.get(), bytes);
+        testOutputStream(supplier.get(), bytes);
+    }
+
+    private static void testArray(FsData data, byte[] bytes) {
         Assert.assertEquals(data.toString(FsString.CHARSET), DATA);
     }
 
-    private void testWriteArray(FsData data) {
-        byte[] bytes = DATA.getBytes(FsString.CHARSET);
+    private static void testWriteArray(FsData data, byte[] bytes) {
         byte[] dest = new byte[1024];
         int size = data.write(dest, 8, 88);
         Assert.assertEquals(Arrays.copyOfRange(dest, 8, 8 + 88), Arrays.copyOfRange(bytes, 0, 88));
         Assert.assertEquals(size, 88);
     }
 
-    private void testBuffer(FsData data) {
-        Assert.assertEquals(data.toBuffer(), ByteBuffer.wrap(DATA.getBytes(FsString.CHARSET)));
+    private static void testBuffer(FsData data, byte[] bytes) {
+        Assert.assertEquals(data.toBuffer(), ByteBuffer.wrap(bytes));
     }
 
-    private void testWriteBuffer(FsData data) {
-        byte[] bytes = DATA.getBytes(FsString.CHARSET);
+    private static void testWriteBuffer(FsData data, byte[] bytes) {
         byte[] dest = new byte[1024];
         int size = data.write(ByteBuffer.wrap(dest, 8, 88));
         Assert.assertEquals(Arrays.copyOfRange(dest, 8, 8 + 88), Arrays.copyOfRange(bytes, 0, 88));
         Assert.assertEquals(size, 88);
     }
 
-    private void testInputStream(FsData data) {
-        Assert.assertEquals(FsIO.readString(data.toInputStream()), DATA);
+    private static void testInputStream(FsData data, byte[] bytes) {
+        Assert.assertEquals(FsIO.readBytes(data.toInputStream()), bytes);
     }
 
-    private void testOutputStream(FsData data) {
+    private static void testOutputStream(FsData data, byte[] bytes) {
         ByteArrayOutputStream dest = new ByteArrayOutputStream();
         long size = data.write(dest);
-        Assert.assertEquals(dest.toByteArray(), DATA.getBytes(FsString.CHARSET));
-        Assert.assertEquals(size, DATA.getBytes(FsString.CHARSET).length);
+        Assert.assertEquals(dest.toByteArray(), bytes);
+        Assert.assertEquals(size, bytes.length);
     }
 }
