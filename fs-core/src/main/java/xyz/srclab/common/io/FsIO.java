@@ -10,6 +10,7 @@ import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 /**
  * Input/Output utilities.
@@ -44,7 +45,30 @@ public class FsIO {
     @Nullable
     public static byte[] readBytes(InputStream inputStream, boolean close) {
         try {
-            ByteArrayOutputStream dest = new ByteArrayOutputStream();
+            int available = inputStream.available();
+            ByteArrayOutputStream dest;
+            if (available > 0) {
+                byte[] bytes = new byte[available];
+                int c = inputStream.read(bytes);
+                if (c == -1) {
+                    return null;
+                }
+                if (c == available) {
+                    int r = inputStream.read();
+                    if (r == -1) {
+                        return bytes;
+                    } else {
+                        dest = new ByteArrayOutputStream(available + 1);
+                        dest.write(bytes);
+                        dest.write(r);
+                    }
+                } else {
+                    dest = new ByteArrayOutputStream(c);
+                    dest.write(bytes, 0, c);
+                }
+            } else {
+                dest = new ByteArrayOutputStream();
+            }
             long readCount = readBytesTo(inputStream, dest);
             if (readCount == -1) {
                 return null;
@@ -90,8 +114,48 @@ public class FsIO {
     @Nullable
     public static byte[] readBytes(InputStream inputStream, int limit, boolean close) {
         try {
-            ByteArrayOutputStream dest = new ByteArrayOutputStream();
-            long readCount = readBytesTo(inputStream, dest, limit);
+            int available = inputStream.available();
+            int hasRead = 0;
+            ByteArrayOutputStream dest;
+            if (available > 0) {
+                if (available >= limit) {
+                    byte[] bytes = new byte[limit];
+                    int c = inputStream.read(bytes);
+                    if (c == -1) {
+                        return null;
+                    }
+                    if (c == limit) {
+                        return bytes;
+                    } else {
+                        return Arrays.copyOf(bytes, c);
+                    }
+                } else {
+                    byte[] bytes = new byte[available];
+                    int c = inputStream.read(bytes);
+                    if (c == -1) {
+                        return null;
+                    }
+                    if (c == available) {
+                        int r = inputStream.read();
+                        if (r == -1) {
+                            return bytes;
+                        } else {
+                            dest = new ByteArrayOutputStream(available + 1);
+                            dest.write(bytes);
+                            dest.write(r);
+                            hasRead += (available + 1);
+                        }
+                    } else {
+                        dest = new ByteArrayOutputStream(c);
+                        dest.write(bytes, 0, c);
+                        hasRead += c;
+                    }
+                }
+            } else {
+                dest = new ByteArrayOutputStream();
+            }
+            long readCount = limit == -1 ?
+                readBytesTo(inputStream, dest, limit) : readBytesTo(inputStream, dest, limit - hasRead);
             if (readCount == -1) {
                 return null;
             }
@@ -188,6 +252,18 @@ public class FsIO {
     @Nullable
     public static byte[] availableBytes(InputStream inputStream) {
         try {
+            int available = inputStream.available();
+            if (available > 0) {
+                byte[] bytes = new byte[available];
+                int c = inputStream.read(bytes);
+                if (c == -1) {
+                    return null;
+                }
+                if (c == available) {
+                    return bytes;
+                }
+                return Arrays.copyOf(bytes, c);
+            }
             ByteArrayOutputStream dest = new ByteArrayOutputStream();
             long readCount = availableBytesTo(inputStream, dest);
             if (readCount == -1) {

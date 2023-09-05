@@ -19,17 +19,17 @@ public class DataTest {
     @Test
     public void testData() {
         byte[] bytes = DATA.getBytes(FsString.CHARSET);
-        FsData fromBytes = FsData.fromBytes(bytes);
+        FsData fromBytes = FsData.wrap(bytes);
         testData(bytes, () -> fromBytes);
-        testData(bytes, () -> FsData.fromBuffer(ByteBuffer.wrap(bytes)));
-        testData(bytes, () -> FsData.fromStream(new ByteArrayInputStream(bytes)));
+        testData(bytes, () -> FsData.wrap(ByteBuffer.wrap(bytes)));
+        testData(bytes, () -> FsData.from(new ByteArrayInputStream(bytes)));
     }
 
     @Test
     public void testMisc() {
         byte[] bytes = DATA.getBytes(FsString.CHARSET);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        FsData fromBuffer = FsData.fromBuffer(buffer);
+        FsData fromBuffer = FsData.wrap(buffer);
         testWriteBuffer(fromBuffer, bytes);
         Assert.assertEquals(buffer.position(), 88);
     }

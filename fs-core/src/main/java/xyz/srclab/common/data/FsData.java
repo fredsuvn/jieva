@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * This interface represents a segment of data which is prepared to write.
+ * This interface represents data adapter to convert or write data into other types.
  *
  * @author fredsuvn
  */
@@ -19,41 +19,41 @@ import java.nio.charset.Charset;
 public interface FsData {
 
     /**
-     * Returns an instance of {@link FsData} from given array.
+     * Wraps given array to {@link FsData}.
      *
      * @param array given array
      */
-    static FsData fromBytes(byte[] array) {
-        return fromBytes(array, 0, array.length);
+    static FsData wrap(byte[] array) {
+        return wrap(array, 0, array.length);
     }
 
     /**
-     * Returns an instance of {@link FsData} from given array of specified length and start offset index.
+     * Wraps given array of specified length to {@link FsData}, start from offset index.
      *
      * @param array  given array
      * @param offset specified length
      * @param length start offset index
      */
-    static FsData fromBytes(byte[] array, int offset, int length) {
+    static FsData wrap(byte[] array, int offset, int length) {
         FsCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
         return new ByteArrayData(array, offset, length);
     }
 
     /**
-     * Returns an instance of {@link FsData} from given buffer.
+     * Wraps given buffer to {@link FsData}.
      *
      * @param buffer given buffer
      */
-    static FsData fromBuffer(ByteBuffer buffer) {
+    static FsData wrap(ByteBuffer buffer) {
         return new ByteBufferData(buffer);
     }
 
     /**
-     * Returns an instance of {@link FsData} from given input stream.
+     * Returns an instance of {@link FsData} of which data comes from given input stream.
      *
      * @param inputStream given input stream
      */
-    static FsData fromStream(InputStream inputStream) {
+    static FsData from(InputStream inputStream) {
         return new InputStreamData(inputStream);
     }
 
