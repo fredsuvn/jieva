@@ -26,7 +26,7 @@ public class SecurityTest {
     public void testCipher() throws Exception {
         testCipherAsymmetric(150, 88, 256, "RSA", "RSA/ECB/PKCS1Padding");
         testCipherAsymmetric(1500, 188, 256, "RSA", "RSA");
-        testCipherSymmetric(150, 16, 32, "AES", "AES");
+        testCipherSymmetric(150, 999, 9999, "AES", "AES");
         testCipherSymmetric(1500, 16, 32, "AES", "AES");
     }
 
