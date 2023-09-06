@@ -9,7 +9,7 @@ import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
- * Represents chain process for crypto operation.
+ * Provides method chaining operation for crypto operation.
  *
  * @author fredsuvn
  * @see FsCipher
@@ -60,16 +60,45 @@ public interface CryptoProcess {
     CryptoProcess blockSize(int blockSize);
 
     /**
-     * Do the encryption operation.
+     * Sets buffer size and return itself.
      *
-     * @param key the key.
+     * @param bufferSize buffer size
      */
-    FsData encrypt(Key key);
+    CryptoProcess bufferSize(int bufferSize);
 
     /**
-     * Do the decryption operation.
+     * Final encryption operation.
+     * <p>
+     * It should be noted that the actual computation may occur when invoking methods on the returned value,
+     * and it's possible that the computation is performed anew with each invocation.
      *
      * @param key the key.
      */
-    FsData decrypt(Key key);
+    default FsData encrypt(Key key) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Final decryption operation.
+     * <p>
+     * It should be noted that the actual computation may occur when invoking methods on the returned value,
+     * and it's possible that the computation is performed anew with each invocation.
+     *
+     * @param key the key.
+     */
+    default FsData decrypt(Key key) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Final MAC generation operation.
+     * <p>
+     * It should be noted that the actual computation may occur when invoking methods on the returned value,
+     * and it's possible that the computation is performed anew with each invocation.
+     *
+     * @param key the key.
+     */
+    default FsData generateMac(Key key) {
+        throw new UnsupportedOperationException();
+    }
 }

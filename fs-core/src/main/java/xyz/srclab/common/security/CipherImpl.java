@@ -20,15 +20,15 @@ import java.util.function.Supplier;
 
 final class CipherImpl implements FsCipher {
 
-    private final ThreadLocal<Cipher> localCipher;
+    private final ThreadLocal<Cipher> local;
 
     CipherImpl(Supplier<Cipher> supplier) {
-        this.localCipher = ThreadLocal.withInitial(supplier);
+        this.local = ThreadLocal.withInitial(supplier);
     }
 
     @Override
     public @Nullable Cipher getCipher() {
-        return localCipher.get();
+        return local.get();
     }
 
     @Override
@@ -61,20 +61,24 @@ final class CipherImpl implements FsCipher {
 
         @Override
         public FsData encrypt(Key key) {
-            Cipher cipher = localCipher.get();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            FsCrypto.encrypt(
-                cipher, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
-            return FsData.wrap(out.toByteArray());
+            return FsData.from(() -> {
+                Cipher cipher = local.get();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                FsCrypto.encrypt(
+                    cipher, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
+                return out.toByteArray();
+            });
         }
 
         @Override
         public FsData decrypt(Key key) {
-            Cipher cipher = localCipher.get();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            FsCrypto.decrypt(
-                cipher, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
-            return FsData.wrap(out.toByteArray());
+            return FsData.from(() -> {
+                Cipher cipher = local.get();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                FsCrypto.decrypt(
+                    cipher, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
+                return out.toByteArray();
+            });
         }
     }
 
@@ -88,20 +92,24 @@ final class CipherImpl implements FsCipher {
 
         @Override
         public FsData encrypt(Key key) {
-            Cipher cipher = localCipher.get();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            FsCrypto.encrypt(
-                cipher, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
-            return FsData.wrap(out.toByteArray());
+            return FsData.from(() -> {
+                Cipher cipher = local.get();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                FsCrypto.encrypt(
+                    cipher, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
+                return out.toByteArray();
+            });
         }
 
         @Override
         public FsData decrypt(Key key) {
-            Cipher cipher = localCipher.get();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            FsCrypto.decrypt(
-                cipher, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
-            return FsData.wrap(out.toByteArray());
+            return FsData.from(() -> {
+                Cipher cipher = local.get();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                FsCrypto.decrypt(
+                    cipher, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
+                return out.toByteArray();
+            });
         }
     }
 
@@ -115,24 +123,28 @@ final class CipherImpl implements FsCipher {
 
         @Override
         public FsData encrypt(Key key) {
-            Cipher cipher = localCipher.get();
+            Cipher cipher = local.get();
             int blockSize = getBlockSize(cipher);
             if (blockSize <= 0) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.encrypt(cipher, key, in, out, getBlockSize(cipher), params);
-                return FsData.wrap(out.toByteArray());
+                return FsData.from(() -> {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    FsCrypto.encrypt(cipher, key, in, out, 0, params);
+                    return out.toByteArray();
+                });
             }
             return FsData.from(new EncryptStream(cipher, key, blockSize, Cipher.ENCRYPT_MODE));
         }
 
         @Override
         public FsData decrypt(Key key) {
-            Cipher cipher = localCipher.get();
+            Cipher cipher = local.get();
             int blockSize = getBlockSize(cipher);
             if (blockSize <= 0) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.decrypt(cipher, key, in, out, getBlockSize(cipher), params);
-                return FsData.wrap(out.toByteArray());
+                return FsData.from(() -> {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    FsCrypto.decrypt(cipher, key, in, out, 0, params);
+                    return out.toByteArray();
+                });
             }
             return FsData.from(new EncryptStream(cipher, key, blockSize, Cipher.DECRYPT_MODE));
         }
@@ -250,6 +262,11 @@ final class CipherImpl implements FsCipher {
         @Override
         public CryptoProcess blockSize(int blockSize) {
             this.blockSize = blockSize;
+            return this;
+        }
+
+        @Override
+        public CryptoProcess bufferSize(int bufferSize) {
             return this;
         }
 

@@ -5,6 +5,7 @@ import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.io.FsIO;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -52,6 +53,29 @@ public class FsCrypto {
                     cipher.init(mode, key);
                 }
             }
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
+
+    /**
+     * Initializes given MAC.
+     *
+     * @param mac    given MAC
+     * @param key    key for generating MAC
+     * @param params algorithm parameters
+     */
+    public static void initMac(Mac mac, Key key, @Nullable AlgorithmParams params) {
+        try {
+            if (params == null) {
+                mac.init(key);
+                return;
+            }
+            if (params.getAlgorithmParameterSpec() != null) {
+                mac.init(key, params.getAlgorithmParameterSpec());
+                return;
+            }
+            mac.init(key);
         } catch (Exception e) {
             throw new FsSecurityException(e);
         }
@@ -181,6 +205,38 @@ public class FsCrypto {
                 remaining -= blockSize;
             }
             return writeCount;
+        } catch (FsSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
+
+    /**
+     * Generate MAC for given input stream.
+     *
+     * @param mac        MAC generator
+     * @param key        key for generating
+     * @param in         given input stream
+     * @param bufferSize buffer size
+     * @param params     other parameters
+     */
+    public static byte[] generateMac(
+        Mac mac, Key key, InputStream in, int bufferSize, @Nullable AlgorithmParams params) {
+        try {
+            initMac(mac, key, params);
+            if (bufferSize <= 0) {
+                byte[] src = FsIO.readBytes(in);
+                return mac.doFinal(src);
+            }
+            byte[] buffer = new byte[bufferSize];
+            while (true) {
+                int readSize = in.read(buffer);
+                if (readSize == -1) {
+                    return mac.doFinal();
+                }
+                mac.update(buffer);
+            }
         } catch (FsSecurityException e) {
             throw e;
         } catch (Exception e) {
