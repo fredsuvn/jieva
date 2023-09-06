@@ -6,6 +6,7 @@ import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.security.FsCipher;
 import xyz.srclab.common.security.FsCrypto;
+import xyz.srclab.common.security.FsDigest;
 import xyz.srclab.common.security.FsMac;
 
 import javax.crypto.Cipher;
@@ -116,6 +117,35 @@ public class SecurityTest {
         Assert.assertEquals(bufferSize, mac.getMacLength());
         buffer.flip();
         Assert.assertEquals(macBytes, FsIO.getBytes(buffer));
+        System.out.println(destSize);
+    }
+
+    @Test
+    public void testDigest() throws Exception {
+        byte[] data = DATA.getBytes(FsString.CHARSET);
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] mdBytes = md.digest(data);
+        System.out.println(mdBytes.length + ", " + md.getDigestLength());
+        FsDigest fd = FsDigest.getDigest("MD5");
+        byte[] fdBytes = fd.prepare(data).doFinal();
+        Assert.assertEquals(mdBytes, fdBytes);
+        byte[] enDest = new byte[md.getDigestLength() + 8];
+        int destSize = fd.prepare(data, 2, data.length - 2).bufferSize(1).doFinal(enDest, 8);
+        mdBytes = md.digest(Arrays.copyOfRange(data, 2, data.length));
+        Assert.assertEquals(mdBytes, Arrays.copyOfRange(enDest, 8, 8 + destSize));
+        Assert.assertEquals(destSize, md.getDigestLength());
+        mdBytes = md.digest(data);
+        InputStream enStream = fd.prepare(data).doFinalStream();
+        Assert.assertEquals(mdBytes, FsIO.readBytes(enStream));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        long outSize = fd.prepare(ByteBuffer.wrap(data)).doFinal(out);
+        Assert.assertEquals(outSize, md.getDigestLength());
+        Assert.assertEquals(mdBytes, out.toByteArray());
+        ByteBuffer buffer = ByteBuffer.allocate(mdBytes.length);
+        int bufferSize = fd.prepare(FsIO.toInputStream(data)).doFinal(buffer);
+        Assert.assertEquals(bufferSize, md.getDigestLength());
+        buffer.flip();
+        Assert.assertEquals(mdBytes, FsIO.getBytes(buffer));
         System.out.println(destSize);
     }
 

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.Key;
+import java.security.MessageDigest;
 
 /**
  * Crypto utilities.
@@ -292,32 +293,48 @@ public class FsCrypto {
         }
     }
 
-    // /**
-    //  * Digests given input stream.
-    //  *
-    //  * @param digest        digestion generator
-    //  * @param key        key for generating
-    //  * @param in         given input stream
-    //  * @param bufferSize buffer size
-    //  */
-    // public static byte[] digest(MessageDigest digest, Key key, InputStream in, int bufferSize) {
-    //     try {
-    //         if (bufferSize <= 0) {
-    //             byte[] src = FsIO.readBytes(in);
-    //             return mac.doFinal(src);
-    //         }
-    //         byte[] buffer = new byte[bufferSize];
-    //         while (true) {
-    //             int readSize = in.read(buffer);
-    //             if (readSize == -1) {
-    //                 return mac.doFinal();
-    //             }
-    //             mac.update(buffer);
-    //         }
-    //     } catch (FsSecurityException e) {
-    //         throw e;
-    //     } catch (Exception e) {
-    //         throw new FsSecurityException(e);
-    //     }
-    // }
+    /**
+     * Digests for given input stream.
+     *
+     * @param digest     MAC generator
+     * @param in         given input stream
+     * @param bufferSize buffer size
+     */
+    public static byte[] digest(MessageDigest digest, InputStream in, int bufferSize) {
+        try {
+            if (bufferSize <= 0) {
+                byte[] src = FsIO.readBytes(in);
+                return digest.digest(src);
+            }
+            byte[] buffer = new byte[bufferSize];
+            while (true) {
+                int readSize = in.read(buffer);
+                if (readSize == -1) {
+                    return digest.digest();
+                }
+                digest.update(buffer);
+            }
+        } catch (FsSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
+
+    /**
+     * Digests for given buffer.
+     *
+     * @param mac MAC generator
+     * @param in  given buffer
+     */
+    public static byte[] digest(MessageDigest mac, ByteBuffer in) {
+        try {
+            mac.update(in);
+            return mac.digest();
+        } catch (FsSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
 }
