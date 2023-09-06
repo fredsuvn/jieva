@@ -1,21 +1,7 @@
 package samples;
 
-import org.bouncycastle.x509.X509V3CertificateGenerator;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.codec.*;
-import xyz.srclab.common.codec.bouncycastle.BouncyCastleCodecProvider;
-import xyz.srclab.common.codec.jdk.JdkCodecProvider;
+import xyz.srclab.common.security.FsKeyTool;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyPair;
-import java.security.cert.CertificateFactory;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,8 +25,8 @@ public class CASample {
         map.put("ST", "ss");
         map.put("C", "CN");
         FsKeyTool.genKeyPair("\"C:\\Program Files\\Java\\jdk1.8.0_301\\bin\\keytool\"", "anxin123!", map);
-//        FsEncryptor encryptor = FsEncryptor.rsa();
-//        KeyPair keyPair = encryptor.generateKeyPair(new FsEncryptParams(1024));
-////        X509v3CertificateBuilder.
+        //        FsEncryptor encryptor = FsEncryptor.rsa();
+        //        KeyPair keyPair = encryptor.generateKeyPair(new FsEncryptParams(1024));
+        ////        X509v3CertificateBuilder.
     }
 }

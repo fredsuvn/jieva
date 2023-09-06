@@ -1,13 +1,10 @@
-package xyz.srclab.common.codec;
+package xyz.srclab.common.security;
 
-import com.google.common.primitives.Chars;
 import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsSystem;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -79,14 +76,14 @@ public class FsKeyTool {
             }
             process.waitFor();
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsSecurityException(e);
         }
     }
 
     private static void checkParams(Map<String, String> params) {
         for (String param : GEN_KEY_PAIR_PARAMS) {
             if (!params.containsKey(param)) {
-                throw new FsCodecException("Miss param: " + param + ".");
+                throw new FsSecurityException("Miss param: " + param + ".");
             }
         }
     }
