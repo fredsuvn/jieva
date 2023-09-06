@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.function.Supplier;
 
 /**
  * This interface represents data adapter to convert or write data into other types.
@@ -39,7 +40,7 @@ public interface FsData {
      */
     static FsData wrap(byte[] array, int offset, int length) {
         FsCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
-        return new ByteArrayData(array, offset, length);
+        return new ArrayData(array, offset, length);
     }
 
     /**
@@ -48,7 +49,7 @@ public interface FsData {
      * @param buffer given buffer
      */
     static FsData wrap(ByteBuffer buffer) {
-        return new ByteBufferData(buffer);
+        return new BufferData(buffer);
     }
 
     /**
@@ -58,6 +59,16 @@ public interface FsData {
      */
     static FsData from(InputStream inputStream) {
         return new InputStreamData(inputStream);
+    }
+
+    /**
+     * Returns an instance of {@link FsData} of which data comes from given supplier.
+     * The returned data will call {@link Supplier#get()} for each method calling of {@link FsData}.
+     *
+     * @param supplier given supplier
+     */
+    static FsData from(Supplier<byte[]> supplier) {
+        return new ArraySupplierData(supplier);
     }
 
     /**

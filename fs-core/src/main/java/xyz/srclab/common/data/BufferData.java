@@ -7,11 +7,11 @@ import xyz.srclab.common.io.FsIO;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-final class ByteBufferData implements FsData {
+final class BufferData implements FsData {
 
     private final ByteBuffer buffer;
 
-    ByteBufferData(ByteBuffer buffer) {
+    BufferData(ByteBuffer buffer) {
         this.buffer = buffer;
     }
 

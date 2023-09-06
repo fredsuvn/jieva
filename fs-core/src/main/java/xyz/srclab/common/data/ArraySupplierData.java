@@ -2,59 +2,57 @@ package xyz.srclab.common.data;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsCheck;
+import xyz.srclab.common.io.FsIO;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.util.function.Supplier;
 
-final class ByteArrayData implements FsData {
+final class ArraySupplierData implements FsData {
 
-    private final byte[] array;
-    private final int offset;
-    private final int length;
+    private final Supplier<byte[]> supplier;
 
-    ByteArrayData(byte[] array, int offset, int length) {
-        this.array = array;
-        this.offset = offset;
-        this.length = length;
+    ArraySupplierData(Supplier<byte[]> supplier) {
+        this.supplier = supplier;
     }
 
     @Override
     public synchronized byte[] toBytes() {
-        return Arrays.copyOfRange(array, offset, offset + length);
+        return supplier.get();
     }
 
     @Override
     public synchronized int write(byte[] dest, int offset, int length) {
         FsCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
-        int len = Math.min(this.length, length);
-        System.arraycopy(array, this.offset, dest, offset, len);
+        byte[] bytes = supplier.get();
+        int len = Math.min(bytes.length, length);
+        System.arraycopy(bytes, 0, dest, offset, len);
         return len;
     }
 
     @Override
     public synchronized int write(ByteBuffer dest) {
-        int len = Math.min(this.length, dest.remaining());
+        byte[] bytes = supplier.get();
+        int len = Math.min(bytes.length, dest.remaining());
         if (len == 0) {
             return 0;
         }
-        dest.put(array, offset, len);
+        dest.put(bytes, 0, len);
         return len;
     }
 
     @Override
     public synchronized InputStream toInputStream() {
-        return new ByteArrayInputStream(array, offset, length);
+        return FsIO.toInputStream(supplier.get());
     }
 
     @Override
     public boolean hasBackArray() {
-        return true;
+        return false;
     }
 
     @Override
     public @Nullable byte[] backArray() {
-        return array;
+        return null;
     }
 }

@@ -23,6 +23,7 @@ public class DataTest {
         testData(bytes, () -> fromBytes);
         testData(bytes, () -> FsData.wrap(ByteBuffer.wrap(bytes)));
         testData(bytes, () -> FsData.from(new ByteArrayInputStream(bytes)));
+        testData(bytes, () -> FsData.from(() -> Arrays.copyOf(bytes, bytes.length)));
     }
 
     @Test
