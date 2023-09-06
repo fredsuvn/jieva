@@ -14,6 +14,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.Arrays;
@@ -53,8 +54,8 @@ public class SecurityTest {
             cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinalStream());
         Assert.assertEquals(data, deBytes);
         byte[] enDest = new byte[dataSize * 10];
-        int destSize = cipher.prepare(data, 2, data.length - 2).blockSize(enBlockSize).key(publicKey).encrypt().doFinal(enDest);
-        enBytes = Arrays.copyOf(enDest, destSize);
+        int destSize = cipher.prepare(data, 2, data.length - 2).blockSize(enBlockSize).key(publicKey).encrypt().doFinal(enDest, 1);
+        enBytes = Arrays.copyOfRange(enDest, 1, destSize + 1);
         deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
         Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
     }
@@ -80,8 +81,8 @@ public class SecurityTest {
             cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinalStream());
         Assert.assertEquals(data, deBytes);
         byte[] enDest = new byte[dataSize * 10];
-        int destSize = cipher.prepare(data, 2, data.length - 2).blockSize(enBlockSize).key(key).encrypt().doFinal(enDest);
-        enBytes = Arrays.copyOf(enDest, destSize);
+        int destSize = cipher.prepare(data, 2, data.length - 2).blockSize(enBlockSize).key(key).encrypt().doFinal(enDest, 1);
+        enBytes = Arrays.copyOfRange(enDest, 1, destSize + 1);
         deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinal();
         Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
     }
@@ -103,6 +104,18 @@ public class SecurityTest {
         macBytes = mac.doFinal(Arrays.copyOfRange(data, 2, data.length));
         Assert.assertEquals(macBytes, Arrays.copyOfRange(enDest, 8, 8 + destSize));
         Assert.assertEquals(destSize, mac.getMacLength());
+        macBytes = mac.doFinal(data);
+        InputStream enStream = fsMac.prepare(data).key(macKey).doFinalStream();
+        Assert.assertEquals(macBytes, FsIO.readBytes(enStream));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        long outSize = fsMac.prepare(ByteBuffer.wrap(data)).key(macKey).doFinal(out);
+        Assert.assertEquals(outSize, mac.getMacLength());
+        Assert.assertEquals(macBytes, out.toByteArray());
+        ByteBuffer buffer = ByteBuffer.allocate(macBytes.length);
+        int bufferSize = fsMac.prepare(FsIO.toInputStream(data)).key(macKey).doFinal(buffer);
+        Assert.assertEquals(bufferSize, mac.getMacLength());
+        buffer.flip();
+        Assert.assertEquals(macBytes, FsIO.getBytes(buffer));
         System.out.println(destSize);
     }
 

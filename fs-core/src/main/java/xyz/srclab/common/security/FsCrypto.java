@@ -273,39 +273,51 @@ public class FsCrypto {
     }
 
     /**
-     * Generate MAC for given input stream into dest array from dest offset.
+     * Generate MAC for given buffer.
      *
-     * @param mac        MAC generator
-     * @param key        key for generating
-     * @param in         given input stream
-     * @param dest       dest array
-     * @param destOffset dest offset
-     * @param bufferSize buffer size
-     * @param params     other parameters
+     * @param mac    MAC generator
+     * @param key    key for generating
+     * @param in     given buffer
+     * @param params other parameters
      */
-    public static int generateMac(
-        Mac mac, Key key, InputStream in, byte[] dest, int destOffset, int bufferSize, @Nullable AlgorithmParams params) {
+    public static byte[] generateMac(Mac mac, Key key, ByteBuffer in, @Nullable AlgorithmParams params) {
         try {
             initMac(mac, key, params);
-            if (bufferSize <= 0) {
-                byte[] src = FsIO.readBytes(in);
-                mac.update(src);
-                mac.doFinal(dest, destOffset);
-                return mac.getMacLength();
-            }
-            byte[] buffer = new byte[bufferSize];
-            while (true) {
-                int readSize = in.read(buffer);
-                if (readSize == -1) {
-                    mac.doFinal(dest, destOffset);
-                    return mac.getMacLength();
-                }
-                mac.update(buffer);
-            }
+            mac.update(in);
+            return mac.doFinal();
         } catch (FsSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new FsSecurityException(e);
         }
     }
+
+    // /**
+    //  * Digests given input stream.
+    //  *
+    //  * @param digest        digestion generator
+    //  * @param key        key for generating
+    //  * @param in         given input stream
+    //  * @param bufferSize buffer size
+    //  */
+    // public static byte[] digest(MessageDigest digest, Key key, InputStream in, int bufferSize) {
+    //     try {
+    //         if (bufferSize <= 0) {
+    //             byte[] src = FsIO.readBytes(in);
+    //             return mac.doFinal(src);
+    //         }
+    //         byte[] buffer = new byte[bufferSize];
+    //         while (true) {
+    //             int readSize = in.read(buffer);
+    //             if (readSize == -1) {
+    //                 return mac.doFinal();
+    //             }
+    //             mac.update(buffer);
+    //         }
+    //     } catch (FsSecurityException e) {
+    //         throw e;
+    //     } catch (Exception e) {
+    //         throw new FsSecurityException(e);
+    //     }
+    // }
 }

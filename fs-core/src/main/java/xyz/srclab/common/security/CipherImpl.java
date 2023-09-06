@@ -62,10 +62,10 @@ final class CipherImpl implements FsCipher {
         @Override
         public byte[] doFinal() {
             try {
+                InputStream in = FsIO.toInputStream(source, offset, length);
                 Cipher cipher = local.get();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.doEncrypt(
-                    cipher, mode, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
+                FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
                 return out.toByteArray();
             } catch (FsSecurityException e) {
                 throw e;
@@ -77,10 +77,10 @@ final class CipherImpl implements FsCipher {
         @Override
         public int doFinal(byte[] dest, int offset) {
             try {
-                OutputStream out = FsIO.toOutputStream(dest, offset, dest.length - offset);
+                ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
+                ByteBuffer out = ByteBuffer.wrap(dest, offset, dest.length - offset);
                 Cipher cipher = local.get();
-                return (int) FsCrypto.doEncrypt(
-                    cipher, mode, key, FsIO.toInputStream(source, this.offset, length), out, getBlockSize(cipher), params);
+                return FsCrypto.doEncrypt(cipher, mode, key, src, out, getBlockSize(cipher), params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
@@ -91,10 +91,9 @@ final class CipherImpl implements FsCipher {
         @Override
         public int doFinal(ByteBuffer dest) {
             try {
-                ByteBuffer src = ByteBuffer.wrap(source, offset, length);
+                ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(
-                    cipher, mode, key, src, dest, getBlockSize(cipher), params);
+                return FsCrypto.doEncrypt(cipher, mode, key, src, dest, getBlockSize(cipher), params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
@@ -105,9 +104,9 @@ final class CipherImpl implements FsCipher {
         @Override
         public long doFinal(OutputStream dest) {
             try {
+                InputStream in = FsIO.toInputStream(source, offset, length);
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(
-                    cipher, mode, key, FsIO.toInputStream(source, offset, length), dest, getBlockSize(cipher), params);
+                return FsCrypto.doEncrypt(cipher, mode, key, in, dest, getBlockSize(cipher), params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
@@ -154,10 +153,10 @@ final class CipherImpl implements FsCipher {
         @Override
         public int doFinal(byte[] dest, int offset) {
             try {
-                OutputStream out = FsIO.toOutputStream(dest, offset, dest.length);
+                ByteBuffer out = ByteBuffer.wrap(dest, offset, dest.length - offset);
                 Cipher cipher = local.get();
-                return (int) FsCrypto.doEncrypt(
-                    cipher, mode, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
+                return FsCrypto.doEncrypt(
+                    cipher, mode, key, source, out, getBlockSize(cipher), params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
@@ -229,7 +228,7 @@ final class CipherImpl implements FsCipher {
         @Override
         public int doFinal(byte[] dest, int offset) {
             try {
-                OutputStream out = FsIO.toOutputStream(dest, offset, dest.length);
+                OutputStream out = FsIO.toOutputStream(dest, offset, dest.length - offset);
                 Cipher cipher = local.get();
                 return (int) FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
             } catch (FsSecurityException e) {
@@ -413,11 +412,6 @@ final class CipherImpl implements FsCipher {
         public CryptoProcess decrypt() {
             this.mode = Cipher.DECRYPT_MODE;
             return this;
-        }
-
-        @Override
-        public CryptoProcess mac() {
-            throw new UnsupportedOperationException("mac");
         }
 
         protected AlgorithmParams getParams() {

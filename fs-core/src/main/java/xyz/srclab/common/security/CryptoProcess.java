@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
@@ -78,17 +79,30 @@ public interface CryptoProcess {
     /**
      * Sets encryption mode.
      */
-    CryptoProcess encrypt();
+    default CryptoProcess encrypt() {
+        throw new FsSecurityException(new UnsupportedOperationException("Encryption"));
+    }
 
     /**
      * Sets decryption mode.
      */
-    CryptoProcess decrypt();
+    default CryptoProcess decrypt() {
+        throw new FsSecurityException(new UnsupportedOperationException("Decryption"));
+    }
 
     /**
      * Sets MAC mode (for {@link Mac}).
      */
-    CryptoProcess mac();
+    default CryptoProcess mac() {
+        throw new FsSecurityException(new UnsupportedOperationException("MAC"));
+    }
+
+    /**
+     * Sets digestion mode (for {@link MessageDigest}).
+     */
+    default CryptoProcess digest() {
+        throw new FsSecurityException(new UnsupportedOperationException("Digestion"));
+    }
 
     /**
      * Does final computation and returns result.

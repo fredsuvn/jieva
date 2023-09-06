@@ -64,60 +64,9 @@ final class MacImpl implements FsMac {
         @Override
         public byte[] doFinal() {
             try {
+                ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
                 Mac mac = local.get();
-                return FsCrypto.generateMac(
-                    mac, key, FsIO.toInputStream(source, offset, length), bufferSize, params);
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public int doFinal(byte[] dest, int offset) {
-            try {
-                Mac mac = local.get();
-                return FsCrypto.generateMac(
-                    mac, key, FsIO.toInputStream(source, this.offset, length), dest, offset, bufferSize, params);
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public int doFinal(ByteBuffer dest) {
-            try {
-                byte[] en = doFinal();
-                dest.put(en);
-                return en.length;
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public long doFinal(OutputStream dest) {
-            try {
-                byte[] en = doFinal();
-                dest.write(en);
-                return en.length;
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public InputStream doFinalStream() {
-            try {
-                byte[] en = doFinal();
-                return FsIO.toInputStream(en);
+                return FsCrypto.generateMac(mac, key, src, params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
@@ -138,59 +87,7 @@ final class MacImpl implements FsMac {
         public byte[] doFinal() {
             try {
                 Mac mac = local.get();
-                return FsCrypto.generateMac(
-                    mac, key, FsIO.toInputStream(source), bufferSize, params);
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public int doFinal(byte[] dest, int offset) {
-            try {
-                Mac mac = local.get();
-                return FsCrypto.generateMac(
-                    mac, key, FsIO.toInputStream(source), dest, offset, bufferSize, params);
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public int doFinal(ByteBuffer dest) {
-            try {
-                byte[] en = doFinal();
-                dest.put(en);
-                return en.length;
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public long doFinal(OutputStream dest) {
-            try {
-                byte[] en = doFinal();
-                dest.write(en);
-                return en.length;
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public InputStream doFinalStream() {
-            try {
-                byte[] en = doFinal();
-                return FsIO.toInputStream(en);
+                return FsCrypto.generateMac(mac, key, source, params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
@@ -218,59 +115,9 @@ final class MacImpl implements FsMac {
                 throw new FsSecurityException(e);
             }
         }
-
-        @Override
-        public int doFinal(byte[] dest, int offset) {
-            try {
-                Mac mac = local.get();
-                return FsCrypto.generateMac(mac, key, in, dest, offset, bufferSize, params);
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public int doFinal(ByteBuffer dest) {
-            try {
-                byte[] en = doFinal();
-                dest.put(en);
-                return en.length;
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public long doFinal(OutputStream dest) {
-            try {
-                byte[] en = doFinal();
-                dest.write(en);
-                return en.length;
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
-
-        @Override
-        public InputStream doFinalStream() {
-            try {
-                byte[] en = doFinal();
-                return FsIO.toInputStream(en);
-            } catch (FsSecurityException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FsSecurityException(e);
-            }
-        }
     }
 
-    private abstract static class AbstractCryptoProcess implements CryptoProcess {
+    private abstract class AbstractCryptoProcess implements CryptoProcess {
 
         protected AlgorithmParams params;
         protected Key key;
@@ -323,16 +170,6 @@ final class MacImpl implements FsMac {
         }
 
         @Override
-        public CryptoProcess encrypt() {
-            throw new UnsupportedOperationException("encrypt");
-        }
-
-        @Override
-        public CryptoProcess decrypt() {
-            throw new UnsupportedOperationException("decrypt");
-        }
-
-        @Override
         public CryptoProcess mac() {
             return this;
         }
@@ -344,6 +181,63 @@ final class MacImpl implements FsMac {
             AlgorithmParams newParams = new AlgorithmParams();
             params = newParams;
             return newParams;
+        }
+
+        @Override
+        public int doFinal(byte[] dest, int offset) {
+            try {
+                if (dest.length - offset < getMacLength()) {
+                    throw new FsSecurityException("length of dest remaining is not enough.");
+                }
+                byte[] en = doFinal();
+                System.arraycopy(en, 0, dest, offset, en.length);
+                return en.length;
+            } catch (FsSecurityException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new FsSecurityException(e);
+            }
+        }
+
+        @Override
+        public int doFinal(ByteBuffer dest) {
+            try {
+                if (dest.remaining() < getMacLength()) {
+                    throw new FsSecurityException("length of dest remaining is not enough.");
+                }
+                byte[] en = doFinal();
+                dest.put(en);
+                return en.length;
+            } catch (FsSecurityException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new FsSecurityException(e);
+            }
+        }
+
+        @Override
+        public long doFinal(OutputStream dest) {
+            try {
+                byte[] en = doFinal();
+                dest.write(en);
+                return en.length;
+            } catch (FsSecurityException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new FsSecurityException(e);
+            }
+        }
+
+        @Override
+        public InputStream doFinalStream() {
+            try {
+                byte[] en = doFinal();
+                return FsIO.toInputStream(en);
+            } catch (FsSecurityException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new FsSecurityException(e);
+            }
         }
     }
 }
