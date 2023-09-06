@@ -117,7 +117,21 @@ public class FsCrypto {
         return doEncrypt(cipher, Cipher.DECRYPT_MODE, key, in, out, blockSize, params);
     }
 
-    private static long doEncrypt(
+    /**
+     * Encrypts/Decrypts data from given input stream into given output stream with specified cipher,
+     * returns the written bytes count.
+     * If {@code blockSize} > 0, this method will submit the data in blocks of the specified size to the cipher for
+     * encryption, otherwise, it will submit all the data to the cipher at once.
+     *
+     * @param cipher    specified cipher
+     * @param mode      encryption mode: ({@link Cipher#ENCRYPT_MODE}/{@link Cipher#DECRYPT_MODE})
+     * @param key       key for encrypting
+     * @param in        given input stream
+     * @param out       given output stream
+     * @param blockSize block size for each decrypting
+     * @param params    algorithm parameters
+     */
+    public static long doEncrypt(
         Cipher cipher, int mode, Key key, InputStream in, OutputStream out, int blockSize, @Nullable AlgorithmParams params) {
         try {
             initCipher(cipher, mode, key, params);
@@ -184,7 +198,21 @@ public class FsCrypto {
         return doEncrypt(cipher, Cipher.DECRYPT_MODE, key, in, out, blockSize, params);
     }
 
-    private static int doEncrypt(
+    /**
+     * Encrypts/Decrypts data from given input buffer into given output buffer with specified cipher,
+     * returns the written bytes count.
+     * If {@code blockSize} > 0, this method will submit the data in blocks of the specified size to the cipher for
+     * encryption, otherwise, it will submit all the data to the cipher at once.
+     *
+     * @param cipher    specified cipher
+     * @param mode      encryption mode: ({@link Cipher#ENCRYPT_MODE}/{@link Cipher#DECRYPT_MODE})
+     * @param key       key for encrypting
+     * @param in        given input buffer
+     * @param out       given output buffer
+     * @param blockSize block size for each decrypting
+     * @param params    algorithm parameters
+     */
+    public static int doEncrypt(
         Cipher cipher, int mode, Key key, ByteBuffer in, ByteBuffer out, int blockSize, @Nullable AlgorithmParams params) {
         try {
             initCipher(cipher, mode, key, params);

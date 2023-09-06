@@ -1,7 +1,9 @@
 package xyz.srclab.common.security;
 
-import xyz.srclab.common.data.FsData;
-
+import javax.crypto.Mac;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
 import java.security.Key;
 import java.security.SecureRandom;
@@ -16,6 +18,13 @@ import java.security.spec.AlgorithmParameterSpec;
  * @see FsMac
  */
 public interface CryptoProcess {
+
+    /**
+     * Sets key for crypto.
+     *
+     * @param key key for crypto
+     */
+    CryptoProcess key(Key key);
 
     /**
      * Sets specification of cryptographic parameters and return itself.
@@ -67,38 +76,60 @@ public interface CryptoProcess {
     CryptoProcess bufferSize(int bufferSize);
 
     /**
-     * Final encryption operation.
-     * <p>
-     * It should be noted that the actual computation may occur when invoking methods on the returned value,
-     * and it's possible that the computation is performed anew with each invocation.
-     *
-     * @param key the key.
+     * Sets encryption mode.
      */
-    default FsData encrypt(Key key) {
-        throw new UnsupportedOperationException();
+    CryptoProcess encrypt();
+
+    /**
+     * Sets decryption mode.
+     */
+    CryptoProcess decrypt();
+
+    /**
+     * Sets MAC mode (for {@link Mac}).
+     */
+    CryptoProcess mac();
+
+    /**
+     * Does final computation and returns result.
+     */
+    byte[] doFinal();
+
+    /**
+     * Does final computation and writes result into dest array, return written bytes count.
+     *
+     * @param dest dest array
+     */
+    default int doFinal(byte[] dest) {
+        return doFinal(dest, 0);
     }
 
     /**
-     * Final decryption operation.
-     * <p>
-     * It should be noted that the actual computation may occur when invoking methods on the returned value,
-     * and it's possible that the computation is performed anew with each invocation.
+     * Does final computation and writes result into dest array from start offset, return written bytes count.
      *
-     * @param key the key.
+     * @param dest   dest array
+     * @param offset start offset
      */
-    default FsData decrypt(Key key) {
-        throw new UnsupportedOperationException();
-    }
+    int doFinal(byte[] dest, int offset);
 
     /**
-     * Final MAC generation operation.
-     * <p>
-     * It should be noted that the actual computation may occur when invoking methods on the returned value,
-     * and it's possible that the computation is performed anew with each invocation.
+     * Does final computation and writes result into dest buffer, return written bytes count.
      *
-     * @param key the key.
+     * @param dest dest buffer
      */
-    default FsData generateMac(Key key) {
-        throw new UnsupportedOperationException();
-    }
+    int doFinal(ByteBuffer dest);
+
+    /**
+     * Does final computation and writes result into dest stream, return written bytes count.
+     *
+     * @param dest dest stream
+     */
+    long doFinal(OutputStream dest);
+
+    /**
+     * Does final computation and returns result as input stream.
+     * <p>
+     * The returned stream is lazy, it can be affected by any changes of the process before the stream is fully read.
+     */
+    InputStream doFinalStream();
 }

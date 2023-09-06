@@ -38,14 +38,19 @@ public class SecurityTest {
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
         FsCipher cipher = FsCipher.getCipher(cryptoAlgorithm);
-        byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).encrypt(publicKey).toBytes();
-        byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).decrypt(privateKey).toBytes();
+        byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).key(publicKey).encrypt().doFinal();
+        byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
         Assert.assertEquals(data, deBytes);
-        enBytes = cipher.prepare(ByteBuffer.wrap(data)).blockSize(enBlockSize).encrypt(publicKey).toBytes();
-        deBytes = cipher.prepare(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).decrypt(privateKey).toBytes();
+        enBytes = cipher.prepare(ByteBuffer.wrap(data)).blockSize(enBlockSize).key(publicKey).encrypt().doFinal();
+        deBytes = cipher.prepare(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
         Assert.assertEquals(data, deBytes);
-        enBytes = cipher.prepare(FsIO.toInputStream(data)).blockSize(enBlockSize).encrypt(publicKey).toBytes();
-        deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).decrypt(privateKey).toBytes();
+        enBytes = cipher.prepare(FsIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().doFinal();
+        deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
+        Assert.assertEquals(data, deBytes);
+        enBytes = FsIO.readBytes(
+            cipher.prepare(FsIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().doFinalStream());
+        deBytes = FsIO.readBytes(
+            cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinalStream());
         Assert.assertEquals(data, deBytes);
     }
 
@@ -55,14 +60,19 @@ public class SecurityTest {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(keyAlgorithm);
         SecretKey key = keyGenerator.generateKey();
         FsCipher cipher = FsCipher.getCipher(cryptoAlgorithm);
-        byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).encrypt(key).toBytes();
-        byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).decrypt(key).toBytes();
+        byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).key(key).encrypt().doFinal();
+        byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).key(key).decrypt().doFinal();
         Assert.assertEquals(data, deBytes);
-        enBytes = cipher.prepare(ByteBuffer.wrap(data)).blockSize(enBlockSize).encrypt(key).toBytes();
-        deBytes = cipher.prepare(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).decrypt(key).toBytes();
+        enBytes = cipher.prepare(ByteBuffer.wrap(data)).blockSize(enBlockSize).key(key).encrypt().doFinal();
+        deBytes = cipher.prepare(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinal();
         Assert.assertEquals(data, deBytes);
-        enBytes = cipher.prepare(FsIO.toInputStream(data)).blockSize(enBlockSize).encrypt(key).toBytes();
-        deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).decrypt(key).toBytes();
+        enBytes = cipher.prepare(FsIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().doFinal();
+        deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinal();
+        Assert.assertEquals(data, deBytes);
+        enBytes = FsIO.readBytes(
+            cipher.prepare(FsIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().doFinalStream());
+        deBytes = FsIO.readBytes(
+            cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinalStream());
         Assert.assertEquals(data, deBytes);
     }
 

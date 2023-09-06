@@ -3,13 +3,13 @@ package xyz.srclab.common.security;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.base.FsCheck;
-import xyz.srclab.common.data.FsData;
 import xyz.srclab.common.io.FsIO;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
 import java.security.Key;
@@ -60,25 +60,41 @@ final class CipherImpl implements FsCipher {
         }
 
         @Override
-        public FsData encrypt(Key key) {
-            return FsData.from(() -> {
-                Cipher cipher = local.get();
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.encrypt(
-                    cipher, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
-                return out.toByteArray();
-            });
+        public byte[] doFinal() {
+            Cipher cipher = local.get();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            FsCrypto.doEncrypt(
+                cipher, mode, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
+            return out.toByteArray();
         }
 
         @Override
-        public FsData decrypt(Key key) {
-            return FsData.from(() -> {
-                Cipher cipher = local.get();
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.decrypt(
-                    cipher, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
-                return out.toByteArray();
-            });
+        public int doFinal(byte[] dest, int offset) {
+            OutputStream out = FsIO.toOutputStream(dest, offset, dest.length);
+            Cipher cipher = local.get();
+            return (int) FsCrypto.doEncrypt(
+                cipher, mode, key, FsIO.toInputStream(source, offset, length), out, getBlockSize(cipher), params);
+        }
+
+        @Override
+        public int doFinal(ByteBuffer dest) {
+            ByteBuffer src = ByteBuffer.wrap(source, offset, length);
+            Cipher cipher = local.get();
+            return FsCrypto.doEncrypt(
+                cipher, mode, key, src, dest, getBlockSize(cipher), params);
+        }
+
+        @Override
+        public long doFinal(OutputStream dest) {
+            Cipher cipher = local.get();
+            return FsCrypto.doEncrypt(
+                cipher, mode, key, FsIO.toInputStream(source, offset, length), dest, getBlockSize(cipher), params);
+        }
+
+        @Override
+        public InputStream doFinalStream() {
+            Cipher cipher = local.get();
+            return new EncryptStream(cipher, this, FsIO.toInputStream(source, offset, length));
         }
     }
 
@@ -91,25 +107,40 @@ final class CipherImpl implements FsCipher {
         }
 
         @Override
-        public FsData encrypt(Key key) {
-            return FsData.from(() -> {
-                Cipher cipher = local.get();
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.encrypt(
-                    cipher, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
-                return out.toByteArray();
-            });
+        public byte[] doFinal() {
+            Cipher cipher = local.get();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            FsCrypto.doEncrypt(
+                cipher, mode, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
+            return out.toByteArray();
         }
 
         @Override
-        public FsData decrypt(Key key) {
-            return FsData.from(() -> {
-                Cipher cipher = local.get();
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.decrypt(
-                    cipher, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
-                return out.toByteArray();
-            });
+        public int doFinal(byte[] dest, int offset) {
+            OutputStream out = FsIO.toOutputStream(dest, offset, dest.length);
+            Cipher cipher = local.get();
+            return (int) FsCrypto.doEncrypt(
+                cipher, mode, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
+        }
+
+        @Override
+        public int doFinal(ByteBuffer dest) {
+            Cipher cipher = local.get();
+            return FsCrypto.doEncrypt(
+                cipher, mode, key, source, dest, getBlockSize(cipher), params);
+        }
+
+        @Override
+        public long doFinal(OutputStream dest) {
+            Cipher cipher = local.get();
+            return FsCrypto.doEncrypt(
+                cipher, mode, key, FsIO.toInputStream(source), dest, getBlockSize(cipher), params);
+        }
+
+        @Override
+        public InputStream doFinalStream() {
+            Cipher cipher = local.get();
+            return new EncryptStream(cipher, this, FsIO.toInputStream(source));
         }
     }
 
@@ -122,113 +153,126 @@ final class CipherImpl implements FsCipher {
         }
 
         @Override
-        public FsData encrypt(Key key) {
+        public byte[] doFinal() {
             Cipher cipher = local.get();
-            int blockSize = getBlockSize(cipher);
-            if (blockSize <= 0) {
-                return FsData.from(() -> {
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    FsCrypto.encrypt(cipher, key, in, out, 0, params);
-                    return out.toByteArray();
-                });
-            }
-            return FsData.from(new EncryptStream(cipher, key, blockSize, Cipher.ENCRYPT_MODE));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
+            return out.toByteArray();
         }
 
         @Override
-        public FsData decrypt(Key key) {
+        public int doFinal(byte[] dest, int offset) {
+            OutputStream out = FsIO.toOutputStream(dest, offset, dest.length);
             Cipher cipher = local.get();
-            int blockSize = getBlockSize(cipher);
-            if (blockSize <= 0) {
-                return FsData.from(() -> {
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    FsCrypto.decrypt(cipher, key, in, out, 0, params);
-                    return out.toByteArray();
-                });
-            }
-            return FsData.from(new EncryptStream(cipher, key, blockSize, Cipher.DECRYPT_MODE));
+            return (int) FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
         }
 
-        private final class EncryptStream extends InputStream {
+        @Override
+        public int doFinal(ByteBuffer dest) {
+            OutputStream out = FsIO.toOutputStream(dest);
+            Cipher cipher = local.get();
+            return (int) FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
+        }
 
-            private final Cipher cipher;
-            private final Key key;
-            private final int blockSize;
-            private final int mode;
+        @Override
+        public long doFinal(OutputStream dest) {
+            Cipher cipher = local.get();
+            return FsCrypto.doEncrypt(cipher, mode, key, in, dest, getBlockSize(cipher), params);
+        }
 
-            private byte[] buffer;
-            private int pos = 0;
+        @Override
+        public InputStream doFinalStream() {
+            Cipher cipher = local.get();
+            return new EncryptStream(cipher, this, in);
+        }
+    }
 
-            private EncryptStream(Cipher cipher, Key key, int blockSize, int mode) {
-                this.cipher = cipher;
-                this.key = key;
-                this.blockSize = blockSize;
-                this.mode = mode;
-            }
 
-            @Override
-            public int read(byte[] b, int off, int len) throws IOException {
-                try {
-                    FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
-                    if (len == 0) {
-                        return 0;
-                    }
-                    FsCrypto.initCipher(cipher, mode, key, params);
-                    int count = 0;
-                    int bOff = off;
-                    int bLen = len;
-                    while (bLen > 0) {
-                        if (buffer == null) {
-                            byte[] nextIn = FsIO.readBytes(in, blockSize);
-                            if (FsArray.isEmpty(nextIn)) {
-                                if (count == 0) {
-                                    return -1;
-                                } else {
-                                    return count;
-                                }
+    private static final class EncryptStream extends InputStream {
+
+        private final Cipher cipher;
+        private final AbstractCryptoProcess process;
+        private final InputStream in;
+
+        private byte[] buffer;
+        private int pos = 0;
+
+        private EncryptStream(Cipher cipher, AbstractCryptoProcess process, InputStream in) {
+            this.cipher = cipher;
+            this.process = process;
+            this.in = in;
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            try {
+                FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+                if (len == 0) {
+                    return 0;
+                }
+                FsCrypto.initCipher(cipher, process.mode, process.key, process.params);
+                int count = 0;
+                int bOff = off;
+                int bLen = len;
+                while (bLen > 0) {
+                    if (buffer == null) {
+                        byte[] nextIn = FsIO.readBytes(in, process.blockSize);
+                        if (FsArray.isEmpty(nextIn)) {
+                            if (count == 0) {
+                                return -1;
+                            } else {
+                                return count;
                             }
-                            buffer = cipher.doFinal(nextIn);
-                            pos = 0;
                         }
-                        int inRemaining = buffer.length - pos;
-                        if (inRemaining == bLen) {
-                            System.arraycopy(buffer, pos, b, bOff, bLen);
-                            count += bLen;
-                            return count;
-                        }
-                        if (inRemaining < bLen) {
-                            System.arraycopy(buffer, pos, b, bOff, inRemaining);
-                            count += inRemaining;
-                            bLen -= inRemaining;
-                            bOff += inRemaining;
-                            buffer = null;
-                            continue;
-                        }
-                        // inRemaining > bLen
+                        buffer = cipher.doFinal(nextIn);
+                        pos = 0;
+                    }
+                    int inRemaining = buffer.length - pos;
+                    if (inRemaining == bLen) {
                         System.arraycopy(buffer, pos, b, bOff, bLen);
                         count += bLen;
-                        pos += bLen;
                         return count;
                     }
+                    if (inRemaining < bLen) {
+                        System.arraycopy(buffer, pos, b, bOff, inRemaining);
+                        count += inRemaining;
+                        bLen -= inRemaining;
+                        bOff += inRemaining;
+                        buffer = null;
+                        continue;
+                    }
+                    // inRemaining > bLen
+                    System.arraycopy(buffer, pos, b, bOff, bLen);
+                    count += bLen;
+                    pos += bLen;
                     return count;
-                } catch (Exception e) {
-                    throw new IOException(e);
                 }
+                return count;
+            } catch (Exception e) {
+                throw new IOException(e);
             }
+        }
 
-            @Override
-            public int read() throws IOException {
-                byte[] b = new byte[1];
-                int r = read(b);
-                return r == -1 ? -1 : b[0];
-            }
+        @Override
+        public int read() throws IOException {
+            byte[] b = new byte[1];
+            int r = read(b);
+            return r == -1 ? -1 : b[0];
         }
     }
 
     private abstract static class AbstractCryptoProcess implements CryptoProcess {
 
         protected AlgorithmParams params;
+        protected Key key;
         protected int blockSize;
+        protected int mode;
+
+        @Override
+        public CryptoProcess key(Key key) {
+            this.key = key;
+            return this;
+        }
 
         @Override
         public CryptoProcess algorithmParameterSpec(AlgorithmParameterSpec parameterSpec) {
@@ -256,7 +300,7 @@ final class CipherImpl implements FsCipher {
 
         @Override
         public CryptoProcess keySize(int keySize) {
-            return this;
+            throw new UnsupportedOperationException("keySize");
         }
 
         @Override
@@ -267,7 +311,24 @@ final class CipherImpl implements FsCipher {
 
         @Override
         public CryptoProcess bufferSize(int bufferSize) {
+            throw new UnsupportedOperationException("bufferSize");
+        }
+
+        @Override
+        public CryptoProcess encrypt() {
+            this.mode = Cipher.ENCRYPT_MODE;
             return this;
+        }
+
+        @Override
+        public CryptoProcess decrypt() {
+            this.mode = Cipher.DECRYPT_MODE;
+            return this;
+        }
+
+        @Override
+        public CryptoProcess mac() {
+            throw new UnsupportedOperationException("mac");
         }
 
         protected AlgorithmParams getParams() {
