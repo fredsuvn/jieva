@@ -10,7 +10,7 @@ import java.security.Provider;
  * <p>
  * It is recommended to use method-chaining:
  * <pre>
- *     byte[] enBytes = cipher.prepare(bytes).blockSize(size).encrypt(key).toBytes();
+ *     byte[] enBytes = cipher.prepare(bytes).key(key).blockSize(size).encrypt().doFinal();
  * </pre>
  *
  * @author fredsuvn

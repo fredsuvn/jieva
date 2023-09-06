@@ -271,4 +271,41 @@ public class FsCrypto {
             throw new FsSecurityException(e);
         }
     }
+
+    /**
+     * Generate MAC for given input stream into dest array from dest offset.
+     *
+     * @param mac        MAC generator
+     * @param key        key for generating
+     * @param in         given input stream
+     * @param dest       dest array
+     * @param destOffset dest offset
+     * @param bufferSize buffer size
+     * @param params     other parameters
+     */
+    public static int generateMac(
+        Mac mac, Key key, InputStream in, byte[] dest, int destOffset, int bufferSize, @Nullable AlgorithmParams params) {
+        try {
+            initMac(mac, key, params);
+            if (bufferSize <= 0) {
+                byte[] src = FsIO.readBytes(in);
+                mac.update(src);
+                mac.doFinal(dest, destOffset);
+                return mac.getMacLength();
+            }
+            byte[] buffer = new byte[bufferSize];
+            while (true) {
+                int readSize = in.read(buffer);
+                if (readSize == -1) {
+                    mac.doFinal(dest, destOffset);
+                    return mac.getMacLength();
+                }
+                mac.update(buffer);
+            }
+        } catch (FsSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
 }

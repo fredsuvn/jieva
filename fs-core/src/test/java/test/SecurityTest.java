@@ -6,17 +6,17 @@ import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.security.FsCipher;
 import xyz.srclab.common.security.FsCrypto;
+import xyz.srclab.common.security.FsMac;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.util.Arrays;
 
 public class SecurityTest {
 
@@ -52,6 +52,11 @@ public class SecurityTest {
         deBytes = FsIO.readBytes(
             cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinalStream());
         Assert.assertEquals(data, deBytes);
+        byte[] enDest = new byte[dataSize * 10];
+        int destSize = cipher.prepare(data, 2, data.length - 2).blockSize(enBlockSize).key(publicKey).encrypt().doFinal(enDest);
+        enBytes = Arrays.copyOf(enDest, destSize);
+        deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
+        Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
     }
 
     private void testCipherSymmetric(
@@ -74,6 +79,31 @@ public class SecurityTest {
         deBytes = FsIO.readBytes(
             cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinalStream());
         Assert.assertEquals(data, deBytes);
+        byte[] enDest = new byte[dataSize * 10];
+        int destSize = cipher.prepare(data, 2, data.length - 2).blockSize(enBlockSize).key(key).encrypt().doFinal(enDest);
+        enBytes = Arrays.copyOf(enDest, destSize);
+        deBytes = cipher.prepare(FsIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinal();
+        Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
+    }
+
+    @Test
+    public void testMac() throws Exception {
+        byte[] data = DATA.getBytes(FsString.CHARSET);
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
+        Key macKey = keyGenerator.generateKey();
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(macKey);
+        byte[] macBytes = mac.doFinal(data);
+        System.out.println(macBytes.length + ", " + mac.getMacLength());
+        FsMac fsMac = FsMac.getMac("HmacSHA256");
+        byte[] fsMacBytes = fsMac.prepare(data).key(macKey).doFinal();
+        Assert.assertEquals(macBytes, fsMacBytes);
+        byte[] enDest = new byte[mac.getMacLength() + 8];
+        int destSize = fsMac.prepare(data, 2, data.length - 2).bufferSize(1).key(macKey).doFinal(enDest, 8);
+        macBytes = mac.doFinal(Arrays.copyOfRange(data, 2, data.length));
+        Assert.assertEquals(macBytes, Arrays.copyOfRange(enDest, 8, 8 + destSize));
+        Assert.assertEquals(destSize, mac.getMacLength());
+        System.out.println(destSize);
     }
 
     @Test
@@ -88,8 +118,8 @@ public class SecurityTest {
 
         //encrypt
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        System.out.println(cipher.getBlockSize());
-        System.out.println(cipher.getOutputSize(0));
+        //System.out.println(cipher.getBlockSize());
+        //System.out.println(cipher.getOutputSize(0));
         ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
         FsCrypto.encrypt(cipher, publicKey, new ByteArrayInputStream(data), outBytes, 245, null);
         byte[] enBytes = outBytes.toByteArray();
@@ -107,8 +137,8 @@ public class SecurityTest {
 
         //decrypt
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        System.out.println(cipher.getBlockSize());
-        System.out.println(cipher.getOutputSize(0));
+        //System.out.println(cipher.getBlockSize());
+        //System.out.println(cipher.getOutputSize(0));
         outBytes.reset();
         FsCrypto.decrypt(cipher, privateKey, new ByteArrayInputStream(enBytes), outBytes, 256, null);
         byte[] deBytes = outBytes.toByteArray();
