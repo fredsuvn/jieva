@@ -4,33 +4,28 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.FsCheck;
 import xyz.srclab.common.io.FsIO;
 
-import javax.crypto.Mac;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
 import java.security.Key;
 import java.security.SecureRandom;
+import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Supplier;
 
-final class MacImpl implements FsMac {
+final class SignImpl implements FsSign {
 
-    private final ThreadLocal<Mac> local;
+    private final ThreadLocal<Signature> local;
 
-    MacImpl(Supplier<Mac> supplier) {
+    SignImpl(Supplier<Signature> supplier) {
         this.local = ThreadLocal.withInitial(supplier);
     }
 
     @Override
-    public @Nullable Mac getInstance() {
+    public @Nullable Signature getSignature() {
         return local.get();
-    }
-
-    @Override
-    public int getMacLength() {
-        return local.get().getMacLength();
     }
 
     @Override
@@ -65,13 +60,20 @@ final class MacImpl implements FsMac {
         public byte[] doFinal() {
             try {
                 ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
-                Mac mac = local.get();
-                return FsCrypto.generateMac(mac, key, src, params);
+                Signature signature = local.get();
+                return FsCrypto.sign(signature, key, src, params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
                 throw new FsSecurityException(e);
             }
+        }
+
+        @Override
+        public boolean verify(byte[] sign, int offset, int length) {
+            ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
+            Signature signature = local.get();
+            return FsCrypto.verify(signature, key, src, sign, offset, length, params);
         }
     }
 
@@ -86,13 +88,19 @@ final class MacImpl implements FsMac {
         @Override
         public byte[] doFinal() {
             try {
-                Mac mac = local.get();
-                return FsCrypto.generateMac(mac, key, source, params);
+                Signature signature = local.get();
+                return FsCrypto.sign(signature, key, source, params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
                 throw new FsSecurityException(e);
             }
+        }
+
+        @Override
+        public boolean verify(byte[] sign, int offset, int length) {
+            Signature signature = local.get();
+            return FsCrypto.verify(signature, key, source, sign, offset, length, params);
         }
     }
 
@@ -107,13 +115,19 @@ final class MacImpl implements FsMac {
         @Override
         public byte[] doFinal() {
             try {
-                Mac mac = local.get();
-                return FsCrypto.generateMac(mac, key, in, bufferSize, params);
+                Signature signature = local.get();
+                return FsCrypto.sign(signature, key, in, bufferSize, params);
             } catch (FsSecurityException e) {
                 throw e;
             } catch (Exception e) {
                 throw new FsSecurityException(e);
             }
+        }
+
+        @Override
+        public boolean verify(byte[] sign, int offset, int length) {
+            Signature signature = local.get();
+            return FsCrypto.verify(signature, key, in, bufferSize, sign, offset, length, params);
         }
     }
 
@@ -170,7 +184,7 @@ final class MacImpl implements FsMac {
         }
 
         @Override
-        public CryptoProcess mac() {
+        public CryptoProcess sign() {
             return this;
         }
 
@@ -186,10 +200,10 @@ final class MacImpl implements FsMac {
         @Override
         public int doFinal(byte[] dest, int offset) {
             try {
-                if (dest.length - offset < getMacLength()) {
+                byte[] en = doFinal();
+                if (dest.length - offset < en.length) {
                     throw new FsSecurityException("length of dest remaining is not enough.");
                 }
-                byte[] en = doFinal();
                 System.arraycopy(en, 0, dest, offset, en.length);
                 return en.length;
             } catch (FsSecurityException e) {
@@ -202,10 +216,10 @@ final class MacImpl implements FsMac {
         @Override
         public int doFinal(ByteBuffer dest) {
             try {
-                if (dest.remaining() < getMacLength()) {
+                byte[] en = doFinal();
+                if (dest.remaining() < en.length) {
                     throw new FsSecurityException("length of dest remaining is not enough.");
                 }
-                byte[] en = doFinal();
                 dest.put(en);
                 return en.length;
             } catch (FsSecurityException e) {

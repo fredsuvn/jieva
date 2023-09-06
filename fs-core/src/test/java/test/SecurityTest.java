@@ -4,10 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.io.FsIO;
-import xyz.srclab.common.security.FsCipher;
-import xyz.srclab.common.security.FsCrypto;
-import xyz.srclab.common.security.FsDigest;
-import xyz.srclab.common.security.FsMac;
+import xyz.srclab.common.security.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -39,7 +36,7 @@ public class SecurityTest {
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
-        FsCipher cipher = FsCipher.getCipher(cryptoAlgorithm);
+        FsCipher cipher = FsCipher.getInstance(cryptoAlgorithm);
         byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).key(publicKey).encrypt().doFinal();
         byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
         Assert.assertEquals(data, deBytes);
@@ -66,7 +63,7 @@ public class SecurityTest {
         byte[] data = TestUtil.buildRandomBytes(dataSize);
         KeyGenerator keyGenerator = KeyGenerator.getInstance(keyAlgorithm);
         SecretKey key = keyGenerator.generateKey();
-        FsCipher cipher = FsCipher.getCipher(cryptoAlgorithm);
+        FsCipher cipher = FsCipher.getInstance(cryptoAlgorithm);
         byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).key(key).encrypt().doFinal();
         byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).key(key).decrypt().doFinal();
         Assert.assertEquals(data, deBytes);
@@ -97,7 +94,7 @@ public class SecurityTest {
         mac.init(macKey);
         byte[] macBytes = mac.doFinal(data);
         System.out.println(macBytes.length + ", " + mac.getMacLength());
-        FsMac fsMac = FsMac.getMac("HmacSHA256");
+        FsMac fsMac = FsMac.getInstance("HmacSHA256");
         byte[] fsMacBytes = fsMac.prepare(data).key(macKey).doFinal();
         Assert.assertEquals(macBytes, fsMacBytes);
         byte[] enDest = new byte[mac.getMacLength() + 8];
@@ -126,7 +123,7 @@ public class SecurityTest {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] mdBytes = md.digest(data);
         System.out.println(mdBytes.length + ", " + md.getDigestLength());
-        FsDigest fd = FsDigest.getDigest("MD5");
+        FsDigest fd = FsDigest.getInstance("MD5");
         byte[] fdBytes = fd.prepare(data).doFinal();
         Assert.assertEquals(mdBytes, fdBytes);
         byte[] enDest = new byte[md.getDigestLength() + 8];
@@ -147,6 +144,58 @@ public class SecurityTest {
         buffer.flip();
         Assert.assertEquals(mdBytes, FsIO.getBytes(buffer));
         System.out.println(destSize);
+    }
+
+    @Test
+    public void testSign() throws Exception {
+        byte[] data = DATA.getBytes(FsString.CHARSET);
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+
+        //sign
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(privateKey);
+        signature.update(data);
+        byte[] signBytes = signature.sign();
+        System.out.println(signBytes.length);
+        FsSign fsSign = FsSign.getInstance("SHA256withRSA");
+        byte[] fsMacBytes = fsSign.prepare(data).key(privateKey).doFinal();
+        Assert.assertEquals(signBytes, fsMacBytes);
+        byte[] enDest = new byte[signBytes.length + 8];
+        int destSize = fsSign.prepare(data, 2, data.length - 2).bufferSize(1).key(privateKey).doFinal(enDest, 8);
+        signature.update(Arrays.copyOfRange(data, 2, data.length));
+        signBytes = signature.sign();
+        Assert.assertEquals(signBytes, Arrays.copyOfRange(enDest, 8, 8 + destSize));
+        Assert.assertEquals(destSize, signBytes.length);
+        signature.update(data);
+        signBytes = signature.sign();
+        InputStream enStream = fsSign.prepare(data).key(privateKey).doFinalStream();
+        Assert.assertEquals(signBytes, FsIO.readBytes(enStream));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        long outSize = fsSign.prepare(ByteBuffer.wrap(data)).key(privateKey).doFinal(out);
+        Assert.assertEquals(outSize, signBytes.length);
+        Assert.assertEquals(signBytes, out.toByteArray());
+        ByteBuffer buffer = ByteBuffer.allocate(signBytes.length);
+        int bufferSize = fsSign.prepare(FsIO.toInputStream(data)).key(privateKey).doFinal(buffer);
+        Assert.assertEquals(bufferSize, signBytes.length);
+        buffer.flip();
+        Assert.assertEquals(signBytes, FsIO.getBytes(buffer));
+        System.out.println(destSize);
+
+        //verify
+        signature.initSign(privateKey);
+        signature.update(data);
+        signBytes = signature.sign();
+        signature.initVerify(publicKey);
+        signature.update(data);
+        Assert.assertTrue(signature.verify(signBytes));
+        Assert.assertTrue(fsSign.prepare(data).key(publicKey).verify(signBytes));
+        signature.initVerify(publicKey);
+        signature.update(data);
+        Assert.assertTrue(signature.verify(out.toByteArray()));
+        Assert.assertTrue(fsSign.prepare(FsIO.toInputStream(data)).key(publicKey).verify(signBytes));
     }
 
     @Test

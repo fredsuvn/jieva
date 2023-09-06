@@ -24,7 +24,7 @@ final class DigestImpl implements FsDigest {
     }
 
     @Override
-    public @Nullable MessageDigest getDigest() {
+    public @Nullable MessageDigest getInstance() {
         return local.get();
     }
 

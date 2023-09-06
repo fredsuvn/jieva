@@ -27,7 +27,7 @@ final class CipherImpl implements FsCipher {
     }
 
     @Override
-    public @Nullable Cipher getCipher() {
+    public @Nullable Cipher getInstance() {
         return local.get();
     }
 

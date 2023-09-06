@@ -1,13 +1,12 @@
 package xyz.srclab.common.security;
 
+import xyz.srclab.common.encode.FsEncoder;
+
 import javax.crypto.Mac;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.security.AlgorithmParameters;
-import java.security.Key;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 
@@ -105,6 +104,13 @@ public interface CryptoProcess {
     }
 
     /**
+     * Sets digestion mode (for {@link Signature}).
+     */
+    default CryptoProcess sign() {
+        throw new FsSecurityException(new UnsupportedOperationException("Sign"));
+    }
+
+    /**
      * Does final computation and returns result.
      */
     byte[] doFinal();
@@ -146,4 +152,31 @@ public interface CryptoProcess {
      * The returned stream is lazy, it can be affected by any changes of the process before the stream is fully read.
      */
     InputStream doFinalStream();
+
+    /**
+     * Does final computation and returns base64 string of result.
+     */
+    default String doFinalBase64() {
+        return FsEncoder.base64().encodeToString(doFinal());
+    }
+
+    /**
+     * Verifies sign for {@link FsSign}.
+     *
+     * @param sign sign to be verified
+     */
+    default boolean verify(byte[] sign) {
+        return verify(sign, 0, sign.length);
+    }
+
+    /**
+     * Verifies sign for {@link FsSign}.
+     *
+     * @param sign   sign to be verified
+     * @param offset start offset of sign
+     * @param length length of sign
+     */
+    default boolean verify(byte[] sign, int offset, int length) {
+        throw new FsSecurityException(new UnsupportedOperationException("Verification"));
+    }
 }

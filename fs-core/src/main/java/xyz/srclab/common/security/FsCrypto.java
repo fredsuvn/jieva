@@ -9,8 +9,7 @@ import javax.crypto.Mac;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.security.Key;
-import java.security.MessageDigest;
+import java.security.*;
 
 /**
  * Crypto utilities.
@@ -20,7 +19,7 @@ import java.security.MessageDigest;
 public class FsCrypto {
 
     /**
-     * Initializes given cipher.
+     * Initializes given {@link Cipher}.
      *
      * @param cipher given cipher
      * @param mode   cipher mode
@@ -60,7 +59,7 @@ public class FsCrypto {
     }
 
     /**
-     * Initializes given MAC.
+     * Initializes given {@link Mac}.
      *
      * @param mac    given MAC
      * @param key    key for generating MAC
@@ -80,6 +79,52 @@ public class FsCrypto {
         } catch (Exception e) {
             throw new FsSecurityException(e);
         }
+    }
+
+    /**
+     * Initializes given {@link Signature}.
+     *
+     * @param signature given signature
+     * @param key       key for generating MAC
+     * @param params    algorithm parameters
+     */
+    public static void initSignature(
+        Signature signature, boolean forSign, @Nullable Key key, @Nullable AlgorithmParams params) {
+        try {
+            if (forSign) {
+                if (params == null) {
+                    signature.initSign(asPrivateKey(key));
+                    return;
+                }
+                if (params.getSecureRandom() != null) {
+                    signature.initSign(asPrivateKey(key), params.getSecureRandom());
+                }
+            } else {
+                if (params == null) {
+                    signature.initVerify(asPublicKey(key));
+                    return;
+                }
+                if (params.getCertificate() != null) {
+                    signature.initVerify(params.getCertificate());
+                }
+            }
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
+
+    private static PrivateKey asPrivateKey(Key key) {
+        if (key instanceof PrivateKey) {
+            return (PrivateKey) key;
+        }
+        throw new FsSecurityException("Not a PrivateKey: " + key);
+    }
+
+    private static PublicKey asPublicKey(Key key) {
+        if (key instanceof PublicKey) {
+            return (PublicKey) key;
+        }
+        throw new FsSecurityException("Not a PublicKey: " + key);
     }
 
     /**
@@ -242,7 +287,7 @@ public class FsCrypto {
     }
 
     /**
-     * Generate MAC for given input stream.
+     * Generates MAC for given input stream.
      *
      * @param mac        MAC generator
      * @param key        key for generating
@@ -274,7 +319,7 @@ public class FsCrypto {
     }
 
     /**
-     * Generate MAC for given buffer.
+     * Generates MAC for given buffer.
      *
      * @param mac    MAC generator
      * @param key    key for generating
@@ -331,6 +376,123 @@ public class FsCrypto {
         try {
             mac.update(in);
             return mac.digest();
+        } catch (FsSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
+
+    /**
+     * Generates signature for given input stream.
+     *
+     * @param signature  signature generator
+     * @param key        key for generating
+     * @param in         given input stream
+     * @param bufferSize buffer size
+     * @param params     other parameters
+     */
+    public static byte[] sign(
+        Signature signature, Key key, InputStream in, int bufferSize, @Nullable AlgorithmParams params) {
+        try {
+            initSignature(signature, true, key, params);
+            if (bufferSize <= 0) {
+                byte[] src = FsIO.readBytes(in);
+                signature.update(src);
+                return signature.sign();
+            }
+            byte[] buffer = new byte[bufferSize];
+            while (true) {
+                int readSize = in.read(buffer);
+                if (readSize == -1) {
+                    return signature.sign();
+                }
+                signature.update(buffer);
+            }
+        } catch (FsSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
+
+    /**
+     * Generates signature for given buffer.
+     *
+     * @param signature signature generator
+     * @param key       key for generating
+     * @param in        given buffer
+     * @param params    other parameters
+     */
+    public static byte[] sign(Signature signature, Key key, ByteBuffer in, @Nullable AlgorithmParams params) {
+        try {
+            initSignature(signature, true, key, params);
+            signature.update(in);
+            return signature.sign();
+        } catch (FsSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
+
+    /**
+     * Verifies signature for given input stream.
+     *
+     * @param signature  signature generator
+     * @param key        key for generating
+     * @param in         given input stream
+     * @param bufferSize buffer size
+     * @param sign       sign to be verified
+     * @param signOffset start offset of sign
+     * @param signLength length of sign
+     * @param params     other parameters
+     */
+    public static boolean verify(
+        Signature signature, Key key, InputStream in, int bufferSize,
+        byte[] sign, int signOffset, int signLength, @Nullable AlgorithmParams params
+    ) {
+        try {
+            initSignature(signature, false, key, params);
+            if (bufferSize <= 0) {
+                byte[] src = FsIO.readBytes(in);
+                signature.update(src);
+                return signature.verify(sign, signOffset, signLength);
+            }
+            byte[] buffer = new byte[bufferSize];
+            while (true) {
+                int readSize = in.read(buffer);
+                if (readSize == -1) {
+                    return signature.verify(sign, signOffset, signLength);
+                }
+                signature.update(buffer);
+            }
+        } catch (FsSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FsSecurityException(e);
+        }
+    }
+
+    /**
+     * Verifies signature for given buffer.
+     *
+     * @param signature  signature generator
+     * @param key        key for generating
+     * @param in         given buffer
+     * @param sign       sign to be verified
+     * @param signOffset start offset of sign
+     * @param signLength length of sign
+     * @param params     other parameters
+     */
+    public static boolean verify(
+        Signature signature, Key key, ByteBuffer in,
+        byte[] sign, int signOffset, int signLength, @Nullable AlgorithmParams params
+    ) {
+        try {
+            initSignature(signature, false, key, params);
+            signature.update(in);
+            return signature.verify(sign, signOffset, signLength);
         } catch (FsSecurityException e) {
             throw e;
         } catch (Exception e) {

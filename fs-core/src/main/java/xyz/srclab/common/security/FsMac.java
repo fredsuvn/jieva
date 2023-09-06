@@ -24,7 +24,7 @@ public interface FsMac extends Prepareable {
      *
      * @param algorithm specified algorithm
      */
-    static FsMac getMac(String algorithm) {
+    static FsMac getInstance(String algorithm) {
         return new MacImpl(() -> {
             try {
                 return Mac.getInstance(algorithm);
@@ -41,7 +41,7 @@ public interface FsMac extends Prepareable {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
-    static FsMac getMac(String algorithm, String provider) {
+    static FsMac getInstance(String algorithm, String provider) {
         return new MacImpl(() -> {
             try {
                 return Mac.getInstance(algorithm, provider);
@@ -58,7 +58,7 @@ public interface FsMac extends Prepareable {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
-    static FsMac getMac(String algorithm, Provider provider) {
+    static FsMac getInstance(String algorithm, Provider provider) {
         return new MacImpl(() -> {
             try {
                 return Mac.getInstance(algorithm, provider);
@@ -73,7 +73,7 @@ public interface FsMac extends Prepareable {
      * The back {@link Mac} maybe thread-local, that is, returned value may be not only one instance.
      */
     @Nullable
-    Mac getMac();
+    Mac getInstance();
 
     /**
      * Returns MAC length.
