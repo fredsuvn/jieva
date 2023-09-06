@@ -1,7 +1,6 @@
 package xyz.srclab.common.encode;
 
 import xyz.srclab.common.base.FsCheck;
-import xyz.srclab.common.codec.FsCodecException;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.IOException;
@@ -25,10 +24,10 @@ final class Base64Encoder implements FsEncoder {
     public byte[] encode(byte[] source) {
         try {
             return encoder.encode(source);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -39,10 +38,10 @@ final class Base64Encoder implements FsEncoder {
                 return encoder.encode(source);
             }
             return encoder.encode(copyArray(source, offset, length));
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -50,10 +49,10 @@ final class Base64Encoder implements FsEncoder {
     public int encode(byte[] source, byte[] dest) {
         try {
             return encoder.encode(source, dest);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -69,10 +68,10 @@ final class Base64Encoder implements FsEncoder {
     public ByteBuffer encode(ByteBuffer source) {
         try {
             return encoder.encode(source);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -84,10 +83,10 @@ final class Base64Encoder implements FsEncoder {
             FsIO.readBytesTo(source, out);
             out.flush();
             return wrapper.count;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -95,10 +94,10 @@ final class Base64Encoder implements FsEncoder {
     public String encodeToString(byte[] source) {
         try {
             return encoder.encodeToString(source);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -111,10 +110,10 @@ final class Base64Encoder implements FsEncoder {
     public byte[] decode(byte[] source) {
         try {
             return decoder.decode(source);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -125,10 +124,10 @@ final class Base64Encoder implements FsEncoder {
                 return decoder.decode(source);
             }
             return decoder.decode(copyArray(source, offset, length));
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -136,10 +135,10 @@ final class Base64Encoder implements FsEncoder {
     public int decode(byte[] source, byte[] dest) {
         try {
             return decoder.decode(source, dest);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -155,10 +154,10 @@ final class Base64Encoder implements FsEncoder {
     public ByteBuffer decode(ByteBuffer source) {
         try {
             return decoder.decode(source);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -169,10 +168,10 @@ final class Base64Encoder implements FsEncoder {
             InputStream in = decoder.wrap(source);
             FsIO.readBytesTo(in, wrapper);
             return wrapper.count;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 

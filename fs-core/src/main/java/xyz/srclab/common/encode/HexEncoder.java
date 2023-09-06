@@ -1,7 +1,6 @@
 package xyz.srclab.common.encode;
 
 import xyz.srclab.common.base.FsCheck;
-import xyz.srclab.common.codec.FsCodecException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,10 +17,10 @@ final class HexEncoder implements FsEncoder {
             byte[] dest = new byte[length * 2];
             encode0(source, offset, dest, 0, length);
             return dest;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -31,10 +30,10 @@ final class HexEncoder implements FsEncoder {
             FsCheck.checkRangeInBounds(sourceOffset, sourceOffset + length, 0, source.length);
             FsCheck.checkRangeInBounds(destOffset, destOffset + length * 2, 0, dest.length);
             return encode0(source, sourceOffset, dest, destOffset, length);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -56,10 +55,10 @@ final class HexEncoder implements FsEncoder {
             encode0(source, result);
             result.flip();
             return result;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -71,10 +70,10 @@ final class HexEncoder implements FsEncoder {
                 "Remaining of dest buffer is not enough."
             );
             return encode0(source, dest);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -103,10 +102,10 @@ final class HexEncoder implements FsEncoder {
                 count += 2;
             }
             return count;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -114,10 +113,10 @@ final class HexEncoder implements FsEncoder {
     public int encodeBlockSize() {
         try {
             return 1;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -167,10 +166,10 @@ final class HexEncoder implements FsEncoder {
             byte[] result = new byte[length / 2];
             decode0(source, offset, result, 0, length);
             return result;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -181,10 +180,10 @@ final class HexEncoder implements FsEncoder {
             FsCheck.checkRangeInBounds(sourceOffset, sourceOffset + length, 0, source.length);
             FsCheck.checkRangeInBounds(destOffset, destOffset + length / 2, 0, dest.length);
             return decode0(source, sourceOffset, dest, destOffset, length);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -192,12 +191,12 @@ final class HexEncoder implements FsEncoder {
         for (int i = sourceOffset, j = destOffset, c = 0; c < length; i++, j++, c += 2) {
             int i1 = decodeByte(source[i]);
             if (i1 == -1) {
-                throw new FsCodecException("Wrong data at index " + i + ": " + (char) (source[i] & 0x00ff) + ".");
+                throw new FsEncodeException("Wrong data at index " + i + ": " + (char) (source[i] & 0x00ff) + ".");
             }
             i++;
             int i2 = decodeByte(source[i]);
             if (i2 == -1) {
-                throw new FsCodecException("Wrong data at index " + i + ": " + (char) (source[i + 1] & 0x00ff) + ".");
+                throw new FsEncodeException("Wrong data at index " + i + ": " + (char) (source[i + 1] & 0x00ff) + ".");
             }
             dest[j] = mergeByte(i1, i2);
         }
@@ -212,10 +211,10 @@ final class HexEncoder implements FsEncoder {
             decode0(source, result);
             result.flip();
             return result;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -228,10 +227,10 @@ final class HexEncoder implements FsEncoder {
                 "Remaining of dest buffer is not enough."
             );
             return decode0(source, dest);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -241,12 +240,12 @@ final class HexEncoder implements FsEncoder {
             byte b1 = source.get();
             int i1 = decodeByte(b1);
             if (i1 == -1) {
-                throw new FsCodecException("Wrong data at position " + source.position() + ": " + (char) (b1 & 0x00ff) + ".");
+                throw new FsEncodeException("Wrong data at position " + source.position() + ": " + (char) (b1 & 0x00ff) + ".");
             }
             byte b2 = source.get();
             int i2 = decodeByte(b2);
             if (i2 == -1) {
-                throw new FsCodecException("Wrong data at position " + source.position() + ": " + (char) (b2 & 0x00ff) + ".");
+                throw new FsEncodeException("Wrong data at position " + source.position() + ": " + (char) (b2 & 0x00ff) + ".");
             }
             dest.put(mergeByte(i1, i2));
             count++;
@@ -265,24 +264,24 @@ final class HexEncoder implements FsEncoder {
                 }
                 int i1 = decodeByte((byte) b1);
                 if (i1 == -1) {
-                    throw new FsCodecException("Wrong source data at position " + count * 2 + ": " + (char) (b1 & 0x00ff) + ".");
+                    throw new FsEncodeException("Wrong source data at position " + count * 2 + ": " + (char) (b1 & 0x00ff) + ".");
                 }
                 int b2 = source.read();
                 if (b2 == -1) {
-                    throw new FsCodecException("Wrong source data at position " + (count * 2 + 1) + ", unexpected end of stream.");
+                    throw new FsEncodeException("Wrong source data at position " + (count * 2 + 1) + ", unexpected end of stream.");
                 }
                 int i2 = decodeByte((byte) b2);
                 if (i2 == -1) {
-                    throw new FsCodecException("Wrong source data at position " + (count * 2 + 1) + ": " + (char) (b2 & 0x00ff) + ".");
+                    throw new FsEncodeException("Wrong source data at position " + (count * 2 + 1) + ": " + (char) (b2 & 0x00ff) + ".");
                 }
                 dest.write(mergeByte(i1, i2));
                 count++;
             }
             return count;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -290,10 +289,10 @@ final class HexEncoder implements FsEncoder {
     public int decodeBlockSize() {
         try {
             return 2;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 

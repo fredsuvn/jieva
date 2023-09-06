@@ -2,7 +2,6 @@ package xyz.srclab.common.encode;
 
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.codec.FsCodecException;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.InputStream;
@@ -110,10 +109,10 @@ public interface FsEncoder {
             InputStream in = FsIO.toInputStream(source, sourceOffset, length);
             OutputStream out = FsIO.toOutputStream(dest, destOffset, dest.length - destOffset);
             return (int) encode(in, out);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -127,10 +126,10 @@ public interface FsEncoder {
         try {
             byte[] src = FsIO.getBytes(source);
             return ByteBuffer.wrap(encode(src));
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -146,10 +145,10 @@ public interface FsEncoder {
             int result = (int) encode(FsIO.toInputStream(source), out);
             out.flush();
             return result;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -228,10 +227,10 @@ public interface FsEncoder {
             InputStream in = FsIO.toInputStream(source, sourceOffset, length);
             OutputStream out = FsIO.toOutputStream(dest, destOffset, dest.length - destOffset);
             return (int) decode(in, out);
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -245,10 +244,10 @@ public interface FsEncoder {
         try {
             byte[] src = FsIO.getBytes(source);
             return ByteBuffer.wrap(decode(src));
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 
@@ -264,10 +263,10 @@ public interface FsEncoder {
             int result = (int) decode(FsIO.toInputStream(source), out);
             out.flush();
             return result;
-        } catch (FsCodecException e) {
+        } catch (FsEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsCodecException(e);
+            throw new FsEncodeException(e);
         }
     }
 

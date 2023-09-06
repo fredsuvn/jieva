@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.codec.FsCodecException;
+import xyz.srclab.common.encode.FsEncodeException;
 import xyz.srclab.common.encode.FsEncoder;
 
 import java.io.ByteArrayInputStream;
@@ -39,7 +39,7 @@ public class EncodeTest {
         Assert.assertEquals(encoder.encode(srcBytes), destBytes);
         Assert.assertEquals(encoder.encode(srcBytes, 0, srcBytes.length), destBytes);
         Assert.assertEquals(encoder.encode(srcBytesPadding, 10, srcBytes.length), destBytes);
-        Assert.expectThrows(FsCodecException.class, () -> encoder.encode(srcBytes, 0, 9999999));
+        Assert.expectThrows(FsEncodeException.class, () -> encoder.encode(srcBytes, 0, 9999999));
 
         Arrays.fill(bytes, (byte) 0);
         Assert.assertEquals(
@@ -62,7 +62,7 @@ public class EncodeTest {
         Assert.assertEquals(Arrays.copyOfRange(bytes, 10, 10 + destBytes.length), destBytes);
 
         Arrays.fill(bytes, (byte) 0);
-        Assert.expectThrows(FsCodecException.class, () ->
+        Assert.expectThrows(FsEncodeException.class, () ->
             encoder.encode(srcBytesPadding, 999999, bytes, 10, srcBytes.length));
 
         Arrays.fill(bytes, (byte) 0);
@@ -89,7 +89,7 @@ public class EncodeTest {
         Assert.assertEquals(encoder.decode(destBytes), srcBytes);
         Assert.assertEquals(encoder.decode(destBytes, 0, destBytes.length), srcBytes);
         Assert.assertEquals(encoder.decode(destBytesPadding, 10, destBytes.length), srcBytes);
-        Assert.expectThrows(FsCodecException.class, () -> encoder.decode(destBytes, 0, 9999999));
+        Assert.expectThrows(FsEncodeException.class, () -> encoder.decode(destBytes, 0, 9999999));
 
         Arrays.fill(bytes, (byte) 0);
         Assert.assertEquals(
@@ -112,7 +112,7 @@ public class EncodeTest {
         Assert.assertEquals(Arrays.copyOfRange(bytes, 10, 10 + srcBytes.length), srcBytes);
 
         Arrays.fill(bytes, (byte) 0);
-        Assert.expectThrows(FsCodecException.class, () ->
+        Assert.expectThrows(FsEncodeException.class, () ->
             encoder.decode(destBytesPadding, 999999, bytes, 10, destBytes.length));
 
         Arrays.fill(bytes, (byte) 0);
