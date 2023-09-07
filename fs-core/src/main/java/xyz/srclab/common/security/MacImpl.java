@@ -24,7 +24,7 @@ final class MacImpl implements FsMac {
     }
 
     @Override
-    public @Nullable Mac getInstance() {
+    public @Nullable Mac getMac() {
         return local.get();
     }
 

@@ -2,7 +2,6 @@ package xyz.srclab.common.security;
 
 import xyz.srclab.annotations.Nullable;
 
-import javax.crypto.Mac;
 import java.security.MessageDigest;
 import java.security.Provider;
 
@@ -15,7 +14,7 @@ import java.security.Provider;
  * </pre>
  *
  * @author fredsuvn
- * @see Mac
+ * @see MessageDigest
  */
 public interface FsDigest extends Prepareable {
 
@@ -77,7 +76,7 @@ public interface FsDigest extends Prepareable {
      * The back {@link MessageDigest} maybe thread-local, that is, returned value may be not only one instance.
      */
     @Nullable
-    MessageDigest getInstance();
+    MessageDigest getMessageDigest();
 
     /**
      * Returns digest length.

@@ -73,5 +73,5 @@ public interface FsCipher extends Prepareable {
      * The back {@link Cipher} maybe thread-local, that is, returned value may be not only one instance.
      */
     @Nullable
-    Cipher getInstance();
+    Cipher getCipher();
 }

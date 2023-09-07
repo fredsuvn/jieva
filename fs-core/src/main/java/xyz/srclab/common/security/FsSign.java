@@ -2,7 +2,6 @@ package xyz.srclab.common.security;
 
 import xyz.srclab.annotations.Nullable;
 
-import javax.crypto.Mac;
 import java.security.Provider;
 import java.security.Signature;
 
@@ -16,7 +15,7 @@ import java.security.Signature;
  * </pre>
  *
  * @author fredsuvn
- * @see Mac
+ * @see Signature
  */
 public interface FsSign extends Prepareable {
 

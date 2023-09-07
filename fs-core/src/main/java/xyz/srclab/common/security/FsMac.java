@@ -73,7 +73,7 @@ public interface FsMac extends Prepareable {
      * The back {@link Mac} maybe thread-local, that is, returned value may be not only one instance.
      */
     @Nullable
-    Mac getInstance();
+    Mac getMac();
 
     /**
      * Returns MAC length.
