@@ -30,7 +30,7 @@ public class BeanTest {
     public void testTypeBean() throws Exception {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
-        FsBean ccBean = Fs.resolveBean(ccType);
+        FsBean ccBean = FsBean.resolve(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
         FsProperty cc = ccBean.getProperty("cc");
         FsProperty c1 = ccBean.getProperty("c1");
@@ -66,7 +66,7 @@ public class BeanTest {
     @Test
     public void testClassBean() throws Exception {
         Type ccType = Cc.class;
-        FsBean ccBean = Fs.resolveBean(ccType);
+        FsBean ccBean = FsBean.resolve(ccType);
         FsLogger.system().info("ccBean: ", ccBean);
         FsProperty cc = ccBean.getProperty("cc");
         FsProperty c1 = ccBean.getProperty("c1");
@@ -107,7 +107,7 @@ public class BeanTest {
         map.put("1", 10086L);
         map.put("2", 10010L);
         map.put("3", 10000L);
-        FsBean mapBean = Fs.wrapBean(map, mapType);
+        FsBean mapBean = FsBean.wrap(map, mapType);
         FsLogger.system().info("mapBean: ", mapBean);
         FsProperty p1 = mapBean.getProperty("1");
         FsProperty p2 = mapBean.getProperty("2");
@@ -130,7 +130,7 @@ public class BeanTest {
         Assert.assertNull(mapBean.getProperty("2"));
         FsLogger.system().info("mapBean: ", mapBean);
 
-        FsBean mapObjBean = Fs.wrapBean(map);
+        FsBean mapObjBean = FsBean.wrap(map);
         FsProperty p1Obj = mapObjBean.getProperty("1");
         Assert.assertEquals(p1Obj.getType(), Object.class);
         Assert.assertEquals(
@@ -139,7 +139,7 @@ public class BeanTest {
         );
 
         Assert.assertThrows(IllegalArgumentException.class, () -> {
-            Fs.wrapBean(map, new TypeRef<Map<Object, Long>>() {
+            FsBean.wrap(map, new TypeRef<Map<Object, Long>>() {
             }.getType());
         });
     }
@@ -148,8 +148,8 @@ public class BeanTest {
     public void testBeanResolver() {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
-        FsBean ccBean1 = Fs.resolveBean(ccType);
-        FsBean ccBean2 = Fs.resolveBean(ccType);
+        FsBean ccBean1 = FsBean.resolve(ccType);
+        FsBean ccBean2 = FsBean.resolve(ccType);
         Assert.assertSame(ccBean1, ccBean2);
         FsBeanResolver resolver = FsBeanResolver.newResolver(
             Collections.singletonList(new DefaultBeanResolveHandler()),

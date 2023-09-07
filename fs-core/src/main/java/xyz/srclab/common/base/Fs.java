@@ -1,9 +1,7 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.bean.FsBean;
 import xyz.srclab.common.bean.FsBeanCopier;
-import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.TypeRef;
 
@@ -704,43 +702,6 @@ public class Fs {
     public static <T> T convertType(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options) {
         return FsConverter.defaultConverter().convertType(source, sourceType, targetType, options);
-    }
-
-    /**
-     * Resolves given type to {@link FsBean}.
-     *
-     * @param type given type
-     */
-    public static FsBean resolveBean(Type type) {
-        return FsBeanResolver.defaultResolver().resolve(type);
-    }
-
-    /**
-     * Wraps given map as a {@link FsBean}, of which type will be seen as Map&lt;String, Object>.
-     * This method is same with:
-     * <pre>
-     *     wrapMap(map, null);
-     * </pre>
-     *
-     * @param map given map
-     * @see #wrapBean(Map, Type)
-     */
-    public static FsBean wrapBean(Map<String, ?> map) {
-        return wrapBean(map, null);
-    }
-
-    /**
-     * Wraps given map as a {@link FsBean}, the key type of map type must be {@link String}.
-     * If the given map type is null, the map type will be seen as Map&lt;String, Object>.
-     * <p>
-     * Result of {@link FsBean#getProperties()} is immutable, but content may be different for each time calling.
-     * Because of the changes in given map, contents of return property map are also changed accordingly.
-     *
-     * @param map     given map
-     * @param mapType given map type
-     */
-    public static FsBean wrapBean(Map<String, ?> map, @Nullable Type mapType) {
-        return FsBeanResolver.defaultResolver().wrapMap(map, mapType);
     }
 
     /**
