@@ -17,9 +17,11 @@ import java.util.function.Supplier;
 
 final class SignImpl implements FsSign {
 
+    private final String algorithm;
     private final ThreadLocal<Signature> local;
 
-    SignImpl(Supplier<Signature> supplier) {
+    SignImpl(String algorithm, Supplier<Signature> supplier) {
+        this.algorithm = algorithm;
         this.local = ThreadLocal.withInitial(supplier);
     }
 
@@ -42,6 +44,11 @@ final class SignImpl implements FsSign {
     @Override
     public CryptoProcess prepare(InputStream source) {
         return new StreamCryptoProcess(source);
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return algorithm;
     }
 
     private final class ByteArrayCryptoProcess extends AbstractCryptoProcess {

@@ -20,12 +20,13 @@ public interface FsCipher extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm.
-     * Returned instance has a back thread-local cipher which supplied with {@link Cipher#getInstance(String)}.
+     * Returned instance has a back thread-local {@link Cipher}
+     * which supplied with {@link Cipher#getInstance(String)}.
      *
      * @param algorithm specified algorithm
      */
     static FsCipher getInstance(String algorithm) {
-        return new CipherImpl(() -> {
+        return new CipherImpl(algorithm, () -> {
             try {
                 return Cipher.getInstance(algorithm);
             } catch (Exception e) {
@@ -36,13 +37,14 @@ public interface FsCipher extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local cipher which supplied with {@link Cipher#getInstance(String, String)}.
+     * Returned instance has a back thread-local {@link Cipher}
+     * which supplied with {@link Cipher#getInstance(String, String)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsCipher getInstance(String algorithm, String provider) {
-        return new CipherImpl(() -> {
+        return new CipherImpl(algorithm, () -> {
             try {
                 return Cipher.getInstance(algorithm, provider);
             } catch (Exception e) {
@@ -53,13 +55,14 @@ public interface FsCipher extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local cipher which supplied with {@link Cipher#getInstance(String, Provider)}.
+     * Returned instance has a back thread-local {@link Cipher}
+     * which supplied with {@link Cipher#getInstance(String, Provider)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsCipher getInstance(String algorithm, Provider provider) {
-        return new CipherImpl(() -> {
+        return new CipherImpl(algorithm, () -> {
             try {
                 return Cipher.getInstance(algorithm, provider);
             } catch (Exception e) {

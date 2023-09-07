@@ -20,9 +20,11 @@ import java.util.function.Supplier;
 
 final class CipherImpl implements FsCipher {
 
+    private final String algorithm;
     private final ThreadLocal<Cipher> local;
 
-    CipherImpl(Supplier<Cipher> supplier) {
+    CipherImpl(String algorithm, Supplier<Cipher> supplier) {
+        this.algorithm = algorithm;
         this.local = ThreadLocal.withInitial(supplier);
     }
 
@@ -45,6 +47,11 @@ final class CipherImpl implements FsCipher {
     @Override
     public CryptoProcess prepare(InputStream source) {
         return new StreamCryptoProcess(source);
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return algorithm;
     }
 
     private final class ByteArrayCryptoProcess extends AbstractCryptoProcess {

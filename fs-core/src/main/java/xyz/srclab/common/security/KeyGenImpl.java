@@ -10,9 +10,11 @@ import java.util.function.Supplier;
 
 final class KeyGenImpl implements FsKeyGen {
 
+    private final String algorithm;
     private final ThreadLocal<KeyGenerator> local;
 
-    KeyGenImpl(Supplier<KeyGenerator> supplier) {
+    KeyGenImpl(String algorithm, Supplier<KeyGenerator> supplier) {
+        this.algorithm = algorithm;
         this.local = ThreadLocal.withInitial(supplier);
     }
 
@@ -96,5 +98,10 @@ final class KeyGenImpl implements FsKeyGen {
         } catch (Exception e) {
             throw new FsSecurityException(e);
         }
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return algorithm;
     }
 }

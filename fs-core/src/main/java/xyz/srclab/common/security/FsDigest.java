@@ -20,13 +20,13 @@ public interface FsDigest extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm.
-     * Returned instance has a back thread-local mac which supplied with
-     * {@link MessageDigest#getInstance(String)}.
+     * Returned instance has a back thread-local {@link MessageDigest}
+     * which supplied with {@link MessageDigest#getInstance(String)}.
      *
      * @param algorithm specified algorithm
      */
     static FsDigest getInstance(String algorithm) {
-        return new DigestImpl(() -> {
+        return new DigestImpl(algorithm, () -> {
             try {
                 return MessageDigest.getInstance(algorithm);
             } catch (Exception e) {
@@ -37,14 +37,14 @@ public interface FsDigest extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local mac which supplied with
-     * {@link MessageDigest#getInstance(String, String)}.
+     * Returned instance has a back thread-local {@link MessageDigest}
+     * which supplied with {@link MessageDigest#getInstance(String, String)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsDigest getInstance(String algorithm, String provider) {
-        return new DigestImpl(() -> {
+        return new DigestImpl(algorithm, () -> {
             try {
                 return MessageDigest.getInstance(algorithm, provider);
             } catch (Exception e) {
@@ -55,14 +55,14 @@ public interface FsDigest extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local mac which supplied with
-     * {@link MessageDigest#getInstance(String, Provider)}.
+     * Returned instance has a back thread-local
+     * which supplied with {@link MessageDigest#getInstance(String, Provider)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsDigest getInstance(String algorithm, Provider provider) {
-        return new DigestImpl(() -> {
+        return new DigestImpl(algorithm, () -> {
             try {
                 return MessageDigest.getInstance(algorithm, provider);
             } catch (Exception e) {

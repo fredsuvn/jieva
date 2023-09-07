@@ -17,9 +17,11 @@ import java.util.function.Supplier;
 
 final class DigestImpl implements FsDigest {
 
+    private final String algorithm;
     private final ThreadLocal<MessageDigest> local;
 
-    DigestImpl(Supplier<MessageDigest> supplier) {
+    DigestImpl(String algorithm, Supplier<MessageDigest> supplier) {
+        this.algorithm = algorithm;
         this.local = ThreadLocal.withInitial(supplier);
     }
 
@@ -47,6 +49,11 @@ final class DigestImpl implements FsDigest {
     @Override
     public CryptoProcess prepare(InputStream source) {
         return new StreamCryptoProcess(source);
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return algorithm;
     }
 
     private final class ByteArrayCryptoProcess extends AbstractCryptoProcess {

@@ -21,12 +21,13 @@ public interface FsSign extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm.
-     * Returned instance has a back thread-local mac which supplied with {@link Signature#getInstance(String)}.
+     * Returned instance has a back thread-local {@link Signature}
+     * which supplied with {@link Signature#getInstance(String)}.
      *
      * @param algorithm specified algorithm
      */
     static FsSign getInstance(String algorithm) {
-        return new SignImpl(() -> {
+        return new SignImpl(algorithm, () -> {
             try {
                 return Signature.getInstance(algorithm);
             } catch (Exception e) {
@@ -37,13 +38,14 @@ public interface FsSign extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local mac which supplied with {@link Signature#getInstance(String, String)}.
+     * Returned instance has a back thread-local {@link Signature}
+     * which supplied with {@link Signature#getInstance(String, String)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsSign getInstance(String algorithm, String provider) {
-        return new SignImpl(() -> {
+        return new SignImpl(algorithm, () -> {
             try {
                 return Signature.getInstance(algorithm, provider);
             } catch (Exception e) {
@@ -54,13 +56,14 @@ public interface FsSign extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local mac which supplied with {@link Signature#getInstance(String, Provider)}.
+     * Returned instance has a back thread-local {@link Signature}
+     * which supplied with {@link Signature#getInstance(String, Provider)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsSign getInstance(String algorithm, Provider provider) {
-        return new SignImpl(() -> {
+        return new SignImpl(algorithm, () -> {
             try {
                 return Signature.getInstance(algorithm, provider);
             } catch (Exception e) {

@@ -199,6 +199,26 @@ public class SecurityTest {
     }
 
     @Test
+    public void testKeyGen() throws Exception {
+        FsKeyGen keyGen = FsKeyGen.getInstance("AES");
+        Key key = keyGen.generateKey();
+        byte[] keyBytes = key.getEncoded();
+        Assert.assertEquals(key, FsKeyGen.generate("AES", keyBytes));
+
+        FsKeyPairGen keyPairGen = FsKeyPairGen.getInstance("RSA");
+        KeyPair keyPair = keyPairGen.generateKeyPair();
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+        byte[] publicBytes = publicKey.getEncoded();
+        byte[] privateBytes = privateKey.getEncoded();
+        FsKeyFactory keyFactory = FsKeyFactory.getInstance("RSA");
+        PublicKey newPublicKey = keyFactory.generatePublic(FsKeyPairGen.generateX509(publicBytes));
+        PrivateKey newPrivateKey = keyFactory.generatePrivate(FsKeyPairGen.generatePkcs8(privateBytes));
+        Assert.assertEquals(publicKey, newPublicKey);
+        Assert.assertEquals(privateKey, newPrivateKey);
+    }
+
+    @Test
     public void testCrypto() throws Exception {
         byte[] data = DATA.getBytes(FsString.CHARSET);
         byte[] data2 = TestUtil.buildRandomBytes(150);

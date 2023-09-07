@@ -20,12 +20,13 @@ public interface FsMac extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm.
-     * Returned instance has a back thread-local mac which supplied with {@link Mac#getInstance(String)}.
+     * Returned instance has a back thread-local {@link Mac}
+     * which supplied with {@link Mac#getInstance(String)}.
      *
      * @param algorithm specified algorithm
      */
     static FsMac getInstance(String algorithm) {
-        return new MacImpl(() -> {
+        return new MacImpl(algorithm, () -> {
             try {
                 return Mac.getInstance(algorithm);
             } catch (Exception e) {
@@ -36,13 +37,14 @@ public interface FsMac extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local mac which supplied with {@link Mac#getInstance(String, String)}.
+     * Returned instance has a back thread-local {@link Mac}
+     * which supplied with {@link Mac#getInstance(String, String)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsMac getInstance(String algorithm, String provider) {
-        return new MacImpl(() -> {
+        return new MacImpl(algorithm, () -> {
             try {
                 return Mac.getInstance(algorithm, provider);
             } catch (Exception e) {
@@ -53,13 +55,14 @@ public interface FsMac extends Prepareable {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local mac which supplied with {@link Mac#getInstance(String, Provider)}.
+     * Returned instance has a back thread-local {@link Mac}
+     * which supplied with {@link Mac#getInstance(String, Provider)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsMac getInstance(String algorithm, Provider provider) {
-        return new MacImpl(() -> {
+        return new MacImpl(algorithm, () -> {
             try {
                 return Mac.getInstance(algorithm, provider);
             } catch (Exception e) {

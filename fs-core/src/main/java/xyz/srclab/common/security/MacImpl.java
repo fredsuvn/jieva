@@ -17,9 +17,11 @@ import java.util.function.Supplier;
 
 final class MacImpl implements FsMac {
 
+    private final String algorithm;
     private final ThreadLocal<Mac> local;
 
-    MacImpl(Supplier<Mac> supplier) {
+    MacImpl(String algorithm, Supplier<Mac> supplier) {
+        this.algorithm = algorithm;
         this.local = ThreadLocal.withInitial(supplier);
     }
 
@@ -47,6 +49,11 @@ final class MacImpl implements FsMac {
     @Override
     public CryptoProcess prepare(InputStream source) {
         return new StreamCryptoProcess(source);
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return algorithm;
     }
 
     private final class ByteArrayCryptoProcess extends AbstractCryptoProcess {

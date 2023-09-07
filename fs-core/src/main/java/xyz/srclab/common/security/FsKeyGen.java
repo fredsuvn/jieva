@@ -15,16 +15,17 @@ import java.security.spec.AlgorithmParameterSpec;
  * @author fredsuvn
  * @see KeyGenerator
  */
-public interface FsKeyGen {
+public interface FsKeyGen extends SecurityAlgorithm {
 
     /**
      * Returns new instance of specified algorithm.
-     * Returned instance has a back thread-local mac which supplied with {@link KeyGenerator#getInstance(String)}.
+     * Returned instance has a back thread-local {@link KeyGenerator}
+     * which supplied with {@link KeyGenerator#getInstance(String)}.
      *
      * @param algorithm specified algorithm
      */
     static FsKeyGen getInstance(String algorithm) {
-        return new KeyGenImpl(() -> {
+        return new KeyGenImpl(algorithm, () -> {
             try {
                 return KeyGenerator.getInstance(algorithm);
             } catch (Exception e) {
@@ -35,13 +36,14 @@ public interface FsKeyGen {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local mac which supplied with {@link KeyGenerator#getInstance(String, String)}.
+     * Returned instance has a back thread-local {@link KeyGenerator}
+     * which supplied with {@link KeyGenerator#getInstance(String, String)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsKeyGen getInstance(String algorithm, String provider) {
-        return new KeyGenImpl(() -> {
+        return new KeyGenImpl(algorithm, () -> {
             try {
                 return KeyGenerator.getInstance(algorithm, provider);
             } catch (Exception e) {
@@ -52,13 +54,14 @@ public interface FsKeyGen {
 
     /**
      * Returns new instance of specified algorithm and provider.
-     * Returned instance has a back thread-local mac which supplied with {@link KeyGenerator#getInstance(String, Provider)}.
+     * Returned instance has a back thread-local {@link KeyGenerator}
+     * which supplied with {@link KeyGenerator#getInstance(String, Provider)}.
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
      */
     static FsKeyGen getInstance(String algorithm, Provider provider) {
-        return new KeyGenImpl(() -> {
+        return new KeyGenImpl(algorithm, () -> {
             try {
                 return KeyGenerator.getInstance(algorithm, provider);
             } catch (Exception e) {

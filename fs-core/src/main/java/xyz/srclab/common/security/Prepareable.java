@@ -3,7 +3,7 @@ package xyz.srclab.common.security;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-interface Prepareable {
+interface Prepareable extends SecurityAlgorithm {
 
     /**
      * Prepares for source array.
