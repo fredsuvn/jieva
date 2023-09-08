@@ -1,6 +1,7 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.bean.CopyOptions;
 import xyz.srclab.common.bean.FsBeanCopier;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.TypeRef;
@@ -718,6 +719,7 @@ public class Fs {
     /**
      * Copies properties from source object to dest object by {@link FsBeanCopier}.
      * The properties with null value will not be copied if {@code copyNull} is true.
+     * Otherwise, the null will not be copied.
      *
      * @param source   source object
      * @param dest     dest object
@@ -728,10 +730,10 @@ public class Fs {
         if (copyNull) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        return FsBeanCopier.newBuilder()
+        CopyOptions options = CopyOptions.DEFAULT.toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
-            .build()
-            .copyProperties(source, dest);
+            .build();
+        return FsBeanCopier.defaultCopier().copyProperties(source, dest, options);
     }
 
     /**
@@ -747,10 +749,10 @@ public class Fs {
         if (FsArray.isEmpty(ignoredProperties)) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        return FsBeanCopier.newBuilder()
+        CopyOptions options = CopyOptions.DEFAULT.toBuilder()
             .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build()
-            .copyProperties(source, dest);
+            .build();
+        return FsBeanCopier.defaultCopier().copyProperties(source, dest, options);
     }
 
     /**
@@ -768,11 +770,11 @@ public class Fs {
         if (copyNull && FsArray.isEmpty(ignoredProperties)) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        return FsBeanCopier.newBuilder()
+        CopyOptions options = CopyOptions.DEFAULT.toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
             .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build()
-            .copyProperties(source, dest);
+            .build();
+        return FsBeanCopier.defaultCopier().copyProperties(source, dest, options);
     }
 
     /**
@@ -803,10 +805,10 @@ public class Fs {
         if (copyNull) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        return FsBeanCopier.newBuilder()
+        CopyOptions options = CopyOptions.DEFAULT.toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
-            .build()
-            .copyProperties(source, sourceType, dest, destType);
+            .build();
+        return FsBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType, options);
     }
 
     /**
@@ -825,10 +827,10 @@ public class Fs {
         if (FsArray.isEmpty(ignoredProperties)) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        return FsBeanCopier.newBuilder()
+        CopyOptions options = CopyOptions.DEFAULT.toBuilder()
             .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build()
-            .copyProperties(source, sourceType, dest, destType);
+            .build();
+        return FsBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType, options);
     }
 
     /**
@@ -849,11 +851,11 @@ public class Fs {
         if (copyNull && FsArray.isEmpty(ignoredProperties)) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        return FsBeanCopier.newBuilder()
+        CopyOptions options = CopyOptions.DEFAULT.toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
             .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build()
-            .copyProperties(source, sourceType, dest, destType);
+            .build();
+        return FsBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType, options);
     }
 
     /**

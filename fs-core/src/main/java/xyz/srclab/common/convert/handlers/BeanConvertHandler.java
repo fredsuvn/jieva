@@ -2,6 +2,7 @@ package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
+import xyz.srclab.common.bean.CopyOptions;
 import xyz.srclab.common.bean.FsBeanCopier;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
@@ -105,6 +106,7 @@ public class BeanConvertHandler implements Handler {
         } else {
             dest = FsType.newInstance(targetRawType);
         }
-        return beanCopier.copyProperties(source, sourceType, dest, targetType, converter);
+        return beanCopier.copyProperties(
+            source, sourceType, dest, targetType, CopyOptions.DEFAULT.toBuilder().converter(converter).build());
     }
 }

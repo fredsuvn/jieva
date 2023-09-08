@@ -9,10 +9,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.bean.FsBean;
-import xyz.srclab.common.bean.FsBeanCopier;
-import xyz.srclab.common.bean.FsBeanResolver;
-import xyz.srclab.common.bean.FsProperty;
+import xyz.srclab.common.bean.*;
 import xyz.srclab.common.bean.handlers.DefaultBeanResolveHandler;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.TypeRef;
@@ -233,7 +230,7 @@ public class BeanTest {
             new HashMap<>(),
             new TypeRef<Map<Kk, String>>() {
             }.getType(),
-            kConverter
+            CopyOptions.DEFAULT.toBuilder().converter(kConverter).build()
         );
         Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(cc1.getI1(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(cc1.getI2(), String::valueOf));
@@ -249,7 +246,7 @@ public class BeanTest {
             new Cc<>(),
             new TypeRef<Cc<String>>() {
             }.getType(),
-            kConverter
+            CopyOptions.DEFAULT.toBuilder().converter(kConverter).build()
         );
         Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(cs2.getI1(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(cs2.getI2(), String::valueOf));
@@ -264,7 +261,7 @@ public class BeanTest {
             new HashMap<>(),
             new TypeRef<Map<String, Kk>>() {
             }.getType(),
-            kConverter
+            CopyOptions.DEFAULT.toBuilder().converter(kConverter).build()
         );
         Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(map2.get("i1"), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(map2.get("i2"), String::valueOf));
