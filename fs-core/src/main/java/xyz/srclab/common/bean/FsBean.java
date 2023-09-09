@@ -12,7 +12,6 @@ import java.util.Map;
  *
  * @author fredsuvn
  * @see FsBeanResolver
- * @see FsBeanCopier
  */
 @ThreadSafe
 public interface FsBean {
@@ -71,7 +70,7 @@ public interface FsBean {
     /**
      * Returns all properties in this bean.
      */
-    Map<String, FsProperty> getProperties();
+    Map<String, FsBeanProperty> getProperties();
 
     /**
      * Returns property with given name in this bean.
@@ -79,7 +78,7 @@ public interface FsBean {
      * @param name given name
      */
     @Nullable
-    default FsProperty getProperty(String name) {
+    default FsBeanProperty getProperty(String name) {
         return getProperties().get(name);
     }
 }

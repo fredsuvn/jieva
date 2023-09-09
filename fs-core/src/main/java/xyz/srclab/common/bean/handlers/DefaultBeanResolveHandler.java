@@ -6,8 +6,8 @@ import xyz.srclab.common.base.FsCase;
 import xyz.srclab.common.base.FsFinal;
 import xyz.srclab.common.bean.FsBean;
 import xyz.srclab.common.bean.FsBeanException;
+import xyz.srclab.common.bean.FsBeanProperty;
 import xyz.srclab.common.bean.FsBeanResolver;
-import xyz.srclab.common.bean.FsProperty;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.FsInvoker;
 import xyz.srclab.common.reflect.FsType;
@@ -136,14 +136,14 @@ public class DefaultBeanResolveHandler implements FsBeanResolver.Handler {
                 }
             }
             Field field = findField(name, rawType);
-            builder.getProperties().put(name, new DefaultFsPropertyImpl(builder, name, getter, setter, field, returnType));
+            builder.getProperties().put(name, new DefaultFsBeanPropertyImpl(builder, name, getter, setter, field, returnType));
             setters.remove(name);
         });
         setters.forEach((name, setter) -> {
             Field field = findField(name, rawType);
             Type setType = setter.getGenericParameterTypes()[0];
             setType = getActualType(setType, typeParameterMapping, stack);
-            builder.getProperties().put(name, new DefaultFsPropertyImpl(builder, name, null, setter, field, setType));
+            builder.getProperties().put(name, new DefaultFsBeanPropertyImpl(builder, name, null, setter, field, setType));
         });
         return Fs.CONTINUE;
     }
@@ -221,7 +221,7 @@ public class DefaultBeanResolveHandler implements FsBeanResolver.Handler {
         return null;
     }
 
-    private final class DefaultFsPropertyImpl extends FsFinal implements FsProperty {
+    private final class DefaultFsBeanPropertyImpl extends FsFinal implements FsBeanProperty {
 
         private final FsBean owner;
         private final String name;
@@ -236,7 +236,7 @@ public class DefaultBeanResolveHandler implements FsBeanResolver.Handler {
         private final List<Annotation> fieldAnnotations;
         private final List<Annotation> allAnnotations;
 
-        private DefaultFsPropertyImpl(
+        private DefaultFsBeanPropertyImpl(
             FsBean owner, String name,
             @Nullable Method getter, @Nullable Method setter,
             @Nullable Field field, Type type
@@ -365,10 +365,10 @@ public class DefaultBeanResolveHandler implements FsBeanResolver.Handler {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof DefaultFsPropertyImpl)) {
+            if (!(o instanceof DefaultFsBeanPropertyImpl)) {
                 return false;
             }
-            DefaultFsPropertyImpl other = (DefaultFsPropertyImpl) o;
+            DefaultFsBeanPropertyImpl other = (DefaultFsBeanPropertyImpl) o;
             return Objects.equals(owner.getType(), other.owner.getType())
                 && Objects.equals(name, other.name)
                 && Objects.equals(type, other.type);

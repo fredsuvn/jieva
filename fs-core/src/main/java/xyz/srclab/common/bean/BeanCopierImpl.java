@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.convert.FsConvertException;
 import xyz.srclab.common.convert.FsConverter;
@@ -8,87 +9,129 @@ import xyz.srclab.common.reflect.FsType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 final class BeanCopierImpl implements FsBeanCopier {
 
     static BeanCopierImpl INSTANCE = new BeanCopierImpl();
 
     @Override
-    public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, CopyOptions options) {
+    public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, Options options) {
+        copyProperties0(source, sourceType, dest, destType, options);
+        return dest;
+    }
+
+    private void copyProperties0(Object source, Type sourceType, Object dest, Type destType, Options options) {
         if (source instanceof Map) {
             ParameterizedType sourceMapType = FsType.getGenericSuperType(sourceType, Map.class);
             if (sourceMapType == null) {
                 throw new IllegalArgumentException("Not a map type: " + sourceType + ".");
             }
             Type[] sourceActualTypes = sourceMapType.getActualTypeArguments();
+            Type sourceKeyType = sourceActualTypes[0];
             Type sourceValueType = sourceActualTypes[1];
             if (dest instanceof Map) {
-                FsConverter converter = Fs.notNull(options.getConverter(), FsConverter.defaultConverter());
                 ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
                 if (destMapType == null) {
                     throw new IllegalArgumentException("Not a map type: " + destType + ".");
                 }
                 Type[] destActualTypes = destMapType.getActualTypeArguments();
+                Type destKeyType = destActualTypes[0];
                 Type destValueType = destActualTypes[1];
-                Map<Object, Object> sourceMap = (Map<Object, Object>) source;
-                Map<Object, Object> destMap = (Map<Object, Object>) dest;
+                copyProperties00(source, sourceType, sourceKeyType, sourceValueType, dest, destType, destKeyType, destValueType, options);
+            } else {
+                copyProperties00(source, sourceType, sourceKeyType, sourceValueType, dest, destType, null, null, options);
+            }
+        } else {
+            if (dest instanceof Map) {
+                ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
+                if (destMapType == null) {
+                    throw new IllegalArgumentException("Not a map type: " + destType + ".");
+                }
+                Type[] destActualTypes = destMapType.getActualTypeArguments();
+                Type destKeyType = destActualTypes[0];
+                Type destValueType = destActualTypes[1];
+                copyProperties00(source, sourceType, null, null, dest, destType, destKeyType, destValueType, options);
+            } else {
+                copyProperties00(source, sourceType, null, null, dest, destType, null, null, options);
+            }
+        }
+    }
+
+    private void copyProperties00(
+        Object source, Type sourceType, Type sourceKeyType, Type sourceValueType,
+        Object dest, Type destType, Type destKeyType, Type destValueType,
+        Options options
+    ) {
+        Function<Object, Object> propertyNameMapper = options.getPropertyNameMapper() != null ?
+            options.getPropertyNameMapper()
+            :
+            n -> n;
+        BiPredicate<Object, @Nullable Object> sourcePropertyFilter = options.getSourcePropertyFilter() != null ?
+            options.getSourcePropertyFilter()
+            :
+            (k, v) -> true;
+        BiPredicate<Object, @Nullable Object> destPropertyFilter = options.getDestPropertyFilter() != null ?
+            options.getDestPropertyFilter()
+            :
+            (k, v) -> true;
+        if (source instanceof Map) {
+            if (dest instanceof Map) {
+                FsConverter converter = Fs.notNull(options.getConverter(), FsConverter.defaultConverter());
+                Map<Object, Object> sourceMap = Fs.as(source);
+                Map<Object, Object> destMap = Fs.as(dest);
                 sourceMap.forEach((key, value) -> {
-                    if (options.getSourcePropertyFilter() != null
-                        && !options.getSourcePropertyFilter().test(key, value)) {
+                    if (!sourcePropertyFilter.test(key, value)) {
                         return;
                     }
-                    Object destKey = options.getPropertyNameMapper() == null ?
-                        key : options.getPropertyNameMapper().apply(key);
+                    Object destKey = propertyNameMapper.apply(key);
                     if (destKey == null) {
                         return;
                     }
-                    if (!options.isPutIfNotContained() && !destMap.containsKey(destKey)) {
+                    Object newDestKey = tryConvert(destKey, sourceKeyType, destKeyType, converter, options);
+                    if (newDestKey == Fs.RETURN) {
                         return;
                     }
-                    Object newDestValue = converter.convertObject(value, sourceValueType, destValueType);
+                    if (!options.isPutIfNotContained() && !destMap.containsKey(newDestKey)) {
+                        return;
+                    }
+                    Object newDestValue = tryConvert(value, sourceValueType, destValueType, converter, options);
                     if (newDestValue == Fs.RETURN) {
-                        if (options.isThrowIfConvertFailed()) {
-                            throw new FsConvertException(sourceValueType, destValueType);
-                        } else {
-                            return;
-                        }
-                    }
-                    if (options.getDestPropertyFilter() != null
-                        && !options.getDestPropertyFilter().test(destKey, newDestValue)) {
                         return;
                     }
-                    destMap.put(destKey, newDestValue);
+                    if (!destPropertyFilter.test(newDestKey, newDestValue)) {
+                        return;
+                    }
+                    destMap.put(newDestKey, newDestValue);
                 });
             } else {
                 FsBeanResolver resolver = Fs.notNull(options.getBeanResolver(), FsBeanResolver.defaultResolver());
                 FsConverter converter = Fs.notNull(options.getConverter(), FsConverter.defaultConverter());
+                Map<Object, Object> sourceMap = Fs.as(source);
                 FsBean destBean = resolver.resolve(destType);
-                Map<Object, Object> sourceMap = (Map<Object, Object>) source;
                 sourceMap.forEach((key, value) -> {
-                    if (options.getSourcePropertyFilter() != null
-                        && !options.getSourcePropertyFilter().test(key, value)) {
+                    if (!sourcePropertyFilter.test(key, value)) {
                         return;
                     }
-                    Object destNameObj = options.getPropertyNameMapper() == null ?
-                        key : options.getPropertyNameMapper().apply(key);
+                    Object destNameObj = propertyNameMapper.apply(key);
                     if (destNameObj == null) {
                         return;
                     }
-                    String destName = destNameObj.toString();
-                    FsProperty destProperty = destBean.getProperty(destName);
+                    Object newDestNameObj = tryConvert(destNameObj, sourceKeyType, String.class, converter, options);
+                    if (newDestNameObj == Fs.RETURN) {
+                        return;
+                    }
+                    String newDestName = (String) newDestNameObj;
+                    FsBeanProperty destProperty = destBean.getProperty(newDestName);
                     if (destProperty == null || !destProperty.isWriteable()) {
                         return;
                     }
-                    Object newDestValue = converter.convertObject(value, sourceValueType, destProperty.getType());
+                    Object newDestValue = tryConvert(value, sourceValueType, destProperty.getType(), converter, options);
                     if (newDestValue == Fs.RETURN) {
-                        if (options.isThrowIfConvertFailed()) {
-                            throw new FsConvertException(sourceValueType, destProperty.getType());
-                        } else {
-                            return;
-                        }
+                        return;
                     }
-                    if (options.getDestPropertyFilter() != null
-                        && !options.getDestPropertyFilter().test(destName, newDestValue)) {
+                    if (!destPropertyFilter.test(newDestName, newDestValue)) {
                         return;
                     }
                     destProperty.set(dest, newDestValue);
@@ -99,43 +142,34 @@ final class BeanCopierImpl implements FsBeanCopier {
             FsConverter converter = Fs.notNull(options.getConverter(), FsConverter.defaultConverter());
             FsBean sourceBean = resolver.resolve(sourceType);
             if (dest instanceof Map) {
-                ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
-                if (destMapType == null) {
-                    throw new IllegalArgumentException("Not a map type: " + destType + ".");
-                }
-                Type[] destActualTypes = destMapType.getActualTypeArguments();
-                Type destValueType = destActualTypes[1];
-                Map<Object, Object> destMap = (Map<Object, Object>) dest;
+                Map<Object, Object> destMap = Fs.as(dest);
                 sourceBean.getProperties().forEach((sourceName, sourceProperty) -> {
                     if (!sourceProperty.isReadable()) {
                         return;
                     }
                     Object sourceValue = sourceProperty.get(source);
-                    if (options.getSourcePropertyFilter() != null
-                        && !options.getSourcePropertyFilter().test(sourceName, sourceValue)) {
+                    if (!sourcePropertyFilter.test(sourceName, sourceValue)) {
                         return;
                     }
-                    Object destKey = options.getPropertyNameMapper() == null ?
-                        sourceName : options.getPropertyNameMapper().apply(sourceName);
+                    Object destKey = propertyNameMapper.apply(sourceName);
                     if (destKey == null) {
+                        return;
+                    }
+                    Object newDestKey = tryConvert(destKey, String.class, destKeyType, converter, options);
+                    if (newDestKey == Fs.RETURN) {
                         return;
                     }
                     if (!options.isPutIfNotContained() && !destMap.containsKey(destKey)) {
                         return;
                     }
-                    Object newDestValue = converter.convertObject(sourceValue, sourceProperty.getType(), destValueType);
+                    Object newDestValue = tryConvert(sourceValue, sourceProperty.getType(), destValueType, converter, options);
                     if (newDestValue == Fs.RETURN) {
-                        if (options.isThrowIfConvertFailed()) {
-                            throw new FsConvertException(sourceProperty.getType(), destValueType);
-                        } else {
-                            return;
-                        }
-                    }
-                    if (options.getDestPropertyFilter() != null
-                        && !options.getDestPropertyFilter().test(destKey, newDestValue)) {
                         return;
                     }
-                    destMap.put(destKey, newDestValue);
+                    if (!destPropertyFilter.test(destKey, newDestValue)) {
+                        return;
+                    }
+                    destMap.put(newDestKey, newDestValue);
                 });
             } else {
                 FsBean destBean = resolver.resolve(destType);
@@ -144,37 +178,47 @@ final class BeanCopierImpl implements FsBeanCopier {
                         return;
                     }
                     Object sourceValue = sourceProperty.get(source);
-                    if (options.getSourcePropertyFilter() != null
-                        && !options.getSourcePropertyFilter().test(sourceName, sourceValue)) {
+                    if (!sourcePropertyFilter.test(sourceName, sourceValue)) {
                         return;
                     }
-                    Object destNameObj = options.getPropertyNameMapper() == null ?
-                        sourceName : options.getPropertyNameMapper().apply(sourceName);
+                    Object destNameObj = propertyNameMapper.apply(sourceName);
                     if (destNameObj == null) {
                         return;
                     }
-                    String destName = destNameObj.toString();
-                    FsProperty destProperty = destBean.getProperty(destName);
+                    Object newDestNameObj = tryConvert(destNameObj, String.class, String.class, converter, options);
+                    if (newDestNameObj == Fs.RETURN) {
+                        return;
+                    }
+                    String newDestName = (String) newDestNameObj;
+                    FsBeanProperty destProperty = destBean.getProperty(newDestName);
                     if (destProperty == null || !destProperty.isWriteable()) {
                         return;
                     }
-                    Object newDestValue = converter.convertObject(
-                        sourceValue, sourceProperty.getType(), destProperty.getType());
+                    Object newDestValue = tryConvert(sourceValue, sourceProperty.getType(), destProperty.getType(), converter, options);
                     if (newDestValue == Fs.RETURN) {
-                        if (options.isThrowIfConvertFailed()) {
-                            throw new FsConvertException(sourceProperty.getType(), destProperty.getType());
-                        } else {
-                            return;
-                        }
+                        return;
                     }
-                    if (options.getDestPropertyFilter() != null
-                        && !options.getDestPropertyFilter().test(destName, newDestValue)) {
+                    if (!destPropertyFilter.test(newDestName, newDestValue)) {
                         return;
                     }
                     destProperty.set(dest, newDestValue);
                 });
             }
         }
-        return dest;
+    }
+
+    private Object tryConvert(
+        Object value, Type fromType, Type destType,
+        FsConverter converter, Options options
+    ) {
+        Object newValue = converter.convertObject(value, fromType, destType);
+        if (newValue == Fs.RETURN) {
+            if (options.isThrowIfConvertFailed()) {
+                throw new FsConvertException(fromType, destType);
+            } else {
+                return Fs.RETURN;
+            }
+        }
+        return newValue;
     }
 }

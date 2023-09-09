@@ -96,7 +96,7 @@ public interface FsBeanResolver {
             final class FsBeanBuilderImpl implements Handler.BeanBuilder {
 
                 private final Type type;
-                private volatile Map<String, FsProperty> properties = new LinkedHashMap<>();
+                private volatile Map<String, FsBeanProperty> properties = new LinkedHashMap<>();
                 private volatile boolean built = false;
                 private int hash = 0;
                 private String toString = null;
@@ -111,7 +111,7 @@ public interface FsBeanResolver {
                 }
 
                 @Override
-                public Map<String, FsProperty> getProperties() {
+                public Map<String, FsBeanProperty> getProperties() {
                     return properties;
                 }
 
@@ -163,7 +163,7 @@ public interface FsBeanResolver {
                 }
 
                 private FsBean build() {
-                    Map<String, FsProperty> builtProperties = this.properties;
+                    Map<String, FsBeanProperty> builtProperties = this.properties;
                     properties = Collections.unmodifiableMap(new LinkedHashMap<>(builtProperties));
                     built = true;
                     return this;
@@ -212,7 +212,7 @@ public interface FsBeanResolver {
             private final Type valueType;
             private final Map<String, Node> propertyNodes = new LinkedHashMap<>();
             private int propertyVersion = 0;
-            private Map<String, FsProperty> properties;
+            private Map<String, FsBeanProperty> properties;
 
             private FsMapBeanImpl(Map<String, Object> map, @Nullable Type mapType) {
                 this.mapObject = map;
@@ -238,11 +238,11 @@ public interface FsBeanResolver {
             }
 
             @Override
-            public synchronized Map<String, FsProperty> getProperties() {
+            public synchronized Map<String, FsBeanProperty> getProperties() {
                 // first init
                 if (properties == null) {
                     mapObject.forEach((k, v) -> {
-                        FsProperty property = new FsMapPropertyImpl(k);
+                        FsBeanProperty property = new FsMapBeanPropertyImpl(k);
                         propertyNodes.put(k, new Node(propertyVersion, property));
                     });
                     properties = Collections.unmodifiableMap(
@@ -257,7 +257,7 @@ public interface FsBeanResolver {
                 for (String key : keySet) {
                     Node node = propertyNodes.get(key);
                     if (node == null) {
-                        FsProperty property = new FsMapPropertyImpl(key);
+                        FsBeanProperty property = new FsMapBeanPropertyImpl(key);
                         propertyNodes.put(key, new Node(propertyVersion, property));
                         hasNewNode = true;
                     } else {
@@ -310,14 +310,14 @@ public interface FsBeanResolver {
             @AllArgsConstructor
             final class Node {
                 private int version;
-                private FsProperty property;
+                private FsBeanProperty property;
             }
 
-            final class FsMapPropertyImpl implements FsProperty {
+            final class FsMapBeanPropertyImpl implements FsBeanProperty {
 
                 private final String key;
 
-                private FsMapPropertyImpl(String key) {
+                private FsMapBeanPropertyImpl(String key) {
                     this.key = key;
                 }
 
@@ -391,11 +391,11 @@ public interface FsBeanResolver {
                     if (this == o) {
                         return true;
                     }
-                    if (!(o instanceof FsMapPropertyImpl)) {
+                    if (!(o instanceof FsMapBeanPropertyImpl)) {
                         return false;
                     }
-                    return Objects.equals(key, ((FsMapPropertyImpl) o).key)
-                        && Objects.equals(FsMapBeanImpl.this, ((FsMapPropertyImpl) o).getOwner());
+                    return Objects.equals(key, ((FsMapBeanPropertyImpl) o).key)
+                        && Objects.equals(FsMapBeanImpl.this, ((FsMapBeanPropertyImpl) o).getOwner());
                 }
 
                 @Override
@@ -435,7 +435,7 @@ public interface FsBeanResolver {
          * <p>
          * Given bean builder itself is the final resolved {@link FsBean}, it is mutable in resolving process,
          * and finally become to immutable. That means, it can be directly used as the return value of
-         * {@link FsProperty#getOwner()}.
+         * {@link FsBeanProperty#getOwner()}.
          * <p>
          * If this method returns {@link Fs#CONTINUE}, means the resolving will continue to next handler.
          * Otherwise, the resolving will end (such as return null or {@link Fs#BREAK}) .

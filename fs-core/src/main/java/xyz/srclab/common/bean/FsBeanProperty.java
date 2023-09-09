@@ -17,7 +17,7 @@ import java.util.Objects;
  * @author fredsuvn
  */
 @ThreadSafe
-public interface FsProperty {
+public interface FsBeanProperty {
 
     /**
      * Returns property value of given bean instance.
