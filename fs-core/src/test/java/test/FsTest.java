@@ -134,6 +134,18 @@ public class FsTest {
         FsLogger.system().info(FsSystem.isJdk9OrHigher());
     }
 
+    @Test
+    public void testEnum() {
+        Assert.assertEquals(Te.A, Fs.findEnum(Te.class, 0));
+        Assert.assertEquals(Te.B, Fs.findEnum(Te.class, "B", false));
+        Assert.assertEquals(Te.C, Fs.findEnum(Te.class, "c", true));
+        Assert.assertNull(Fs.findEnum(Te.class, 10));
+        Assert.assertNull(Fs.findEnum(Te.class, "d", false));
+        Assert.expectThrows(IllegalArgumentException.class, () -> Fs.findEnum(Te.class, -1));
+        Assert.expectThrows(IllegalArgumentException.class, () -> Fs.findEnum(Fs.class, -1));
+        Assert.expectThrows(IllegalArgumentException.class, () -> Fs.findEnum(Fs.class, "a", true));
+    }
+
     private static final class T1 {
         public static void invoke1() {
             T2.invoke2();
@@ -158,5 +170,9 @@ public class FsTest {
             Assert.assertEquals(element3.getClassName(), T2.class.getName());
             Assert.assertEquals(element3.getMethodName(), "invoke2");
         }
+    }
+
+    public enum Te {
+        A, B, C
     }
 }

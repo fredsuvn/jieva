@@ -3,7 +3,8 @@ package xyz.srclab.common.convert.handlers;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsArray;
-import xyz.srclab.common.base.FsObj;
+import xyz.srclab.common.base.obj.FsObj;
+import xyz.srclab.common.base.obj.ParameterizedObj;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
@@ -67,7 +68,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         }
         if (targetType instanceof Class) {
             if (((Class<?>) targetType).isArray()) {
-                FsObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
+                ParameterizedObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
                 if (sourceInfo == null) {
                     return Fs.CONTINUE;
                 }
@@ -75,7 +76,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             }
             return convertIterableType(source, sourceType, targetType, options, converter);
         } else if (targetType instanceof GenericArrayType) {
-            FsObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
+            ParameterizedObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
             if (sourceInfo == null) {
                 return Fs.CONTINUE;
             }
@@ -91,11 +92,11 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (targetItType == null) {
             return Fs.CONTINUE;
         }
-        FsObj<Iterable<?>> sourceInfo = toGenericInfo(obj, sourceType);
+        ParameterizedObj<Iterable<?>> sourceInfo = toGenericInfo(obj, sourceType);
         if (sourceInfo == null) {
             return Fs.CONTINUE;
         }
-        if (sourceInfo.getRawType().isArray()) {
+        if (FsType.getRawType(sourceInfo.getType()).isArray()) {
             return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], options, converter);
         }
         Generator generator = GENERATOR_MAP.get(FsType.getRawType(targetItType));
@@ -145,7 +146,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
 
     @Nullable
     private Object convertArray(
-        FsObj<Iterable<?>> sourceInfo,
+        ParameterizedObj<Iterable<?>> sourceInfo,
         Type targetComponentType,
         FsConverter.Options options,
         FsConverter converter
@@ -172,15 +173,17 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Nullable
-    private FsObj<Iterable<?>> toGenericInfo(Object obj, Type type) {
+    private ParameterizedObj<Iterable<?>> toGenericInfo(Object obj, Type type) {
         if (type instanceof Class && ((Class<?>) type).isArray()) {
             Iterable<?> it = asIterable(obj);
             if (it == null) {
                 return null;
             }
-            return FsObj.wrap(
-                it,
-                FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+            return Fs.as(
+                FsObj.wrap(
+                    it,
+                    FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+                ).toParameterizedObj()
             );
         }
         if (type instanceof GenericArrayType) {
@@ -188,9 +191,11 @@ public class CollectConvertHandler implements FsConverter.Handler {
             if (it == null) {
                 return null;
             }
-            return FsObj.wrap(
-                it,
-                FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+            return Fs.as(
+                FsObj.wrap(
+                    it,
+                    FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+                ).toParameterizedObj()
             );
         }
         if (!(obj instanceof Iterable)) {
@@ -204,7 +209,9 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (it == null) {
             return null;
         }
-        return FsObj.wrap(it, itType);
+        return Fs.as(
+            FsObj.wrap(it, itType).toParameterizedObj()
+        );
     }
 
     @Nullable

@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.base.FsObj;
+import xyz.srclab.common.base.obj.FsObj;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
@@ -49,55 +49,55 @@ public class TypeTest {
     public void testFsObj() {
         Assert.assertEquals(
             FsObj.wrap(null, new TypeRef<List<?>>() {
-            }.getType()),
+            }),
             FsObj.wrap(null, new TypeRef<List<?>>() {
-            }.getType())
+            })
         );
         FsObj<?> cType = FsObj.wrap(null, String.class);
         Assert.assertEquals(
-            cType.getClassType(),
+            cType.toClassObj().getType(),
             String.class
         );
         FsObj<?> pType = FsObj.wrap(null, new TypeRef<Map<String, Integer>>() {
         }.getType());
         Assert.assertEquals(
-            pType.getParameterizedType(),
+            pType.toParameterizedObj().getType(),
             new TypeRef<Map<String, Integer>>() {
             }.getType()
         );
         Assert.assertEquals(
-            pType.getActualTypeArgument(0),
+            pType.toParameterizedObj().getActualTypeArgument(0),
             String.class
         );
         Assert.assertEquals(
-            pType.getActualTypeArgument(1),
+            pType.toParameterizedObj().getActualTypeArgument(1),
             Integer.class
         );
         FsObj<?> wType = FsObj.wrap(null,
             FsType.wildcardType(Collections.singletonList(String.class), null));
         Assert.assertEquals(
-            wType.getWildcardType(),
+            wType.toWildcardObj().getType(),
             FsType.wildcardType(Collections.singletonList(String.class), null)
         );
         Assert.assertEquals(
-            wType.getUpperBound(),
+            wType.toWildcardObj().getUpperBound(),
             String.class
         );
         wType = FsObj.wrap(null,
             FsType.wildcardType(null, Collections.singletonList(Integer.class)));
         Assert.assertEquals(
-            wType.getLowerBound(),
+            wType.toWildcardObj().getLowerBound(),
             Integer.class
         );
         FsObj<?> gType = FsObj.wrap(null, new TypeRef<Map<String, Integer>[]>() {
         }.getType());
         Assert.assertEquals(
-            gType.getGenericArrayType(),
+            gType.toGenericArrayObj().getType(),
             new TypeRef<Map<String, Integer>[]>() {
             }.getType()
         );
         Assert.assertEquals(
-            gType.getGenericComponentType(),
+            gType.toGenericArrayObj().getType().getGenericComponentType(),
             new TypeRef<Map<String, Integer>>() {
             }.getType()
         );
@@ -105,11 +105,11 @@ public class TypeTest {
         }
         FsObj<?> tType = FsObj.wrap(null, OT.class.getTypeParameters()[0]);
         Assert.assertEquals(
-            tType.getTypeVariable(),
+            tType.toTypeVariableObj().getType(),
             OT.class.getTypeParameters()[0]
         );
         Assert.assertEquals(
-            tType.getTypeVariableBound(0),
+            tType.toTypeVariableObj().getBound(0),
             Float.class
         );
     }

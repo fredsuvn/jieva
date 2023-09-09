@@ -24,6 +24,9 @@ public class FsCollect {
      */
     @SafeVarargs
     public static <T, C extends Collection<? super T>> C toCollection(C dest, T... elements) {
+        if (FsArray.isEmpty(elements)) {
+            return dest;
+        }
         dest.addAll(Arrays.asList(elements));
         return dest;
     }
@@ -35,8 +38,12 @@ public class FsCollect {
      * @param elements given elements
      */
     public static <T, C extends Collection<? super T>> C toCollection(C dest, Iterable<T> elements) {
-        for (T t : elements) {
-            dest.add(t);
+        if (elements instanceof Collection) {
+            dest.addAll((Collection<T>) elements);
+        } else {
+            for (T t : elements) {
+                dest.add(t);
+            }
         }
         return dest;
     }
@@ -95,8 +102,26 @@ public class FsCollect {
         if (iterable == null) {
             return Collections.emptyList();
         }
-        Object[] array = asOrToList(iterable).toArray();
-        return (List<T>) Collections.unmodifiableList(FsArray.asList(array));
+        List<T> list;
+        if (iterable instanceof Collection) {
+            list = toCollection(new ArrayList<>(((Collection<? extends T>) iterable).size()), iterable);
+        } else {
+            list = toCollection(new ArrayList<>(), iterable);
+        }
+        return Collections.unmodifiableList(list);
+    }
+
+    /**
+     * Returns immutable list of which elements were put from given array.
+     *
+     * @param array given array
+     */
+    public static <T> List<T> immutableList(@Nullable T[] array) {
+        if (FsArray.isEmpty(array)) {
+            return Collections.emptyList();
+        }
+        List<T> list = toCollection(new ArrayList<>(array.length), array);
+        return Collections.unmodifiableList(list);
     }
 
     /**
@@ -110,11 +135,24 @@ public class FsCollect {
         }
         LinkedHashSet<T> set;
         if (iterable instanceof Collection) {
-            set = new LinkedHashSet<>(((Collection<? extends T>) iterable).size());
+            set = toCollection(new LinkedHashSet<>(((Collection<? extends T>) iterable).size()), iterable);
         } else {
-            set = new LinkedHashSet<>();
+            set = toCollection(new LinkedHashSet<>(), iterable);
         }
-        return Collections.unmodifiableSet(toCollection(set, iterable));
+        return Collections.unmodifiableSet(set);
+    }
+
+    /**
+     * Returns immutable set of which elements were put from given array.
+     *
+     * @param array given array
+     */
+    public static <T> Set<T> immutableSet(@Nullable T[] array) {
+        if (FsArray.isEmpty(array)) {
+            return Collections.emptySet();
+        }
+        LinkedHashSet<T> set = toCollection(new LinkedHashSet<>(array.length), array);
+        return Collections.unmodifiableSet(set);
     }
 
     /**
@@ -123,7 +161,7 @@ public class FsCollect {
      * @param map given map
      */
     public static <K, V> Map<K, V> immutableMap(@Nullable Map<? extends K, ? extends V> map) {
-        if (map == null) {
+        if (isEmpty(map)) {
             return Collections.emptyMap();
         }
         return Collections.unmodifiableMap(new LinkedHashMap<>(map));
