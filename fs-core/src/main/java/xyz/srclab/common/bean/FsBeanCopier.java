@@ -96,20 +96,20 @@ public interface FsBeanCopier {
          * Default is null, in this case the operation will use {@link FsBeanResolver#defaultResolver()}.
          */
         @Nullable
-        FsBeanResolver getBeanResolver();
+        FsBeanResolver beanResolver();
 
         /**
          * Returns object converter for copy operation.
          * Default is null, in this case the operation will use {@link FsConverter#defaultConverter()}.
          */
         @Nullable
-        FsConverter getConverter();
+        FsConverter converter();
 
         /**
          * Returns whether throws {@link FsConvertException} if conversion operation was failed.
          * Default is false, means ignore failed properties.
          */
-        boolean isThrowIfConvertFailed();
+        boolean throwIfConvertFailed();
 
         /**
          * Returns property name mapper, to map property names from source object to dest object.
@@ -129,7 +129,7 @@ public interface FsBeanCopier {
          *     </li>
          * </ul>
          */
-        @Nullable <T> Function<T, T> getPropertyNameMapper();
+        @Nullable <T> Function<T, T> propertyNameMapper();
 
         /**
          * Returns source property filter,
@@ -138,7 +138,7 @@ public interface FsBeanCopier {
          * Only the property that pass through this filter (return true) will be copied from.
          */
         @Nullable
-        BiPredicate<Object, @Nullable Object> getSourcePropertyFilter();
+        BiPredicate<Object, @Nullable Object> sourcePropertyFilter();
 
         /**
          * Returns dest property filter,
@@ -148,26 +148,26 @@ public interface FsBeanCopier {
          * Only the property that pass through this filter (return true) will be copied from.
          */
         @Nullable
-        BiPredicate<Object, @Nullable Object> getDestPropertyFilter();
+        BiPredicate<Object, @Nullable Object> destPropertyFilter();
 
         /**
          * Returns whether put the property into dest map if dest map doesn't contain corresponding property.
          * Default is true.
          */
-        boolean isPutIfNotContained();
+        boolean putIfNotContained();
 
         /**
          * Returns a new builder with current options.
          */
         default Builder toBuilder() {
             return newBuilder()
-                .beanResolver(getBeanResolver())
-                .converter(getConverter())
-                .throwIfConvertFailed(isThrowIfConvertFailed())
-                .propertyNameMapper(getPropertyNameMapper())
-                .sourcePropertyFilter(getSourcePropertyFilter())
-                .destPropertyFilter(getDestPropertyFilter())
-                .putIfNotContained(isPutIfNotContained());
+                .beanResolver(beanResolver())
+                .converter(converter())
+                .throwIfConvertFailed(throwIfConvertFailed())
+                .propertyNameMapper(propertyNameMapper())
+                .sourcePropertyFilter(sourcePropertyFilter())
+                .destPropertyFilter(destPropertyFilter())
+                .putIfNotContained(putIfNotContained());
         }
 
         /**
@@ -266,37 +266,37 @@ public interface FsBeanCopier {
 
 
                     @Override
-                    public @Nullable FsBeanResolver getBeanResolver() {
+                    public @Nullable FsBeanResolver beanResolver() {
                         return beanResolver;
                     }
 
                     @Override
-                    public @Nullable FsConverter getConverter() {
+                    public @Nullable FsConverter converter() {
                         return converter;
                     }
 
                     @Override
-                    public boolean isThrowIfConvertFailed() {
+                    public boolean throwIfConvertFailed() {
                         return throwIfConvertFailed;
                     }
 
                     @Override
-                    public @Nullable <T> Function<T, T> getPropertyNameMapper() {
+                    public @Nullable <T> Function<T, T> propertyNameMapper() {
                         return Fs.as(propertyNameMapper);
                     }
 
                     @Override
-                    public @Nullable BiPredicate<Object, @Nullable Object> getSourcePropertyFilter() {
+                    public @Nullable BiPredicate<Object, @Nullable Object> sourcePropertyFilter() {
                         return sourcePropertyFilter;
                     }
 
                     @Override
-                    public @Nullable BiPredicate<Object, @Nullable Object> getDestPropertyFilter() {
+                    public @Nullable BiPredicate<Object, @Nullable Object> destPropertyFilter() {
                         return destPropertyFilter;
                     }
 
                     @Override
-                    public boolean isPutIfNotContained() {
+                    public boolean putIfNotContained() {
                         return putIfNotContained;
                     }
                 };

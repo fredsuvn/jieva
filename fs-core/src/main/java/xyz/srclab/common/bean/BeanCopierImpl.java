@@ -64,21 +64,21 @@ final class BeanCopierImpl implements FsBeanCopier {
         Object dest, Type destType, Type destKeyType, Type destValueType,
         Options options
     ) {
-        Function<Object, Object> propertyNameMapper = options.getPropertyNameMapper() != null ?
-            options.getPropertyNameMapper()
+        Function<Object, Object> propertyNameMapper = options.propertyNameMapper() != null ?
+            options.propertyNameMapper()
             :
             n -> n;
-        BiPredicate<Object, @Nullable Object> sourcePropertyFilter = options.getSourcePropertyFilter() != null ?
-            options.getSourcePropertyFilter()
+        BiPredicate<Object, @Nullable Object> sourcePropertyFilter = options.sourcePropertyFilter() != null ?
+            options.sourcePropertyFilter()
             :
             (k, v) -> true;
-        BiPredicate<Object, @Nullable Object> destPropertyFilter = options.getDestPropertyFilter() != null ?
-            options.getDestPropertyFilter()
+        BiPredicate<Object, @Nullable Object> destPropertyFilter = options.destPropertyFilter() != null ?
+            options.destPropertyFilter()
             :
             (k, v) -> true;
         if (source instanceof Map) {
             if (dest instanceof Map) {
-                FsConverter converter = Fs.notNull(options.getConverter(), FsConverter.defaultConverter());
+                FsConverter converter = Fs.notNull(options.converter(), FsConverter.defaultConverter());
                 Map<Object, Object> sourceMap = Fs.as(source);
                 Map<Object, Object> destMap = Fs.as(dest);
                 sourceMap.forEach((key, value) -> {
@@ -93,7 +93,7 @@ final class BeanCopierImpl implements FsBeanCopier {
                     if (newDestKey == Fs.RETURN) {
                         return;
                     }
-                    if (!options.isPutIfNotContained() && !destMap.containsKey(newDestKey)) {
+                    if (!options.putIfNotContained() && !destMap.containsKey(newDestKey)) {
                         return;
                     }
                     Object newDestValue = tryConvert(value, sourceValueType, destValueType, converter, options);
@@ -106,8 +106,8 @@ final class BeanCopierImpl implements FsBeanCopier {
                     destMap.put(newDestKey, newDestValue);
                 });
             } else {
-                FsBeanResolver resolver = Fs.notNull(options.getBeanResolver(), FsBeanResolver.defaultResolver());
-                FsConverter converter = Fs.notNull(options.getConverter(), FsConverter.defaultConverter());
+                FsBeanResolver resolver = Fs.notNull(options.beanResolver(), FsBeanResolver.defaultResolver());
+                FsConverter converter = Fs.notNull(options.converter(), FsConverter.defaultConverter());
                 Map<Object, Object> sourceMap = Fs.as(source);
                 FsBean destBean = resolver.resolve(destType);
                 sourceMap.forEach((key, value) -> {
@@ -138,8 +138,8 @@ final class BeanCopierImpl implements FsBeanCopier {
                 });
             }
         } else {
-            FsBeanResolver resolver = Fs.notNull(options.getBeanResolver(), FsBeanResolver.defaultResolver());
-            FsConverter converter = Fs.notNull(options.getConverter(), FsConverter.defaultConverter());
+            FsBeanResolver resolver = Fs.notNull(options.beanResolver(), FsBeanResolver.defaultResolver());
+            FsConverter converter = Fs.notNull(options.converter(), FsConverter.defaultConverter());
             FsBean sourceBean = resolver.resolve(sourceType);
             if (dest instanceof Map) {
                 Map<Object, Object> destMap = Fs.as(dest);
@@ -159,7 +159,7 @@ final class BeanCopierImpl implements FsBeanCopier {
                     if (newDestKey == Fs.RETURN) {
                         return;
                     }
-                    if (!options.isPutIfNotContained() && !destMap.containsKey(destKey)) {
+                    if (!options.putIfNotContained() && !destMap.containsKey(destKey)) {
                         return;
                     }
                     Object newDestValue = tryConvert(sourceValue, sourceProperty.getType(), destValueType, converter, options);
@@ -213,7 +213,7 @@ final class BeanCopierImpl implements FsBeanCopier {
     ) {
         Object newValue = converter.convertObject(value, fromType, destType);
         if (newValue == Fs.RETURN) {
-            if (options.isThrowIfConvertFailed()) {
+            if (options.throwIfConvertFailed()) {
                 throw new FsConvertException(fromType, destType);
             } else {
                 return Fs.RETURN;
