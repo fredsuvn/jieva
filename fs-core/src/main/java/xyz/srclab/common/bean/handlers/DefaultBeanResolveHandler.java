@@ -20,7 +20,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 /**
- * Default bean resolve handler for {@link FsBeanResolver}.
+ * Default bean resolve handler.
  *
  * @author fredsuvn
  */
