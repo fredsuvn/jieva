@@ -90,10 +90,11 @@ public interface FsBeanResolver {
                         break;
                     }
                 }
-                return builder.build();
+                builder.build();
+                return builder;
             }
 
-            final class FsBeanBuilderImpl implements Handler.BeanBuilder {
+            final class FsBeanBuilderImpl implements BeanBuilder {
 
                 private final Type type;
                 private volatile Map<String, FsBeanProperty> properties = new LinkedHashMap<>();
@@ -162,11 +163,11 @@ public interface FsBeanResolver {
                         ")";
                 }
 
-                private FsBean build() {
+                @Override
+                public void build() {
                     Map<String, FsBeanProperty> builtProperties = this.properties;
-                    properties = Collections.unmodifiableMap(new LinkedHashMap<>(builtProperties));
+                    properties = FsCollect.immutableMap(builtProperties);
                     built = true;
-                    return this;
                 }
             }
         }
@@ -434,8 +435,8 @@ public interface FsBeanResolver {
          * add new property or remove property which is resolved by previous handler.
          * <p>
          * Given bean builder itself is the final resolved {@link FsBean}, it is mutable in resolving process,
-         * and finally become to immutable. That means, it can be directly used as the return value of
-         * {@link FsBeanProperty#getOwner()}.
+         * and finally its {@link BeanBuilder#build()} will be called then become to immutable {@link FsBean}.
+         * That means, it can be set to returned value of {@link FsBeanProperty#getOwner()} for property implementation.
          * <p>
          * If this method returns {@link Fs#CONTINUE}, means the resolving will continue to next handler.
          * Otherwise, the resolving will end (such as return null or {@link Fs#BREAK}) .
@@ -445,8 +446,20 @@ public interface FsBeanResolver {
          */
         @Nullable
         Object resolve(BeanBuilder builder);
+    }
 
-        interface BeanBuilder extends FsBean {
-        }
+    /**
+     * Builder and subtype of {@link FsBean}.
+     * It is mutable at the beginning, but becomes immutable after executing {@link #build()}.
+     * This interface is used to resolve bean, see {@link Handler#resolve(BeanBuilder)}.
+     *
+     * @see Handler#resolve(BeanBuilder)
+     */
+    interface BeanBuilder extends FsBean {
+
+        /**
+         * To make this mutable builder into immutable {@link FsBean}.
+         */
+        void build();
     }
 }

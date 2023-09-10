@@ -96,7 +96,7 @@ public class DefaultBeanResolveHandler implements FsBeanResolver.Handler {
     }
 
     @Override
-    public @Nullable Object resolve(BeanBuilder builder) {
+    public @Nullable Object resolve(FsBeanResolver.BeanBuilder builder) {
         Type type = builder.getType();
         Class<?> rawType = FsType.getRawType(type);
         if (rawType == null) {
