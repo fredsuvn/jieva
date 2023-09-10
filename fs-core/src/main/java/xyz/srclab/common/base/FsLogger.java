@@ -4,7 +4,6 @@ import xyz.srclab.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -58,7 +57,7 @@ public interface FsLogger {
         if (getLevel().value() > Level.TRACE.value()) {
             return;
         }
-        LogInfo logInfo = buildLog(messages, 2);
+        LogInfo logInfo = buildLog(messages, 1);
         writeLog(logInfo);
     }
 
@@ -69,7 +68,7 @@ public interface FsLogger {
         if (getLevel().value() > Level.DEBUG.value()) {
             return;
         }
-        LogInfo logInfo = buildLog(messages, 2);
+        LogInfo logInfo = buildLog(messages, 1);
         writeLog(logInfo);
     }
 
@@ -80,7 +79,7 @@ public interface FsLogger {
         if (getLevel().value() > Level.INFO.value()) {
             return;
         }
-        LogInfo logInfo = buildLog(messages, 2);
+        LogInfo logInfo = buildLog(messages, 1);
         writeLog(logInfo);
     }
 
@@ -91,7 +90,7 @@ public interface FsLogger {
         if (getLevel().value() > Level.WARN.value()) {
             return;
         }
-        LogInfo logInfo = buildLog(messages, 2);
+        LogInfo logInfo = buildLog(messages, 1);
         writeLog(logInfo);
     }
 
@@ -102,7 +101,7 @@ public interface FsLogger {
         if (getLevel().value() > Level.ERROR.value()) {
             return;
         }
-        LogInfo logInfo = buildLog(messages, 2);
+        LogInfo logInfo = buildLog(messages, 1);
         writeLog(logInfo);
     }
 
@@ -140,13 +139,21 @@ public interface FsLogger {
 
     /**
      * Builds log info with given message array
-     * and offset between the point where log operation occurs and this method.
-     * For example, let method {@code A} be the method which call the log method,
-     * let {@code LoggerImpl} be the FsLogger implementation, and the calling-chain is:
+     * and offset between the log method and this method.
+     * For example, calling chain from the default method {@link #info(Object...)} to this method is:
      * <pre>
-     *     A -> LoggerImpl -> buildLog
+     *     info(Object... messages) -> buildLog(Object[] msg, int stackTraceOffset)
      * </pre>
-     * In this case the {@code stackTraceOffset} is 2.
+     * In this case the {@code stackTraceOffset} is 1. And the default implementation of {@link #info(Object...)} is:
+     * <pre>
+     *     default void info(Object... messages) {
+     *         if (getLevel().value() > Level.INFO.value()) {
+     *             return;
+     *         }
+     *         LogInfo logInfo = buildLog(messages, 1);
+     *         writeLog(logInfo);
+     *     }
+     * </pre>
      *
      * @param msg              given message array
      * @param stackTraceOffset offset between the point where log operation occurs and this method
@@ -156,25 +163,9 @@ public interface FsLogger {
 
             private final Level level = FsLogger.this.getLevel();
             private final Instant time = Instant.now();
-            private final @Nullable StackTraceElement stackTrace = getStackTrace();
+            private final @Nullable StackTraceElement stackTrace =
+                Fs.findCallerStackTrace(FsLogger.class.getName(), "buildLog", stackTraceOffset);
             private final Object[] messages = msg.clone();
-
-            @Nullable
-            private StackTraceElement getStackTrace() {
-                StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-                if (FsArray.isEmpty(stackTraceElements)) {
-                    return null;
-                }
-                for (int i = 0; i < stackTraceElements.length; i++) {
-                    StackTraceElement element = stackTraceElements[i];
-                    if (Objects.equals(element.getClassName(), FsLogger.class.getName())
-                        && Objects.equals(element.getMethodName(), "buildLog")
-                        && i + stackTraceOffset < stackTraceElements.length) {
-                        return stackTraceElements[i + stackTraceOffset];
-                    }
-                }
-                return null;
-            }
 
             @Override
             public Level level() {

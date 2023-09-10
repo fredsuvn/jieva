@@ -325,29 +325,34 @@ public class Fs {
     }
 
     /**
-     * Returns caller stack trace element of given class name and method name, or null if failed.
-     * This method is equivalent to {@link #findStackTraceCaller(String, String, int)}:
+     * Returns caller stack trace of given class name and method name, or null if failed.
+     * This method is equivalent to {@link #findCallerStackTrace(String, String, int)}:
      * <pre>
-     *     findStackTraceCaller(className, methodName, 0);
+     *     findCallerStackTrace(className, methodName, 0)
      * </pre>
      * <p>
-     * Note return element is <b>caller of given method</b>, not given method.
+     * This method searches the result of {@link Thread#getStackTrace()} of current thread,
+     * to find first {@link StackTraceElement} of which class name and method name are match given names.
+     * Let the next of found element be the {@code caller}, the {@code caller} will be returned.
+     * <p>
+     * If stack trace element is null or empty, or the final index is out of bound, return null.
      *
      * @param className  given class name
      * @param methodName given method name
      */
     @Nullable
-    public static StackTraceElement findStackTraceCaller(String className, String methodName) {
-        return findStackTraceCaller(className, methodName, 0);
+    public static StackTraceElement findCallerStackTrace(String className, String methodName) {
+        return findCallerStackTrace(className, methodName, 0);
     }
 
     /**
-     * Returns caller stack trace element of given class name and method name, or null if failed.
+     * Returns caller stack trace of given class name and method name, or null if failed.
      * <p>
-     * This method search the result of calling of {@link Thread#getStackTrace()} of current thread.
-     * It first finds the {@link StackTraceElement} which class name and method name are match given names,
-     * then obtain the index of next element (not matched element), then add given offset into the index.
-     * Finally return the element at index after adding.
+     * This method searches the result of {@link Thread#getStackTrace()} of current thread,
+     * to find first {@link StackTraceElement} of which class name and method name are match given names.
+     * Let the next of found element be the {@code caller},
+     * if given {@code offset} is 0, the {@code caller} will be returned.
+     * Otherwise, the element at index of {@code (caller's index + offset)} will be returned.
      * <p>
      * If stack trace element is null or empty, or the final index is out of bound, return null.
      *
@@ -356,7 +361,7 @@ public class Fs {
      * @param offset     given offset
      */
     @Nullable
-    public static StackTraceElement findStackTraceCaller(String className, String methodName, int offset) {
+    public static StackTraceElement findCallerStackTrace(String className, String methodName, int offset) {
         StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
         if (FsArray.isEmpty(stackTraces)) {
             return null;
