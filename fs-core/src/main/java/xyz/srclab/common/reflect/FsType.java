@@ -154,17 +154,12 @@ public class FsType {
      */
     @Nullable
     public static <T> T newInstance(Class<?> type) {
-        Constructor<?>[] constructors = type.getConstructors();
-        for (Constructor<?> constructor : constructors) {
-            if (constructor.getParameterCount() == 0) {
-                try {
-                    return (T) constructor.newInstance();
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            }
+        try {
+            Constructor<?> constructor = type.getConstructor();
+            return Fs.as(constructor.newInstance());
+        } catch (Exception e) {
+            return null;
         }
-        return null;
     }
 
     /**

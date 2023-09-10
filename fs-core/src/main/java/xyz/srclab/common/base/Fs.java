@@ -3,6 +3,7 @@ package xyz.srclab.common.base;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.bean.FsBeanCopier;
 import xyz.srclab.common.convert.FsConverter;
+import xyz.srclab.common.reflect.FsType;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.io.File;
@@ -576,13 +577,6 @@ public class Fs {
     }
 
     /**
-     * Returns default class loader: {@link Thread#getContextClassLoader()}.
-     */
-    public static ClassLoader getClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
-    }
-
-    /**
      * Converts source object to target type by {@link FsConverter#defaultConverter()}.
      * If the conversion is unsupported, return null.
      * <p>
@@ -886,5 +880,30 @@ public class Fs {
      */
     public static long chunkCount(long total, long chunkSize) {
         return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+    }
+
+    /**
+     * Returns default class loader: {@link Thread#getContextClassLoader()}.
+     */
+    public static ClassLoader getClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    /**
+     * Returns new instance for given class name.
+     * This method first uses {@link Class#forName(String)} to load given class,
+     * then call the none-arguments constructor to create instance.
+     * If loading failed, return null.
+     *
+     * @param className given clas name
+     */
+    @Nullable
+    public static <T> T load(String className) {
+        try {
+            Class<?> cls = Class.forName(className);
+            return FsType.newInstance(cls);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 }
