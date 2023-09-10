@@ -47,6 +47,7 @@ public class FsIO {
         try {
             int available = inputStream.available();
             ByteArrayOutputStream dest;
+            boolean hasRead = false;
             if (available > 0) {
                 byte[] bytes = new byte[available];
                 int c = inputStream.read(bytes);
@@ -61,16 +62,21 @@ public class FsIO {
                         dest = new ByteArrayOutputStream(available + 1);
                         dest.write(bytes);
                         dest.write(r);
+                        hasRead = true;
                     }
                 } else {
                     dest = new ByteArrayOutputStream(c);
                     dest.write(bytes, 0, c);
+                    hasRead = true;
                 }
             } else {
                 dest = new ByteArrayOutputStream();
             }
             long readCount = readBytesTo(inputStream, dest);
             if (readCount == -1) {
+                if (hasRead) {
+                    return dest.toByteArray();
+                }
                 return null;
             }
             if (close) {
@@ -157,6 +163,9 @@ public class FsIO {
             long readCount = limit == -1 ?
                 readBytesTo(inputStream, dest, limit) : readBytesTo(inputStream, dest, limit - hasRead);
             if (readCount == -1) {
+                if (hasRead > 0) {
+                    return dest.toByteArray();
+                }
                 return null;
             }
             if (close) {

@@ -7,9 +7,6 @@ import xyz.srclab.common.base.ref.FsRef;
 import xyz.srclab.common.base.ref.IntRef;
 import xyz.srclab.common.cache.FsCache;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class CacheTest {
 
     @Test
@@ -19,10 +16,11 @@ public class CacheTest {
             detected[0]++;
             cache.cleanUp();
         });
-        Map<Integer, String> map = new HashMap<>();
-        int times = 1000000 * 3;
+        //Map<Integer, String> map = new HashMap<>();
+        int times = 1000 * 3;
+        String value = TestUtil.buildRandomString(1024 * 100, 1024 * 100);
         for (int i = 0; i < times; i++) {
-            softCache.put(i, String.valueOf(i * 10086));
+            softCache.put(i, value + "i");
             //map.put(i, String.valueOf(i * 10086));
         }
         int removed = 0;
@@ -41,10 +39,6 @@ public class CacheTest {
             ", size: " + softCache.size()
         );
         Assert.assertEquals(removed, detected[0]);
-        //fill map:
-        //2023-05-21 22:27:25.006[INFO]test.CacheTest.cache(32)[Test worker]:total: 3000000, removed: 2582629, detected: 2582629, cached: 417371
-        //remove map:
-        //2023-05-21 22:29:00.384[INFO]test.CacheTest.cache(32)[Test worker]:total: 3000000, removed: 177071, detected: 177071, cached: 2822929
 
         detected[0] = 0;
         FsCache<Integer, String> weakCache = FsCache.weakCache((cache, key) -> {
@@ -52,7 +46,7 @@ public class CacheTest {
             cache.cleanUp();
         });
         for (int i = 0; i < times; i++) {
-            weakCache.put(i, String.valueOf(i * 10086));
+            weakCache.put(i, value + "i");
         }
         removed = 0;
         for (int i = 0; i < times; i++) {
