@@ -10,7 +10,8 @@ public class LoggerTest {
 
     @Test
     public void testLogger() {
-        FsLogger logger = FsLogger.ofLevel(FsLogger.INFO_LEVEL);
+        //info
+        FsLogger logger = FsLogger.system();
         logger.trace("test trace");
         logger.debug("test debug");
         logger.info("test info");
@@ -18,7 +19,7 @@ public class LoggerTest {
         logger.error("test error");
         IntRef count = FsRef.ofInt(0);
         FsLogger logger2 = FsLogger.newLogger(
-            FsLogger.INFO_LEVEL,
+            FsLogger.Level.DEBUG,
             it -> count.getAndIncrement()
         );
         logger2.trace("test trace");
@@ -26,6 +27,6 @@ public class LoggerTest {
         logger2.info("test info");
         logger2.warn("test warn");
         logger2.error("test error");
-        Assert.assertEquals(count.get(), 3);
+        Assert.assertEquals(count.get(), 4);
     }
 }

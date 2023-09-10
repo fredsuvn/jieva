@@ -1,11 +1,10 @@
 package xyz.srclab.common.base;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import xyz.srclab.annotations.Nullable;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -17,167 +16,262 @@ public interface FsLogger {
 
     /**
      * Returns system default logger, which using {@link System#out} to output,
-     * and its level is {@link FsLogger#INFO_LEVEL}.
+     * and its level is {@link Level#INFO}.
      */
     static FsLogger system() {
         return FsUnsafe.ForLogger.SYSTEM_LOGGER;
     }
 
     /**
-     * Converts given level to description, for example: {@link #INFO_LEVEL} -> "INFO".
-     * <p>
-     * If given level cannot match at least one level of {@link FsLogger}, return String.valueOf(level).
+     * Returns a new logger with given level and default output: ({@link System#out}).
      *
      * @param level given level
      */
-    static String toLevelDescription(int level) {
-        switch (level) {
-            case TRACE_LEVEL:
-                return "TRACE";
-            case DEBUG_LEVEL:
-                return "DEBUG";
-            case INFO_LEVEL:
-                return "INFO";
-            case WARN_LEVEL:
-                return "WARN";
-            case ERROR_LEVEL:
-                return "ERROR";
-            default:
-                return String.valueOf(level);
-        }
-    }
-
-    /**
-     * Returns a new logger with given level and default output (System.out).
-     *
-     * @param level given level
-     */
-    static FsLogger ofLevel(int level) {
+    static FsLogger ofLevel(Level level) {
         return () -> level;
     }
 
     /**
-     * Returns a new logger with given level and output.
+     * Returns a new logger with given level and specified output.
      *
      * @param level  given level
-     * @param output given output
+     * @param output specified output
      */
-    static FsLogger newLogger(int level, Consumer<LogMessage> output) {
+    static FsLogger newLogger(Level level, Consumer<LogInfo> output) {
         return new FsLogger() {
             @Override
-            public int getLevel() {
+            public Level getLevel() {
                 return level;
             }
 
             @Override
-            public void output(LogMessage log) {
-                output.accept(log);
+            public void writeLog(LogInfo logInfo) {
+                output.accept(logInfo);
             }
         };
     }
 
     /**
-     * Trace level.
+     * Logs message in level of {@link Level#TRACE}.
      */
-    int TRACE_LEVEL = 1000;
-    /**
-     * Debug level.
-     */
-    int DEBUG_LEVEL = 2000;
-    /**
-     * Info level.
-     */
-    int INFO_LEVEL = 3000;
-    /**
-     * Warn level.
-     */
-    int WARN_LEVEL = 4000;
-    /**
-     * Error level.
-     */
-    int ERROR_LEVEL = 5000;
-
-    /**
-     * Logs with {@link FsLogger#TRACE_LEVEL}.
-     */
-    default void trace(Object... message) {
-        FsUnsafe.ForLogger.log(this, TRACE_LEVEL, message);
+    default void trace(Object... messages) {
+        if (getLevel().value() > Level.TRACE.value()) {
+            return;
+        }
+        LogInfo logInfo = buildLog(messages, 2);
+        writeLog(logInfo);
     }
 
     /**
-     * Logs with {@link FsLogger#DEBUG_LEVEL}.
+     * Logs message in level of {@link Level#DEBUG}.
      */
-    default void debug(Object... message) {
-        FsUnsafe.ForLogger.log(this, DEBUG_LEVEL, message);
+    default void debug(Object... messages) {
+        if (getLevel().value() > Level.DEBUG.value()) {
+            return;
+        }
+        LogInfo logInfo = buildLog(messages, 2);
+        writeLog(logInfo);
     }
 
     /**
-     * Logs with {@link FsLogger#INFO_LEVEL}.
+     * Logs message in level of {@link Level#INFO}.
      */
-    default void info(Object... message) {
-        FsUnsafe.ForLogger.log(this, INFO_LEVEL, message);
+    default void info(Object... messages) {
+        if (getLevel().value() > Level.INFO.value()) {
+            return;
+        }
+        LogInfo logInfo = buildLog(messages, 2);
+        writeLog(logInfo);
     }
 
     /**
-     * Logs with {@link FsLogger#WARN_LEVEL}.
+     * Logs message in level of {@link Level#WARN}.
      */
-    default void warn(Object... message) {
-        FsUnsafe.ForLogger.log(this, WARN_LEVEL, message);
+    default void warn(Object... messages) {
+        if (getLevel().value() > Level.WARN.value()) {
+            return;
+        }
+        LogInfo logInfo = buildLog(messages, 2);
+        writeLog(logInfo);
     }
 
     /**
-     * Logs with {@link FsLogger#ERROR_LEVEL}.
+     * Logs message in level of {@link Level#ERROR}.
      */
-    default void error(Object... message) {
-        FsUnsafe.ForLogger.log(this, ERROR_LEVEL, message);
-    }
-
-    default void log(int level, Object... message) {
-        FsUnsafe.ForLogger.log(this, level, message);
+    default void error(Object... messages) {
+        if (getLevel().value() > Level.ERROR.value()) {
+            return;
+        }
+        LogInfo logInfo = buildLog(messages, 2);
+        writeLog(logInfo);
     }
 
     /**
      * Returns level of this log.
      */
-    int getLevel();
+    Level getLevel();
 
     /**
-     * Outputs given log message.
+     * Writes given log info.
      *
-     * @param log given log message
+     * @param logInfo given log info
      */
-    default void output(LogMessage log) {
-        StringBuilder printInfo = new StringBuilder();
+    default void writeLog(LogInfo logInfo) {
+        StringBuilder message = new StringBuilder();
         Thread thread = Thread.currentThread();
-        printInfo
-            .append("[").append(FsDate.FORMATTER.format(log.date)).append("]")
-            .append("[").append(toLevelDescription(log.level)).append("]");
-        if (log.stackTrace != null) {
-            printInfo
-                .append(log.stackTrace.getClassName())
+        message
+            .append(FsDate.format(Date.from(logInfo.time())))
+            .append("[").append(logInfo.level().description()).append("]");
+        StackTraceElement stackTrace = logInfo.stackTrace();
+        if (stackTrace != null) {
+            message
+                .append(stackTrace.getClassName())
                 .append(".")
-                .append(log.stackTrace.getMethodName())
-                .append("(").append(log.stackTrace.getLineNumber()).append(")");
+                .append(stackTrace.getMethodName())
+                .append("(").append(stackTrace.getLineNumber()).append(")");
         }
-        printInfo
+        message
             .append("[").append(thread.getName()).append("]:");
-        for (Object o : log.message) {
-            printInfo.append(o);
+        for (Object o : logInfo.messages()) {
+            message.append(o);
         }
-        System.out.println(printInfo);
+        System.out.println(message);
     }
 
     /**
-     * Log info.
+     * Builds log info with given message array
+     * and offset between the point where log operation occurs and this method.
+     * For example, let method {@code A} be the method which call the log method,
+     * let {@code LoggerImpl} be the FsLogger implementation, and the calling-chain is:
+     * <pre>
+     *     A -> LoggerImpl -> buildLog
+     * </pre>
+     * In this case the {@code stackTraceOffset} is 2.
+     *
+     * @param msg              given message array
+     * @param stackTraceOffset offset between the point where log operation occurs and this method
      */
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    class LogMessage {
-        private int level;
-        private LocalDateTime date;
+    default LogInfo buildLog(Object[] msg, int stackTraceOffset) {
+        return new LogInfo() {
+
+            private final Level level = FsLogger.this.getLevel();
+            private final Instant time = Instant.now();
+            private final @Nullable StackTraceElement stackTrace = getStackTrace();
+            private final Object[] messages = msg.clone();
+
+            @Nullable
+            private StackTraceElement getStackTrace() {
+                StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+                if (FsArray.isEmpty(stackTraceElements)) {
+                    return null;
+                }
+                for (int i = 0; i < stackTraceElements.length; i++) {
+                    StackTraceElement element = stackTraceElements[i];
+                    if (Objects.equals(element.getClassName(), FsLogger.class.getName())
+                        && Objects.equals(element.getMethodName(), "buildLog")
+                        && i + stackTraceOffset < stackTraceElements.length) {
+                        return stackTraceElements[i + stackTraceOffset];
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public Level level() {
+                return level;
+            }
+
+            @Override
+            public Instant time() {
+                return time;
+            }
+
+            @Override
+            public @Nullable StackTraceElement stackTrace() {
+                return stackTrace;
+            }
+
+            @Override
+            public Object[] messages() {
+                return messages;
+            }
+        };
+    }
+
+    /**
+     * Denotes log info, including current stack trace info.
+     */
+    interface LogInfo {
+
+        /**
+         * Returns level of this log.
+         */
+        Level level();
+
+        /**
+         * Returns record time of this log.
+         */
+        Instant time();
+
+        /**
+         * Returns stack trace info of this log.
+         */
         @Nullable
-        private StackTraceElement stackTrace;
-        private Object[] message;
+        StackTraceElement stackTrace();
+
+        /**
+         * Returns message array of this log, each element represents a message to be logged.
+         */
+        Object[] messages();
+    }
+
+    /**
+     * Denotes log level.
+     */
+    enum Level {
+
+        /**
+         * Trace level, value: 1000.
+         */
+        TRACE(1000, "TRACE"),
+        /**
+         * Debug level, value: 2000.
+         */
+        DEBUG(2000, "DEBUG"),
+        /**
+         * Info level, value: 3000.
+         */
+        INFO(3000, "INFO"),
+        /**
+         * Warn level, value: 4000.
+         */
+        WARN(4000, "WARN"),
+        /**
+         * Error level, value: 5000.
+         */
+        ERROR(5000, "ERROR"),
+        ;
+
+        private final int value;
+        private final String description;
+
+        Level(int value, String description) {
+            this.value = value;
+            this.description = description;
+        }
+
+        /**
+         * Returns value of this level (2000, 3000...).
+         */
+        public int value() {
+            return value;
+        }
+
+        /**
+         * Returns description of this level (such as "DEBUG", "INFO"...).
+         */
+        public String description() {
+            return description;
+        }
     }
 }

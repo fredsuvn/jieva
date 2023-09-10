@@ -1,12 +1,10 @@
 package xyz.srclab.common.base;
 
-import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.bean.handlers.DefaultBeanResolveHandler;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.convert.handlers.*;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -18,20 +16,7 @@ import java.util.Collections;
 public final class FsUnsafe {
 
     public static final class ForLogger {
-
-        static final FsLogger SYSTEM_LOGGER = FsLogger.ofLevel(FsLogger.INFO_LEVEL);
-
-        @Nullable
-        public static void log(FsLogger logger, int level, Object... message) {
-            if (level < logger.getLevel()) {
-                return;
-            }
-            LocalDateTime now = LocalDateTime.now();
-            StackTraceElement stackTraceElement = Fs.findStackTraceCaller(
-                ForLogger.class.getName(), "internalLog", 1);
-            FsLogger.LogMessage log = new FsLogger.LogMessage(level, now, stackTraceElement, message);
-            logger.output(log);
-        }
+        static final FsLogger SYSTEM_LOGGER = FsLogger.ofLevel(FsLogger.Level.INFO);
     }
 
     public static final class ForBean {
