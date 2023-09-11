@@ -24,7 +24,7 @@ import java.util.Objects;
 public class RecordBeanResolveHandler extends AbstractBeanResolveHandler {
 
     /**
-     * Instance of this class.
+     * An instance.
      */
     public static final RecordBeanResolveHandler INSTANCE = new RecordBeanResolveHandler();
 

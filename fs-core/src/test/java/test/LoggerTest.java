@@ -18,10 +18,10 @@ public class LoggerTest {
         logger.warn("test warn");
         logger.error("test error");
         IntRef count = FsRef.ofInt(0);
-        FsLogger logger2 = FsLogger.newLogger(
-            FsLogger.Level.DEBUG,
-            it -> count.getAndIncrement()
-        );
+        FsLogger logger2 = FsLogger.newBuilder()
+            .level(FsLogger.Level.DEBUG).formatter(it -> {
+                count.getAndIncrement();
+            }).build();
         logger2.trace("test trace");
         logger2.debug("test debug");
         logger2.info("test info");

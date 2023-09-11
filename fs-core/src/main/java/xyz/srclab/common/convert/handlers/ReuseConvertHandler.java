@@ -86,6 +86,11 @@ import static xyz.srclab.common.convert.FsConverter.Options;
  */
 public class ReuseConvertHandler implements FsConverter.Handler {
 
+    /**
+     * An instance.
+     */
+    public static final ReuseConvertHandler INSTANCE = new ReuseConvertHandler();
+
     @Override
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, Options options, FsConverter converter) {

@@ -27,6 +27,11 @@ import java.util.Objects;
  */
 public class NumberConvertHandler implements FsConverter.Handler {
 
+    /**
+     * An instance.
+     */
+    public static final NumberConvertHandler INSTANCE = new NumberConvertHandler();
+
     @Override
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {

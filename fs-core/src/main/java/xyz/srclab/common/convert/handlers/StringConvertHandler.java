@@ -25,6 +25,11 @@ import java.util.Objects;
  */
 public class StringConvertHandler implements FsConverter.Handler {
 
+    /**
+     * An instance.
+     */
+    public static final StringConvertHandler INSTANCE = new StringConvertHandler();
+
     @Override
     public @Nullable Object convert(
         @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {

@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 final class BeanCopierImpl implements FsBeanCopier {
 
-    static BeanCopierImpl INSTANCE = new BeanCopierImpl();
+    static final BeanCopierImpl INSTANCE = new BeanCopierImpl();
 
     @Override
     public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, Options options) {

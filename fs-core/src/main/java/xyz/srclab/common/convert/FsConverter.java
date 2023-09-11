@@ -3,7 +3,6 @@ package xyz.srclab.common.convert;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsUnsafe;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.TypeRef;
 
@@ -50,7 +49,7 @@ public interface FsConverter {
      * Those are constructed from empty constructor and in the order listed.
      */
     static FsConverter defaultConverter() {
-        return FsUnsafe.ForConvert.DEFAULT_CONVERTER;
+        return ConverterImpl.INSTANCE;
     }
 
     /**
@@ -62,7 +61,7 @@ public interface FsConverter {
      * </ul>
      */
     static Options defaultOptions() {
-        return FsUnsafe.ForConvert.DEFAULT_OPTIONS;
+        return Options.Builder.DEFAULT;
     }
 
     /**
@@ -79,56 +78,7 @@ public interface FsConverter {
         Iterable<Handler> commonHandlers,
         Options options
     ) {
-        class FsConverterImpl implements FsConverter, Handler {
-
-            private final @Nullable Handler pf;
-            private final @Nullable Handler sf;
-            private final List<Handler> chs;
-            private final Options opts;
-
-            FsConverterImpl(@Nullable Handler pf, @Nullable Handler sf, List<Handler> chs, Options opts) {
-                this.pf = pf;
-                this.sf = sf;
-                this.chs = chs;
-                this.opts = opts;
-            }
-
-            @Override
-            public @Nullable Handler getPrefixHandler() {
-                return pf;
-            }
-
-            @Override
-            public @Nullable Handler getSuffixHandler() {
-                return sf;
-            }
-
-            @Override
-            public List<Handler> getCommonHandlers() {
-                return chs;
-            }
-
-            @Override
-            public Options getOptions() {
-                return opts;
-            }
-
-            @Override
-            public Handler asHandler() {
-                return this;
-            }
-
-            @Override
-            public @Nullable Object convert(
-                @Nullable Object source, Type sourceType, Type targetType, Options opts, FsConverter converter) {
-                Object value = convertObject(source, sourceType, targetType, opts);
-                if (value == Fs.RETURN) {
-                    return Fs.BREAK;
-                }
-                return value;
-            }
-        }
-        return new FsConverterImpl(prefix, suffix, FsCollect.immutableList(commonHandlers), options);
+        return new ConverterImpl(prefix, suffix, FsCollect.immutableList(commonHandlers), options);
     }
 
     /**
@@ -153,6 +103,13 @@ public interface FsConverter {
         Iterable<Handler> commonHandlers
     ) {
         return newConverter(prefix, suffix, commonHandlers, FsConverter.defaultOptions());
+    }
+
+    /**
+     * Returns new options builder.
+     */
+    static Options.Builder optionsBuilder() {
+        return new Options.Builder();
     }
 
     /**
@@ -502,6 +459,41 @@ public interface FsConverter {
                 return this;
             }
             return withReusePolicy(reusePolicy);
+        }
+
+        /**
+         * Builder for {@link Options}.
+         */
+        class Builder {
+
+            private static final Options DEFAULT = new Builder().build();
+
+            private int reusePolicy = REUSE_ASSIGNABLE;
+
+            /**
+             * Sets object reuse policy:
+             * <ul>
+             *     <li>{@link #REUSE_ASSIGNABLE} (default);</li>
+             *     <li>{@link #REUSE_EQUAL};</li>
+             *     <li>{@link #NO_REUSE};</li>
+             * </ul>
+             */
+            public Builder reusePolicy(int reusePolicy) {
+                this.reusePolicy = reusePolicy;
+                return this;
+            }
+
+            public Options build() {
+                return new Options() {
+
+                    private final int reusePolicy = Builder.this.reusePolicy;
+
+                    @Override
+                    public int reusePolicy() {
+                        return reusePolicy;
+                    }
+                };
+            }
         }
     }
 }

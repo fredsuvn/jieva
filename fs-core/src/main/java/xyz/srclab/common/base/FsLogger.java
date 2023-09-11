@@ -4,7 +4,6 @@ import xyz.srclab.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.function.Consumer;
 
 /**
  * Logging for fs.
@@ -18,7 +17,7 @@ public interface FsLogger {
      * and its level is {@link Level#INFO}.
      */
     static FsLogger system() {
-        return FsUnsafe.ForLogger.SYSTEM_LOGGER;
+        return Builder.INSTANCE;
     }
 
     /**
@@ -27,27 +26,14 @@ public interface FsLogger {
      * @param level given level
      */
     static FsLogger ofLevel(Level level) {
-        return () -> level;
+        return newBuilder().level(level).build();
     }
 
     /**
-     * Returns a new logger with given level and specified output.
-     *
-     * @param level  given level
-     * @param output specified output
+     * Returns new logger builder.
      */
-    static FsLogger newLogger(Level level, Consumer<LogInfo> output) {
-        return new FsLogger() {
-            @Override
-            public Level getLevel() {
-                return level;
-            }
-
-            @Override
-            public void writeLog(LogInfo logInfo) {
-                output.accept(logInfo);
-            }
-        };
+    static Builder newBuilder() {
+        return new Builder();
     }
 
     /**
@@ -115,27 +101,7 @@ public interface FsLogger {
      *
      * @param logInfo given log info
      */
-    default void writeLog(LogInfo logInfo) {
-        StringBuilder message = new StringBuilder();
-        Thread thread = Thread.currentThread();
-        message
-            .append(FsDate.format(Date.from(logInfo.time())))
-            .append("[").append(logInfo.level().description()).append("]");
-        StackTraceElement stackTrace = logInfo.stackTrace();
-        if (stackTrace != null) {
-            message
-                .append(stackTrace.getClassName())
-                .append(".")
-                .append(stackTrace.getMethodName())
-                .append("(").append(stackTrace.getLineNumber()).append(")");
-        }
-        message
-            .append("[").append(thread.getName()).append("]:");
-        for (Object o : logInfo.messages()) {
-            message.append(o);
-        }
-        System.out.println(message);
-    }
+    void writeLog(LogInfo logInfo);
 
     /**
      * Builds log info with given message array
@@ -217,6 +183,18 @@ public interface FsLogger {
     }
 
     /**
+     * Formatter to format output log into underlying device.
+     */
+    interface Formatter {
+        /**
+         * Formats and output given log info.
+         *
+         * @param logInfo given log info
+         */
+        void format(LogInfo logInfo);
+    }
+
+    /**
      * Denotes log level.
      */
     enum Level {
@@ -263,6 +241,75 @@ public interface FsLogger {
          */
         public String description() {
             return description;
+        }
+    }
+
+    /**
+     * Builder for {@link FsLogger}.
+     */
+    class Builder {
+
+        private static final FsLogger INSTANCE = new Builder().build();
+
+        private Level level = Level.INFO;
+        private Formatter formatter = logInfo -> {
+            StringBuilder message = new StringBuilder();
+            Thread thread = Thread.currentThread();
+            message
+                .append(FsDate.format(Date.from(logInfo.time())))
+                .append("[").append(logInfo.level().description()).append("]");
+            StackTraceElement stackTrace = logInfo.stackTrace();
+            if (stackTrace != null) {
+                message
+                    .append(stackTrace.getClassName())
+                    .append(".")
+                    .append(stackTrace.getMethodName())
+                    .append("(").append(stackTrace.getLineNumber()).append(")");
+            }
+            message
+                .append("[").append(thread.getName()).append("]:");
+            for (Object o : logInfo.messages()) {
+                message.append(o);
+            }
+            System.out.println(message);
+        };
+
+        /**
+         * Sets level, default is {@link Level#INFO}.
+         *
+         * @param level log level
+         */
+        public Builder level(Level level) {
+            this.level = level;
+            return this;
+        }
+
+        /**
+         * Sets formatter, default formatter will format and write into {@link System#out}.
+         *
+         * @param formatter log formatter
+         */
+        public Builder formatter(Formatter formatter) {
+            this.formatter = formatter;
+            return this;
+        }
+
+        public FsLogger build() {
+            return new FsLogger() {
+
+                private final Level level = Builder.this.level;
+                private final Formatter formatter = Builder.this.formatter;
+
+                @Override
+                public Level getLevel() {
+                    return level;
+                }
+
+                @Override
+                public void writeLog(LogInfo logInfo) {
+                    formatter.format(logInfo);
+                }
+            };
         }
     }
 }

@@ -43,6 +43,11 @@ import java.util.function.IntFunction;
  */
 public class CollectConvertHandler implements FsConverter.Handler {
 
+    /**
+     * An instance.
+     */
+    public static final CollectConvertHandler INSTANCE = new CollectConvertHandler();
+
     private static final Map<Class<?>, Generator> GENERATOR_MAP = new ConcurrentHashMap<>();
 
     static {

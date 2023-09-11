@@ -60,6 +60,11 @@ import java.util.TimeZone;
  */
 public class DateConvertHandler implements FsConverter.Handler {
 
+    /**
+     * An instance with {@link #DateConvertHandler()}.
+     */
+    public static final DateConvertHandler INSTANCE = new DateConvertHandler();
+
     private static final PatternFunction DEFAULT_PATTERN_FUNCTION = new PatternFunction() {
 
         @Override

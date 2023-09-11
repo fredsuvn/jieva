@@ -41,6 +41,11 @@ import static xyz.srclab.common.convert.FsConverter.Handler;
  */
 public class BeanConvertHandler implements Handler {
 
+    /**
+     * An instance with {@link #BeanConvertHandler()}.
+     */
+    public static final BeanConvertHandler INSTANCE = new BeanConvertHandler();
+
     private static final Map<Class<?>, Supplier<Object>> GENERATOR_MAP = new ConcurrentHashMap<>();
 
     private static final Collection<Class<?>> UNSUPPORTED_TYPES = Arrays.asList(
@@ -68,24 +73,24 @@ public class BeanConvertHandler implements Handler {
         GENERATOR_MAP.put(ConcurrentSkipListMap.class, ConcurrentSkipListMap::new);
     }
 
-    private final FsBeanCopier beanCopier;
+    private final FsBeanCopier.Options copyOptions;
 
     /**
-     * Constructs with {@link FsBeanCopier#defaultCopier()}.
+     * Constructs with {@link FsBeanCopier#defaultOptions()}.
      *
-     * @see #BeanConvertHandler(FsBeanCopier)
+     * @see #BeanConvertHandler(FsBeanCopier.Options)
      */
     public BeanConvertHandler() {
-        this(FsBeanCopier.defaultCopier());
+        this(FsBeanCopier.defaultOptions());
     }
 
     /**
-     * Constructs with given bean copier.
+     * Constructs with given bean copy options.
      *
-     * @param beanCopier given bean copier
+     * @param copyOptions bean copy options
      */
-    public BeanConvertHandler(FsBeanCopier beanCopier) {
-        this.beanCopier = beanCopier;
+    public BeanConvertHandler(FsBeanCopier.Options copyOptions) {
+        this.copyOptions = copyOptions;
     }
 
     @Override
@@ -105,7 +110,7 @@ public class BeanConvertHandler implements Handler {
         } else {
             dest = FsType.newInstance(targetRawType);
         }
-        return beanCopier.copyProperties(
+        return FsBeanCopier.defaultCopier().copyProperties(
             source, sourceType, dest, targetType,
             FsBeanCopier.defaultOptions().toBuilder().converter(converter).build()
         );

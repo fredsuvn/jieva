@@ -22,7 +22,7 @@ import java.util.Objects;
 public class JavaBeanResolveHandler extends AbstractBeanResolveHandler {
 
     /**
-     * Instance of this class.
+     * An instance.
      */
     public static final JavaBeanResolveHandler INSTANCE = new JavaBeanResolveHandler();
 
