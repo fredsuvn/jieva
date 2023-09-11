@@ -207,6 +207,8 @@ public class BeanTest {
         Fs.copyProperties(cc1, cc2, false);
         Assert.assertEquals("888", cc2.getI1());
         cc1.setI1("aaaa");
+        cc2 = Fs.copyProperties(cc1, new Cc<>());
+        Assert.assertNotNull(cc2.getC2());
         cc2 = Fs.copyProperties(cc1, new Cc<>(), "c2");
         Assert.assertEquals(cc1.getI1(), cc2.getI1());
         Assert.assertEquals(cc1.getI2(), cc2.getI2());
