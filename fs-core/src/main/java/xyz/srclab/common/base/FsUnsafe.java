@@ -1,7 +1,7 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.common.bean.FsBeanResolver;
-import xyz.srclab.common.bean.handlers.DefaultBeanResolveHandler;
+import xyz.srclab.common.bean.handlers.JavaBeanResolveHandler;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.convert.handlers.*;
 
@@ -21,7 +21,7 @@ public final class FsUnsafe {
 
     public static final class ForBean {
         public static final FsBeanResolver DEFAULT_RESOLVER = FsBeanResolver.newResolver(
-            Collections.singletonList(new DefaultBeanResolveHandler())
+            Collections.singletonList(JavaBeanResolveHandler.INSTANCE)
         );
     }
 

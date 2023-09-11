@@ -13,7 +13,8 @@ import xyz.srclab.common.bean.FsBean;
 import xyz.srclab.common.bean.FsBeanCopier;
 import xyz.srclab.common.bean.FsBeanProperty;
 import xyz.srclab.common.bean.FsBeanResolver;
-import xyz.srclab.common.bean.handlers.DefaultBeanResolveHandler;
+import xyz.srclab.common.bean.handlers.JavaBeanResolveHandler;
+import xyz.srclab.common.bean.handlers.RecordBeanResolveHandler;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.TypeRef;
 
@@ -152,8 +153,8 @@ public class BeanTest {
         FsBean ccBean2 = FsBean.resolve(ccType);
         Assert.assertSame(ccBean1, ccBean2);
         FsBeanResolver resolver = FsBeanResolver.newResolver(
-            Collections.singletonList(new DefaultBeanResolveHandler()),
-            false
+            Collections.singletonList(new JavaBeanResolveHandler()),
+            null
         );
         FsBean ccBean3 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean1, ccBean3);
@@ -161,6 +162,29 @@ public class BeanTest {
         FsBean ccBean4 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean4, ccBean3);
         Assert.assertEquals(ccBean4, ccBean3);
+    }
+
+    @Test
+    public void testBeanResolveHandler() {
+        FsBean aaa = FsBean.resolve(TestHandler.class);
+        Assert.assertEquals(aaa.getProperties().size(), 3);
+        Assert.assertNotNull(aaa.getProperty("aaa"));
+        Assert.assertNotNull(aaa.getProperty("bbb"));
+        Assert.assertTrue(aaa.getProperty("aaa").isReadable());
+        Assert.assertTrue(aaa.getProperty("aaa").isWriteable());
+        Assert.assertFalse(aaa.getProperty("bbb").isReadable());
+        Assert.assertTrue(aaa.getProperty("bbb").isWriteable());
+        FsBean bbb = FsBeanResolver.newResolver(RecordBeanResolveHandler.INSTANCE).resolve(TestHandler.class);
+        Assert.assertEquals(bbb.getProperties().size(), 3);
+        Assert.assertNotNull(bbb.getProperty("aaa"));
+        Assert.assertNotNull(bbb.getProperty("bbb"));
+        Assert.assertNotNull(bbb.getProperty("getAaa"));
+        Assert.assertFalse(bbb.getProperty("aaa").isReadable());
+        Assert.assertTrue(bbb.getProperty("aaa").isWriteable());
+        Assert.assertTrue(bbb.getProperty("bbb").isReadable());
+        Assert.assertTrue(bbb.getProperty("bbb").isWriteable());
+        Assert.assertTrue(bbb.getProperty("getAaa").isReadable());
+        Assert.assertFalse(bbb.getProperty("getAaa").isWriteable());
     }
 
     @Test
@@ -405,5 +429,24 @@ public class BeanTest {
         private List<int[]> list;
         private Map<Integer, ? super CopyP2> map;
         private CopyP2 p;
+    }
+
+    public static class TestHandler {
+
+        public String getAaa() {
+            return null;
+        }
+
+        public String setAaa(String aaa) {
+            return null;
+        }
+
+        public String bbb() {
+            return null;
+        }
+
+        public String setBbb(String bbb) {
+            return null;
+        }
     }
 }

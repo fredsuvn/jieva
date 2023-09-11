@@ -2,7 +2,6 @@ package xyz.srclab.common.bean.handlers;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsCase;
 import xyz.srclab.common.base.FsFinal;
 import xyz.srclab.common.bean.FsBean;
 import xyz.srclab.common.bean.FsBeanException;
@@ -20,80 +19,19 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 /**
- * Default bean resolve handler.
+ * Base abstract bean resolve handler, provides a skeletal implementation of the {@link FsBeanResolver.Handler}
+ * to minimize the effort required to implement the interface backed by "method-based" getters/setters.
+ * <p>
+ * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
+ * {@link #isGetter(Method)} and {@link #isSetter(Method)} method to determine whether it is a getter/setting.
+ * If it is, it will be wrapped to a property.
+ * <p>
+ * {@link #buildMethodInvoker(Method)} can be overridden to build custom method invoker.
+ * Default is {@link FsInvoker#reflectMethod(Method)}.
  *
  * @author fredsuvn
  */
-public class DefaultBeanResolveHandler implements FsBeanResolver.Handler {
-
-    /**
-     * Reflect mode: using reflect to invoke getter and setter methods.
-     */
-    public static final int REFLECT_MODE = 1;
-    /**
-     * Un-reflect mode: using un-reflect ({@link java.lang.invoke.MethodHandles})
-     * to invoke getter and setter methods.
-     */
-    public static final int UNREFLECT_MODE = 2;
-    /**
-     * Bean naming mapping: starting with "get"/"set" for each getter and setter methods.
-     */
-    public static final int BEAN_NAMING_MAPPING = 1;
-    /**
-     * Record naming mapping: Directly using property name for getter methods,
-     * and starting with "set" for setter methods.
-     */
-    public static final int RECORD_NAMING_MAPPING = 2;
-
-    private final int invokeMode;
-    private final int propertyNaming;
-    private final FsCase propertyNamingCase;
-    private final FsCase methodNamingCase;
-
-    /**
-     * Construct with options:
-     * <ul>
-     *     <li>
-     *         Invoke mode: {@link #REFLECT_MODE};
-     *     </li>
-     *     <li>
-     *         Property name mapping: {@link #BEAN_NAMING_MAPPING};
-     *     </li>
-     *     <li>
-     *         Property/Method naming case: {@link FsCase#LOWER_CAMEL};
-     *     </li>
-     * </ul>
-     */
-    public DefaultBeanResolveHandler() {
-        this(REFLECT_MODE, BEAN_NAMING_MAPPING, FsCase.LOWER_CAMEL, FsCase.LOWER_CAMEL);
-    }
-
-    /**
-     * Constructs with options:
-     * <ul>
-     *     <li>
-     *         Invoke mode: {@link #REFLECT_MODE}, {@link #UNREFLECT_MODE};
-     *     </li>
-     *     <li>
-     *         Property name mapping: {@link #BEAN_NAMING_MAPPING}, {@link #RECORD_NAMING_MAPPING};
-     *     </li>
-     *     <li>
-     *         Property/Method naming case: naming case for property and methods.
-     *     </li>
-     * </ul>
-     *
-     * @param invokeMode         invoke mode
-     * @param propertyNaming     property name mapping
-     * @param propertyNamingCase property naming case
-     * @param methodNamingCase   method naming case
-     */
-    public DefaultBeanResolveHandler(
-        int invokeMode, int propertyNaming, FsCase propertyNamingCase, FsCase methodNamingCase) {
-        this.invokeMode = invokeMode;
-        this.propertyNaming = propertyNaming;
-        this.propertyNamingCase = propertyNamingCase;
-        this.methodNamingCase = methodNamingCase;
-    }
+public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handler {
 
     @Override
     public @Nullable Object resolve(FsBeanResolver.BeanBuilder builder) {
@@ -148,48 +86,29 @@ public class DefaultBeanResolveHandler implements FsBeanResolver.Handler {
         return Fs.CONTINUE;
     }
 
+    /**
+     * Whether given method is a getter.
+     * If it is, return name of this property, or null if it is not
+     *
+     * @param method given method
+     */
     @Nullable
-    private String isGetter(Method method) {
-        switch (propertyNaming) {
-            case BEAN_NAMING_MAPPING:
-                if (method.getParameterCount() == 0
-                    && method.getName().length() > 3
-                    && method.getName().startsWith("get")
-                ) {
-                    List<CharSequence> words = methodNamingCase.split(method.getName());
-                    if (FsCollect.isNotEmpty(words) && words.size() > 1 && Objects.equals(words.get(0).toString(), "get")) {
-                        return propertyNamingCase.join(words.subList(1, words.size()));
-                    }
-                }
-                return null;
-            case RECORD_NAMING_MAPPING:
-                if (method.getParameterCount() == 0) {
-                    return method.getName();
-                }
-                return null;
-            default:
-                throw new IllegalArgumentException("Unknown property naming: " + propertyNaming + ".");
-        }
-    }
+    protected abstract String isGetter(Method method);
 
+    /**
+     * Whether given method is a setter.
+     * If it is, return name of this property, or null if it is not
+     *
+     * @param method given method
+     */
     @Nullable
-    private String isSetter(Method method) {
-        switch (propertyNaming) {
-            case BEAN_NAMING_MAPPING:
-            case RECORD_NAMING_MAPPING:
-                if (method.getParameterCount() == 1
-                    && method.getName().length() > 3
-                    && method.getName().startsWith("set")
-                ) {
-                    List<CharSequence> words = methodNamingCase.split(method.getName());
-                    if (FsCollect.isNotEmpty(words) && words.size() > 1 && Objects.equals(words.get(0).toString(), "set")) {
-                        return propertyNamingCase.join(words.subList(1, words.size()));
-                    }
-                }
-                return null;
-            default:
-                throw new IllegalArgumentException("Unknown property naming: " + propertyNaming + ".");
-        }
+    protected abstract String isSetter(Method method);
+
+    /**
+     * Builds invoker of given getter/setter.
+     */
+    protected FsInvoker buildMethodInvoker(Method method) {
+        return FsInvoker.reflectMethod(method);
     }
 
     private Type getActualType(Type type, Map<TypeVariable<?>, Type> typeParameterMapping, Set<Type> stack) {
@@ -247,33 +166,15 @@ public class DefaultBeanResolveHandler implements FsBeanResolver.Handler {
             this.setter = setter;
             this.field = field;
             this.type = type;
-            switch (invokeMode) {
-                case REFLECT_MODE:
-                    if (getter != null) {
-                        getterInvoker = FsInvoker.reflectMethod(getter);
-                    } else {
-                        getterInvoker = null;
-                    }
-                    if (setter != null) {
-                        setterInvoker = FsInvoker.reflectMethod(setter);
-                    } else {
-                        setterInvoker = null;
-                    }
-                    break;
-                case UNREFLECT_MODE:
-                    if (getter != null) {
-                        getterInvoker = FsInvoker.unreflectMethod(getter);
-                    } else {
-                        getterInvoker = null;
-                    }
-                    if (setter != null) {
-                        setterInvoker = FsInvoker.unreflectMethod(setter);
-                    } else {
-                        setterInvoker = null;
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown invoke mode setting: " + invokeMode + ".");
+            if (getter != null) {
+                getterInvoker = buildMethodInvoker(getter);
+            } else {
+                getterInvoker = null;
+            }
+            if (setter != null) {
+                setterInvoker = buildMethodInvoker(setter);
+            } else {
+                setterInvoker = null;
             }
             getterAnnotations = getter == null ? Collections.emptyList() :
                 Collections.unmodifiableList(Arrays.asList(getter.getAnnotations()));

@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotations.Immutable;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.reflect.FsType;
@@ -13,6 +14,7 @@ import java.util.Map;
  * @author fredsuvn
  * @see FsBeanResolver
  */
+@Immutable
 @ThreadSafe
 public interface FsBean {
 
@@ -28,9 +30,9 @@ public interface FsBean {
     /**
      * Wraps given map as a {@link FsBean} by {@link FsBeanResolver#defaultResolver()},
      * of which type will be seen as Map&lt;String, Object>.
-     * This method is same with:
+     * This method is equivalent to:
      * <pre>
-     *     wrapMap(map, null);
+     *     wrap(map, null);
      * </pre>
      *
      * @param map given map

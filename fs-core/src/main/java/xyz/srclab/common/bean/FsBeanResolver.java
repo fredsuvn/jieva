@@ -3,9 +3,12 @@ package xyz.srclab.common.bean;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsUnsafe;
-import xyz.srclab.common.bean.handlers.DefaultBeanResolveHandler;
+import xyz.srclab.common.bean.handlers.JavaBeanResolveHandler;
+import xyz.srclab.common.bean.handlers.ProtobufResolveHandler;
+import xyz.srclab.common.bean.handlers.RecordBeanResolveHandler;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.FsType;
@@ -21,9 +24,17 @@ import java.util.stream.Collectors;
 
 /**
  * Resolver for {@link FsBean}.
+ * <p>
+ * There are built-in resolvers:
+ * <ul>
+ *     <li>{@link JavaBeanResolveHandler}: default resolver for {@link #defaultResolver()};</li>
+ *     <li>{@link RecordBeanResolveHandler};</li>
+ *     <li>{@link ProtobufResolveHandler};</li>
+ * </ul>
  *
  * @author fredsuvn
  */
+@ThreadSafe
 public interface FsBeanResolver {
 
     /**
@@ -33,45 +44,52 @@ public interface FsBeanResolver {
     }.getType();
 
     /**
-     * Returns default bean resolver, of which handlers are:
-     * <ul>
-     *     <li>{@link DefaultBeanResolveHandler#DefaultBeanResolveHandler()}</li>
-     * </ul>
+     * Returns default bean resolver of which handler is {@link JavaBeanResolveHandler}.
      */
     static FsBeanResolver defaultResolver() {
         return FsUnsafe.ForBean.DEFAULT_RESOLVER;
     }
 
     /**
-     * Returns new bean resolver with given handler.
-     * This method is equivalent to {@link #newResolver(Iterable, boolean)}:
+     * Returns new bean resolver with given handler and {@link FsCache#softCache()}.
+     * This method is equivalent to {@link #newResolver(Iterable)}:
      * <pre>
-     *     return newResolver(handlers, true);
+     *     return newResolver(Collections.singleton(handler));
      * </pre>
      *
-     * @param handlers given handler
+     * @param handler given handler
      */
-    static FsBeanResolver newResolver(Iterable<Handler> handlers) {
-        return newResolver(handlers, true);
+    static FsBeanResolver newResolver(Handler handler) {
+        return newResolver(Collections.singleton(handler));
     }
 
     /**
-     * Returns new bean resolver with given handler and cache option.
-     * If the cache option is true, returned resolver will hold a cache from {@link FsCache#softCache()}
-     * and cache the resolved bean.
+     * Returns new bean resolver with given handlers and {@link FsCache#softCache()}.
+     * This method is equivalent to {@link #newResolver(Iterable, FsCache)}:
+     * <pre>
+     *     return newResolver(handlers, FsCache.softCache());
+     * </pre>
      *
-     * @param handlers given handler
-     * @param useCache cache option
+     * @param handlers given handlers
      */
-    static FsBeanResolver newResolver(Iterable<Handler> handlers, boolean useCache) {
+    static FsBeanResolver newResolver(Iterable<Handler> handlers) {
+        return newResolver(handlers, FsCache.softCache());
+    }
+
+    /**
+     * Returns new bean resolver with given handlers and cache option.
+     * If given cache is null, returned resolver will not cache the resolved bean.
+     *
+     * @param handlers given handlers
+     * @param cache    given cache
+     */
+    static FsBeanResolver newResolver(Iterable<Handler> handlers, @Nullable FsCache<Type, FsBean> cache) {
         final class FsBeanResolverImpl implements FsBeanResolver {
 
             private final Iterable<Handler> handlers;
-            private final FsCache<Type, FsBean> cache;
 
-            FsBeanResolverImpl(Iterable<Handler> handlers, boolean useCache) {
+            FsBeanResolverImpl(Iterable<Handler> handlers) {
                 this.handlers = FsCollect.toCollection(new LinkedList<>(), handlers);
-                this.cache = useCache ? FsCache.softCache() : null;
             }
 
             @Override
@@ -163,15 +181,14 @@ public interface FsBeanResolver {
                         ")";
                 }
 
-                @Override
-                public void build() {
+                private void build() {
                     Map<String, FsBeanProperty> builtProperties = this.properties;
                     properties = FsCollect.immutableMap(builtProperties);
                     built = true;
                 }
             }
         }
-        return new FsBeanResolverImpl(handlers, useCache);
+        return new FsBeanResolverImpl(handlers);
     }
 
     /**
@@ -427,6 +444,7 @@ public interface FsBeanResolver {
      * @author fredsuvn
      * @see FsBeanResolver
      */
+    @ThreadSafe
     interface Handler {
 
         /**
@@ -435,7 +453,7 @@ public interface FsBeanResolver {
          * add new property or remove property which is resolved by previous handler.
          * <p>
          * Given bean builder itself is the final resolved {@link FsBean}, it is mutable in resolving process,
-         * and finally its {@link BeanBuilder#build()} will be called then become to immutable {@link FsBean}.
+         * and finally it will become immutable.
          * That means, it can be set to returned value of {@link FsBeanProperty#getOwner()} for property implementation.
          * <p>
          * If this method returns {@link Fs#CONTINUE}, means the resolving will continue to next handler.
@@ -450,16 +468,13 @@ public interface FsBeanResolver {
 
     /**
      * Builder and subtype of {@link FsBean}.
-     * It is mutable at the beginning, but becomes immutable after executing {@link #build()}.
-     * This interface is used to resolve bean, see {@link Handler#resolve(BeanBuilder)}.
+     * <p>
+     * The parameter instance in {@link Handler#resolve(BeanBuilder)} is the final instance of {@link FsBean}
+     * (it is mutable at the beginning, but becomes immutable after resolving),
+     * that is, it can be set into {@link FsBeanProperty#getOwner()} for property implementation.
      *
      * @see Handler#resolve(BeanBuilder)
      */
     interface BeanBuilder extends FsBean {
-
-        /**
-         * To make this mutable builder into immutable {@link FsBean}.
-         */
-        void build();
     }
 }

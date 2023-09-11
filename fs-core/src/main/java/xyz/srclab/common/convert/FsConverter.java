@@ -412,6 +412,7 @@ public interface FsConverter {
      * @author fredsuvn
      * @see FsConverter
      */
+    @ThreadSafe
     interface Handler {
 
         /**
