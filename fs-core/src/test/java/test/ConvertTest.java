@@ -155,11 +155,11 @@ public class ConvertTest {
         FsConverter.Handler handler = new FsConverter.Handler() {
             @Override
             public @Nullable Object convert(
-                @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+                @Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
                 return x;
             }
         };
-        FsConverter converter = FsConverter.defaultConverter().withCommonHandler(handler);
+        FsConverter converter = FsConverter.defaultConverter().withMiddleHandler(handler);
         Assert.assertSame(
             x,
             converter.convert(
@@ -168,6 +168,18 @@ public class ConvertTest {
                 }.getType()
             )
         );
+        FsConverter converter2 = converter.withOptions(converter.getOptions());
+        Assert.assertSame(converter, converter2);
+        converter2 = converter.withOptions(converter.getOptions()
+            .replaceReusePolicy(converter.getOptions().reusePolicy()));
+        Assert.assertSame(converter, converter2);
+        int reusePolicy = converter.getOptions().reusePolicy();
+        converter2 = converter.withOptions(converter.getOptions()
+            .replaceReusePolicy(reusePolicy + 1));
+        Assert.assertNotSame(converter, converter2);
+        converter2 = converter.withOptions(converter.getOptions()
+            .replaceReusePolicy(reusePolicy));
+        Assert.assertSame(converter, converter2);
     }
 
     @NoArgsConstructor

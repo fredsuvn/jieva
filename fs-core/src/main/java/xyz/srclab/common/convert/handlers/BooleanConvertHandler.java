@@ -32,8 +32,7 @@ public class BooleanConvertHandler implements FsConverter.Handler {
     public static final BooleanConvertHandler INSTANCE = new BooleanConvertHandler();
 
     @Override
-    public @Nullable Object convert(
-        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
             return Fs.CONTINUE;
         }

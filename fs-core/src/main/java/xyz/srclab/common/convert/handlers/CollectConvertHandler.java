@@ -66,8 +66,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(
-        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
             return Fs.CONTINUE;
         }
@@ -77,22 +76,22 @@ public class CollectConvertHandler implements FsConverter.Handler {
                 if (sourceInfo == null) {
                     return Fs.CONTINUE;
                 }
-                return convertArray(sourceInfo, ((Class<?>) targetType).getComponentType(), options, converter);
+                return convertArray(sourceInfo, ((Class<?>) targetType).getComponentType(), converter);
             }
-            return convertIterableType(source, sourceType, targetType, options, converter);
+            return convertIterableType(source, sourceType, targetType, converter);
         } else if (targetType instanceof GenericArrayType) {
             ParameterizedObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
             if (sourceInfo == null) {
                 return Fs.CONTINUE;
             }
-            return convertArray(sourceInfo, ((GenericArrayType) targetType).getGenericComponentType(), options, converter);
+            return convertArray(sourceInfo, ((GenericArrayType) targetType).getGenericComponentType(), converter);
         }
-        return convertIterableType(source, sourceType, targetType, options, converter);
+        return convertIterableType(source, sourceType, targetType, converter);
     }
 
     @Nullable
     private Object convertIterableType(
-        @Nullable Object obj, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+        @Nullable Object obj, Type sourceType, Type targetType, FsConverter converter) {
         ParameterizedType targetItType = FsType.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
             return Fs.CONTINUE;
@@ -102,7 +101,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             return Fs.CONTINUE;
         }
         if (FsType.getRawType(sourceInfo.getType()).isArray()) {
-            return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], options, converter);
+            return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], converter);
         }
         Generator generator = GENERATOR_MAP.get(FsType.getRawType(targetItType));
         if (generator == null) {
@@ -115,7 +114,6 @@ public class CollectConvertHandler implements FsConverter.Handler {
                 generator.generate(srcList.size()),
                 sourceInfo.getActualTypeArgument(0),
                 targetItType.getActualTypeArguments()[0],
-                options,
                 converter
             );
         } else {
@@ -124,7 +122,6 @@ public class CollectConvertHandler implements FsConverter.Handler {
                 generator.generate(0),
                 sourceInfo.getActualTypeArgument(0),
                 targetItType.getActualTypeArguments()[0],
-                options,
                 converter
             );
         }
@@ -136,11 +133,10 @@ public class CollectConvertHandler implements FsConverter.Handler {
         Collection<Object> dest,
         Type sourceComponentType,
         Type destComponentType,
-        FsConverter.Options options,
         FsConverter converter
     ) {
         for (Object srcValue : source) {
-            Object targetValue = converter.convertObject(srcValue, sourceComponentType, destComponentType, options);
+            Object targetValue = converter.convertObject(srcValue, sourceComponentType, destComponentType);
             if (targetValue == Fs.RETURN) {
                 return Fs.BREAK;
             }
@@ -153,7 +149,6 @@ public class CollectConvertHandler implements FsConverter.Handler {
     private Object convertArray(
         ParameterizedObj<Iterable<?>> sourceInfo,
         Type targetComponentType,
-        FsConverter.Options options,
         FsConverter converter
     ) {
         Collection<?> srcList;
@@ -167,7 +162,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         int i = 0;
         for (Object srcValue : srcList) {
             Object targetValue = converter.convertObject(
-                srcValue, sourceInfo.getActualTypeArgument(0), targetComponentType, options);
+                srcValue, sourceInfo.getActualTypeArgument(0), targetComponentType);
             if (targetValue == Fs.RETURN) {
                 return Fs.BREAK;
             }

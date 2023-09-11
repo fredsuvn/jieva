@@ -1,5 +1,6 @@
 package xyz.srclab.common.convert;
 
+import lombok.EqualsAndHashCode;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.Fs;
@@ -8,22 +9,28 @@ import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Converter to convert source object from source type to target type.
+ * Converter to convert object from source type to target type.
  * <p>
- * A {@link FsConverter} consists of a list of {@link Handler}s.
- * More specifically, the converter is composed of a prefix handler (maybe null), a list of common handlers,
+ * A {@link FsConverter} consists of a list of {@link Handler}s and a set of {@link Options}.
+ * The handlers are composed of a prefix handler (maybe null), a list of middle handlers,
  * and a suffix handler (maybe null).
  * <p>
- * The conversion is performed in the order of the prefix handler (if not null), common handlers,
- * and suffix converter (if not null). If any handler returns a non-{@link Fs#CONTINUE} and non-{@link Fs#BREAK} value,
+ * The conversion is performed in the order of
+ * <pre>
+ *     prefix handler (if not null) -> middle handlers -> suffix converter (if not null)
+ * </pre>
+ * If any handler returns a non-{@link Fs#CONTINUE} and non-{@link Fs#BREAK} value,
  * that means the conversion is successful and that return value will be returned.
  * <p>
- * If the handler returns {@link Fs#CONTINUE},
+ * If a handler returns {@link Fs#CONTINUE},
  * it means that handler doesn't support current conversion and hands off to next handler;
- * If it returns {@link Fs#BREAK}, means this converter doesn't support current conversion.
+ * If the last handler (maybe suffix handler), or any other handler returns {@link Fs#BREAK},
+ * current conversion will be broken and failed.
  *
  * @author fredsuvn
  * @see Handler
@@ -65,44 +72,20 @@ public interface FsConverter {
     }
 
     /**
-     * Returns new converters with given prefix, suffix, common handlers and conversion options.
+     * Returns new converters with given prefix handler, suffix handler, middle handlers and conversion options.
      *
-     * @param prefix         prefix handler
-     * @param suffix         suffix handler
-     * @param commonHandlers common handlers
+     * @param prefixHandler  prefix handler
+     * @param suffixHandler  suffix handler
+     * @param middleHandlers common handlers
      * @param options        conversion options
      */
     static FsConverter newConverter(
-        @Nullable Handler prefix,
-        @Nullable Handler suffix,
-        Iterable<Handler> commonHandlers,
+        @Nullable Handler prefixHandler,
+        @Nullable Handler suffixHandler,
+        Iterable<Handler> middleHandlers,
         Options options
     ) {
-        return new ConverterImpl(prefix, suffix, FsCollect.immutableList(commonHandlers), options);
-    }
-
-    /**
-     * Returns a converters with given common handlers.
-     *
-     * @param commonHandlers common handlers
-     */
-    static FsConverter withHandlers(Iterable<Handler> commonHandlers) {
-        return withHandlers(null, null, commonHandlers);
-    }
-
-    /**
-     * Returns a converters with given prefix, suffix, common handlers.
-     *
-     * @param prefix         prefix handler
-     * @param suffix         suffix handler
-     * @param commonHandlers common handlers
-     */
-    static FsConverter withHandlers(
-        @Nullable Handler prefix,
-        @Nullable Handler suffix,
-        Iterable<Handler> commonHandlers
-    ) {
-        return newConverter(prefix, suffix, commonHandlers, FsConverter.defaultOptions());
+        return new ConverterImpl(prefixHandler, suffixHandler, middleHandlers, options);
     }
 
     /**
@@ -119,15 +102,20 @@ public interface FsConverter {
     Handler getPrefixHandler();
 
     /**
-     * Returns prefix handler.
+     * Returns suffix handler.
      */
     @Nullable
     Handler getSuffixHandler();
 
     /**
-     * Returns common handlers.
+     * Returns middles handlers.
      */
-    List<Handler> getCommonHandlers();
+    List<Handler> getMiddleHandlers();
+
+    /**
+     * Returns all handlers in order by: prefix handler -> middle handlers -> suffix handler.
+     */
+    List<Handler> getHandlers();
 
     /**
      * Returns conversion options.
@@ -135,7 +123,7 @@ public interface FsConverter {
     Options getOptions();
 
     /**
-     * Converts source object to target type.
+     * Converts source object to target type with given options.
      * If the conversion is unsupported, return null.
      * <p>
      * <b>Note returned value after conversion itself may also be null.</b>
@@ -145,7 +133,7 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convert(@Nullable Object source, Class<T> targetType) {
-        return convert(source, targetType, getOptions());
+        return convertType(source, source == null ? Object.class : source.getClass(), targetType);
     }
 
     /**
@@ -154,42 +142,12 @@ public interface FsConverter {
      * <p>
      * <b>Note returned value after conversion itself may also be null.</b>
      *
-     * @param source     source object
-     * @param targetType target type
-     * @param options    given options
+     * @param source        source object
+     * @param targetTypeRef type reference target type
      */
     @Nullable
-    default <T> T convert(@Nullable Object source, Class<T> targetType, Options options) {
-        return convertType(source, source == null ? Object.class : source.getClass(), targetType, options);
-    }
-
-    /**
-     * Converts source object to target type.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
-     *
-     * @param source     source object
-     * @param targetType type reference of target type
-     */
-    @Nullable
-    default <T> T convert(@Nullable Object source, TypeRef<T> targetType) {
-        return convert(source, targetType, getOptions());
-    }
-
-    /**
-     * Converts source object to target type with given options.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
-     *
-     * @param source     source object
-     * @param targetType type reference target type
-     * @param options    given options
-     */
-    @Nullable
-    default <T> T convert(@Nullable Object source, TypeRef<T> targetType, Options options) {
-        return convertType(source, source == null ? Object.class : source.getClass(), targetType.getType(), options);
+    default <T> T convert(@Nullable Object source, TypeRef<T> targetTypeRef) {
+        return convertType(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType());
     }
 
     /**
@@ -203,22 +161,7 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convert(@Nullable Object source, Type targetType) {
-        return convert(source, targetType, getOptions());
-    }
-
-    /**
-     * Converts source object to target type with given options.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
-     *
-     * @param source     source object
-     * @param targetType target type
-     * @param options    given options
-     */
-    @Nullable
-    default <T> T convert(@Nullable Object source, Type targetType, Options options) {
-        return convertType(source, source == null ? Object.class : source.getClass(), targetType, options);
+        return convertType(source, source == null ? Object.class : source.getClass(), targetType);
     }
 
     /**
@@ -233,25 +176,26 @@ public interface FsConverter {
      */
     @Nullable
     default <T> T convertType(@Nullable Object source, Type sourceType, Type targetType) {
-        return convertType(source, sourceType, targetType, getOptions());
+        Object value = convertObject(source, sourceType, targetType);
+        if (value == Fs.RETURN) {
+            return null;
+        }
+        return (T) value;
     }
 
     /**
-     * Converts source object from source type to target type with given options.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * Converts source object from source type to target type.
+     * If the conversion is unsupported, an {@link FsConvertException} will be thrown
      *
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
-     * @param options    given options
      */
     @Nullable
-    default <T> T convertType(@Nullable Object source, Type sourceType, Type targetType, Options options) {
-        Object value = convertObject(source, sourceType, targetType, options);
+    default <T> T convertThrow(@Nullable Object source, Type sourceType, Type targetType) {
+        Object value = convertObject(source, sourceType, targetType);
         if (value == Fs.RETURN) {
-            return null;
+            throw new FsConvertException(sourceType, targetType);
         }
         return (T) value;
     }
@@ -267,99 +211,50 @@ public interface FsConverter {
      */
     @Nullable
     default Object convertObject(@Nullable Object source, Type sourceType, Type targetType) {
-        return convertObject(source, sourceType, targetType, getOptions());
-    }
-
-    /**
-     * Converts source object from source type to target type with given options.
-     * If return value is {@link Fs#RETURN}, it indicates current conversion is unsupported.
-     * Any other return value indicates current conversion is successful and the return value is valid, including null.
-     *
-     * @param source     source object
-     * @param sourceType source type
-     * @param targetType target type
-     * @param options    given options
-     */
-    @Nullable
-    default Object convertObject(@Nullable Object source, Type sourceType, Type targetType, Options options) {
-        Handler prefix = getPrefixHandler();
-        if (prefix != null) {
-            Object value = prefix.convert(source, sourceType, targetType, options, this);
+        for (Handler handler : getHandlers()) {
+            Object value = handler.convert(source, sourceType, targetType, this);
             if (value == Fs.BREAK || value == Fs.RETURN) {
                 return Fs.RETURN;
             }
             if (value != Fs.CONTINUE) {
                 return value;
             }
-        }
-        for (Handler commonHandler : getCommonHandlers()) {
-            Object value = commonHandler.convert(source, sourceType, targetType, options, this);
-            if (value == Fs.BREAK || value == Fs.RETURN) {
-                return Fs.RETURN;
-            }
-            if (value != Fs.CONTINUE) {
-                return value;
-            }
-        }
-        Handler suffix = getSuffixHandler();
-        if (suffix != null) {
-            Object value = suffix.convert(source, sourceType, targetType, options, this);
-            if (value == Fs.BREAK || value == Fs.CONTINUE || value == Fs.RETURN) {
-                return Fs.RETURN;
-            }
-            return value;
         }
         return Fs.RETURN;
     }
 
     /**
-     * Converts source object from source type to target type.
-     * If the conversion is unsupported, an {@link FsConvertException} will be thrown
-     *
-     * @param source     source object
-     * @param sourceType source type
-     * @param targetType target type
-     */
-    @Nullable
-    default <T> T convertThrow(@Nullable Object source, Type sourceType, Type targetType) {
-        return convertThrow(source, sourceType, targetType, getOptions());
-    }
-
-    /**
-     * Converts source object from source type to target type with given options.
-     * If the conversion is unsupported, an {@link FsConvertException} will be thrown
-     *
-     * @param source     source object
-     * @param sourceType source type
-     * @param targetType target type
-     * @param options    given options
-     */
-    @Nullable
-    default <T> T convertThrow(
-        @Nullable Object source, Type sourceType, Type targetType, Options options) throws FsConvertException {
-        Object value = convertObject(source, sourceType, targetType, options);
-        if (value == Fs.RETURN) {
-            throw new FsConvertException(sourceType, targetType);
-        }
-        return (T) value;
-    }
-
-    /**
-     * Returns a new converter with handlers consist of the handlers from the current converter,
-     * but inserts given handler at first index of common handlers.
+     * Returns a new converter of which handlers and options come from current converter,
+     * but inserts given handler at first index of middle handlers.
      *
      * @param handler given handler
      */
-    default FsConverter withCommonHandler(Handler handler) {
-        List<Handler> common = getCommonHandlers();
-        List<Handler> newCommon = new ArrayList<>(common.size() + 1);
-        newCommon.add(handler);
-        newCommon.addAll(common);
-        return withHandlers(getPrefixHandler(), getSuffixHandler(), newCommon);
+    default FsConverter withMiddleHandler(Handler handler) {
+        List<Handler> middleHandlers = getMiddleHandlers();
+        if (FsCollect.isEmpty(middleHandlers)) {
+            return newConverter(getPrefixHandler(), getSuffixHandler(), Collections.singleton(handler), getOptions());
+        }
+        List<Handler> newMiddleHandlers = new ArrayList<>(middleHandlers.size() + 1);
+        newMiddleHandlers.add(handler);
+        newMiddleHandlers.addAll(middleHandlers);
+        return newConverter(getPrefixHandler(), getSuffixHandler(), newMiddleHandlers, getOptions());
     }
 
     /**
-     * Returns this converter as handler type.
+     * Returns a new converter of which handlers come from current converter,
+     * but the options will be replaced by given options.
+     *
+     * @param options given options
+     */
+    default FsConverter withOptions(Options options) {
+        if (Objects.equals(getOptions(), options)) {
+            return this;
+        }
+        return newConverter(getPrefixHandler(), getSuffixHandler(), getMiddleHandlers(), options);
+    }
+
+    /**
+     * Returns this converter as a {@link Handler}.
      */
     Handler asHandler();
 
@@ -373,26 +268,24 @@ public interface FsConverter {
     interface Handler {
 
         /**
-         * Converts source object from source type to target type.
+         * Converts object from source type to target type.
          * <p>
          * If this method returns {@link Fs#CONTINUE},
          * it means that this handler doesn't support current conversion, but it will hand off to next handler.
          * <p>
          * If this method returns {@link Fs#BREAK},
-         * it means that this handler doesn't support current conversion,
-         * and the converter will break out from the conversion.
-         * This indicates that the converter does not support current conversion.
+         * it means that this handler doesn't support current conversion, and it will break out the handler chain.
+         * This will cause the conversion failure.
          * <p>
-         * Otherwise, any other return value is considered as the final conversion result.
+         * Otherwise, other return value is the valid final conversion result.
          *
          * @param source     source object
          * @param sourceType source type
          * @param targetType target type
-         * @param converter  converter in which this handler is located.
+         * @param converter  converter to help convert unsupported part of object for this handler.
          */
         @Nullable
-        Object convert(
-            @Nullable Object source, Type sourceType, Type targetType, Options options, FsConverter converter);
+        Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter);
     }
 
     /**
@@ -484,15 +377,22 @@ public interface FsConverter {
             }
 
             public Options build() {
-                return new Options() {
+                return new OptionImpl(reusePolicy);
+            }
 
-                    private final int reusePolicy = Builder.this.reusePolicy;
+            @EqualsAndHashCode
+            private static final class OptionImpl implements Options {
 
-                    @Override
-                    public int reusePolicy() {
-                        return reusePolicy;
-                    }
-                };
+                private final int reusePolicy;
+
+                private OptionImpl(int reusePolicy) {
+                    this.reusePolicy = reusePolicy;
+                }
+
+                @Override
+                public int reusePolicy() {
+                    return reusePolicy;
+                }
             }
         }
     }

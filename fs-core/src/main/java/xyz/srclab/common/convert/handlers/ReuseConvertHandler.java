@@ -92,12 +92,11 @@ public class ReuseConvertHandler implements FsConverter.Handler {
     public static final ReuseConvertHandler INSTANCE = new ReuseConvertHandler();
 
     @Override
-    public @Nullable Object convert(
-        @Nullable Object source, Type sourceType, Type targetType, Options options, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
             return Fs.CONTINUE;
         }
-        int reusePolicy = options.reusePolicy();
+        int reusePolicy = converter.getOptions().reusePolicy();
         if (Objects.equals(targetType, sourceType)) {
             if (reusePolicy != Options.NO_REUSE) {
                 return source;
@@ -117,11 +116,11 @@ public class ReuseConvertHandler implements FsConverter.Handler {
             WildcardType wildcardType = (WildcardType) sourceType;
             Type sourceUpper = FsType.getUpperBound(wildcardType);
             if (sourceUpper != null) {
-                return converter.convertObject(source, sourceUpper, targetType, options);
+                return converter.convertObject(source, sourceUpper, targetType);
             } else {
                 Type sourceLower = FsType.getLowerBound(wildcardType);
                 if (sourceLower != null) {
-                    return converter.convertObject(source, Object.class, targetType, options);
+                    return converter.convertObject(source, Object.class, targetType);
                 }
             }
         }
@@ -129,11 +128,13 @@ public class ReuseConvertHandler implements FsConverter.Handler {
             WildcardType wildcardType = (WildcardType) targetType;
             Type targetUpper = FsType.getUpperBound(wildcardType);
             if (targetUpper != null) {
-                return converter.convertObject(source, sourceType, targetUpper, options);
+                return converter.convertObject(source, sourceType, targetUpper);
             } else {
                 Type targetLower = FsType.getLowerBound(wildcardType);
                 if (targetLower != null) {
-                    return converter.convertObject(source, sourceType, targetLower, options.replaceReusePolicy(Options.REUSE_EQUAL));
+                    return converter
+                        .withOptions(converter.getOptions().replaceReusePolicy(Options.REUSE_EQUAL))
+                        .convertObject(source, sourceType, targetLower);
                 }
             }
         }

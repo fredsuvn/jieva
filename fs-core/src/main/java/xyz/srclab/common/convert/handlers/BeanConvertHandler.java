@@ -94,8 +94,7 @@ public class BeanConvertHandler implements Handler {
     }
 
     @Override
-    public @Nullable Object convert(
-        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
             return null;
         }

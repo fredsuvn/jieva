@@ -237,10 +237,10 @@ public class BeanTest {
             }.getType());
         Assert.assertEquals(ccs.getCc(), cc1.getCc().toString());
 
-        FsConverter kConverter = FsConverter.defaultConverter().withCommonHandler(new FsConverter.Handler() {
+        FsConverter kConverter = FsConverter.defaultConverter().withMiddleHandler(new FsConverter.Handler() {
             @Override
             public @Nullable Object convert(
-                @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options, FsConverter converter) {
+                @Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
                 if (Objects.equals(targetType, Kk.class)) {
                     return new Kk(String.valueOf(source));
                 }

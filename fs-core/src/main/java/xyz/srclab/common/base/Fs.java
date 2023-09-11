@@ -592,22 +592,6 @@ public class Fs {
     }
 
     /**
-     * Converts source object to target type with given options by {@link FsConverter#defaultConverter()}.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
-     *
-     * @param source     source object
-     * @param targetType target type
-     * @param options    given options
-     * @see FsConverter
-     */
-    @Nullable
-    public static <T> T convert(@Nullable Object source, Class<T> targetType, FsConverter.Options options) {
-        return FsConverter.defaultConverter().convert(source, targetType, options);
-    }
-
-    /**
      * Converts source object to target type by {@link FsConverter#defaultConverter()}.
      * If the conversion is unsupported, return null.
      * <p>
@@ -620,22 +604,6 @@ public class Fs {
     @Nullable
     public static <T> T convert(@Nullable Object source, TypeRef<T> targetType) {
         return FsConverter.defaultConverter().convert(source, targetType);
-    }
-
-    /**
-     * Converts source object to target type with given options by {@link FsConverter#defaultConverter()}.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
-     *
-     * @param source     source object
-     * @param targetType type reference target type
-     * @param options    given options
-     * @see FsConverter
-     */
-    @Nullable
-    public static <T> T convert(@Nullable Object source, TypeRef<T> targetType, FsConverter.Options options) {
-        return FsConverter.defaultConverter().convert(source, targetType, options);
     }
 
     /**
@@ -654,22 +622,6 @@ public class Fs {
     }
 
     /**
-     * Converts source object to target type with given options by {@link FsConverter#defaultConverter()}.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
-     *
-     * @param source     source object
-     * @param targetType target type
-     * @param options    given options
-     * @see FsConverter
-     */
-    @Nullable
-    public static <T> T convert(@Nullable Object source, Type targetType, FsConverter.Options options) {
-        return FsConverter.defaultConverter().convert(source, targetType, options);
-    }
-
-    /**
      * Converts source object from source type to target type by {@link FsConverter#defaultConverter()}.
      * If the conversion is unsupported, return null.
      * <p>
@@ -683,24 +635,6 @@ public class Fs {
     @Nullable
     public static <T> T convertType(@Nullable Object source, Type sourceType, Type targetType) {
         return FsConverter.defaultConverter().convertType(source, sourceType, targetType);
-    }
-
-    /**
-     * Converts source object from source type to target type with given options
-     * by {@link FsConverter#defaultConverter()}. If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
-     *
-     * @param source     source object
-     * @param sourceType source type
-     * @param targetType target type
-     * @param options    given options
-     * @see FsConverter
-     */
-    @Nullable
-    public static <T> T convertType(
-        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options options) {
-        return FsConverter.defaultConverter().convertType(source, sourceType, targetType, options);
     }
 
     /**

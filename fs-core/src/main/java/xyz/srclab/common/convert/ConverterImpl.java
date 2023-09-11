@@ -2,10 +2,13 @@ package xyz.srclab.common.convert;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
+import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.convert.handlers.*;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 final class ConverterImpl implements FsConverter, FsConverter.Handler {
@@ -23,36 +26,72 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
         FsConverter.defaultOptions()
     );
 
-    private final @Nullable FsConverter.Handler pf;
-    private final @Nullable FsConverter.Handler sf;
-    private final List<FsConverter.Handler> chs;
-    private final FsConverter.Options opts;
+    private final @Nullable FsConverter.Handler prefixHandler;
+    private final @Nullable FsConverter.Handler suffixHandler;
+    private final List<FsConverter.Handler> middleHandlers;
+    private final FsConverter.Options options;
+    private final List<FsConverter.Handler> handlers;
 
-    ConverterImpl(@Nullable FsConverter.Handler pf, @Nullable FsConverter.Handler sf, List<FsConverter.Handler> chs, FsConverter.Options opts) {
-        this.pf = pf;
-        this.sf = sf;
-        this.chs = chs;
-        this.opts = opts;
+    ConverterImpl(
+        @Nullable FsConverter.Handler prefixHandler,
+        @Nullable FsConverter.Handler suffixHandler,
+        Iterable<FsConverter.Handler> middleHandlers,
+        FsConverter.Options options
+    ) {
+        this.prefixHandler = prefixHandler;
+        this.suffixHandler = suffixHandler;
+        this.middleHandlers = FsCollect.immutableList(middleHandlers);
+        this.options = options;
+        int total = 0;
+        if (this.prefixHandler != null) {
+            total++;
+        }
+        if (this.suffixHandler != null) {
+            total++;
+        }
+        if (FsCollect.isNotEmpty(this.middleHandlers)) {
+            total += this.middleHandlers.size();
+        }
+        if (total > 0) {
+            ArrayList<FsConverter.Handler> handlers = new ArrayList<>(total);
+            if (this.prefixHandler != null) {
+                handlers.add(prefixHandler);
+            }
+            if (FsCollect.isNotEmpty(this.middleHandlers)) {
+                handlers.addAll(this.middleHandlers);
+            }
+            if (this.suffixHandler != null) {
+                handlers.add(suffixHandler);
+            }
+            this.handlers = Collections.unmodifiableList(handlers);
+        } else {
+            this.handlers = Collections.emptyList();
+        }
     }
 
     @Override
     public @Nullable FsConverter.Handler getPrefixHandler() {
-        return pf;
+        return prefixHandler;
     }
 
     @Override
     public @Nullable FsConverter.Handler getSuffixHandler() {
-        return sf;
+        return suffixHandler;
     }
 
     @Override
-    public List<FsConverter.Handler> getCommonHandlers() {
-        return chs;
+    public List<FsConverter.Handler> getMiddleHandlers() {
+        return middleHandlers;
+    }
+
+    @Override
+    public List<Handler> getHandlers() {
+        return handlers;
     }
 
     @Override
     public FsConverter.Options getOptions() {
-        return opts;
+        return options;
     }
 
     @Override
@@ -61,11 +100,10 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(
-        @Nullable Object source, Type sourceType, Type targetType, FsConverter.Options opts, FsConverter converter) {
-        Object value = convertObject(source, sourceType, targetType, opts);
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+        Object value = convertObject(source, sourceType, targetType);
         if (value == Fs.RETURN) {
-            return Fs.BREAK;
+            return Fs.CONTINUE;
         }
         return value;
     }
