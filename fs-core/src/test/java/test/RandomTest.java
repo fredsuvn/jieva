@@ -29,10 +29,10 @@ public class RandomTest {
         }
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
-        FsLogger.system().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
+        FsLogger.defaultLogger().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
 
         String randomStr = String.join("", fsRandom.nextList(100));
-        FsLogger.system().info("randomStr: ", randomStr);
+        FsLogger.defaultLogger().info("randomStr: ", randomStr);
         Assert.assertEquals(randomStr.length(), 100);
     }
 }

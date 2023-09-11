@@ -32,7 +32,7 @@ public class CacheTest {
                 //Assert.assertEquals(map.get(i), fsValue);
             }
         }
-        FsLogger.system().info("Soft---> total: " + times +
+        FsLogger.defaultLogger().info("Soft---> total: " + times +
             ", removed: " + removed +
             ", detected: " + detected[0] +
             ", cached: " + (times - removed) +
@@ -55,7 +55,7 @@ public class CacheTest {
                 removed++;
             }
         }
-        FsLogger.system().info("Weak---> total: " + times +
+        FsLogger.defaultLogger().info("Weak---> total: " + times +
             ", removed: " + removed +
             ", detected: " + detected[0] +
             ", cached: " + (times - removed) +
@@ -70,7 +70,7 @@ public class CacheTest {
         Assert.assertNull(fsCache.get(1));
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
         Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
-        FsLogger.system().info("cacheLoader: 1=", fsCache.get(1));
+        FsLogger.defaultLogger().info("cacheLoader: 1=", fsCache.get(1));
         fsCache.get(1, k -> null);
         Assert.assertEquals(fsCache.get(1), "1");
     }

@@ -32,7 +32,7 @@ public class BeanTest {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
         FsBean ccBean = FsBean.resolve(ccType);
-        FsLogger.system().info("ccBean: ", ccBean);
+        FsLogger.defaultLogger().info("ccBean: ", ccBean);
         FsBeanProperty cc = ccBean.getProperty("cc");
         FsBeanProperty c1 = ccBean.getProperty("c1");
         FsBeanProperty c2 = ccBean.getProperty("c2");
@@ -68,7 +68,7 @@ public class BeanTest {
     public void testClassBean() throws Exception {
         Type ccType = Cc.class;
         FsBean ccBean = FsBean.resolve(ccType);
-        FsLogger.system().info("ccBean: ", ccBean);
+        FsLogger.defaultLogger().info("ccBean: ", ccBean);
         FsBeanProperty cc = ccBean.getProperty("cc");
         FsBeanProperty c1 = ccBean.getProperty("c1");
         FsBeanProperty c2 = ccBean.getProperty("c2");
@@ -109,7 +109,7 @@ public class BeanTest {
         map.put("2", 10010L);
         map.put("3", 10000L);
         FsBean mapBean = FsBean.wrap(map, mapType);
-        FsLogger.system().info("mapBean: ", mapBean);
+        FsLogger.defaultLogger().info("mapBean: ", mapBean);
         FsBeanProperty p1 = mapBean.getProperty("1");
         FsBeanProperty p2 = mapBean.getProperty("2");
         FsBeanProperty p3 = mapBean.getProperty("3");
@@ -129,7 +129,7 @@ public class BeanTest {
         Assert.assertSame(p1, mapBean.getProperty("1"));
         map.remove("2");
         Assert.assertNull(mapBean.getProperty("2"));
-        FsLogger.system().info("mapBean: ", mapBean);
+        FsLogger.defaultLogger().info("mapBean: ", mapBean);
 
         FsBean mapObjBean = FsBean.wrap(map);
         FsBeanProperty p1Obj = mapObjBean.getProperty("1");
@@ -250,17 +250,16 @@ public class BeanTest {
         FsBeanCopier copier = FsBeanCopier.defaultCopier();
 
         //bean -> map
-        Map<Kk, String> map1 = copier.copyProperties(
-            cc1,
-            new TypeRef<Cc<Long>>() {
-            }.getType(),
-            new HashMap<>(),
-            new TypeRef<Map<Kk, String>>() {
-            }.getType(),
-            FsBeanCopier.defaultOptions().toBuilder()
-                .converter(kConverter)
-                .build()
-        );
+        Map<Kk, String> map1 = copier.toBuilder()
+            .converter(kConverter)
+            .build().copyProperties(
+                cc1,
+                new TypeRef<Cc<Long>>() {
+                }.getType(),
+                new HashMap<>(),
+                new TypeRef<Map<Kk, String>>() {
+                }.getType()
+            );
         Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(cc1.getI1(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(cc1.getI2(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("cc")), Fs.orNull(cc1.getCc(), String::valueOf));
@@ -268,30 +267,32 @@ public class BeanTest {
 
         // map -> bean
         map1.put(new Kk("i1"), "88888");
-        Cc<String> cs2 = copier.copyProperties(
-            map1,
-            new TypeRef<Map<Kk, String>>() {
-            }.getType(),
-            new Cc<>(),
-            new TypeRef<Cc<String>>() {
-            }.getType(),
-            FsBeanCopier.defaultOptions().toBuilder().converter(kConverter).build()
-        );
+        Cc<String> cs2 = copier.toBuilder()
+            .converter(kConverter)
+            .build().copyProperties(
+                map1,
+                new TypeRef<Map<Kk, String>>() {
+                }.getType(),
+                new Cc<>(),
+                new TypeRef<Cc<String>>() {
+                }.getType()
+            );
         Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(cs2.getI1(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(cs2.getI2(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("cc")), Fs.orNull(cs2.getCc(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("c2")), Fs.orNull(cs2.getC2(), String::valueOf));
 
         // map -> map
-        Map<String, Kk> map2 = copier.copyProperties(
-            map1,
-            new TypeRef<Map<Kk, String>>() {
-            }.getType(),
-            new HashMap<>(),
-            new TypeRef<Map<String, Kk>>() {
-            }.getType(),
-            FsBeanCopier.defaultOptions().toBuilder().converter(kConverter).build()
-        );
+        Map<String, Kk> map2 = copier.toBuilder()
+            .converter(kConverter)
+            .build().copyProperties(
+                map1,
+                new TypeRef<Map<Kk, String>>() {
+                }.getType(),
+                new HashMap<>(),
+                new TypeRef<Map<String, Kk>>() {
+                }.getType()
+            );
         Assert.assertEquals(map1.get(new Kk("i1")), Fs.orNull(map2.get("i1"), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Fs.orNull(map2.get("i2"), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("cc")), Fs.orNull(map2.get("cc"), String::valueOf));

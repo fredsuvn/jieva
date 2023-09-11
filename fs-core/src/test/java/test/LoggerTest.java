@@ -11,7 +11,7 @@ public class LoggerTest {
     @Test
     public void testLogger() {
         //info
-        FsLogger logger = FsLogger.system();
+        FsLogger logger = FsLogger.defaultLogger();
         logger.trace("test trace");
         logger.debug("test debug");
         logger.info("test info");

@@ -662,10 +662,11 @@ public class Fs {
         if (copyNull) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        FsBeanCopier.Options options = FsBeanCopier.defaultOptions().toBuilder()
+        return FsBeanCopier.defaultCopier().toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
-            .build();
-        return FsBeanCopier.defaultCopier().copyProperties(source, dest, options);
+            .build()
+            .copyProperties(source, dest);
+
     }
 
     /**
@@ -681,10 +682,10 @@ public class Fs {
         if (FsArray.isEmpty(ignoredProperties)) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        FsBeanCopier.Options options = FsBeanCopier.defaultOptions().toBuilder()
+        return FsBeanCopier.defaultCopier().toBuilder()
             .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build();
-        return FsBeanCopier.defaultCopier().copyProperties(source, dest, options);
+            .build()
+            .copyProperties(source, dest);
     }
 
     /**
@@ -702,11 +703,11 @@ public class Fs {
         if (copyNull && FsArray.isEmpty(ignoredProperties)) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        FsBeanCopier.Options options = FsBeanCopier.defaultOptions().toBuilder()
+        return FsBeanCopier.defaultCopier().toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
             .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build();
-        return FsBeanCopier.defaultCopier().copyProperties(source, dest, options);
+            .build()
+            .copyProperties(source, dest);
     }
 
     /**
@@ -737,10 +738,10 @@ public class Fs {
         if (copyNull) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        FsBeanCopier.Options options = FsBeanCopier.defaultOptions().toBuilder()
+        return FsBeanCopier.defaultCopier().toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
-            .build();
-        return FsBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType, options);
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
     }
 
     /**
@@ -759,10 +760,10 @@ public class Fs {
         if (FsArray.isEmpty(ignoredProperties)) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        FsBeanCopier.Options options = FsBeanCopier.defaultOptions().toBuilder()
+        return FsBeanCopier.defaultCopier().toBuilder()
             .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build();
-        return FsBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType, options);
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
     }
 
     /**
@@ -783,11 +784,11 @@ public class Fs {
         if (copyNull && FsArray.isEmpty(ignoredProperties)) {
             return FsBeanCopier.defaultCopier().copyProperties(source, dest);
         }
-        FsBeanCopier.Options options = FsBeanCopier.defaultOptions().toBuilder()
+        return FsBeanCopier.defaultCopier().toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
             .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build();
-        return FsBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType, options);
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
     }
 
     /**

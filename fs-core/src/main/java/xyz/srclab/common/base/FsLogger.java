@@ -13,11 +13,11 @@ import java.util.Date;
 public interface FsLogger {
 
     /**
-     * Returns system default logger, which using {@link System#out} to output,
+     * Returns default logger, which using {@link System#out} to output,
      * and its level is {@link Level#INFO}.
      */
-    static FsLogger system() {
-        return Builder.INSTANCE;
+    static FsLogger defaultLogger() {
+        return Builder.DEFAULT;
     }
 
     /**
@@ -249,7 +249,7 @@ public interface FsLogger {
      */
     class Builder {
 
-        private static final FsLogger INSTANCE = new Builder().build();
+        private static final FsLogger DEFAULT = new Builder().build();
 
         private Level level = Level.INFO;
         private Formatter formatter = logInfo -> {

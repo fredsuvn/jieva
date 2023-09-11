@@ -24,7 +24,7 @@ public class InvokeTest {
         helloStatic.setAccessible(true);
         helloVirtual.setAccessible(true);
         TT tt = (TT) (reflect ? FsInvoker.reflectConstructor(constructor) : FsInvoker.unreflectConstructor(constructor)).invoke(null);
-        FsLogger.system().info(tt);
+        FsLogger.defaultLogger().info(tt);
         Assert.assertNotNull(tt);
         Assert.assertEquals(
             (reflect ? FsInvoker.reflectMethod(helloStatic) : FsInvoker.unreflectMethod(helloStatic))

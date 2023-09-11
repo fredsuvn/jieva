@@ -224,7 +224,7 @@ public interface FsConverter {
     }
 
     /**
-     * Returns a new converter of which handlers and options come from current converter,
+     * Returns a converter of which handlers and options come from current converter,
      * but inserts given handler at first index of middle handlers.
      *
      * @param handler given handler
@@ -241,7 +241,7 @@ public interface FsConverter {
     }
 
     /**
-     * Returns a new converter of which handlers come from current converter,
+     * Returns a converter of which handlers come from current converter,
      * but the options will be replaced by given options.
      *
      * @param options given options

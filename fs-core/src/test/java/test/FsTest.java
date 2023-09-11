@@ -19,10 +19,10 @@ public class FsTest {
 
     @Test
     public void testThrow() {
-        FsLogger.system().info(Fs.stackTraceToString(
+        FsLogger.defaultLogger().info(Fs.stackTraceToString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())))
         );
-        FsLogger.system().info(Fs.stackTraceToString(
+        FsLogger.defaultLogger().info(Fs.stackTraceToString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())),
             " : ")
         );
@@ -85,7 +85,7 @@ public class FsTest {
                     return;
                 }
                 if (FsString.isNotEmpty(output)) {
-                    FsLogger.system().info(output);
+                    FsLogger.defaultLogger().info(output);
                 }
                 Fs.sleep(1);
             }
@@ -101,7 +101,7 @@ public class FsTest {
         Process process = Fs.runProcess(command);
         process.waitFor();
         String output = FsIO.avalaibleString(process.getInputStream(), FsSystem.nativeCharset());
-        FsLogger.system().info(output);
+        FsLogger.defaultLogger().info(output);
         Assert.assertEquals(output, ECHO_CONTENT + FsSystem.getLineSeparator());
         process.destroy();
     }
@@ -123,15 +123,15 @@ public class FsTest {
 
     @Test
     public void testSystem() {
-        FsLogger.system().info(FsSystem.getJavaVersion());
-        FsLogger.system().info(FsSystem.javaMajorVersion());
-        FsLogger.system().info(FsSystem.nativeCharset());
-        FsLogger.system().info(FsSystem.getOsName());
-        FsLogger.system().info(FsSystem.isWindows());
-        FsLogger.system().info(FsSystem.isLinux());
-        FsLogger.system().info(FsSystem.isBsd());
-        FsLogger.system().info(FsSystem.isMac());
-        FsLogger.system().info(FsSystem.isJdk9OrHigher());
+        FsLogger.defaultLogger().info(FsSystem.getJavaVersion());
+        FsLogger.defaultLogger().info(FsSystem.javaMajorVersion());
+        FsLogger.defaultLogger().info(FsSystem.nativeCharset());
+        FsLogger.defaultLogger().info(FsSystem.getOsName());
+        FsLogger.defaultLogger().info(FsSystem.isWindows());
+        FsLogger.defaultLogger().info(FsSystem.isLinux());
+        FsLogger.defaultLogger().info(FsSystem.isBsd());
+        FsLogger.defaultLogger().info(FsSystem.isMac());
+        FsLogger.defaultLogger().info(FsSystem.isJdk9OrHigher());
     }
 
     @Test
