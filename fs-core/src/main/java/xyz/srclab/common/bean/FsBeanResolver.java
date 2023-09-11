@@ -22,11 +22,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Resolver for {@link FsBean}.
- * <p>
- * There are built-in resolvers:
+ * Resolver for {@link FsBean}, usually consists of {@link Handler}s.
+ * There are 3 built-in resolvers:
  * <ul>
- *     <li>{@link JavaBeanResolveHandler}: default resolver for {@link #defaultResolver()};</li>
+ *     <li>{@link JavaBeanResolveHandler}: default handler for {@link #defaultResolver()};</li>
  *     <li>{@link RecordBeanResolveHandler};</li>
  *     <li>{@link ProtobufResolveHandler};</li>
  * </ul>

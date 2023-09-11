@@ -23,6 +23,7 @@ dependencies {
   compileOnly "org.springframework:spring-core"
   compileOnly "cglib:cglib"
   compileOnly "org.bouncycastle:bcprov-jdk15on"
+  compileOnly "com.google.protobuf:protobuf-java"
 
   testImplementation project(":boat-test")
   testImplementation "commons-beanutils:commons-beanutils:1.9.4"
