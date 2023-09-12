@@ -17,6 +17,7 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
         ReuseConvertHandler.INSTANCE,
         BeanConvertHandler.INSTANCE,
         Arrays.asList(
+            EnumConvertHandler.INSTANCE,
             DateConvertHandler.INSTANCE,
             BooleanConvertHandler.INSTANCE,
             NumberConvertHandler.INSTANCE,

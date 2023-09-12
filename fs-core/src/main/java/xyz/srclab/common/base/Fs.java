@@ -283,6 +283,17 @@ public class Fs {
     /**
      * Returns enum object of specified name from given enum class, may be null if not found.
      *
+     * @param enumClass given enum class
+     * @param name      specified name
+     */
+    @Nullable
+    public static <T extends Enum<T>> T findEnum(Class<?> enumClass, String name) {
+        return findEnum(enumClass, name, false);
+    }
+
+    /**
+     * Returns enum object of specified name from given enum class, may be null if not found.
+     *
      * @param enumClass  given enum class
      * @param name       specified name
      * @param ignoreCase whether ignore case for specified name

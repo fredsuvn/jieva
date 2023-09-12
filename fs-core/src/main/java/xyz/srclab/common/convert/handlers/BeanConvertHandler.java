@@ -109,6 +109,9 @@ public class BeanConvertHandler implements Handler {
         } else {
             dest = FsType.newInstance(targetRawType);
         }
+        if (dest == null) {
+            return Fs.CONTINUE;
+        }
         return copier.copyProperties(source, sourceType, dest, targetType);
     }
 }

@@ -147,6 +147,34 @@ public class ConvertTest {
                 }.getType()
             )
         );
+        Assert.assertEquals(
+            E1.E1,
+            Fs.convert(
+                "E1",
+                E1.class
+            )
+        );
+        Assert.assertEquals(
+            "E2",
+            Fs.convert(
+                E1.E2,
+                String.class
+            )
+        );
+        Assert.assertEquals(
+            E2.E1,
+            Fs.convert(
+                E1.E1,
+                E2.class
+            )
+        );
+        Assert.assertEquals(
+            E1.E2,
+            Fs.convert(
+                E2.E2,
+                E1.class
+            )
+        );
     }
 
     @Test
@@ -200,5 +228,15 @@ public class ConvertTest {
         public T2(String value) {
             super(value);
         }
+    }
+
+    public enum E1 {
+        E1, E2, E3,
+        ;
+    }
+
+    public enum E2 {
+        E1, E2, E3,
+        ;
     }
 }

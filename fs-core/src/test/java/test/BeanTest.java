@@ -74,10 +74,14 @@ public class BeanTest {
         FsBeanProperty c2 = ccBean.getProperty("c2");
         FsBeanProperty i1 = ccBean.getProperty("i1");
         FsBeanProperty i2 = ccBean.getProperty("i2");
+        FsBeanProperty e1 = ccBean.getProperty("e1");
+        FsBeanProperty e2 = ccBean.getProperty("e2");
         Assert.assertEquals(cc.getType().toString(), "T");
         Assert.assertEquals(c2.getType(), Long.class);
         Assert.assertEquals(i1.getType(), String.class);
         Assert.assertEquals(i2.getType(), Integer.class);
+        Assert.assertEquals(e1.getType(), E1.class);
+        Assert.assertEquals(e2.getType(), E2.class);
         Assert.assertNull(c1);
         Assert.assertEquals(
             c2.getFieldAnnotations().stream().map(Annotation::toString).collect(Collectors.toList()),
@@ -195,6 +199,8 @@ public class BeanTest {
         cc1.setI2(2);
         cc1.setC2(22L);
         cc1.setCc(33L);
+        cc1.setE1(E1.E2);
+        cc1.setE2(E2.E3);
         Cc<Long> cc2 = Fs.copyProperties(cc1, new Cc<>());
         Assert.assertEquals(cc2, cc1);
         cc1.setI1(null);
@@ -203,6 +209,8 @@ public class BeanTest {
         Assert.assertEquals(cc2, cc1);
         Assert.assertEquals(cc2.getI1(), cc1.getI1());
         Assert.assertNull(cc2.getI1());
+        Assert.assertSame(cc2.getE1(), E1.E2);
+        Assert.assertSame(cc2.getE2(), E2.E3);
         cc2.setI1("888");
         Fs.copyProperties(cc1, cc2, false);
         Assert.assertEquals("888", cc2.getI1());
@@ -305,16 +313,17 @@ public class BeanTest {
     public void testCopyPropertiesComplex() {
         Map<? extends Number, ? extends String> pm = new HashMap<>();
         pm.put(Fs.as(1), Fs.as("11"));
-        CopyP1 p1 = new CopyP1("22", new List[]{Arrays.asList(pm)});
+        CopyP1 p1 = new CopyP1("22", new List[]{Arrays.asList(pm)}, E1.E1);
         Map<String, ? extends CopyP1> cm = new HashMap<>();
         cm.put("33", Fs.as(p1));
         CopyA ca = new CopyA("44", new List[]{Arrays.asList(55)}, cm, p1);
         CopyB cb = Fs.copyProperties(ca, new CopyB());
         Assert.assertEquals(cb.getS(), new Long(44L));
         Assert.assertEquals(cb.getList().get(0), new int[]{55});
+        Assert.assertSame(cb.getP().getE(), E2.E1);
         Map<? super BigDecimal, ? super BigInteger> bm = new LinkedHashMap<>();
         bm.put(new BigDecimal("1"), new BigInteger("11"));
-        CopyP2 p2 = new CopyP2(22L, new List[]{Arrays.asList(bm)});
+        CopyP2 p2 = new CopyP2(22L, new List[]{Arrays.asList(bm)}, E2.E1);
         Assert.assertEquals(cb.getP(), p2);
         Map<Integer, ? super CopyP2> cm2 = new LinkedHashMap<>();
         cm2.put(33, p2);
@@ -328,6 +337,8 @@ public class BeanTest {
         private String i1;
         private T cc;
         private Integer i2;
+        private E1 e1;
+        private E2 e2;
 
         @Override
         public String getI1() {
@@ -403,6 +414,7 @@ public class BeanTest {
     public static class CopyP1 {
         private String p;
         private List<Map<? extends Number, ? extends String>>[] list;
+        private E1 e;
     }
 
     @Data
@@ -412,6 +424,7 @@ public class BeanTest {
     public static class CopyP2 {
         private Long p;
         private List<Map<? super BigDecimal, ? super BigInteger>>[] list;
+        private E2 e;
     }
 
     @Data
@@ -451,5 +464,15 @@ public class BeanTest {
         public String setBbb(String bbb) {
             return null;
         }
+    }
+
+    public enum E1 {
+        E1, E2, E3,
+        ;
+    }
+
+    public enum E2 {
+        E1, E2, E3,
+        ;
     }
 }
