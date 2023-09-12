@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -54,10 +55,10 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
             Method getDescriptorMethod = rawType.getMethod("getDescriptor");
             Descriptors.Descriptor descriptor = (Descriptors.Descriptor) getDescriptorMethod.invoke(null);
             for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
-                FsBeanProperty property = buildProperty(field, rawType, isBuilder);
+                FsBeanProperty property = buildProperty(builder, field, rawType, isBuilder);
                 builder.getProperties().put(property.getName(), property);
             }
-            return Fs.CONTINUE;
+            return Fs.BREAK;
         } catch (FsConvertException e) {
             throw e;
         } catch (Exception e) {
@@ -66,8 +67,12 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
     }
 
     private FsBeanProperty buildProperty(
-        Descriptors.FieldDescriptor field, Class<?> rawClass, boolean isBuilder) throws Exception{
-        //return null;
+        FsBeanResolver.BeanBuilder builder,
+        Descriptors.FieldDescriptor field,
+        Class<?> rawClass,
+        boolean isBuilder
+    ) throws Exception {
+
         String rawName = field.getName();
 
         //map
@@ -76,11 +81,9 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
             Method getterMethod = rawClass.getMethod("get" + FsString.capitalize(name));
             Type type = FsType.getGenericSuperType(getterMethod.getGenericReturnType(), Map.class);
             FsInvoker getter = FsInvoker.reflectMethod(getterMethod);
-            //getters[name] = GetterInfo(name, type, getter, null, getterMethod)
-
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + FsString.capitalize(rawName));
-                Method putAllMethod = rawClass.getMethod("putAll"+ FsString.capitalize(rawName), Map.class);
+                Method putAllMethod = rawClass.getMethod("putAll" + FsString.capitalize(rawName), Map.class);
                 FsInvoker setter = new FsInvoker() {
                     @Override
                     public @Nullable Object invoke(@Nullable Object inst, Object... args) {
@@ -94,72 +97,79 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
                         }
                     }
                 };
-                //setters[name] = SetterInfo(name, type, setter, null, null)
+                return new PropertyImpl(name, type, getterMethod, null, getter, setter, builder);
+            } else {
+                return new PropertyImpl(name, type, getterMethod, null, getter, null, builder);
             }
-
-            return new PropertyImpl(name, type, getter, null);
         }
 
         //repeated
-//        if (field.isRepeated) {
-//            val name = rawName + "List"
-//            val getterMethod = rawClass.getMethodOrNull("get${name.capitalize()}")
-//            if (getterMethod === null) {
-//                return
-//            }
-//            val type = getterMethod.genericReturnType.getTypeSignature(List::class.java)
-//            val getter = getterMethod.toInstInvoke()
-//            getters[name] = GetterInfo(name, type, getter, null, getterMethod)
-//
-//            if (isBuilder) {
-//                val clearMethod = rawClass.getMethodOrNull("clear${rawName.capitalize()}")
-//                if (clearMethod === null) {
-//                    throw IllegalStateException("Cannot find clear method of field: $name")
-//                }
-//                val addAllMethod =
-//                    rawClass.getMethodOrNull("addAll${rawName.capitalize()}", Iterable::class.java)
-//                if (addAllMethod === null) {
-//                    throw IllegalStateException("Cannot find add-all method of field: $name")
-//                }
-//                val setter = createSetter(clearMethod, addAllMethod)
-//                setters[name] = SetterInfo(name, type, setter, null, null)
-//            }
-//
-//            return
-//        }
-//
-//        // Simple object
-//        val getterMethod = rawClass.getMethodOrNull("get${rawName.capitalize()}")
-//        if (getterMethod === null) {
-//            return
-//        }
-//        val type = getterMethod.genericReturnType
-//        val getter = getterMethod.toInstInvoke()
-//        getters[rawName] = GetterInfo(rawName, type, getter, null, getterMethod)
-//
-//        if (isBuilder) {
-//            val setterMethod = rawClass.getMethodOrNull("set${rawName.capitalize()}", type.rawClass)
-//            if (setterMethod === null) {
-//                throw IllegalStateException("Cannot find setter method of field: $rawName")
-//            }
-//            val setter = setterMethod.toInstInvoke()
-//            setters[rawName] = SetterInfo(rawName, type, setter, null, setterMethod)
-//        }
-        return null;
+        if (field.isRepeated()) {
+            String name = rawName + "List";
+            Method getterMethod = rawClass.getMethod("get" + FsString.capitalize(name));
+            Type type = FsType.getGenericSuperType(getterMethod.getGenericReturnType(), List.class);
+            FsInvoker getter = FsInvoker.reflectMethod(getterMethod);
+            if (isBuilder) {
+                Method clearMethod = rawClass.getMethod("clear" + FsString.capitalize(rawName));
+                Method addAllMethod = rawClass.getMethod("addAll" + FsString.capitalize(rawName), Iterable.class);
+                FsInvoker setter = new FsInvoker() {
+                    @Override
+                    public @Nullable Object invoke(@Nullable Object inst, Object... args) {
+                        try {
+                            clearMethod.invoke(inst);
+                            return addAllMethod.invoke(inst, args);
+                        } catch (InvocationTargetException e) {
+                            throw new FsBeanException(e.getCause());
+                        } catch (Exception e) {
+                            throw new FsBeanException(e);
+                        }
+                    }
+                };
+                return new PropertyImpl(name, type, getterMethod, null, getter, setter, builder);
+            } else {
+                return new PropertyImpl(name, type, getterMethod, null, getter, null, builder);
+            }
+        }
+
+        // Simple object
+        Method getterMethod = rawClass.getMethod("get" + FsString.capitalize(rawName));
+        Type type = getterMethod.getGenericReturnType();
+        FsInvoker getter = FsInvoker.reflectMethod(getterMethod);
+        if (isBuilder) {
+            Method setterMethod = rawClass.getMethod("set" + FsString.capitalize(rawName), FsType.getRawType(type));
+            FsInvoker setter = FsInvoker.reflectMethod(setterMethod);
+            return new PropertyImpl(rawName, type, getterMethod, setterMethod, getter, setter, builder);
+        } else {
+            return new PropertyImpl(rawName, type, getterMethod, null, getter, null, builder);
+        }
     }
 
     private static final class PropertyImpl implements FsBeanProperty {
 
         private final String name;
         private final Type type;
+        private final @Nullable Method getterMethod;
+        private final @Nullable Method setterMethod;
         private final FsInvoker getter;
-        private final FsInvoker setter;
+        private final @Nullable FsInvoker setter;
+        private final FsBean owner;
 
-        private PropertyImpl(String name, Type type, FsInvoker getter, FsInvoker setter) {
+        private PropertyImpl(
+            String name,
+            Type type,
+            @Nullable Method getterMethod,
+            @Nullable Method setterMethod,
+            FsInvoker getter,
+            @Nullable FsInvoker setter,
+            FsBean owner
+        ) {
             this.name = name;
             this.type = type;
+            this.getterMethod = getterMethod;
+            this.setterMethod = setterMethod;
             this.getter = getter;
             this.setter = setter;
+            this.owner = owner;
         }
 
         @Override
@@ -174,22 +184,24 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
 
         @Override
         public void set(Object bean, @Nullable Object value) {
-
+            if (setter == null) {
+                throw new FsBeanException("Not writeable.");
+            }
         }
 
         @Override
         public Type getType() {
-            return null;
+            return type;
         }
 
         @Override
         public @Nullable Method getGetter() {
-            return null;
+            return getterMethod;
         }
 
         @Override
         public @Nullable Method getSetter() {
-            return null;
+            return setterMethod;
         }
 
         @Override
@@ -199,37 +211,37 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
 
         @Override
         public List<Annotation> getGetterAnnotations() {
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
         public List<Annotation> getSetterAnnotations() {
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
         public List<Annotation> getFieldAnnotations() {
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
         public List<Annotation> getAnnotations() {
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
         public FsBean getOwner() {
-            return null;
+            return owner;
         }
 
         @Override
         public boolean isReadable() {
-            return false;
+            return true;
         }
 
         @Override
         public boolean isWriteable() {
-            return false;
+            return setter != null;
         }
     }
 }

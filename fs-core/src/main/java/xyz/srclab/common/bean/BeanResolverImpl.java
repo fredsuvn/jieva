@@ -10,16 +10,16 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-final class BeanResolverImpl implements FsBeanResolver {
+final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
 
     static final BeanResolverImpl INSTANCE =
         new BeanResolverImpl(Collections.singletonList(JavaBeanResolveHandler.INSTANCE), FsCache.softCache());
 
-    private final Iterable<Handler> handlers;
+    private final List<Handler> handlers;
     private final @Nullable FsCache<Type, FsBean> cache;
 
     BeanResolverImpl(Iterable<Handler> handlers, @Nullable FsCache<Type, FsBean> cache) {
-        this.handlers = FsCollect.toCollection(new LinkedList<>(), handlers);
+        this.handlers = FsCollect.immutableList(handlers);
         this.cache = cache;
     }
 
@@ -29,6 +29,33 @@ final class BeanResolverImpl implements FsBeanResolver {
             return resolve0(type);
         }
         return cache.get(type, this::resolve0);
+    }
+
+    @Override
+    public List<Handler> getHandlers() {
+        return handlers;
+    }
+
+    @Override
+    public FsBeanResolver withHandler(Handler handler) {
+        List<Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
+        return new BeanResolverImpl(newHandlers, cache);
+    }
+
+    @Override
+    public Handler asHandler() {
+        return this;
+    }
+
+    @Override
+    public @Nullable Object resolve(BeanBuilder builder) {
+        for (Handler handler : handlers) {
+            Object result = handler.resolve(builder);
+            if (!Objects.equals(result, Fs.CONTINUE)) {
+                return result;
+            }
+        }
+        return Fs.CONTINUE;
     }
 
     private FsBean resolve0(Type type) {
@@ -43,7 +70,7 @@ final class BeanResolverImpl implements FsBeanResolver {
         return builder;
     }
 
-    final class FsBeanBuilderImpl implements BeanBuilder {
+    static final class FsBeanBuilderImpl implements BeanBuilder {
 
         private final Type type;
         private volatile Map<String, FsBeanProperty> properties = new LinkedHashMap<>();

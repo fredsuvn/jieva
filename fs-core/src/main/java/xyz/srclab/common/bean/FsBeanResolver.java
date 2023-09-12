@@ -336,6 +336,25 @@ public interface FsBeanResolver {
     }
 
     /**
+     * Returns handlers of this resolver.
+     */
+    List<Handler> getHandlers();
+
+    /**
+     * Returns a new resolver of which handlers come from current resolver,
+     * but inserts given handler at first index of handlers.
+     * The returned resolver will share the cache with this resolver.
+     *
+     * @param handler given handler
+     */
+    FsBeanResolver withHandler(Handler handler);
+
+    /**
+     * Returns this resolver as a {@link Handler}.
+     */
+    Handler asHandler();
+
+    /**
      * Handler of {@link FsBeanResolver}.
      * <p>
      * Note this interface doesn't support wrap-map methods such as {@link #wrapMap(Map, Type)}.
