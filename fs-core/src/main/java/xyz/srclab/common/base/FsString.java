@@ -238,6 +238,24 @@ public class FsString {
     }
 
     /**
+     * Capitalizes given chars, equivalent to {@code firstCase(chars, true)}.
+     *
+     * @param chars given chars
+     */
+    public static String capitalize(CharSequence chars) {
+        return firstCase(chars, true);
+    }
+
+    /**
+     * Un-capitalizes given chars, equivalent to {@code firstCase(chars, false)}.
+     *
+     * @param chars given chars
+     */
+    public static String uncapitalize(CharSequence chars) {
+        return firstCase(chars, false);
+    }
+
+    /**
      * Returns a String of which first char is upper or lower (according to given upper) of first char of given chars,
      * and the rest chars are unchanged.
      *

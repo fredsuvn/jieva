@@ -217,4 +217,12 @@ public class StringTest {
             })
         );
     }
+
+    @Test
+    public void testCapitalize() {
+        Assert.assertEquals("Abc", FsString.capitalize("abc"));
+        Assert.assertEquals("Abc", FsString.capitalize("Abc"));
+        Assert.assertEquals("abc", FsString.uncapitalize("abc"));
+        Assert.assertEquals("abc", FsString.uncapitalize("Abc"));
+    }
 }
