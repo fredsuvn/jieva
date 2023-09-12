@@ -39,6 +39,8 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
     @Override
     public FsBeanResolver withHandler(Handler handler) {
         List<Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
+        newHandlers.add(handler);
+        newHandlers.addAll(handlers);
         return new BeanResolverImpl(newHandlers, cache);
     }
 
@@ -51,8 +53,8 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
     public @Nullable Object resolve(BeanBuilder builder) {
         for (Handler handler : handlers) {
             Object result = handler.resolve(builder);
-            if (!Objects.equals(result, Fs.CONTINUE)) {
-                return result;
+            if (Fs.CONTINUE != result) {
+                return Fs.BREAK;
             }
         }
         return Fs.CONTINUE;

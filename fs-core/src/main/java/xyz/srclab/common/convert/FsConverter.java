@@ -214,7 +214,7 @@ public interface FsConverter {
     default Object convertObject(@Nullable Object source, Type sourceType, Type targetType) {
         for (Handler handler : getHandlers()) {
             Object value = handler.convert(source, sourceType, targetType, this);
-            if (value == Fs.BREAK || value == Fs.RETURN) {
+            if (value == Fs.BREAK) {
                 return Fs.RETURN;
             }
             if (value != Fs.CONTINUE) {

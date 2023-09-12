@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class ConvertTest {
 
@@ -208,6 +209,35 @@ public class ConvertTest {
         converter2 = converter.withOptions(converter.getOptions()
             .replaceReusePolicy(reusePolicy));
         Assert.assertSame(converter, converter2);
+    }
+
+    @Test
+    public void testConvertAsHandler() {
+        FsConverter.Handler handler = FsConverter.defaultConverter()
+            .withMiddleHandler(new FsConverter.Handler() {
+                @Override
+                public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+                    if (Objects.equals(source, "1")) {
+                        return "2";
+                    }
+                    if (Objects.equals(source, "2")) {
+                        return "1";
+                    }
+                    if (Objects.equals(source, "3")) {
+                        return Fs.CONTINUE;
+                    }
+                    return Fs.BREAK;
+                }
+            })
+            .asHandler();
+        Assert.assertEquals(
+            handler.convert("1", String.class, Integer.class, FsConverter.defaultConverter()), "2");
+        Assert.assertEquals(
+            handler.convert("2", String.class, Integer.class, FsConverter.defaultConverter()), "1");
+        Assert.assertEquals(
+            handler.convert("3", String.class, Integer.class, FsConverter.defaultConverter()), 3);
+        Assert.assertEquals(
+            handler.convert("4", String.class, Integer.class, FsConverter.defaultConverter()), Fs.BREAK);
     }
 
     @NoArgsConstructor

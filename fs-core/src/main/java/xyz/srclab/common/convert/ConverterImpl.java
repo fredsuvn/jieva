@@ -102,10 +102,15 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
 
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
-        Object value = convertObject(source, sourceType, targetType);
-        if (value == Fs.RETURN) {
-            return Fs.CONTINUE;
+        for (Handler handler : getHandlers()) {
+            Object value = handler.convert(source, sourceType, targetType, this);
+            if (value == Fs.BREAK) {
+                return Fs.BREAK;
+            }
+            if (value != Fs.CONTINUE) {
+                return value;
+            }
         }
-        return value;
+        return Fs.CONTINUE;
     }
 }

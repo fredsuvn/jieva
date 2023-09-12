@@ -330,6 +330,51 @@ public class BeanTest {
         Assert.assertEquals(cb.getMap(), cm2);
     }
 
+    @Test
+    public void testResolverAsHandler() {
+        int[] x = {0};
+        FsBeanResolver.Handler handler = FsBeanResolver.defaultResolver()
+            .withHandler(new FsBeanResolver.Handler() {
+                @Override
+                public @Nullable Object resolve(FsBeanResolver.BeanBuilder builder) {
+                    if (Objects.equals(builder.getType(), Integer.class)) {
+                        x[0]++;
+                        return Fs.CONTINUE;
+                    }
+                    return Fs.BREAK;
+                }
+            })
+            .asHandler();
+        FsBeanResolver.BeanBuilder builder1 = new FsBeanResolver.BeanBuilder() {
+
+            @Override
+            public Type getType() {
+                return Integer.class;
+            }
+
+            @Override
+            public Map<String, FsBeanProperty> getProperties() {
+                return new HashMap<>();
+            }
+        };
+        Assert.assertEquals(handler.resolve(builder1), Fs.CONTINUE);
+        Assert.assertEquals(x[0], 1);
+        FsBeanResolver.BeanBuilder builder2 = new FsBeanResolver.BeanBuilder() {
+
+            @Override
+            public Type getType() {
+                return String.class;
+            }
+
+            @Override
+            public Map<String, FsBeanProperty> getProperties() {
+                return new HashMap<>();
+            }
+        };
+        Assert.assertEquals(handler.resolve(builder2), Fs.BREAK);
+        Assert.assertEquals(x[0], 1);
+    }
+
     @EqualsAndHashCode(callSuper = true)
     @Data
     public static class Cc<T> extends C2<Long> implements I1, I2<Integer> {
