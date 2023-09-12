@@ -191,6 +191,11 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
         }
 
         @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
         public @Nullable Object get(Object bean) {
             if (getterInvoker == null) {
                 throw new FsBeanException("Property is not readable: " + name + ".");

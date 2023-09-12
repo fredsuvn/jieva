@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
  * Resolver for {@link FsBean}, usually consists of {@link Handler}s.
  * There are 3 built-in resolvers:
  * <ul>
- *     <li>{@link JavaBeanResolveHandler}: default handler for {@link #defaultResolver()};</li>
+ *     <li>{@link JavaBeanResolveHandler} (default handler);</li>
  *     <li>{@link RecordBeanResolveHandler};</li>
- *     <li>{@link ProtobufResolveHandler};</li>
+ *     <li>{@link ProtobufResolveHandler} (the runtime must contains protobuf libs);</li>
  * </ul>
  *
  * @author fredsuvn
@@ -231,6 +231,11 @@ public interface FsBeanResolver {
 
                 private FsMapBeanPropertyImpl(String key) {
                     this.key = key;
+                }
+
+                @Override
+                public String getName() {
+                    return key;
                 }
 
                 @Override

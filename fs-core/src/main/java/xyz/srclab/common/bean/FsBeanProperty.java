@@ -22,6 +22,11 @@ import java.util.Objects;
 public interface FsBeanProperty {
 
     /**
+     * Returns name of this property.
+     */
+    String getName();
+
+    /**
      * Returns property value of given bean instance.
      *
      * @param bean given bean instance
