@@ -18,14 +18,28 @@ import java.io.InputStream;
 
 public class FileTest {
 
+    private static final String GENERATED_TEMP_DIR = "generated/temp/test";
+
     private static final String DATA = TestUtil.buildRandomString(256, 256);
 
+    public static File createFile(String path) {
+        createGeneratedTempDir();
+        File file = new File(GENERATED_TEMP_DIR + "/" + path);
+        return file;
+    }
+
     public static File createFile(String path, String data) throws IOException {
-        File file = new File(path);
+        createGeneratedTempDir();
+        File file = new File(GENERATED_TEMP_DIR + "/" + path);
         FileOutputStream fileOutputStream = new FileOutputStream(file, false);
         fileOutputStream.write(data.getBytes(FsString.CHARSET));
         fileOutputStream.close();
         return file;
+    }
+
+    private static void createGeneratedTempDir() {
+        File firFile = new File(GENERATED_TEMP_DIR);
+        firFile.mkdirs();
     }
 
     @Test

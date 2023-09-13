@@ -320,7 +320,7 @@ public class IOTest {
 
     @Test
     public void testWriteFile() throws IOException {
-        File file = new File("IOTest-testWriteFile.txt");
+        File file = FileTest.createFile("IOTest-testWriteFile.txt");
         if (!file.exists()) {
             file.createNewFile();
         }
