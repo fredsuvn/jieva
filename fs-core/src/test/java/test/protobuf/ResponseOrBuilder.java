@@ -11,7 +11,7 @@ public interface ResponseOrBuilder extends
    * <code>string code = 1;</code>
    * @return The code.
    */
-  java.lang.String getCode();
+  String getCode();
   /**
    * <code>string code = 1;</code>
    * @return The bytes for code.
@@ -34,9 +34,9 @@ public interface ResponseOrBuilder extends
    * <code>.Data data = 3;</code>
    * @return The data.
    */
-  test.protobuf.Data getData();
+  Data getData();
   /**
    * <code>.Data data = 3;</code>
    */
-  test.protobuf.DataOrBuilder getDataOrBuilder();
+  DataOrBuilder getDataOrBuilder();
 }

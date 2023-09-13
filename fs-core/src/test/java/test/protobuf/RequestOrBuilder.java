@@ -28,9 +28,9 @@ public interface RequestOrBuilder extends
    * <code>.Data data = 3;</code>
    * @return The data.
    */
-  test.protobuf.Data getData();
+  Data getData();
   /**
    * <code>.Data data = 3;</code>
    */
-  test.protobuf.DataOrBuilder getDataOrBuilder();
+  DataOrBuilder getDataOrBuilder();
 }

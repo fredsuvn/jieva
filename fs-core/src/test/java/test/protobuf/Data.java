@@ -19,16 +19,17 @@ private static final long serialVersionUID = 0L;
     em_ = 0;
     str_ = "";
     text_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    bytes_ = com.google.protobuf.ByteString.EMPTY;
   }
 
-  @java.lang.Override
+  @Override
   @SuppressWarnings({"unused"})
-  protected java.lang.Object newInstance(
+  protected Object newInstance(
       UnusedPrivateParameter unused) {
     return new Data();
   }
 
-  @java.lang.Override
+  @Override
   public final com.google.protobuf.UnknownFieldSet
   getUnknownFields() {
     return this.unknownFields;
@@ -39,7 +40,7 @@ private static final long serialVersionUID = 0L;
       throws com.google.protobuf.InvalidProtocolBufferException {
     this();
     if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
+      throw new NullPointerException();
     }
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -59,7 +60,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 18: {
-            java.lang.String s = input.readStringRequireUtf8();
+            String s = input.readStringRequireUtf8();
 
             str_ = s;
             break;
@@ -70,7 +71,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 34: {
-            java.lang.String s = input.readStringRequireUtf8();
+            String s = input.readStringRequireUtf8();
             if (!((mutable_bitField0_ & 0x00000001) != 0)) {
               text_ = new com.google.protobuf.LazyStringArrayList();
               mutable_bitField0_ |= 0x00000001;
@@ -84,11 +85,56 @@ private static final long serialVersionUID = 0L;
                   EntryDefaultEntryHolder.defaultEntry);
               mutable_bitField0_ |= 0x00000002;
             }
-            com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+            com.google.protobuf.MapEntry<String, String>
             entry__ = input.readMessage(
                 EntryDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
             entry_.getMutableMap().put(
                 entry__.getKey(), entry__.getValue());
+            break;
+          }
+          case 48: {
+
+            uint32_ = input.readUInt32();
+            break;
+          }
+          case 56: {
+
+            uint64_ = input.readUInt64();
+            break;
+          }
+          case 69: {
+
+            fixed32_ = input.readFixed32();
+            break;
+          }
+          case 73: {
+
+            fixed64_ = input.readFixed64();
+            break;
+          }
+          case 85: {
+
+            sfixed32_ = input.readSFixed32();
+            break;
+          }
+          case 89: {
+
+            sfixed64_ = input.readSFixed64();
+            break;
+          }
+          case 96: {
+
+            sint32_ = input.readSInt32();
+            break;
+          }
+          case 104: {
+
+            sint64_ = input.readSInt64();
+            break;
+          }
+          case 114: {
+
+            bytes_ = input.readBytes();
             break;
           }
           default: {
@@ -115,11 +161,11 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return test.protobuf.Message.internal_static_Data_descriptor;
+    return Message.internal_static_Data_descriptor;
   }
 
   @SuppressWarnings({"rawtypes"})
-  @java.lang.Override
+  @Override
   protected com.google.protobuf.MapField internalGetMapField(
       int number) {
     switch (number) {
@@ -130,12 +176,12 @@ private static final long serialVersionUID = 0L;
             "Invalid map field number: " + number);
     }
   }
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+  @Override
+  protected FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return test.protobuf.Message.internal_static_Data_fieldAccessorTable
+    return Message.internal_static_Data_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            test.protobuf.Data.class, test.protobuf.Data.Builder.class);
+            Data.class, Builder.class);
   }
 
   public static final int EM_FIELD_NUMBER = 1;
@@ -144,34 +190,34 @@ private static final long serialVersionUID = 0L;
    * <code>.Enum em = 1;</code>
    * @return The enum numeric value on the wire for em.
    */
-  @java.lang.Override public int getEmValue() {
+  @Override public int getEmValue() {
     return em_;
   }
   /**
    * <code>.Enum em = 1;</code>
    * @return The em.
    */
-  @java.lang.Override public test.protobuf.Enum getEm() {
+  @Override public Enum getEm() {
     @SuppressWarnings("deprecation")
-    test.protobuf.Enum result = test.protobuf.Enum.valueOf(em_);
-    return result == null ? test.protobuf.Enum.UNRECOGNIZED : result;
+    Enum result = Enum.valueOf(em_);
+    return result == null ? Enum.UNRECOGNIZED : result;
   }
 
   public static final int STR_FIELD_NUMBER = 2;
-  private volatile java.lang.Object str_;
+  private volatile Object str_;
   /**
    * <code>string str = 2;</code>
    * @return The str.
    */
-  @java.lang.Override
-  public java.lang.String getStr() {
-    java.lang.Object ref = str_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
+  @Override
+  public String getStr() {
+    Object ref = str_;
+    if (ref instanceof String) {
+      return (String) ref;
     } else {
       com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
+      String s = bs.toStringUtf8();
       str_ = s;
       return s;
     }
@@ -180,14 +226,14 @@ private static final long serialVersionUID = 0L;
    * <code>string str = 2;</code>
    * @return The bytes for str.
    */
-  @java.lang.Override
+  @Override
   public com.google.protobuf.ByteString
       getStrBytes() {
-    java.lang.Object ref = str_;
-    if (ref instanceof java.lang.String) {
+    Object ref = str_;
+    if (ref instanceof String) {
       com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
+              (String) ref);
       str_ = b;
       return b;
     } else {
@@ -201,7 +247,7 @@ private static final long serialVersionUID = 0L;
    * <code>int64 num = 3;</code>
    * @return The num.
    */
-  @java.lang.Override
+  @Override
   public long getNum() {
     return num_;
   }
@@ -228,7 +274,7 @@ private static final long serialVersionUID = 0L;
    * @param index The index of the element to return.
    * @return The text at the given index.
    */
-  public java.lang.String getText(int index) {
+  public String getText(int index) {
     return text_.get(index);
   }
   /**
@@ -244,18 +290,18 @@ private static final long serialVersionUID = 0L;
   public static final int ENTRY_FIELD_NUMBER = 5;
   private static final class EntryDefaultEntryHolder {
     static final com.google.protobuf.MapEntry<
-        java.lang.String, java.lang.String> defaultEntry =
+        String, String> defaultEntry =
             com.google.protobuf.MapEntry
-            .<java.lang.String, java.lang.String>newDefaultInstance(
-                test.protobuf.Message.internal_static_Data_EntryEntry_descriptor,
+            .<String, String>newDefaultInstance(
+                Message.internal_static_Data_EntryEntry_descriptor,
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "",
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "");
   }
   private com.google.protobuf.MapField<
-      java.lang.String, java.lang.String> entry_;
-  private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      String, String> entry_;
+  private com.google.protobuf.MapField<String, String>
   internalGetEntry() {
     if (entry_ == null) {
       return com.google.protobuf.MapField.emptyMapField(
@@ -271,59 +317,158 @@ private static final long serialVersionUID = 0L;
    * <code>map&lt;string, string&gt; entry = 5;</code>
    */
 
-  @java.lang.Override
+  @Override
   public boolean containsEntry(
-      java.lang.String key) {
-    if (key == null) { throw new java.lang.NullPointerException(); }
+      String key) {
+    if (key == null) { throw new NullPointerException(); }
     return internalGetEntry().getMap().containsKey(key);
   }
   /**
    * Use {@link #getEntryMap()} instead.
    */
-  @java.lang.Override
-  @java.lang.Deprecated
-  public java.util.Map<java.lang.String, java.lang.String> getEntry() {
+  @Override
+  @Deprecated
+  public java.util.Map<String, String> getEntry() {
     return getEntryMap();
   }
   /**
    * <code>map&lt;string, string&gt; entry = 5;</code>
    */
-  @java.lang.Override
+  @Override
 
-  public java.util.Map<java.lang.String, java.lang.String> getEntryMap() {
+  public java.util.Map<String, String> getEntryMap() {
     return internalGetEntry().getMap();
   }
   /**
    * <code>map&lt;string, string&gt; entry = 5;</code>
    */
-  @java.lang.Override
+  @Override
 
-  public java.lang.String getEntryOrDefault(
-      java.lang.String key,
-      java.lang.String defaultValue) {
-    if (key == null) { throw new java.lang.NullPointerException(); }
-    java.util.Map<java.lang.String, java.lang.String> map =
+  public String getEntryOrDefault(
+      String key,
+      String defaultValue) {
+    if (key == null) { throw new NullPointerException(); }
+    java.util.Map<String, String> map =
         internalGetEntry().getMap();
     return map.containsKey(key) ? map.get(key) : defaultValue;
   }
   /**
    * <code>map&lt;string, string&gt; entry = 5;</code>
    */
-  @java.lang.Override
+  @Override
 
-  public java.lang.String getEntryOrThrow(
-      java.lang.String key) {
-    if (key == null) { throw new java.lang.NullPointerException(); }
-    java.util.Map<java.lang.String, java.lang.String> map =
+  public String getEntryOrThrow(
+      String key) {
+    if (key == null) { throw new NullPointerException(); }
+    java.util.Map<String, String> map =
         internalGetEntry().getMap();
     if (!map.containsKey(key)) {
-      throw new java.lang.IllegalArgumentException();
+      throw new IllegalArgumentException();
     }
     return map.get(key);
   }
 
+  public static final int UINT32_FIELD_NUMBER = 6;
+  private int uint32_;
+  /**
+   * <code>uint32 uint32 = 6;</code>
+   * @return The uint32.
+   */
+  @Override
+  public int getUint32() {
+    return uint32_;
+  }
+
+  public static final int UINT64_FIELD_NUMBER = 7;
+  private long uint64_;
+  /**
+   * <code>uint64 uint64 = 7;</code>
+   * @return The uint64.
+   */
+  @Override
+  public long getUint64() {
+    return uint64_;
+  }
+
+  public static final int FIXED32_FIELD_NUMBER = 8;
+  private int fixed32_;
+  /**
+   * <code>fixed32 fixed32 = 8;</code>
+   * @return The fixed32.
+   */
+  @Override
+  public int getFixed32() {
+    return fixed32_;
+  }
+
+  public static final int FIXED64_FIELD_NUMBER = 9;
+  private long fixed64_;
+  /**
+   * <code>fixed64 fixed64 = 9;</code>
+   * @return The fixed64.
+   */
+  @Override
+  public long getFixed64() {
+    return fixed64_;
+  }
+
+  public static final int SFIXED32_FIELD_NUMBER = 10;
+  private int sfixed32_;
+  /**
+   * <code>sfixed32 sfixed32 = 10;</code>
+   * @return The sfixed32.
+   */
+  @Override
+  public int getSfixed32() {
+    return sfixed32_;
+  }
+
+  public static final int SFIXED64_FIELD_NUMBER = 11;
+  private long sfixed64_;
+  /**
+   * <code>sfixed64 sfixed64 = 11;</code>
+   * @return The sfixed64.
+   */
+  @Override
+  public long getSfixed64() {
+    return sfixed64_;
+  }
+
+  public static final int SINT32_FIELD_NUMBER = 12;
+  private int sint32_;
+  /**
+   * <code>sint32 sint32 = 12;</code>
+   * @return The sint32.
+   */
+  @Override
+  public int getSint32() {
+    return sint32_;
+  }
+
+  public static final int SINT64_FIELD_NUMBER = 13;
+  private long sint64_;
+  /**
+   * <code>sint64 sint64 = 13;</code>
+   * @return The sint64.
+   */
+  @Override
+  public long getSint64() {
+    return sint64_;
+  }
+
+  public static final int BYTES_FIELD_NUMBER = 14;
+  private com.google.protobuf.ByteString bytes_;
+  /**
+   * <code>bytes bytes = 14;</code>
+   * @return The bytes.
+   */
+  @Override
+  public com.google.protobuf.ByteString getBytes() {
+    return bytes_;
+  }
+
   private byte memoizedIsInitialized = -1;
-  @java.lang.Override
+  @Override
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
     if (isInitialized == 1) return true;
@@ -333,10 +478,10 @@ private static final long serialVersionUID = 0L;
     return true;
   }
 
-  @java.lang.Override
+  @Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (em_ != test.protobuf.Enum.E1.getNumber()) {
+    if (em_ != Enum.E1.getNumber()) {
       output.writeEnum(1, em_);
     }
     if (!getStrBytes().isEmpty()) {
@@ -354,16 +499,43 @@ private static final long serialVersionUID = 0L;
         internalGetEntry(),
         EntryDefaultEntryHolder.defaultEntry,
         5);
+    if (uint32_ != 0) {
+      output.writeUInt32(6, uint32_);
+    }
+    if (uint64_ != 0L) {
+      output.writeUInt64(7, uint64_);
+    }
+    if (fixed32_ != 0) {
+      output.writeFixed32(8, fixed32_);
+    }
+    if (fixed64_ != 0L) {
+      output.writeFixed64(9, fixed64_);
+    }
+    if (sfixed32_ != 0) {
+      output.writeSFixed32(10, sfixed32_);
+    }
+    if (sfixed64_ != 0L) {
+      output.writeSFixed64(11, sfixed64_);
+    }
+    if (sint32_ != 0) {
+      output.writeSInt32(12, sint32_);
+    }
+    if (sint64_ != 0L) {
+      output.writeSInt64(13, sint64_);
+    }
+    if (!bytes_.isEmpty()) {
+      output.writeBytes(14, bytes_);
+    }
     unknownFields.writeTo(output);
   }
 
-  @java.lang.Override
+  @Override
   public int getSerializedSize() {
     int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
-    if (em_ != test.protobuf.Enum.E1.getNumber()) {
+    if (em_ != Enum.E1.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(1, em_);
     }
@@ -382,9 +554,9 @@ private static final long serialVersionUID = 0L;
       size += dataSize;
       size += 1 * getTextList().size();
     }
-    for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+    for (java.util.Map.Entry<String, String> entry
          : internalGetEntry().getMap().entrySet()) {
-      com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+      com.google.protobuf.MapEntry<String, String>
       entry__ = EntryDefaultEntryHolder.defaultEntry.newBuilderForType()
           .setKey(entry.getKey())
           .setValue(entry.getValue())
@@ -392,20 +564,56 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, entry__);
     }
+    if (uint32_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt32Size(6, uint32_);
+    }
+    if (uint64_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(7, uint64_);
+    }
+    if (fixed32_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFixed32Size(8, fixed32_);
+    }
+    if (fixed64_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFixed64Size(9, fixed64_);
+    }
+    if (sfixed32_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeSFixed32Size(10, sfixed32_);
+    }
+    if (sfixed64_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeSFixed64Size(11, sfixed64_);
+    }
+    if (sint32_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeSInt32Size(12, sint32_);
+    }
+    if (sint64_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeSInt64Size(13, sint64_);
+    }
+    if (!bytes_.isEmpty()) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(14, bytes_);
+    }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
+  @Override
+  public boolean equals(final Object obj) {
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof test.protobuf.Data)) {
+    if (!(obj instanceof Data)) {
       return super.equals(obj);
     }
-    test.protobuf.Data other = (test.protobuf.Data) obj;
+    Data other = (Data) obj;
 
     if (em_ != other.em_) return false;
     if (!getStr()
@@ -416,11 +624,29 @@ private static final long serialVersionUID = 0L;
         .equals(other.getTextList())) return false;
     if (!internalGetEntry().equals(
         other.internalGetEntry())) return false;
+    if (getUint32()
+        != other.getUint32()) return false;
+    if (getUint64()
+        != other.getUint64()) return false;
+    if (getFixed32()
+        != other.getFixed32()) return false;
+    if (getFixed64()
+        != other.getFixed64()) return false;
+    if (getSfixed32()
+        != other.getSfixed32()) return false;
+    if (getSfixed64()
+        != other.getSfixed64()) return false;
+    if (getSint32()
+        != other.getSint32()) return false;
+    if (getSint64()
+        != other.getSint64()) return false;
+    if (!getBytes()
+        .equals(other.getBytes())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
 
-  @java.lang.Override
+  @Override
   public int hashCode() {
     if (memoizedHashCode != 0) {
       return memoizedHashCode;
@@ -442,74 +668,96 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ENTRY_FIELD_NUMBER;
       hash = (53 * hash) + internalGetEntry().hashCode();
     }
+    hash = (37 * hash) + UINT32_FIELD_NUMBER;
+    hash = (53 * hash) + getUint32();
+    hash = (37 * hash) + UINT64_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getUint64());
+    hash = (37 * hash) + FIXED32_FIELD_NUMBER;
+    hash = (53 * hash) + getFixed32();
+    hash = (37 * hash) + FIXED64_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getFixed64());
+    hash = (37 * hash) + SFIXED32_FIELD_NUMBER;
+    hash = (53 * hash) + getSfixed32();
+    hash = (37 * hash) + SFIXED64_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getSfixed64());
+    hash = (37 * hash) + SINT32_FIELD_NUMBER;
+    hash = (53 * hash) + getSint32();
+    hash = (37 * hash) + SINT64_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getSint64());
+    hash = (37 * hash) + BYTES_FIELD_NUMBER;
+    hash = (53 * hash) + getBytes().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
   }
 
-  public static test.protobuf.Data parseFrom(
+  public static Data parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static test.protobuf.Data parseFrom(
+  public static Data parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static test.protobuf.Data parseFrom(
+  public static Data parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static test.protobuf.Data parseFrom(
+  public static Data parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static test.protobuf.Data parseFrom(byte[] data)
+  public static Data parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static test.protobuf.Data parseFrom(
+  public static Data parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static test.protobuf.Data parseFrom(java.io.InputStream input)
+  public static Data parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static test.protobuf.Data parseFrom(
+  public static Data parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static test.protobuf.Data parseDelimitedFrom(java.io.InputStream input)
+  public static Data parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static test.protobuf.Data parseDelimitedFrom(
+  public static Data parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static test.protobuf.Data parseFrom(
+  public static Data parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static test.protobuf.Data parseFrom(
+  public static Data parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -517,23 +765,23 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  @java.lang.Override
+  @Override
   public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(test.protobuf.Data prototype) {
+  public static Builder newBuilder(Data prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-  @java.lang.Override
+  @Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
         ? new Builder() : new Builder().mergeFrom(this);
   }
 
-  @java.lang.Override
+  @Override
   protected Builder newBuilderForType(
-      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
@@ -543,10 +791,10 @@ private static final long serialVersionUID = 0L;
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:Data)
-      test.protobuf.DataOrBuilder {
+      DataOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return test.protobuf.Message.internal_static_Data_descriptor;
+      return Message.internal_static_Data_descriptor;
     }
 
     @SuppressWarnings({"rawtypes"})
@@ -571,21 +819,21 @@ private static final long serialVersionUID = 0L;
               "Invalid map field number: " + number);
       }
     }
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    @Override
+    protected FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return test.protobuf.Message.internal_static_Data_fieldAccessorTable
+      return Message.internal_static_Data_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              test.protobuf.Data.class, test.protobuf.Data.Builder.class);
+              Data.class, Builder.class);
     }
 
-    // Construct using test.proto.Data.newBuilder()
+    // Construct using test.protobuf.Data.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
 
     private Builder(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        BuilderParent parent) {
       super(parent);
       maybeForceBuilderInitialization();
     }
@@ -594,7 +842,7 @@ private static final long serialVersionUID = 0L;
               .alwaysUseFieldBuilders) {
       }
     }
-    @java.lang.Override
+    @Override
     public Builder clear() {
       super.clear();
       em_ = 0;
@@ -606,32 +854,50 @@ private static final long serialVersionUID = 0L;
       text_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       bitField0_ = (bitField0_ & ~0x00000001);
       internalGetMutableEntry().clear();
+      uint32_ = 0;
+
+      uint64_ = 0L;
+
+      fixed32_ = 0;
+
+      fixed64_ = 0L;
+
+      sfixed32_ = 0;
+
+      sfixed64_ = 0L;
+
+      sint32_ = 0;
+
+      sint64_ = 0L;
+
+      bytes_ = com.google.protobuf.ByteString.EMPTY;
+
       return this;
     }
 
-    @java.lang.Override
+    @Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return test.protobuf.Message.internal_static_Data_descriptor;
+      return Message.internal_static_Data_descriptor;
     }
 
-    @java.lang.Override
-    public test.protobuf.Data getDefaultInstanceForType() {
-      return test.protobuf.Data.getDefaultInstance();
+    @Override
+    public Data getDefaultInstanceForType() {
+      return Data.getDefaultInstance();
     }
 
-    @java.lang.Override
-    public test.protobuf.Data build() {
-      test.protobuf.Data result = buildPartial();
+    @Override
+    public Data build() {
+      Data result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
       return result;
     }
 
-    @java.lang.Override
-    public test.protobuf.Data buildPartial() {
-      test.protobuf.Data result = new test.protobuf.Data(this);
+    @Override
+    public Data buildPartial() {
+      Data result = new Data(this);
       int from_bitField0_ = bitField0_;
       result.em_ = em_;
       result.str_ = str_;
@@ -643,54 +909,63 @@ private static final long serialVersionUID = 0L;
       result.text_ = text_;
       result.entry_ = internalGetEntry();
       result.entry_.makeImmutable();
+      result.uint32_ = uint32_;
+      result.uint64_ = uint64_;
+      result.fixed32_ = fixed32_;
+      result.fixed64_ = fixed64_;
+      result.sfixed32_ = sfixed32_;
+      result.sfixed64_ = sfixed64_;
+      result.sint32_ = sint32_;
+      result.sint64_ = sint64_;
+      result.bytes_ = bytes_;
       onBuilt();
       return result;
     }
 
-    @java.lang.Override
+    @Override
     public Builder clone() {
       return super.clone();
     }
-    @java.lang.Override
+    @Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
+        Object value) {
       return super.setField(field, value);
     }
-    @java.lang.Override
+    @Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
       return super.clearField(field);
     }
-    @java.lang.Override
+    @Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
       return super.clearOneof(oneof);
     }
-    @java.lang.Override
+    @Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
-        int index, java.lang.Object value) {
+        int index, Object value) {
       return super.setRepeatedField(field, index, value);
     }
-    @java.lang.Override
+    @Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
+        Object value) {
       return super.addRepeatedField(field, value);
     }
-    @java.lang.Override
+    @Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof test.protobuf.Data) {
-        return mergeFrom((test.protobuf.Data)other);
+      if (other instanceof Data) {
+        return mergeFrom((Data)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(test.protobuf.Data other) {
-      if (other == test.protobuf.Data.getDefaultInstance()) return this;
+    public Builder mergeFrom(Data other) {
+      if (other == Data.getDefaultInstance()) return this;
       if (other.em_ != 0) {
         setEmValue(other.getEmValue());
       }
@@ -713,26 +988,53 @@ private static final long serialVersionUID = 0L;
       }
       internalGetMutableEntry().mergeFrom(
           other.internalGetEntry());
+      if (other.getUint32() != 0) {
+        setUint32(other.getUint32());
+      }
+      if (other.getUint64() != 0L) {
+        setUint64(other.getUint64());
+      }
+      if (other.getFixed32() != 0) {
+        setFixed32(other.getFixed32());
+      }
+      if (other.getFixed64() != 0L) {
+        setFixed64(other.getFixed64());
+      }
+      if (other.getSfixed32() != 0) {
+        setSfixed32(other.getSfixed32());
+      }
+      if (other.getSfixed64() != 0L) {
+        setSfixed64(other.getSfixed64());
+      }
+      if (other.getSint32() != 0) {
+        setSint32(other.getSint32());
+      }
+      if (other.getSint64() != 0L) {
+        setSint64(other.getSint64());
+      }
+      if (other.getBytes() != com.google.protobuf.ByteString.EMPTY) {
+        setBytes(other.getBytes());
+      }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
       return this;
     }
 
-    @java.lang.Override
+    @Override
     public final boolean isInitialized() {
       return true;
     }
 
-    @java.lang.Override
+    @Override
     public Builder mergeFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      test.protobuf.Data parsedMessage = null;
+      Data parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (test.protobuf.Data) e.getUnfinishedMessage();
+        parsedMessage = (Data) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -748,7 +1050,7 @@ private static final long serialVersionUID = 0L;
      * <code>.Enum em = 1;</code>
      * @return The enum numeric value on the wire for em.
      */
-    @java.lang.Override public int getEmValue() {
+    @Override public int getEmValue() {
       return em_;
     }
     /**
@@ -766,18 +1068,18 @@ private static final long serialVersionUID = 0L;
      * <code>.Enum em = 1;</code>
      * @return The em.
      */
-    @java.lang.Override
-    public test.protobuf.Enum getEm() {
+    @Override
+    public Enum getEm() {
       @SuppressWarnings("deprecation")
-      test.protobuf.Enum result = test.protobuf.Enum.valueOf(em_);
-      return result == null ? test.protobuf.Enum.UNRECOGNIZED : result;
+      Enum result = Enum.valueOf(em_);
+      return result == null ? Enum.UNRECOGNIZED : result;
     }
     /**
      * <code>.Enum em = 1;</code>
      * @param value The em to set.
      * @return This builder for chaining.
      */
-    public Builder setEm(test.protobuf.Enum value) {
+    public Builder setEm(Enum value) {
       if (value == null) {
         throw new NullPointerException();
       }
@@ -797,21 +1099,21 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private java.lang.Object str_ = "";
+    private Object str_ = "";
     /**
      * <code>string str = 2;</code>
      * @return The str.
      */
-    public java.lang.String getStr() {
-      java.lang.Object ref = str_;
-      if (!(ref instanceof java.lang.String)) {
+    public String getStr() {
+      Object ref = str_;
+      if (!(ref instanceof String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
+        String s = bs.toStringUtf8();
         str_ = s;
         return s;
       } else {
-        return (java.lang.String) ref;
+        return (String) ref;
       }
     }
     /**
@@ -820,11 +1122,11 @@ private static final long serialVersionUID = 0L;
      */
     public com.google.protobuf.ByteString
         getStrBytes() {
-      java.lang.Object ref = str_;
+      Object ref = str_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+                (String) ref);
         str_ = b;
         return b;
       } else {
@@ -837,7 +1139,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setStr(
-        java.lang.String value) {
+        String value) {
       if (value == null) {
     throw new NullPointerException();
   }
@@ -878,7 +1180,7 @@ private static final long serialVersionUID = 0L;
      * <code>int64 num = 3;</code>
      * @return The num.
      */
-    @java.lang.Override
+    @Override
     public long getNum() {
       return num_;
     }
@@ -931,7 +1233,7 @@ private static final long serialVersionUID = 0L;
      * @param index The index of the element to return.
      * @return The text at the given index.
      */
-    public java.lang.String getText(int index) {
+    public String getText(int index) {
       return text_.get(index);
     }
     /**
@@ -950,7 +1252,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setText(
-        int index, java.lang.String value) {
+        int index, String value) {
       if (value == null) {
     throw new NullPointerException();
   }
@@ -965,7 +1267,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder addText(
-        java.lang.String value) {
+        String value) {
       if (value == null) {
     throw new NullPointerException();
   }
@@ -980,7 +1282,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder addAllText(
-        java.lang.Iterable<java.lang.String> values) {
+        Iterable<String> values) {
       ensureTextIsMutable();
       com.google.protobuf.AbstractMessageLite.Builder.addAll(
           values, text_);
@@ -1015,8 +1317,8 @@ private static final long serialVersionUID = 0L;
     }
 
     private com.google.protobuf.MapField<
-        java.lang.String, java.lang.String> entry_;
-    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+        String, String> entry_;
+    private com.google.protobuf.MapField<String, String>
     internalGetEntry() {
       if (entry_ == null) {
         return com.google.protobuf.MapField.emptyMapField(
@@ -1024,7 +1326,7 @@ private static final long serialVersionUID = 0L;
       }
       return entry_;
     }
-    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    private com.google.protobuf.MapField<String, String>
     internalGetMutableEntry() {
       onChanged();;
       if (entry_ == null) {
@@ -1044,53 +1346,53 @@ private static final long serialVersionUID = 0L;
      * <code>map&lt;string, string&gt; entry = 5;</code>
      */
 
-    @java.lang.Override
+    @Override
     public boolean containsEntry(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
+        String key) {
+      if (key == null) { throw new NullPointerException(); }
       return internalGetEntry().getMap().containsKey(key);
     }
     /**
      * Use {@link #getEntryMap()} instead.
      */
-    @java.lang.Override
-    @java.lang.Deprecated
-    public java.util.Map<java.lang.String, java.lang.String> getEntry() {
+    @Override
+    @Deprecated
+    public java.util.Map<String, String> getEntry() {
       return getEntryMap();
     }
     /**
      * <code>map&lt;string, string&gt; entry = 5;</code>
      */
-    @java.lang.Override
+    @Override
 
-    public java.util.Map<java.lang.String, java.lang.String> getEntryMap() {
+    public java.util.Map<String, String> getEntryMap() {
       return internalGetEntry().getMap();
     }
     /**
      * <code>map&lt;string, string&gt; entry = 5;</code>
      */
-    @java.lang.Override
+    @Override
 
-    public java.lang.String getEntryOrDefault(
-        java.lang.String key,
-        java.lang.String defaultValue) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      java.util.Map<java.lang.String, java.lang.String> map =
+    public String getEntryOrDefault(
+        String key,
+        String defaultValue) {
+      if (key == null) { throw new NullPointerException(); }
+      java.util.Map<String, String> map =
           internalGetEntry().getMap();
       return map.containsKey(key) ? map.get(key) : defaultValue;
     }
     /**
      * <code>map&lt;string, string&gt; entry = 5;</code>
      */
-    @java.lang.Override
+    @Override
 
-    public java.lang.String getEntryOrThrow(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      java.util.Map<java.lang.String, java.lang.String> map =
+    public String getEntryOrThrow(
+        String key) {
+      if (key == null) { throw new NullPointerException(); }
+      java.util.Map<String, String> map =
           internalGetEntry().getMap();
       if (!map.containsKey(key)) {
-        throw new java.lang.IllegalArgumentException();
+        throw new IllegalArgumentException();
       }
       return map.get(key);
     }
@@ -1105,8 +1407,8 @@ private static final long serialVersionUID = 0L;
      */
 
     public Builder removeEntry(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
+        String key) {
+      if (key == null) { throw new NullPointerException(); }
       internalGetMutableEntry().getMutableMap()
           .remove(key);
       return this;
@@ -1114,8 +1416,8 @@ private static final long serialVersionUID = 0L;
     /**
      * Use alternate mutation accessors instead.
      */
-    @java.lang.Deprecated
-    public java.util.Map<java.lang.String, java.lang.String>
+    @Deprecated
+    public java.util.Map<String, String>
     getMutableEntry() {
       return internalGetMutableEntry().getMutableMap();
     }
@@ -1123,10 +1425,10 @@ private static final long serialVersionUID = 0L;
      * <code>map&lt;string, string&gt; entry = 5;</code>
      */
     public Builder putEntry(
-        java.lang.String key,
-        java.lang.String value) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      if (value == null) { throw new java.lang.NullPointerException(); }
+        String key,
+        String value) {
+      if (key == null) { throw new NullPointerException(); }
+      if (value == null) { throw new NullPointerException(); }
       internalGetMutableEntry().getMutableMap()
           .put(key, value);
       return this;
@@ -1136,18 +1438,300 @@ private static final long serialVersionUID = 0L;
      */
 
     public Builder putAllEntry(
-        java.util.Map<java.lang.String, java.lang.String> values) {
+        java.util.Map<String, String> values) {
       internalGetMutableEntry().getMutableMap()
           .putAll(values);
       return this;
     }
-    @java.lang.Override
+
+    private int uint32_ ;
+    /**
+     * <code>uint32 uint32 = 6;</code>
+     * @return The uint32.
+     */
+    @Override
+    public int getUint32() {
+      return uint32_;
+    }
+    /**
+     * <code>uint32 uint32 = 6;</code>
+     * @param value The uint32 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setUint32(int value) {
+
+      uint32_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint32 uint32 = 6;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearUint32() {
+
+      uint32_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private long uint64_ ;
+    /**
+     * <code>uint64 uint64 = 7;</code>
+     * @return The uint64.
+     */
+    @Override
+    public long getUint64() {
+      return uint64_;
+    }
+    /**
+     * <code>uint64 uint64 = 7;</code>
+     * @param value The uint64 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setUint64(long value) {
+
+      uint64_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint64 uint64 = 7;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearUint64() {
+
+      uint64_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private int fixed32_ ;
+    /**
+     * <code>fixed32 fixed32 = 8;</code>
+     * @return The fixed32.
+     */
+    @Override
+    public int getFixed32() {
+      return fixed32_;
+    }
+    /**
+     * <code>fixed32 fixed32 = 8;</code>
+     * @param value The fixed32 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFixed32(int value) {
+
+      fixed32_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>fixed32 fixed32 = 8;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFixed32() {
+
+      fixed32_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private long fixed64_ ;
+    /**
+     * <code>fixed64 fixed64 = 9;</code>
+     * @return The fixed64.
+     */
+    @Override
+    public long getFixed64() {
+      return fixed64_;
+    }
+    /**
+     * <code>fixed64 fixed64 = 9;</code>
+     * @param value The fixed64 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFixed64(long value) {
+
+      fixed64_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>fixed64 fixed64 = 9;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFixed64() {
+
+      fixed64_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private int sfixed32_ ;
+    /**
+     * <code>sfixed32 sfixed32 = 10;</code>
+     * @return The sfixed32.
+     */
+    @Override
+    public int getSfixed32() {
+      return sfixed32_;
+    }
+    /**
+     * <code>sfixed32 sfixed32 = 10;</code>
+     * @param value The sfixed32 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSfixed32(int value) {
+
+      sfixed32_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>sfixed32 sfixed32 = 10;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSfixed32() {
+
+      sfixed32_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private long sfixed64_ ;
+    /**
+     * <code>sfixed64 sfixed64 = 11;</code>
+     * @return The sfixed64.
+     */
+    @Override
+    public long getSfixed64() {
+      return sfixed64_;
+    }
+    /**
+     * <code>sfixed64 sfixed64 = 11;</code>
+     * @param value The sfixed64 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSfixed64(long value) {
+
+      sfixed64_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>sfixed64 sfixed64 = 11;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSfixed64() {
+
+      sfixed64_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private int sint32_ ;
+    /**
+     * <code>sint32 sint32 = 12;</code>
+     * @return The sint32.
+     */
+    @Override
+    public int getSint32() {
+      return sint32_;
+    }
+    /**
+     * <code>sint32 sint32 = 12;</code>
+     * @param value The sint32 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSint32(int value) {
+
+      sint32_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>sint32 sint32 = 12;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSint32() {
+
+      sint32_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private long sint64_ ;
+    /**
+     * <code>sint64 sint64 = 13;</code>
+     * @return The sint64.
+     */
+    @Override
+    public long getSint64() {
+      return sint64_;
+    }
+    /**
+     * <code>sint64 sint64 = 13;</code>
+     * @param value The sint64 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSint64(long value) {
+
+      sint64_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>sint64 sint64 = 13;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSint64() {
+
+      sint64_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private com.google.protobuf.ByteString bytes_ = com.google.protobuf.ByteString.EMPTY;
+    /**
+     * <code>bytes bytes = 14;</code>
+     * @return The bytes.
+     */
+    @Override
+    public com.google.protobuf.ByteString getBytes() {
+      return bytes_;
+    }
+    /**
+     * <code>bytes bytes = 14;</code>
+     * @param value The bytes to set.
+     * @return This builder for chaining.
+     */
+    public Builder setBytes(com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+
+      bytes_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bytes bytes = 14;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearBytes() {
+
+      bytes_ = getDefaultInstance().getBytes();
+      onChanged();
+      return this;
+    }
+    @Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.setUnknownFields(unknownFields);
     }
 
-    @java.lang.Override
+    @Override
     public final Builder mergeUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
@@ -1158,18 +1742,18 @@ private static final long serialVersionUID = 0L;
   }
 
   // @@protoc_insertion_point(class_scope:Data)
-  private static final test.protobuf.Data DEFAULT_INSTANCE;
+  private static final Data DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new test.protobuf.Data();
+    DEFAULT_INSTANCE = new Data();
   }
 
-  public static test.protobuf.Data getDefaultInstance() {
+  public static Data getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
   private static final com.google.protobuf.Parser<Data>
       PARSER = new com.google.protobuf.AbstractParser<Data>() {
-    @java.lang.Override
+    @Override
     public Data parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1182,13 +1766,13 @@ private static final long serialVersionUID = 0L;
     return PARSER;
   }
 
-  @java.lang.Override
+  @Override
   public com.google.protobuf.Parser<Data> getParserForType() {
     return PARSER;
   }
 
-  @java.lang.Override
-  public test.protobuf.Data getDefaultInstanceForType() {
+  @Override
+  public Data getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

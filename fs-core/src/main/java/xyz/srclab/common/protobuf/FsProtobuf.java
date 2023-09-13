@@ -11,9 +11,13 @@ import xyz.srclab.common.convert.handlers.BeanConvertHandler;
  */
 public class FsProtobuf {
 
-    private static FsBeanResolver RESOLVER = FsBeanResolver.defaultResolver().withHandler(ProtobufResolveHandler.INSTANCE);
-    private static FsBeanCopier COPIER = FsBeanCopier.defaultCopier().toBuilder().beanResolver(RESOLVER).build();
-    private static FsConverter CONVERTER = FsConverter.defaultConverter().withSuffixHandler(new BeanConvertHandler(COPIER));
+    private static final FsBeanResolver RESOLVER = FsBeanResolver.defaultResolver()
+        .withHandler(ProtobufResolveHandler.INSTANCE);
+    private static final FsBeanCopier COPIER = FsBeanCopier.defaultCopier()
+        .toBuilder().beanResolver(RESOLVER).build();
+    private static final FsConverter CONVERTER = FsConverter.defaultConverter()
+        .withFirstMiddleHandler(ByteStringConvertHandler.INSTANCE)
+        .withSuffixHandler(new BeanConvertHandler(COPIER));
 
     /**
      * Returns bean resolver supports protobuf based on {@link FsBeanResolver#defaultResolver()}.

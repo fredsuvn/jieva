@@ -182,7 +182,6 @@ public class ConvertTest {
     @Test
     public void testConvertBytes() {
         byte[] low = {1, 2, 3};
-        Byte[] up = {1, 2, 3};
         ByteBuffer buffer = ByteBuffer.wrap(new byte[]{1, 2, 3});
         FsConverter converter = FsConverter.defaultConverter();
         FsConverter newConverter = converter.withOptions(
@@ -192,32 +191,12 @@ public class ConvertTest {
             low
         );
         Assert.assertEquals(
-            converter.convert(low, Byte[].class),
-            up
-        );
-        Assert.assertEquals(
             converter.convert(low, ByteBuffer.class),
-            buffer.slice()
-        );
-        Assert.assertEquals(
-            converter.convert(up, byte[].class),
-            low
-        );
-        Assert.assertEquals(
-            converter.convert(up, Byte[].class),
-            up
-        );
-        Assert.assertEquals(
-            converter.convert(up, ByteBuffer.class),
             buffer.slice()
         );
         Assert.assertEquals(
             converter.convert(buffer, byte[].class),
             low
-        );
-        Assert.assertEquals(
-            converter.convert(buffer, Byte[].class),
-            up
         );
         Assert.assertEquals(
             converter.convert(buffer, ByteBuffer.class),
@@ -227,25 +206,13 @@ public class ConvertTest {
             converter.convert(low, byte[].class),
             low
         );
-        Assert.assertSame(
-            converter.convert(up, Byte[].class),
-            up
-        );
         Assert.assertEquals(
             newConverter.convert(low, byte[].class),
             low
         );
-        Assert.assertEquals(
-            newConverter.convert(up, Byte[].class),
-            up
-        );
         Assert.assertNotSame(
             newConverter.convert(low, byte[].class),
             low
-        );
-        Assert.assertNotSame(
-            newConverter.convert(up, Byte[].class),
-            up
         );
         Assert.assertNotSame(
             converter.convert(buffer, ByteBuffer.class),

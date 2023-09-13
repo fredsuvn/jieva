@@ -39,13 +39,6 @@ public class StringConvertHandler implements FsConverter.Handler {
             return source.toString();
         } else if (Objects.equals(targetType, char[].class)) {
             return source.toString().toCharArray();
-        } else if (Objects.equals(targetType, Character[].class)) {
-            String str = source.toString();
-            Character[] result = new Character[str.length()];
-            for (int i = 0; i < result.length; i++) {
-                result[i] = str.charAt(i);
-            }
-            return result;
         } else if (Objects.equals(targetType, StringBuilder.class)) {
             return new StringBuilder(source.toString());
         } else if (Objects.equals(targetType, StringBuffer.class)) {

@@ -40,59 +40,19 @@ public class BytesConvertHandler implements FsConverter.Handler {
                     return src.clone();
                 }
                 return source;
-            } else if (Objects.equals(sourceType, Byte[].class)) {
-                Byte[] src = (Byte[]) source;
-                byte[] bytes = new byte[src.length];
-                for (int i = 0; i < src.length; i++) {
-                    bytes[i] = src[i];
-                }
-                return bytes;
             } else if (FsType.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = ((ByteBuffer) source).slice();
                 return FsIO.getBytes(src);
             } else {
                 return Fs.CONTINUE;
             }
-        } else if (Objects.equals(targetType, Byte[].class)) {
-            if (Objects.equals(sourceType, byte[].class)) {
-                byte[] src = (byte[]) source;
-                Byte[] bytes = new Byte[src.length];
-                for (int i = 0; i < src.length; i++) {
-                    bytes[i] = src[i];
-                }
-                return bytes;
-            } else if (Objects.equals(sourceType, Byte[].class)) {
-                Byte[] src = (Byte[]) source;
-                if (converter.getOptions().reusePolicy() == FsConverter.Options.NO_REUSE) {
-                    return src.clone();
-                }
-                return source;
-            } else if (FsType.isAssignableFrom(ByteBuffer.class, sourceType)) {
-                ByteBuffer src = ((ByteBuffer) source).slice();
-                byte[] b = FsIO.getBytes(src);
-                Byte[] bytes = new Byte[b.length];
-                for (int i = 0; i < b.length; i++) {
-                    bytes[i] = b[i];
-                }
-                return bytes;
-            } else {
-                return Fs.CONTINUE;
-            }
-        } else if (FsType.isAssignableFrom(ByteBuffer.class, targetType)) {
+        } else if (Objects.equals(targetType, ByteBuffer.class)) {
             if (Objects.equals(sourceType, byte[].class)) {
                 byte[] src = (byte[]) source;
                 if (converter.getOptions().reusePolicy() == FsConverter.Options.NO_REUSE) {
                     return ByteBuffer.wrap(src.clone());
                 }
                 return ByteBuffer.wrap(src);
-            } else if (Objects.equals(sourceType, Byte[].class)) {
-                Byte[] src = (Byte[]) source;
-                ByteBuffer buffer = ByteBuffer.allocate(src.length);
-                for (Byte aByte : src) {
-                    buffer.put(aByte);
-                }
-                buffer.flip();
-                return buffer;
             } else if (FsType.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = (ByteBuffer) source;
                 ByteBuffer slice = src.slice();

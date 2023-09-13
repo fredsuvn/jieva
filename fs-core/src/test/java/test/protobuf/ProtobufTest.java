@@ -1,5 +1,6 @@
 package test.protobuf;
 
+import com.google.protobuf.ByteString;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.bean.FsBean;
@@ -29,7 +30,7 @@ public class ProtobufTest {
         FsBeanResolver resolver = FsProtobuf.protobufBeanResolver();
         FsBean dataBean = resolver.resolve(Data.class);
         Map<String, FsBeanProperty> propertyMap = dataBean.getProperties();
-        Assert.assertEquals(propertyMap.size(), 5);
+        Assert.assertEquals(propertyMap.size(), 14);
         Assert.assertEquals(propertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(propertyMap.get("str").getType(), String.class);
         Assert.assertEquals(propertyMap.get("num").getType(), long.class);
@@ -45,7 +46,7 @@ public class ProtobufTest {
 
         FsBean dataBuilderBean = resolver.resolve(Data.newBuilder().getClass());
         Map<String, FsBeanProperty> builderPropertyMap = dataBuilderBean.getProperties();
-        Assert.assertEquals(builderPropertyMap.size(), 5);
+        Assert.assertEquals(builderPropertyMap.size(), 14);
         Assert.assertEquals(builderPropertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(builderPropertyMap.get("str").getType(), String.class);
         Assert.assertEquals(builderPropertyMap.get("num").getType(), long.class);

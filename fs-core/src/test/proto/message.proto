@@ -23,6 +23,15 @@ message Data {
     int64 num = 3;
     repeated string text = 4;
     map<string, string> entry = 5;
+    uint32 uint32 = 6;
+    uint64 uint64 = 7;
+    fixed32 fixed32 = 8;
+    fixed64 fixed64 = 9;
+    sfixed32 sfixed32 = 10;
+    sfixed64 sfixed64 = 11;
+    sint32 sint32 = 12;
+    sint64 sint64 = 13;
+    bytes bytes = 14;
 }
 
 enum Enum {
