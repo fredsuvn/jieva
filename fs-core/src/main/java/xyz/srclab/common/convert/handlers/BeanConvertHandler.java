@@ -114,4 +114,11 @@ public class BeanConvertHandler implements Handler {
         }
         return copier.copyProperties(source, sourceType, dest, targetType);
     }
+
+    /**
+     * Returns bean copier of this handler.
+     */
+    public FsBeanCopier getCopier() {
+        return copier;
+    }
 }

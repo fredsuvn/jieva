@@ -37,10 +37,10 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
     }
 
     @Override
-    public FsBeanResolver withHandler(Handler handler) {
+    public FsBeanResolver insertHandler(int index, Handler handler) {
         List<Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
-        newHandlers.add(handler);
         newHandlers.addAll(handlers);
+        newHandlers.add(index, handler);
         return new BeanResolverImpl(newHandlers, cache);
     }
 

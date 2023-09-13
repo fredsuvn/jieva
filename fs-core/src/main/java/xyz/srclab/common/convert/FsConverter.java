@@ -251,14 +251,25 @@ public interface FsConverter {
      *
      * @param handler given handler
      */
-    default FsConverter withFirstMiddleHandler(Handler handler) {
+    default FsConverter insertFirstMiddleHandler(Handler handler) {
+        return insertMiddleHandler(0, handler);
+    }
+
+    /**
+     * Returns a converter of which handlers and options come from current converter,
+     * but inserts given handler at specified index of middle handlers.
+     *
+     * @param index   specified index
+     * @param handler given handler
+     */
+    default FsConverter insertMiddleHandler(int index, Handler handler) {
         List<Handler> middleHandlers = getMiddleHandlers();
         if (FsCollect.isEmpty(middleHandlers)) {
             return newConverter(getPrefixHandler(), getSuffixHandler(), Collections.singleton(handler), getOptions());
         }
         List<Handler> newMiddleHandlers = new ArrayList<>(middleHandlers.size() + 1);
-        newMiddleHandlers.add(handler);
         newMiddleHandlers.addAll(middleHandlers);
+        newMiddleHandlers.add(index, handler);
         return newConverter(getPrefixHandler(), getSuffixHandler(), newMiddleHandlers, getOptions());
     }
 

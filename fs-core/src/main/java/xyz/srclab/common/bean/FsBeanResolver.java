@@ -345,7 +345,19 @@ public interface FsBeanResolver {
      *
      * @param handler given handler
      */
-    FsBeanResolver withHandler(Handler handler);
+    default FsBeanResolver insertFirstHandler(Handler handler) {
+        return insertHandler(0, handler);
+    }
+
+    /**
+     * Returns a new resolver of which handlers come from current resolver,
+     * but inserts given handler at specified index of handlers.
+     * The returned resolver will share the cache with this resolver.
+     *
+     * @param index   specified index
+     * @param handler given handler
+     */
+    FsBeanResolver insertHandler(int index, Handler handler);
 
     /**
      * Returns this resolver as a {@link Handler}.

@@ -247,7 +247,7 @@ public class BeanTest {
             }.getType());
         Assert.assertEquals(ccs.getCc(), cc1.getCc().toString());
 
-        FsConverter kConverter = FsConverter.defaultConverter().withFirstMiddleHandler(new FsConverter.Handler() {
+        FsConverter kConverter = FsConverter.defaultConverter().insertFirstMiddleHandler(new FsConverter.Handler() {
             @Override
             public @Nullable Object convert(
                 @Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
@@ -334,7 +334,7 @@ public class BeanTest {
     public void testResolverAsHandler() {
         int[] x = {0};
         FsBeanResolver.Handler handler = FsBeanResolver.defaultResolver()
-            .withHandler(new FsBeanResolver.Handler() {
+            .insertFirstHandler(new FsBeanResolver.Handler() {
                 @Override
                 public @Nullable Object resolve(FsBeanResolver.BeanBuilder builder) {
                     if (Objects.equals(builder.getType(), Integer.class)) {

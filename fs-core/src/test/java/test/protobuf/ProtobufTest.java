@@ -1,5 +1,6 @@
 package test.protobuf;
 
+import com.google.protobuf.ByteString;
 import lombok.EqualsAndHashCode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -92,13 +93,12 @@ public class ProtobufTest {
 
     @Test
     public void testConvert() {
-        Data.Builder dataBuilder = Data.newBuilder()
-            .setEm(Enum.E2)
-            .setStr("888")
-            .setNum(999)
-            .addAllText(Arrays.asList("2", "4", "6"))
-            .putAllEntry(FsCollect.hashMap("1", "1", "3", "3"));
-        Data data = dataBuilder.build();
+        DataDto dataDto = new DataDto();
+        dataDto.setNum(777);
+        dataDto.setBytes("123".getBytes());
+        Data data = FsProtobuf.protobufConverter().convert(dataDto, Data.class);
+        Assert.assertEquals(data.getBytes().toStringUtf8(), "123");
+        Assert.assertEquals(data.getNum(), 777L);
     }
 
     @lombok.Data

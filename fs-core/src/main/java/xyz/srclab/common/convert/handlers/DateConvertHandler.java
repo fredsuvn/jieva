@@ -478,6 +478,13 @@ public class DateConvertHandler implements FsConverter.Handler {
     }
 
     /**
+     * Returns pattern function of this handler.
+     */
+    public PatternFunction getPattern() {
+        return pattern;
+    }
+
+    /**
      * Function to parse date string to pattern and get date formatter.
      */
     public interface PatternFunction {
