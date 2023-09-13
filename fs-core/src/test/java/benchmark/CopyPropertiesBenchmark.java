@@ -1,4 +1,4 @@
-package test.benchmark;
+package benchmark;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;

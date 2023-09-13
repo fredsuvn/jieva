@@ -1,4 +1,4 @@
-package test.benchmark;
+package benchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
