@@ -188,7 +188,7 @@ public class ConvertTest {
                 return x;
             }
         };
-        FsConverter converter = FsConverter.defaultConverter().withMiddleHandler(handler);
+        FsConverter converter = FsConverter.defaultConverter().withFirstMiddleHandler(handler);
         Assert.assertSame(
             x,
             converter.convert(
@@ -214,7 +214,7 @@ public class ConvertTest {
     @Test
     public void testConvertAsHandler() {
         FsConverter.Handler handler = FsConverter.defaultConverter()
-            .withMiddleHandler(new FsConverter.Handler() {
+            .withFirstMiddleHandler(new FsConverter.Handler() {
                 @Override
                 public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
                     if (Objects.equals(source, "1")) {

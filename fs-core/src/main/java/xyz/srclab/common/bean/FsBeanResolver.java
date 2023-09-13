@@ -6,7 +6,6 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.bean.handlers.JavaBeanResolveHandler;
-import xyz.srclab.common.bean.handlers.ProtobufResolveHandler;
 import xyz.srclab.common.bean.handlers.RecordBeanResolveHandler;
 import xyz.srclab.common.cache.FsCache;
 import xyz.srclab.common.collect.FsCollect;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
  * <ul>
  *     <li>{@link JavaBeanResolveHandler} (default handler);</li>
  *     <li>{@link RecordBeanResolveHandler};</li>
- *     <li>{@link ProtobufResolveHandler} (the runtime must contains protobuf libs);</li>
  * </ul>
  *
  * @author fredsuvn

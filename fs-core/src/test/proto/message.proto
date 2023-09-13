@@ -1,29 +1,31 @@
 syntax = "proto3";
 
-option java_package = "test.xyz.srclab.common.proto";
+option java_package = "test.protobuf";
 //option java_outer_classname = "ProtoMessage";
 option java_multiple_files = true;
 //option java_generic_services = true;
 
-message RequestMessage {
-    string id = 1;
-    MessageData data = 2;
+message Request {
+    int32 code = 1;
+    bytes message = 2;
+    Data data = 3;
 }
 
-message ResponseMessage {
+message Response {
     string code = 1;
-    string state = 2;
-    MessageData data = 3;
+    int64 state = 2;
+    Data data = 3;
 }
 
-message MessageData {
-    enum EnumMessage {
-        E1 = 0;
-        E2 = 1;
-    }
-    EnumMessage em = 1;
+message Data {
+    Enum em = 1;
     string str = 2;
     int64 num = 3;
     repeated string text = 4;
     map<string, string> entry = 5;
+}
+
+enum Enum {
+    E1 = 0;
+    E2 = 1;
 }

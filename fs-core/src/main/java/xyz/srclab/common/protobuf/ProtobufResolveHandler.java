@@ -1,4 +1,4 @@
-package xyz.srclab.common.bean.handlers;
+package xyz.srclab.common.protobuf;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Protobuf bean resolve handler.
- * This handler depends on libs about <a href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>.
+ * Resolve handler implementation for <a href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>.
+ * This handler depends on protobuf libs in the runtime.
  *
  * @author fredsuvn
  */
@@ -187,6 +187,7 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
             if (setter == null) {
                 throw new FsBeanException("Not writeable.");
             }
+            setter.invoke(bean, value);
         }
 
         @Override

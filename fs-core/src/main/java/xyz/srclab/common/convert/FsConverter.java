@@ -226,11 +226,31 @@ public interface FsConverter {
 
     /**
      * Returns a converter of which handlers and options come from current converter,
+     * but the prefix handler is replaced by given handler.
+     *
+     * @param handler given handler
+     */
+    default FsConverter withPrefixHandler(Handler handler) {
+        return newConverter(handler, getSuffixHandler(), getMiddleHandlers(), getOptions());
+    }
+
+    /**
+     * Returns a converter of which handlers and options come from current converter,
+     * but the suffix handler is replaced by given handler.
+     *
+     * @param handler given handler
+     */
+    default FsConverter withSuffixHandler(Handler handler) {
+        return newConverter(getPrefixHandler(), handler, getMiddleHandlers(), getOptions());
+    }
+
+    /**
+     * Returns a converter of which handlers and options come from current converter,
      * but inserts given handler at first index of middle handlers.
      *
      * @param handler given handler
      */
-    default FsConverter withMiddleHandler(Handler handler) {
+    default FsConverter withFirstMiddleHandler(Handler handler) {
         List<Handler> middleHandlers = getMiddleHandlers();
         if (FsCollect.isEmpty(middleHandlers)) {
             return newConverter(getPrefixHandler(), getSuffixHandler(), Collections.singleton(handler), getOptions());
