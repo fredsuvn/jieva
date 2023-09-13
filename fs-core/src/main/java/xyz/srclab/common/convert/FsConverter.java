@@ -47,6 +47,7 @@ public interface FsConverter {
      *     <ul>
      *         <li>{@link xyz.srclab.common.convert.handlers.EnumConvertHandler};</li>
      *         <li>{@link xyz.srclab.common.convert.handlers.DateConvertHandler};</li>
+     *         <li>{@link xyz.srclab.common.convert.handlers.BytesConvertHandler};</li>
      *         <li>{@link xyz.srclab.common.convert.handlers.BooleanConvertHandler};</li>
      *         <li>{@link xyz.srclab.common.convert.handlers.NumberConvertHandler};</li>
      *         <li>{@link xyz.srclab.common.convert.handlers.StringConvertHandler};</li>

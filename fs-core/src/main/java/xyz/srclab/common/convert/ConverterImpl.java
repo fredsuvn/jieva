@@ -19,6 +19,7 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
         Arrays.asList(
             EnumConvertHandler.INSTANCE,
             DateConvertHandler.INSTANCE,
+            BytesConvertHandler.INSTANCE,
             BooleanConvertHandler.INSTANCE,
             NumberConvertHandler.INSTANCE,
             StringConvertHandler.INSTANCE,
