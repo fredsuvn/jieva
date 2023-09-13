@@ -1,6 +1,6 @@
 package test.protobuf;
 
-import com.google.protobuf.ByteString;
+import lombok.EqualsAndHashCode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.bean.FsBean;
@@ -101,35 +101,42 @@ public class ProtobufTest {
         Data data = dataBuilder.build();
     }
 
+    @lombok.Data
+    @EqualsAndHashCode
+    public static class DataDto {
+        private EnumDto em;
+        private String str;
+        private long num;
+        private List<String> textList;
+        private Map<String, String> entryMap;
+        private int uint32;
+        private long uint64;
+        private int fixed32;
+        private long fixed64;
+        private int sfixed32;
+        private long sfixed64;
+        private int sint32;
+        private long sint64;
+        private byte[] bytes;
+    }
+
+    @lombok.Data
+    @EqualsAndHashCode
     public static class RequestDto {
         private int code;
         private byte[] message;
+        private DataDto data;
     }
 
-    /*
-    message Request {
-    int32 code = 1;
-    bytes message = 2;
-    Data data = 3;
-}
+    @lombok.Data
+    @EqualsAndHashCode
+    public static class ResponseDto {
+        private String code;
+        private long state;
+        private DataDto data;
+    }
 
-message Response {
-    string code = 1;
-    int64 state = 2;
-    Data data = 3;
-}
-
-message Data {
-    Enum em = 1;
-    string str = 2;
-    int64 num = 3;
-    repeated string text = 4;
-    map<string, string> entry = 5;
-}
-
-enum Enum {
-    E1 = 0;
-    E2 = 1;
-}
-     */
+    public enum EnumDto {
+        E1, E2;
+    }
 }
