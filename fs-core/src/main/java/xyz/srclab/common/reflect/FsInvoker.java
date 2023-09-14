@@ -76,7 +76,7 @@ final class OfMethod implements FsInvoker {
         try {
             return method.invoke(inst, args);
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new FsInvokeException(e);
         }
     }
 }
@@ -94,7 +94,7 @@ final class OfConstructor implements FsInvoker {
         try {
             return constructor.newInstance(args);
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new FsInvokeException(e);
         }
     }
 }
@@ -109,7 +109,7 @@ final class OfMethodHandle implements FsInvoker {
             this.methodHandle = MethodHandles.lookup().unreflect(method);
             this.isStatic = Modifier.isStatic(method.getModifiers());
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
+            throw new FsInvokeException(e);
         }
     }
 
@@ -118,7 +118,7 @@ final class OfMethodHandle implements FsInvoker {
             this.methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
             this.isStatic = true;
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
+            throw new FsInvokeException(e);
         }
     }
 
@@ -127,7 +127,7 @@ final class OfMethodHandle implements FsInvoker {
         try {
             return isStatic ? invokeStatic(args) : invokeVirtual(inst, args);
         } catch (Throwable e) {
-            throw new IllegalStateException(e);
+            throw new FsInvokeException(e);
         }
     }
 
