@@ -29,6 +29,10 @@ public interface FsNetChannelHandler<C, M> {
     default void onClose(FsNetChannel<C> channel, M message) {
     }
 
+    default void onException(FsNetChannel<C> channel) {
+
+    }
+
     /**
      * Handler for receiving a message from remote.
      * <p>

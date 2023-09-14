@@ -1,11 +1,25 @@
 package xyz.srclab.common.net;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.base.Fs;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
- * TCP/IP server.
+ * TCP/IP server interface.
+ * <p>
+ * A {@link FsTcpServer} implementation should support following types of handler:
+ * <ul>
+ *     <li>
+ *         one {@link FsNetServerHandler}: to deal with server actions;
+ *     </li>
+ *     <li>
+ *         a list of {@link FsNetServerHandler}: to deal with actions for each connection;
+ *     </li>
+ * </ul>
+ * These handlers are usually set into {@link Builder} (or its subtype)
+ * to build final implementation of {@link FsTcpServer}.
  *
  * @param <S> underlying server type
  * @author fredsuvn
@@ -53,4 +67,43 @@ public interface FsTcpServer<S> {
      * Returns underlying server type.
      */
     S getServer();
+
+    /**
+     * Builder for {@link FsTcpServer}.
+     *
+     * @param <C> underlying channel type
+     * @param <S> underlying server type
+     * @param <T> type of this server
+     * @param <B> type of this server builder
+     */
+    abstract class Builder<C, S, T extends FsTcpServer<S>, B extends Builder<C, S, T, B>> {
+
+        protected @Nullable FsNetServerHandler<S> serverHandler;
+        protected @Nullable List<FsNetChannelHandler<C, ?>> channelHandlers;
+
+        /**
+         * Sets  server handler.
+         *
+         * @param serverHandler server handler
+         */
+        public B serverHandler(FsNetServerHandler<S> serverHandler) {
+            this.serverHandler = serverHandler;
+            return Fs.as(this);
+        }
+
+        /**
+         * Sets channel handlers.
+         *
+         * @param channelHandlers channel handlers
+         */
+        public B channelHandlers(List<FsNetChannelHandler<C, ?>> channelHandlers) {
+            this.channelHandlers = channelHandlers;
+            return Fs.as(this);
+        }
+
+        /**
+         * Builds the server.
+         */
+        public abstract T build();
+    }
 }
