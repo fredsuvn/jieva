@@ -54,6 +54,8 @@ public interface FsData {
 
     /**
      * Returns an instance of {@link FsData} of which data comes from given input stream.
+     * <p>
+     * Note the state of stream reflects methods of returned data.
      *
      * @param inputStream given input stream
      */

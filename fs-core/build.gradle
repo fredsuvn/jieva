@@ -25,6 +25,7 @@ dependencies {
     compileOnly "cglib:cglib"
     compileOnly "org.bouncycastle:bcprov-jdk15on"
     compileOnly "com.google.protobuf:protobuf-java"
+    compileOnly "io.netty:netty-all"
 
     testImplementation project(":boat-test")
     testImplementation "commons-beanutils:commons-beanutils:1.9.4"
