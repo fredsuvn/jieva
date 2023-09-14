@@ -273,6 +273,17 @@ public class FsIO {
                 }
                 return Arrays.copyOf(bytes, c);
             }
+            if (available == 0) {
+                byte[] b = new byte[1];
+                int readSize = inputStream.read(b);
+                if (readSize == -1) {
+                    return null;
+                }
+                if (readSize == 0) {
+                    return new byte[0];
+                }
+                return b;
+            }
             ByteArrayOutputStream dest = new ByteArrayOutputStream();
             long readCount = availableBytesTo(inputStream, dest);
             if (readCount == -1) {

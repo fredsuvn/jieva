@@ -5,24 +5,20 @@ import xyz.srclab.annotations.Nullable;
 import java.nio.ByteBuffer;
 
 /**
- * Network callback handler for channel. See:
- * <ul>
- *     <li>{@link #onMessage(FsNetChannel, Object)};</li>
- *     <li>{@link #onOpen(FsNetChannel)};</li>
- *     <li>{@link #onClose(FsNetChannel)};</li>
- *     <li>{@link #onException(FsNetChannel, Throwable)};</li>
- * </ul>
+ * Network callback handler for channel.
  *
+ * @param <C> underlying channel type
+ * @param <M> message type
  * @author fredsuvn
  */
-public interface FsNetChannelHandler<M> {
+public interface FsNetChannelHandler<C, M> {
 
     /**
      * Handler for the remote opens the channel.
      *
      * @param channel the channel
      */
-    default void onOpen(FsNetChannel channel) {
+    default void onOpen(FsNetChannel<C> channel) {
     }
 
     /**
@@ -30,16 +26,7 @@ public interface FsNetChannelHandler<M> {
      *
      * @param channel the channel
      */
-    default void onClose(FsNetChannel channel) {
-    }
-
-    /**
-     * Handler for an exception occurs on the channel.
-     *
-     * @param channel   the channel
-     * @param exception the exception
-     */
-    default void onException(FsNetChannel channel, Throwable exception) {
+    default void onClose(FsNetChannel<C> channel, M message) {
     }
 
     /**
@@ -70,5 +57,5 @@ public interface FsNetChannelHandler<M> {
      * @param message the message
      */
     @Nullable
-    Object onMessage(FsNetChannel channel, M message);
+    Object onMessage(FsNetChannel<C> channel, M message, @Nullable Throwable exception);
 }

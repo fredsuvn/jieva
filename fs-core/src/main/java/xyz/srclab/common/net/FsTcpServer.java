@@ -7,9 +7,10 @@ import java.time.Duration;
 /**
  * TCP/IP server.
  *
+ * @param <S> underlying server type
  * @author fredsuvn
  */
-public interface FsTcpServer {
+public interface FsTcpServer<S> {
 
     /**
      * Starts the server and wait until the server has been closed.
@@ -47,4 +48,9 @@ public interface FsTcpServer {
      * Closes this server immediately, without waiting the buffered operations to be flushed.
      */
     void closeNow();
+
+    /**
+     * Returns underlying server type.
+     */
+    S getServer();
 }

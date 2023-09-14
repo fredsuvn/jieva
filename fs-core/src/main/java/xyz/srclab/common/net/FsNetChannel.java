@@ -7,11 +7,12 @@ import java.net.InetSocketAddress;
 import java.time.Duration;
 
 /**
- * Channel info about current connection.
+ * Channel of a network connection.
  *
+ * @param <C> underlying channel type
  * @author fredsuvn
  */
-public interface FsNetChannel {
+public interface FsNetChannel<C> {
 
     /**
      * Returns remote address.
@@ -50,4 +51,9 @@ public interface FsNetChannel {
      * Flushes buffered data to be sent.
      */
     void flush();
+
+    /**
+     * Returns underlying channel type.
+     */
+    C getChannel();
 }

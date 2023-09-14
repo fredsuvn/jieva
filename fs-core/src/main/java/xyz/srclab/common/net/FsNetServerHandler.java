@@ -3,8 +3,9 @@ package xyz.srclab.common.net;
 import xyz.srclab.annotations.Nullable;
 
 /**
- * Network handler for server.
+ * Network handler for server actions.
  *
+ * @param <S> underlying server type
  * @author fredsuvn
  */
 public interface FsNetServerHandler<S> {
