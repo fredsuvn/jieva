@@ -3,7 +3,7 @@ package xyz.srclab.common.convert;
 import java.lang.reflect.Type;
 
 /**
- * Exception for Fs conversion.
+ * Exception for conversion.
  *
  * @author fredsuvn
  */

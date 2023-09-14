@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean;
 
 /**
- * Exception for Fs bean.
+ * Exception for bean.
  *
  * @author fredsuvn
  */

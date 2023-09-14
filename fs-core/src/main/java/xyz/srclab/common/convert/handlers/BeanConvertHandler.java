@@ -3,6 +3,7 @@ package xyz.srclab.common.convert.handlers;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.bean.FsBeanCopier;
+import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.reflect.FsType;
 
@@ -73,24 +74,28 @@ public class BeanConvertHandler implements Handler {
         GENERATOR_MAP.put(ConcurrentSkipListMap.class, ConcurrentSkipListMap::new);
     }
 
+    private final FsBeanResolver beanResolver;
     private final FsBeanCopier copier;
 
     /**
-     * Constructs with {@link FsBeanCopier#defaultCopier()}.
+     * Constructs with {@link FsBeanResolver#defaultResolver()}.
      *
-     * @see #BeanConvertHandler(FsBeanCopier)
+     * @see #BeanConvertHandler(FsBeanResolver)
      */
     public BeanConvertHandler() {
-        this(FsBeanCopier.defaultCopier());
+        this(FsBeanResolver.defaultResolver());
     }
 
     /**
-     * Constructs with given bean copy copier.
+     * Constructs with given bean resolver.
      *
-     * @param copier bean copier
+     * @param beanResolver bean resolver
      */
-    public BeanConvertHandler(FsBeanCopier copier) {
-        this.copier = copier;
+    public BeanConvertHandler(FsBeanResolver beanResolver) {
+        this.beanResolver = beanResolver;
+        this.copier = FsBeanCopier.defaultCopier().toBuilder()
+            .beanResolver(beanResolver)
+            .build();
     }
 
     @Override
@@ -112,11 +117,18 @@ public class BeanConvertHandler implements Handler {
         if (dest == null) {
             return Fs.CONTINUE;
         }
-        return copier.copyProperties(source, sourceType, dest, targetType);
+        return getCopier().withConverter(converter).copyProperties(source, sourceType, dest, targetType);
     }
 
     /**
-     * Returns bean copier of this handler.
+     * Returns bean resolver of this handler.
+     */
+    public FsBeanResolver getBeanResolver() {
+        return beanResolver;
+    }
+
+    /**
+     * Returns copier of this handler.
      */
     public FsBeanCopier getCopier() {
         return copier;
