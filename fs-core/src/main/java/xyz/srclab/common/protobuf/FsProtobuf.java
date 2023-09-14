@@ -15,8 +15,7 @@ public class FsProtobuf {
     private static final FsConverter CONVERTER = FsConverter.defaultConverter()
         .insertFirstMiddleHandler(ByteStringConvertHandler.INSTANCE)
         .withSuffixHandler(ProtobufBeanConvertHandler.INSTANCE);
-    private static final FsBeanCopier COPIER = FsBeanCopier.defaultCopier()
-        .toBuilder().beanResolver(RESOLVER).converter(CONVERTER).build();
+    private static final FsBeanCopier COPIER = ProtobufBeanConvertHandler.INSTANCE.getCopier();
 
     /**
      * Returns bean resolver supports protobuf based on {@link FsBeanResolver#defaultResolver()}.

@@ -12,7 +12,8 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 
 /**
- * Convert handler implementation which is used to support the conversion between bytes, string and {@link ByteString}.
+ * Convert handler implementation for protobuf,
+ * which is used to support the conversion between bytes, string and {@link ByteString}.
  * It supports types:
  * <ul>
  *     <li>byte[];</li>

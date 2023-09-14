@@ -2,7 +2,7 @@ package xyz.srclab.common.protobuf;
 
 import com.google.protobuf.Message;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.bean.FsBeanCopier;
+import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.convert.FsConvertException;
 import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.convert.handlers.BeanConvertHandler;
@@ -26,18 +26,20 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
 
     /**
      * Constructs with {@link FsProtobuf#protobufBeanCopier()}.
+     *
+     * @see #ProtobufBeanConvertHandler(FsBeanResolver)
      */
     public ProtobufBeanConvertHandler() {
-        this(FsProtobuf.protobufBeanCopier());
+        this(FsProtobuf.protobufBeanResolver());
     }
 
     /**
-     * Constructs with given bean copier.
+     * Constructs with given object converter.
      *
-     * @param copier given bean copier
+     * @param resolver given object converter
      */
-    public ProtobufBeanConvertHandler(FsBeanCopier copier) {
-        super(copier);
+    public ProtobufBeanConvertHandler(FsBeanResolver resolver) {
+        super(resolver);
     }
 
     @Override
@@ -64,7 +66,9 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
         }
         try {
             Object builder = getProtobufBuilder(rawType, isBuilder);
-            getCopier().copyProperties(source, sourceType, builder, builder.getClass());
+            getCopier().withConverter(converter)
+
+                .copyProperties(source, sourceType, builder, builder.getClass());
             return build(builder, isBuilder);
         } catch (FsConvertException e) {
             throw e;

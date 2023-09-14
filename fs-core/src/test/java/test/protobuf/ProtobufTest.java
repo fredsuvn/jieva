@@ -8,9 +8,11 @@ import xyz.srclab.common.bean.FsBean;
 import xyz.srclab.common.bean.FsBeanProperty;
 import xyz.srclab.common.bean.FsBeanResolver;
 import xyz.srclab.common.collect.FsCollect;
+import xyz.srclab.common.convert.FsConverter;
 import xyz.srclab.common.protobuf.FsProtobuf;
 import xyz.srclab.common.reflect.TypeRef;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -92,13 +94,126 @@ public class ProtobufTest {
     }
 
     @Test
-    public void testConvert() {
+    public void testConvertBean() {
         DataDto dataDto = new DataDto();
+        dataDto.setEm(EnumDto.E2);
+        dataDto.setStr("dataDto");
+        dataDto.setTextList(Arrays.asList("11", "22", "33"));
         dataDto.setNum(777);
         dataDto.setBytes("123".getBytes());
-        Data data = FsProtobuf.protobufConverter().convert(dataDto, Data.class);
-        Assert.assertEquals(data.getBytes().toStringUtf8(), "123");
-        Assert.assertEquals(data.getNum(), 777L);
+        dataDto.setEntryMap(FsCollect.hashMap("88", "99"));
+        dataDto.setFixed32(132);
+        dataDto.setFixed64(164);
+        dataDto.setSfixed32(232);
+        dataDto.setSfixed64(264);
+        dataDto.setUint32(332);
+        dataDto.setUint64(364);
+        dataDto.setSint32(432);
+        dataDto.setSint64(464);
+        RequestDto requestDto = new RequestDto();
+        requestDto.setCode(111);
+        requestDto.setMessage("111");
+        requestDto.setData(dataDto);
+
+        //dto -> protobuf
+        ResponseDto responseDto = FsProtobuf.protobufConverter().convert(requestDto, ResponseDto.class);
+        Assert.assertEquals(responseDto.getCode(), "111");
+        Assert.assertEquals(responseDto.getMessage(), 111L);
+        Data data = responseDto.getData();
+        Assert.assertEquals(data.getEm(), Enum.E2);
+        Assert.assertEquals(data.getStr(), dataDto.getStr());
+        Assert.assertEquals(data.getTextList(), dataDto.getTextList());
+        Assert.assertEquals(data.getBytes(), ByteString.copyFrom(dataDto.getBytes()));
+        Assert.assertEquals(data.getEntryMap(), dataDto.getEntryMap());
+        Assert.assertEquals(data.getFixed32(), dataDto.getFixed32());
+        Assert.assertEquals(data.getFixed64(), dataDto.getFixed64());
+        Assert.assertEquals(data.getSfixed32(), dataDto.getSfixed32());
+        Assert.assertEquals(data.getSfixed64(), dataDto.getSfixed64());
+        Assert.assertEquals(data.getUint32(), dataDto.getUint32());
+        Assert.assertEquals(data.getUint64(), dataDto.getUint64());
+        Assert.assertEquals(data.getSint32(), dataDto.getSint32());
+        Assert.assertEquals(data.getSint64(), dataDto.getSint64());
+
+        //dto -> protobuf builder
+        Data.Builder dataBuilder = FsProtobuf.protobufConverter().convert(requestDto.getData(), Data.Builder.class);
+        Assert.assertEquals(dataBuilder.getEm(), Enum.E2);
+        Assert.assertEquals(dataBuilder.getStr(), dataDto.getStr());
+        Assert.assertEquals(dataBuilder.getTextList(), dataDto.getTextList());
+        Assert.assertEquals(dataBuilder.getBytes(), ByteString.copyFrom(dataDto.getBytes()));
+        Assert.assertEquals(dataBuilder.getEntryMap(), dataDto.getEntryMap());
+        Assert.assertEquals(dataBuilder.getFixed32(), dataDto.getFixed32());
+        Assert.assertEquals(dataBuilder.getFixed64(), dataDto.getFixed64());
+        Assert.assertEquals(dataBuilder.getSfixed32(), dataDto.getSfixed32());
+        Assert.assertEquals(dataBuilder.getSfixed64(), dataDto.getSfixed64());
+        Assert.assertEquals(dataBuilder.getUint32(), dataDto.getUint32());
+        Assert.assertEquals(dataBuilder.getUint64(), dataDto.getUint64());
+        Assert.assertEquals(dataBuilder.getSint32(), dataDto.getSint32());
+        Assert.assertEquals(dataBuilder.getSint64(), dataDto.getSint64());
+
+        //protobuf -> dto
+        DataDto dataDto1 = FsProtobuf.protobufConverter().convert(data, DataDto.class);
+        Assert.assertEquals(data.getEm(), Enum.E2);
+        Assert.assertEquals(data.getStr(), dataDto.getStr());
+        Assert.assertEquals(data.getTextList(), dataDto.getTextList());
+        Assert.assertEquals(data.getBytes(), ByteString.copyFrom(dataDto.getBytes()));
+        Assert.assertEquals(data.getEntryMap(), dataDto.getEntryMap());
+        Assert.assertEquals(data.getFixed32(), dataDto.getFixed32());
+        Assert.assertEquals(data.getFixed64(), dataDto.getFixed64());
+        Assert.assertEquals(data.getSfixed32(), dataDto.getSfixed32());
+        Assert.assertEquals(data.getSfixed64(), dataDto.getSfixed64());
+        Assert.assertEquals(data.getUint32(), dataDto.getUint32());
+        Assert.assertEquals(data.getUint64(), dataDto.getUint64());
+        Assert.assertEquals(data.getSint32(), dataDto.getSint32());
+        Assert.assertEquals(data.getSint64(), dataDto.getSint64());
+
+        //protobuf builder -> dto
+        DataDto dataDto2 = FsProtobuf.protobufConverter().convert(dataBuilder, DataDto.class);
+        Assert.assertEquals(dataBuilder.getEm(), Enum.E2);
+        Assert.assertEquals(dataBuilder.getStr(), dataDto.getStr());
+        Assert.assertEquals(dataBuilder.getTextList(), dataDto.getTextList());
+        Assert.assertEquals(dataBuilder.getBytes(), ByteString.copyFrom(dataDto.getBytes()));
+        Assert.assertEquals(dataBuilder.getEntryMap(), dataDto.getEntryMap());
+        Assert.assertEquals(dataBuilder.getFixed32(), dataDto.getFixed32());
+        Assert.assertEquals(dataBuilder.getFixed64(), dataDto.getFixed64());
+        Assert.assertEquals(dataBuilder.getSfixed32(), dataDto.getSfixed32());
+        Assert.assertEquals(dataBuilder.getSfixed64(), dataDto.getSfixed64());
+        Assert.assertEquals(dataBuilder.getUint32(), dataDto.getUint32());
+        Assert.assertEquals(dataBuilder.getUint64(), dataDto.getUint64());
+        Assert.assertEquals(dataBuilder.getSint32(), dataDto.getSint32());
+        Assert.assertEquals(dataBuilder.getSint64(), dataDto.getSint64());
+
+        //protobuf -> protobuf
+        Data.Builder dataBuilder1 = FsProtobuf.protobufConverter().convert(data, Data.Builder.class);
+        Assert.assertEquals(dataBuilder1.build(), dataBuilder.build());
+        Data data1 = FsProtobuf.protobufConverter().convert(dataBuilder1, Data.class);
+        Assert.assertEquals(data1, dataBuilder1.build());
+
+        Request request = Request.newBuilder()
+            .setCode(3).setMessage(ByteString.copyFromUtf8("xxxx")).setData(data).build();
+        RequestDto requestDto1 = FsProtobuf.protobufConverter().convert(request, RequestDto.class);
+        Assert.assertEquals(requestDto1.getCode(), request.getCode());
+        Assert.assertEquals(requestDto1.getMessage(), request.getMessage().toStringUtf8());
+        Assert.assertEquals(requestDto1.getData(), dataDto);
+    }
+
+    @Test
+    public void testConvert() {
+        byte[] bytes = {1, 2, 3, 4};
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        ByteString bs = ByteString.copyFrom(bytes);
+        String str = bs.toStringUtf8();
+        FsConverter converter = FsProtobuf.protobufConverter();
+        Assert.assertEquals(converter.convert(bytes, ByteBuffer.class), buffer.slice());
+        Assert.assertEquals(converter.convert(bs, ByteBuffer.class), buffer.slice());
+        Assert.assertEquals(converter.convert(buffer, ByteBuffer.class), buffer.slice());
+        Assert.assertEquals(converter.convert(bytes, byte[].class), bytes);
+        Assert.assertEquals(converter.convert(bs, byte[].class), bytes);
+        Assert.assertEquals(converter.convert(buffer, byte[].class), bytes);
+        Assert.assertEquals(converter.convert(bytes, ByteString.class), bs);
+        Assert.assertEquals(converter.convert(bs, ByteString.class), bs);
+        Assert.assertEquals(converter.convert(buffer, ByteString.class), bs);
+        Assert.assertEquals(converter.convert(bs, String.class), str);
+        Assert.assertEquals(converter.convert(str, ByteString.class), bs);
     }
 
     @lombok.Data
@@ -124,7 +239,7 @@ public class ProtobufTest {
     @EqualsAndHashCode
     public static class RequestDto {
         private int code;
-        private byte[] message;
+        private String message;
         private DataDto data;
     }
 
@@ -132,8 +247,8 @@ public class ProtobufTest {
     @EqualsAndHashCode
     public static class ResponseDto {
         private String code;
-        private long state;
-        private DataDto data;
+        private long message;
+        private Data data;
     }
 
     public enum EnumDto {
