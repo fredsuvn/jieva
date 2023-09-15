@@ -4,6 +4,7 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.data.FsData;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.time.Duration;
 
 /**
@@ -51,6 +52,11 @@ public interface FsNetChannel<C> {
      * Flushes buffered data to be sent.
      */
     void flush();
+
+    /**
+     * Returns buffer of this channel.
+     */
+    ByteBuffer getBuffer();
 
     /**
      * Returns underlying channel type.

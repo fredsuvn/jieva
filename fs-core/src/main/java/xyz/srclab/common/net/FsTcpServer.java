@@ -19,7 +19,7 @@ import java.util.List;
  *     </li>
  * </ul>
  * These handlers are usually set into {@link Builder} (or its subtype)
- * to build final implementation of {@link FsTcpServer}.
+ * to build final implementation instance.
  *
  * @param <S> underlying server type
  * @author fredsuvn
