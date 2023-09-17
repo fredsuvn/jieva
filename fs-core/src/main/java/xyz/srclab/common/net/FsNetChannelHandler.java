@@ -5,58 +5,40 @@ import xyz.srclab.annotations.Nullable;
 import java.nio.ByteBuffer;
 
 /**
- * Network callback handler for channel.
+ * Network channel callback handler.
  * <p>
- * An implementation of {@link FsTcpServer} has a list of handlers.
- * When a new channel was created, {@link #onOpen(FsNetChannel)} will be called once;
- * when that channel was closed, {@link #onClose(FsNetChannel)} will also be called once.
+ * An implementation of {@link FsTcpServer} has a list of {@link FsNetChannelHandler}.
  * <p>
- * When the channel receives new data from remote point, the data will be wrapped as {@link ByteBuffer} and passed to
+ * When the server receives new data from remote point, the data will be wrapped as {@link ByteBuffer} and passed to
  * {@link #onMessage(FsNetChannel, Object)} of first handler. Returned object from first handler will be passed to next
  * handler as {@code message}, and so on.
  * If null is returned, the handlers calling chain will be broken;
- * if an exception is thrown, {@link #onException(FsNetChannel, Throwable)} will be called on current handler and the
- * calling chain will also be broken.
+ * if an exception is thrown, {@link FsNetServerHandler#onException(FsNetChannel, Throwable)} will be called
+ * and the handlers calling chain will also be broken.
+ * <p>
+ * {@link #onMessage(FsNetChannel, Object)} only be called when new data was received, for more detailed operations,
+ * try {@link #onLoop(FsNetChannel, boolean)}.
  *
- * @param <C> underlying channel type
  * @param <M> message type
  * @author fredsuvn
  */
-public interface FsNetChannelHandler<C, M> {
-
-    /**
-     * Callback when the channel was opened.
-     *
-     * @param channel the channel
-     */
-    default void onOpen(FsNetChannel<C> channel) {
-    }
-
-    /**
-     * Callback when the channel was closed.
-     *
-     * @param channel the channel
-     */
-    default void onClose(FsNetChannel<C> channel) {
-    }
-
-    /**
-     * Callback when an exception occurs in this handle.
-     *
-     * @param channel   the channel
-     * @param throwable the exception
-     */
-    default void onException(FsNetChannel<C> channel, Throwable throwable) {
-    }
+public interface FsNetChannelHandler<M> {
 
     /**
      * Callback for each read loop of channel.
-     * Note the callback of this method always <b>after</b> {@link #onMessage(FsNetChannel, Object)}.
+     * <p>
+     * Server has a list of handlers, if there has new data read from remote endpoint,
+     * {@link #onMessage(FsNetChannel, Object)} will be call for each handler.
+     * <b>Only after onMessage of all handlers are called</b>, this method will be called for each handler.
+     * <p>
+     * Similar to calling of {@link #onMessage(FsNetChannel, Object)}, if an exception is thrown,
+     * {@link FsNetServerHandler#onException(FsNetChannel, Throwable)} will be called
+     * and the calling chain will be broken.
      *
      * @param channel    the channel
      * @param hasNewData whether there has new data read in current loop
      */
-    default void onLoop(FsNetChannel<C> channel, boolean hasNewData) {
+    default void onLoop(FsNetChannel channel, boolean hasNewData) {
     }
 
     /**
@@ -65,9 +47,9 @@ public interface FsNetChannelHandler<C, M> {
      * Server has a list of handlers,
      * the first handler will be passed a {@link ByteBuffer} as {@code message} parameter,
      * then returned object from first handler will be passed to next handler as {@code message} parameter, and so on.
-     * If null is returned from any handler, the handlers calling chain will be broken at the handler;
-     * if an exception is thrown, {@link #onException(FsNetChannel, Throwable)} will be called on that handler and the
-     * calling chain will also be broken. The process like:
+     * If null is returned from any handler, the handlers calling chain will be broken at that handler;
+     * if an exception is thrown, {@link FsNetServerHandler#onException(FsNetChannel, Throwable)} will be called
+     * and the calling chain will also be broken. The process like:
      * <pre>
      *     Object message = ByteBuffer.wrap(...);
      *     for (FsNetChannelHandler<...> channelHandler : channelHandlers) {
@@ -78,19 +60,19 @@ public interface FsNetChannelHandler<C, M> {
      *             }
      *             message = result;
      *         } catch (Throwable e) {
-     *             channelHandler.onException(channel, e);
+     *             serverHandler.onException(channel, e);
      *             break;
      *         }
      *     }
      * </pre>
      * If the {@link ByteBuffer} on this callback is not fully consumed (remaining() > 0), the remaining data will be
      * reserved to next calling. However, the handler chain will be called if and only if there has new data read from
-     * the channel, it's best to try to consume as much as possible each time,
-     * and using {@link #onLoop(FsNetChannel, boolean)} can deal with un-consumed data.
+     * the remote endpoint. It's best to try to consume as much as possible for each time,
+     * or using {@link #onLoop(FsNetChannel, boolean)} to deal with un-consumed data.
      *
      * @param channel the channel
      * @param message the message
      */
     @Nullable
-    Object onMessage(FsNetChannel<C> channel, M message);
+    Object onMessage(FsNetChannel channel, M message);
 }

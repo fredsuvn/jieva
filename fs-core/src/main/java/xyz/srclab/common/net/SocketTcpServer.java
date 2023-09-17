@@ -8,7 +8,9 @@ import xyz.srclab.common.data.FsData;
 import xyz.srclab.common.io.FsIO;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -28,8 +30,8 @@ import java.util.function.IntFunction;
 public class SocketTcpServer implements FsTcpServer<ServerSocket> {
 
     private final int port;
-    private final List<FsNetServerHandler<ServerSocket>> serverHandlers;
-    private final List<FsNetChannelHandler<Socket, ?>> channelHandlers;
+    private final FsNetServerHandler<ServerSocket> serverHandler;
+    private final List<FsNetChannelHandler< ?>> channelHandlers;
     private final ThreadPoolExecutor threadPoolExecutor;
     private final @Nullable Consumer<ServerSocket> config;
     private final IntFunction<ByteBuffer> bufferGenerator;
@@ -40,7 +42,7 @@ public class SocketTcpServer implements FsTcpServer<ServerSocket> {
 
     private SocketTcpServer(Builder builder) {
         this.port = builder.port;
-        this.serverHandlers = FsCollect.immutableList(builder.serverHandlers);
+        this.serverHandler = builder.serverHandler;
         this.channelHandlers = FsCollect.immutableList(builder.channelHandlers);
         this.threadPoolExecutor = builder.threadPoolExecutor;
         this.config = builder.config;
@@ -72,69 +74,81 @@ public class SocketTcpServer implements FsTcpServer<ServerSocket> {
         return serverSocket;
     }
 
-    private void startAcceptLoop() throws Exception {
-        serverSocket = buildServerSocket();
-        threadPoolExecutor.execute(() -> {
-            while (true) {
-                Socket socket;
-                try {
-                    socket = serverSocket.accept();
-                } catch (IOException e) {
-                    for (FsNetServerHandler<ServerSocket> serverHandler : serverHandlers) {
-                        serverHandler.onStart(serverSocket, e);
-                    }
-                    continue;
-                }
-
-            }
-        });
-    }
+    // private void startAcceptLoop() throws Exception {
+    //     serverSocket = buildServerSocket();
+    //     threadPoolExecutor.execute(() -> {
+    //         while (true) {
+    //             Socket socket;
+    //             try {
+    //                 socket = serverSocket.accept();
+    //             } catch (IOException e) {
+    //                 for (FsNetServerHandler<ServerSocket> serverHandler : serverHandlers) {
+    //                     serverHandler.onStart(serverSocket, e);
+    //                 }
+    //                 continue;
+    //             }
+    //
+    //         }
+    //     });
+    // }
 
     private void loopSocket() {
         for (ChannelImpl channel : channels) {
-            byte[] bytes = null;
-            try {
-                bytes = FsIO.availableBytes(channel.socket.getInputStream());
-                if (FsArray.isEmpty(bytes)) {
-                    //channelHandlers.get(0).
-                    continue;
+        }
+    }
+
+    private void doChannel(ChannelImpl channel) {
+        byte[] bytes = null;
+        try {
+            bytes = FsIO.availableBytes(channel.in);
+            if (FsArray.isEmpty(bytes)) {
+                for (FsNetChannelHandler<?> channelHandler : channelHandlers) {
+                    channelHandler.onLoop(channel, false);
                 }
-            } catch (IOException e) {
-                channelHandlers.get(0).onException(channel, e);
-                continue;
+                return;
             }
-            ByteBuffer buffer;
-            if (channel.buffer == null) {
-                buffer = ByteBuffer.wrap(bytes);
-            } else if (channel.buffer.remaining() <= 0) {
-                if (channel.buffer.capacity() >= bytes.length && channel.buffer.capacity() <= bytes.length * 1.5) {
-                    buffer = channel.buffer;
-                    buffer.position(0);
-                    buffer.put(bytes);
-                } else {
-                    buffer = ByteBuffer.wrap(bytes);
-                }
-            } else {
-                buffer = bufferGenerator.apply(bytes.length + channel.buffer.remaining());
+        } catch (Exception e) {
+            serverHandler.onException(channel, e);
+            return;
+        }
+        if (channel.buffer == null) {
+            channel.buffer = ByteBuffer.wrap(bytes);
+        } else if (channel.buffer.capacity() - channel.buffer.limit() >= bytes.length){
+            channel.buffer.position(channel.buffer.limit());
+            channel.buffer.put(bytes);
+            channel.buffer.flip();
+        } else {
+              ByteBuffer  buffer = bufferGenerator.apply(bytes.length + channel.buffer.remaining());
                 buffer.put(channel.buffer);
                 buffer.put(bytes);
                 buffer.flip();
-            }
             channel.buffer = buffer;
-            Object message = buffer;
-            for (FsNetChannelHandler<Socket, ?> channelHandler : channelHandlers) {
-                FsNetChannelHandler<Socket, Object> handler = Fs.as(channelHandler);
-                try {
-                    Object result = handler.onMessage(channel, message);
-                    if (result == null) {
-                        break;
-                    }
-                    message = result;
-                } catch (Throwable e) {
-                    handler.onException(channel, e);
+        }
+        Object message = channel.buffer;
+        for (FsNetChannelHandler< ?> channelHandler : channelHandlers) {
+            FsNetChannelHandler< Object> handler = Fs.as(channelHandler);
+            try {
+                Object result = handler.onMessage(channel, message);
+                if (result == null) {
                     break;
                 }
+                message = result;
+            } catch (Throwable e) {
+                serverHandler.onException(channel, e);
+                return;
             }
+        }
+        for (FsNetChannelHandler< ?> channelHandler : channelHandlers) {
+            FsNetChannelHandler< Object> handler = Fs.as(channelHandler);
+            try {
+                handler.onLoop(channel, true);
+            } catch (Throwable e) {
+                serverHandler.onException(channel, e);
+                return;
+            }
+        }
+        if (channel.buffer.hasRemaining()) {
+            channel.buffer.compact();
         }
     }
 
@@ -146,43 +160,43 @@ public class SocketTcpServer implements FsTcpServer<ServerSocket> {
         return server;
     }
 
-    private static final class ChannelImpl implements FsNetChannel<Socket> {
+    private static final class ChannelImpl implements FsNetChannel {
 
         private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(new byte[0]);
 
         private final Socket socket;
-        private final ServerSocket serverSocket;
-        private @Nullable InetSocketAddress remoteAddress;
-        private @Nullable InetSocketAddress hostAddress;
-
+        private final InputStream in;
+        private volatile @Nullable OutputStream out;
         private @Nullable ByteBuffer buffer;
 
-        private ChannelImpl(Socket socket, ServerSocket serverSocket) {
+        private ChannelImpl(Socket socket) {
             this.socket = socket;
-            this.serverSocket = serverSocket;
+            this.in = getIn(socket);
         }
 
         @Override
-        public InetSocketAddress getRemoteAddress() {
-            if (remoteAddress != null) {
-                return remoteAddress;
-            }
-            remoteAddress = new InetSocketAddress(socket.getInetAddress(), serverSocket.getLocalPort());
-            return remoteAddress;
+        public InetAddress getRemoteAddress() {
+            return socket.getInetAddress();
         }
 
         @Override
-        public InetSocketAddress getHostAddress() {
-            if (hostAddress != null) {
-                return hostAddress;
-            }
-            hostAddress = new InetSocketAddress(serverSocket.getInetAddress(), serverSocket.getLocalPort());
-            return hostAddress;
+        public int getRemotePort() {
+            return socket.getPort();
         }
 
         @Override
-        public boolean isAlive() {
-            return socket.isConnected();
+        public InetAddress getLocalAddress() {
+            return socket.getLocalAddress();
+        }
+
+        @Override
+        public int getLocalPort() {
+            return socket.getLocalPort();
+        }
+
+        @Override
+        public boolean isOpened() {
+            return !socket.isClosed() && socket.isBound() && socket.isConnected();
         }
 
         @Override
@@ -201,17 +215,15 @@ public class SocketTcpServer implements FsTcpServer<ServerSocket> {
 
         @Override
         public void send(FsData data) {
-            try {
-                FsIO.readBytesTo(data.toInputStream(), socket.getOutputStream());
-            } catch (IOException e) {
-                throw new FsNetException(e);
-            }
+            setOut();
+            FsIO.readBytesTo(data.toInputStream(), out);
         }
 
         @Override
         public void flush() {
+            setOut();
             try {
-                socket.getOutputStream().flush();
+                out.flush();
             } catch (IOException e) {
                 throw new FsNetException(e);
             }
@@ -223,15 +235,37 @@ public class SocketTcpServer implements FsTcpServer<ServerSocket> {
         }
 
         @Override
-        public Socket getChannel() {
+        public Object getSource() {
             return socket;
+        }
+
+        private InputStream getIn(Socket socket) {
+            try {
+                return socket.getInputStream();
+            } catch (IOException e) {
+                throw new FsNetException(e);
+            }
+        }
+
+        private void setOut() {
+            if (out == null) {
+                synchronized (this) {
+                    if (out == null) {
+                        try {
+                            out = socket.getOutputStream();
+                        } catch (IOException e) {
+                            throw new FsNetException(e);
+                        }
+                    }
+                }
+            }
         }
     }
 
     public static class Builder {
         private int port;
-        private List<FsNetServerHandler<ServerSocket>> serverHandlers;
-        private List<FsNetChannelHandler<Socket, ?>> channelHandlers;
+        private FsNetServerHandler<ServerSocket> serverHandler;
+        private List<FsNetChannelHandler<?>> channelHandlers;
         private ThreadPoolExecutor threadPoolExecutor;
         private @Nullable Consumer<ServerSocket> config;
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;

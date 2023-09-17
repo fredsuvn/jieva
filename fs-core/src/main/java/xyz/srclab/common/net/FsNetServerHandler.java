@@ -33,4 +33,29 @@ public interface FsNetServerHandler<S> {
      * @param exception the exception
      */
     void onException(S server, Throwable exception);
+
+    /**
+     * Callback when the channel was opened.
+     *
+     * @param channel the channel
+     */
+    default void onOpen(FsNetChannel channel) {
+    }
+
+    /**
+     * Callback when the channel was closed.
+     *
+     * @param channel the channel
+     */
+    default void onClose(FsNetChannel channel) {
+    }
+
+    /**
+     * Callback when an exception occurs in this handle.
+     *
+     * @param channel   the channel
+     * @param throwable the exception
+     */
+    default void onException(FsNetChannel channel, Throwable throwable) {
+    }
 }

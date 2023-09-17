@@ -3,63 +3,73 @@ package xyz.srclab.common.net;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.data.FsData;
 
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 
 /**
- * Channel of a network connection.
+ * This class represents a channel connects the local and remote endpoint.
  *
- * @param <C> underlying channel type
  * @author fredsuvn
  */
-public interface FsNetChannel<C> {
+public interface FsNetChannel {
 
     /**
-     * Returns remote address.
+     * Returns address of remote endpoint.
      */
-    InetSocketAddress getRemoteAddress();
+    InetAddress getRemoteAddress();
 
     /**
-     * Returns host/current/local address of this channel.
+     * Returns port of remote endpoint.
      */
-    InetSocketAddress getHostAddress();
+    int getRemotePort();
 
     /**
-     * Returns whether this channel is alive.
+     * Returns address of local endpoint.
      */
-    boolean isAlive();
+    InetAddress getLocalAddress();
+
+    /**
+     * Returns port of remote endpoint.
+     */
+    int getLocalPort();
+
+    /**
+     * Returns whether this channel is opened.
+     */
+    boolean isOpened();
 
     /**
      * Closes this channel.
-     * It will wait all buffered data has been flushed for given timeout, or keep waiting if the timeout is null.
+     * It will wait all buffered data has been flushed in given timeout (or always waiting if the timeout is null).
      *
      * @param timeout given timeout
      */
     void close(@Nullable Duration timeout);
 
     /**
-     * Closes this channel immediately, without waiting the buffered data to be flushed.
+     * Closes this channel immediately, other operations in processing will in forced interruption.
      */
     void closeNow();
 
     /**
-     * Sends data to remote of this channel.
+     * Writes data to remote endpoint.
+     * The written data may be buffered before the {@link #flush()} is called.
      */
     void send(FsData data);
 
     /**
-     * Flushes buffered data to be sent.
+     * Flushes buffered data to be written to remote endpoint.
      */
     void flush();
 
     /**
-     * Returns buffer of this channel.
+     * Returns buffered data read from remote endpoint.
      */
     ByteBuffer getBuffer();
 
     /**
-     * Returns underlying channel type.
+     * Returns underlying object which implements {@link FsNetChannel} interface.
      */
-    C getChannel();
+    Object getSource();
 }

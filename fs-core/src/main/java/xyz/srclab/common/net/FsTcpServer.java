@@ -79,7 +79,7 @@ public interface FsTcpServer<S> {
     abstract class Builder<C, S, T extends FsTcpServer<S>, B extends Builder<C, S, T, B>> {
 
         protected @Nullable FsNetServerHandler<S> serverHandler;
-        protected @Nullable List<FsNetChannelHandler<C, ?>> channelHandlers;
+        protected @Nullable List<FsNetChannelHandler<?>> channelHandlers;
 
         /**
          * Sets  server handler.
@@ -96,7 +96,7 @@ public interface FsTcpServer<S> {
          *
          * @param channelHandlers channel handlers
          */
-        public B channelHandlers(List<FsNetChannelHandler<C, ?>> channelHandlers) {
+        public B channelHandlers(List<FsNetChannelHandler<?>> channelHandlers) {
             this.channelHandlers = channelHandlers;
             return Fs.as(this);
         }
