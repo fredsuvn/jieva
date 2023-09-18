@@ -5,7 +5,7 @@ package xyz.srclab.common.net;
  *
  * @author fredsuvn
  */
-public interface FsNetServerHandler {
+public interface FsNetClientHandler {
 
     /**
      * Callback when an exception occurs on the server.

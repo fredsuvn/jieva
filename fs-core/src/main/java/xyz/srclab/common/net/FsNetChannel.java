@@ -4,6 +4,7 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.data.FsData;
 
 import java.net.InetAddress;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 
@@ -40,6 +41,11 @@ public interface FsNetChannel {
     boolean isOpened();
 
     /**
+     * Returns whether this channel is closed.
+     */
+    boolean isClosed();
+
+    /**
      * Closes this channel.
      * It will wait all buffered data has been flushed in given timeout (or always waiting if the timeout is null).
      *
@@ -69,7 +75,7 @@ public interface FsNetChannel {
     ByteBuffer getBuffer();
 
     /**
-     * Returns underlying object which implements {@link FsNetChannel} interface.
+     * Returns underlying object which implements {@link FsNetChannel} interface, such as {@link Socket}.
      */
     Object getSource();
 }
