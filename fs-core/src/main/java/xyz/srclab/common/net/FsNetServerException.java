@@ -7,7 +7,7 @@ import java.net.ServerSocket;
  *
  * @author fredsuvn
  */
-public class FsNetEndpointException extends RuntimeException {
+public class FsNetServerException extends RuntimeException {
 
     private final Object source;
 
@@ -17,7 +17,7 @@ public class FsNetEndpointException extends RuntimeException {
      * @param source server source object, such as {@link ServerSocket}
      * @param cause  the cause
      */
-    public FsNetEndpointException(Object source, Throwable cause) {
+    public FsNetServerException(Object source, Throwable cause) {
         super(cause);
         this.source = source;
     }

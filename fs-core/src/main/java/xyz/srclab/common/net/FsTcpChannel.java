@@ -9,11 +9,11 @@ import java.nio.ByteBuffer;
 import java.time.Duration;
 
 /**
- * This class represents a channel connects the local and remote endpoint.
+ * This class represents a TCP/IP channel connects the local and remote endpoint.
  *
  * @author fredsuvn
  */
-public interface FsNetChannel {
+public interface FsTcpChannel {
 
     /**
      * Returns address of remote endpoint.
@@ -75,7 +75,7 @@ public interface FsNetChannel {
     ByteBuffer getBuffer();
 
     /**
-     * Returns underlying object which implements {@link FsNetChannel} interface, such as {@link Socket}.
+     * Returns underlying object which implements {@link FsTcpChannel} interface, such as {@link Socket}.
      */
     Object getSource();
 }

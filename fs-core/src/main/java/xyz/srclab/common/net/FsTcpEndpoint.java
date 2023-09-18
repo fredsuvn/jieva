@@ -7,13 +7,13 @@ import java.net.Socket;
 import java.time.Duration;
 
 /**
- * This interface represent an endpoint on the network: server or client.
+ * This interface represent an endpoint on the TCP/IP network: server or client.
  *
  * @author fredsuvn
  * @see FsTcpServer
  * @see FsTcpClient
  */
-public interface FsNetEndpoint {
+public interface FsTcpEndpoint {
 
     /**
      * Returns whether this point is opened.

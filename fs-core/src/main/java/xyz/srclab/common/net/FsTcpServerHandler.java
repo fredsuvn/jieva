@@ -1,18 +1,18 @@
 package xyz.srclab.common.net;
 
 /**
- * Network handler for server actions.
+ * TCP/IP network handler in server endpoint.
  *
  * @author fredsuvn
  */
-public interface FsNetClientHandler {
+public interface FsTcpServerHandler {
 
     /**
      * Callback when an exception occurs on the server.
      *
      * @param exception the exception for server
      */
-    default void onException(FsNetEndpointException exception) {
+    default void onException(FsNetServerException exception) {
     }
 
     /**
@@ -20,7 +20,7 @@ public interface FsNetClientHandler {
      *
      * @param channel the channel
      */
-    default void onOpen(FsNetChannel channel) {
+    default void onOpen(FsTcpChannel channel) {
     }
 
     /**
@@ -28,30 +28,30 @@ public interface FsNetClientHandler {
      *
      * @param channel the channel
      */
-    default void onClose(FsNetChannel channel) {
+    default void onClose(FsTcpChannel channel) {
     }
 
     /**
-     * Callback when an exception occurs in this handle.
+     * Callback when an exception occurs in the channel.
      *
      * @param channel   the channel
      * @param throwable the exception
      */
-    default void onException(FsNetChannel channel, Throwable throwable) {
+    default void onException(FsTcpChannel channel, Throwable throwable) {
     }
 
     /**
      * Callback for each read loop of channel.
      * <p>
      * Server has a list of handlers, if there has new data read from remote endpoint,
-     * {@link FsNetChannelHandler#onMessage(FsNetChannel, Object)} will be called for each handler.
+     * {@link FsTcpChannelHandler#onMessage(FsTcpChannel, Object)} will be called for each handler.
      * <b>Only all onMessage method of handlers have been called</b>, then this method would be called.
      * <p>
-     * If an exception is thrown, {@link #onException(FsNetChannel, Throwable)} will be called.
+     * If an exception is thrown, {@link #onException(FsTcpChannel, Throwable)} will be called.
      *
      * @param channel    the channel
      * @param hasNewData whether there has new data read in current loop
      */
-    default void onLoop(FsNetChannel channel, boolean hasNewData) {
+    default void onLoop(FsTcpChannel channel, boolean hasNewData) {
     }
 }

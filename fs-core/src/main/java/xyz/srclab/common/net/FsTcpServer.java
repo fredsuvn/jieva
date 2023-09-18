@@ -26,21 +26,21 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 
 /**
- * TCP/IP server interface, server endpoint of {@link FsNetEndpoint}.
+ * TCP/IP server interface, server endpoint of {@link FsTcpEndpoint}.
  * <p>
  * A {@link FsTcpServer} implementation should support following types of handler:
  * <ul>
  *     <li>
- *         one {@link FsNetServerHandler}: to deal with server actions;
+ *         one {@link FsTcpServerHandler}: to deal with server actions;
  *     </li>
  *     <li>
- *         a list of {@link FsNetClientHandler}: to deal with actions for each connection;
+ *         a list of {@link FsTcpClientHandler}: to deal with actions for each connection;
  *     </li>
  * </ul>
  *
  * @author fredsuvn
  */
-public interface FsTcpServer extends FsNetEndpoint {
+public interface FsTcpServer extends FsTcpEndpoint {
 
     /**
      * Returns new builder for this interface.
@@ -78,14 +78,14 @@ public interface FsTcpServer extends FsNetEndpoint {
         private static final int OPENED = 1;
         private static final int CLOSED = 2;
         private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(new byte[0]);
-        private static final FsNetServerHandler EMPTY_SERVER_HANDLER = new FsNetServerHandler() {
+        private static final FsTcpServerHandler EMPTY_SERVER_HANDLER = new FsTcpServerHandler() {
         };
 
         private int port = 0;
         private int maxConnection = 50;
         private @Nullable InetAddress hostAddress;
-        private @Nullable FsNetServerHandler serverHandler;
-        private final List<FsNetChannelHandler<?>> channelHandlers = new LinkedList<>();
+        private @Nullable FsTcpServerHandler serverHandler;
+        private final List<FsTcpChannelHandler<?>> channelHandlers = new LinkedList<>();
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;
         private @Nullable Executor executor;
         private int bufferSize = FsIO.IO_BUFFER_SIZE;
@@ -130,7 +130,7 @@ public interface FsTcpServer extends FsNetEndpoint {
         /**
          * Sets server handler.
          */
-        public Builder serverHandler(FsNetServerHandler serverHandler) {
+        public Builder serverHandler(FsTcpServerHandler serverHandler) {
             this.serverHandler = serverHandler;
             return this;
         }
@@ -138,7 +138,7 @@ public interface FsTcpServer extends FsNetEndpoint {
         /**
          * Adds channel handler.
          */
-        public Builder addChannelHandler(FsNetChannelHandler<?> channelHandler) {
+        public Builder addChannelHandler(FsTcpChannelHandler<?> channelHandler) {
             this.channelHandlers.add(channelHandler);
             return this;
         }
@@ -146,7 +146,7 @@ public interface FsTcpServer extends FsNetEndpoint {
         /**
          * Adds channel handlers.
          */
-        public Builder addChannelHandlers(Iterable<FsNetChannelHandler<?>> channelHandlers) {
+        public Builder addChannelHandlers(Iterable<FsTcpChannelHandler<?>> channelHandlers) {
             FsCollect.toCollection(this.channelHandlers, channelHandlers);
             return this;
         }
@@ -196,8 +196,8 @@ public interface FsTcpServer extends FsNetEndpoint {
             private final int port;
             private final int maxConnection;
             private final InetAddress hostAddress;
-            private final FsNetServerHandler serverHandler;
-            private final List<FsNetChannelHandler<?>> channelHandlers;
+            private final FsTcpServerHandler serverHandler;
+            private final List<FsTcpChannelHandler<?>> channelHandlers;
             private final IntFunction<ByteBuffer> bufferGenerator;
             private final Executor executor;
             private final int bufferSize;
@@ -316,7 +316,7 @@ public interface FsTcpServer extends FsNetEndpoint {
                                 socket = serverSocket.accept();
                                 channel = new ChannelImpl(socket);
                             } catch (Throwable e) {
-                                serverHandler.onException(new FsNetEndpointException(serverSocket, e));
+                                serverHandler.onException(new FsNetServerException(serverSocket, e));
                                 continue;
                             }
                             try {
@@ -370,8 +370,8 @@ public interface FsTcpServer extends FsNetEndpoint {
                 }
                 try {
                     Object message = buildBuffer(channel.buffer, bytes);
-                    for (FsNetChannelHandler<?> channelHandler : channelHandlers) {
-                        FsNetChannelHandler<Object> handler = Fs.as(channelHandler);
+                    for (FsTcpChannelHandler<?> channelHandler : channelHandlers) {
+                        FsTcpChannelHandler<Object> handler = Fs.as(channelHandler);
                         try {
                             Object result = handler.onMessage(channel, message);
                             if (result == null) {
@@ -426,7 +426,7 @@ public interface FsTcpServer extends FsNetEndpoint {
                 return buffer;
             }
 
-            private final class ChannelImpl implements FsNetChannel {
+            private final class ChannelImpl implements FsTcpChannel {
 
                 private final Socket socket;
                 private final InputStream in;
