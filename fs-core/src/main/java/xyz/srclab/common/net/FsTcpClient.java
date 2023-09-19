@@ -403,11 +403,6 @@ public interface FsTcpClient extends FsTcpEndpoint {
                     return socket;
                 }
 
-                @Override
-                public ByteBuffer newBuffer(int size) {
-                    return bufferGenerator.apply(size);
-                }
-
                 private InputStream getIn(Socket socket) {
                     try {
                         return socket.getInputStream();
