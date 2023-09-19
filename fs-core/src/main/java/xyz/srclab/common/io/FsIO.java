@@ -32,18 +32,6 @@ public class FsIO {
      */
     @Nullable
     public static byte[] readBytes(InputStream inputStream) {
-        return readBytes(inputStream, false);
-    }
-
-    /**
-     * Reads all bytes from given input stream, then close the stream if given close is true (else not).
-     * Return null if no data read out and reach to the end of stream.
-     *
-     * @param inputStream given input stream
-     * @param close       whether close the stream after reading
-     */
-    @Nullable
-    public static byte[] readBytes(InputStream inputStream, boolean close) {
         try {
             int available = inputStream.available();
             ByteArrayOutputStream dest;
@@ -79,9 +67,6 @@ public class FsIO {
                 }
                 return null;
             }
-            if (close) {
-                inputStream.close();
-            }
             return dest.toByteArray();
         } catch (Exception e) {
             throw new FsIOException(e);
@@ -101,24 +86,6 @@ public class FsIO {
      */
     @Nullable
     public static byte[] readBytes(InputStream inputStream, int limit) {
-        return readBytes(inputStream, limit, false);
-    }
-
-    /**
-     * Reads specified limit number of bytes from given input stream,
-     * then close the stream if given close is true (else not).
-     * Return null if no data read out and reach to the end of stream.
-     * <p>
-     * If the limit number &lt; 0, read all bytes;
-     * els if limit number is 0, no read and return;
-     * else this method will keep reading bytes until it reaches the limit or the end of the stream.
-     *
-     * @param inputStream given input stream
-     * @param limit       specified limit number
-     * @param close       whether close the stream after reading
-     */
-    @Nullable
-    public static byte[] readBytes(InputStream inputStream, int limit, boolean close) {
         try {
             int available = inputStream.available();
             int hasRead = 0;
@@ -167,9 +134,6 @@ public class FsIO {
                     return dest.toByteArray();
                 }
                 return null;
-            }
-            if (close) {
-                inputStream.close();
             }
             return dest.toByteArray();
         } catch (Exception e) {
@@ -335,26 +299,11 @@ public class FsIO {
      */
     @Nullable
     public static String readString(Reader reader) {
-        return readString(reader, false);
-    }
-
-    /**
-     * Reads all chars from given reader, then close the reader if given close is true (else not).
-     * Return null if no data read out and reach to the end of stream.
-     *
-     * @param reader given reader
-     * @param close  whether close the stream after reading
-     */
-    @Nullable
-    public static String readString(Reader reader, boolean close) {
         try {
             StringBuilder dest = new StringBuilder();
             long readCount = readCharsTo(reader, dest);
             if (readCount == -1) {
                 return null;
-            }
-            if (close) {
-                reader.close();
             }
             return dest.toString();
         } catch (Exception e) {
@@ -375,32 +324,11 @@ public class FsIO {
      */
     @Nullable
     public static String readString(Reader reader, int limit) {
-        return readString(reader, limit, false);
-    }
-
-    /**
-     * Reads specified limit number of chars from given reader,
-     * then close the reader if given close is true (else not).
-     * Return null if no data read out and reach to the end of stream.
-     * <p>
-     * If the limit number &lt; 0, read all bytes;
-     * els if limit number is 0, no read and return;
-     * else this method will keep reading chars until it reaches the limit or the end of the reader.
-     *
-     * @param reader given reader
-     * @param limit  specified limit number
-     * @param close  whether close the stream after reading
-     */
-    @Nullable
-    public static String readString(Reader reader, int limit, boolean close) {
         try {
             StringBuilder dest = new StringBuilder();
             long readCount = readCharsTo(reader, dest, limit);
             if (readCount == -1) {
                 return null;
-            }
-            if (close) {
-                reader.close();
             }
             return dest.toString();
         } catch (Exception e) {
@@ -520,24 +448,6 @@ public class FsIO {
     @Nullable
     public static String readString(InputStream inputStream, Charset charset) {
         byte[] bytes = readBytes(inputStream);
-        if (bytes == null) {
-            return null;
-        }
-        return new String(bytes, charset);
-    }
-
-    /**
-     * Reads String encoded by all bytes from given input stream,
-     * then close given input stream if given close is true (else not).
-     * Return null if no data read out and reach to the end of stream.
-     *
-     * @param inputStream given input stream
-     * @param charset     charset of the string
-     * @param close       given close
-     */
-    @Nullable
-    public static String readString(InputStream inputStream, Charset charset, boolean close) {
-        byte[] bytes = readBytes(inputStream, close);
         if (bytes == null) {
             return null;
         }
