@@ -1,6 +1,8 @@
 package test;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestUtil {
 
@@ -27,5 +29,10 @@ public class TestUtil {
             bytes[i] = (byte) ((now * (i + 888) / 999) % 64);
         }
         return bytes;
+    }
+
+    public static void count(String key, Map<String, AtomicInteger> map) {
+        AtomicInteger c = map.computeIfAbsent(key, k -> new AtomicInteger(0));
+        c.incrementAndGet();
     }
 }

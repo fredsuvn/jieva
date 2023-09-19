@@ -731,6 +731,17 @@ public class FsIO {
     }
 
     /**
+     * Read all bytes of given buffer and encodes to string with {@link FsString#CHARSET}.
+     * After reading, the buffer's position will be updated to its limit, its limit will not have been changed.
+     *
+     * @param buffer given buffer
+     */
+    public static String getString(ByteBuffer buffer) {
+        byte[] bytes = getBytes(buffer);
+        return new String(bytes, FsString.CHARSET);
+    }
+
+    /**
      * Using {@link RandomAccessFile} to read all bytes of given file of path.
      *
      * @param path given file of path

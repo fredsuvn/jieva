@@ -3,6 +3,7 @@ package xyz.srclab.common.data;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.FsCheck;
+import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.encode.FsEncoder;
 import xyz.srclab.common.io.FsIO;
 
@@ -19,6 +20,16 @@ import java.util.function.Supplier;
  */
 @ThreadSafe
 public interface FsData {
+
+    /**
+     * Wraps given string to {@link FsData}.
+     * The given string will be decoded by {@link FsString#CHARSET}.
+     *
+     * @param str given string
+     */
+    static FsData wrap(String str) {
+        return wrap(str.getBytes(FsString.CHARSET));
+    }
 
     /**
      * Wraps given array to {@link FsData}.
