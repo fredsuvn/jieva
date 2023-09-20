@@ -5,11 +5,10 @@ import xyz.srclab.common.data.FsData;
 
 import java.net.InetAddress;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.time.Duration;
 
 /**
- * This class represents a TCP/IP channel connects the local and remote endpoint.
+ * This class represents a TCP/IP connection channel between local and remote endpoint.
  *
  * @author fredsuvn
  */
@@ -68,11 +67,6 @@ public interface FsTcpChannel {
      * Flushes buffered data to be written to remote endpoint.
      */
     void flush();
-
-    /**
-     * Returns buffered data read from remote endpoint.
-     */
-    ByteBuffer getBuffer();
 
     /**
      * Returns underlying object which implements {@link FsTcpChannel} interface, such as {@link Socket}.

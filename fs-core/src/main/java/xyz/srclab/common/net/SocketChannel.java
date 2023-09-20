@@ -91,11 +91,6 @@ final class SocketChannel implements FsTcpChannel{
     }
 
     @Override
-    public ByteBuffer getBuffer() {
-        return null;
-    }
-
-    @Override
     public Object getSource() {
         return socket;
     }

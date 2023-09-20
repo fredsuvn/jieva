@@ -742,6 +742,18 @@ public class FsIO {
     }
 
     /**
+     * Returns slice of given buffer by {@link ByteBuffer#slice()}, and set new buffer's limit to given limit.
+     *
+     * @param buffer given buffer
+     * @param limit  given limit
+     */
+    public static ByteBuffer slice(ByteBuffer buffer, int limit) {
+        ByteBuffer slice = buffer.slice();
+        slice.limit(limit);
+        return slice;
+    }
+
+    /**
      * Using {@link RandomAccessFile} to read all bytes of given file of path.
      *
      * @param path given file of path

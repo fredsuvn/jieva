@@ -13,11 +13,11 @@ import java.nio.ByteBuffer;
  * {@link #onMessage(FsTcpChannel, Object)} of first handler. Returned object from first handler will be passed to next
  * handler as {@code message}, and so on.
  * If null is returned, the handlers calling chain will be broken;
- * if an exception is thrown, {@link FsTcpServerHandler#onException(FsTcpChannel, Throwable)} will be called
+ * if an exception is thrown, {@link FsTcpServerHandler#onException(FsTcpChannel, Throwable, ByteBuffer)} will be called
  * and the handlers calling chain will also be broken.
  * <p>
  * {@link #onMessage(FsTcpChannel, Object)} only be called when new data was received, for more detailed operations,
- * try {@link FsTcpServerHandler#onLoop(FsTcpChannel, boolean)}.
+ * try {@link FsTcpServerHandler#onLoop(FsTcpChannel, boolean, ByteBuffer)}.
  *
  * @param <M> message type
  * @author fredsuvn
@@ -31,7 +31,7 @@ public interface FsTcpChannelHandler<M> {
      * the first handler will be passed a {@link ByteBuffer} as {@code message} parameter,
      * then returned object from first handler will be passed to next handler as {@code message} parameter, and so on.
      * If null is returned from any handler, the handlers calling chain will be broken at that handler;
-     * if an exception is thrown, {@link FsTcpServerHandler#onException(FsTcpChannel, Throwable)} will be called
+     * if an exception is thrown, {@link FsTcpServerHandler#onException(FsTcpChannel, Throwable, ByteBuffer)} will be called
      * and the calling chain will also be broken. The process like:
      * <pre>
      *     Object message = ByteBuffer.wrap(...);
@@ -51,7 +51,7 @@ public interface FsTcpChannelHandler<M> {
      * If the {@link ByteBuffer} on this callback is not fully consumed (remaining() > 0), the remaining data will be
      * reserved to next calling. However, the handler chain will be called if and only if there has new data read from
      * the remote endpoint. It's best to try to consume as much as possible for each time,
-     * or using {@link FsTcpServerHandler#onLoop(FsTcpChannel, boolean)} to deal with un-consumed data.
+     * or using {@link FsTcpServerHandler#onLoop(FsTcpChannel, boolean, ByteBuffer)} to deal with un-consumed data.
      *
      * @param channel the channel
      * @param message the message
