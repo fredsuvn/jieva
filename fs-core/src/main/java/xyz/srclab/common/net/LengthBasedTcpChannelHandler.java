@@ -1,8 +1,6 @@
-package xyz.srclab.common.net.handlers;
+package xyz.srclab.common.net;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.net.FsTcpChannel;
-import xyz.srclab.common.net.FsTcpChannelHandler;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -25,6 +23,8 @@ import java.util.List;
  *         Specified length: created by {@link #LengthBasedTcpChannelHandler(int, int)}, to split with specified length;
  *     </li>
  * </ul>
+ *
+ * @author fredsuvn
  */
 public class LengthBasedTcpChannelHandler implements FsTcpChannelHandler<ByteBuffer> {
 
@@ -88,7 +88,7 @@ public class LengthBasedTcpChannelHandler implements FsTcpChannelHandler<ByteBuf
         List<ByteBuffer> result = new LinkedList<>();
         while (true) {
             message.mark();
-            message.position(lengthOffset);
+            message.position(message.position() + lengthOffset);
             int length = readLength(message);
             message.reset();
             if (message.remaining() < length) {

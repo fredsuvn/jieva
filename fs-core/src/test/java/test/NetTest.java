@@ -5,10 +5,10 @@ import org.testng.annotations.Test;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsLogger;
+import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.data.FsData;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.net.*;
-import xyz.srclab.common.net.handlers.LengthBasedTcpChannelHandler;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -49,10 +49,9 @@ public class NetTest {
 
                 @Override
                 public void onOpen(FsTcpChannel channel) {
-                    channel.send(FsData.wrap("hlo"));
-                    TestUtil.count("hlo", data);
-                    channel.flush();
                     TestUtil.count("server-onOpen", data);
+                    channel.sendAndFlush(FsData.wrap(buildServerData("hlo")));
+                    TestUtil.count("hlo", data);
                 }
 
                 @Override
@@ -75,11 +74,11 @@ public class NetTest {
                         TestUtil.count(str, data);
                         switch (str) {
                             case "abc": {
-                                channel.sendAndFlush(FsData.wrap("qwe"));
+                                channel.sendAndFlush(FsData.wrap(buildServerData("qwe")));
                                 break;
                             }
                             case "bye": {
-                                channel.sendAndFlush(FsData.wrap("bye"));
+                                channel.sendAndFlush(FsData.wrap(buildServerData("bye")));
                                 //channel.flush();
                                 channel.closeNow();
                                 break;
@@ -114,12 +113,12 @@ public class NetTest {
                         FsLogger.defaultLogger().info("client-channel.onException: ", throwable);
                     }
                 })
-                .addChannelHandler(new LengthBasedTcpChannelHandler(3))
+                .addChannelHandler(new LengthBasedTcpChannelHandler(1, 2))
                 .addChannelHandler(new FsTcpChannelHandler<List<ByteBuffer>>() {
                     @Override
                     public @Nullable Object onMessage(FsTcpChannel channel, List<ByteBuffer> message) {
                         for (ByteBuffer buffer : message) {
-                            String str = FsIO.getString(buffer);
+                            String str = parseServerData(buffer);
                             TestUtil.count(str, data);
                             switch (str) {
                                 case "hlo": {
@@ -188,5 +187,25 @@ public class NetTest {
         Assert.assertEquals(data.get("bye").get(), clientThreads * 2);
         Assert.assertEquals(data.get("abc").get(), clientThreads * 10);
         Assert.assertEquals(data.get("qwe").get(), clientThreads * 10);
+    }
+
+    private byte[] buildServerData(String data) {
+        byte[] dataBytes = data.getBytes(FsString.CHARSET);
+        byte[] bytes = new byte[6];
+        bytes[0] = 0;
+        bytes[1] = 0;
+        bytes[2] = 6;
+        bytes[3] = dataBytes[0];
+        bytes[4] = dataBytes[1];
+        bytes[5] = dataBytes[2];
+        return bytes;
+    }
+
+    private String parseServerData(ByteBuffer buffer) {
+        byte[] bytes = FsIO.getBytes(buffer);
+        if (bytes.length != 6) {
+            throw new FsNetException("bytes.length != 6");
+        }
+        return new String(bytes, 3, 3, FsString.CHARSET);
     }
 }
