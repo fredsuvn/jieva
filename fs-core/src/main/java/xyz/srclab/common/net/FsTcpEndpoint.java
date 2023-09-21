@@ -26,15 +26,21 @@ public interface FsTcpEndpoint {
     boolean isClosed();
 
     /**
-     * Closes this point.
-     * It will wait all buffered operations has been flushed for given timeout, or keep waiting if the timeout is null.
+     * Closes this point, blocks and waits for buffered operations.
+     */
+    default void close() {
+        close(null);
+    }
+
+    /**
+     * Closes this point, blocks and waits for buffered operations in given timeout.
      *
      * @param timeout given timeout
      */
     void close(@Nullable Duration timeout);
 
     /**
-     * Closes this point immediately, without waiting the buffered operations to be flushed.
+     * Closes this point immediately, without blocking and waiting for buffered operations.
      */
     void closeNow();
 

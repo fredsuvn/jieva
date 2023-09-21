@@ -46,6 +46,14 @@ public interface FsTcpChannel {
 
     /**
      * Closes this channel.
+     * It will wait all buffered data has been flushed.
+     */
+    default void close() {
+        close(null);
+    }
+
+    /**
+     * Closes this channel.
      * It will wait all buffered data has been flushed in given timeout (or always waiting if the timeout is null).
      *
      * @param timeout given timeout
@@ -62,6 +70,11 @@ public interface FsTcpChannel {
      * The written data may be buffered before the {@link #flush()} is called.
      */
     void send(FsData data);
+
+    /**
+     * Writes data to remote endpoint and flushes immediately.
+     */
+    void sendAndFlush(FsData data);
 
     /**
      * Flushes buffered data to be written to remote endpoint.

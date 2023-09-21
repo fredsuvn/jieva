@@ -1,5 +1,6 @@
 package test;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
@@ -22,7 +23,9 @@ public class NetTest {
 
     @Test
     public void testTcp() {
-        testTcp0(2, 5, 10);
+        testTcp0(6, 5, 10);
+        testTcp0(1024, 8, 20);
+        testTcp0(22, 8, 50);
     }
 
     private void testTcp0(int bufferSize, int serverThreads, int clientThreads) {
@@ -36,7 +39,7 @@ public class NetTest {
         //server bye
 
         FsTcpServer server = FsTcpServer.newBuilder()
-            .bufferSize(bufferSize)
+            .channelBufferSize(bufferSize)
             .executor(Executors.newFixedThreadPool(serverThreads))
             .serverHandler(new FsTcpServerHandler() {
                 @Override
@@ -47,17 +50,19 @@ public class NetTest {
                 @Override
                 public void onOpen(FsTcpChannel channel) {
                     channel.send(FsData.wrap("hlo"));
+                    TestUtil.count("hlo", data);
+                    channel.flush();
                     TestUtil.count("server-onOpen", data);
                 }
 
                 @Override
-                public void onClose(FsTcpChannel channel) {
-                    FsLogger.defaultLogger().info("server-channel.onClose: ");
+                public void onClose(FsTcpChannel channel, ByteBuffer buffer) {
                     TestUtil.count("server-onClose", data);
                 }
 
                 @Override
-                public void onException(FsTcpChannel channel, Throwable throwable) {
+                public void onException(FsTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
+                    TestUtil.count("server-channel.onException", data);
                     FsLogger.defaultLogger().info("server-channel.onException: ", throwable);
                 }
             })
@@ -70,27 +75,28 @@ public class NetTest {
                         TestUtil.count(str, data);
                         switch (str) {
                             case "abc": {
-                                channel.send(FsData.wrap("qwe"));
+                                channel.sendAndFlush(FsData.wrap("qwe"));
                                 break;
                             }
                             case "bye": {
-                                channel.send(FsData.wrap("bye"));
-                                channel.flush();
+                                channel.sendAndFlush(FsData.wrap("bye"));
+                                //channel.flush();
                                 channel.closeNow();
                                 break;
                             }
                         }
                     }
-                    channel.flush();
+                    //channel.flush();
                     return null;
                 }
             })
             .build();
+        server.start(false);
         CountDownLatch latch = new CountDownLatch(clientThreads);
         List<FsTcpClient> clients = new LinkedList<>();
         for (int i = 0; i < clientThreads; i++) {
             FsTcpClient client = FsTcpClient.newBuilder()
-                .bufferSize(bufferSize)
+                .channelBufferSize(bufferSize)
                 .clientHandler(new FsTcpClientHandler() {
                     @Override
                     public void onOpen(FsTcpChannel channel) {
@@ -98,12 +104,13 @@ public class NetTest {
                     }
 
                     @Override
-                    public void onClose(FsTcpChannel channel) {
+                    public void onClose(FsTcpChannel channel, ByteBuffer buffer) {
                         TestUtil.count("client-onClose", data);
                     }
 
                     @Override
-                    public void onException(FsTcpChannel channel, Throwable throwable) {
+                    public void onException(FsTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
+                        TestUtil.count("client-channel.onException", data);
                         FsLogger.defaultLogger().info("client-channel.onException: ", throwable);
                     }
                 })
@@ -117,27 +124,28 @@ public class NetTest {
                             switch (str) {
                                 case "hlo": {
                                     new Thread(() -> {
-                                        channel.send(FsData.wrap("a"));
+                                        channel.sendAndFlush(FsData.wrap("a"));
                                         Fs.sleep(200);
-                                        channel.send(FsData.wrap("bc"));
+                                        channel.sendAndFlush(FsData.wrap("bc"));
                                         Fs.sleep(200);
-                                        channel.send(FsData.wrap("abc"));
+                                        channel.sendAndFlush(FsData.wrap("abc"));
                                         Fs.sleep(200);
-                                        channel.send(FsData.wrap("ab"));
+                                        channel.sendAndFlush(FsData.wrap("ab"));
                                         Fs.sleep(200);
-                                        channel.send(FsData.wrap("ca"));
+                                        channel.sendAndFlush(FsData.wrap("ca"));
                                         Fs.sleep(200);
-                                        channel.send(FsData.wrap("bca"));
+                                        channel.sendAndFlush(FsData.wrap("bca"));
                                         Fs.sleep(200);
-                                        channel.send(FsData.wrap("bc"));
+                                        channel.sendAndFlush(FsData.wrap("bc"));
                                         Fs.sleep(200);
-                                        channel.send(FsData.wrap("abcabcabcabcabc"));
-                                        channel.flush();
+                                        channel.sendAndFlush(FsData.wrap("abcabcabcabcabc"));
+                                        Fs.sleep(500);
+                                        channel.sendAndFlush(FsData.wrap("bye"));
                                     }).start();
                                     break;
                                 }
                                 case "bye": {
-                                    channel.flush();
+                                    //channel.flush();
                                     channel.closeNow();
                                     break;
                                 }
@@ -150,11 +158,10 @@ public class NetTest {
                 .build();
             clients.add(client);
         }
-        server.start(false);
         for (FsTcpClient client : clients) {
             new Thread(() -> {
                 try {
-                    client.start();
+                    client.start("localhost", server.getPort());
                 } catch (Exception e) {
                     System.out.println(e);
                 }
@@ -166,6 +173,20 @@ public class NetTest {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(data);
+        server.close();
+        //server: hlo
+        //client: hlo
+        //client: abc * 10
+        //server: qwe * 10
+        //client: bye
+        //server bye
+        Assert.assertEquals(data.get("server-onOpen").get(), clientThreads);
+        Assert.assertEquals(data.get("client-onOpen").get(), clientThreads);
+        Assert.assertEquals(data.get("server-onClose").get(), clientThreads);
+        Assert.assertEquals(data.get("client-onClose").get(), clientThreads);
+        Assert.assertEquals(data.get("hlo").get(), clientThreads * 2);
+        Assert.assertEquals(data.get("bye").get(), clientThreads * 2);
+        Assert.assertEquals(data.get("abc").get(), clientThreads * 10);
+        Assert.assertEquals(data.get("qwe").get(), clientThreads * 10);
     }
 }

@@ -1,5 +1,7 @@
 package xyz.srclab.common.net;
 
+import java.nio.ByteBuffer;
+
 /**
  * TCP/IP network handler for client actions.
  *
@@ -19,8 +21,9 @@ public interface FsTcpClientHandler {
      * Callback when the channel was closed.
      *
      * @param channel the channel
+     * @param buffer  remaining buffer of the channel, readonly and initial position is 0
      */
-    default void onClose(FsTcpChannel channel) {
+    default void onClose(FsTcpChannel channel, ByteBuffer buffer) {
     }
 
     /**
@@ -28,8 +31,9 @@ public interface FsTcpClientHandler {
      *
      * @param channel   the channel
      * @param throwable the exception
+     * @param buffer    remaining buffer of the channel, readonly and initial position is 0
      */
-    default void onException(FsTcpChannel channel, Throwable throwable) {
+    default void onException(FsTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
     }
 
     /**
@@ -39,11 +43,12 @@ public interface FsTcpClientHandler {
      * {@link FsTcpChannelHandler#onMessage(FsTcpChannel, Object)} will be called for each handler.
      * <b>Only all onMessage method of handlers have been called</b>, then this method would be called.
      * <p>
-     * If an exception is thrown, {@link #onException(FsTcpChannel, Throwable)} will be called.
+     * If an exception is thrown, {@link #onException(FsTcpChannel, Throwable, ByteBuffer)} will be called.
      *
      * @param channel    the channel
      * @param hasNewData whether there has new data read in current loop
+     * @param buffer     remaining buffer of the channel, readonly and initial position is 0
      */
-    default void onLoop(FsTcpChannel channel, boolean hasNewData) {
+    default void onLoop(FsTcpChannel channel, boolean hasNewData, ByteBuffer buffer) {
     }
 }

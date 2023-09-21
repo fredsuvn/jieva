@@ -2,17 +2,14 @@ package xyz.srclab.common.net;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsArray;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.data.FsData;
 import xyz.srclab.common.io.FsIO;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.Proxy;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.Arrays;
@@ -47,16 +44,41 @@ public interface FsTcpClient extends FsTcpEndpoint {
     }
 
     /**
-     * Starts this client and wait until the client has been closed.
+     * Starts this client and blocks until the client has been closed.
+     * Connection timeout is 30 seconds.
+     *
+     * @param address address of target endpoint
      */
-    void start();
+    default void start(SocketAddress address) {
+        start(address, Duration.ofSeconds(30));
+    }
+
+    /**
+     * Starts this client and blocks until the client has been closed.
+     * Connection timeout is 30 seconds.
+     *
+     * @param host host name of target endpoint
+     * @param port port of target endpoint
+     */
+    default void start(String host, int port) {
+        start(new InetSocketAddress(host, port), Duration.ofSeconds(30));
+    }
+
+    /**
+     * Starts this client and blocks until the client has been closed.
+     *
+     * @param address address of target endpoint
+     * @param timeout wait timeout to connect, maybe null to infinite waiting
+     */
+    void start(SocketAddress address, @Nullable Duration timeout);
 
     /**
      * Builder for {@link FsTcpClient}.
      */
     class Builder {
 
-        private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(new byte[0]);
+        private static final byte[] EMPTY_ARRAY = new byte[0];
+        private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(EMPTY_ARRAY);
         private static final FsTcpClientHandler EMPTY_CLIENT_HANDLER = new FsTcpClientHandler() {
         };
 
@@ -65,7 +87,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         private @Nullable FsTcpClientHandler clientHandler;
         private final List<FsTcpChannelHandler<?>> channelHandlers = new LinkedList<>();
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;
-        private int bufferSize = FsIO.IO_BUFFER_SIZE;
+        private int channelBufferSize = FsIO.IO_BUFFER_SIZE;
         private @Nullable Consumer<Socket> socketConfig;
         private @Nullable Proxy proxy;
 
@@ -131,10 +153,10 @@ public interface FsTcpClient extends FsTcpEndpoint {
         }
 
         /**
-         * Sets reference value of buffer size for byte buffer.
+         * Sets buffer size of the channel.
          */
-        public Builder bufferSize(int bufferSize) {
-            this.bufferSize = bufferSize;
+        public Builder channelBufferSize(int channelBufferSize) {
+            this.channelBufferSize = channelBufferSize;
             return this;
         }
 
@@ -168,7 +190,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
             private final FsTcpClientHandler clientHandler;
             private final List<FsTcpChannelHandler<?>> channelHandlers;
             private final IntFunction<ByteBuffer> bufferGenerator;
-            private final int bufferSize;
+            private final int channelBufferSize;
             private final @Nullable Consumer<Socket> socketConfig;
             private final @Nullable Proxy proxy;
 
@@ -185,21 +207,22 @@ public interface FsTcpClient extends FsTcpEndpoint {
                 }
                 this.socketConfig = builder.socketConfig;
                 this.bufferGenerator = Fs.notNull(builder.bufferGenerator, ByteBuffer::allocate);
-                this.bufferSize = builder.bufferSize;
-                if (bufferSize <= 0) {
-                    throw new FsNetException("Buffer size must > 0.");
+                this.channelBufferSize = builder.channelBufferSize;
+                if (channelBufferSize <= 0) {
+                    throw new FsNetException("Channel buffer size must > 0.");
                 }
                 this.proxy = builder.proxy;
             }
 
             @Override
-            public synchronized void start() {
+            public void start(SocketAddress address, @Nullable Duration timeout) {
                 synchronized (this) {
                     if (!state.isCreated()) {
                         throw new FsNetException("The client has been opened or closed.");
                     }
+                    state.open();
                 }
-                start0();
+                start0(address, timeout == null ? 0 : (int) timeout.toMillis());
             }
 
             @Override
@@ -219,7 +242,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
 
             @Override
             public synchronized void closeNow() {
-                if (!state.isOpened()) {
+                if (!state.isOpened() || channel == null) {
                     throw new FsNetException("The client has not been opened.");
                 }
                 if (state.isClosed()) {
@@ -243,17 +266,22 @@ public interface FsTcpClient extends FsTcpEndpoint {
                 return channel.socket;
             }
 
-            private void start0() {
+            private void start0(SocketAddress address, int timeout) {
                 Socket socket = buildSocket();
+                try {
+                    socket.connect(address, timeout);
+                } catch (IOException e) {
+                    throw new FsNetException(e);
+                }
                 ChannelImpl channel = new ChannelImpl(socket);
                 this.channel = channel;
-                state.open();
                 clientHandler.onOpen(channel);
-                while (!channel.removed) {
+                while (!channel.closed) {
                     try {
                         doChannel(channel);
                     } catch (Throwable e) {
-                        clientHandler.onException(channel, e);
+                        compactBuffer(channel);
+                        clientHandler.onException(channel, e, channel.buffer);
                     }
                 }
             }
@@ -277,31 +305,33 @@ public interface FsTcpClient extends FsTcpEndpoint {
                 }
             }
 
-            private void doChannel(ChannelImpl channel) throws Exception {
-                byte[] bytes;
-                InputStream in = channel.in;
-                boolean isClosed = channel.socket.isClosed();
-                int available = in.available();
-                if (available == 0) {
-                    if (isClosed) {
-                        channel.closeNow();
-                        clientHandler.onClose(channel);
-                        channel.removed = true;
-                        return;
-                    }
-                    bytes = null;
-                } else {
-                    bytes = new byte[available];
-                    int r = in.read(bytes);
-                    if (r < bytes.length) {
-                        bytes = Arrays.copyOf(bytes, r);
-                    }
-                }
-                if (FsArray.isEmpty(bytes)) {
-                    clientHandler.onLoop(channel, false);
+            private void doChannel(ChannelImpl channel) {
+                if (channel.closed) {
                     return;
                 }
-                Object message = FsNet.growBuffer(channel.buffer, bytes, bufferGenerator);
+                byte[] newBytes = channel.readAvailable();
+                //null means channel error
+                if (newBytes == null) {
+                    try {
+                        channel.closeNow();
+                        state.close();
+                        compactBuffer(channel);
+                        clientHandler.onClose(channel, channel.buffer);
+                    } catch (Throwable e) {
+                        compactBuffer(channel);
+                        clientHandler.onException(channel, e, channel.buffer);
+                    } finally {
+                        channel.closed = true;
+                    }
+                    return;
+                }
+                if (newBytes.length == 0) {
+                    compactBuffer(channel);
+                    clientHandler.onLoop(channel, false, channel.buffer);
+                    return;
+                }
+                compactBuffer(channel, newBytes);
+                Object message = channel.buffer;
                 for (FsTcpChannelHandler<?> channelHandler : channelHandlers) {
                     FsTcpChannelHandler<Object> handler = Fs.as(channelHandler);
                     Object result = handler.onMessage(channel, message);
@@ -310,21 +340,48 @@ public interface FsTcpClient extends FsTcpEndpoint {
                     }
                     message = result;
                 }
-                clientHandler.onLoop(channel, true);
-                channel.buffer = FsNet.compactBuffer(channel.buffer, bufferSize, bufferGenerator);
+                compactBuffer(channel);
+                clientHandler.onLoop(channel, true, channel.buffer);
+            }
+
+            private void compactBuffer(ChannelImpl channel) {
+                if (channel.buffer.position() == 0) {
+                    //not consumed
+                    return;
+                }
+                if (channel.buffer.remaining() <= 0) {
+                    channel.buffer = EMPTY_BUFFER;
+                    return;
+                }
+                ByteBuffer newBuffer = bufferGenerator.apply(channel.buffer.remaining());
+                newBuffer.put(channel.buffer);
+                newBuffer.flip();
+                channel.buffer = newBuffer.asReadOnlyBuffer();
+            }
+
+            private void compactBuffer(ChannelImpl channel, byte[] newBytes) {
+                if (channel.buffer.remaining() <= 0) {
+                    channel.buffer = ByteBuffer.wrap(newBytes).asReadOnlyBuffer();
+                    return;
+                }
+                int newCapacity = channel.buffer.remaining() + newBytes.length;
+                ByteBuffer newBuffer = bufferGenerator.apply(newCapacity);
+                newBuffer.put(channel.buffer);
+                newBuffer.put(newBytes);
+                newBuffer.flip();
+                channel.buffer = newBuffer.asReadOnlyBuffer();
             }
 
             private final class ChannelImpl implements FsTcpChannel {
 
                 private final Socket socket;
-                private final InputStream in;
+                private volatile boolean closed = false;
+                private volatile ByteBuffer buffer = EMPTY_BUFFER;
+
                 private volatile @Nullable OutputStream out;
-                private @Nullable ByteBuffer buffer;
-                private volatile boolean removed = false;
 
                 private ChannelImpl(Socket socket) {
                     this.socket = socket;
-                    this.in = getIn(socket);
                 }
 
                 @Override
@@ -349,7 +406,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
 
                 @Override
                 public boolean isOpened() {
-                    return !socket.isClosed() && socket.isBound() && socket.isConnected();
+                    return socket.isConnected();
                 }
 
                 @Override
@@ -358,44 +415,75 @@ public interface FsTcpClient extends FsTcpEndpoint {
                 }
 
                 @Override
-                public void close(@Nullable Duration timeout) {
-                    closeNow();
+                public synchronized void close(@Nullable Duration timeout) {
+                    if (socket.isClosed()) {
+                        return;
+                    }
+                    if (out != null) {
+                        try {
+                            out.flush();
+                        } catch (IOException e) {
+                            throw new FsNetException(e);
+                        }
+                    }
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        throw new FsNetException(e);
+                    }
                 }
 
                 @Override
-                public void closeNow() {
+                public synchronized void closeNow() {
+                    if (socket.isClosed()) {
+                        return;
+                    }
                     try {
-                        if (!socket.isClosed()) {
-                            socket.close();
-                        }
-                    } catch (Throwable e) {
+                        socket.close();
+                    } catch (IOException e) {
                         throw new FsNetException(e);
                     }
                 }
 
                 @Override
                 public synchronized void send(FsData data) {
+                    if (out == null) {
+                        try {
+                            out = socket.getOutputStream();
+                        } catch (IOException e) {
+                            throw new FsNetException(e);
+                        }
+                    }
+                    FsIO.readBytesTo(data.toInputStream(), out);
+                }
+
+                @Override
+                public synchronized void sendAndFlush(FsData data) {
+                    if (out == null) {
+                        try {
+                            out = socket.getOutputStream();
+                        } catch (IOException e) {
+                            throw new FsNetException(e);
+                        }
+                    }
+                    FsIO.readBytesTo(data.toInputStream(), out);
                     try {
-                        setOut();
-                        FsIO.readBytesTo(data.toInputStream(), out);
-                    } catch (Throwable e) {
+                        out.flush();
+                    } catch (IOException e) {
                         throw new FsNetException(e);
                     }
                 }
 
                 @Override
                 public synchronized void flush() {
+                    if (out == null) {
+                        return;
+                    }
                     try {
-                        setOut();
                         out.flush();
-                    } catch (Throwable e) {
+                    } catch (IOException e) {
                         throw new FsNetException(e);
                     }
-                }
-
-                @Override
-                public ByteBuffer getBuffer() {
-                    return buffer == null ? EMPTY_BUFFER : buffer;
                 }
 
                 @Override
@@ -403,22 +491,39 @@ public interface FsTcpClient extends FsTcpEndpoint {
                     return socket;
                 }
 
-                private InputStream getIn(Socket socket) {
+                @Nullable
+                byte[] readAvailable() {
+                    InputStream in;
                     try {
-                        return socket.getInputStream();
-                    } catch (Throwable e) {
-                        throw new FsNetException(e);
+                        in = socket.getInputStream();
+                    } catch (IOException e) {
+                        return null;
                     }
-                }
-
-                private void setOut() throws Exception {
-                    if (out == null) {
-                        synchronized (this) {
-                            if (out == null) {
-                                out = socket.getOutputStream();
-                            }
-                        }
+                    int available;
+                    try {
+                        available = in.available();
+                    } catch (IOException e) {
+                        return null;
                     }
+                    if (available == 0) {
+                        return EMPTY_ARRAY;
+                    }
+                    int maxRead = channelBufferSize - buffer.remaining();
+                    int needRead = Math.min(available, maxRead);
+                    if (needRead <= 0) {
+                        return EMPTY_ARRAY;
+                    }
+                    byte[] newBytes = new byte[needRead];
+                    int readCount;
+                    try {
+                        readCount = in.read(newBytes);
+                    } catch (IOException e) {
+                        return null;
+                    }
+                    if (readCount < newBytes.length) {
+                        return Arrays.copyOf(newBytes, readCount);
+                    }
+                    return newBytes;
                 }
             }
         }
