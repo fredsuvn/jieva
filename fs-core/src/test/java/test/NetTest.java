@@ -8,7 +8,7 @@ import xyz.srclab.common.base.FsLogger;
 import xyz.srclab.common.data.FsData;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.net.*;
-import xyz.srclab.common.net.handlers.FixedLengthTcpChannelHandler;
+import xyz.srclab.common.net.handlers.LengthBasedTcpChannelHandler;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -66,7 +66,7 @@ public class NetTest {
                     FsLogger.defaultLogger().info("server-channel.onException: ", throwable);
                 }
             })
-            .addChannelHandler(new FixedLengthTcpChannelHandler(3))
+            .addChannelHandler(new LengthBasedTcpChannelHandler(3))
             .addChannelHandler(new FsTcpChannelHandler<List<ByteBuffer>>() {
                 @Override
                 public @Nullable Object onMessage(FsTcpChannel channel, List<ByteBuffer> message) {
@@ -114,7 +114,7 @@ public class NetTest {
                         FsLogger.defaultLogger().info("client-channel.onException: ", throwable);
                     }
                 })
-                .addChannelHandler(new FixedLengthTcpChannelHandler(3))
+                .addChannelHandler(new LengthBasedTcpChannelHandler(3))
                 .addChannelHandler(new FsTcpChannelHandler<List<ByteBuffer>>() {
                     @Override
                     public @Nullable Object onMessage(FsTcpChannel channel, List<ByteBuffer> message) {

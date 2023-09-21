@@ -15,7 +15,7 @@ import java.util.List;
  * </pre>
  * The returned object of {@link #onMessage(FsTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}>.
  */
-public class FixedLengthTcpChannelHandler implements FsTcpChannelHandler<ByteBuffer> {
+public class SeparateBasedTcpChannelHandler implements FsTcpChannelHandler<ByteBuffer> {
 
     private final int length;
 
@@ -24,7 +24,7 @@ public class FixedLengthTcpChannelHandler implements FsTcpChannelHandler<ByteBuf
      *
      * @param length given length
      */
-    public FixedLengthTcpChannelHandler(int length) {
+    public SeparateBasedTcpChannelHandler(int length) {
         this.length = length;
     }
 

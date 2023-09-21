@@ -1,6 +1,8 @@
 package xyz.srclab.common.net;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.common.net.handlers.LengthBasedTcpChannelHandler;
+import xyz.srclab.common.net.handlers.SeparateBasedTcpChannelHandler;
 
 import java.nio.ByteBuffer;
 
@@ -18,9 +20,17 @@ import java.nio.ByteBuffer;
  * <p>
  * {@link #onMessage(FsTcpChannel, Object)} only be called when new data was received, for more detailed operations,
  * try {@link FsTcpServerHandler#onLoop(FsTcpChannel, boolean, ByteBuffer)}.
+ * <p>
+ * There are built-in handler implementations:
+ * <ul>
+ *     <li>{@link LengthBasedTcpChannelHandler}: to deal with length based data;</li>
+ *     <li>{@link SeparateBasedTcpChannelHandler}: to deal with separate based data;</li>
+ * </ul>
  *
  * @param <M> message type
  * @author fredsuvn
+ * @see LengthBasedTcpChannelHandler
+ * @see SeparateBasedTcpChannelHandler
  */
 public interface FsTcpChannelHandler<M> {
 
