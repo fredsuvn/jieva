@@ -1,4 +1,4 @@
-package xyz.srclab.common.net;
+package xyz.srclab.common.net.tcp;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.data.FsData;

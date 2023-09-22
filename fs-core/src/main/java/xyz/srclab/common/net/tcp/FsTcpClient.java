@@ -1,10 +1,11 @@
-package xyz.srclab.common.net;
+package xyz.srclab.common.net.tcp;
 
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.data.FsData;
 import xyz.srclab.common.io.FsIO;
+import xyz.srclab.common.net.FsNetException;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package xyz.srclab.common.net;
+package xyz.srclab.common.net.tcp;
 
 /**
  * States for TCP/IP connection.

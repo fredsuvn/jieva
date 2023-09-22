@@ -1,4 +1,6 @@
-package xyz.srclab.common.net;
+package xyz.srclab.common.net.tcp;
+
+import xyz.srclab.common.net.FsNetServerException;
 
 import java.nio.ByteBuffer;
 
