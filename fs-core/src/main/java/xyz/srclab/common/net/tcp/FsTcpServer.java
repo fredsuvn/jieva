@@ -18,7 +18,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -84,7 +84,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         private @Nullable FsTcpServerHandler serverHandler;
         private final List<FsTcpChannelHandler<?>> channelHandlers = new LinkedList<>();
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;
-        private @Nullable Executor executor;
+        private @Nullable ExecutorService executor;
         private int channelBufferSize = FsIO.IO_BUFFER_SIZE;
         private @Nullable Consumer<ServerSocket> socketConfig;
 
@@ -158,9 +158,9 @@ public interface FsTcpServer extends FsTcpEndpoint {
         }
 
         /**
-         * Sets executor, must be of multi-threads.
+         * Sets executor service, must be of multi-threads.
          */
-        public Builder executor(Executor executor) {
+        public Builder executor(ExecutorService executor) {
             this.executor = executor;
             return this;
         }
@@ -196,15 +196,15 @@ public interface FsTcpServer extends FsTcpEndpoint {
             private final FsTcpServerHandler serverHandler;
             private final List<FsTcpChannelHandler<?>> channelHandlers;
             private final IntFunction<ByteBuffer> bufferGenerator;
-            private final Executor executor;
+            private final ExecutorService executor;
             private final int channelBufferSize;
             private final @Nullable Consumer<ServerSocket> socketConfig;
 
             private final CountDownLatch serverLatch = new CountDownLatch(1);
-            private final CountDownLatch connectionLatch = new CountDownLatch(1);
             private final FsServerStates state = new FsServerStates();
             private final Set<ChannelImpl> channels = ConcurrentHashMap.newKeySet();
             private @Nullable ServerSocket serverSocket;
+            private volatile boolean outAcceptLoop = false;
 
             private SocketTcpServer(Builder builder) {
                 this.port = builder.port;
@@ -237,7 +237,6 @@ public interface FsTcpServer extends FsTcpEndpoint {
                 if (block) {
                     try {
                         serverLatch.await();
-                        connectionLatch.await();
                     } catch (InterruptedException ignored) {
                     }
                 }
@@ -279,29 +278,29 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
             @Override
             public synchronized void close(@Nullable Duration timeout) {
-                closeNow();
-                if (timeout == null) {
-                    try {
+                close0();
+                try {
+                    if (timeout == null) {
                         serverLatch.await();
-                        connectionLatch.await();
-                    } catch (InterruptedException e) {
-                        throw new FsNetException(e);
+                    } else {
+                        serverLatch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
                     }
-                } else {
-                    try {
-                        long n1 = System.currentTimeMillis();
-                        long millis = timeout.toMillis();
-                        serverLatch.await(millis, TimeUnit.MILLISECONDS);
-                        long n2 = System.currentTimeMillis();
-                        connectionLatch.await(Math.max(1, millis - (n2 - n1)), TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException e) {
-                        throw new FsNetException(e);
-                    }
+                } catch (InterruptedException e) {
+                    //do nothing
+                } finally {
+                    state.close();
                 }
             }
 
             @Override
             public synchronized void closeNow() {
+                close0();
+                executor.shutdown();
+                serverLatch.countDown();
+                state.close();
+            }
+
+            private void close0() {
                 if (!state.isOpened() || serverSocket == null) {
                     throw new FsNetException("The server has not been opened.");
                 }
@@ -310,8 +309,6 @@ public interface FsTcpServer extends FsTcpEndpoint {
                 }
                 try {
                     serverSocket.close();
-                    state.close();
-                    serverLatch.countDown();
                 } catch (IOException e) {
                     throw new FsNetException(e);
                 }
@@ -349,7 +346,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
             private void loopServerSocket() {
                 executor.execute(() -> {
-                    while (true) {
+                    while (!serverSocket.isClosed()) {
                         try {
                             Socket socket;
                             ChannelImpl channel;
@@ -357,34 +354,23 @@ public interface FsTcpServer extends FsTcpEndpoint {
                                 socket = serverSocket.accept();
                                 channel = new ChannelImpl(socket);
                             } catch (Throwable e) {
-                                serverHandler.onException(new FsNetServerException(serverSocket, e));
-                                if (serverSocket.isClosed()) {
-                                    state.close();
-                                    serverLatch.countDown();
-                                    break;
-                                }
+                                executor.execute(() ->
+                                    serverHandler.onException(new FsNetServerException(serverSocket, e)));
                                 continue;
                             }
-                            executor.execute(() -> {
-                                try {
-                                    serverHandler.onOpen(channel);
-                                } catch (Throwable e) {
-                                    serverHandler.onException(channel, e, EMPTY_BUFFER);
-                                } finally {
-                                    channels.add(channel);
-                                }
-                            });
+                            channels.add(channel);
                         } catch (Throwable e) {
                             //Ensure the loop continue
                         }
                     }
+                    outAcceptLoop = true;
                 });
                 executor.execute(() -> {
                     while (true) {
                         Iterator<ChannelImpl> it = channels.iterator();
                         while (it.hasNext()) {
                             ChannelImpl channel = it.next();
-                            if (channel.closed) {
+                            if (channel.onClose) {
                                 it.remove();
                             }
                             if (channel.lock) {
@@ -392,24 +378,35 @@ public interface FsTcpServer extends FsTcpEndpoint {
                             }
                             channel.lock = true;
                             try {
-                                executor.execute(() -> {
-                                    try {
-                                        doChannel(channel);
-                                    } catch (Throwable e) {
-                                        compactBuffer(channel);
-                                        serverHandler.onException(channel, e, channel.buffer);
-                                    } finally {
-                                        channel.lock = false;
-                                    }
-                                });
+                                if (!channel.onOpen) {
+                                    executor.execute(() -> {
+                                        try {
+                                            serverHandler.onOpen(channel);
+                                        } catch (Throwable e) {
+                                            serverHandler.onException(channel, e, EMPTY_BUFFER);
+                                        } finally {
+                                            channel.onOpen = true;
+                                            channel.lock = false;
+                                        }
+                                    });
+                                } else {
+                                    executor.execute(() -> {
+                                        try {
+                                            doChannel(channel);
+                                        } catch (Throwable e) {
+                                            compactBuffer(channel);
+                                            serverHandler.onException(channel, e, channel.buffer);
+                                        } finally {
+                                            channel.lock = false;
+                                        }
+                                    });
+                                }
                             } catch (Throwable e) {
                                 //Ensure the loop continue
                             }
                         }
-                        if (channels.isEmpty() && serverSocket.isClosed()) {
-                            state.close();
+                        if (outAcceptLoop && serverSocket.isClosed() && channels.isEmpty()) {
                             serverLatch.countDown();
-                            connectionLatch.countDown();
                             break;
                         }
                         Fs.sleep(1);
@@ -418,7 +415,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
             }
 
             private void doChannel(ChannelImpl channel) {
-                if (channel.closed) {
+                if (channel.onClose) {
                     return;
                 }
                 byte[] newBytes = channel.availableOrClosed();
@@ -432,7 +429,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
                         compactBuffer(channel);
                         serverHandler.onException(channel, e, channel.buffer);
                     } finally {
-                        channel.closed = true;
+                        channel.onClose = true;
                     }
                     return;
                 }
@@ -487,7 +484,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
                 private final Socket socket;
                 private volatile boolean lock = false;
-                private volatile boolean closed = false;
+                private volatile boolean onOpen = false;
+                private volatile boolean onClose = false;
                 private volatile ByteBuffer buffer = EMPTY_BUFFER;
 
                 private volatile @Nullable OutputStream out;

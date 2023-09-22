@@ -45,23 +45,21 @@ public interface FsTcpChannel {
     boolean isClosed();
 
     /**
-     * Closes this channel.
-     * It will wait all buffered data has been flushed.
+     * Closes this channel, blocks current thread for buffered operations.
      */
     default void close() {
         close(null);
     }
 
     /**
-     * Closes this channel.
-     * It will wait all buffered data has been flushed in given timeout (or always waiting if the timeout is null).
+     * Closes this channel, blocks current thread for buffered operations in given timeout.
      *
-     * @param timeout given timeout
+     * @param timeout given timeout, maybe null to always wait
      */
     void close(@Nullable Duration timeout);
 
     /**
-     * Closes this channel immediately, other operations in processing will in forced interruption.
+     * Closes this channel immediately, without blocking and buffered operations.
      */
     void closeNow();
 

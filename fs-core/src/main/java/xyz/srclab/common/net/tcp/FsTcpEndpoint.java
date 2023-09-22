@@ -18,35 +18,6 @@ import java.time.Duration;
 public interface FsTcpEndpoint {
 
     /**
-     * Returns whether this point is opened.
-     */
-    boolean isOpened();
-
-    /**
-     * Returns whether this point is closed.
-     */
-    boolean isClosed();
-
-    /**
-     * Closes this point, blocks and waits for buffered operations.
-     */
-    default void close() {
-        close(null);
-    }
-
-    /**
-     * Closes this point, blocks and waits for buffered operations in given timeout.
-     *
-     * @param timeout given timeout
-     */
-    void close(@Nullable Duration timeout);
-
-    /**
-     * Closes this point immediately, without blocking and waiting for buffered operations.
-     */
-    void closeNow();
-
-    /**
      * Returns bound address of this point.
      */
     InetAddress getAddress();
@@ -65,4 +36,33 @@ public interface FsTcpEndpoint {
      * Returns underlying object which implements this interface, such as {@link ServerSocket} or {@link Socket}.
      */
     Object getSource();
+
+    /**
+     * Returns whether this point is opened.
+     */
+    boolean isOpened();
+
+    /**
+     * Returns whether this point is closed.
+     */
+    boolean isClosed();
+
+    /**
+     * Closes this point, blocks current thread for buffered operations.
+     */
+    default void close() {
+        close(null);
+    }
+
+    /**
+     * Closes this point, blocks current thread for buffered operations in given timeout.
+     *
+     * @param timeout given timeout, maybe null to always wait
+     */
+    void close(@Nullable Duration timeout);
+
+    /**
+     * Closes this point immediately, without blocking and buffered operations.
+     */
+    void closeNow();
 }
