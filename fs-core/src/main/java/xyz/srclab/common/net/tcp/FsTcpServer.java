@@ -7,6 +7,7 @@ import xyz.srclab.common.data.FsData;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.net.FsNetException;
 import xyz.srclab.common.net.FsNetServerException;
+import xyz.srclab.common.net.FsServerStates;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,22 +69,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
     void start(boolean block);
 
     /**
-     * Returns bound address of this server.
-     */
-    InetAddress getAddress();
-
-    /**
-     * Returns bound port of this server.
-     */
-    int getPort();
-
-    /**
-     * Returns bound socket address of this server.
-     */
-    SocketAddress getSocketAddress();
-
-    /**
-     * Builder for {@link FsTcpServer}.
+     * Builder for {@link FsTcpServer}, based on {@link ServerSocket}.
      */
     class Builder {
 
@@ -94,7 +80,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         private int port = 0;
         private int maxConnection = 50;
-        private @Nullable InetAddress hostAddress;
+        private @Nullable InetAddress address;
         private @Nullable FsTcpServerHandler serverHandler;
         private final List<FsTcpChannelHandler<?>> channelHandlers = new LinkedList<>();
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;
@@ -119,19 +105,19 @@ public interface FsTcpServer extends FsTcpEndpoint {
         }
 
         /**
-         * Sets host address.
+         * Sets server address.
          */
-        public Builder hostAddress(InetAddress hostAddress) {
-            this.hostAddress = hostAddress;
+        public Builder address(InetAddress address) {
+            this.address = address;
             return this;
         }
 
         /**
-         * Sets host name.
+         * Sets server host name.
          */
         public Builder hostName(String hostName) {
             try {
-                this.hostAddress = InetAddress.getByName(hostName);
+                this.address = InetAddress.getByName(hostName);
                 return this;
             } catch (UnknownHostException e) {
                 throw new FsNetException(e);
@@ -206,7 +192,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
             private final int port;
             private final int maxConnection;
-            private final InetAddress hostAddress;
+            private final InetAddress address;
             private final FsTcpServerHandler serverHandler;
             private final List<FsTcpChannelHandler<?>> channelHandlers;
             private final IntFunction<ByteBuffer> bufferGenerator;
@@ -216,14 +202,14 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
             private final CountDownLatch serverLatch = new CountDownLatch(1);
             private final CountDownLatch connectionLatch = new CountDownLatch(1);
-            private final FsTcpStates state = new FsTcpStates();
+            private final FsServerStates state = new FsServerStates();
             private final Set<ChannelImpl> channels = ConcurrentHashMap.newKeySet();
             private @Nullable ServerSocket serverSocket;
 
             private SocketTcpServer(Builder builder) {
                 this.port = builder.port;
                 this.maxConnection = builder.maxConnection;
-                this.hostAddress = builder.hostAddress;
+                this.address = builder.address;
                 this.serverHandler = Fs.notNull(builder.serverHandler, EMPTY_SERVER_HANDLER);
                 this.channelHandlers = FsCollect.immutableList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
@@ -296,13 +282,18 @@ public interface FsTcpServer extends FsTcpEndpoint {
                 closeNow();
                 if (timeout == null) {
                     try {
+                        serverLatch.await();
                         connectionLatch.await();
                     } catch (InterruptedException e) {
                         throw new FsNetException(e);
                     }
                 } else {
                     try {
-                        connectionLatch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
+                        long n1 = System.currentTimeMillis();
+                        long millis = timeout.toMillis();
+                        serverLatch.await(millis, TimeUnit.MILLISECONDS);
+                        long n2 = System.currentTimeMillis();
+                        connectionLatch.await(Math.max(1, millis - (n2 - n1)), TimeUnit.MILLISECONDS);
                     } catch (InterruptedException e) {
                         throw new FsNetException(e);
                     }
@@ -342,8 +333,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
             private ServerSocket buildServerSocket() {
                 try {
                     ServerSocket server;
-                    if (hostAddress != null) {
-                        server = new ServerSocket(port, maxConnection, hostAddress);
+                    if (address != null) {
+                        server = new ServerSocket(port, maxConnection, address);
                     } else {
                         server = new ServerSocket(port, maxConnection);
                     }

@@ -1,11 +1,11 @@
-package xyz.srclab.common.net.tcp;
+package xyz.srclab.common.net;
 
 /**
- * States for TCP/IP connection.
+ * Represents server states.
  *
  * @author fredsuvn
  */
-public class FsTcpStates {
+public class FsServerStates {
 
     /**
      * Created state: the channel or endpoint never open or close.

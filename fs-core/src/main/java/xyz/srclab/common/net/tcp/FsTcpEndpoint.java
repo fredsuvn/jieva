@@ -2,8 +2,10 @@ package xyz.srclab.common.net.tcp;
 
 import xyz.srclab.annotations.Nullable;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.time.Duration;
 
 /**
@@ -43,6 +45,21 @@ public interface FsTcpEndpoint {
      * Closes this point immediately, without blocking and waiting for buffered operations.
      */
     void closeNow();
+
+    /**
+     * Returns bound address of this point.
+     */
+    InetAddress getAddress();
+
+    /**
+     * Returns bound port of this point.
+     */
+    int getPort();
+
+    /**
+     * Returns bound socket address of this point.
+     */
+    SocketAddress getSocketAddress();
 
     /**
      * Returns underlying object which implements this interface, such as {@link ServerSocket} or {@link Socket}.

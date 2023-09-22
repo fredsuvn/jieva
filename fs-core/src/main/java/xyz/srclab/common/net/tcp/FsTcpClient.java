@@ -6,6 +6,7 @@ import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.data.FsData;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.net.FsNetException;
+import xyz.srclab.common.net.FsServerStates;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 
@@ -74,7 +76,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
     void start(SocketAddress address, @Nullable Duration timeout);
 
     /**
-     * Builder for {@link FsTcpClient}.
+     * Builder for {@link FsTcpClient}, based on {@link Socket}.
      */
     class Builder {
 
@@ -84,7 +86,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         };
 
         private int port = 0;
-        private @Nullable InetAddress hostAddress;
+        private @Nullable InetAddress address;
         private @Nullable FsTcpClientHandler clientHandler;
         private final List<FsTcpChannelHandler<?>> channelHandlers = new LinkedList<>();
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;
@@ -93,7 +95,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         private @Nullable Proxy proxy;
 
         /**
-         * Sets server port.
+         * Sets local port.
          */
         public Builder port(int port) {
             this.port = port;
@@ -101,19 +103,19 @@ public interface FsTcpClient extends FsTcpEndpoint {
         }
 
         /**
-         * Sets host address.
+         * Sets local address.
          */
-        public Builder hostAddress(InetAddress hostAddress) {
-            this.hostAddress = hostAddress;
+        public Builder address(InetAddress address) {
+            this.address = address;
             return this;
         }
 
         /**
-         * Sets host name.
+         * Sets local host name.
          */
         public Builder hostName(String hostName) {
             try {
-                this.hostAddress = InetAddress.getByName(hostName);
+                this.address = InetAddress.getByName(hostName);
                 return this;
             } catch (UnknownHostException e) {
                 throw new FsNetException(e);
@@ -187,7 +189,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         private static final class SocketTcpClient implements FsTcpClient {
 
             private final int port;
-            private final InetAddress hostAddress;
+            private final InetAddress address;
             private final FsTcpClientHandler clientHandler;
             private final List<FsTcpChannelHandler<?>> channelHandlers;
             private final IntFunction<ByteBuffer> bufferGenerator;
@@ -195,12 +197,13 @@ public interface FsTcpClient extends FsTcpEndpoint {
             private final @Nullable Consumer<Socket> socketConfig;
             private final @Nullable Proxy proxy;
 
-            private final FsTcpStates state = new FsTcpStates();
+            private final FsServerStates state = new FsServerStates();
+            private final CountDownLatch latch = new CountDownLatch(1);
             private ChannelImpl channel;
 
             private SocketTcpClient(Builder builder) {
                 this.port = builder.port;
-                this.hostAddress = builder.hostAddress;
+                this.address = builder.address;
                 this.clientHandler = Fs.notNull(builder.clientHandler, EMPTY_CLIENT_HANDLER);
                 this.channelHandlers = FsCollect.immutableList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
@@ -224,6 +227,30 @@ public interface FsTcpClient extends FsTcpEndpoint {
                     state.open();
                 }
                 start0(address, timeout == null ? 0 : (int) timeout.toMillis());
+            }
+
+            @Override
+            public InetAddress getAddress() {
+                if (channel == null) {
+                    throw new FsNetException("Client has not been initialized.");
+                }
+                return channel.socket.getInetAddress();
+            }
+
+            @Override
+            public int getPort() {
+                if (channel == null) {
+                    throw new FsNetException("Client has not been initialized.");
+                }
+                return channel.socket.getLocalPort();
+            }
+
+            @Override
+            public SocketAddress getSocketAddress() {
+                if (channel == null) {
+                    throw new FsNetException("Client has not been initialized.");
+                }
+                return channel.socket.getLocalSocketAddress();
             }
 
             @Override
@@ -292,8 +319,8 @@ public interface FsTcpClient extends FsTcpEndpoint {
                     Socket client;
                     if (proxy != null) {
                         client = new Socket(proxy);
-                    } else if (hostAddress != null) {
-                        client = new Socket(hostAddress, port);
+                    } else if (address != null) {
+                        client = new Socket(address, port);
                     } else {
                         client = new Socket();
                     }
