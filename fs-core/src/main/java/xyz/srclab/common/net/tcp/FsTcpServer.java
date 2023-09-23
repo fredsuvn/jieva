@@ -1,6 +1,7 @@
 package xyz.srclab.common.net.tcp;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.data.FsData;
@@ -38,6 +39,7 @@ import java.util.function.IntFunction;
  *
  * @author fredsuvn
  */
+@ThreadSafe
 public interface FsTcpServer extends FsTcpEndpoint {
 
     /**
@@ -67,6 +69,11 @@ public interface FsTcpServer extends FsTcpEndpoint {
      * @param block whether block current thread
      */
     void start(boolean block);
+
+    /**
+     * Returns a new builder configured with this server.
+     */
+    Builder toBuilder();
 
     /**
      * Builder for {@link FsTcpServer}, based on {@link ServerSocket}.
@@ -200,7 +207,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
             private final int channelBufferSize;
             private final @Nullable Consumer<ServerSocket> socketConfig;
 
-            private final CountDownLatch serverLatch = new CountDownLatch(1);
+            private final CountDownLatch latch = new CountDownLatch(1);
             private final FsServerStates state = new FsServerStates();
             private final Set<ChannelImpl> channels = ConcurrentHashMap.newKeySet();
             private @Nullable ServerSocket serverSocket;
@@ -236,7 +243,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
                 state.open();
                 if (block) {
                     try {
-                        serverLatch.await();
+                        latch.await();
                     } catch (InterruptedException ignored) {
                     }
                 }
@@ -278,15 +285,19 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
             @Override
             public synchronized void close(@Nullable Duration timeout) {
-                close0();
                 try {
+                    close0();
                     if (timeout == null) {
-                        serverLatch.await();
+                        latch.await();
                     } else {
-                        serverLatch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
+                        latch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
                     }
+                } catch (FsNetException e) {
+                    throw e;
                 } catch (InterruptedException e) {
                     //do nothing
+                } catch (Exception e) {
+                    throw new FsNetException(e);
                 } finally {
                     state.close();
                 }
@@ -294,23 +305,16 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
             @Override
             public synchronized void closeNow() {
-                close0();
-                executor.shutdown();
-                serverLatch.countDown();
-                state.close();
-            }
-
-            private void close0() {
-                if (!state.isOpened() || serverSocket == null) {
-                    throw new FsNetException("The server has not been opened.");
-                }
-                if (state.isClosed()) {
-                    return;
-                }
                 try {
-                    serverSocket.close();
-                } catch (IOException e) {
+                    close0();
+                    executor.shutdown();
+                    latch.countDown();
+                } catch (FsNetException e) {
+                    throw e;
+                } catch (Exception e) {
                     throw new FsNetException(e);
+                } finally {
+                    state.close();
                 }
             }
 
@@ -322,9 +326,33 @@ public interface FsTcpServer extends FsTcpEndpoint {
                 return serverSocket;
             }
 
+            @Override
+            public Builder toBuilder() {
+                return newBuilder()
+                    .port(port)
+                    .address(address)
+                    .maxConnection(maxConnection)
+                    .serverHandler(serverHandler)
+                    .addChannelHandlers(channelHandlers)
+                    .bufferGenerator(bufferGenerator)
+                    .executor(executor)
+                    .channelBufferSize(channelBufferSize)
+                    .socketConfig(socketConfig);
+            }
+
             private void start0() {
                 serverSocket = buildServerSocket();
                 loopServerSocket();
+            }
+
+            private void close0() throws Exception {
+                if (!state.isOpened() || serverSocket == null) {
+                    throw new FsNetException("The server has not been opened.");
+                }
+                if (state.isClosed()) {
+                    return;
+                }
+                serverSocket.close();
             }
 
             private ServerSocket buildServerSocket() {
@@ -406,7 +434,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
                             }
                         }
                         if (outAcceptLoop && serverSocket.isClosed() && channels.isEmpty()) {
-                            serverLatch.countDown();
+                            latch.countDown();
                             break;
                         }
                         Fs.sleep(1);
@@ -529,12 +557,10 @@ public interface FsTcpServer extends FsTcpEndpoint {
                     if (socket.isClosed()) {
                         return;
                     }
-                    if (out != null) {
-                        try {
-                            out.flush();
-                        } catch (IOException e) {
-                            throw new FsNetException(e);
-                        }
+                    try {
+                        getOutputStream().flush();
+                    } catch (IOException e) {
+                        throw new FsNetException(e);
                     }
                     try {
                         socket.close();
@@ -557,40 +583,45 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
                 @Override
                 public synchronized void send(FsData data) {
-                    if (out == null) {
-                        try {
-                            out = socket.getOutputStream();
-                        } catch (IOException e) {
-                            throw new FsNetException(e);
-                        }
-                    }
-                    FsIO.readBytesTo(data.toInputStream(), out);
+                    FsIO.readBytesTo(data.toInputStream(), getOutputStream());
                 }
 
                 @Override
-                public synchronized void sendAndFlush(FsData data) {
-                    if (out == null) {
-                        try {
-                            out = socket.getOutputStream();
-                        } catch (IOException e) {
-                            throw new FsNetException(e);
-                        }
-                    }
-                    FsIO.readBytesTo(data.toInputStream(), out);
+                public synchronized void send(byte[] data) {
                     try {
-                        out.flush();
+                        getOutputStream().write(data);
                     } catch (IOException e) {
                         throw new FsNetException(e);
                     }
                 }
 
                 @Override
-                public synchronized void flush() {
-                    if (out == null) {
-                        return;
-                    }
+                public synchronized void send(byte[] data, int offset, int length) {
                     try {
-                        out.flush();
+                        getOutputStream().write(data, offset, length);
+                    } catch (IOException e) {
+                        throw new FsNetException(e);
+                    }
+                }
+
+                @Override
+                public synchronized void send(ByteBuffer data) {
+                    if (data.hasArray()) {
+                        send(data.array(), data.arrayOffset(), data.remaining());
+                    } else {
+                        send(FsIO.getBytes(data));
+                    }
+                }
+
+                @Override
+                public synchronized void send(InputStream data) {
+                    FsIO.readBytesTo(data, getOutputStream());
+                }
+
+                @Override
+                public synchronized void flush() {
+                    try {
+                        getOutputStream().flush();
                     } catch (IOException e) {
                         throw new FsNetException(e);
                     }
@@ -599,6 +630,17 @@ public interface FsTcpServer extends FsTcpEndpoint {
                 @Override
                 public Object getSource() {
                     return socket;
+                }
+
+                private OutputStream getOutputStream() {
+                    if (out == null) {
+                        try {
+                            out = socket.getOutputStream();
+                        } catch (IOException e) {
+                            throw new FsNetException(e);
+                        }
+                    }
+                    return out;
                 }
 
                 @Nullable

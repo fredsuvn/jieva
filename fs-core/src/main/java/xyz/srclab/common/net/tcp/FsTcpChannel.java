@@ -1,10 +1,13 @@
 package xyz.srclab.common.net.tcp;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.data.FsData;
 
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.time.Duration;
 
 /**
@@ -12,6 +15,7 @@ import java.time.Duration;
  *
  * @author fredsuvn
  */
+@ThreadSafe
 public interface FsTcpChannel {
 
     /**
@@ -64,15 +68,96 @@ public interface FsTcpChannel {
     void closeNow();
 
     /**
-     * Writes data to remote endpoint.
+     * Sends data to remote endpoint.
      * The written data may be buffered before the {@link #flush()} is called.
      */
     void send(FsData data);
 
     /**
-     * Writes data to remote endpoint and flushes immediately.
+     * Sends data to remote endpoint.
+     * The written data may be buffered before the {@link #flush()} is called.
+     *
+     * @param data the data
      */
-    void sendAndFlush(FsData data);
+    void send(byte[] data);
+
+    /**
+     * Sends data of specified length from given offset to remote endpoint.
+     * The written data may be buffered before the {@link #flush()} is called.
+     *
+     * @param data   the data
+     * @param offset given offset
+     * @param length specified length
+     */
+    void send(byte[] data, int offset, int length);
+
+    /**
+     * Sends data to remote endpoint.
+     * The written data may be buffered before the {@link #flush()} is called.
+     *
+     * @param data the data
+     */
+    void send(ByteBuffer data);
+
+    /**
+     * Sends data to remote endpoint.
+     * The written data may be buffered before the {@link #flush()} is called.
+     *
+     * @param data the data
+     */
+    void send(InputStream data);
+
+    /**
+     * Sends data to remote endpoint and flushes immediately.
+     *
+     * @param data the data
+     */
+    default void sendAndFlush(FsData data) {
+        send(data);
+        flush();
+    }
+
+    /**
+     * Sends data to remote endpoint and flushes immediately.
+     *
+     * @param data the data
+     */
+    default void sendAndFlush(byte[] data) {
+        send(data);
+        flush();
+    }
+
+    /**
+     * Sends data of specified length from given offset to remote endpoint and flushes immediately.
+     *
+     * @param data   the data
+     * @param offset given offset
+     * @param length specified length
+     */
+    default void sendAndFlush(byte[] data, int offset, int length) {
+        send(data, offset, length);
+        flush();
+    }
+
+    /**
+     * Sends data to remote endpoint and flushes immediately.
+     *
+     * @param data the data
+     */
+    default void sendAndFlush(ByteBuffer data) {
+        send(data);
+        flush();
+    }
+
+    /**
+     * Sends data to remote endpoint and flushes immediately.
+     *
+     * @param data the data
+     */
+    default void sendAndFlush(InputStream data) {
+        send(data);
+        flush();
+    }
 
     /**
      * Flushes buffered data to be written to remote endpoint.
