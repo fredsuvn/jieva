@@ -1,6 +1,9 @@
 package xyz.srclab.common.net.udp;
 
+import xyz.srclab.common.io.FsIO;
+
 import java.net.DatagramPacket;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -30,7 +33,30 @@ public interface FsUdpPacket {
 
             @Override
             public ByteBuffer getData() {
-                return buffer;
+                return buffer.asReadOnlyBuffer();
+            }
+        };
+    }
+
+    /**
+     * Returns UDP header of given buffer and address.
+     * The given buffer will be read out by this method.
+     *
+     * @param buffer  given buffer
+     * @param address given address
+     */
+    static FsUdpPacket of(ByteBuffer buffer, InetSocketAddress address) {
+        ByteBuffer data = ByteBuffer.wrap(FsIO.getBytes(buffer));
+        return new FsUdpPacket() {
+
+            @Override
+            public FsUdpHeader getHeader() {
+                return FsUdpHeader.of(address);
+            }
+
+            @Override
+            public ByteBuffer getData() {
+                return data.asReadOnlyBuffer();
             }
         };
     }

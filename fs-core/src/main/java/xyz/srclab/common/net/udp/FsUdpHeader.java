@@ -2,6 +2,8 @@ package xyz.srclab.common.net.udp;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 /**
  * Represents header info of UDP datagram packet, such as address and port.
@@ -16,18 +18,35 @@ public interface FsUdpHeader {
      * @param packet given packet
      */
     static FsUdpHeader from(DatagramPacket packet) {
-        InetAddress address = packet.getAddress();
-        int port = packet.getPort();
+        SocketAddress socketAddress = packet.getSocketAddress();
+        if (socketAddress instanceof InetSocketAddress) {
+            return of((InetSocketAddress) socketAddress);
+        }
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(packet.getAddress(), packet.getPort());
+        return of(inetSocketAddress);
+    }
+
+    /**
+     * Returns UDP header of given address.
+     *
+     * @param address given address
+     */
+    static FsUdpHeader of(InetSocketAddress address) {
         return new FsUdpHeader() {
 
             @Override
             public InetAddress getAddress() {
-                return address;
+                return address.getAddress();
             }
 
             @Override
             public int getPort() {
-                return port;
+                return address.getPort();
+            }
+
+            @Override
+            public InetSocketAddress getInetSocketAddress() {
+                return address;
             }
         };
     }
@@ -41,4 +60,9 @@ public interface FsUdpHeader {
      * Returns port of the datagram packet.
      */
     int getPort();
+
+    /**
+     * Returns {@link InetSocketAddress}.
+     */
+    InetSocketAddress getInetSocketAddress();
 }

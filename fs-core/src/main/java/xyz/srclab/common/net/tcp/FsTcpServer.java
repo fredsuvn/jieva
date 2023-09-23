@@ -543,6 +543,16 @@ public interface FsTcpServer extends FsTcpEndpoint {
                 }
 
                 @Override
+                public SocketAddress getRemoteSocketAddress() {
+                    return socket.getRemoteSocketAddress();
+                }
+
+                @Override
+                public SocketAddress getLocalSocketAddress() {
+                    return socket.getLocalSocketAddress();
+                }
+
+                @Override
                 public boolean isOpened() {
                     return socket.isConnected();
                 }

@@ -7,6 +7,7 @@ import xyz.srclab.common.data.FsData;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 
@@ -37,6 +38,16 @@ public interface FsTcpChannel {
      * Returns port of remote endpoint.
      */
     int getLocalPort();
+
+    /**
+     * Returns socket address of remote endpoint.
+     */
+    SocketAddress getRemoteSocketAddress();
+
+    /**
+     * Returns socket address of local endpoint.
+     */
+    SocketAddress getLocalSocketAddress();
 
     /**
      * Returns whether this channel is opened.

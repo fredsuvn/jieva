@@ -1,20 +1,24 @@
 package xyz.srclab.common.net.udp;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.net.FsNetException;
-import xyz.srclab.common.net.FsNetServerException;
 import xyz.srclab.common.net.FsServerStates;
 
-import java.net.*;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -34,7 +38,8 @@ import java.util.function.Consumer;
  *
  * @author fredsuvn
  */
-public interface FsUdpServer {
+@ThreadSafe
+public interface FsUdpServer extends FsUdpClient {
 
     /**
      * Returns new builder for this interface.
@@ -65,35 +70,6 @@ public interface FsUdpServer {
     void start(boolean block);
 
     /**
-     * Returns whether this server is opened.
-     */
-    boolean isOpened();
-
-    /**
-     * Returns whether this server is closed.
-     */
-    boolean isClosed();
-
-    /**
-     * Closes this server, blocks and waits for buffered operations.
-     */
-    default void close() {
-        close(null);
-    }
-
-    /**
-     * Closes this server, blocks and waits for buffered operations in given timeout.
-     *
-     * @param timeout given timeout
-     */
-    void close(@Nullable Duration timeout);
-
-    /**
-     * Closes this server immediately, without blocking and waiting for buffered operations.
-     */
-    void closeNow();
-
-    /**
      * Returns bound address of this server.
      */
     InetAddress getAddress();
@@ -114,47 +90,88 @@ public interface FsUdpServer {
     Object getSource();
 
     /**
+     * Returns whether this server is opened.
+     */
+    boolean isOpened();
+
+    /**
+     * Returns whether this server is closed.
+     */
+    boolean isClosed();
+
+    /**
+     * Closes this server, blocks current thread for buffered operations.
+     */
+    default void close() {
+        close(null);
+    }
+
+    /**
+     * Closes this server, blocks current thread for buffered operations in given timeout.
+     *
+     * @param timeout given timeout, maybe null to always wait
+     */
+    void close(@Nullable Duration timeout);
+
+    /**
+     * Closes this server immediately, without blocking and buffered operations.
+     */
+    void closeNow();
+
+    /**
+     * Returns a new builder configured with this server.
+     */
+    Builder toBuilder();
+
+    /**
      * Builder for {@link FsUdpServer}, based on {@link DatagramSocket}.
      */
-    class Builder {
+    class Builder extends FsUdpClient.Builder {
 
+        private static final byte[] EMPTY_ARRAY = new byte[0];
+        private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(EMPTY_ARRAY);
         private static final FsUdpServerHandler EMPTY_SERVER_HANDLER = new FsUdpServerHandler() {
         };
 
-        private int port = 0;
-        private @Nullable InetAddress address;
         private @Nullable FsUdpServerHandler serverHandler;
         private final List<FsUdpPacketHandler<?>> packetHandlers = new LinkedList<>();
-        private @Nullable Executor executor;
+        private @Nullable ExecutorService executor;
         private int packetBufferSize = FsIO.IO_BUFFER_SIZE;
-        private @Nullable Consumer<DatagramSocket> socketConfig;
 
         /**
-         * Sets server port, maybe 0 to get an available one from system.
+         * Sets local port, maybe 0 to get an available one from system.
          */
+        @Override
         public Builder port(int port) {
-            this.port = port;
+            super.port(port);
             return this;
         }
 
         /**
-         * Sets server address.
+         * Sets local address.
          */
+        @Override
         public Builder address(InetAddress address) {
-            this.address = address;
+            super.address(address);
             return this;
         }
 
         /**
-         * Sets host name.
+         * Sets local host name.
          */
+        @Override
         public Builder hostName(String hostName) {
-            try {
-                this.address = InetAddress.getByName(hostName);
-                return this;
-            } catch (UnknownHostException e) {
-                throw new FsNetException(e);
-            }
+            super.hostName(hostName);
+            return this;
+        }
+
+        /**
+         * Sets other socket config.
+         */
+        @Override
+        public Builder socketConfig(Consumer<DatagramSocket> socketConfig) {
+            super.socketConfig(socketConfig);
+            return this;
         }
 
         /**
@@ -184,7 +201,7 @@ public interface FsUdpServer {
         /**
          * Sets executor, must be of multi-threads.
          */
-        public Builder executor(Executor executor) {
+        public Builder executor(ExecutorService executor) {
             this.executor = executor;
             return this;
         }
@@ -198,39 +215,30 @@ public interface FsUdpServer {
         }
 
         /**
-         * Sets other socket config.
-         */
-        public Builder socketConfig(Consumer<DatagramSocket> socketConfig) {
-            this.socketConfig = socketConfig;
-            return this;
-        }
-
-        /**
          * Builds the server.
          */
         public FsUdpServer build() {
             return new SocketUdpServer(this);
         }
 
-        private static final class SocketUdpServer implements FsUdpServer {
+        private static final class SocketUdpServer implements FsUdpServer, FsUdpClient {
 
             private final int port;
-            private final InetAddress hostAddress;
+            private final InetAddress address;
             private final FsUdpServerHandler serverHandler;
             private final List<FsUdpPacketHandler<?>> packetHandlers;
-            private final Executor executor;
+            private final ExecutorService executor;
             private final int packetBufferSize;
             private final @Nullable Consumer<DatagramSocket> socketConfig;
 
-            private final CountDownLatch serverLatch = new CountDownLatch(1);
-            private final CountDownLatch packetLatch = new CountDownLatch(1);
-            private final AtomicInteger handlingCounter = new AtomicInteger();
+            private final CountDownLatch latch = new CountDownLatch(1);
+            private final AtomicInteger packetCounter = new AtomicInteger();
             private final FsServerStates state = new FsServerStates();
             private @Nullable DatagramSocket serverSocket;
 
-            private SocketUdpServer(Builder builder) {
+            private SocketUdpServer(FsUdpServer.Builder builder) {
                 this.port = builder.port;
-                this.hostAddress = builder.address;
+                this.address = builder.address;
                 this.serverHandler = Fs.notNull(builder.serverHandler, EMPTY_SERVER_HANDLER);
                 this.packetHandlers = FsCollect.immutableList(builder.packetHandlers);
                 if (packetHandlers.isEmpty()) {
@@ -256,10 +264,27 @@ public interface FsUdpServer {
                 state.open();
                 if (block) {
                     try {
-                        serverLatch.await();
-                        packetLatch.await();
+                        latch.await();
                     } catch (InterruptedException ignored) {
                     }
+                }
+            }
+
+            @Override
+            public synchronized void send(FsUdpPacket packet) {
+                ByteBuffer buffer = packet.getData();
+                DatagramPacket datagramPacket;
+                if (buffer.hasArray()) {
+                    datagramPacket = new DatagramPacket(buffer.array(), buffer.arrayOffset(), buffer.remaining());
+                } else {
+                    byte[] bytes = FsIO.getBytes(buffer);
+                    datagramPacket = new DatagramPacket(bytes, bytes.length);
+                }
+                datagramPacket.setSocketAddress(packet.getHeader().getInetSocketAddress());
+                try {
+                    serverSocket.send(datagramPacket);
+                } catch (IOException e) {
+                    throw new FsNetException(e);
                 }
             }
 
@@ -268,7 +293,7 @@ public interface FsUdpServer {
                 if (serverSocket == null) {
                     throw new FsNetException("Server has not been initialized.");
                 }
-                return serverSocket.getInetAddress();
+                return serverSocket.getLocalAddress();
             }
 
             @Override
@@ -299,41 +324,36 @@ public interface FsUdpServer {
 
             @Override
             public synchronized void close(@Nullable Duration timeout) {
-                closeNow();
-                if (timeout == null) {
-                    try {
-                        serverLatch.await();
-                        packetLatch.await();
-                    } catch (InterruptedException e) {
-                        throw new FsNetException(e);
+                try {
+                    close0();
+                    if (timeout == null) {
+                        latch.await();
+                    } else {
+                        latch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
                     }
-                } else {
-                    try {
-                        long n1 = System.currentTimeMillis();
-                        long millis = timeout.toMillis();
-                        serverLatch.await(millis, TimeUnit.MILLISECONDS);
-                        long n2 = System.currentTimeMillis();
-                        packetLatch.await(Math.max(1, millis - (n2 - n1)), TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException e) {
-                        throw new FsNetException(e);
-                    }
+                } catch (FsNetException e) {
+                    throw e;
+                } catch (InterruptedException e) {
+                    //do nothing
+                } catch (Exception e) {
+                    throw new FsNetException(e);
+                } finally {
+                    state.close();
                 }
             }
 
             @Override
             public synchronized void closeNow() {
-                if (!state.isOpened() || serverSocket == null) {
-                    throw new FsNetException("The server has not been opened.");
-                }
-                if (state.isClosed()) {
-                    return;
-                }
                 try {
-                    serverSocket.close();
-                    state.close();
-                    serverLatch.countDown();
+                    close0();
+                    executor.shutdown();
+                    latch.countDown();
+                } catch (FsNetException e) {
+                    throw e;
                 } catch (Exception e) {
                     throw new FsNetException(e);
+                } finally {
+                    state.close();
                 }
             }
 
@@ -345,16 +365,38 @@ public interface FsUdpServer {
                 return serverSocket;
             }
 
+            @Override
+            public FsUdpServer.Builder toBuilder() {
+                return newBuilder()
+                    .port(port)
+                    .address(address)
+                    .serverHandler(serverHandler)
+                    .addPacketHandlers(packetHandlers)
+                    .executor(executor)
+                    .packetBufferSize(packetBufferSize)
+                    .socketConfig(socketConfig);
+            }
+
             private void start0() {
                 serverSocket = buildServerSocket();
                 loopServerSocket();
             }
 
+            private void close0() {
+                if (!state.isOpened() || serverSocket == null) {
+                    throw new FsNetException("The server has not been opened.");
+                }
+                if (state.isClosed()) {
+                    return;
+                }
+                serverSocket.close();
+            }
+
             private DatagramSocket buildServerSocket() {
                 try {
                     DatagramSocket server;
-                    if (hostAddress != null) {
-                        server = new DatagramSocket(port, hostAddress);
+                    if (address != null) {
+                        server = new DatagramSocket(port, address);
                     } else {
                         server = new DatagramSocket(port);
                     }
@@ -369,59 +411,54 @@ public interface FsUdpServer {
 
             private void loopServerSocket() {
                 executor.execute(() -> {
-                    byte[] buffer = new byte[packetBufferSize];
+                    byte[] data = new byte[packetBufferSize];
+                    DatagramPacket packet = new DatagramPacket(data, data.length);
                     while (!serverSocket.isClosed()) {
                         try {
-                            Object result = receive(buffer);
-                            if (result == null) {
-                                break;
-                            }
+                            serverSocket.receive(packet);
+                            FsUdpPacket udpPacket = FsUdpPacket.from(packet);
+                            ByteBuffer buffer = udpPacket.getData().asReadOnlyBuffer();
+                            packetCounter.incrementAndGet();
+                            executor.execute(() -> {
+                                try {
+                                    doPacket(udpPacket.getHeader(), buffer);
+                                } catch (Throwable e) {
+                                    serverHandler.onException(udpPacket.getHeader(), this, e, compactBuffer(buffer));
+                                } finally {
+                                    packetCounter.decrementAndGet();
+                                }
+                            });
                         } catch (Throwable e) {
                             //Ensure the loop continue
                         }
                     }
+                    while (packetCounter.get() > 0) {
+                        Fs.sleep(1);
+                    }
+                    latch.countDown();
                 });
             }
 
-            @Nullable
-            private Object receive(byte[] buffer) {
-                DatagramPacket packet = new DatagramPacket(buffer, 0, buffer.length);
-                FsUdpPacket udpPacket;
-                try {
-                    serverSocket.receive(packet);
-                } catch (Throwable e) {
-                    serverHandler.onException(new FsNetServerException(serverSocket, e));
-                    if (serverSocket.isClosed()) {
-                        state.close();
-                        serverLatch.countDown();
-                        return null;
+            private void doPacket(FsUdpHeader header, ByteBuffer buffer) {
+                Object packet = buffer;
+                for (FsUdpPacketHandler<?> packetHandler : packetHandlers) {
+                    FsUdpPacketHandler<Object> handler = Fs.as(packetHandler);
+                    Object result = handler.onPacket(header, this, packet);
+                    if (result == null) {
+                        break;
                     }
-                    return true;
+                    packet = result;
                 }
-                udpPacket = FsUdpPacket.from(packet);
-                executor.execute(() -> {
-                    ByteBuffer buf = udpPacket.getData().asReadOnlyBuffer();
-                    Object msg = buf;
-                    try {
-                        handlingCounter.incrementAndGet();
-                        for (FsUdpPacketHandler<?> packetHandler : packetHandlers) {
-                            FsUdpPacketHandler<Object> handler = Fs.as(packetHandler);
-                            Object result = handler.onPacket(udpPacket.getHeader(), msg);
-                            if (result == null) {
-                                break;
-                            }
-                            msg = result;
-                        }
-                    } catch (Throwable e) {
-                        serverHandler.onException(udpPacket.getHeader(), e, buf.slice());
-                    } finally {
-                        int c = handlingCounter.decrementAndGet();
-                        if (c <= 0 && serverSocket.isClosed()) {
-                            packetLatch.countDown();
-                        }
-                    }
-                });
-                return true;
+            }
+
+            private ByteBuffer compactBuffer(ByteBuffer buffer) {
+                if (buffer.position() == 0) {
+                    return buffer;
+                }
+                if (!buffer.hasRemaining()) {
+                    return EMPTY_BUFFER;
+                }
+                return ByteBuffer.wrap(FsIO.getBytes(buffer)).asReadOnlyBuffer();
             }
         }
     }
