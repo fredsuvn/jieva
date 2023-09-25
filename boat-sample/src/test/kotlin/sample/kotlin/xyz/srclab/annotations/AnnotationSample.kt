@@ -4,7 +4,7 @@ import org.testng.Assert
 import org.testng.annotations.Test
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
-import xyz.srclab.annotations.Written
+import xyz.srclab.annotations.OutParam
 
 class AnnotationSample {
 
@@ -15,7 +15,7 @@ class AnnotationSample {
         Assert.assertEquals(buffer.toString(), "123")
     }
 
-    private fun @receiver:Written StringBuilder.writeBuffer(
+    private fun @receiver:OutParam StringBuilder.writeBuffer(
         @Acceptable(
             Accepted(String::class),
             Accepted(StringBuffer::class),

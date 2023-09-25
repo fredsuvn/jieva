@@ -8,9 +8,8 @@ package xyz.srclab.common.reflect
 import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.annotations.Accepted
-import xyz.srclab.annotations.Written
+import xyz.srclab.annotations.OutParam
 import xyz.srclab.common.asType
-import xyz.srclab.common.base.currentThread
 import xyz.srclab.common.base.dotMatcher
 import java.lang.reflect.*
 import java.util.function.Predicate
@@ -1126,18 +1125,18 @@ fun Type.getTypeSignature(to: Class<*>): ParameterizedType {
 @JvmOverloads
 fun Type.eraseTypeParameters(
     typeArguments: Map<TypeVariable<*>, Type>,
-    @Written searchStack: MutableSet<TypeVariable<*>> = HashSet()
+    @OutParam searchStack: MutableSet<TypeVariable<*>> = HashSet()
 ): Type {
     return eraseTypeParameters(typeArguments.asType(), searchStack, false)
 }
 
 private fun Type.eraseTypeParameters(
-    @Written typeArguments: MutableMap<TypeVariable<*>, Type>,
-    @Written searchStack: MutableSet<TypeVariable<*>>,
+    @OutParam typeArguments: MutableMap<TypeVariable<*>, Type>,
+    @OutParam searchStack: MutableSet<TypeVariable<*>>,
     replaceTypeParameter: Boolean,
 ): Type {
 
-    fun getAndSwapTypes(@Written array: Array<Type>): Boolean {
+    fun getAndSwapTypes(@OutParam array: Array<Type>): Boolean {
         var changed = false
         for (i in array.indices) {
             val oldType = array[i]

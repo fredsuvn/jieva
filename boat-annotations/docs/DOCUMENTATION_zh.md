@@ -1,7 +1,7 @@
 # <span class="image">![Boat Annotations](../../logo.svg)</span> `boat-annotations`: Boat Annotations — [Boat](../../README.md) 注解库
 
-<span id="author" class="author">Sun Qian</span>  
-<span id="email" class="email"><fredsuvn@163.com></span>  
+<span id="author" class="author">Sun Qian</span>
+<span id="email" class="email"><fredsuvn@163.com></span>
 
 Boat Annotations提供了许多可以让代码整洁又干净的注解:
 
@@ -39,7 +39,7 @@ Boat Annotations提供了许多可以让代码整洁又干净的注解:
     import xyz.srclab.annotations.Accepted;
     import xyz.srclab.annotations.JavaBean;
     import xyz.srclab.annotations.NonNull;
-    import xyz.srclab.annotations.Written;
+    import xyz.srclab.annotations.OutParam;
 
     public class AnnotationSample {
 
@@ -95,7 +95,7 @@ Kotlin Examples
     import org.testng.annotations.Test
     import xyz.srclab.annotations.Acceptable
     import xyz.srclab.annotations.Accepted
-    import xyz.srclab.annotations.Written
+    import xyz.srclab.annotations.OutParam
 
     class AnnotationSample {
 

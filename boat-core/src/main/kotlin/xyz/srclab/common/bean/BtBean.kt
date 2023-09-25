@@ -5,7 +5,7 @@
 
 package xyz.srclab.common.bean
 
-import xyz.srclab.annotations.Written
+import xyz.srclab.annotations.OutParam
 import xyz.srclab.common.base.asType
 import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.convert.Converter
@@ -39,40 +39,40 @@ fun Any.asBeanMap(beanType: BeanType): BeanMap {
 
 @JvmOverloads
 fun <T : Any> Any.copyProperties(
-    @Written to: T,
-    beanResolver: BeanResolver = defaultResolver,
-    converter: Converter = defaultConverter(),
+        @OutParam to: T,
+        beanResolver: BeanResolver = defaultResolver,
+        converter: Converter = defaultConverter(),
 ): T {
     return copyProperties(to, true, beanResolver, converter)
 }
 
 @JvmOverloads
 fun <T : Any> Any.copyProperties(
-    @Written to: T,
-    toType: Type,
-    beanResolver: BeanResolver = defaultResolver,
-    converter: Converter = defaultConverter(),
+        @OutParam to: T,
+        toType: Type,
+        beanResolver: BeanResolver = defaultResolver,
+        converter: Converter = defaultConverter(),
 ): T {
     return copyProperties(to, toType, true, beanResolver, converter)
 }
 
 @JvmOverloads
 fun <T : Any> Any.copyProperties(
-    @Written to: T,
-    copyNull: Boolean,
-    beanResolver: BeanResolver = defaultResolver,
-    converter: Converter = defaultConverter(),
+        @OutParam to: T,
+        copyNull: Boolean,
+        beanResolver: BeanResolver = defaultResolver,
+        converter: Converter = defaultConverter(),
 ): T {
     return copyProperties(to, to.javaClass, copyNull, beanResolver, converter)
 }
 
 @JvmOverloads
 fun <T : Any> Any.copyProperties(
-    @Written to: T,
-    toType: Type,
-    copyNull: Boolean,
-    beanResolver: BeanResolver = defaultResolver,
-    converter: Converter = defaultConverter(),
+        @OutParam to: T,
+        toType: Type,
+        copyNull: Boolean,
+        beanResolver: BeanResolver = defaultResolver,
+        converter: Converter = defaultConverter(),
 ): T {
     return when {
         this is Map<*, *> && to is MutableMap<*, *> -> {

@@ -1,7 +1,7 @@
 # <span class="image">![Boat Annotations](../../logo.svg)</span> `boat-annotations`: Boat Annotations — Annotations of [Boat](../../README.md)
 
-<span id="author" class="author">Sun Qian</span>  
-<span id="email" class="email"><fredsuvn@163.com></span>  
+<span id="author" class="author">Sun Qian</span>
+<span id="email" class="email"><fredsuvn@163.com></span>
 
 Boat Annotations provides a set of annotations to make codes clear and
 clean:
@@ -43,7 +43,7 @@ Java Examples
     import xyz.srclab.annotations.Accepted;
     import xyz.srclab.annotations.JavaBean;
     import xyz.srclab.annotations.NonNull;
-    import xyz.srclab.annotations.Written;
+    import xyz.srclab.annotations.OutParam;
 
     public class AnnotationSample {
 
@@ -99,7 +99,7 @@ Kotlin Examples
     import org.testng.annotations.Test
     import xyz.srclab.annotations.Acceptable
     import xyz.srclab.annotations.Accepted
-    import xyz.srclab.annotations.Written
+    import xyz.srclab.annotations.OutParam
 
     class AnnotationSample {
 

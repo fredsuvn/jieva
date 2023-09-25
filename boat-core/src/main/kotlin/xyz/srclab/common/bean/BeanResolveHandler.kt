@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.annotations.Written
+import xyz.srclab.annotations.OutParam
 import xyz.srclab.common.base.uncapitalize
 import xyz.srclab.common.func.InstFunc
 import xyz.srclab.common.func.InstFunc.Companion.toInstInvoke
@@ -26,7 +26,7 @@ interface BeanResolveHandler {
      *
      * For each handler, the resolved properties should be put into or remove from [BeanResolveContext.properties].
      */
-    fun resolve(@Written context: BeanResolveContext)
+    fun resolve(@OutParam context: BeanResolveContext)
 
     companion object {
 
@@ -65,9 +65,9 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
      * Overrides this method to provide getters and setters of target bean type.
      */
     protected abstract fun resolveAccessors(
-        context: BeanResolveContext,
-        @Written getters: MutableMap<String, GetterInfo>,
-        @Written setters: MutableMap<String, SetterInfo>,
+            context: BeanResolveContext,
+            @OutParam getters: MutableMap<String, GetterInfo>,
+            @OutParam setters: MutableMap<String, SetterInfo>,
     )
 
     override fun resolve(context: BeanResolveContext) {

@@ -3,12 +3,14 @@ package xyz.srclab.annotations;
 import java.lang.annotation.*;
 
 /**
- * Represents the parameter is an output parameter (may be modified).
+ * Claims the annotated element is an output parameter that can be modified.
+ *
+ * @author fredsuvn
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
     ElementType.PARAMETER,
 })
-public @interface Written {
+public @interface OutParam {
 }

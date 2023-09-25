@@ -1,456 +1,98 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.collect.FsCollect;
+import xyz.srclab.common.bean.FsBeanCopier;
+import xyz.srclab.common.convert.FsConverter;
+import xyz.srclab.common.reflect.FsType;
+import xyz.srclab.common.reflect.TypeRef;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
- * Common utilities, collected from
- * {@link FsObject}, {@link FsCheck}, {@link FsString} and etc..
+ * Utilities for Object.
  *
  * @author fredsuvn
  */
 public class Fs {
 
-    // Methods from FsArray:
-
     /**
-     * Returns given arguments as an array.
-     *
-     * @param args given arguments
+     * A flag object that represents 'continue' to continue a loop.
      */
-    @SafeVarargs
-    public static <T> T[] array(T... args) {
-        return FsArray.array(args);
-    }
+    public static Object CONTINUE = new Object();
 
     /**
-     * Maps source array of type T[] to dest array of typeR[].
-     * If the dest array's length equals to source array, the mapped elements will be put into the dest array,
-     * else create and put into a new array.
-     *
-     * @param <T>    component type of source array
-     * @param <R>    component type of dest array
-     * @param source the source array
-     * @param dest   the dest array
-     * @param mapper given mapper
+     * A flag object that represents 'break' to break out from a loop.
      */
-    public static <T, R> R[] mapArray(T[] source, R[] dest, Function<T, R> mapper) {
-        return FsArray.map(source, dest, mapper);
-    }
+    public static Object BREAK = new Object();
 
     /**
-     * Creates a new array of given component type and length.
-     *
-     * @param componentType given component type
-     * @param length        given length
+     * A flag object that represents 'return' to return from a process.
      */
-    public static <T> T[] newArray(Class<?> componentType, int length) {
-        return FsArray.newArray(componentType, length);
-    }
+    public static Object RETURN = new Object();
 
     /**
-     * Returns value from given array at specified index, if failed to obtain, return null.
-     *
-     * @param array given array
-     * @param index specified index
+     * A flag object that represents 'goto' to jump to a process point.
      */
-    public static <T> T get(@Nullable T[] array, int index) {
-        return FsArray.get(array, index);
-    }
+    public static Object GOTO = new Object();
 
     /**
-     * Returns value from given array at specified index, if failed to obtain, return default value.
-     *
-     * @param array        given array
-     * @param index        specified index
-     * @param defaultValue default value
-     */
-    public static <T> T get(@Nullable T[] array, int index, @Nullable T defaultValue) {
-        return FsArray.get(array, index, defaultValue);
-    }
-
-    // Methods from FsCheck:
-
-    /**
-     * Checks whether given object is null, if it is, throw a {@link NullPointerException}.
+     * Casts given object as given type T.
      *
      * @param obj given object
+     * @param <T> given type T
      */
-    public static void checkNull(@Nullable Object obj) throws NullPointerException {
-        FsCheck.checkNull(obj);
+    public static <T> T as(@Nullable Object obj) {
+        return (T) obj;
     }
 
     /**
-     * Checks whether given obj is null, if it is, throw a {@link NullPointerException} with given message.
-     *
-     * @param obj     given object
-     * @param message given message
-     */
-    public static void checkNull(@Nullable Object obj, CharSequence message) throws NullPointerException {
-        FsCheck.checkNull(obj, message);
-    }
-
-    /**
-     * Checks whether given obj is null, if it is, throw a {@link NullPointerException} with message
-     * concatenated from given message arguments.
-     *
-     * @param obj         given object
-     * @param messageArgs given message arguments
-     */
-    public static void checkNull(@Nullable Object obj, Object... messageArgs) throws NullPointerException {
-        FsCheck.checkNull(obj, messageArgs);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not, throw a {@link NullPointerException}.
-     *
-     * @param expr given expression
-     */
-    public static void checkNull(boolean expr) throws NullPointerException {
-        FsCheck.checkNull(expr);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw a {@link NullPointerException} with given message.
-     *
-     * @param expr    given expression
-     * @param message given message
-     */
-    public static void checkNull(boolean expr, CharSequence message) throws NullPointerException {
-        FsCheck.checkNull(expr, message);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw a {@link NullPointerException} with message concatenated from given message arguments.
-     *
-     * @param expr        given expression
-     * @param messageArgs given message arguments
-     */
-    public static void checkNull(boolean expr, Object... messageArgs) throws NullPointerException {
-        FsCheck.checkNull(expr, messageArgs);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not, throw an {@link IllegalArgumentException}.
-     *
-     * @param expr given expression
-     */
-    public static void checkArgument(boolean expr) throws IllegalArgumentException {
-        FsCheck.checkArgument(expr);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link IllegalArgumentException} with given message.
-     *
-     * @param expr    given expression
-     * @param message given message
-     */
-    public static void checkArgument(boolean expr, CharSequence message) throws IllegalArgumentException {
-        FsCheck.checkArgument(expr, message);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link IllegalArgumentException} with given message concatenated from given message arguments.
-     *
-     * @param expr        given expression
-     * @param messageArgs given message arguments
-     */
-    public static void checkArgument(boolean expr, Object... messageArgs) throws IllegalArgumentException {
-        FsCheck.checkArgument(expr, messageArgs);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not, throw an {@link IllegalStateException}.
-     *
-     * @param expr given expression
-     */
-    public static void checkState(boolean expr) throws IllegalStateException {
-        FsCheck.checkState(expr);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link IllegalStateException} with given message.
-     *
-     * @param expr    given expression
-     * @param message given message
-     */
-    public static void checkState(boolean expr, CharSequence message) throws IllegalStateException {
-        FsCheck.checkState(expr, message);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link IllegalStateException} with given message concatenated from given message arguments.
-     *
-     * @param expr        given expression
-     * @param messageArgs given message arguments
-     */
-    public static void checkState(boolean expr, Object... messageArgs) throws IllegalArgumentException {
-        FsCheck.checkState(expr, messageArgs);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not, throw an {@link UnsupportedOperationException}.
-     *
-     * @param expr given expression
-     */
-    public static void checkSupported(boolean expr) throws UnsupportedOperationException {
-        FsCheck.checkSupported(expr);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link UnsupportedOperationException} with given message.
-     *
-     * @param expr    given expression
-     * @param message given message
-     */
-    public static void checkSupported(boolean expr, CharSequence message) throws UnsupportedOperationException {
-        FsCheck.checkSupported(expr, message);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link UnsupportedOperationException} with given message concatenated from given message arguments.
-     *
-     * @param expr        given expression
-     * @param messageArgs given message arguments
-     */
-    public static void checkSupported(boolean expr, Object... messageArgs) throws IllegalArgumentException {
-        FsCheck.checkSupported(expr, messageArgs);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not, throw a {@link NoSuchElementException}.
-     *
-     * @param expr given expression
-     */
-    public static void checkElement(boolean expr) throws NoSuchElementException {
-        FsCheck.checkElement(expr);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw a {@link NoSuchElementException} with given message.
-     *
-     * @param expr    given expression
-     * @param message given message
-     */
-    public static void checkElement(boolean expr, CharSequence message) throws NoSuchElementException {
-        FsCheck.checkElement(expr, message);
-    }
-
-    /**
-     * Checks whether given expression is true, if it is not,
-     * throw a {@link IllegalArgumentException} with given message concatenated from given message arguments.
-     *
-     * @param expr        given expression
-     * @param messageArgs given message arguments
-     */
-    public static void checkElement(boolean expr, Object... messageArgs) throws IllegalArgumentException {
-        FsCheck.checkElement(expr, messageArgs);
-    }
-
-    /**
-     * Returns whether given index is in bounds from start index (inclusive) to end index (exclusive).
-     * <p>
-     * Note all indexed must >= 0;
-     *
-     * @param index      given index
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     */
-    public static boolean isInBounds(int index, int startIndex, int endIndex) {
-        return FsCheck.isInBounds(index, startIndex, endIndex);
-    }
-
-    /**
-     * Returns whether given index is in bounds from start index (inclusive) to end index (exclusive).
-     * <p>
-     * Note all indexed must >= 0;
-     *
-     * @param index      given index
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     */
-    public static boolean isInBounds(long index, long startIndex, long endIndex) {
-        return FsCheck.isInBounds(index, startIndex, endIndex);
-    }
-
-    /**
-     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
-     * if it is not, throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): index.
-     * <p>
-     * Note all indexed must >= 0;
-     *
-     * @param index      given index
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     */
-    public static void checkInBounds(int index, int startIndex, int endIndex) throws IndexOutOfBoundsException {
-        FsCheck.checkInBounds(index, startIndex, endIndex);
-    }
-
-    /**
-     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
-     * if it is not, throw an {@link IndexOutOfBoundsException} with given message.
-     * <p>
-     * Note all indexed must >= 0;
-     *
-     * @param index      given index
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     * @param message    given message
-     */
-    public static void checkInBounds(int index, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
-        FsCheck.checkInBounds(index, startIndex, endIndex, message);
-    }
-
-    /**
-     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
-     * if it is not, throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): index.
-     * <p>
-     * Note all indexed must >= 0;
-     *
-     * @param index      given index
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     */
-    public static void checkInBounds(long index, long startIndex, long endIndex) throws IndexOutOfBoundsException {
-        FsCheck.checkInBounds(index, startIndex, endIndex);
-    }
-
-    /**
-     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
-     * if it is not, throw an {@link IndexOutOfBoundsException} with given message.
-     * <p>
-     * Note all indexed must >= 0;
-     *
-     * @param index      given index
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     * @param message    given message
-     */
-    public static void checkInBounds(long index, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
-        FsCheck.checkInBounds(index, startIndex, endIndex, message);
-    }
-
-    /**
-     * Returns whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive).
-     * <p>
-     * Note all ranges and indexed must >= 0;
-     *
-     * @param startRange start range index inclusive
-     * @param endRange   end range index exclusive
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     */
-    public static boolean isRangeInBounds(int startRange, int endRange, int startIndex, int endIndex) {
-        return FsCheck.isRangeInBounds(startRange, endRange, startIndex, endIndex);
-    }
-
-    /**
-     * Returns whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive).
-     * <p>
-     * Note all ranges and indexed must >= 0;
-     *
-     * @param startRange start range index inclusive
-     * @param endRange   end range index exclusive
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     */
-    public static boolean isRangeInBounds(long startRange, long endRange, long startIndex, long endIndex) {
-        return FsCheck.isRangeInBounds(startRange, endRange, startIndex, endIndex);
-    }
-
-    /**
-     * Checks whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive), if it is not,
-     * throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): [startRange, endRange).
-     * <p>
-     * Note all ranges and indexed must >= 0;
-     *
-     * @param startRange start range index inclusive
-     * @param endRange   end range index exclusive
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     */
-    public static void checkRangeInBounds(int startRange, int endRange, int startIndex, int endIndex) throws IndexOutOfBoundsException {
-        FsCheck.checkRangeInBounds(startRange, endRange, startIndex, endIndex);
-    }
-
-    /**
-     * Checks whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive), if it is not,
-     * throw an {@link IndexOutOfBoundsException} with given message.
-     * <p>
-     * Note all ranges and indexed must >= 0;
-     *
-     * @param startRange start range index inclusive
-     * @param endRange   end range index exclusive
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     * @param message    given message
-     */
-    public static void checkRangeInBounds(int startRange, int endRange, int startIndex, int endIndex, CharSequence message) throws IndexOutOfBoundsException {
-        FsCheck.checkRangeInBounds(startRange, endRange, startIndex, endIndex, message);
-    }
-
-    /**
-     * Checks whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive), if it is not,
-     * throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): [startRange, endRange).
-     * <p>
-     * Note all ranges and indexed must >= 0;
-     *
-     * @param startRange start range index inclusive
-     * @param endRange   end range index exclusive
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     */
-    public static void checkRangeInBounds(long startRange, long endRange, long startIndex, long endIndex) throws IndexOutOfBoundsException {
-        FsCheck.checkRangeInBounds(startRange, endRange, startIndex, endIndex);
-    }
-
-    /**
-     * Checks whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive), if it is not,
-     * throw an {@link IndexOutOfBoundsException} with given message.
-     * <p>
-     * Note all ranges and indexed must >= 0;
-     *
-     * @param startRange start range index inclusive
-     * @param endRange   end range index exclusive
-     * @param startIndex start index (inclusive)
-     * @param endIndex   end index (exclusive)
-     * @param message    given message
-     */
-    public static void checkRangeInBounds(long startRange, long endRange, long startIndex, long endIndex, CharSequence message) throws IndexOutOfBoundsException {
-        FsCheck.checkRangeInBounds(startRange, endRange, startIndex, endIndex, message);
-    }
-
-    // Methods from FsObject:
-
-    /**
-     * Returns default value if given object is null, or given object itself if it is not null.
+     * Returns default value if given object is null, or given object itself if it is not null:
+     * <pre>
+     *     return obj == null ? defaultValue : obj;
+     * </pre>
      *
      * @param obj          given object
      * @param defaultValue default value
      */
     public static <T> T notNull(@Nullable T obj, T defaultValue) {
-        return FsObject.notNull(obj, defaultValue);
+        return obj == null ? defaultValue : obj;
+    }
+
+    /**
+     * Returns default value if given object is null, or the value computed by given function if it is not null:
+     * <pre>
+     *     return obj == null ? defaultValue : function.apply(obj);
+     * </pre>
+     *
+     * @param obj          given object
+     * @param defaultValue default value
+     * @param function     given function
+     */
+    public static <K, V> V notNull(@Nullable K obj, V defaultValue, Function<? super K, ? extends V> function) {
+        return obj == null ? defaultValue : function.apply(obj);
+    }
+
+    /**
+     * Returns the value computed by given function if it is not null, or null if it is null:
+     * <pre>
+     *     return obj == null ? null : function.apply(obj);
+     * </pre>
+     *
+     * @param obj      given object
+     * @param function given function
+     */
+    @Nullable
+    public static <K, V> V orNull(@Nullable K obj, Function<? super K, ? extends V> function) {
+        return obj == null ? null : function.apply(obj);
     }
 
     /**
@@ -467,7 +109,7 @@ public class Fs {
      * @param obj given object
      */
     public static int hash(@Nullable Object obj) {
-        return FsObject.hash(obj);
+        return hashWith(obj, true, true);
     }
 
     /**
@@ -476,7 +118,7 @@ public class Fs {
      * @param objs given objects
      */
     public static int hash(Object... objs) {
-        return FsObject.hash(objs);
+        return Arrays.deepHashCode(objs);
     }
 
     /**
@@ -494,8 +136,42 @@ public class Fs {
      * @param arrayCheck the array-check
      * @param deepHash   whether deep-hash
      */
-    public static int hash(@Nullable Object obj, boolean arrayCheck, boolean deepHash) {
-        return FsObject.hash(obj, arrayCheck, deepHash);
+    public static int hashWith(@Nullable Object obj, boolean arrayCheck, boolean deepHash) {
+        if (obj == null || !arrayCheck) {
+            return Objects.hashCode(obj);
+        }
+        Class<?> type = obj.getClass();
+        if (!type.isArray()) {
+            return obj.hashCode();
+        }
+        if (obj instanceof Object[]) {
+            return deepHash ? Arrays.deepHashCode((Object[]) obj) : Arrays.hashCode((Object[]) obj);
+        }
+        if (obj instanceof boolean[]) {
+            return Arrays.hashCode((boolean[]) obj);
+        }
+        if (obj instanceof byte[]) {
+            return Arrays.hashCode((byte[]) obj);
+        }
+        if (obj instanceof short[]) {
+            return Arrays.hashCode((short[]) obj);
+        }
+        if (obj instanceof char[]) {
+            return Arrays.hashCode((char[]) obj);
+        }
+        if (obj instanceof int[]) {
+            return Arrays.hashCode((int[]) obj);
+        }
+        if (obj instanceof long[]) {
+            return Arrays.hashCode((long[]) obj);
+        }
+        if (obj instanceof float[]) {
+            return Arrays.hashCode((float[]) obj);
+        }
+        if (obj instanceof double[]) {
+            return Arrays.hashCode((double[]) obj);
+        }
+        return obj.hashCode();
     }
 
     /**
@@ -504,7 +180,7 @@ public class Fs {
      * @param obj given object
      */
     public static int systemHash(@Nullable Object obj) {
-        return FsObject.systemHash(obj);
+        return System.identityHashCode(obj);
     }
 
     /**
@@ -522,7 +198,7 @@ public class Fs {
      * @param b given object b
      */
     public static boolean equals(@Nullable Object a, @Nullable Object b) {
-        return FsObject.equals(a, b);
+        return equalsWith(a, b, true, true);
     }
 
     /**
@@ -531,7 +207,18 @@ public class Fs {
      * @param objs given objects
      */
     public static boolean equals(Object... objs) {
-        return FsObject.equals(objs);
+        if (objs.length <= 1) {
+            return true;
+        }
+        if (objs.length == 2) {
+            return equals(objs[0], objs[1]);
+        }
+        for (int i = 0; i < objs.length - 2; i++) {
+            if (!equals(objs[i], objs[i + 1])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -551,290 +238,618 @@ public class Fs {
      * @param arrayCheck the array-check
      * @param deepEquals whether deep-equals
      */
-    public static boolean equals(@Nullable Object a, @Nullable Object b, boolean arrayCheck, boolean deepEquals) {
-        return FsObject.equals(a, b, arrayCheck, deepEquals);
+    public static boolean equalsWith(@Nullable Object a, @Nullable Object b, boolean arrayCheck, boolean deepEquals) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        if (!arrayCheck) {
+            return Objects.equals(a, b);
+        }
+        Class<?> typeA = a.getClass();
+        Class<?> typeB = b.getClass();
+        if (typeA.isArray() && typeB.isArray()) {
+            if (a instanceof boolean[] && b instanceof boolean[]) {
+                return Arrays.equals((boolean[]) a, (boolean[]) b);
+            }
+            if (a instanceof byte[] && b instanceof byte[]) {
+                return Arrays.equals((byte[]) a, (byte[]) b);
+            }
+            if (a instanceof short[] && b instanceof short[]) {
+                return Arrays.equals((short[]) a, (short[]) b);
+            }
+            if (a instanceof char[] && b instanceof char[]) {
+                return Arrays.equals((char[]) a, (char[]) b);
+            }
+            if (a instanceof int[] && b instanceof int[]) {
+                return Arrays.equals((int[]) a, (int[]) b);
+            }
+            if (a instanceof long[] && b instanceof long[]) {
+                return Arrays.equals((long[]) a, (long[]) b);
+            }
+            if (a instanceof float[] && b instanceof float[]) {
+                return Arrays.equals((float[]) a, (float[]) b);
+            }
+            if (a instanceof double[] && b instanceof double[]) {
+                return Arrays.equals((double[]) a, (double[]) b);
+            }
+            return deepEquals ? Arrays.deepEquals((Object[]) a, (Object[]) b) : Arrays.equals((Object[]) a, (Object[]) b);
+        }
+        return Objects.equals(a, b);
     }
 
-    // Methods from FsString:
+    /**
+     * Returns enum object of specified name from given enum class, may be null if not found.
+     *
+     * @param enumClass given enum class
+     * @param name      specified name
+     */
+    @Nullable
+    public static <T extends Enum<T>> T findEnum(Class<?> enumClass, String name) {
+        return findEnum(enumClass, name, false);
+    }
 
     /**
-     * Returns a string follows:
-     * <ul>
-     * <li>returns String.valueOf for given object if it is not an array;</li>
-     * <li>if given object is primitive array, returns Arrays.toString for it;</li>
-     * <li>if given object is Object[], returns Arrays.deepToString for it;</li>
-     * <li>else returns String.valueOf for given object</li>
-     * </ul>
+     * Returns enum object of specified name from given enum class, may be null if not found.
+     *
+     * @param enumClass  given enum class
+     * @param name       specified name
+     * @param ignoreCase whether ignore case for specified name
+     */
+    @Nullable
+    public static <T extends Enum<T>> T findEnum(Class<?> enumClass, String name, boolean ignoreCase) {
+        FsCheck.checkArgument(enumClass.isEnum(), "Not an enum class.");
+        if (!ignoreCase) {
+            try {
+                return Enum.valueOf((Class<T>) enumClass, name);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+        Object[] enums = enumClass.getEnumConstants();
+        FsCheck.checkArgument(enums != null, "Not an enum class.");
+        for (Object anEnum : enums) {
+            if (name.equalsIgnoreCase(anEnum.toString())) {
+                return (T) anEnum;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns enum object at specified index from given enum class, may be null if not found.
+     *
+     * @param enumClass given enum class
+     * @param index     specified index
+     */
+    @Nullable
+    public static <T extends Enum<T>> T findEnum(Class<?> enumClass, int index) {
+        FsCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
+        FsCheck.checkArgument(index >= 0, "index must >= 0.");
+        Object[] enums = enumClass.getEnumConstants();
+        FsCheck.checkArgument(enums != null, enumClass + " is not an enum.");
+        if (index >= enums.length) {
+            return null;
+        }
+        return (T) enums[index];
+    }
+
+    /**
+     * Returns caller stack trace of given class name and method name, or null if failed.
+     * This method is equivalent to {@link #findCallerStackTrace(String, String, int)}:
+     * <pre>
+     *     findCallerStackTrace(className, methodName, 0)
+     * </pre>
      * <p>
-     * This method is same as: toString(obj, true, true)
-     *
-     * @param obj given object
-     */
-    public static String toString(@Nullable Object obj) {
-        return FsString.toString(obj);
-    }
-
-    /**
-     * Returns deep-array-to-string for given objects.
-     *
-     * @param objs given objects
-     */
-    public static String toString(Object... objs) {
-        return FsString.toString(objs);
-    }
-
-    /**
-     * Returns a string follows:
-     * <ul>
-     * <li>if given object is primitive array and array-check is true, returns Arrays.toString for it;</li>
-     * <li>if given object is Object[] and both array-check and deep-to-string are true,
-     * returns Arrays.deepToString for it;</li>
-     * <li>if given object is Object[] and array-check is true and deep-to-string is false,
-     * returns Arrays.toString for it;</li>
-     * <li>else returns String.valueOf for given object</li>
-     * </ul>
-     *
-     * @param obj          given object
-     * @param arrayCheck   the array-check
-     * @param deepToString whether deep-to-string
-     */
-    public static String toString(@Nullable Object obj, boolean arrayCheck, boolean deepToString) {
-        return FsString.toString(obj, arrayCheck, deepToString);
-    }
-
-    /**
-     * Concatenates given strings.
-     *
-     * @param strings given strings
-     */
-    public static String concat(String... strings) {
-        return FsString.concat(strings);
-    }
-
-    /**
-     * Concatenates toString of given arguments.
-     *
-     * @param args given arguments
-     */
-    public static String concat(Object... args) {
-        return FsString.concat(args);
-    }
-
-    /**
-     * Concatenates toString of given arguments.
-     *
-     * @param args given arguments
-     */
-    public static String concat(Iterable<?> args) {
-        return FsString.concat(args);
-    }
-
-    /**
-     * Joins given strings with given separator.
-     *
-     * @param separator given separator
-     * @param strings   given strings
-     */
-    public static String join(String separator, String... strings) {
-        return FsString.join(separator, strings);
-    }
-
-    /**
-     * Joins toString of given arguments with given separator.
-     *
-     * @param separator given separator
-     * @param args      given arguments
-     */
-    public static String join(String separator, Object... args) {
-        return FsString.join(separator, args);
-    }
-
-    /**
-     * Joins toString of given arguments with given separator.
-     *
-     * @param separator given separator
-     * @param args      given arguments
-     */
-    public static String join(String separator, Iterable<?> args) {
-        return FsString.join(separator, args);
-    }
-
-    /**
-     * Returns an object which is lazy for executing method {@link Object#toString()},
-     * the executing was provided by given supplier.
+     * This method searches the result of {@link Thread#getStackTrace()} of current thread,
+     * to find first {@link StackTraceElement} of which class name and method name are match given names.
+     * Let the next of found element be the {@code caller}, the {@code caller} will be returned.
      * <p>
-     * Note returned {@link CharSequence}'s other methods (such as {@link CharSequence#length()})
-     * were based on its toString() (and the toString() is lazy).
+     * If stack trace element is null or empty, or the final index is out of bound, return null.
      *
-     * @param supplier given supplier
+     * @param className  given class name
+     * @param methodName given method name
      */
-    public static CharSequence lazyString(Supplier<CharSequence> supplier) {
-        return FsString.lazyString(supplier);
-    }
-
-    // Methods from FsCollect:
-
-    /**
-     * Puts all given elements into dest collection, and returns the dest collection.
-     *
-     * @param dest     dest collection
-     * @param elements given elements
-     */
-    @SafeVarargs
-    public static <T, C extends Collection<? super T>> C toCollection(C dest, T... elements) {
-        return FsCollect.toCollection(dest, elements);
+    @Nullable
+    public static StackTraceElement findCallerStackTrace(String className, String methodName) {
+        return findCallerStackTrace(className, methodName, 0);
     }
 
     /**
-     * Puts all given elements into dest collection, and returns the dest collection.
-     *
-     * @param dest     dest collection
-     * @param elements given elements
-     */
-    public static <T, C extends Collection<? super T>> C toCollection(C dest, Iterable<T> elements) {
-        return FsCollect.toCollection(dest, elements);
-    }
-
-    /**
-     * Puts all given key-values into dest map, and returns the dest map.
+     * Returns caller stack trace of given class name and method name, or null if failed.
      * <p>
-     * The key-values is an array of which elements are in order of key followed by value,
-     * means the first element (index 0) is key, second (index 1) is value, third is key, fourth is value and so on.
-     * If the array miss the last value, the last value will be considered as null.
-     *
-     * @param dest      dest collection
-     * @param keyValues given key-values
-     */
-    public static <K, V, M extends Map<? super K, ? super V>> M toMap(M dest, Object... keyValues) {
-        return FsCollect.toMap(dest, keyValues);
-    }
-
-    /**
-     * Returns an array contains all elements from given iterable in its order.
-     *
-     * @param iterable given iterable
-     * @param type     array's component type
-     */
-    public static <T> T[] toArray(Iterable<? extends T> iterable, Class<T> type) {
-        return FsCollect.toArray(iterable, type);
-    }
-
-    /**
-     * Creates an {@link ArrayList} and put all given elements into it.
-     *
-     * @param elements given elements
-     */
-    @SafeVarargs
-    public static <T> ArrayList<T> arrayList(T... elements) {
-        return FsCollect.arrayList(elements);
-    }
-
-    /**
-     * Creates an {@link LinkedList} and put all given elements into it.
-     *
-     * @param elements given elements
-     */
-    @SafeVarargs
-    public static <T> LinkedList<T> linkedList(T... elements) {
-        return FsCollect.linkedList(elements);
-    }
-
-    /**
-     * Creates an {@link HashMap} and put all given key-values into it.
+     * This method searches the result of {@link Thread#getStackTrace()} of current thread,
+     * to find first {@link StackTraceElement} of which class name and method name are match given names.
+     * Let the next of found element be the {@code caller},
+     * if given {@code offset} is 0, the {@code caller} will be returned.
+     * Otherwise, the element at index of {@code (caller's index + offset)} will be returned.
      * <p>
-     * The key-values is an array of which elements are in order of key followed by value,
-     * means the first element (index 0) is key, second (index 1) is value, third is key, fourth is value and so on.
-     * If the array miss the last value, the last value will be considered as null.
+     * If stack trace element is null or empty, or the final index is out of bound, return null.
      *
-     * @param keyValues given key-values
+     * @param className  given class name
+     * @param methodName given method name
+     * @param offset     given offset
      */
-    public static <K, V> HashMap<K, V> hashMap(Object... keyValues) {
-        return FsCollect.hashMap(keyValues);
+    @Nullable
+    public static StackTraceElement findCallerStackTrace(String className, String methodName, int offset) {
+        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+        if (FsArray.isEmpty(stackTraces)) {
+            return null;
+        }
+        for (int i = 0; i < stackTraces.length; i++) {
+            StackTraceElement stackTraceElement = stackTraces[i];
+            if (Fs.equals(stackTraceElement.getClassName(), className)
+                && Fs.equals(stackTraceElement.getMethodName(), methodName)) {
+                int targetIndex = i + 1 + offset;
+                if (FsCheck.isInBounds(targetIndex, 0, stackTraces.length)) {
+                    return stackTraces[targetIndex];
+                }
+                return null;
+            }
+        }
+        return null;
     }
 
     /**
-     * Creates an {@link LinkedHashMap} and put all given key-values into it.
+     * Returns stack trace info of given throwable as string.
+     *
+     * @param throwable given throwable
+     */
+    public static String stackTraceToString(Throwable throwable) {
+        return stackTraceToString(throwable, null);
+    }
+
+    /**
+     * Returns stack trace info of given throwable as string,
+     * the line separator of return string will be replaced by given line separator if given separator is not null.
+     *
+     * @param throwable     given throwable
+     * @param lineSeparator given separator
+     */
+    public static String stackTraceToString(Throwable throwable, @Nullable String lineSeparator) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        pw.flush();
+        String stackTrace = sw.toString();
+        if (lineSeparator == null) {
+            return stackTrace;
+        }
+        String sysLineSeparator = System.lineSeparator();
+        return stackTrace.replaceAll(sysLineSeparator, lineSeparator);
+    }
+
+    /**
+     * Finds resource of given resource path (starts with "/").
+     *
+     * @param resPath given resource
+     */
+    public static URL findRes(String resPath) {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        return classLoader.getResource(FsString.removeStart(resPath, "/"));
+    }
+
+    /**
+     * Finds all resources of given resource path (starts with "/").
+     *
+     * @param resPath given resource
+     */
+    public static Set<URL> findAllRes(String resPath) {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        try {
+            Enumeration<URL> urls = classLoader.getResources(FsString.removeStart(resPath, "/"));
+            Set<URL> result = new LinkedHashSet<>();
+            while (urls.hasMoreElements()) {
+                result.add(urls.nextElement());
+            }
+            return result;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Runs a new thread.
+     */
+    public static Thread runThread(Runnable runnable) {
+        return runThread(null, false, runnable);
+    }
+
+    /**
+     * Runs a new thread with given thread name.
+     *
+     * @param threadName given thread name
+     * @param runnable   run content
+     */
+    public static Thread runThread(@Nullable String threadName, Runnable runnable) {
+        return runThread(threadName, false, runnable);
+    }
+
+    /**
+     * Runs a new thread with given thread name, whether the thread is daemon.
+     *
+     * @param threadName given thread name
+     * @param daemon     whether the thread is daemon
+     * @param runnable   run content
+     */
+    public static Thread runThread(@Nullable String threadName, boolean daemon, Runnable runnable) {
+        Thread thread = new Thread(runnable);
+        if (threadName != null) {
+            thread.setName(threadName);
+        }
+        if (daemon) {
+            thread.setDaemon(daemon);
+        }
+        thread.start();
+        return thread;
+    }
+
+    /**
+     * Sleeps current thread for specified milliseconds.
+     *
+     * @param millis specified milliseconds
+     */
+    public static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Sleeps current thread for specified duration.
+     *
+     * @param duration specified duration
+     */
+    public static void sleep(Duration duration) {
+        try {
+            Thread.sleep(duration.toMillis(), duration.getNano());
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Starts a process with given command.
+     *
+     * @param cmd given command
+     */
+    public static Process runProcess(String cmd) {
+        String[] splits = cmd.split(" ");
+        List<String> actualCmd = Arrays.stream(splits)
+            .filter(FsString::isNotBlank)
+            .map(String::trim)
+            .collect(Collectors.toList());
+        return runProcess(false, actualCmd);
+    }
+
+    /**
+     * Starts a process with given command.
+     *
+     * @param cmd given command
+     */
+    public static Process runProcess(String... cmd) {
+        return runProcess(false, cmd);
+    }
+
+    /**
+     * Starts a process with given command and whether redirect error stream.
+     *
+     * @param redirectErrorStream whether redirect error stream
+     * @param cmd                 given command
+     */
+    public static Process runProcess(boolean redirectErrorStream, String... cmd) {
+        return runProcess(redirectErrorStream, Arrays.asList(cmd));
+    }
+
+    /**
+     * Starts a process with given command and whether redirect error stream.
+     *
+     * @param redirectErrorStream whether redirect error stream
+     * @param cmd                 given command
+     */
+    public static Process runProcess(boolean redirectErrorStream, List<String> cmd) {
+        return runProcess(null, null, redirectErrorStream, cmd);
+    }
+
+    /**
+     * Starts a process with given command, given environment, given directory file, and whether redirect error stream.
+     *
+     * @param env                 given environment
+     * @param dir                 given directory file
+     * @param redirectErrorStream whether redirect error stream
+     * @param cmd                 given command
+     */
+    public static Process runProcess(
+        @Nullable Map<String, String> env,
+        @Nullable File dir,
+        boolean redirectErrorStream,
+        List<String> cmd
+    ) {
+        ProcessBuilder builder = new ProcessBuilder();
+        if (env != null) {
+            builder.environment().putAll(env);
+        }
+        if (dir != null) {
+            builder.directory(dir);
+        }
+        if (redirectErrorStream) {
+            builder.redirectErrorStream(true);
+        }
+        builder.command(cmd);
+        try {
+            return builder.start();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Converts source object to target type by {@link FsConverter#defaultConverter()}.
+     * If the conversion is unsupported, return null.
      * <p>
-     * The key-values is an array of which elements are in order of key followed by value,
-     * means the first element (index 0) is key, second (index 1) is value, third is key, fourth is value and so on.
-     * If the array miss the last value, the last value will be considered as null.
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
-     * @param keyValues given key-values
+     * @param source     source object
+     * @param targetType target type
+     * @see FsConverter
      */
-    public static <K, V> LinkedHashMap<K, V> linkedHashMap(Object... keyValues) {
-        return FsCollect.linkedHashMap(keyValues);
+    @Nullable
+    public static <T> T convert(@Nullable Object source, Class<T> targetType) {
+        return FsConverter.defaultConverter().convert(source, targetType);
     }
 
     /**
-     * Creates an {@link ConcurrentHashMap} and put all given key-values into it.
+     * Converts source object to target type by {@link FsConverter#defaultConverter()}.
+     * If the conversion is unsupported, return null.
      * <p>
-     * The key-values is an array of which elements are in order of key followed by value,
-     * means the first element (index 0) is key, second (index 1) is value, third is key, fourth is value and so on.
-     * If the array miss the last value, the last value will be considered as null.
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
-     * @param keyValues given key-values
+     * @param source     source object
+     * @param targetType type reference of target type
+     * @see FsConverter
      */
-    public static <K, V> ConcurrentHashMap<K, V> concurrentHashMap(Object... keyValues) {
-        return FsCollect.concurrentHashMap(keyValues);
+    @Nullable
+    public static <T> T convert(@Nullable Object source, TypeRef<T> targetType) {
+        return FsConverter.defaultConverter().convert(source, targetType);
     }
 
     /**
-     * Returns whether given iterable is null or empty.
+     * Converts source object to target type by {@link FsConverter#defaultConverter()}.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
-     * @param iterable given iterable
+     * @param source     source object
+     * @param targetType target type
+     * @see FsConverter
      */
-    public static boolean isEmpty(@Nullable Iterable<?> iterable) {
-        return FsCollect.isEmpty(iterable);
+    @Nullable
+    public static <T> T convert(@Nullable Object source, Type targetType) {
+        return FsConverter.defaultConverter().convert(source, targetType);
     }
 
     /**
-     * Returns whether given map is null or empty.
+     * Converts source object from source type to target type by {@link FsConverter#defaultConverter()}.
+     * If the conversion is unsupported, return null.
+     * <p>
+     * <b>Note returned value after conversion itself may also be null.</b>
      *
-     * @param map given map
+     * @param source     source object
+     * @param sourceType source type
+     * @param targetType target type
+     * @see FsConverter
      */
-    public static boolean isEmpty(@Nullable Map<?, ?> map) {
-        return FsCollect.isEmpty(map);
+    @Nullable
+    public static <T> T convertType(@Nullable Object source, Type sourceType, Type targetType) {
+        return FsConverter.defaultConverter().convertType(source, sourceType, targetType);
     }
 
     /**
-     * Returns value from given iterable at specified index, if failed to obtain, return null.
+     * Copies properties from source object to dest object by {@link FsBeanCopier#defaultCopier()}.
      *
-     * @param iterable given iterable
-     * @param index    specified index
+     * @param source source object
+     * @param dest   dest object
+     * @see FsBeanCopier
      */
-    public static <T> T get(@Nullable Iterable<T> iterable, int index) {
-        return FsCollect.get(iterable, index);
+    public static <T> T copyProperties(Object source, T dest) {
+        return FsBeanCopier.defaultCopier().copyProperties(source, dest);
     }
 
     /**
-     * Returns value from given iterable at specified index, if failed to obtain, return default value.
+     * Copies properties from source object to dest object by {@link FsBeanCopier}.
+     * The properties with null value will not be copied if {@code copyNull} is true.
+     * Otherwise, the null will not be copied.
      *
-     * @param iterable     given iterable
-     * @param index        specified index
-     * @param defaultValue default value
+     * @param source   source object
+     * @param dest     dest object
+     * @param copyNull whether copy null properties
+     * @see FsBeanCopier
      */
-    public static <T> T get(@Nullable Iterable<T> iterable, int index, @Nullable T defaultValue) {
-        return FsCollect.get(iterable, index, defaultValue);
+    public static <T> T copyProperties(Object source, T dest, boolean copyNull) {
+        if (copyNull) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.defaultCopier().toBuilder()
+            .sourcePropertyFilter((name, value) -> value != null)
+            .build()
+            .copyProperties(source, dest);
+
     }
 
     /**
-     * Returns value from given map at specified key, if failed to obtain, return null.
+     * Copies properties from source object to dest object by {@link FsBeanCopier#defaultCopier()}.
+     * The properties that are specified to ignore will not be copied.
      *
-     * @param map given map
-     * @param key specified key
+     * @param source            source object
+     * @param dest              dest object
+     * @param ignoredProperties property names that are specified to ignore
+     * @see FsBeanCopier
      */
-    public static <K, V> V get(@Nullable Map<K, V> map, K key) {
-        return FsCollect.get(map, key);
+    public static <T> T copyProperties(Object source, T dest, String... ignoredProperties) {
+        if (FsArray.isEmpty(ignoredProperties)) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.defaultCopier().toBuilder()
+            .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .build()
+            .copyProperties(source, dest);
     }
 
     /**
-     * Returns value from given map at specified key, if failed to obtain, return default value.
+     * Copies properties from source object to dest object by {@link FsBeanCopier#defaultCopier()}.
+     * The properties with null value will not be copied if {@code copyNull} is true,
+     * and the properties that are specified to ignore will not be copied.
      *
-     * @param map          given map
-     * @param key          specified key
-     * @param defaultValue default value
+     * @param source            source object
+     * @param dest              dest object
+     * @param copyNull          whether copy null properties
+     * @param ignoredProperties property names that are specified to ignore
+     * @see FsBeanCopier
      */
-    public static <K, V> V get(@Nullable Map<K, V> map, K key, @Nullable V defaultValue) {
-        return FsCollect.get(map, key, defaultValue);
+    public static <T> T copyProperties(Object source, T dest, boolean copyNull, String... ignoredProperties) {
+        if (copyNull && FsArray.isEmpty(ignoredProperties)) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.defaultCopier().toBuilder()
+            .sourcePropertyFilter((name, value) -> value != null)
+            .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .build()
+            .copyProperties(source, dest);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types by {@link FsBeanCopier#defaultCopier()}.
+     *
+     * @param source     source object
+     * @param sourceType specified type of source object
+     * @param dest       dest object
+     * @param destType   specified type of dest type
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
+        return FsBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types by {@link FsBeanCopier}.
+     * The properties with null value will not be copied if {@code copyNull} is true.
+     *
+     * @param source     source object
+     * @param sourceType specified type of source object
+     * @param dest       dest object
+     * @param destType   specified type of dest type
+     * @param copyNull   whether copy null properties
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, boolean copyNull) {
+        if (copyNull) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.defaultCopier().toBuilder()
+            .sourcePropertyFilter((name, value) -> value != null)
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types by {@link FsBeanCopier#defaultCopier()}.
+     * The properties that are specified to ignore will not be copied.
+     *
+     * @param source            source object
+     * @param sourceType        specified type of source object
+     * @param dest              dest object
+     * @param destType          specified type of dest type
+     * @param ignoredProperties property names that are specified to ignore
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(
+        Object source, Type sourceType, T dest, Type destType, String... ignoredProperties) {
+        if (FsArray.isEmpty(ignoredProperties)) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.defaultCopier().toBuilder()
+            .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types by {@link FsBeanCopier#defaultCopier()}.
+     * The properties with null value will not be copied if {@code copyNull} is true,
+     * and the properties that are specified to ignore will not be copied.
+     *
+     * @param source            source object
+     * @param sourceType        specified type of source object
+     * @param dest              dest object
+     * @param destType          specified type of dest type
+     * @param copyNull          whether copy null properties
+     * @param ignoredProperties property names that are specified to ignore
+     * @see FsBeanCopier
+     */
+    public static <T> T copyProperties(
+        Object source, Type sourceType, T dest, Type destType, boolean copyNull, String... ignoredProperties) {
+        if (copyNull && FsArray.isEmpty(ignoredProperties)) {
+            return FsBeanCopier.defaultCopier().copyProperties(source, dest);
+        }
+        return FsBeanCopier.defaultCopier().toBuilder()
+            .sourcePropertyFilter((name, value) -> value != null)
+            .propertyNameMapper(name -> FsArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .build()
+            .copyProperties(source, sourceType, dest, destType);
+    }
+
+    /**
+     * Returns chunk count of total value and chunk size:
+     * <pre>
+     *     return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+     * </pre>
+     *
+     * @param total     total value
+     * @param chunkSize chunk size
+     */
+    public static int chunkCount(int total, int chunkSize) {
+        return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+    }
+
+    /**
+     * Returns chunk count of total value and chunk size:
+     * <pre>
+     *     return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+     * </pre>
+     *
+     * @param total     total value
+     * @param chunkSize chunk size
+     */
+    public static long chunkCount(long total, long chunkSize) {
+        return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+    }
+
+    /**
+     * Returns default class loader: {@link Thread#getContextClassLoader()}.
+     */
+    public static ClassLoader getClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    /**
+     * Returns new instance for given class name.
+     * This method first uses {@link Class#forName(String)} to load given class,
+     * then call the none-arguments constructor to create instance.
+     * If loading failed, return null.
+     *
+     * @param className given clas name
+     */
+    @Nullable
+    public static <T> T load(String className) {
+        try {
+            Class<?> cls = Class.forName(className);
+            return FsType.newInstance(cls);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 }

@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.annotations.Accepted;
 import xyz.srclab.annotations.JavaBean;
 import xyz.srclab.annotations.NonNull;
-import xyz.srclab.annotations.Written;
+import xyz.srclab.annotations.OutParam;
 
 public class AnnotationSample {
 
@@ -21,7 +21,7 @@ public class AnnotationSample {
     }
 
     private void writeBuffer(
-        @Written StringBuilder buffer,
+        @OutParam StringBuilder buffer,
         @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
     ) {
         buffer.append(readOnly);
