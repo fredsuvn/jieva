@@ -737,8 +737,19 @@ public class FsIO {
      * @param buffer given buffer
      */
     public static String getString(ByteBuffer buffer) {
+        return getString(buffer, FsString.CHARSET);
+    }
+
+    /**
+     * Read all bytes of given buffer and encodes to string with given charset.
+     * After reading, the buffer's position will be updated to its limit, its limit will not have been changed.
+     *
+     * @param buffer  given buffer
+     * @param charset given charset
+     */
+    public static String getString(ByteBuffer buffer, Charset charset) {
         byte[] bytes = getBytes(buffer);
-        return new String(bytes, FsString.CHARSET);
+        return new String(bytes, charset);
     }
 
     /**

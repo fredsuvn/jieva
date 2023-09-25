@@ -4,9 +4,6 @@ import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.collect.FsCollect;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -17,11 +14,10 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
-public class FsHttpResponse {
+public class FsHttpResponse extends FsHttpContent {
 
     private int statusCode;
     private @Nullable String statusReason;
-    private @Nullable Map<String, Object> headers;
     private @Nullable InputStream body;
 
     /**
@@ -47,8 +43,10 @@ public class FsHttpResponse {
         int statusCode, @Nullable String statusReason, @Nullable Map<String, ?> headers, @Nullable InputStream body) {
         this.statusCode = statusCode;
         this.statusReason = statusReason;
-        this.headers = FsCollect.immutableMap(headers);
         this.body = body;
+        if (FsCollect.isNotEmpty(headers)) {
+            addHeaders(headers);
+        }
     }
 
     /**
@@ -81,46 +79,6 @@ public class FsHttpResponse {
      */
     public void setStatusReason(String statusReason) {
         this.statusReason = statusReason;
-    }
-
-    /**
-     * Returns response headers.
-     * <p>
-     * Returned object is immutable.
-     * If a value is instance of {@link Collection}, it will be considered as repeated header.
-     * All values (and elements if the value is a collection) will be converted to string
-     * by {@link String#valueOf(Object)} when put into actual http headers.
-     */
-    public Map<String, Object> getHeaders() {
-        if (headers == null) {
-            return Collections.emptyMap();
-        }
-        return FsCollect.immutableMap(headers);
-    }
-
-    /**
-     * Adds header. If the value is instance of {@link Collection}, it will be considered as repeated header.
-     *
-     * @param key   header key
-     * @param value header value
-     */
-    public void addHeader(String key, Object value) {
-        if (headers == null) {
-            headers = new LinkedHashMap<>();
-        }
-        headers.put(key, value);
-    }
-
-    /**
-     * Adds header. If a value is instance of {@link Collection}, it will be considered as repeated header.
-     *
-     * @param headers headers to be added
-     */
-    public void addHeaders(Map<String, ?> headers) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.putAll(headers);
     }
 
     /**

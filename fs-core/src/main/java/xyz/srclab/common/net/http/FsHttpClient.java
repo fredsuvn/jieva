@@ -182,11 +182,11 @@ public interface FsHttpClient {
                 int responseCode = connection.getResponseCode();
                 String responseMessage = connection.getResponseMessage();
                 Map<String, List<String>> responseHeaders = connection.getHeaderFields();
-                final InputStream responseBody = connection.getInputStream();
-                if (requestBody == null) {
+                InputStream responseBody = connection.getInputStream();
+                if (responseBody == null) {
                     connection.disconnect();
                 } else {
-                    return new FsHttpResponse(responseCode, responseMessage, responseHeaders, new InputWithConnection(responseBody, connection));
+                    responseBody = new InputWithConnection(responseBody, connection);
                 }
                 return new FsHttpResponse(responseCode, responseMessage, responseHeaders, responseBody);
             }
@@ -196,7 +196,11 @@ public interface FsHttpClient {
                 private final HttpURLConnection connection;
 
                 private InputWithConnection(InputStream source, HttpURLConnection connection) {
-                    this.source = source;
+                    try {
+                        this.source = source;
+                    } catch (Exception e) {
+                        throw new FsHttpException(e);
+                    }
                     this.connection = connection;
                 }
 

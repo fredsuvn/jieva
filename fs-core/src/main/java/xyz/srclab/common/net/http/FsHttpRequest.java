@@ -7,9 +7,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -17,11 +14,10 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
-public class FsHttpRequest {
+public class FsHttpRequest extends FsHttpContent {
 
     private URL url;
     private String method;
-    private @Nullable Map<String, Object> headers;
     private @Nullable Object body;
 
     /**
@@ -46,8 +42,10 @@ public class FsHttpRequest {
     public FsHttpRequest(URL url, String method, @Nullable Map<String, ?> headers, @Nullable Object body) {
         this.url = url;
         this.method = method;
-        this.headers = FsCollect.immutableMap(headers);
         this.body = body;
+        if (FsCollect.isNotEmpty(headers)) {
+            addHeaders(headers);
+        }
     }
 
     /**
@@ -70,8 +68,10 @@ public class FsHttpRequest {
             throw new FsHttpException(e);
         }
         this.method = method;
-        this.headers = FsCollect.immutableMap(headers);
         this.body = body;
+        if (FsCollect.isNotEmpty(headers)) {
+            addHeaders(headers);
+        }
     }
 
     /**
@@ -117,46 +117,6 @@ public class FsHttpRequest {
      */
     public void setMethod(String method) {
         this.method = method;
-    }
-
-    /**
-     * Returns request headers.
-     * <p>
-     * Returned object is immutable.
-     * If a value is instance of {@link Collection}, it will be considered as repeated header.
-     * All values (and elements if the value is a collection) will be converted to string
-     * by {@link String#valueOf(Object)} when put into actual http headers.
-     */
-    public Map<String, Object> getHeaders() {
-        if (headers == null) {
-            return Collections.emptyMap();
-        }
-        return FsCollect.immutableMap(headers);
-    }
-
-    /**
-     * Adds header. If the value is instance of {@link Collection}, it will be considered as repeated header.
-     *
-     * @param key   header key
-     * @param value header value
-     */
-    public void addHeader(String key, Object value) {
-        if (headers == null) {
-            headers = new LinkedHashMap<>();
-        }
-        headers.put(key, value);
-    }
-
-    /**
-     * Adds header. If a value is instance of {@link Collection}, it will be considered as repeated header.
-     *
-     * @param headers headers to be added
-     */
-    public void addHeaders(Map<String, ?> headers) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.putAll(headers);
     }
 
     /**

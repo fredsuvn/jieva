@@ -16,9 +16,12 @@ import xyz.srclab.common.net.http.FsHttpResponse;
 import xyz.srclab.common.net.tcp.*;
 import xyz.srclab.common.net.udp.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,17 +48,7 @@ public class NetTest {
 
     @Test
     public void testHttp() throws Exception {
-        FsHttpResponse response = FsHttp.get(
-            "https://www.taobao.com/",
-            FsCollect.linkedHashMap(
-                "Connection", "keep-alive",
-                "Host", "www.taobao.com"
-            )
-        );
-        System.out.println(response.getHeaders());
-        InputStream body = response.getBody();
-        System.out.println(FsIO.readString(body));
-        body.close();
+        testHttp0();
     }
 
     private void testTcp0(int bufferSize, int serverThreads, int clientThreads) {
@@ -310,5 +303,48 @@ public class NetTest {
         udpServer.close();
         //client: udp-client * 10
         Assert.assertEquals(data.get("udp-client").get(), clientThreads * 10);
+    }
+
+    private void testHttp0() throws Exception {
+        ByteArrayOutputStream received = new ByteArrayOutputStream();
+        FsTcpServer server = FsTcpServer.newBuilder()
+            .executor(Executors.newFixedThreadPool(5))
+            .addChannelHandler(new FsTcpChannelHandler<ByteBuffer>() {
+                @Override
+                public @Nullable Object onMessage(FsTcpChannel channel, ByteBuffer message) {
+                    FsIO.readBytesTo(FsIO.toInputStream(message), received);
+                    String response = "HTTP/1.1 200 OK\r\n" +
+                        "Content-Length: 9\r\n" +
+                        "Content-Length2: 9\r\n" +
+                        "Content-Length2: 9\r\n" +
+                        "\r\n" +
+                        "Fuck Off!";
+                    channel.sendAndFlush(response.getBytes(StandardCharsets.ISO_8859_1));
+                    channel.close();
+                    return null;
+                }
+            })
+            .build();
+        server.start(false);
+        FsHttpResponse response = FsHttp.get(
+            "http://localhost:" + server.getPort(),
+            FsCollect.linkedHashMap(
+                "Connection", "keep-alive"
+            )
+        );
+        System.out.println("Server received:");
+        System.out.println(new String(received.toByteArray(), FsString.CHARSET));
+        System.out.println("Client response header:");
+        Map<String, Object> headers = response.getHeaders();
+        System.out.println(headers);
+        InputStream body = response.getBody();
+        System.out.println("Client response body:");
+        String bodyString = FsIO.readString(body);
+        System.out.println(bodyString);
+        body.close();
+        server.close();
+        Assert.assertEquals(headers.get("Content-Length"), "9");
+        Assert.assertEquals(headers.get("Content-Length2"), Arrays.asList("9", "9", "9", "9"));
+        Assert.assertEquals(bodyString, "Fuck Off!");
     }
 }
