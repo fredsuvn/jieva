@@ -18,8 +18,4 @@ in scope of annotated element are nullable/non-null, usually used in package-inf
 * *Immutable*: tells the annotated element is immutable;
 * *ThreadSafe*: tells the annotated element is thread-safe;
 
-.Java Examples
-[source,java]
-----
-include::../src/test/java/samples/Samples.java[]
-----
+== link:../src/test/java/samples/[Samples Here]
