@@ -1,0 +1,21 @@
+plugins {
+  id 'build.platform'
+}
+
+description = "Fs BOM"
+
+javaPlatform {
+  allowDependencies()
+}
+
+dependencies {
+  constraints {
+    //api project(":boat")
+    file("${rootDir}").eachDirMatch(~/fs-(?!plugins).*/) { dir ->
+      api project(":${dir.name}")
+    }
+//    file("${rootDir}/boat-plugins").eachDirMatch(~/boat-.*/) { dir ->
+//      api project(":boat-plugins:${dir.name}")
+//    }
+  }
+}

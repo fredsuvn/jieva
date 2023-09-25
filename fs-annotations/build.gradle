@@ -2,7 +2,7 @@ plugins {
   id 'build.jar'
 }
 
-description = "Boat Annotations"
+description = "Fs Annotations"
 
 java {
   registerFeature('optionalSupport') {
@@ -11,10 +11,10 @@ java {
 }
 
 dependencies {
-  api platform(project(":boat-dependencies"))
+  api platform(project(":fs-dependencies"))
 
   api "com.google.code.findbugs:jsr305"
   api "org.jetbrains:annotations"
 
-  testImplementation project(":boat-test")
+  testImplementation project(":fs-test")
 }

@@ -2,7 +2,7 @@ plugins {
   id 'build.jar'
 }
 
-description = "Boat Test Dependencies Management"
+description = "Fs Test Dependencies Management"
 
 java {
   registerFeature('optionalSupport') {
@@ -11,7 +11,7 @@ java {
 }
 
 dependencies {
-  api platform(project(":boat-dependencies"))
+  api platform(project(":fs-dependencies"))
 
   api("org.jetbrains.kotlin:kotlin-test-testng") {
     exclude(group: "org.testng", module: "testng")

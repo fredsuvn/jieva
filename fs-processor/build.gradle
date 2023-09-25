@@ -18,9 +18,8 @@ sourceSets {
 }
 
 
-
 dependencies {
-  api platform(project(":boat-dependencies"))
+  api platform(project(":fs-dependencies"))
 
   implementation 'org.apache.velocity:velocity-engine-core:2.3'
   //implementation group: 'org.apache.velocity', name: 'velocity-engine-core', version: '2.3.2'
