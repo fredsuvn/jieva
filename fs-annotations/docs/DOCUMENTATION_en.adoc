@@ -1,7 +1,4 @@
 = image:../../logo.svg[Fs Annotations] `fs-annotations`: Fs Annotations -- Annotations of link:../../README.md[Fs]
-:toc:
-:toclevels: 3
-:toc-title:
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
