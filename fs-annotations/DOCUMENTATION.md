@@ -1,4 +1,4 @@
-# ![Fs Annotations](../logo.svg) `1fs-annotations`: Fs Annotations -- Annotations of [Fs](../README.md)
+# ![Fs Annotations](../logo.svg) `fs-annotations`: Fs Annotations -- Annotations of [Fs](../README.md)
 
 - AsciiDoc:
   * [English](docs/DOCUMENTATION_en.adoc)

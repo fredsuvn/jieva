@@ -1,7 +1,7 @@
 = image:../../logo.svg[Fs Annotations] `fs-annotations`: Fs Annotations -- link:../../README.md[Fs]的注解
 :toc:
 :toclevels: 3
-:toc-title: 目录
+:toc-title:
 :last-update-label!:
 孙谦 <fredsuvn@163.com>
 :encoding: UTF-8
