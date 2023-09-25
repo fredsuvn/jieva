@@ -1,15 +1,15 @@
-package test.xyz.srclab.annotations;
+package test;
 
 import org.testng.annotations.Test;
 
 /**
  * @author sunqian
  */
-public class AnnotationsTest {
+public class AnnotationTest {
 
     @Test
     public void testAnnotations() {
-        Bean1 bean1 = new Bean1();
+        Bean bean1 = new Bean();
         bean1.setP1("123");
         bean1.setP1("p1");
         bean1.setP2("p2");

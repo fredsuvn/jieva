@@ -10,6 +10,8 @@ javaPlatform {
 
 dependencies {
   api platform("xyz.srclab.dependencies:srclab-dependencies:0.0.1")
+
+  api 'org.projectlombok:lombok:1.18.30'
   //api "org.slf4j:slf4j-api"
   //api "org.apache.commons:commons-lang3"
   //api "org.apache.commons:commons-collections4"

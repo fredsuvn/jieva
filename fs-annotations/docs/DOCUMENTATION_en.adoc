@@ -8,24 +8,17 @@ Sun Qian <fredsuvn@163.com>
 
 Fs Annotations provides a set of annotations to help your codes stay tidy and clean:
 
-* *DefaultNonNull*/*DefaultNullable*: It tells that all variables, fields, parameters, and other use of type are non-null/nullable by default in annotated scope, usually used in package-info.java;
-* *NotNull*/*Nullable*: It tells that annotated variable, field, parameter, and other use of type is non-null/nullable;
-* *JavaBean*: It tells that annotated type is a java-bean, which all properties are nullable by default;
-* *Acceptable*/*Accepted*: It tells that annotated parameter only accepts specified types;
-* *Rejectable*/*Rejected*: It tells that annotated parameter will reject specified types;
-* *Written*: It tells that the parameter may be written;
-* *Immutable*: It tells that annotated variable, field, parameter, and other use of type is immutable and thread-safe;
-* *ThreadSafe*: It tells that annotated variable, field, parameter, and other use of type is thread-safe;
-* *ThreadSafeIf*: It tells that annotated variable, field, parameter, and other use of type is thread-safe if specified conditions were met;
+* *Nullable*/*NonNull*: tells the annotated element is nullable/non-null;
+* *DefaultNullable*/*DefaultNonNull*: tells all elements which can be annotated by *Nullable*/*NonNull*
+in scope of annotated element are nullable/non-null, usually used in package-info.java;
+* *AcceptedType*/*AcceptedTypes*: tells which type is accepted;
+* *RejectedType*/*RejectedTypes*: tells which type is rejected;
+* *OutParam*: tells the parameter is an output param which can be modified;
+* *Immutable*: tells the annotated element is immutable;
+* *ThreadSafe*: tells the annotated element is thread-safe;
 
 .Java Examples
 [source,java]
 ----
-include::../../boat-sample/src/test/java/sample/java/xyz/srclab/annotations/AnnotationSample.java[]
-----
-
-.Kotlin Examples
-[source,kotlin]
-----
-include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/annotations/AnnotationSample.kt[]
+include::../src/test/java/samples/Samples.java[]
 ----

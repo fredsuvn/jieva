@@ -1,5 +1,6 @@
 plugins {
   id 'build.jar'
+  id 'io.freefair.lombok' version '5.3.0'
 }
 
 description = "Fs Annotations"
@@ -14,7 +15,7 @@ dependencies {
 
   implementation platform(project(":fs-dependencies"))
   implementation "com.google.code.findbugs:jsr305"
-  //api "org.jetbrains:annotations"
+  compileOnly 'org.projectlombok:lombok'
 
   testImplementation project(":fs-test")
 }

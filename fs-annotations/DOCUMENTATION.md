@@ -1,10 +1,8 @@
-# ![Boat Annotations](../logo.svg) `boat-annotations`: Boat Annotations -- Annotations of [Boat](../README.md)
+# ![Fs Annotations](../logo.svg) `1fs-annotations`: Fs Annotations -- Annotations of [Fs](../README.md)
 
 - AsciiDoc:
   * [English](docs/DOCUMENTATION_en.adoc)
   * [简体中文](docs/DOCUMENTATION_zh.adoc)
 - Markdown:
-  * [English](docs/DOCUMENTATION_en.md)
-  * [简体中文](docs/DOCUMENTATION_zh.md)
 
 More see [docs/](docs/)
