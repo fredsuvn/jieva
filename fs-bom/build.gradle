@@ -11,7 +11,7 @@ javaPlatform {
 dependencies {
   constraints {
     //api project(":boat")
-    file("${rootDir}").eachDirMatch(~/fs-(?!plugins).*/) { dir ->
+    file("${rootDir}").eachDirMatch(~/fs-(?!(plugins|draft)).*/) { dir ->
       api project(":${dir.name}")
     }
   }
