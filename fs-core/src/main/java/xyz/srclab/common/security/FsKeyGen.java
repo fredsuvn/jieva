@@ -1,6 +1,7 @@
 package xyz.srclab.common.security;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.ThreadSafe;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,6 +16,7 @@ import java.security.spec.AlgorithmParameterSpec;
  * @author fredsuvn
  * @see KeyGenerator
  */
+@ThreadSafe
 public interface FsKeyGen extends SecurityAlgorithm {
 
     /**

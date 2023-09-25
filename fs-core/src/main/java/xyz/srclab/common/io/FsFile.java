@@ -1,6 +1,6 @@
 package xyz.srclab.common.io;
 
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 
 import java.io.*;
 import java.nio.channels.FileChannel;

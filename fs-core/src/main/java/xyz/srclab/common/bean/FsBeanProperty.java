@@ -2,7 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotations.Immutable;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.reflect.FsType;
 
 import java.lang.annotation.Annotation;

@@ -3,19 +3,23 @@ package xyz.srclab.annotations;
 import java.lang.annotation.*;
 
 /**
- * Indicates annotated type is typically designed for `java`, not `kotlin`.
+ * Declares type of the annotated element is allowed to be the specified type.
+ *
+ * @author sunqian
+ * @see AcceptedTypes
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-    ElementType.TYPE,
     ElementType.METHOD,
-    ElementType.CONSTRUCTOR,
     ElementType.FIELD,
     ElementType.PARAMETER,
     ElementType.LOCAL_VARIABLE,
     ElementType.TYPE_PARAMETER,
     ElementType.TYPE_USE,
 })
-public @interface ForJava {
+@Repeatable(AcceptedTypes.class)
+public @interface AcceptedType {
+
+    Class<?>[] value();
 }

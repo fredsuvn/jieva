@@ -3,10 +3,11 @@ package xyz.srclab.annotations;
 import java.lang.annotation.*;
 
 /**
- * To specify a rejected type.
+ * Declares type of the annotated element is allowed to be the specified types.
+ * It is container of {@link AcceptedType}.
  *
  * @author sunqian
- * @see Rejectable
+ * @see AcceptedType
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -18,8 +19,7 @@ import java.lang.annotation.*;
     ElementType.TYPE_PARAMETER,
     ElementType.TYPE_USE,
 })
-@Repeatable(Rejectable.class)
-public @interface Rejected {
+public @interface AcceptedTypes {
 
-    Class<?> value();
+    AcceptedType[] value();
 }

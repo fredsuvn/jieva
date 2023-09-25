@@ -52,7 +52,15 @@ dependencies {
   //testImplementation group: 'com.github.javaparser', name: 'javaparser-core', version: '3.25.2'
   // https://mvnrepository.com/artifact/com.github.javaparser/javaparser-symbol-solver-core
   //testImplementation group: 'com.github.javaparser', name: 'javaparser-symbol-solver-core', version: '3.25.2'
-
+  //api "org.slf4j:slf4j-api"
+  //api "org.apache.commons:commons-lang3"
+  //api "org.apache.commons:commons-collections4"
+  //api "commons-beanutils:commons-beanutils"
+  //api "commons-io:commons-io"
+  //api "commons-codec:commons-codec"
+  //api "com.google.guava:guava"
+  testImplementation "com.github.ben-manes.caffeine:caffeine"
+  //api "org.yaml:snakeyaml"
 }
 
 //utils.writeBuildInfos(project, "src/main/resources/META-INF/build.properties")

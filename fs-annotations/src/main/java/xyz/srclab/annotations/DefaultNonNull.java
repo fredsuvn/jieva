@@ -5,6 +5,13 @@ import javax.annotation.meta.TypeQualifierDefault;
 import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 
+/**
+ * Declares the annotated element and all methods, fields parameters, local variables and type uses
+ * in its scope must not be null.
+ * It is equivalent to use {@link NonNull} on those spaces.
+ *
+ * @author fredsuvn
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Nonnull

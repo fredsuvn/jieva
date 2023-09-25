@@ -6,7 +6,7 @@ import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
 /**
- * Claims the annotated element may be null.
+ * Declares the annotated element may be null.
  *
  * @author fredsuvn
  */
@@ -15,6 +15,12 @@ import java.lang.annotation.*;
 @Nonnull(when = When.UNKNOWN)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-    ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.TYPE_USE})
+    ElementType.METHOD,
+    ElementType.FIELD,
+    ElementType.PARAMETER,
+    ElementType.LOCAL_VARIABLE,
+    ElementType.TYPE_PARAMETER,
+    ElementType.TYPE_USE,
+})
 public @interface Nullable {
 }

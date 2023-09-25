@@ -11,10 +11,10 @@ java {
 }
 
 dependencies {
-  api platform(project(":fs-dependencies"))
 
-  api "com.google.code.findbugs:jsr305"
-  api "org.jetbrains:annotations"
+  implementation platform(project(":fs-dependencies"))
+  implementation "com.google.code.findbugs:jsr305"
+  //api "org.jetbrains:annotations"
 
   testImplementation project(":fs-test")
 }

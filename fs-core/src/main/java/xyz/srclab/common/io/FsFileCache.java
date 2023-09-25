@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.base.FsCheck;
 import xyz.srclab.common.base.ref.BooleanRef;
 import xyz.srclab.common.base.ref.FsRef;

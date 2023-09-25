@@ -1,6 +1,6 @@
 package xyz.srclab.common.encode;
 
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.io.FsIO;
 

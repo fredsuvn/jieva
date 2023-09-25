@@ -40,7 +40,7 @@ Java Examples
 
     import org.testng.Assert;
     import org.testng.annotations.Test;
-    import xyz.srclab.annotations.Accepted;
+    import xyz.srclab.annotations.AcceptedType;
     import xyz.srclab.annotations.JavaBean;
     import xyz.srclab.annotations.NonNull;
     import xyz.srclab.annotations.OutParam;
@@ -97,8 +97,8 @@ Kotlin Examples
 
     import org.testng.Assert
     import org.testng.annotations.Test
-    import xyz.srclab.annotations.Acceptable
-    import xyz.srclab.annotations.Accepted
+    import xyz.srclab.annotations.AcceptedTypes
+    import xyz.srclab.annotations.AcceptedType
     import xyz.srclab.annotations.OutParam
 
     class AnnotationSample {

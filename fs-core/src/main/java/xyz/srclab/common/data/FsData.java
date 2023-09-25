@@ -1,7 +1,7 @@
 package xyz.srclab.common.data;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.base.FsCheck;
 import xyz.srclab.common.base.FsString;
 import xyz.srclab.common.encode.FsEncoder;

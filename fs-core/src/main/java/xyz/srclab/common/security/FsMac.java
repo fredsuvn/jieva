@@ -1,6 +1,7 @@
 package xyz.srclab.common.security;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.ThreadSafe;
 
 import javax.crypto.Mac;
 import java.security.Provider;
@@ -16,6 +17,7 @@ import java.security.Provider;
  * @author fredsuvn
  * @see Mac
  */
+@ThreadSafe
 public interface FsMac extends Prepareable {
 
     /**

@@ -1,8 +1,9 @@
 package xyz.srclab.common.convert;
 
 import lombok.EqualsAndHashCode;
+import xyz.srclab.annotations.Immutable;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.collect.FsCollect;
 import xyz.srclab.common.reflect.TypeRef;
@@ -112,11 +113,13 @@ public interface FsConverter {
     /**
      * Returns middles handlers.
      */
+    @Immutable
     List<Handler> getMiddleHandlers();
 
     /**
      * Returns all handlers in order by: prefix handler -> middle handlers -> suffix handler.
      */
+    @Immutable
     List<Handler> getHandlers();
 
     /**

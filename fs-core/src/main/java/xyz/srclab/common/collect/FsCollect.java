@@ -1,5 +1,6 @@
 package xyz.srclab.common.collect;
 
+import xyz.srclab.annotations.Immutable;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.base.FsArray;
@@ -98,7 +99,7 @@ public class FsCollect {
      *
      * @param iterable given iterable
      */
-    public static <T> List<T> immutableList(@Nullable Iterable<? extends T> iterable) {
+    public static <T> @Immutable List<T> immutableList(@Nullable Iterable<? extends T> iterable) {
         if (iterable == null) {
             return Collections.emptyList();
         }
@@ -116,7 +117,7 @@ public class FsCollect {
      *
      * @param array given array
      */
-    public static <T> List<T> immutableList(@Nullable T[] array) {
+    public static <T> @Immutable List<T> immutableList(@Nullable T[] array) {
         if (FsArray.isEmpty(array)) {
             return Collections.emptyList();
         }
@@ -129,7 +130,7 @@ public class FsCollect {
      *
      * @param iterable given iterable
      */
-    public static <T> Set<T> immutableSet(@Nullable Iterable<? extends T> iterable) {
+    public static <T> @Immutable Set<T> immutableSet(@Nullable Iterable<? extends T> iterable) {
         if (iterable == null) {
             return Collections.emptySet();
         }
@@ -147,7 +148,7 @@ public class FsCollect {
      *
      * @param array given array
      */
-    public static <T> Set<T> immutableSet(@Nullable T[] array) {
+    public static <T> @Immutable Set<T> immutableSet(@Nullable T[] array) {
         if (FsArray.isEmpty(array)) {
             return Collections.emptySet();
         }
@@ -160,7 +161,7 @@ public class FsCollect {
      *
      * @param map given map
      */
-    public static <K, V> Map<K, V> immutableMap(@Nullable Map<? extends K, ? extends V> map) {
+    public static <K, V> @Immutable Map<K, V> immutableMap(@Nullable Map<? extends K, ? extends V> map) {
         if (isEmpty(map)) {
             return Collections.emptyMap();
         }

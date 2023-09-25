@@ -3,7 +3,7 @@ package xyz.srclab.common.bean;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.bean.handlers.JavaBeanResolveHandler;
 import xyz.srclab.common.bean.handlers.RecordBeanResolveHandler;

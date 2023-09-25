@@ -1,6 +1,7 @@
 package xyz.srclab.common.security;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.base.FsCheck;
 
 import java.security.KeyPair;
@@ -18,6 +19,7 @@ import java.util.Arrays;
  * @author fredsuvn
  * @see KeyPairGenerator
  */
+@ThreadSafe
 public interface FsKeyPairGen extends SecurityAlgorithm {
 
     /**

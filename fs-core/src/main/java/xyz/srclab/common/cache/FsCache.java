@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;

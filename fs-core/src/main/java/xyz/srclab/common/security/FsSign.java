@@ -1,6 +1,7 @@
 package xyz.srclab.common.security;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.ThreadSafe;
 
 import java.security.Provider;
 import java.security.Signature;
@@ -17,6 +18,7 @@ import java.security.Signature;
  * @author fredsuvn
  * @see Signature
  */
+@ThreadSafe
 public interface FsSign extends Prepareable {
 
     /**

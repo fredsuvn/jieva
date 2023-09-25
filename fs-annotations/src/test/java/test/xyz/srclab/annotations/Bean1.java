@@ -1,6 +1,5 @@
 package test.xyz.srclab.annotations;
 
-import xyz.srclab.annotations.JavaBean;
 import xyz.srclab.annotations.NonNull;
 
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.List;
 /**
  * @author sunqian
  */
-@JavaBean
 public class Bean1 {
 
     private String p1;
@@ -26,7 +24,7 @@ public class Bean1 {
         this.p1 = p1;
     }
 
-    @NonNull
+    //@NonNull
     public String getP2() {
         return p2;
     }

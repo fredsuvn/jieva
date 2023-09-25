@@ -1,23 +1,25 @@
-package xyz.srclab.annotations.concurrent;
+package xyz.srclab.annotations;
 
 import java.lang.annotation.*;
 
 /**
- * To specify target annotated is thread-safe if {@link #value()} was met.
+ * Declares type of the annotated element is not allowed to be the specified type.
+ *
+ * @author sunqian
+ * @see RejectedTypes
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-    ElementType.TYPE,
     ElementType.METHOD,
-    ElementType.CONSTRUCTOR,
     ElementType.FIELD,
     ElementType.PARAMETER,
     ElementType.LOCAL_VARIABLE,
     ElementType.TYPE_PARAMETER,
     ElementType.TYPE_USE,
 })
-public @interface ThreadSafeIf {
+@Repeatable(RejectedTypes.class)
+public @interface RejectedType {
 
-    String value();
+    Class<?> value();
 }

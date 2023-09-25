@@ -1,6 +1,7 @@
 package xyz.srclab.common.net.http;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.base.Fs;
 import xyz.srclab.common.io.FsIO;
 
@@ -22,6 +23,7 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
+@ThreadSafe
 public interface FsHttpClient {
 
     /**

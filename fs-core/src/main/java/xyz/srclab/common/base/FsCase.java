@@ -1,5 +1,6 @@
 package xyz.srclab.common.base;
 
+import xyz.srclab.annotations.Immutable;
 import xyz.srclab.common.collect.FsCollect;
 
 import java.util.Collections;
@@ -71,6 +72,7 @@ public interface FsCase {
      *
      * @param chars given chars
      */
+    @Immutable
     List<CharSequence> split(CharSequence chars);
 
     /**

@@ -1,7 +1,7 @@
 package xyz.srclab.common.net.udp;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.io.FsIO;
 import xyz.srclab.common.net.FsNetException;
 

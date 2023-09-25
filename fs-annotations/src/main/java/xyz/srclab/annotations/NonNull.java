@@ -4,6 +4,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 
+/**
+ * Declares the annotated element must not be null.
+ *
+ * @author fredsuvn
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Nonnull

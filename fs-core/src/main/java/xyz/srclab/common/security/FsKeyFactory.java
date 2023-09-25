@@ -1,6 +1,7 @@
 package xyz.srclab.common.security;
 
 import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotations.ThreadSafe;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -14,6 +15,7 @@ import java.security.spec.KeySpec;
  * @author fredsuvn
  * @see KeyFactory
  */
+@ThreadSafe
 public interface FsKeyFactory extends SecurityAlgorithm {
 
     /**

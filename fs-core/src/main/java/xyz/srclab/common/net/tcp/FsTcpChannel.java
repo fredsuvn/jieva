@@ -1,7 +1,7 @@
 package xyz.srclab.common.net.tcp;
 
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotations.ThreadSafe;
 import xyz.srclab.common.data.FsData;
 
 import java.io.InputStream;
