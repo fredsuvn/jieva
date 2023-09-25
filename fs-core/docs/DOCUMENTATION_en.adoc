@@ -1,0 +1,165 @@
+= image:../../logo.svg[Fs Core] `fs-core`: Fs Core -- Core interfaces and classes of Fs
+:toc:
+:toclevels: 3
+:toc-title:
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+
+Fs Core provides core interfaces and classes of Fs, including:
+
+* *<<base>>*: base package, provides base functional interfaces and utilities;
+* *<<collect>>*: collection package, provides interfaces and utilities for collection operations;
+* *<<bean>>*: provides interfaces and utilities for bean operations;
+* *<<cache>>*: provides interfaces and utilities for cache operations;
+* *<<convert>>*: provides interfaces and utilities for conversion operations;
+* *<<data>>*: provides interfaces and utilities for data operations;
+* *<<encode>>*: provides interfaces and utilities for encoding/decoding;
+* *<<io>>*: provides interfaces and utilities for IO operations;
+* *<<net>>*: provides interfaces and utilities for network operations (TCP/UDP/HTTP);
+* *<<protobuf>>*: expansion package for link:https://github.com/protocolbuffers/protobuf[protobuf];
+* *<<proxy>>*: proxy with spring-cglib or cglib or JDK;
+* *<<reflect>>*: provides interfaces and utilities for reflection;
+* *<<security>>*: provides interfaces and utilities for Crypto/Cipher/MAC/Digest/Sign/Key;
+
+== Functions
+
+[[base]]
+=== base
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[collect]]
+=== Collection
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[bean]]
+=== Bean
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[cache]]
+=== Cache
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[convert]]
+=== Conversion
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[data]]
+=== Data
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[encode]]
+=== Encoding/Decoding
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[io]]
+=== IO
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[net]]
+=== Network
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[protobuf]]
+=== Protobuf Expansion
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[proxy]]
+=== Proxy
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[reflect]]
+=== Reflection
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+[[security]]
+=== Security
+
+Provides base interfaces and utilities.
+
+[source,java]
+----
+include::../src/test/java/samples/BaseSamples.java[]
+----
+
+== Benchmark
+
+[[copyProperties]]
+=== Copy Properties
+
+----
+include::../src/test/java/benchmark/CopyProperties.txt[]
+----

@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit;
  * @author fredsuvn
  */
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 1)
-@Measurement(iterations = 3, time = 1)
+@Warmup(iterations = 1, time = 1)
+@Measurement(iterations = 1, time = 1)
 @Threads(1)
 @Fork(1)
 @State(value = Scope.Benchmark)
@@ -36,7 +36,10 @@ public class CopyPropertiesBenchmark {
      * CopyPropertiesBenchmark.springCopy  thrpt    3   276.925 ±  2.676  ops/ms
      */
     public static void main(String[] args) throws Exception {
-        Options options = new OptionsBuilder().include(CopyPropertiesBenchmark.class.getSimpleName()).build();
+        Options options = new OptionsBuilder()
+            .include(CopyPropertiesBenchmark.class.getSimpleName())
+            .output(BenchmarkUtils.OUTPUT_DIR + "CopyProperties.txt")
+            .build();
         new Runner(options).run();
     }
 
@@ -46,12 +49,12 @@ public class CopyPropertiesBenchmark {
 
     @Benchmark
     public void springCopy() {
-        org.springframework.beans.BeanUtils.copyProperties(bean, new Bean(), "s1", "i1","l1");
+        org.springframework.beans.BeanUtils.copyProperties(bean, new Bean(), "s1", "i1", "l1");
     }
 
     @Benchmark
     public void hutoolCopy() {
-        BeanUtil.copyProperties(bean, new Bean(), "s1", "i1","l1");
+        BeanUtil.copyProperties(bean, new Bean(), "s1", "i1", "l1");
     }
 
     @Benchmark
@@ -61,7 +64,7 @@ public class CopyPropertiesBenchmark {
 
     @Benchmark
     public void fsCopy() {
-        Fs.copyProperties(bean, new Bean(), "s1", "i1","l1");
+        Fs.copyProperties(bean, new Bean(), "s1", "i1", "l1");
     }
 
     @Data
