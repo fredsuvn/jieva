@@ -10,19 +10,19 @@
 //  }
 //}
 
-rootProject.name = 'boat-build'
+rootProject.name = 'fs-build'
 
 //boat:
 include ":boat"
-file("${rootDir}/").eachDirMatch(~/boat-(?!plugins).*/) { dir ->
-  include ":${dir.name}"
-}
+//file("${rootDir}/").eachDirMatch(~/boat-(?!plugins).*/) { dir ->
+//  include ":${dir.name}"
+//}
 file("${rootDir}/").eachDirMatch(~/fs-(?!plugins).*/) { dir ->
   include ":${dir.name}"
 }
 //plugins:
-file("${rootDir}/boat-plugins").eachDirMatch(~/boat-.*/) { dir ->
-  include ":boat-plugins:${dir.name}"
-}
+//file("${rootDir}/boat-plugins").eachDirMatch(~/boat-.*/) { dir ->
+//  include ":boat-plugins:${dir.name}"
+//}
 //processor
 //include ":fs-processor"

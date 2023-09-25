@@ -17,19 +17,19 @@ Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, �
 
 Boat 包括:
 
-* link:../boat-annotations/DOCUMENTATION.md[boat-annotations]: 核心注解;
+* link:../fs-annotations/DOCUMENTATION.md[boat-annotations]: 核心注解;
 * link:../boat-core/DOCUMENTATION.md[boat-core]: 核心库;
 * link:../boat-data/DOCUMENTATION.md[boat-data]: 序列化和反序列化核心库 (支持 `JSON`);
 * link:../boat-codec/DOCUMENTATION.md[boat-codec]: 编码核心库 (支持 `HEX`, `BASE64`, `SHA`, `MD`, `HMAC`, `AES`, `RSA`, `SM2` 等);
 * link:../boat-id/DOCUMENTATION.md[boat-id]: 快速ID生成框架;
 * link:../boat-plugins/DOCUMENTATION.md[boat-others]: 第三方支持和扩展库 (如 `protobuf`);
 
-* link:../boat-test/[boat-test]: 测试库的依赖管理工程;
-* link:../boat-bom/[boat-bom]: BOM (gradle platform) project;
+* link:../fs-test/[boat-test]: 测试库的依赖管理工程;
+* link:../fs-bom/[boat-bom]: BOM (gradle platform) project;
 
 如果你需要一次性导入常用库 (`annotations`, `core`, `codec`, `data` and `id`), 只需要导入:
 
-* link:../boat/[boat].
+* link:../fs/[boat].
 
 == 获取
 
@@ -83,14 +83,14 @@ api implementation("xyz.srclab.common:boat-bom:{boat-version}")
 === Boat Annotations
 
 * AsciiDoc:
-** link:../boat-annotations/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-annotations/docs/DOCUMENTATION_zh.adoc[简体中文]
+** link:../fs-annotations/docs/DOCUMENTATION_en.adoc[English]
+** link:../fs-annotations/docs/DOCUMENTATION_zh.adoc[简体中文]
 * Markdown:
-** link:../boat-annotations/docs/DOCUMENTATION_en.md[English]
-** link:../boat-annotations/docs/DOCUMENTATION_zh.md[简体中文]
+** link:../fs-annotations/docs/DOCUMENTATION_en.md[English]
+** link:../fs-annotations/docs/DOCUMENTATION_zh.md[简体中文]
 * HTML:
-** link:../boat-annotations/docs/DOCUMENTATION_en.html[English]
-** link:../boat-annotations/docs/DOCUMENTATION_zh.html[简体中文]
+** link:../fs-annotations/docs/DOCUMENTATION_en.html[English]
+** link:../fs-annotations/docs/DOCUMENTATION_zh.html[简体中文]
 
 === Boat Core
 
