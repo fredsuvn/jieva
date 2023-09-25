@@ -26,9 +26,12 @@ Fs Core provides core interfaces and classes of Fs, including:
 == Functions
 
 [[base]]
-=== base
+=== Base package
 
-Provides base interfaces and utilities.
+Provides base utilities:
+
+* Fs: utilities for Object, thread, process,
+* FsArray:
 
 [source,java]
 ----

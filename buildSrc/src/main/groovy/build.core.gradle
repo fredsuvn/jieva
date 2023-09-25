@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
+  id 'build-utils'
   id 'build.repositories'
 }
 
@@ -96,3 +97,5 @@ class Printer {
 }
 
 ext["printer"] = new Printer(localProject)
+
+bu.hello()
