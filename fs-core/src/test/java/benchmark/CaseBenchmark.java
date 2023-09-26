@@ -5,7 +5,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import xyz.srclab.common.base.FsCase;
+import xyz.fsgik.common.base.FsCase;
 
 import java.util.concurrent.TimeUnit;
 

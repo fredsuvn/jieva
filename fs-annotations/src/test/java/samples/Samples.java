@@ -1,9 +1,9 @@
 package samples;
 
-import xyz.srclab.annotations.DefaultNonNull;
-import xyz.srclab.annotations.DefaultNullable;
-import xyz.srclab.annotations.NonNull;
-import xyz.srclab.annotations.Nullable;
+import xyz.fsgik.annotations.DefaultNonNull;
+import xyz.fsgik.annotations.DefaultNullable;
+import xyz.fsgik.annotations.NonNull;
+import xyz.fsgik.annotations.Nullable;
 
 public class Samples {
 

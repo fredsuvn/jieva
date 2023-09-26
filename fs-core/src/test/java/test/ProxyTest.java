@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.proxy.FsProxy;
+import xyz.fsgik.common.proxy.FsProxy;
 
 public class ProxyTest {
 
@@ -42,6 +42,16 @@ public class ProxyTest {
         System.out.println(fooProxy.newInstance().getClass());
     }
 
+    public interface FooInter1 {
+
+        String foo1(String input);
+    }
+
+    public interface FooInter2 {
+
+        String foo2(String input);
+    }
+
     public static class FooClass {
 
         public String foo0(String input) {
@@ -51,15 +61,5 @@ public class ProxyTest {
         public String bar0(String input) {
             return input;
         }
-    }
-
-    public interface FooInter1 {
-
-        String foo1(String input);
-    }
-
-    public interface FooInter2 {
-
-        String foo2(String input);
     }
 }

@@ -4,7 +4,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import xyz.srclab.common.reflect.FsInvoker;
+import xyz.fsgik.common.reflect.FsInvoker;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;

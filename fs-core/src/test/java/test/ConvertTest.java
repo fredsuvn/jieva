@@ -6,10 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.convert.FsConverter;
-import xyz.srclab.common.reflect.TypeRef;
+import xyz.fsgik.annotations.Nullable;
+import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.convert.FsConverter;
+import xyz.fsgik.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
@@ -282,6 +282,16 @@ public class ConvertTest {
             handler.convert("4", String.class, Integer.class, FsConverter.defaultConverter()), Fs.BREAK);
     }
 
+    public enum E1 {
+        E1, E2, E3,
+        ;
+    }
+
+    public enum E2 {
+        E1, E2, E3,
+        ;
+    }
+
     @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
@@ -300,15 +310,5 @@ public class ConvertTest {
         public T2(String value) {
             super(value);
         }
-    }
-
-    public enum E1 {
-        E1, E2, E3,
-        ;
-    }
-
-    public enum E2 {
-        E1, E2, E3,
-        ;
     }
 }

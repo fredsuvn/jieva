@@ -2,11 +2,11 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.base.FsSystem;
-import xyz.srclab.common.io.FsIO;
+import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsSystem;
+import xyz.fsgik.common.io.FsIO;
 
 import java.io.IOException;
 import java.net.URL;
@@ -146,6 +146,10 @@ public class FsTest {
         Assert.expectThrows(IllegalArgumentException.class, () -> Fs.findEnum(Fs.class, "a", true));
     }
 
+    public enum Te {
+        A, B, C
+    }
+
     private static final class T1 {
         public static void invoke1() {
             T2.invoke2();
@@ -170,9 +174,5 @@ public class FsTest {
             Assert.assertEquals(element3.getClassName(), T2.class.getName());
             Assert.assertEquals(element3.getMethodName(), "invoke2");
         }
-    }
-
-    public enum Te {
-        A, B, C
     }
 }

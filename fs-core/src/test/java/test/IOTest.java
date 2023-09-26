@@ -2,8 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.io.FsIO;
+import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.io.FsIO;
 
 import java.io.*;
 import java.nio.ByteBuffer;

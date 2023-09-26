@@ -7,7 +7,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import xyz.srclab.common.cache.FsCache;
+import xyz.fsgik.common.cache.FsCache;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

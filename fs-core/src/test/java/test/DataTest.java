@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.data.FsData;
-import xyz.srclab.common.io.FsIO;
+import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.data.FsData;
+import xyz.fsgik.common.io.FsIO;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,25 +15,6 @@ import java.util.function.Supplier;
 public class DataTest {
 
     private static final String DATA = TestUtil.buildRandomString(256, 256);
-
-    @Test
-    public void testData() {
-        byte[] bytes = DATA.getBytes(FsString.CHARSET);
-        FsData fromBytes = FsData.wrap(bytes);
-        testData(bytes, () -> fromBytes);
-        testData(bytes, () -> FsData.wrap(ByteBuffer.wrap(bytes)));
-        testData(bytes, () -> FsData.from(new ByteArrayInputStream(bytes)));
-        testData(bytes, () -> FsData.from(() -> Arrays.copyOf(bytes, bytes.length)));
-    }
-
-    @Test
-    public void testMisc() {
-        byte[] bytes = DATA.getBytes(FsString.CHARSET);
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        FsData fromBuffer = FsData.wrap(buffer);
-        testWriteBuffer(fromBuffer, bytes);
-        Assert.assertEquals(buffer.position(), 88);
-    }
 
     public static void testData(byte[] bytes, Supplier<FsData> supplier) {
         testArray(supplier.get(), bytes);
@@ -75,5 +56,24 @@ public class DataTest {
         long size = data.write(dest);
         Assert.assertEquals(dest.toByteArray(), bytes);
         Assert.assertEquals(size, bytes.length);
+    }
+
+    @Test
+    public void testData() {
+        byte[] bytes = DATA.getBytes(FsString.CHARSET);
+        FsData fromBytes = FsData.wrap(bytes);
+        testData(bytes, () -> fromBytes);
+        testData(bytes, () -> FsData.wrap(ByteBuffer.wrap(bytes)));
+        testData(bytes, () -> FsData.from(new ByteArrayInputStream(bytes)));
+        testData(bytes, () -> FsData.from(() -> Arrays.copyOf(bytes, bytes.length)));
+    }
+
+    @Test
+    public void testMisc() {
+        byte[] bytes = DATA.getBytes(FsString.CHARSET);
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        FsData fromBuffer = FsData.wrap(buffer);
+        testWriteBuffer(fromBuffer, bytes);
+        Assert.assertEquals(buffer.position(), 88);
     }
 }

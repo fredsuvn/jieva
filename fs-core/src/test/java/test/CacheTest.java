@@ -2,10 +2,10 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.base.ref.FsRef;
-import xyz.srclab.common.base.ref.IntRef;
-import xyz.srclab.common.cache.FsCache;
+import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.base.ref.FsRef;
+import xyz.fsgik.common.base.ref.IntRef;
+import xyz.fsgik.common.cache.FsCache;
 
 public class CacheTest {
 

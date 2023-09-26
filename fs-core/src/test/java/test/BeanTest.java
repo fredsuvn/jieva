@@ -6,17 +6,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.bean.FsBean;
-import xyz.srclab.common.bean.FsBeanCopier;
-import xyz.srclab.common.bean.FsBeanProperty;
-import xyz.srclab.common.bean.FsBeanResolver;
-import xyz.srclab.common.bean.handlers.JavaBeanResolveHandler;
-import xyz.srclab.common.bean.handlers.RecordBeanResolveHandler;
-import xyz.srclab.common.convert.FsConverter;
-import xyz.srclab.common.reflect.TypeRef;
+import xyz.fsgik.annotations.Nullable;
+import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.bean.FsBean;
+import xyz.fsgik.common.bean.FsBeanCopier;
+import xyz.fsgik.common.bean.FsBeanProperty;
+import xyz.fsgik.common.bean.FsBeanResolver;
+import xyz.fsgik.common.bean.handlers.JavaBeanResolveHandler;
+import xyz.fsgik.common.bean.handlers.RecordBeanResolveHandler;
+import xyz.fsgik.common.convert.FsConverter;
+import xyz.fsgik.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Type;
@@ -375,6 +375,37 @@ public class BeanTest {
         Assert.assertEquals(x[0], 1);
     }
 
+    public enum E1 {
+        E1, E2, E3,
+        ;
+    }
+
+    public enum E2 {
+        E1, E2, E3,
+        ;
+    }
+
+    public interface I2<T> {
+
+        T getI2();
+
+        void setI2(T t);
+    }
+
+    public interface I1 {
+
+        String getI1();
+
+        void setI1(String i1);
+    }
+
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherited
+    public @interface Ann {
+        String value();
+    }
+
     @EqualsAndHashCode(callSuper = true)
     @Data
     public static class Cc<T> extends C2<Long> implements I1, I2<Integer> {
@@ -416,27 +447,6 @@ public class BeanTest {
     @Data
     public static class C1 {
         private String c1;
-    }
-
-    public interface I2<T> {
-
-        T getI2();
-
-        void setI2(T t);
-    }
-
-    public interface I1 {
-
-        String getI1();
-
-        void setI1(String i1);
-    }
-
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-    @Inherited
-    public @interface Ann {
-        String value();
     }
 
     @Data
@@ -509,15 +519,5 @@ public class BeanTest {
         public String setBbb(String bbb) {
             return null;
         }
-    }
-
-    public enum E1 {
-        E1, E2, E3,
-        ;
-    }
-
-    public enum E2 {
-        E1, E2, E3,
-        ;
     }
 }

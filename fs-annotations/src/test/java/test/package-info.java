@@ -1,4 +1,4 @@
 @DefaultNonNull
 package test;
 
-import xyz.srclab.annotations.DefaultNonNull;
+import xyz.fsgik.annotations.DefaultNonNull;
