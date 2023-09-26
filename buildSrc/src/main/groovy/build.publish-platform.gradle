@@ -6,7 +6,7 @@ plugins {
 
 project.afterEvaluate {
 
-  printer.info("${project.name}: import build.publish-platform")
+  fs.info("${project.name}: import build.publish-platform")
 
   if (configs.publish.enablePublish) {
     publishing {

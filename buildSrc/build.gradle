@@ -16,11 +16,11 @@ dependencies {
   implementation "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
 }
 
-gradlePlugin  {
+gradlePlugin {
   plugins {
-    buildUtils {
-      id = 'build-utils'
-      implementationClass = 'build.BuildUtils'
+    fsBuild {
+      id = 'fs-build'
+      implementationClass = 'xyz.fsgik.build.FsBuild'
     }
   }
 }

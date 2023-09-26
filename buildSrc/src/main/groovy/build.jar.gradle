@@ -4,7 +4,7 @@ plugins {
 
 project.afterEvaluate {
 
-  printer.info("${project.name}: import build.jar")
+  fs.info("${project.name}: import build.jar")
 
   test {
     useTestNG()

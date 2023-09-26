@@ -4,6 +4,6 @@ plugins {
 
 project.afterEvaluate {
 
-  printer.info("${project.name}: import build.platform")
+  fs.info("${project.name}: import build.platform")
 
 }

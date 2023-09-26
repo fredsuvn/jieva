@@ -7,7 +7,7 @@ plugins {
 //asciidoc -> html
 task(group: "asciidoc", "convertAsciidocToHtml") {
   doLast {
-    convertFiles("adoc", "html", rootProject, printer) { from, to ->
+    convertFiles("adoc", "html", rootProject, fs) { from, to ->
       return "$asciidoctorBin -b html $from.path -o $to.path"
     }
   }
@@ -16,7 +16,7 @@ task(group: "asciidoc", "convertAsciidocToHtml") {
 //asciidoc -> docbook
 task(group: "asciidoc", "convertAsciidocToDocBook") {
   doLast {
-    convertFiles("adoc", "xml", rootProject, printer) { from, to ->
+    convertFiles("adoc", "xml", rootProject, fs) { from, to ->
       return "$asciidoctorBin -b docbook $from.path -o $to.path"
     }
   }
@@ -25,7 +25,7 @@ task(group: "asciidoc", "convertAsciidocToDocBook") {
 //html -> markdown
 task(group: "asciidoc", "convertHtmlToMarkdown") {
   doLast {
-    convertFiles("html", "md", rootProject, printer) { from, to ->
+    convertFiles("html", "md", rootProject, fs) { from, to ->
       return "$pandocBin -s -f html -t markdown_strict $from.path -o $to.path"
     }
   }
@@ -52,49 +52,49 @@ task(group: "asciidoc", "convertAsciidocToMarkdown") {
     for (action in convertAsciidocToHtmlMarkdown.actions) {
       action.execute(convertAsciidocToHtmlMarkdown)
     }
-    deleteFiles("html", rootProject, printer)
+    deleteFiles("html", rootProject, fs)
   }
 }
 
 private static void convertFiles(
-  String fromExtName, String toExtName, rootProject, printer, BiFunction<File, File, String> cmd) {
-  List<File> files = findFiles(fromExtName, rootProject, printer)
+  String fromExtName, String toExtName, rootProject, fs, BiFunction<File, File, String> cmd) {
+  List<File> files = findFiles(fromExtName, rootProject, fs)
   files.forEach {
     File toFile = new File("${it.path.substring(0, it.path.length() - (fromExtName.length() + 1))}.$toExtName")
     String cmdString = cmd.apply(it, toFile)
-    printer.info("Execute $cmdString")
+    fs.info("Execute $cmdString")
     def errorBuilder = new StringBuilder()
     def cmdProcess = cmdString.execute()
     cmdProcess.consumeProcessErrorStream(errorBuilder)
     cmdProcess.waitFor()
     def error = errorBuilder.toString()
     if (!error.isEmpty()) {
-      printer.info("Execution error: $error")
+      fs.info("Execution error: $error")
       return
     }
-    printer.info("Execution successful")
+    fs.info("Execution successful")
   }
 }
 
-private static void deleteFiles(String extName, rootProject, printer) {
-  List<File> files = findFiles(extName, rootProject, printer)
+private static void deleteFiles(String extName, rootProject, fs) {
+  List<File> files = findFiles(extName, rootProject, fs)
   files.forEach {
     try {
       if (it.delete()) {
-        printer.info("Delete file $it successful")
+        fs.info("Delete file $it successful")
       } else {
-        printer.info("Delete file $it failed")
+        fs.info("Delete file $it failed")
       }
     } catch (e) {
-      printer.info("Delete file $it failed, cause: $e")
+      fs.info("Delete file $it failed, cause: $e")
     }
   }
 }
 
-private static List<File> findFiles(String extName, rootProject, printer) {
+private static List<File> findFiles(String extName, rootProject, fs) {
   List<String> dirList = new LinkedList<>()
   if (!rootProject.hasProperty("convertAsciidocDirs")) {
-    printer.info("Property convertAsciidocDirs not found, use default path: docs")
+    fs.info("Property convertAsciidocDirs not found, use default path: docs")
     dirList.add("docs")
   } else {
     String convertAsciidocDirs = rootProject.getProperty("convertAsciidocDirs")
@@ -106,7 +106,7 @@ private static List<File> findFiles(String extName, rootProject, printer) {
   for (dir in dirList) {
     def dirFile = new File("${rootProject.rootDir.path}${File.separator}${dir}")
     if (!dirFile.exists()) {
-      printer.info("Asciidoc path not found and skipped: $dirFile")
+      fs.info("Asciidoc path not found and skipped: $dirFile")
     }
     for (htmlFile in dirFile.listFiles(new FilenameFilter() {
       @Override

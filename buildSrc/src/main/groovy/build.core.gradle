@@ -5,8 +5,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-  id 'build-utils'
-  id 'build.repositories'
+  id 'fs-build'
 }
 
 final ThreadLocal<Project> localProject = ThreadLocal.withInitial { project }
@@ -65,37 +64,3 @@ ext["utils"] = [
   readFileAsString          : this.&readFileAsString,
   writeBuildInfos           : this.&writeBuildInfos,
 ]
-
-class Printer {
-
-  private final ThreadLocal<Project> localProject
-  private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
-
-  Printer(ThreadLocal<Project> localProject) {
-    this.localProject = localProject
-  }
-
-  def info(message) {
-    int logLevel = localProject.get().configs.logLevel
-    if (logLevel > 100) {
-      return
-    }
-    out("info: $message")
-  }
-
-  def debug(message) {
-    int logLevel = localProject.get().configs.logLevel
-    if (logLevel > 50) {
-      return
-    }
-    out("debug: $message")
-  }
-
-  private void out(String message) {
-    println(">> ${LocalDateTime.now().format(dateTimeFormatter)} $message")
-  }
-}
-
-ext["printer"] = new Printer(localProject)
-
-bu.hello()

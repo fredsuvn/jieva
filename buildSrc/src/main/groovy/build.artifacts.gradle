@@ -5,7 +5,7 @@ plugins {
 
 project.afterEvaluate {
 
-  printer.info("${project.name}: import build.artifacts")
+  fs.info("${project.name}: import build.artifacts")
 
   task sourceJar(type: Jar) {
     classifier "sources"

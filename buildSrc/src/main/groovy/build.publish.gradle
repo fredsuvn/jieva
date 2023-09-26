@@ -34,8 +34,8 @@ def configurePublishMavenPom(MavenPublication maven) {
         }
       }
     }
-    printer.debug("maven-pom.name: ${name.get()}")
-    printer.debug("maven-pom.description: ${description.get()}")
+    fs.debug("maven-pom.name: ${name.get()}")
+    fs.debug("maven-pom.description: ${description.get()}")
   }
 }
 
@@ -44,26 +44,26 @@ def configurePublishRepositories(RepositoryHandler repositories) {
     repositories.maven {
       name = configs.publish.snapshotId
       url = configs.publish.urls.snapshot
-      printer.debug("snapshot.name: $name")
-      printer.debug("snapshot.url: $url")
+      fs.debug("snapshot.name: $name")
+      fs.debug("snapshot.url: $url")
       credentials {
         username = getProperty("publish${name.capitalize()}Username")
         password = getProperty("publish${name.capitalize()}Password")
-        printer.debug("snapshot.username: $username")
-        printer.debug("snapshot.password: $password")
+        fs.debug("snapshot.username: $username")
+        fs.debug("snapshot.password: $password")
       }
     }
   } else {
     repositories.maven {
       name = configs.publish.releaseId
       url = configs.publish.urls.release
-      printer.debug("release.name: $name")
-      printer.debug("release.url: $url")
+      fs.debug("release.name: $name")
+      fs.debug("release.url: $url")
       credentials {
         username = getProperty("publish${name.capitalize()}Username")
         password = getProperty("publish${name.capitalize()}Password")
-        printer.debug("release.username: $username")
-        printer.debug("release.password: $password")
+        fs.debug("release.username: $username")
+        fs.debug("release.password: $password")
       }
     }
   }
@@ -75,9 +75,9 @@ def configureSigning() {
     def signingKeyId = getProperty("signing${signingName.capitalize()}KeyId")
     def signingPassword = getProperty("signing${signingName.capitalize()}Password")
     def signingKey = utils.readFileAsString(getProperty("signing${signingName.capitalize()}KeyFile"), "UTF-8")
-    printer.debug("signing.signingKeyId: $signingKeyId")
-    printer.debug("signing.signingPassword: $signingPassword")
-    printer.debug("signing.signingKey: $signingKey")
+    fs.debug("signing.signingKeyId: $signingKeyId")
+    fs.debug("signing.signingPassword: $signingPassword")
+    fs.debug("signing.signingKey: $signingKey")
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
   }
 }

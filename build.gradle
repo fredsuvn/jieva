@@ -7,7 +7,7 @@ initConfigs()
 
 description = "Build for Boat projects"
 
-printer.info("Build $project.name")
+fs.info("Build $project.name")
 
 allprojects { p ->
   initProjectConfigure(p)
@@ -22,9 +22,9 @@ def initProjectConfigure(p) {
   p.group = configs.group
   p.version = configs.publish.isSnapshot ? "${configs.version}-SNAPSHOT" : configs.version
   if (p == rootProject) {
-    printer.info("Configure project ${p.group}:${p.name}:${p.version} (root)")
+    fs.info("Configure project ${p.group}:${p.name}:${p.version} (root)")
   } else {
-    printer.info("Configure project ${p.group}:${p.name}:${p.version}")
+    fs.info("Configure project ${p.group}:${p.name}:${p.version}")
   }
 }
 
