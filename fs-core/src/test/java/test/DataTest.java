@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.FsString;
-import xyz.fsgik.common.data.FsData;
-import xyz.fsgik.common.io.FsIO;
+import xyz.fs404.common.base.FsString;
+import xyz.fs404.common.data.FsData;
+import xyz.fs404.common.io.FsIO;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,4 +1,4 @@
 @DefaultNonNull
 package test;
 
-import xyz.fsgik.annotations.DefaultNonNull;
+import xyz.fs404.annotations.DefaultNonNull;

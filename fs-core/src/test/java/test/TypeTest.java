@@ -2,12 +2,12 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsLogger;
-import xyz.fsgik.common.base.obj.FsObj;
-import xyz.fsgik.common.collect.FsCollect;
-import xyz.fsgik.common.reflect.FsType;
-import xyz.fsgik.common.reflect.TypeRef;
+import xyz.fs404.common.base.Fs;
+import xyz.fs404.common.base.FsLogger;
+import xyz.fs404.common.base.obj.FsObj;
+import xyz.fs404.common.collect.FsCollect;
+import xyz.fs404.common.reflect.FsType;
+import xyz.fs404.common.reflect.TypeRef;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -48,10 +48,10 @@ public class TypeTest {
     @Test
     public void testFsObj() {
         Assert.assertEquals(
-            FsObj.wrap(null, new         class OT<OTP extends Float> {
+            FsObj.wrap(null, new class OT<OTP extends Float> {
         }),
-            FsObj.wrap(null, new TypeRef<List<?>>() {
-            })
+        FsObj.wrap(null, new TypeRef<List<?>>() {
+        })
         );
         FsObj<?> cType = FsObj.wrap(null, String.class);
         Assert.assertEquals(
@@ -59,11 +59,11 @@ public class TypeTest {
             String.class
         );
         FsObj<?> pType = FsObj.wrap(null, new TypeRef<List<?>>() {
-            }.getType());
+        }.getType());
         Assert.assertEquals(
             pType.toParameterizedObj().getType(),
             new TypeRef<Map<String, Integer>>() {
-        }.getType()
+            }.getType()
         );
         Assert.assertEquals(
             pType.toParameterizedObj().getActualTypeArgument(0),
@@ -90,19 +90,19 @@ public class TypeTest {
             Integer.class
         );
         FsObj<?> gType = FsObj.wrap(null, new TypeRef<Map<String, Integer>>() {
-            }.getType());
+        }.getType());
         Assert.assertEquals(
             gType.toGenericArrayObj().getType(),
             new TypeRef<Map<String, Integer>[]>() {
-        }.getType()
+            }.getType()
         );
         Assert.assertEquals(
             gType.toGenericArrayObj().getType().getGenericComponentType(),
             new TypeRef<Map<String, Integer>[]>() {
             }.getType()
         );
-TypeRef<Map<String, Integer>>() {
-            }
+        TypeRef<Map<String, Integer>> () {
+        }
         FsObj<?> tType = FsObj.wrap(null, OT.class.getTypeParameters()[0]);
         Assert.assertEquals(
             tType.toTypeVariableObj().getType(),
@@ -218,7 +218,7 @@ TypeRef<Map<String, Integer>>() {
         Assert.assertFalse(FsType.isAssignableFrom(int.class, Double.class));
 
         Assert.assertTrue(FsType.isAssignableFrom(
-            new         class TAF<
+            new class TAF<
             F1,
             F2 extends F1,
             F3 extends CharSequence,
@@ -377,8 +377,8 @@ TypeRef<Map<String, Integer>>() {
             Object[].class,
             Object[][].class
         ));
-TypeRef<Map<String, String>[]>() {
-            }
+        TypeRef<Map<String, String>[]> () {
+        }
         TypeVariable<?>[] tvs = TAF.class.getTypeParameters();
         Assert.assertTrue(FsType.isAssignableFrom(
             tvs[0],

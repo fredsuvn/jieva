@@ -2,8 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.FsLogger;
-import xyz.fsgik.common.reflect.FsInvoker;
+import xyz.fs404.common.base.FsLogger;
+import xyz.fs404.common.reflect.FsInvoker;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

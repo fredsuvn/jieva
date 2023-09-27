@@ -6,10 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.convert.FsConverter;
-import xyz.fsgik.common.reflect.TypeRef;
+import xyz.fs404.annotations.Nullable;
+import xyz.fs404.common.base.Fs;
+import xyz.fs404.common.convert.FsConverter;
+import xyz.fs404.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
