@@ -20,7 +20,7 @@ gradlePlugin {
   plugins {
     fsBuild {
       id = 'fs-build'
-      implementationClass = 'xyz.fsgik.build.FsBuild'
+      implementationClass = 'xyz.fs404.build.FsBuild'
     }
   }
 }

@@ -1,11 +1,32 @@
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 plugins {
   id 'fs-build'
+}
+
+project.repositories {
+  mavenLocal()
+  maven {
+    url "https://maven.aliyun.com/repository/central"
+  }
+  maven {
+    url "https://maven.aliyun.com/repository/public"
+  }
+  mavenCentral()
+  //jcenter()
+}
+
+//def l = kotlinVersion
+//
+//fs {
+//  logLevel = findProject("buildLogLevel")
+//}
+project.afterEvaluate {
+  fs {
+    logLevel = buildLogLevel
+  }
 }
 
 final ThreadLocal<Project> localProject = ThreadLocal.withInitial { project }
