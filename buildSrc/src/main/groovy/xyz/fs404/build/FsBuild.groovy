@@ -1,25 +1,17 @@
 package xyz.fs404.build
 
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class FsBuild implements Plugin<Project> {
+class FsBuild extends AbstractBuild {
 
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
-  private int _logLevel = 5
-  private String _logLevelName = "INFO"
+  private int logLevelValue = 3
 
   @Override
-  void apply(Project project) {
-    project.extensions.add('fs', this)
-  }
-
-  void fs(Closure<?> closure) {
-    closure()
+  String getClosureName() {
+    return "fs"
   }
 
   void debug(Object... messages) {
@@ -27,19 +19,26 @@ class FsBuild implements Plugin<Project> {
   }
 
   void info(Object... messages) {
+    log(3, System.out, messages)
+  }
+
+  void warn(Object... messages) {
     log(5, System.out, messages)
   }
 
   void error(Object... messages) {
-    log(9, System.err, messages)
+    log(7, System.err, messages)
   }
 
   private void log(int level, PrintStream out, Object... messages) {
-    if (_logLevel > level) {
+    initConfiguration("logLevel")
+    if (logLevelValue > level) {
       return;
     }
     out.print("fs-build >> ")
-    out.print("[" + FORMATTER.format(LocalDateTime.now()) + "][${toLevelInt(this._logLevel)}]: ")
+    String prefix = "[" + FORMATTER.format(LocalDateTime.now()) + "] [${levelValueToName(level)}]";
+    out.print(String.format("%-33s", prefix))
+    out.print(": ")
     if (messages != null && messages.length > 0) {
       for (final def msg in messages) {
         out.print(String.valueOf(msg))
@@ -48,30 +47,30 @@ class FsBuild implements Plugin<Project> {
     out.println()
   }
 
-  private String toLevelInt(int level) {
-    switch (level) {
+  void setLogLevel(String levelName) {
+    this.logLevelValue = levelNameToValue(levelName)
+    afterConfiguration("logLevel")
+  }
+
+  private static String levelValueToName(int levelValue) {
+    switch (levelValue) {
       case 1: return "DEBUG"
-      case 5: return "INFO"
-      case 9: return "ERROR"
+      case 3: return "INFO"
+      case 5: return "WARN"
+      case 7: return "ERROR"
     }
     return "INFO"
   }
 
-  void setLogLevel(String level) {
-    switch (level) {
-      case "DEBUG":
-        this._logLevel = 1
-        break
-      case "INFO":
-        this._logLevel = 5
-        break
-      case "ERROR":
-        this._logLevel = 9
-        break
+  private static int levelNameToValue(String name) {
+    switch (name) {
+      case "DEBUG": return 1
+      case "INFO": return 3
+      case "WARN": return 5
+      case "ERROR": return 7
       default:
-        throw new IllegalStateException("Wrong config buildLogLevel: $level")
+        throw new IllegalStateException("Wrong config buildLogLevel: $name")
     }
-    this._logLevelName = level
   }
 }
 

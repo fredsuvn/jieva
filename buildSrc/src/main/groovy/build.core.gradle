@@ -18,17 +18,6 @@ project.repositories {
   //jcenter()
 }
 
-//def l = kotlinVersion
-//
-//fs {
-//  logLevel = findProject("buildLogLevel")
-//}
-project.afterEvaluate {
-  fs {
-    logLevel = buildLogLevel
-  }
-}
-
 final ThreadLocal<Project> localProject = ThreadLocal.withInitial { project }
 
 static boolean isEnable(Object value) {

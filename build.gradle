@@ -3,17 +3,33 @@ plugins {
   id 'build.asciidoc'
 }
 
+description = "Build for Fs projects"
+
+fs.info("Build configuration: $project.name")
+
+fs {
+  //do nothing
+}
+
+//repositories
+allprojects {
+  repositories {
+    mavenLocal()
+    maven {
+      url "https://maven.aliyun.com/repository/central"
+    }
+    maven {
+      url "https://maven.aliyun.com/repository/public"
+    }
+    mavenCentral()
+    //jcenter()
+  }
+}
+
 initConfigs()
-
-description = "Build for Boat projects"
-
-fs.info("Build $project.name")
 
 allprojects { p ->
   initProjectConfigure(p)
-}
-
-subprojects { p ->
 }
 
 def initProjectConfigure(p) {
@@ -32,23 +48,14 @@ def initProjectConfigure(p) {
 def initConfigs() {
   ext {
     configs = [
-
-      //50: debug
-      //100: info
-      logLevel     : 100,
-
       //Version
-      version      : "0.2.0",
-
+      version      : "0.0.0",
       //Group
-      group        : "xyz.srclab.common",
-
+      group        : "xyz.fs404.common",
       //Project url
       url          : "https://github.com/srclab-projects/boat",
-
       //Project inception year
       inceptionYear: "2020",
-
       //Licenses
       licenses     : [
         [
@@ -56,7 +63,6 @@ def initConfigs() {
           url : "https://www.apache.org/licenses/LICENSE-2.0.txt",
         ],
       ],
-
       //Developers
       developers   : [
         [
@@ -65,44 +71,29 @@ def initConfigs() {
           email: "fredsuvn@163.com",
           url  : "https://github.com/fredsuvn",
         ],
-        [
-          id             : "SrcLab",
-          name           : "SrcLab Team",
-          email          : "srclab@163.com",
-          organization   : "SrcLab",
-          organizationUrl: "https://github.com/srclab-projects",
-        ],
       ],
-
       //Publish info
       publish      : [
         //Whether publish
         enablePublish      : true,
-
         //Whether publish as snapshot
         isSnapshot         : false,
-
         /*
          * Whether publish to remote.
          * To enable publish to remote repository, you must configure publishXxxUsername for snapshotId and releaseId.
          */
         enablePublishRemote: false,
-
         //Snapshot id
         snapshotId         : "ossrh",
-
         //Release id
         releaseId          : "ossrh",
-
         /*
          * Whether signing.
          * To enable signing, you must configure signingXxxKeyId, signingXxxPassword and signingXxxKeyFile for signingId.
          */
         isSigning          : false,
-
         //Signing id
         signingId          : "gpg",
-
         //Publish urls
         urls               : [
           snapshot: "https://s01.oss.sonatype.org/content/repositories/snapshots",
@@ -112,3 +103,4 @@ def initConfigs() {
     ]
   }
 }
+
