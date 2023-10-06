@@ -1,9 +1,12 @@
-package test.protobuf;
+package test;
 
 import com.google.protobuf.ByteString;
 import lombok.EqualsAndHashCode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import test.protobuf.Data;
+import test.protobuf.Enum;
+import test.protobuf.Request;
 import xyz.fs404.common.bean.FsBean;
 import xyz.fs404.common.bean.FsBeanProperty;
 import xyz.fs404.common.bean.FsBeanResolver;

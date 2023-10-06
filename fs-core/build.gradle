@@ -88,9 +88,9 @@ sourceSets {
     proto {
       srcDirs = ["src/test/proto"]
     }
-    //java {
-    //    srcDirs += "$protoPath/test/java"
-    //}
+    java {
+        srcDirs += "$protoPath/test/java"
+    }
   }
 }
 
