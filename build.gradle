@@ -1,5 +1,5 @@
 plugins {
-  id 'build.core'
+  id 'fs'
   id 'build.asciidoc'
 }
 
@@ -49,7 +49,7 @@ def initConfigs() {
   ext {
     configs = [
       //Version
-      version      : "0.0.0",
+      version      : "3.3.3",
       //Group
       group        : "xyz.fs404.common",
       //Project url

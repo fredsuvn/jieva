@@ -1,13 +1,13 @@
-package xyz.fs404.build
+package xyz.fsgik.build
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-abstract class AbstractBuild implements Plugin<Project> {
+abstract class AbstractFsPlugin implements Plugin<Project> {
 
   protected Project project;
 
-  private final Set<String> setProperties = new HashSet<>()
+  private final Set<String> configurations = new HashSet<>()
 
   @Override
   void apply(Project project) {
@@ -15,23 +15,23 @@ abstract class AbstractBuild implements Plugin<Project> {
     project.extensions.add(getClosureName(), this)
   }
 
-  abstract String getClosureName()
+  protected abstract String getClosureName()
 
-  void initConfiguration(String... configs) {
+  protected void beforeConfiguration(String... configs) {
     for (final def config in configs) {
-      if (setProperties.contains(config)) {
+      if (configurations.contains(config)) {
         continue
       }
       String gradleConfigName = "fs" + config.capitalize()
       def gradleConfig = project.findProperty(gradleConfigName)
       if (gradleConfig != null) {
         this[config] = gradleConfig.toString()
-        afterConfiguration(config)
+        updateConfiguration(config)
       }
     }
   }
 
-  void afterConfiguration(String config) {
-    setProperties.add(config)
+  protected void updateConfiguration(String config) {
+    configurations.add(config)
   }
 }

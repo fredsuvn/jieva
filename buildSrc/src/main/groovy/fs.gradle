@@ -3,7 +3,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 plugins {
-  id 'fs-build'
+  id 'xyz.fsgik.build.fs'
 }
 
 project.repositories {

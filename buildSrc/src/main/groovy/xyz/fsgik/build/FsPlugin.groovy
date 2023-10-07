@@ -1,9 +1,9 @@
-package xyz.fs404.build
+package xyz.fsgik.build
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class FsBuild extends AbstractBuild {
+class FsPlugin extends AbstractFsPlugin {
 
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
@@ -31,7 +31,7 @@ class FsBuild extends AbstractBuild {
   }
 
   private void log(int level, PrintStream out, Object... messages) {
-    initConfiguration("logLevel")
+    beforeConfiguration("logLevel")
     if (logLevelValue > level) {
       return;
     }
@@ -49,7 +49,7 @@ class FsBuild extends AbstractBuild {
 
   void setLogLevel(String levelName) {
     this.logLevelValue = levelNameToValue(levelName)
-    afterConfiguration("logLevel")
+    updateConfiguration("logLevel")
   }
 
   private static String levelValueToName(int levelValue) {

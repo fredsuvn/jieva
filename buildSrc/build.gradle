@@ -18,9 +18,9 @@ dependencies {
 
 gradlePlugin {
   plugins {
-    fsBuild {
-      id = 'fs-build'
-      implementationClass = 'xyz.fs404.build.FsBuild'
+    fsPlugin {
+      id = 'xyz.fsgik.build.fs'
+      implementationClass = 'xyz.fsgik.build.FsPlugin'
     }
   }
 }

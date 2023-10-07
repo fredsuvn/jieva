@@ -1,4 +1,6 @@
 plugins {
+  id 'fs'
+  id 'java'
   id "com.google.protobuf" version "$protobufPluginVersion"
   id 'build.jar'
   id 'org.jetbrains.kotlin.plugin.lombok' version '1.7.0'
@@ -6,12 +8,6 @@ plugins {
 }
 
 description = "Core of mage."
-
-//fs {
-//  global {
-//    logLevel = fsLogLevel
-//  }
-//}
 
 java {
   registerFeature('optionalSupport') {
@@ -80,7 +76,7 @@ dependencies {
 //  dependsOn 'clean', 'compileJava'
 //}
 
-def generatedPath = "generated"
+def generatedPath = "$project.projectDir/generated"
 def protoPath = "$generatedPath/proto"
 
 sourceSets {
@@ -99,7 +95,7 @@ protobuf {
   protoc {
     // Download from repositories
     artifact = "com.google.protobuf:protoc:$protocVersion"
-    //generatedFilesBaseDir = "generated/proto"
+    generatedFilesBaseDir = "$protoPath"
   }
 
   plugins {
