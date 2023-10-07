@@ -1,7 +1,7 @@
 package test;
 
 import lombok.Data;
-import xyz.fs404.annotations.Nullable;
+import xyz.fsgik.annotations.Nullable;
 
 /**
  * @author sunqian

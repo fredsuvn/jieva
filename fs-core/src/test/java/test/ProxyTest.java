@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fs404.common.proxy.FsProxy;
+import xyz.fsgik.common.proxy.FsProxy;
 
 public class ProxyTest {
 

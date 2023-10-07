@@ -7,13 +7,13 @@ import org.testng.annotations.Test;
 import test.protobuf.Data;
 import test.protobuf.Enum;
 import test.protobuf.Request;
-import xyz.fs404.common.bean.FsBean;
-import xyz.fs404.common.bean.FsBeanProperty;
-import xyz.fs404.common.bean.FsBeanResolver;
-import xyz.fs404.common.collect.FsCollect;
-import xyz.fs404.common.convert.FsConverter;
-import xyz.fs404.common.protobuf.FsProtobuf;
-import xyz.fs404.common.reflect.TypeRef;
+import xyz.fsgik.common.bean.FsBean;
+import xyz.fsgik.common.bean.FsBeanProperty;
+import xyz.fsgik.common.bean.FsBeanResolver;
+import xyz.fsgik.common.collect.FsCollect;
+import xyz.fsgik.common.convert.FsConverter;
+import xyz.fsgik.common.protobuf.FsProtobuf;
+import xyz.fsgik.common.reflect.TypeRef;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -219,6 +219,10 @@ public class ProtobufTest {
         Assert.assertEquals(converter.convert(str, ByteString.class), bs);
     }
 
+    public enum EnumDto {
+        E1, E2;
+    }
+
     @lombok.Data
     @EqualsAndHashCode
     public static class DataDto {
@@ -252,9 +256,5 @@ public class ProtobufTest {
         private String code;
         private long message;
         private Data data;
-    }
-
-    public enum EnumDto {
-        E1, E2;
     }
 }

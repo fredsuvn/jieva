@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fs404.common.base.FsLogger;
-import xyz.fs404.common.base.ref.FsRef;
-import xyz.fs404.common.base.ref.IntRef;
+import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.base.ref.FsRef;
+import xyz.fsgik.common.base.ref.IntRef;
 
 public class LoggerTest {
 

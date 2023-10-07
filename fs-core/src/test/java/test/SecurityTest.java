@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fs404.common.base.FsString;
-import xyz.fs404.common.io.FsIO;
-import xyz.fs404.common.security.*;
+import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.io.FsIO;
+import xyz.fsgik.common.security.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

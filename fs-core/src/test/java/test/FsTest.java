@@ -2,11 +2,11 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fs404.common.base.Fs;
-import xyz.fs404.common.base.FsLogger;
-import xyz.fs404.common.base.FsString;
-import xyz.fs404.common.base.FsSystem;
-import xyz.fs404.common.io.FsIO;
+import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsSystem;
+import xyz.fsgik.common.io.FsIO;
 
 import java.io.IOException;
 import java.net.URL;
