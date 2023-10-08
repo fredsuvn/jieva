@@ -12,7 +12,7 @@ import xyz.fsgik.common.bean.FsBeanProperty;
 import xyz.fsgik.common.bean.FsBeanResolver;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.convert.FsConverter;
-import xyz.fsgik.common.protobuf.FsProtobuf;
+import xyz.fsgik.common.data.protobuf.FsProtobuf;
 import xyz.fsgik.common.reflect.TypeRef;
 
 import java.nio.ByteBuffer;

@@ -1,4 +1,4 @@
-package xyz.fsgik.common.protobuf;
+package xyz.fsgik.common.data.protobuf;
 
 import com.google.protobuf.Message;
 import xyz.fsgik.annotations.Nullable;

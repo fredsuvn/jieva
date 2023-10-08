@@ -1,4 +1,4 @@
-package xyz.fsgik.common.protobuf;
+package xyz.fsgik.common.data.protobuf;
 
 import xyz.fsgik.common.bean.FsBeanCopier;
 import xyz.fsgik.common.bean.FsBeanResolver;
