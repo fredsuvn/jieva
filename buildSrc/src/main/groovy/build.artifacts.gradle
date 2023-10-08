@@ -1,5 +1,5 @@
 plugins {
-  id 'fs'
+  id 'fs-build'
   id 'org.jetbrains.dokka'
 }
 

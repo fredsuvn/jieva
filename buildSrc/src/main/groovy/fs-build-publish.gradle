@@ -4,20 +4,20 @@ plugins {
   id 'signing'
 }
 
-def configurePublishMavenPom(MavenPublication maven) {
+def configurePublishMavenPom(MavenPublication maven, projectInfo) {
   maven.pom {
     name = project.name
     description = project.description
-    url = configs.url
-    inceptionYear = configs.inceptionYear
+    url = projectInfo.url
+    inceptionYear = projectInfo.inceptionYear
     scm {
-      connection = "scm:git:${configs.url}.git"
-      developerConnection = "scm:git:${configs.url}.git"
-      url = configs.url
+      connection = "scm:git:${projectInfo.url}.git"
+      developerConnection = "scm:git:${projectInfo.url}.git"
+      url = projectInfo.url
     }
-    if (configs.licenses != null) {
+    if (projectInfo.licenses != null) {
       licenses {
-        configs.licenses.forEach { each ->
+        projectInfo.licenses.forEach { each ->
           license {
             name = each.name
             url = each.url
@@ -25,25 +25,25 @@ def configurePublishMavenPom(MavenPublication maven) {
         }
       }
     }
-    if (configs.developers != null) {
+    if (projectInfo.developers != null) {
       developers {
-        configs.developers.forEach { each ->
+        projectInfo.developers.forEach { each ->
           developer {
             email = each.email
           }
         }
       }
     }
-    fs.debug("maven-pom.name: ${name.get()}")
-    fs.debug("maven-pom.description: ${description.get()}")
+    fs.debug("maven-pom.name: $name")
+    fs.debug("maven-pom.description: $description")
   }
 }
 
-def configurePublishRepositories(RepositoryHandler repositories) {
-  if (configs.publish.isSnapshot) {
+def configurePublishRepositories(RepositoryHandler repositories, publishInfo) {
+  if (publishInfo.isSnapshot) {
     repositories.maven {
-      name = configs.publish.snapshotId
-      url = configs.publish.urls.snapshot
+      name = publishInfo.snapshotId
+      url = publishInfo.snapshotUrl
       fs.debug("snapshot.name: $name")
       fs.debug("snapshot.url: $url")
       credentials {
@@ -55,8 +55,8 @@ def configurePublishRepositories(RepositoryHandler repositories) {
     }
   } else {
     repositories.maven {
-      name = configs.publish.releaseId
-      url = configs.publish.urls.release
+      name = publishInfo.releaseId
+      url = publishInfo.releaseUrl
       fs.debug("release.name: $name")
       fs.debug("release.url: $url")
       credentials {
@@ -69,9 +69,9 @@ def configurePublishRepositories(RepositoryHandler repositories) {
   }
 }
 
-def configureSigning() {
+def configureSigning(publishInfo) {
   signing {
-    def signingName = configs.publish.signingId
+    def signingName = publishInfo.signingId
     def signingKeyId = getProperty("signing${signingName.capitalize()}KeyId")
     def signingPassword = getProperty("signing${signingName.capitalize()}Password")
     def signingKey = utils.readFileAsString(getProperty("signing${signingName.capitalize()}KeyFile"), "UTF-8")

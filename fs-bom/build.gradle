@@ -1,5 +1,8 @@
 plugins {
-  id 'build.platform'
+  id 'fs-build'
+  id 'fs-build-repo'
+  id 'java-platform'
+  id 'fs-build-publish'
 }
 
 description = "Fs BOM"
@@ -15,4 +18,24 @@ dependencies {
       api project(":${dir.name}")
     }
   }
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      from components.javaPlatform
+      configurePublishMavenPom(it, projectInfo)
+    }
+  }
+//  if (configs.publish.enablePublishRemote) {
+//    repositories {
+//      configurePublishRepositories(it)
+//    }
+//  }
+//  if (configs.publish.isSigning) {
+//    configureSigning()
+//    signing {
+//      sign publishing.publications.maven
+//    }
+//  }
 }

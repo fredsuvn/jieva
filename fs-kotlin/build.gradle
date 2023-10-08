@@ -1,23 +1,23 @@
-plugins {
-  id 'build.jar'
-  id 'org.jetbrains.kotlin.plugin.lombok' version '1.7.0'
-}
-
-description = "Fs for Kotlin."
-
-java {
-  registerFeature('optionalSupport') {
-    usingSourceSet(sourceSets.main)
-  }
-}
-
-dependencies {
-  implementation platform(project(":fs-dependencies"))
-
-  implementation project(":fs-core")
-
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-
-  testImplementation project(":fs-test")
-}
+//plugins {
+//  id 'build.jar'
+//  id 'org.jetbrains.kotlin.plugin.lombok' version '1.7.0'
+//}
+//
+//description = "Fs for Kotlin."
+//
+//java {
+//  registerFeature('optionalSupport') {
+//    usingSourceSet(sourceSets.main)
+//  }
+//}
+//
+//dependencies {
+//  implementation platform(project(":fs-dependencies"))
+//
+//  implementation project(":fs-core")
+//
+//  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+//  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+//
+//  testImplementation project(":fs-test")
+//}

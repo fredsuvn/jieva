@@ -1,5 +1,5 @@
 plugins {
-  id 'fs'
+  id 'fs-build'
   id 'java-platform'
   id 'build.publish'
 }

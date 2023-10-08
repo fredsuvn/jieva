@@ -1,15 +1,12 @@
 plugins {
-  id 'build.jar'
-  id 'io.freefair.lombok' version '5.3.0'
+  id 'fs-build'
+  id 'fs-build-repo'
+  id 'java-library'
+  id 'fs-build-test'
+  id 'fs-build-publish'
 }
 
 description = "Fs Annotations"
-
-java {
-  registerFeature('optionalSupport') {
-    usingSourceSet(sourceSets.main)
-  }
-}
 
 dependencies {
 
@@ -18,4 +15,46 @@ dependencies {
   compileOnly 'org.projectlombok:lombok'
 
   testImplementation project(":fs-test")
+}
+
+javadoc {
+  options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+tasks.register('sourceJar', Jar) {
+  from(sourceSets.main.allSource)
+  archiveClassifier.set('sources')
+}
+
+tasks.register('javadocJar', Jar) {
+  dependsOn javadoc
+  classifier 'javadoc'              // 指定 JAR 分类为 "javadoc"
+  from javadoc.destinationDir
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      artifact sourceJar
+      from components.java
+//      artifact(sourceJar) {
+//        classifier = 'sources'
+//      }
+//      artifact(javadocJar) {
+//        classifier = 'javadoc'
+//      }
+      configurePublishMavenPom(it, projectInfo)
+    }
+  }
+//  if (configs.publish.enablePublishRemote) {
+//    repositories {
+//      configurePublishRepositories(it)
+//    }
+//  }
+//  if (configs.publish.isSigning) {
+//    configureSigning()
+//    signing {
+//      sign publishing.publications.maven
+//    }
+//  }
 }

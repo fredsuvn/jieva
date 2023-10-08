@@ -1,17 +1,42 @@
 package xyz.fsgik.build
 
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class FsPlugin extends AbstractFsPlugin {
+class FsPlugin implements Plugin<Project> {
 
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+
+  private Project project
+  private final Set<String> configurations = new HashSet<>()
 
   private int logLevelValue = 3
 
   @Override
-  String getClosureName() {
-    return "fs"
+  void apply(Project project) {
+    this.project = project
+    project.extensions.add("fs", this)
+  }
+
+  private void beforeConfiguration(String... configs) {
+    for (final def config in configs) {
+      if (configurations.contains(config)) {
+        continue
+      }
+      String gradleConfigName = "fs" + config.capitalize()
+      def gradleConfig = project.findProperty(gradleConfigName)
+      if (gradleConfig != null) {
+        this[config] = gradleConfig.toString()
+        updateConfiguration(config)
+      }
+    }
+  }
+
+  private void updateConfiguration(String config) {
+    configurations.add(config)
   }
 
   void debug(Object... messages) {

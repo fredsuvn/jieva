@@ -1,6 +1,5 @@
 package xyz.fsgik.common.base;
 
-import org.jetbrains.annotations.NotNull;
 import xyz.fsgik.annotations.Nullable;
 
 import java.nio.charset.Charset;
@@ -952,7 +951,6 @@ public class FsString {
                 return toString().charAt(index);
             }
 
-            @NotNull
             @Override
             public CharSequence subSequence(int start, int end) {
                 return toString().subSequence(start, end);
@@ -1013,7 +1011,6 @@ public class FsString {
                 return chars.charAt(start + index);
             }
 
-            @NotNull
             @Override
             public CharSequence subSequence(int s, int e) {
                 FsCheck.checkRangeInBounds(s, e, 0, length());

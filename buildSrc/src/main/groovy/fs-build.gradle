@@ -4,6 +4,7 @@ import java.nio.file.Paths
 
 plugins {
   id 'xyz.fsgik.build.fs'
+  id 'fs-config'
 }
 
 project.repositories {

@@ -1,21 +1,32 @@
 plugins {
-  id 'build.jar'
+  id 'fs-build'
+  id 'fs-build-repo'
+  id 'java-library'
 }
 
-description = "Fs Test Dependencies Management"
-
-java {
-  registerFeature('optionalSupport') {
-    usingSourceSet(sourceSets.main)
-  }
-}
+description = 'Project for Fs Testing'
 
 dependencies {
-  api platform(project(":fs-dependencies"))
-
-  api("org.jetbrains.kotlin:kotlin-test-testng") {
+  implementation platform(project(':fs-dependencies'))
+  api 'org.testng:testng:7.5.1'
+  api("org.jetbrains.kotlin:kotlin-test-testng:$kotlinVersion") {
     exclude(group: "org.testng", module: "testng")
   }
-  api group: 'org.testng', name: 'testng', version: '7.3.0', force: true
-  api "org.openjdk.jmh:jmh-core"
+  api 'org.openjdk.jmh:jmh-core'
+  api 'io.netty:netty-all'
+  api 'cn.hutool:hutool-all:5.8.21'
+  api 'org.apache.velocity:velocity-engine-core:2.3'
+  api 'org.slf4j:slf4j-api'
+  api 'org.apache.commons:commons-lang3'
+  api 'org.apache.commons:commons-collections4'
+  api 'commons-beanutils:commons-beanutils'
+  api 'commons-io:commons-io'
+  api 'commons-codec:commons-codec'
+  api 'com.google.guava:guava'
+  api 'com.github.ben-manes.caffeine:caffeine'
+  api 'org.yaml:snakeyaml'
+  api 'org.bouncycastle:bcprov-jdk15on'
+  api 'org.springframework:spring-core:5.3.29'
+  api 'cglib:cglib'
+  api 'org.springframework:spring-beans:5.3.29'
 }

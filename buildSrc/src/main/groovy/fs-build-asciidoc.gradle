@@ -1,7 +1,7 @@
 import java.util.function.BiFunction
 
 plugins {
-  id 'fs'
+  id 'fs-build'
 }
 
 //asciidoc -> html

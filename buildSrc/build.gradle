@@ -1,12 +1,12 @@
 plugins {
-  id "java-gradle-plugin"
+  id 'java-gradle-plugin'
   id 'groovy-gradle-plugin'
 }
 
 repositories {
-  //maven {
-  //  url "https://maven.aliyun.com/repository/gradle-plugin"
-  //}
+  maven {
+    url "https://maven.aliyun.com/repository/gradle-plugin"
+  }
   mavenCentral()
   gradlePluginPortal()
 }

@@ -1,5 +1,5 @@
 plugins {
-  id 'fs'
+  id 'fs-build'
   id 'build.compile'
   id 'build.artifacts'
   id 'build.publish'
