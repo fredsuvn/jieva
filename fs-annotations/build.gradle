@@ -17,44 +17,10 @@ dependencies {
   testImplementation project(":fs-test")
 }
 
-javadoc {
-  options.addStringOption('Xdoclint:none', '-quiet')
-}
-
-tasks.register('sourceJar', Jar) {
-  from(sourceSets.main.allSource)
-  archiveClassifier.set('sources')
-}
-
-tasks.register('javadocJar', Jar) {
-  dependsOn javadoc
-  classifier 'javadoc'              // 指定 JAR 分类为 "javadoc"
-  from javadoc.destinationDir
-}
-
-publishing {
-  publications {
-    maven(MavenPublication) {
-      artifact sourceJar
-      from components.java
-//      artifact(sourceJar) {
-//        classifier = 'sources'
-//      }
-//      artifact(javadocJar) {
-//        classifier = 'javadoc'
-//      }
-      configurePublishMavenPom(it, projectInfo)
-    }
+java {
+  javadoc {
+    options.addStringOption('Xdoclint:none', '-quiet')
   }
-//  if (configs.publish.enablePublishRemote) {
-//    repositories {
-//      configurePublishRepositories(it)
-//    }
-//  }
-//  if (configs.publish.isSigning) {
-//    configureSigning()
-//    signing {
-//      sign publishing.publications.maven
-//    }
-//  }
+  withJavadocJar()
+  withSourcesJar()
 }

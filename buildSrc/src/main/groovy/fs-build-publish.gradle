@@ -4,6 +4,38 @@ plugins {
   id 'signing'
 }
 
+project.afterEvaluate {
+  configurePublishing()
+}
+
+def configurePublishing() {
+  publishing {
+    publications {
+      maven(MavenPublication) {
+        if (components.hasProperty("javaPlatform")) {
+          from components.javaPlatform
+        } else {
+          from components.java
+        }
+        //artifact sourceJar
+        //artifact javadocJar
+        configurePublishMavenPom(it, projectInfo)
+      }
+    }
+    if (publishInfo.isToRemote) {
+      repositories {
+        configurePublishRepositories(it, publishInfo)
+      }
+    }
+    if (publishInfo.isSigning) {
+      configureSigning(publishInfo)
+      signing {
+        sign publishing.publications.maven
+      }
+    }
+  }
+}
+
 def configurePublishMavenPom(MavenPublication maven, projectInfo) {
   maven.pom {
     name = project.name
@@ -82,6 +114,19 @@ def configureSigning(publishInfo) {
   }
 }
 
-ext["configurePublishMavenPom"] = this.&configurePublishMavenPom
-ext["configurePublishRepositories"] = this.&configurePublishRepositories
-ext["configureSigning"] = this.&configureSigning
+//ext["javaPublishing"] = this.&javaPublishing
+
+// No need:
+//javadoc {
+//  options.addStringOption('Xdoclint:none', '-quiet')
+//}
+//tasks.register('javadocJar', Jar) {
+//  dependsOn javadoc
+//  classifier 'javadoc'
+//  from javadoc.destinationDir
+//}
+//
+//tasks.register('sourceJar', Jar) {
+//  from(sourceSets.main.allSource)
+//  archiveClassifier.set('sources')
+//}

@@ -25,23 +25,3 @@ dependencies {
   //api "com.github.ben-manes.caffeine:caffeine"
   //api "org.yaml:snakeyaml"
 }
-
-publishing {
-  publications {
-    maven(MavenPublication) {
-      from components.javaPlatform
-      configurePublishMavenPom(it, projectInfo)
-    }
-  }
-//  if (configs.publish.enablePublishRemote) {
-//    repositories {
-//      configurePublishRepositories(it)
-//    }
-//  }
-//  if (configs.publish.isSigning) {
-//    configureSigning()
-//    signing {
-//      sign publishing.publications.maven
-//    }
-//  }
-}
