@@ -1,10 +1,12 @@
 plugins {
-  id 'fs-build'
-  id 'fs-build-repo'
+  id 'fs'
+  id 'fs-config'
+  id 'fs-repo'
   id 'java-library'
+  id 'fs-publish'
 }
 
-description = 'Project for Fs Testing'
+description = 'Testing support for fs.'
 
 dependencies {
   implementation platform(project(':fs-dependencies'))
@@ -29,4 +31,18 @@ dependencies {
   api 'org.springframework:spring-core:5.3.29'
   api 'cglib:cglib'
   api 'org.springframework:spring-beans:5.3.29'
+}
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+javadoc {
+  options.addStringOption('Xdoclint:none', '-quiet')
+  destinationDir = file("$project.projectDir/docs/javadoc")
+}
+
+clean {
+  delete(javadoc.destinationDir)
 }

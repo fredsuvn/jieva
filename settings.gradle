@@ -1,17 +1,14 @@
-//pluginManagement {
-//  repositories {
-//    maven {
-//      url "https://maven.aliyun.com/repository/gradle-plugin"
-//    }
-//    gradlePluginPortal()
-//  }
-//  plugins {
-//    id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
-//  }
-//}
+pluginManagement {
+  repositories {
+    maven {
+      url "https://maven.aliyun.com/repository/gradle-plugin"
+    }
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}
 
-rootProject.name = 'fs-build'
-
+rootProject.name = 'fs-root'
 file("${rootDir}/").eachDirMatch(~/fs-(?!(plugins|draft)).*/) { dir ->
   include ":${dir.name}"
 }

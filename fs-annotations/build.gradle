@@ -1,9 +1,10 @@
 plugins {
-  id 'fs-build'
-  id 'fs-build-repo'
+  id 'fs'
+  id 'fs-config'
+  id 'fs-repo'
   id 'java-library'
-  id 'fs-build-test'
-  id 'fs-build-publish'
+  id 'fs-test'
+  id 'fs-publish'
 }
 
 description = "Fs Annotations"
@@ -18,9 +19,15 @@ dependencies {
 }
 
 java {
-  javadoc {
-    options.addStringOption('Xdoclint:none', '-quiet')
-  }
   withJavadocJar()
   withSourcesJar()
+}
+
+javadoc {
+  options.addStringOption('Xdoclint:none', '-quiet')
+  destinationDir = file("$project.projectDir/docs/javadoc")
+}
+
+clean {
+  delete(javadoc.destinationDir)
 }

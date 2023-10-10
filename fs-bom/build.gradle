@@ -1,8 +1,9 @@
 plugins {
-  id 'fs-build'
-  id 'fs-build-repo'
+  id 'fs'
+  id 'fs-config'
+  id 'fs-repo'
   id 'java-platform'
-  id 'fs-build-publish'
+  id 'fs-publish'
 }
 
 description = "Fs BOM"

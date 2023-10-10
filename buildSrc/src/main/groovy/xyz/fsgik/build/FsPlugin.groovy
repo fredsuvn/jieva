@@ -60,7 +60,7 @@ class FsPlugin implements Plugin<Project> {
     if (logLevelValue > level) {
       return;
     }
-    out.print("fs-build >> ")
+    out.print("$project.name> ")
     String prefix = "[" + FORMATTER.format(LocalDateTime.now()) + "] [${levelValueToName(level)}]";
     out.print(String.format("%-33s", prefix))
     out.print(": ")

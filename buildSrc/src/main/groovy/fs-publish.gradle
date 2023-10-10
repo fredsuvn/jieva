@@ -1,17 +1,19 @@
 plugins {
-  id 'fs-build'
+  id 'fs'
+  id 'fs-config'
   id 'maven-publish'
   id 'signing'
 }
 
 project.afterEvaluate {
+  fs.info "Configure fs-publish"
   configurePublishing()
 }
 
 def configurePublishing() {
   publishing {
     publications {
-      maven(MavenPublication) {
+      mavenJar(MavenPublication) {
         if (components.hasProperty("javaPlatform")) {
           from components.javaPlatform
         } else {
@@ -20,6 +22,20 @@ def configurePublishing() {
         //artifact sourceJar
         //artifact javadocJar
         configurePublishMavenPom(it, projectInfo)
+      }
+      if (project.tasks.findByName("javadocJar")) {
+        mavenJavadocJar(MavenPublication) {
+          artifact(javadocJar) {
+            classifier = 'javadoc'
+          }
+        }
+      }
+      if (project.tasks.findByName("sourcesJar")) {
+        mavenSourcesJar(MavenPublication) {
+          artifact(sourcesJar) {
+            classifier = 'sources'
+          }
+        }
       }
     }
     if (publishInfo.isToRemote) {
