@@ -1,5 +1,10 @@
 package xyz.fsgik.common.net;
 
+import xyz.fsgik.common.io.FsBuffer;
+import xyz.fsgik.common.io.FsIO;
+import xyz.fsgik.common.reflect.FsInvoker;
+
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -21,14 +26,20 @@ public class FsNet {
      * @param length fixed length
      */
     public static List<ByteBuffer> splitWithFixedLength(ByteBuffer buffer, int length) {
+        if (!buffer.hasRemaining()) {
+            return Collections.emptyList();
+        }
         if (buffer.remaining() < length) {
             return Collections.emptyList();
         }
-        List<ByteBuffer> result = new LinkedList<>();
+        List<ByteBuffer> result = null;
         while (buffer.remaining() >= length) {
             byte[] bytes = new byte[length];
             buffer.get(bytes);
-            result.add(ByteBuffer.wrap(bytes));
+            if (result == null) {
+                result = new LinkedList<>();
+            }
+            result.add(ByteBuffer.wrap(bytes).asReadOnlyBuffer());
         }
         return result;
     }
@@ -49,11 +60,14 @@ public class FsNet {
      * @param lengthSize   length size must in 1, 2, 4
      */
     public static List<ByteBuffer> splitWithSpecifiedLength(ByteBuffer buffer, int lengthOffset, int lengthSize) {
+        if (!buffer.hasRemaining()) {
+            return Collections.emptyList();
+        }
         int minSize = lengthOffset + lengthSize;
         if (buffer.remaining() < minSize) {
             return Collections.emptyList();
         }
-        List<ByteBuffer> result = new LinkedList<>();
+        List<ByteBuffer> result = null;
         while (true) {
             buffer.mark();
             buffer.position(buffer.position() + lengthOffset);
@@ -64,12 +78,15 @@ public class FsNet {
             }
             byte[] bytes = new byte[length];
             buffer.get(bytes);
-            result.add(ByteBuffer.wrap(bytes));
+            if (result == null) {
+                result = new LinkedList<>();
+            }
+            result.add(ByteBuffer.wrap(bytes).asReadOnlyBuffer());
             if (buffer.remaining() < minSize) {
                 break;
             }
         }
-        return result.isEmpty() ? Collections.emptyList() : result;
+        return result == null ? Collections.emptyList() : result;
     }
 
     private static int readLength(ByteBuffer buffer, int lengthSize) {
@@ -83,4 +100,30 @@ public class FsNet {
         }
         throw new IllegalArgumentException("lengthSize must in (1, 2, 4).");
     }
+
+//    /**
+//     * Reads and split given buffer in specified length.
+//     */
+//    public static List<ByteBuffer> splitWithDelimiter(ByteBuffer buffer, byte delimiter, byte escape) {
+//        if (!buffer.hasRemaining()) {
+//            return Collections.emptyList();
+//        }
+//        List<ByteBuffer> result = new LinkedList<>();
+//        while (true) {
+//            buffer.mark();
+//            while (true) {
+//                byte b = buffer.get();
+//                if (b == delimiter) {
+//                    int pos = buffer.position();
+//                    buffer.reset();
+//                    if (buffer.position() == pos) {
+//                        result.add(FsBuffer.emptyBuffer());
+//                    } else {
+//
+//                    }
+//                }
+//            }
+//        }
+//        return result.isEmpty() ? Collections.emptyList() : result;
+//    }
 }

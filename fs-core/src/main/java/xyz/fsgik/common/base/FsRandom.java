@@ -1,5 +1,7 @@
 package xyz.fsgik.common.base;
 
+import xyz.fsgik.common.collect.FsCollect;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +51,7 @@ public interface FsRandom<T> {
     class Builder<T> {
 
         private int currentScore = 0;
-        private List<Part> parts = new LinkedList<>();
+        private final List<Part> parts = new LinkedList<>();
         private Random random;
 
         /**
@@ -105,7 +107,7 @@ public interface FsRandom<T> {
 
             private Impl(Random random, List<Part> parts) {
                 this.random = random;
-                this.parts = parts;
+                this.parts = FsCollect.immutableList(parts);
             }
 
             @Override

@@ -17,10 +17,12 @@ import java.util.List;
  * There are two length mode:
  * <ul>
  *     <li>
- *         Fixed length: created by {@link #LengthBasedTcpChannelHandler(int)}, to split with fixed length;
+ *         Fixed length: created by {@link #LengthBasedTcpChannelHandler(int)},
+ *         to split with fixed length with {@link FsNet#splitWithFixedLength(ByteBuffer, int)};
  *     </li>
  *     <li>
- *         Specified length: created by {@link #LengthBasedTcpChannelHandler(int, int)}, to split with specified length;
+ *         Specified length: created by {@link #LengthBasedTcpChannelHandler(int, int)},
+ *         to split with specified length with {@link FsNet#splitWithSpecifiedLength(ByteBuffer, int, int)};
  *     </li>
  * </ul>
  *
