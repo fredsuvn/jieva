@@ -147,6 +147,8 @@ public class FsBytes {
      * the buffer's position will be reset to last start position.
      * This method use {@link ByteBuffer#allocate(int)} to create new buffer,
      * then put data into the new buffer from given buffer.
+     * <p>
+     * Each returned buffer's position is 0, limit and capacity is the length.
      *
      * @param buffer given buffer
      * @param length fixed length
@@ -160,6 +162,8 @@ public class FsBytes {
      * If the remaining length of buffer is not enough to split,
      * the buffer's position will be reset to last start position.
      * This method use given buffer generator to create new buffer, then put data into the new buffer from given buffer.
+     * <p>
+     * Each returned buffer's position is 0, limit and capacity is the length.
      *
      * @param buffer    given buffer
      * @param length    fixed length
@@ -199,6 +203,7 @@ public class FsBytes {
      * <p>
      * This method use {@link ByteBuffer#allocate(int)} to create new buffer,
      * then put data into the new buffer from given buffer.
+     * Each returned buffer's position is 0, limit and capacity is the length.
      *
      * @param buffer       given buffer
      * @param lengthOffset offset of length
@@ -221,6 +226,7 @@ public class FsBytes {
      * the buffer's position will be reset to last start position.
      * <p>
      * This method use given buffer generator to create new buffer, then put data into the new buffer from given buffer.
+     * Each returned buffer's position is 0, limit and capacity is the length.
      *
      * @param buffer       given buffer
      * @param lengthOffset offset of length
