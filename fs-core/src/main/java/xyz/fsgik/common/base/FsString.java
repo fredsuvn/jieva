@@ -3,21 +3,15 @@ package xyz.fsgik.common.base;
 import xyz.fsgik.annotations.Nullable;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Supplier;
 
 /**
- * Utilities for String.
+ * Utilities for String/CharSequence.
  *
  * @author fredsuvn
  */
 public class FsString {
-
-    /**
-     * Default charset: UTF-8.
-     */
-    public static final Charset CHARSET = StandardCharsets.UTF_8;
 
     /**
      * Returns string decoding from given bytes with {@link FsChars#defaultCharset()}.
@@ -279,6 +273,9 @@ public class FsString {
      * @param chars given chars
      */
     public static boolean allUpperCase(CharSequence chars) {
+        if (isEmpty(chars)) {
+            return false;
+        }
         for (int i = 0; i < chars.length(); i++) {
             if (!Character.isUpperCase(chars.charAt(i))) {
                 return false;
@@ -378,7 +375,7 @@ public class FsString {
 
     /**
      * Splits given chars by given separator,
-     * using {@link #subRef(CharSequence, int, int)} to generate sub CharSequence.
+     * using {@link #subChars(CharSequence, int, int)} to generate sub CharSequence.
      * If chars or separator is empty, or separator's length is greater than chars' length,
      * or separator is never matched, return an empty list.
      * <p>
@@ -389,7 +386,7 @@ public class FsString {
      * @param separator given separator
      */
     public static List<CharSequence> split(CharSequence chars, CharSequence separator) {
-        return split(chars, separator, FsString::subRef);
+        return split(chars, separator, FsString::subChars);
     }
 
     /**
@@ -626,12 +623,11 @@ public class FsString {
     /**
      * Returns a string follows:
      * <ul>
-     * <li>returns String.valueOf for given object if it is not an array;</li>
-     * <li>if given object is primitive array, returns Arrays.toString for it;</li>
-     * <li>if given object is Object[], returns Arrays.deepToString for it;</li>
-     * <li>else returns String.valueOf for given object</li>
+     *     <li>returns String.valueOf for given object if it is not an array;</li>
+     *     <li>if given object is primitive array, returns Arrays.toString for it;</li>
+     *     <li>if given object is Object[], returns Arrays.deepToString for it;</li>
+     *     <li>else returns String.valueOf for given object</li>
      * </ul>
-     * <p>
      * This method is same as: toString(obj, true, true)
      *
      * @param obj given object
@@ -652,12 +648,16 @@ public class FsString {
     /**
      * Returns a string follows:
      * <ul>
-     * <li>if given object is primitive array and array-check is true, returns Arrays.toString for it;</li>
-     * <li>if given object is Object[] and both array-check and deep-to-string are true,
-     * returns Arrays.deepToString for it;</li>
-     * <li>if given object is Object[] and array-check is true and deep-to-string is false,
-     * returns Arrays.toString for it;</li>
-     * <li>else returns String.valueOf for given object</li>
+     *     <li>if given object is primitive array and array-check is true, returns Arrays.toString for it;</li>
+     *     <li>
+     *         if given object is Object[] and both array-check and deep-to-string are true,
+     *         returns Arrays.deepToString for it;
+     *     </li>
+     *     <li>
+     *         if given object is Object[] and array-check is true and deep-to-string is false,
+     *         returns Arrays.toString for it;
+     *     </li>
+     *     <li>else returns String.valueOf for given object</li>
      * </ul>
      *
      * @param obj          given object
@@ -700,36 +700,6 @@ public class FsString {
             return Arrays.toString((double[]) obj);
         }
         return obj.toString();
-    }
-
-    /**
-     * Encodes given string to bytes with default charset {@link #CHARSET}.
-     *
-     * @param chars given string
-     */
-    public static byte[] toBytes(CharSequence chars) {
-        return toBytes(chars, CHARSET);
-    }
-
-    /**
-     * Encodes given string to bytes with given charset.
-     *
-     * @param chars   given string
-     * @param charset given charset
-     */
-    public static byte[] toBytes(CharSequence chars, String charset) {
-        Charset cs = Charset.forName(charset);
-        return toBytes(chars, cs);
-    }
-
-    /**
-     * Encodes given string to bytes with given charset.
-     *
-     * @param chars   given string
-     * @param charset given charset
-     */
-    public static byte[] toBytes(CharSequence chars, Charset charset) {
-        return chars.toString().getBytes(charset);
     }
 
     /**
@@ -1035,60 +1005,65 @@ public class FsString {
     }
 
     /**
-     * Returns a sub char sequence of given chars from given start index inclusive to end.
-     * The returned CharSequence doesn't store content data,
-     * it is a reference points given chars and store start and end indexes.
-     * That means, the returned CharSequence has very small overhead,
-     * but also makes it difficult for the held CharSequence to be garbage collected.
+     * Returns a sub-range view of given chars from given start index inclusive to end.
+     * The two chars will share the same data so any operation will reflect each other.
      * <p>
-     * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence still uses this
-     * {@link #subRef(CharSequence, int, int)} method.
+     * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence will still use
+     * {@link #subChars(CharSequence, int, int)}.
      *
      * @param chars given chars
      * @param start given start index inclusive
      */
-    public static CharSequence subRef(CharSequence chars, int start) {
-        return subRef(chars, start, chars.length());
+    public static CharSequence subChars(CharSequence chars, int start) {
+        return subChars(chars, start, chars.length());
     }
 
     /**
-     * Returns a sub char sequence of given chars from given start index inclusive to given end index exclusive.
-     * The returned CharSequence doesn't store content data,
-     * it is a reference points given chars and store start and end indexes.
-     * That means, the returned CharSequence has very small overhead,
-     * but also makes it difficult for the held CharSequence to be garbage collected.
+     * Returns a sub-range view of given chars from given start index inclusive to given end index exclusive.
+     * The two chars will share the same data so any operation will reflect each other.
      * <p>
-     * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence still uses this
-     * {@link #subRef(CharSequence, int, int)} method.
+     * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence will still use this method.
      *
      * @param chars given chars
      * @param start given start index inclusive
      * @param end   given end index exclusive
      */
-    public static CharSequence subRef(CharSequence chars, int start, int end) {
+    public static CharSequence subChars(CharSequence chars, int start, int end) {
         FsCheck.checkRangeInBounds(start, end, 0, chars.length());
-        return new CharSequence() {
-            @Override
-            public int length() {
-                return end - start;
-            }
+        return new SubCharsImpl(chars, start, end);
+    }
 
-            @Override
-            public char charAt(int index) {
-                FsCheck.checkInBounds(index, 0, length());
-                return chars.charAt(start + index);
-            }
+    private static final class SubCharsImpl implements CharSequence {
 
-            @Override
-            public CharSequence subSequence(int s, int e) {
-                FsCheck.checkRangeInBounds(s, e, 0, length());
-                return subRef(chars, start + s, start + e);
-            }
+        private final CharSequence source;
+        private final int start;
+        private final int end;
 
-            @Override
-            public String toString() {
-                return chars.subSequence(start, end).toString();
-            }
-        };
+        private SubCharsImpl(CharSequence source, int start, int end) {
+            this.source = source;
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        public int length() {
+            return end - start;
+        }
+
+        @Override
+        public char charAt(int index) {
+            FsCheck.checkInBounds(start + index, start, end);
+            return source.charAt(start + index);
+        }
+
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            return subChars(source, this.start + start, this.start + end);
+        }
+
+        @Override
+        public String toString() {
+            return source.subSequence(start, end).toString();
+        }
     }
 }

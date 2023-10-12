@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.data.FsData;
 import xyz.fsgik.common.io.FsIO;
 
@@ -26,7 +26,7 @@ public class DataTest {
     }
 
     private static void testArray(FsData data, byte[] bytes) {
-        Assert.assertEquals(data.toString(FsString.CHARSET), DATA);
+        Assert.assertEquals(data.toString(FsChars.defaultCharset()), DATA);
     }
 
     private static void testWriteArray(FsData data, byte[] bytes) {
@@ -60,7 +60,7 @@ public class DataTest {
 
     @Test
     public void testData() {
-        byte[] bytes = DATA.getBytes(FsString.CHARSET);
+        byte[] bytes = DATA.getBytes(FsChars.defaultCharset());
         FsData fromBytes = FsData.wrap(bytes);
         testData(bytes, () -> fromBytes);
         testData(bytes, () -> FsData.wrap(ByteBuffer.wrap(bytes)));
@@ -70,7 +70,7 @@ public class DataTest {
 
     @Test
     public void testMisc() {
-        byte[] bytes = DATA.getBytes(FsString.CHARSET);
+        byte[] bytes = DATA.getBytes(FsChars.defaultCharset());
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         FsData fromBuffer = FsData.wrap(buffer);
         testWriteBuffer(fromBuffer, bytes);

@@ -3,7 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.base.ref.FsRef;
 import xyz.fsgik.common.base.ref.LongRef;
 import xyz.fsgik.common.io.FsFile;
@@ -32,7 +32,7 @@ public class FileTest {
         createGeneratedTempDir();
         File file = new File(GENERATED_TEMP_DIR + "/" + path);
         FileOutputStream fileOutputStream = new FileOutputStream(file, false);
-        fileOutputStream.write(data.getBytes(FsString.CHARSET));
+        fileOutputStream.write(data.getBytes(FsChars.defaultCharset()));
         fileOutputStream.close();
         return file;
     }
@@ -45,7 +45,7 @@ public class FileTest {
     @Test
     public void testFile() throws IOException {
         String data = DATA;
-        byte[] bytes = data.getBytes(FsString.CHARSET);
+        byte[] bytes = data.getBytes(FsChars.defaultCharset());
         File file = createFile("FileTest-testFile.txt", data);
         FsFile fsFile = FsFile.from(file.toPath());
         Assert.expectThrows(FsIOException.class, () -> fsFile.bindInputStream());
@@ -90,7 +90,7 @@ public class FileTest {
 
     private void testFileCacheIO0(int chunkSize, int bufferSize) throws IOException {
         String data = DATA;
-        byte[] bytes = data.getBytes(FsString.CHARSET);
+        byte[] bytes = data.getBytes(FsChars.defaultCharset());
         File file = createFile("FileTest-testFileCacheIO.txt", data);
         FsFileCache fileCache = FsFileCache.newBuilder()
             .chunkSize(chunkSize)
@@ -119,8 +119,8 @@ public class FileTest {
     @Test
     public void testFileCache() throws IOException {
         String data = "01234567890123456789";
-        byte[] bytes1 = data.getBytes(FsString.CHARSET);
-        byte[] bytes2 = (data + data + data).getBytes(FsString.CHARSET);
+        byte[] bytes1 = data.getBytes(FsChars.defaultCharset());
+        byte[] bytes2 = (data + data + data).getBytes(FsChars.defaultCharset());
         File file1 = createFile("FileTest-testFileCache1.txt", data);
         File file2 = createFile("FileTest-testFileCache2.txt", data + data + data);
         LongRef cacheRead = FsRef.ofLong(0);

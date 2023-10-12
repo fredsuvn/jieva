@@ -3,7 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgik.common.base.FsBytes;
-import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.io.FsIO;
 import xyz.fsgik.common.security.*;
 
@@ -88,7 +88,7 @@ public class SecurityTest {
 
     @Test
     public void testMac() throws Exception {
-        byte[] data = DATA.getBytes(FsString.CHARSET);
+        byte[] data = DATA.getBytes(FsChars.defaultCharset());
         KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
         Key macKey = keyGenerator.generateKey();
         Mac mac = Mac.getInstance("HmacSHA256");
@@ -120,7 +120,7 @@ public class SecurityTest {
 
     @Test
     public void testDigest() throws Exception {
-        byte[] data = DATA.getBytes(FsString.CHARSET);
+        byte[] data = DATA.getBytes(FsChars.defaultCharset());
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] mdBytes = md.digest(data);
         System.out.println(mdBytes.length + ", " + md.getDigestLength());
@@ -149,7 +149,7 @@ public class SecurityTest {
 
     @Test
     public void testSign() throws Exception {
-        byte[] data = DATA.getBytes(FsString.CHARSET);
+        byte[] data = DATA.getBytes(FsChars.defaultCharset());
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
@@ -221,7 +221,7 @@ public class SecurityTest {
 
     @Test
     public void testCrypto() throws Exception {
-        byte[] data = DATA.getBytes(FsString.CHARSET);
+        byte[] data = DATA.getBytes(FsChars.defaultCharset());
         byte[] data2 = TestUtil.buildRandomBytes(150);
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         KeyPair keyPair = keyPairGenerator.generateKeyPair();

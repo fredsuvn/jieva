@@ -52,10 +52,10 @@ public class FsTest {
     @Test
     public void testRes() throws IOException {
         URL f1 = Fs.findRes("/t2/f1.txt");
-        Assert.assertEquals(FsIO.readString(f1.openStream(), FsString.CHARSET), "f1.txt");
+        Assert.assertEquals(FsIO.readString(f1.openStream(), FsChars.defaultCharset()), "f1.txt");
         Set<URL> set = Fs.findAllRes("/t2/f2.txt");
         for (URL url : set) {
-            Assert.assertEquals(FsIO.readString(url.openStream(), FsString.CHARSET), "f2.txt");
+            Assert.assertEquals(FsIO.readString(url.openStream(), FsChars.defaultCharset()), "f2.txt");
         }
     }
 

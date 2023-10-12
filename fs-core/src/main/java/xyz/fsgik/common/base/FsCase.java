@@ -1,6 +1,5 @@
 package xyz.fsgik.common.base;
 
-import xyz.fsgik.annotations.Immutable;
 import xyz.fsgik.common.collect.FsCollect;
 
 import java.util.Collections;
@@ -67,24 +66,23 @@ public interface FsCase {
     }
 
     /**
-     * Splits given chars into a word list using rules of this implementation.
-     * Default implementations use {@link FsString#subRef(CharSequence, int, int)} to build sub-sequence.
+     * Splits given chars into a word list with rules of this implementation.
+     * Default implementations use {@link FsString#subChars(CharSequence, int, int)} to build sub-sequence.
      *
      * @param chars given chars
      */
-    @Immutable
     List<CharSequence> split(CharSequence chars);
 
     /**
      * Joins given split words to one String in rules of this case.
-     * It is probable that the words is split by {@link #split(CharSequence)}.
+     * It is assumed that the words is split by {@link #split(CharSequence)}.
      *
      * @param words given split words
      */
     String join(List<CharSequence> words);
 
     /**
-     * Converts given chars from this case to other case:
+     * Converts given chars from this case to other case. The default implementation is:
      * <pre>
      *     return otherCase.join(split(chars));
      * </pre>
@@ -99,10 +97,10 @@ public interface FsCase {
     }
 
     /**
-     * Camel case implementation.
-     * This implementation uses
+     * Camel case implementation. This implementation uses
      * {@link Character#isUpperCase(char)}, {@link Character#toUpperCase(char)} and {@link Character#toLowerCase(char)}
      * to check and convert a char.
+     * And use {@link FsString#subChars(CharSequence, int, int)} to split string.
      */
     class CamelCase implements FsCase {
 
@@ -139,21 +137,21 @@ public interface FsCase {
                 if (lastIsUpper && !currentIsUpper) {
                     int wordEnd = i - 1;
                     if (wordEnd > wordStart) {
-                        result.add(FsString.subRef(chars, wordStart, wordEnd));
+                        result.add(FsString.subChars(chars, wordStart, wordEnd));
                     }
                     wordStart = wordEnd;
                 }
                 // aA: two words
                 else {
                     if (i > wordStart) {
-                        result.add(FsString.subRef(chars, wordStart, i));
+                        result.add(FsString.subChars(chars, wordStart, i));
                     }
                     wordStart = i;
                 }
                 lastIsUpper = currentIsUpper;
             }
             if (wordStart < len) {
-                result.add(FsString.subRef(chars, wordStart, len));
+                result.add(FsString.subChars(chars, wordStart, len));
             }
             return result;
         }

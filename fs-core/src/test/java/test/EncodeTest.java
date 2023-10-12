@@ -3,7 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.encode.FsEncodeException;
 import xyz.fsgik.common.encode.FsEncoder;
 
@@ -28,7 +28,7 @@ public class EncodeTest {
 
     private void testEncoder(
         FsEncoder encoder, String source, String dest) {
-        byte[] srcBytes = source.getBytes(FsString.CHARSET);
+        byte[] srcBytes = source.getBytes(FsChars.defaultCharset());
         byte[] destBytes = dest.getBytes(StandardCharsets.ISO_8859_1);
         byte[] srcBytesPadding = padBytes(srcBytes, 10);
         byte[] destBytesPadding = padBytes(destBytes, 10);

@@ -2,6 +2,7 @@ package xyz.fsgik.common.data;
 
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.base.FsCheck;
 import xyz.fsgik.common.base.FsString;
 import xyz.fsgik.common.encode.FsEncoder;
@@ -23,12 +24,12 @@ public interface FsData {
 
     /**
      * Wraps given string to {@link FsData}.
-     * The given string will be decoded by {@link FsString#CHARSET}.
+     * The given string will be decoded by {@link FsChars#defaultCharset()}.
      *
      * @param str given string
      */
     static FsData wrap(String str) {
-        return wrap(str.getBytes(FsString.CHARSET));
+        return wrap(FsString.encode(str));
     }
 
     /**

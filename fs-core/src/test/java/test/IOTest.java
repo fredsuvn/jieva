@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.io.FsIO;
 
 import java.io.*;
@@ -24,7 +24,7 @@ public class IOTest {
         InputStream inputStream,
         boolean testMark
     ) throws IOException {
-        byte[] bytes = data.getBytes(FsString.CHARSET);
+        byte[] bytes = data.getBytes(FsChars.defaultCharset());
         if (length < 128 || bytes.length - offset < length) {
             throw new IllegalArgumentException("Data length not enough!");
         }
@@ -215,19 +215,19 @@ public class IOTest {
     @Test
     public void testWrapper() throws IOException {
         String data = DATA;
-        byte[] dataBytes = data.getBytes(FsString.CHARSET);
+        byte[] dataBytes = data.getBytes(FsChars.defaultCharset());
         File file = FileTest.createFile("IOTest-testWrapper.txt", data);
         RandomAccessFile random = new RandomAccessFile(file, "rws");
 
         testInputStream(data, 3, 222, FsIO.toInputStream(dataBytes, 3, 222), true);
-        testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(ByteBuffer.wrap(data.getBytes(FsString.CHARSET))), true);
+        testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(ByteBuffer.wrap(data.getBytes(FsChars.defaultCharset()))), true);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(new StringReader(DATA)), false);
         testInputStream(data, 0, dataBytes.length, FsIO.toInputStream(random), true);
         testInputStream(data, 2, 131, FsIO.toInputStream(random, 2, 131), true);
         testInputStream(data, 2, 131, FsIO.limited(FsIO.toInputStream(dataBytes, 2, 131), 131), false);
         testReader(data, 5, 155, new StringReader(data.substring(5, 5 + 155)), true);
         testReader(data, 0, data.length(), FsIO.toReader(CharBuffer.wrap(DATA)), true);
-        testReader(data, 0, data.length(), FsIO.toReader(new ByteArrayInputStream(DATA.getBytes(FsString.CHARSET))), false);
+        testReader(data, 0, data.length(), FsIO.toReader(new ByteArrayInputStream(DATA.getBytes(FsChars.defaultCharset()))), false);
 
         byte[] bytes = new byte[1024];
         char[] chars = new char[1024];
@@ -239,7 +239,7 @@ public class IOTest {
         testOutStream(bytes.length, FsIO.limited(outputStream, 1024), (off, len) ->
             Arrays.copyOfRange(outputStream.toByteArray(), off, off + len));
         testOutStream(-1, FsIO.toOutputStream(sb), (off, len) ->
-            Arrays.copyOfRange(sb.toString().getBytes(FsString.CHARSET), off, off + len));
+            Arrays.copyOfRange(sb.toString().getBytes(FsChars.defaultCharset()), off, off + len));
         testOutStream(-1, FsIO.toOutputStream(random), (off, len) ->
             FsIO.readBytes(file.toPath(), off, len));
         testOutStream(188, FsIO.toOutputStream(random, 8, 188), (off, len) ->
@@ -253,7 +253,7 @@ public class IOTest {
             Arrays.copyOfRange(chars, off, off + len));
         outputStream.reset();
         testWriter(FsIO.toWriter(outputStream), (off, len) ->
-            new String(outputStream.toByteArray(), FsString.CHARSET).substring(off, off + len).toCharArray());
+            new String(outputStream.toByteArray(), FsChars.defaultCharset()).substring(off, off + len).toCharArray());
         random.close();
         file.delete();
     }
@@ -313,7 +313,7 @@ public class IOTest {
         Assert.assertEquals(FsIO.readString(file.toPath()), data);
         Assert.assertEquals(
             FsIO.readString(file.toPath(), 18, 36),
-            new String(data.getBytes(FsString.CHARSET), 18, 36)
+            new String(data.getBytes(FsChars.defaultCharset()), 18, 36)
         );
         file.delete();
     }

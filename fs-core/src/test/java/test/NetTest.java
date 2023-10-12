@@ -5,8 +5,8 @@ import org.testng.annotations.Test;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.base.FsBytes;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.base.FsLogger;
-import xyz.fsgik.common.base.FsString;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.data.FsData;
 import xyz.fsgik.common.io.FsIO;
@@ -220,7 +220,7 @@ public class NetTest {
     }
 
     private byte[] buildServerData(String data) {
-        byte[] dataBytes = data.getBytes(FsString.CHARSET);
+        byte[] dataBytes = data.getBytes(FsChars.defaultCharset());
         byte[] bytes = new byte[6];
         bytes[0] = 0;
         bytes[1] = 0;
@@ -236,7 +236,7 @@ public class NetTest {
         if (bytes.length != 6) {
             throw new FsNetException("bytes.length != 6");
         }
-        return new String(bytes, 3, 3, FsString.CHARSET);
+        return new String(bytes, 3, 3, FsChars.defaultCharset());
     }
 
     private void testUdp0(int bufferSize, int serverThreads, int clientThreads) {
@@ -285,7 +285,7 @@ public class NetTest {
                 try {
                     for (int i = 0; i < 10; i++) {
                         c.send(FsUdpPacket.of(
-                            ByteBuffer.wrap("udp-client".getBytes(FsString.CHARSET)),
+                            ByteBuffer.wrap("udp-client".getBytes(FsChars.defaultCharset())),
                             new InetSocketAddress("localhost", udpServer.getPort()))
                         );
                         Fs.sleep(50);
@@ -334,7 +334,7 @@ public class NetTest {
             )
         );
         System.out.println("Server received:");
-        System.out.println(new String(received.toByteArray(), FsString.CHARSET));
+        System.out.println(new String(received.toByteArray(), FsChars.defaultCharset()));
         System.out.println("Client response header:");
         Map<String, Object> headers = response.getHeaders();
         System.out.println(headers);

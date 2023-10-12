@@ -1,8 +1,8 @@
 package xyz.fsgik.common.io;
 
 import xyz.fsgik.annotations.Nullable;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.base.FsCheck;
-import xyz.fsgik.common.base.FsString;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -428,14 +428,14 @@ public class FsIO {
     }
 
     /**
-     * Reads String encoded by all bytes from given input stream with {@link FsString#CHARSET}.
+     * Reads String encoded by all bytes from given input stream with {@link FsChars#defaultCharset()}.
      * Return null if no data read out and reach to the end of stream.
      *
      * @param inputStream given input stream
      */
     @Nullable
     public static String readString(InputStream inputStream) {
-        return readString(inputStream, FsString.CHARSET);
+        return readString(inputStream, FsChars.defaultCharset());
     }
 
     /**
@@ -456,14 +456,14 @@ public class FsIO {
 
     /**
      * Reads available String encoded by all bytes from given input stream with
-     * {@link FsString#CHARSET}, returns null if reaches end of the stream.
+     * {@link FsChars#defaultCharset()}, returns null if reaches end of the stream.
      * Return null if no data read out and reach to the end of stream.
      *
      * @param inputStream given input stream
      */
     @Nullable
     public static String avalaibleString(InputStream inputStream) {
-        return avalaibleString(inputStream, FsString.CHARSET);
+        return avalaibleString(inputStream, FsChars.defaultCharset());
     }
 
     /**
@@ -483,12 +483,12 @@ public class FsIO {
     }
 
     /**
-     * Wraps given input stream as a reader with {@link InputStreamReader} and {@link FsString#CHARSET}.
+     * Wraps given input stream as a reader with {@link InputStreamReader} and {@link FsChars#defaultCharset()}.
      *
      * @param inputStream given input stream
      */
     public static Reader toReader(InputStream inputStream) {
-        return toReader(inputStream, FsString.CHARSET);
+        return toReader(inputStream, FsChars.defaultCharset());
     }
 
     /**
@@ -511,12 +511,12 @@ public class FsIO {
     }
 
     /**
-     * Wraps given reader as an input stream with {@link FsString#CHARSET}, doesn't support mark/reset.
+     * Wraps given reader as an input stream with {@link FsChars#defaultCharset()}, doesn't support mark/reset.
      *
      * @param reader given reader
      */
     public static InputStream toInputStream(Reader reader) {
-        return toInputStream(reader, FsString.CHARSET);
+        return toInputStream(reader, FsChars.defaultCharset());
     }
 
     /**
@@ -587,12 +587,12 @@ public class FsIO {
     }
 
     /**
-     * Wraps given output stream as a writer with {@link OutputStreamWriter} and {@link FsString#CHARSET}.
+     * Wraps given output stream as a writer with {@link OutputStreamWriter} and {@link FsChars#defaultCharset()}.
      *
      * @param outputStream given out stream
      */
     public static Writer toWriter(OutputStream outputStream) {
-        return toWriter(outputStream, FsString.CHARSET);
+        return toWriter(outputStream, FsChars.defaultCharset());
     }
 
     /**
@@ -615,7 +615,7 @@ public class FsIO {
     }
 
     /**
-     * Wraps given appendable as an output stream with {@link FsString#CHARSET}.
+     * Wraps given appendable as an output stream with {@link FsChars#defaultCharset()}.
      * <p>
      * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid for given {@code appendable}
      * if it is instance of {@link Writer}.
@@ -623,7 +623,7 @@ public class FsIO {
      * @param appendable given appendable
      */
     public static OutputStream toOutputStream(Appendable appendable) {
-        return toOutputStream(appendable, FsString.CHARSET);
+        return toOutputStream(appendable, FsChars.defaultCharset());
     }
 
     /**
@@ -745,12 +745,12 @@ public class FsIO {
 
     /**
      * Using {@link RandomAccessFile} to read all bytes of given file of path.
-     * The read bytes will be encoded to String with {@link FsString#CHARSET}.
+     * The read bytes will be encoded to String with {@link FsChars#defaultCharset()}.
      *
      * @param path given file of path
      */
     public static String readString(Path path) {
-        return readString(path, FsString.CHARSET);
+        return readString(path, FsChars.defaultCharset());
     }
 
     /**
@@ -767,14 +767,14 @@ public class FsIO {
     /**
      * Using {@link RandomAccessFile} to read given length bytes of given file of path from offset position,
      * the given length may be set to -1 to read to end of file.
-     * The read bytes will be encoded to String with {@link FsString#CHARSET}.
+     * The read bytes will be encoded to String with {@link FsChars#defaultCharset()}.
      *
      * @param path   given file of path
      * @param offset offset position
      * @param length given length, maybe -1 to read to end of file
      */
     public static String readString(Path path, long offset, long length) {
-        return readString(path, offset, length, FsString.CHARSET);
+        return readString(path, offset, length, FsChars.defaultCharset());
     }
 
     /**
@@ -824,12 +824,12 @@ public class FsIO {
 
     /**
      * Using {@link RandomAccessFile} to write given data into given file.
-     * The written bytes will be decoded from given data with {@link FsString#CHARSET}.
+     * The written bytes will be decoded from given data with {@link FsChars#defaultCharset()}.
      *
      * @param path given file of path
      */
     public static void writeString(Path path, CharSequence data) {
-        writeString(path, data, FsString.CHARSET);
+        writeString(path, data, FsChars.defaultCharset());
     }
 
     /**
@@ -846,7 +846,7 @@ public class FsIO {
     /**
      * Using {@link RandomAccessFile} to write given data into given file of path from offset position,
      * the given length may be set to -1 to write unlimitedly.
-     * The written bytes will be decoded from given data with {@link FsString#CHARSET}.
+     * The written bytes will be decoded from given data with {@link FsChars#defaultCharset()}.
      *
      * @param path   given file of path
      * @param offset offset position
@@ -854,7 +854,7 @@ public class FsIO {
      * @param data   given data
      */
     public static void writeString(Path path, long offset, long length, CharSequence data) {
-        writeString(path, offset, length, data, FsString.CHARSET);
+        writeString(path, offset, length, data, FsChars.defaultCharset());
     }
 
     /**

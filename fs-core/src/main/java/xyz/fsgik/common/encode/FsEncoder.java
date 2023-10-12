@@ -2,7 +2,7 @@ package xyz.fsgik.common.encode;
 
 import xyz.fsgik.annotations.ThreadSafe;
 import xyz.fsgik.common.base.FsBytes;
-import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.io.FsIO;
 
 import java.io.InputStream;
@@ -171,13 +171,13 @@ public interface FsEncoder {
     }
 
     /**
-     * Resolves source string with {@link FsString#CHARSET},
+     * Resolves source string with {@link FsChars#defaultCharset()},
      * and build encoding result to string with {@link StandardCharsets#ISO_8859_1}.
      *
      * @param source source string
      */
     default String encodeToString(String source) {
-        return encodeToString(source.getBytes(FsString.CHARSET));
+        return encodeToString(source.getBytes(FsChars.defaultCharset()));
     }
 
     /**
@@ -280,22 +280,22 @@ public interface FsEncoder {
     long decode(InputStream source, OutputStream dest);
 
     /**
-     * Decodes source array and build encoding result to string with {@link FsString#CHARSET}.
+     * Decodes source array and build encoding result to string with {@link FsChars#defaultCharset()}.
      *
      * @param source source array
      */
     default String decodeToString(byte[] source) {
-        return new String(decode(source), FsString.CHARSET);
+        return new String(decode(source), FsChars.defaultCharset());
     }
 
     /**
      * Resolves source string with {@link StandardCharsets#ISO_8859_1},
-     * and build encoding result to string with {@link FsString#CHARSET}.
+     * and build encoding result to string with {@link FsChars#defaultCharset()}.
      *
      * @param source source string
      */
     default String decode(String source) {
-        return new String(decode(source.getBytes(StandardCharsets.ISO_8859_1)), FsString.CHARSET);
+        return new String(decode(source.getBytes(StandardCharsets.ISO_8859_1)), FsChars.defaultCharset());
     }
 
     /**

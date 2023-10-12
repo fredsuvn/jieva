@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Utilities for chars (such as char array, {@link CharBuffer} and {@link Charset}).
+ * Utilities for char array, {@link CharBuffer}, {@link Charset}, etc.
  *
  * @author sunq62
  */

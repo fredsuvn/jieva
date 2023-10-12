@@ -3,7 +3,7 @@ package xyz.fsgik.common.data.protobuf;
 import com.google.protobuf.ByteString;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
@@ -36,10 +36,10 @@ public class ByteStringConvertHandler implements FsConverter.Handler {
     private final Charset charset;
 
     /**
-     * Constructs with {@link FsString#CHARSET}.
+     * Constructs with {@link FsChars#defaultCharset()}.
      */
     public ByteStringConvertHandler() {
-        this.charset = FsString.CHARSET;
+        this.charset = FsChars.defaultCharset();
     }
 
     /**

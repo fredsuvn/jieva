@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * Utilities for bytes (such as byte array, {@link ByteBuffer}).
+ * Utilities for byte array, {@link ByteBuffer}, etc.
  *
  * @author sunq62
  */
@@ -100,7 +100,7 @@ public class FsBytes {
 
     /**
      * Returns a sub-range view of given buffer, start from given offset to limit.
-     * The two buffer will share the same data so any operation will reflect each other.
+     * The two buffers will share the same data so any operation will reflect each other.
      * <p>
      * Note the offset is start from 0 <b>not</b> current position.
      *
@@ -119,7 +119,7 @@ public class FsBytes {
 
     /**
      * Returns a sub-range view of given buffer, start from given offset to specified length.
-     * The two buffer will share the same data so any operation will reflect each other.
+     * The two buffers will share the same data so any operation will reflect each other.
      * <p>
      * Note the offset is start from 0 <b>not</b> current position.
      *
