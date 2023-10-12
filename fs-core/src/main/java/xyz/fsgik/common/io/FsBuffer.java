@@ -10,6 +10,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.IntFunction;
 
 /**
  * Utilities for {@link Buffer}, etc.
@@ -163,10 +164,10 @@ public class FsBuffer {
      *
      * @param buffer    given buffer
      * @param length    fixed length
-     * @param generator given buffer generator
+     * @param generator given buffer generator, the function arguments is capacity
      * @return split buffers
      */
-    public static List<ByteBuffer> splitInLength(ByteBuffer buffer, int length, BufferGen generator) {
+    public static List<ByteBuffer> splitInLength(ByteBuffer buffer, int length, IntFunction<ByteBuffer> generator) {
         if (!buffer.hasRemaining()) {
             return Collections.emptyList();
         }
@@ -229,11 +230,11 @@ public class FsBuffer {
      * @param buffer       given buffer
      * @param lengthOffset offset of length
      * @param lengthSize   length size must in 1, 2, 4
-     * @param generator    given buffer generator
+     * @param generator    given buffer generator, the function arguments is capacity
      * @return split buffers
      */
     public static List<ByteBuffer> splitInLength(
-        ByteBuffer buffer, int lengthOffset, int lengthSize, BufferGen generator) {
+        ByteBuffer buffer, int lengthOffset, int lengthSize, IntFunction<ByteBuffer> generator) {
         if (!buffer.hasRemaining()) {
             return Collections.emptyList();
         }
@@ -319,10 +320,11 @@ public class FsBuffer {
      *
      * @param buffer    given buffer
      * @param delimiter specified delimiter
-     * @param generator given buffer generator
+     * @param generator given buffer generator, the function arguments is capacity
      * @return split buffers
      */
-    public static List<ByteBuffer> splitByDelimiter(ByteBuffer buffer, byte delimiter, BufferGen generator) {
+    public static List<ByteBuffer> splitByDelimiter(
+        ByteBuffer buffer, byte delimiter, IntFunction<ByteBuffer> generator) {
         if (!buffer.hasRemaining()) {
             return Collections.emptyList();
         }
@@ -347,21 +349,5 @@ public class FsBuffer {
         }
         buffer.reset();
         return result == null ? Collections.emptyList() : result;
-    }
-
-    /**
-     * Functional interface to generator byte buffer.
-     *
-     * @author fredsuvn
-     */
-    @FunctionalInterface
-    public interface BufferGen {
-        /**
-         * Returns a byte buffer with specified capacity.
-         * Position of returned buffer is 0 and limit is capacity.
-         *
-         * @param capacity specified capacity
-         */
-        ByteBuffer apply(int capacity);
     }
 }

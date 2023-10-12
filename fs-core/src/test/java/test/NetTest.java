@@ -15,6 +15,8 @@ import xyz.fsgik.common.net.FsNetServerException;
 import xyz.fsgik.common.net.http.FsHttp;
 import xyz.fsgik.common.net.http.FsHttpResponse;
 import xyz.fsgik.common.net.tcp.*;
+import xyz.fsgik.common.net.tcp.handlers.DelimiterBasedTcpChannelHandler;
+import xyz.fsgik.common.net.tcp.handlers.LengthBasedTcpChannelHandler;
 import xyz.fsgik.common.net.udp.*;
 
 import java.io.ByteArrayOutputStream;
@@ -35,9 +37,12 @@ public class NetTest {
 
     @Test
     public void testTcp() {
-        testTcp0(6, 5, 10);
-        testTcp0(1024, 8, 20);
-        testTcp0(22, 8, 50);
+        testTcpLengthBased(6, 5, 10);
+        testTcpLengthBased(1024, 8, 20);
+        testTcpLengthBased(22, 8, 50);
+        testTcpDelimiterBased(6, 5, 10);
+        testTcpDelimiterBased(1024, 8, 20);
+        testTcpDelimiterBased(22, 8, 50);
     }
 
     @Test
@@ -52,7 +57,7 @@ public class NetTest {
         testHttp0();
     }
 
-    private void testTcp0(int bufferSize, int serverThreads, int clientThreads) {
+    private void testTcpLengthBased(int bufferSize, int serverThreads, int clientThreads) {
         Map<String, AtomicInteger> data = new ConcurrentHashMap<>();
 
         //server: hlo
@@ -237,6 +242,173 @@ public class NetTest {
             throw new FsNetException("bytes.length != 6");
         }
         return new String(bytes, 3, 3, FsChars.defaultCharset());
+    }
+
+    private void testTcpDelimiterBased(int bufferSize, int serverThreads, int clientThreads) {
+        Map<String, AtomicInteger> data = new ConcurrentHashMap<>();
+
+        //server: hlo
+        //client: hlo
+        //client: abc * 10
+        //server: qwe * 10
+        //client: bye
+        //server bye
+
+        FsTcpServer server = FsTcpServer.newBuilder()
+            .channelBufferSize(bufferSize)
+            .executor(Executors.newFixedThreadPool(serverThreads))
+            .serverHandler(new FsTcpServerHandler() {
+                @Override
+                public void onException(FsNetServerException exception) {
+                    FsLogger.defaultLogger().info("server.onException: ", exception);
+                }
+
+                @Override
+                public void onOpen(FsTcpChannel channel) {
+                    TestUtil.count("server-onOpen", data);
+                    channel.sendAndFlush(FsData.wrap("hlo|"));
+                    TestUtil.count("hlo", data);
+                }
+
+                @Override
+                public void onClose(FsTcpChannel channel, ByteBuffer buffer) {
+                    TestUtil.count("server-onClose", data);
+                }
+
+                @Override
+                public void onException(FsTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
+                    TestUtil.count("server-channel.onException", data);
+                    FsLogger.defaultLogger().info("server-channel.onException: ", throwable);
+                }
+            })
+            .addChannelHandler(new DelimiterBasedTcpChannelHandler((byte) '|'))
+            .addChannelHandler(new FsTcpChannelHandler<List<ByteBuffer>>() {
+                @Override
+                public @Nullable Object onMessage(FsTcpChannel channel, List<ByteBuffer> message) {
+                    for (ByteBuffer buffer : message) {
+                        String str = FsBuffer.getString(buffer);
+                        TestUtil.count(str, data);
+                        System.out.println("TCP receive (" + channel.getRemoteSocketAddress() + "): " + str);
+                        switch (str) {
+                            case "abc": {
+                                channel.sendAndFlush(FsData.wrap("qwe|"));
+                                break;
+                            }
+                            case "bye": {
+                                channel.sendAndFlush(FsData.wrap("bye|"));
+                                //channel.flush();
+                                channel.closeNow();
+                                break;
+                            }
+                        }
+                    }
+                    //channel.flush();
+                    return null;
+                }
+            })
+            .build();
+        server.start(false);
+        server.closeNow();
+        server = server.toBuilder().executor(Executors.newFixedThreadPool(serverThreads)).build();
+        CountDownLatch latch = new CountDownLatch(clientThreads);
+        FsTcpClient client = FsTcpClient.newBuilder()
+            .channelBufferSize(bufferSize)
+            .clientHandler(new FsTcpClientHandler() {
+                @Override
+                public void onOpen(FsTcpChannel channel) {
+                    TestUtil.count("client-onOpen", data);
+                }
+
+                @Override
+                public void onClose(FsTcpChannel channel, ByteBuffer buffer) {
+                    TestUtil.count("client-onClose", data);
+                }
+
+                @Override
+                public void onException(FsTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
+                    TestUtil.count("client-channel.onException", data);
+                    FsLogger.defaultLogger().info("client-channel.onException: ", throwable);
+                }
+            })
+            .addChannelHandler(new DelimiterBasedTcpChannelHandler((byte) '|'))
+            .addChannelHandler(new FsTcpChannelHandler<List<ByteBuffer>>() {
+                @Override
+                public @Nullable Object onMessage(FsTcpChannel channel, List<ByteBuffer> message) {
+                    for (ByteBuffer buffer : message) {
+                        String str = FsBuffer.getString(buffer);
+                        TestUtil.count(str, data);
+                        switch (str) {
+                            case "hlo": {
+                                new Thread(() -> {
+                                    channel.sendAndFlush(FsData.wrap("a"));
+                                    Fs.sleep(200);
+                                    channel.sendAndFlush(FsData.wrap("bc|"));
+                                    Fs.sleep(200);
+                                    channel.sendAndFlush(FsData.wrap("abc|"));
+                                    Fs.sleep(200);
+                                    channel.sendAndFlush(FsData.wrap("ab"));
+                                    Fs.sleep(200);
+                                    channel.sendAndFlush(FsData.wrap("c|a"));
+                                    Fs.sleep(200);
+                                    channel.sendAndFlush(FsData.wrap("bc|a"));
+                                    Fs.sleep(200);
+                                    channel.sendAndFlush(FsData.wrap("bc"));
+                                    Fs.sleep(200);
+                                    channel.sendAndFlush(FsData.wrap("|abc|abc|abc|abc|abc"));
+                                    Fs.sleep(500);
+                                    channel.sendAndFlush(FsData.wrap("|bye|"));
+                                }).start();
+                                break;
+                            }
+                            case "bye": {
+                                //channel.flush();
+                                channel.closeNow();
+                                break;
+                            }
+                        }
+                    }
+                    channel.flush();
+                    return null;
+                }
+            })
+            .build();
+        List<FsTcpClient> clients = new LinkedList<>();
+        clients.add(client);
+        for (int i = 0; i < clientThreads - 1; i++) {
+            clients.add(client.toBuilder().build());
+        }
+        FsTcpServer tcpServer = server;
+        tcpServer.start(false);
+        for (FsTcpClient c : clients) {
+            new Thread(() -> {
+                try {
+                    c.start("localhost", tcpServer.getPort());
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+                latch.countDown();
+            }).start();
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        tcpServer.close();
+        //server: hlo
+        //client: hlo
+        //client: abc * 10
+        //server: qwe * 10
+        //client: bye
+        //server bye
+        Assert.assertEquals(data.get("server-onOpen").get(), clientThreads);
+        Assert.assertEquals(data.get("client-onOpen").get(), clientThreads);
+        Assert.assertEquals(data.get("server-onClose").get(), clientThreads);
+        Assert.assertEquals(data.get("client-onClose").get(), clientThreads);
+        Assert.assertEquals(data.get("hlo").get(), clientThreads * 2);
+        Assert.assertEquals(data.get("bye").get(), clientThreads * 2);
+        Assert.assertEquals(data.get("abc").get(), clientThreads * 10);
+        Assert.assertEquals(data.get("qwe").get(), clientThreads * 10);
     }
 
     private void testUdp0(int bufferSize, int serverThreads, int clientThreads) {

@@ -1,6 +1,8 @@
 package xyz.fsgik.common.net.tcp;
 
 import xyz.fsgik.annotations.Nullable;
+import xyz.fsgik.common.net.tcp.handlers.DelimiterBasedTcpChannelHandler;
+import xyz.fsgik.common.net.tcp.handlers.LengthBasedTcpChannelHandler;
 
 import java.nio.ByteBuffer;
 
@@ -22,11 +24,12 @@ import java.nio.ByteBuffer;
  * If buffer of the channel is full, it will not read and put again.
  * If the remaining data from the last callback has not been consumed, it will be left until the next callback.
  * <p>
- * See the built-in handler implementations: {@link LengthBasedTcpChannelHandler}.
+ * See the built-in handler implementations: {@link LengthBasedTcpChannelHandler}, {@link DelimiterBasedTcpChannelHandler}.
  *
  * @param <M> message type
  * @author fredsuvn
  * @see LengthBasedTcpChannelHandler
+ * @see DelimiterBasedTcpChannelHandler
  */
 public interface FsTcpChannelHandler<M> {
 

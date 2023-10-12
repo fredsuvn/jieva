@@ -481,31 +481,11 @@ public interface FsTcpServer extends FsTcpEndpoint {
             }
 
             private void compactBuffer(ChannelImpl channel) {
-                if (channel.buffer.position() == 0) {
-                    //not consumed
-                    return;
-                }
-                if (channel.buffer.remaining() <= 0) {
-                    channel.buffer = EMPTY_BUFFER;
-                    return;
-                }
-                ByteBuffer newBuffer = bufferGenerator.apply(channel.buffer.remaining());
-                newBuffer.put(channel.buffer);
-                newBuffer.flip();
-                channel.buffer = newBuffer.asReadOnlyBuffer();
+                channel.buffer = TcpUtil.compact(channel.buffer, bufferGenerator);
             }
 
             private void compactBuffer(ChannelImpl channel, byte[] newBytes) {
-                if (channel.buffer.remaining() <= 0) {
-                    channel.buffer = ByteBuffer.wrap(newBytes).asReadOnlyBuffer();
-                    return;
-                }
-                int newCapacity = channel.buffer.remaining() + newBytes.length;
-                ByteBuffer newBuffer = bufferGenerator.apply(newCapacity);
-                newBuffer.put(channel.buffer);
-                newBuffer.put(newBytes);
-                newBuffer.flip();
-                channel.buffer = newBuffer.asReadOnlyBuffer();
+                channel.buffer = TcpUtil.compact(channel.buffer, newBytes, bufferGenerator);
             }
 
             private final class ChannelImpl implements FsTcpChannel {
