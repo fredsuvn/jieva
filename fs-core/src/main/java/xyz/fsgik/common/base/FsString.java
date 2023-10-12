@@ -390,7 +390,7 @@ public class FsString {
     }
 
     /**
-     * Splits given chars by given separator, using given sub-sequence function to generate sub CharSequence.
+     * Splits given chars by given separator, using given sub-sequence generator to generate sub CharSequence.
      * If chars or separator is empty, or separator's length is greater than chars' length,
      * or separator is never matched, return an empty list.
      * <p>
@@ -399,9 +399,9 @@ public class FsString {
      *
      * @param chars     given chars
      * @param separator given separator
-     * @param function  given sub-sequence function
+     * @param generator given sub-sequence generator
      */
-    public static List<CharSequence> split(CharSequence chars, CharSequence separator, StringFunction function) {
+    public static List<CharSequence> split(CharSequence chars, CharSequence separator, CharsGen generator) {
         if (isEmpty(chars) || isEmpty(separator) || separator.length() > chars.length()) {
             return Collections.emptyList();
         }
@@ -410,17 +410,17 @@ public class FsString {
         while (true) {
             int index = indexOf(chars, separator, wordStart);
             if (index >= 0) {
-                result.add(function.apply(chars, wordStart, index));
+                result.add(generator.apply(chars, wordStart, index));
                 wordStart = index + separator.length();
                 if (wordStart >= chars.length()) {
-                    result.add(function.apply(chars, wordStart, chars.length()));
+                    result.add(generator.apply(chars, wordStart, chars.length()));
                     return result;
                 }
             } else {
                 if (result.isEmpty()) {
                     return Collections.emptyList();
                 }
-                result.add(function.apply(chars, wordStart, chars.length()));
+                result.add(generator.apply(chars, wordStart, chars.length()));
                 return result;
             }
         }
@@ -974,34 +974,8 @@ public class FsString {
      *
      * @param supplier given supplier
      */
-    public static CharSequence lazyString(Supplier<CharSequence> supplier) {
-        return new CharSequence() {
-
-            private String toString = null;
-
-            @Override
-            public int length() {
-                return toString().length();
-            }
-
-            @Override
-            public char charAt(int index) {
-                return toString().charAt(index);
-            }
-
-            @Override
-            public CharSequence subSequence(int start, int end) {
-                return toString().subSequence(start, end);
-            }
-
-            @Override
-            public String toString() {
-                if (toString == null) {
-                    toString = String.valueOf(supplier.get());
-                }
-                return toString;
-            }
-        };
+    public static CharSequence lazyString(Supplier<String> supplier) {
+        return new LazyChars(supplier);
     }
 
     /**
@@ -1030,16 +1004,76 @@ public class FsString {
      */
     public static CharSequence subView(CharSequence chars, int start, int end) {
         FsCheck.checkRangeInBounds(start, end, 0, chars.length());
-        return new SubCharsImpl(chars, start, end);
+        return new SubChars(chars, start, end);
     }
 
-    private static final class SubCharsImpl implements CharSequence {
+    /**
+     * Functional interface to generator sub-sequence.
+     *
+     * @author fredsuvn
+     */
+    @FunctionalInterface
+    public interface CharsGen {
+        /**
+         * Returns sub-sequence of given chars from given start index inclusive to given end index exclusive.
+         *
+         * @param chars given chars
+         * @param start given start index inclusive
+         * @param end   given end index exclusive
+         */
+        CharSequence apply(CharSequence chars, int start, int end);
+    }
+
+    private static final class LazyChars implements CharSequence {
+
+        private final Supplier<String> supplier;
+        private volatile String chars = null;
+
+        private LazyChars(Supplier<String> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        public int length() {
+            return get().length();
+        }
+
+        @Override
+        public char charAt(int index) {
+            return get().charAt(index);
+        }
+
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            return get().subSequence(start, end);
+        }
+
+        @Override
+        public String toString() {
+            return get();
+        }
+
+        private String get() {
+            if (chars != null) {
+                return chars;
+            }
+            synchronized (this) {
+                if (chars != null) {
+                    return chars;
+                }
+                chars = supplier.get();
+                return chars;
+            }
+        }
+    }
+
+    private static final class SubChars implements CharSequence {
 
         private final CharSequence source;
         private final int start;
         private final int end;
 
-        private SubCharsImpl(CharSequence source, int start, int end) {
+        private SubChars(CharSequence source, int start, int end) {
             this.source = source;
             this.start = start;
             this.end = end;

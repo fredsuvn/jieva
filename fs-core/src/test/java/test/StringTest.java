@@ -225,4 +225,16 @@ public class StringTest {
         Assert.assertEquals("abc", FsString.uncapitalize("abc"));
         Assert.assertEquals("abc", FsString.uncapitalize("Abc"));
     }
+
+    @Test
+    public void testLazyString() {
+        int[] is = {0};
+        CharSequence lazy = FsString.lazyString(() -> {
+            is[0] = 1;
+            return "8899";
+        });
+        Assert.assertEquals(is[0], 0);
+        Assert.assertEquals(lazy.toString(), "8899");
+        Assert.assertEquals(is[0], 1);
+    }
 }
