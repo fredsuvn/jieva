@@ -2,6 +2,9 @@ package xyz.fsgik.common.base;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Utilities for byte array, {@link ByteBuffer}, etc.
@@ -138,89 +141,136 @@ public class FsBytes {
         return slice;
     }
 
-    //    /**
-    //     * Reads and split given buffer in fixed length. This method will move buffer's position by reading.
-    //     * If the remaining length of buffer is not enough to split,
-    //     * the buffer's position will be reset to last start position.
-    //     *
-    //     * @param buffer given buffer
-    //     * @param length fixed length
-    //     */
-    //    public static List<ByteBuffer> splitWithFixedLength(ByteBuffer buffer, int length) {
-    //        if (!buffer.hasRemaining()) {
-    //            return Collections.emptyList();
-    //        }
-    //        if (buffer.remaining() < length) {
-    //            return Collections.emptyList();
-    //        }
-    //        List<ByteBuffer> result = null;
-    //        while (buffer.remaining() >= length) {
-    //            byte[] bytes = new byte[length];
-    //            buffer.get(bytes);
-    //            if (result == null) {
-    //                result = new LinkedList<>();
-    //            }
-    //            result.add(ByteBuffer.wrap(bytes).asReadOnlyBuffer());
-    //        }
-    //        return result;
-    //    }
-    //
-    //    /**
-    //     * Reads and split given buffer in specified length.
-    //     * <p>
-    //     * The split length is specified at offset ({@code lengthOffset}) of buffer, and the {@code lengthSize}
-    //     * specifies width of {@code lengthOffset} (must in 1, 2, 4).
-    //     * <b>The split length value must &lt;= {@link Integer#MAX_VALUE}.</b>
-    //     * <p>
-    //     * This method will move buffer's position by reading.
-    //     * If the remaining length of buffer is not enough to split,
-    //     * the buffer's position will be reset to last start position.
-    //     *
-    //     * @param buffer       given buffer
-    //     * @param lengthOffset offset of length
-    //     * @param lengthSize   length size must in 1, 2, 4
-    //     */
-    //    public static List<ByteBuffer> splitWithSpecifiedLength(ByteBuffer buffer, int lengthOffset, int lengthSize) {
-    //        if (!buffer.hasRemaining()) {
-    //            return Collections.emptyList();
-    //        }
-    //        int minSize = lengthOffset + lengthSize;
-    //        if (buffer.remaining() < minSize) {
-    //            return Collections.emptyList();
-    //        }
-    //        List<ByteBuffer> result = null;
-    //        while (true) {
-    //            buffer.mark();
-    //            buffer.position(buffer.position() + lengthOffset);
-    //            int length = readLength(buffer, lengthSize);
-    //            buffer.reset();
-    //            if (buffer.remaining() < length) {
-    //                break;
-    //            }
-    //            byte[] bytes = new byte[length];
-    //            buffer.get(bytes);
-    //            if (result == null) {
-    //                result = new LinkedList<>();
-    //            }
-    //            result.add(ByteBuffer.wrap(bytes).asReadOnlyBuffer());
-    //            if (buffer.remaining() < minSize) {
-    //                break;
-    //            }
-    //        }
-    //        return result == null ? Collections.emptyList() : result;
-    //    }
-    //
-    //    private static int readLength(ByteBuffer buffer, int lengthSize) {
-    //        switch (lengthSize) {
-    //            case 1:
-    //                return buffer.get() & 0x000000ff;
-    //            case 2:
-    //                return buffer.getShort() & 0x0000ffff;
-    //            case 4:
-    //                return buffer.getInt();
-    //        }
-    //        throw new IllegalArgumentException("lengthSize must in (1, 2, 4).");
-    //    }
+    /**
+     * Reads and split given buffer in fixed length. This method will move buffer's position by reading.
+     * If the remaining length of buffer is not enough to split,
+     * the buffer's position will be reset to last start position.
+     * This method use {@link ByteBuffer#allocate(int)} to create new buffer,
+     * then put data into the new buffer from given buffer.
+     *
+     * @param buffer given buffer
+     * @param length fixed length
+     */
+    public static List<ByteBuffer> splitInLength(ByteBuffer buffer, int length) {
+        return splitInLength(buffer, length, ByteBuffer::allocate);
+    }
+
+    /**
+     * Reads and split given buffer in fixed length. This method will move buffer's position by reading.
+     * If the remaining length of buffer is not enough to split,
+     * the buffer's position will be reset to last start position.
+     * This method use given buffer generator to create new buffer, then put data into the new buffer from given buffer.
+     *
+     * @param buffer    given buffer
+     * @param length    fixed length
+     * @param generator given buffer generator
+     */
+    public static List<ByteBuffer> splitInLength(ByteBuffer buffer, int length, BufferGen generator) {
+        if (!buffer.hasRemaining()) {
+            return Collections.emptyList();
+        }
+        if (buffer.remaining() < length) {
+            return Collections.emptyList();
+        }
+        List<ByteBuffer> result = null;
+        while (buffer.remaining() >= length) {
+            ByteBuffer subBuffer = generator.apply(length);
+            subBuffer.put(slice(buffer, length));
+            subBuffer.flip();
+            buffer.position(buffer.position() + length);
+            if (result == null) {
+                result = new LinkedList<>();
+            }
+            result.add(subBuffer);
+        }
+        return result;
+    }
+
+    /**
+     * Reads and split given buffer in specified length.
+     * <p>
+     * The split length is specified at offset ({@code lengthOffset}) of buffer, and the {@code lengthSize}
+     * specifies width of {@code lengthOffset} (must in 1, 2, 4).
+     * <b>The split length value must &lt;= {@link Integer#MAX_VALUE}.</b>
+     * <p>
+     * This method will move buffer's position by reading.
+     * If the remaining length of buffer is not enough to split,
+     * the buffer's position will be reset to last start position.
+     * <p>
+     * This method use {@link ByteBuffer#allocate(int)} to create new buffer,
+     * then put data into the new buffer from given buffer.
+     *
+     * @param buffer       given buffer
+     * @param lengthOffset offset of length
+     * @param lengthSize   length size must in 1, 2, 4
+     */
+    public static List<ByteBuffer> splitInLength(
+        ByteBuffer buffer, int lengthOffset, int lengthSize) {
+        return splitInLength(buffer, lengthOffset, lengthSize, ByteBuffer::allocate);
+    }
+
+    /**
+     * Reads and split given buffer in specified length.
+     * <p>
+     * The split length is specified at offset ({@code lengthOffset}) of buffer, and the {@code lengthSize}
+     * specifies width of {@code lengthOffset} (must in 1, 2, 4).
+     * <b>The split length value must &lt;= {@link Integer#MAX_VALUE}.</b>
+     * <p>
+     * This method will move buffer's position by reading.
+     * If the remaining length of buffer is not enough to split,
+     * the buffer's position will be reset to last start position.
+     * <p>
+     * This method use given buffer generator to create new buffer, then put data into the new buffer from given buffer.
+     *
+     * @param buffer       given buffer
+     * @param lengthOffset offset of length
+     * @param lengthSize   length size must in 1, 2, 4
+     * @param generator    given buffer generator
+     */
+    public static List<ByteBuffer> splitInLength(
+        ByteBuffer buffer, int lengthOffset, int lengthSize, BufferGen generator) {
+        if (!buffer.hasRemaining()) {
+            return Collections.emptyList();
+        }
+        int minSize = lengthOffset + lengthSize;
+        if (buffer.remaining() < minSize) {
+            return Collections.emptyList();
+        }
+        List<ByteBuffer> result = null;
+        while (true) {
+            buffer.mark();
+            buffer.position(buffer.position() + lengthOffset);
+            int length = readLength(buffer, lengthSize);
+            buffer.reset();
+            if (buffer.remaining() < length) {
+                break;
+            }
+            ByteBuffer subBuffer = generator.apply(length);
+            subBuffer.put(slice(buffer, length));
+            subBuffer.flip();
+            buffer.position(buffer.position() + length);
+            if (result == null) {
+                result = new LinkedList<>();
+            }
+            result.add(subBuffer);
+            if (buffer.remaining() < minSize) {
+                break;
+            }
+        }
+        return result == null ? Collections.emptyList() : result;
+    }
+
+    private static int readLength(ByteBuffer buffer, int lengthSize) {
+        switch (lengthSize) {
+            case 1:
+                return buffer.get() & 0x000000ff;
+            case 2:
+                return buffer.getShort() & 0x0000ffff;
+            case 4:
+                return buffer.getInt();
+        }
+        throw new IllegalArgumentException("lengthSize must in (1, 2, 4).");
+    }
 
     //    /**
     //     * Reads and split given buffer in specified length.
@@ -247,4 +297,20 @@ public class FsBytes {
     //        }
     //        return result.isEmpty() ? Collections.emptyList() : result;
     //    }
+
+    /**
+     * Functional interface to generator byte buffer.
+     *
+     * @author fredsuvn
+     */
+    @FunctionalInterface
+    public interface BufferGen {
+        /**
+         * Returns a byte buffer with specified capacity.
+         * Position of returned buffer is 0 and limit is capacity.
+         *
+         * @param capacity specified capacity
+         */
+        ByteBuffer apply(int capacity);
+    }
 }

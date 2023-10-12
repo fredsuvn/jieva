@@ -7,6 +7,8 @@ import xyz.fsgik.common.base.FsBytesBuilder;
 import xyz.fsgik.common.base.FsString;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class BytesTest {
 
@@ -91,5 +93,21 @@ public class BytesTest {
             FsBytes.getBytes(builder.toByteBuffer()),
             FsString.encode("a1234567893456745678956789")
         );
+    }
+
+    @Test
+    public void testBytesSplit() {
+        ByteBuffer buffer = ByteBuffer.wrap(FsString.encode("1234567890"));
+        Assert.assertEquals(
+            FsBytes.splitInLength(buffer, 4).stream().map(FsBytes::getString).collect(Collectors.toList()),
+            Arrays.asList("1234", "5678")
+        );
+        Assert.assertEquals(buffer.position(), 8);
+        buffer = ByteBuffer.wrap(FsString.encode("1234567890"));
+        Assert.assertEquals(
+            FsBytes.splitInLength(buffer, 5).stream().map(FsBytes::getString).collect(Collectors.toList()),
+            Arrays.asList("12345", "67890")
+        );
+        Assert.assertEquals(buffer.position(), 10);
     }
 }
