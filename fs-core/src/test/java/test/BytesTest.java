@@ -52,7 +52,7 @@ public class BytesTest {
         buffer.reset();
         Assert.assertEquals(
             FsString.encode("56789"),
-            FsBytes.getBytes(FsBytes.subBuffer(buffer, 4))
+            FsBytes.getBytes(FsBytes.subView(buffer, 4))
         );
         Assert.assertEquals(
             buffer.position(),
@@ -61,7 +61,7 @@ public class BytesTest {
         buffer.reset();
         Assert.assertEquals(
             FsString.encode("567"),
-            FsBytes.getBytes(FsBytes.subBuffer(buffer, 4, 3))
+            FsBytes.getBytes(FsBytes.subView(buffer, 4, 3))
         );
         Assert.assertEquals(
             buffer.position(),

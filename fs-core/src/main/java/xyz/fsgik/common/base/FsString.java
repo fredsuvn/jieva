@@ -375,7 +375,7 @@ public class FsString {
 
     /**
      * Splits given chars by given separator,
-     * using {@link #subChars(CharSequence, int, int)} to generate sub CharSequence.
+     * using {@link #subView(CharSequence, int, int)} to generate sub CharSequence.
      * If chars or separator is empty, or separator's length is greater than chars' length,
      * or separator is never matched, return an empty list.
      * <p>
@@ -386,7 +386,7 @@ public class FsString {
      * @param separator given separator
      */
     public static List<CharSequence> split(CharSequence chars, CharSequence separator) {
-        return split(chars, separator, FsString::subChars);
+        return split(chars, separator, FsString::subView);
     }
 
     /**
@@ -1009,13 +1009,13 @@ public class FsString {
      * The two chars will share the same data so any operation will reflect each other.
      * <p>
      * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence will still use
-     * {@link #subChars(CharSequence, int, int)}.
+     * {@link #subView(CharSequence, int, int)}.
      *
      * @param chars given chars
      * @param start given start index inclusive
      */
-    public static CharSequence subChars(CharSequence chars, int start) {
-        return subChars(chars, start, chars.length());
+    public static CharSequence subView(CharSequence chars, int start) {
+        return subView(chars, start, chars.length());
     }
 
     /**
@@ -1028,7 +1028,7 @@ public class FsString {
      * @param start given start index inclusive
      * @param end   given end index exclusive
      */
-    public static CharSequence subChars(CharSequence chars, int start, int end) {
+    public static CharSequence subView(CharSequence chars, int start, int end) {
         FsCheck.checkRangeInBounds(start, end, 0, chars.length());
         return new SubCharsImpl(chars, start, end);
     }
@@ -1058,7 +1058,7 @@ public class FsString {
 
         @Override
         public CharSequence subSequence(int start, int end) {
-            return subChars(source, this.start + start, this.start + end);
+            return subView(source, this.start + start, this.start + end);
         }
 
         @Override

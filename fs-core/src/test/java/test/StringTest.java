@@ -164,15 +164,15 @@ public class StringTest {
     @Test
     public void testSubRef() {
         Assert.assertEquals(
-            FsString.subChars("12345678", 2, 7).toString(),
+            FsString.subView("12345678", 2, 7).toString(),
             "34567"
         );
         Assert.assertEquals(
-            FsString.subChars("12345678", 2, 7).charAt(3),
+            FsString.subView("12345678", 2, 7).charAt(3),
             '6'
         );
         Assert.assertEquals(
-            FsString.subChars("12345678", 2, 7).subSequence(1, 3).toString(),
+            FsString.subView("12345678", 2, 7).subSequence(1, 3).toString(),
             "45"
         );
     }

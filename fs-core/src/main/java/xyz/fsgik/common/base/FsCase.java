@@ -67,7 +67,7 @@ public interface FsCase {
 
     /**
      * Splits given chars into a word list with rules of this implementation.
-     * Default implementations use {@link FsString#subChars(CharSequence, int, int)} to build sub-sequence.
+     * Default implementations use {@link FsString#subView(CharSequence, int, int)} to build sub-sequence.
      *
      * @param chars given chars
      */
@@ -100,7 +100,7 @@ public interface FsCase {
      * Camel case implementation. This implementation uses
      * {@link Character#isUpperCase(char)}, {@link Character#toUpperCase(char)} and {@link Character#toLowerCase(char)}
      * to check and convert a char.
-     * And use {@link FsString#subChars(CharSequence, int, int)} to split string.
+     * And use {@link FsString#subView(CharSequence, int, int)} to split string.
      */
     class CamelCase implements FsCase {
 
@@ -137,21 +137,21 @@ public interface FsCase {
                 if (lastIsUpper && !currentIsUpper) {
                     int wordEnd = i - 1;
                     if (wordEnd > wordStart) {
-                        result.add(FsString.subChars(chars, wordStart, wordEnd));
+                        result.add(FsString.subView(chars, wordStart, wordEnd));
                     }
                     wordStart = wordEnd;
                 }
                 // aA: two words
                 else {
                     if (i > wordStart) {
-                        result.add(FsString.subChars(chars, wordStart, i));
+                        result.add(FsString.subView(chars, wordStart, i));
                     }
                     wordStart = i;
                 }
                 lastIsUpper = currentIsUpper;
             }
             if (wordStart < len) {
-                result.add(FsString.subChars(chars, wordStart, len));
+                result.add(FsString.subView(chars, wordStart, len));
             }
             return result;
         }
