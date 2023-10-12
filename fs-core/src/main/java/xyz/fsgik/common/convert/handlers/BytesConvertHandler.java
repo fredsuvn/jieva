@@ -2,8 +2,8 @@ package xyz.fsgik.common.convert.handlers;
 
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsBytes;
 import xyz.fsgik.common.convert.FsConverter;
+import xyz.fsgik.common.io.FsBuffer;
 import xyz.fsgik.common.reflect.FsType;
 
 import java.lang.reflect.Type;
@@ -42,7 +42,7 @@ public class BytesConvertHandler implements FsConverter.Handler {
                 return source;
             } else if (FsType.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = ((ByteBuffer) source).slice();
-                return FsBytes.getBytes(src);
+                return FsBuffer.getBytes(src);
             } else {
                 return Fs.CONTINUE;
             }

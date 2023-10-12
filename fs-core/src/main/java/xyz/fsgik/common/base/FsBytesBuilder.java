@@ -1,5 +1,7 @@
 package xyz.fsgik.common.base;
 
+import xyz.fsgik.common.io.FsBuffer;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
@@ -76,7 +78,7 @@ public class FsBytesBuilder extends ByteArrayOutputStream {
             write(bytes.array(), bytes.arrayOffset() + bytes.position(), bytes.remaining());
             bytes.position(bytes.position() + bytes.remaining());
         } else {
-            byte[] remaining = FsBytes.getBytes(bytes);
+            byte[] remaining = FsBuffer.getBytes(bytes);
             write(remaining, 0, remaining.length);
         }
         return this;

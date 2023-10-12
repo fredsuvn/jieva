@@ -2,8 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.FsBytes;
 import xyz.fsgik.common.base.FsChars;
+import xyz.fsgik.common.io.FsBuffer;
 import xyz.fsgik.common.io.FsIO;
 import xyz.fsgik.common.security.*;
 
@@ -114,7 +114,7 @@ public class SecurityTest {
         int bufferSize = fsMac.prepare(FsIO.toInputStream(data)).key(macKey).doFinal(buffer);
         Assert.assertEquals(bufferSize, mac.getMacLength());
         buffer.flip();
-        Assert.assertEquals(macBytes, FsBytes.getBytes(buffer));
+        Assert.assertEquals(macBytes, FsBuffer.getBytes(buffer));
         System.out.println(destSize);
     }
 
@@ -143,7 +143,7 @@ public class SecurityTest {
         int bufferSize = fd.prepare(FsIO.toInputStream(data)).doFinal(buffer);
         Assert.assertEquals(bufferSize, md.getDigestLength());
         buffer.flip();
-        Assert.assertEquals(mdBytes, FsBytes.getBytes(buffer));
+        Assert.assertEquals(mdBytes, FsBuffer.getBytes(buffer));
         System.out.println(destSize);
     }
 
@@ -182,7 +182,7 @@ public class SecurityTest {
         int bufferSize = fsSign.prepare(FsIO.toInputStream(data)).key(privateKey).doFinal(buffer);
         Assert.assertEquals(bufferSize, signBytes.length);
         buffer.flip();
-        Assert.assertEquals(signBytes, FsBytes.getBytes(buffer));
+        Assert.assertEquals(signBytes, FsBuffer.getBytes(buffer));
         System.out.println(destSize);
 
         //verify
@@ -239,14 +239,14 @@ public class SecurityTest {
         ByteBuffer outBuffer = ByteBuffer.allocate(enBytes.length);
         FsCrypto.encrypt(cipher, publicKey, ByteBuffer.wrap(data), outBuffer, 245, null);
         outBuffer.flip();
-        byte[] enBuffer = FsBytes.getBytes(outBuffer);
+        byte[] enBuffer = FsBuffer.getBytes(outBuffer);
         outBytes.reset();
         FsCrypto.encrypt(cipher, publicKey, new ByteArrayInputStream(data2), outBytes, 0, null);
         byte[] enBytes2 = outBytes.toByteArray();
         outBuffer.clear();
         FsCrypto.encrypt(cipher, publicKey, ByteBuffer.wrap(data2), outBuffer, 0, null);
         outBuffer.flip();
-        byte[] enBuffer2 = FsBytes.getBytes(outBuffer);
+        byte[] enBuffer2 = FsBuffer.getBytes(outBuffer);
 
         //decrypt
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
@@ -259,7 +259,7 @@ public class SecurityTest {
         outBuffer.clear();
         FsCrypto.decrypt(cipher, privateKey, ByteBuffer.wrap(enBuffer), outBuffer, 256, null);
         outBuffer.flip();
-        byte[] deBuffer = FsBytes.getBytes(outBuffer);
+        byte[] deBuffer = FsBuffer.getBytes(outBuffer);
         Assert.assertEquals(deBuffer, data);
         outBytes.reset();
         FsCrypto.decrypt(cipher, privateKey, new ByteArrayInputStream(enBytes2), outBytes, 0, null);
@@ -268,7 +268,7 @@ public class SecurityTest {
         outBuffer.clear();
         FsCrypto.decrypt(cipher, privateKey, ByteBuffer.wrap(enBuffer2), outBuffer, 0, null);
         outBuffer.flip();
-        byte[] deBuffer2 = FsBytes.getBytes(outBuffer);
+        byte[] deBuffer2 = FsBuffer.getBytes(outBuffer);
         Assert.assertEquals(deBuffer2, data2);
     }
 

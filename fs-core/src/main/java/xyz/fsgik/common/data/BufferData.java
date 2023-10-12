@@ -1,8 +1,8 @@
 package xyz.fsgik.common.data;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.FsBytes;
 import xyz.fsgik.common.base.FsCheck;
+import xyz.fsgik.common.io.FsBuffer;
 import xyz.fsgik.common.io.FsIO;
 
 import java.io.InputStream;
@@ -18,7 +18,7 @@ final class BufferData implements FsData {
 
     @Override
     public synchronized byte[] toBytes() {
-        return FsBytes.getBytes(buffer);
+        return FsBuffer.getBytes(buffer);
     }
 
     @Override

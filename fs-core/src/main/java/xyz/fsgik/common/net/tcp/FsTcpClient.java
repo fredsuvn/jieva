@@ -3,9 +3,9 @@ package xyz.fsgik.common.net.tcp;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
 import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsBytes;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.data.FsData;
+import xyz.fsgik.common.io.FsBuffer;
 import xyz.fsgik.common.io.FsIO;
 import xyz.fsgik.common.net.FsNetException;
 import xyz.fsgik.common.net.FsServerStates;
@@ -539,7 +539,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
                     if (data.hasArray()) {
                         send(data.array(), data.arrayOffset(), data.remaining());
                     } else {
-                        send(FsBytes.getBytes(data));
+                        send(FsBuffer.getBytes(data));
                     }
                 }
 

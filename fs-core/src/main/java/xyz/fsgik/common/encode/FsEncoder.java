@@ -1,8 +1,8 @@
 package xyz.fsgik.common.encode;
 
 import xyz.fsgik.annotations.ThreadSafe;
-import xyz.fsgik.common.base.FsBytes;
 import xyz.fsgik.common.base.FsChars;
+import xyz.fsgik.common.io.FsBuffer;
 import xyz.fsgik.common.io.FsIO;
 
 import java.io.InputStream;
@@ -125,7 +125,7 @@ public interface FsEncoder {
      */
     default ByteBuffer encode(ByteBuffer source) {
         try {
-            byte[] src = FsBytes.getBytes(source);
+            byte[] src = FsBuffer.getBytes(source);
             return ByteBuffer.wrap(encode(src));
         } catch (FsEncodeException e) {
             throw e;
@@ -243,7 +243,7 @@ public interface FsEncoder {
      */
     default ByteBuffer decode(ByteBuffer source) {
         try {
-            byte[] src = FsBytes.getBytes(source);
+            byte[] src = FsBuffer.getBytes(source);
             return ByteBuffer.wrap(decode(src));
         } catch (FsEncodeException e) {
             throw e;

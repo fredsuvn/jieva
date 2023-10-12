@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Utilities for char array, {@link CharBuffer}, {@link Charset}, etc.
  *
- * @author sunq62
+ * @author fredsuvn
  */
 public class FsChars {
 
