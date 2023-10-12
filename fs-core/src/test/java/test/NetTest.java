@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsBytes;
 import xyz.fsgik.common.base.FsLogger;
 import xyz.fsgik.common.base.FsString;
 import xyz.fsgik.common.collect.FsCollect;
@@ -93,7 +94,7 @@ public class NetTest {
                 @Override
                 public @Nullable Object onMessage(FsTcpChannel channel, List<ByteBuffer> message) {
                     for (ByteBuffer buffer : message) {
-                        String str = FsIO.getString(buffer);
+                        String str = FsBytes.getString(buffer);
                         TestUtil.count(str, data);
                         System.out.println("TCP receive (" + channel.getRemoteSocketAddress() + "): " + str);
                         switch (str) {
@@ -231,7 +232,7 @@ public class NetTest {
     }
 
     private String parseServerData(ByteBuffer buffer) {
-        byte[] bytes = FsIO.getBytes(buffer);
+        byte[] bytes = FsBytes.getBytes(buffer);
         if (bytes.length != 6) {
             throw new FsNetException("bytes.length != 6");
         }
@@ -260,7 +261,7 @@ public class NetTest {
             .addPacketHandler(new FsUdpPacketHandler<ByteBuffer>() {
                 @Override
                 public @Nullable Object onPacket(FsUdpHeader header, FsUdpClient client, ByteBuffer buffer) {
-                    String str = FsIO.getString(buffer);
+                    String str = FsBytes.getString(buffer);
                     TestUtil.count(str, data);
                     System.out.println("UDP receive (" + header.getInetSocketAddress() + "): " + str);
                     return null;

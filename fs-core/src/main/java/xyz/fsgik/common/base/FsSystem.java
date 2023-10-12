@@ -3,7 +3,6 @@ package xyz.fsgik.common.base;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.collect.FsCollect;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -45,8 +44,6 @@ public class FsSystem {
 
     //Add on JDK17:
     public static final String NATIVE_ENCODING_KEY = "native.encoding";
-
-    private static Charset nativeCharset = null;
 
     @Nullable
     public static String getJavaVersion() {
@@ -203,51 +200,6 @@ public class FsSystem {
      */
     public static Map<String, String> getProperties() {
         return FsCollect.toMap(System.getProperties());
-    }
-
-    /**
-     * Returns the default charset of JVM: {@link Charset#defaultCharset()}
-     */
-    public static Charset jvmCharset() {
-        return Charset.defaultCharset();
-    }
-
-    /**
-     * Returns native charset.
-     * This will search following system properties in order:
-     * <ul>
-     * <li>native.encoding</li>
-     * <li>sun.jnu.encoding</li>
-     * <li>file.encoding</li>
-     * </ul>
-     * <p>
-     * If still not found, return null.
-     */
-    @Nullable
-    public static Charset nativeCharset() {
-        Charset result = null;
-        if (nativeCharset == null) {
-            String encoding = getNativeEncoding();
-            if (encoding != null) {
-                result = Charset.forName(encoding);
-                nativeCharset = result;
-                return result;
-            }
-            encoding = System.getProperty("sun.jnu.encoding");
-            if (encoding != null) {
-                result = Charset.forName(encoding);
-                nativeCharset = result;
-                return result;
-            }
-            encoding = getFileEncoding();
-            if (encoding != null) {
-                result = Charset.forName(encoding);
-                nativeCharset = result;
-                return result;
-            }
-            return null;
-        }
-        return nativeCharset;
     }
 
     /**

@@ -1,6 +1,6 @@
 package xyz.fsgik.common.net.udp;
 
-import xyz.fsgik.common.io.FsIO;
+import xyz.fsgik.common.base.FsBytes;
 
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
@@ -46,7 +46,7 @@ public interface FsUdpPacket {
      * @param address given address
      */
     static FsUdpPacket of(ByteBuffer buffer, InetSocketAddress address) {
-        ByteBuffer data = ByteBuffer.wrap(FsIO.getBytes(buffer));
+        ByteBuffer data = ByteBuffer.wrap(FsBytes.getBytes(buffer));
         return new FsUdpPacket() {
 
             @Override

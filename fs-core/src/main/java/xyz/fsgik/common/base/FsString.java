@@ -20,6 +20,74 @@ public class FsString {
     public static final Charset CHARSET = StandardCharsets.UTF_8;
 
     /**
+     * Returns string decoding from given bytes with {@link FsChars#defaultCharset()}.
+     *
+     * @param bytes given bytes
+     * @return string decoding from given bytes and charset
+     */
+    public static String of(byte[] bytes) {
+        return of(bytes, FsChars.defaultCharset());
+    }
+
+    /**
+     * Returns string decoding from given bytes (from given offset to specified length)
+     * with {@link FsChars#defaultCharset()}.
+     *
+     * @param bytes  given bytes
+     * @param offset given offset
+     * @param length specified length
+     * @return string decoding from given bytes and charset
+     */
+    public static String of(byte[] bytes, int offset, int length) {
+        return of(bytes, offset, length, FsChars.defaultCharset());
+    }
+
+    /**
+     * Returns string decoding from given bytes and charset.
+     *
+     * @param bytes   given bytes
+     * @param charset given charset
+     * @return string decoding from given bytes and charset
+     */
+    public static String of(byte[] bytes, Charset charset) {
+        return new String(bytes, charset);
+    }
+
+    /**
+     * Returns string decoding from given bytes (from given offset to specified length) and charset.
+     *
+     * @param bytes   given bytes
+     * @param offset  given offset
+     * @param length  specified length
+     * @param charset given charset
+     * @return string decoding from given bytes and charset
+     */
+    public static String of(byte[] bytes, int offset, int length, Charset charset) {
+        return new String(bytes, offset, length, charset);
+    }
+
+    /**
+     * Encodes given chars with {@link FsChars#defaultCharset()}.
+     *
+     * @param chars given chars
+     * @return encoded bytes
+     */
+    public static byte[] encode(CharSequence chars) {
+        return encode(chars, FsChars.defaultCharset());
+    }
+
+    /**
+     * Encodes given chars with given charset.
+     *
+     * @param chars   given chars
+     * @param charset given charset
+     * @return encoded bytes
+     */
+    public static byte[] encode(CharSequence chars, Charset charset) {
+        return chars.toString().getBytes(charset);
+    }
+
+    /**
      * Returns whether given chars is null or empty.
      *
      * @param chars given chars

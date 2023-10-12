@@ -2,10 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsLogger;
-import xyz.fsgik.common.base.FsString;
-import xyz.fsgik.common.base.FsSystem;
+import xyz.fsgik.common.base.*;
 import xyz.fsgik.common.io.FsIO;
 
 import java.io.IOException;
@@ -79,7 +76,7 @@ public class FsTest {
         semaphore.acquire();
         Fs.runThread(() -> {
             while (true) {
-                String output = FsIO.avalaibleString(process.getInputStream(), FsSystem.nativeCharset());
+                String output = FsIO.avalaibleString(process.getInputStream(), FsChars.nativeCharset());
                 if (output == null) {
                     semaphore.release();
                     return;
@@ -100,7 +97,7 @@ public class FsTest {
     private void testEcho(String command) throws InterruptedException {
         Process process = Fs.runProcess(command);
         process.waitFor();
-        String output = FsIO.avalaibleString(process.getInputStream(), FsSystem.nativeCharset());
+        String output = FsIO.avalaibleString(process.getInputStream(), FsChars.nativeCharset());
         FsLogger.defaultLogger().info(output);
         Assert.assertEquals(output, ECHO_CONTENT + FsSystem.getLineSeparator());
         process.destroy();
@@ -125,7 +122,7 @@ public class FsTest {
     public void testSystem() {
         FsLogger.defaultLogger().info(FsSystem.getJavaVersion());
         FsLogger.defaultLogger().info(FsSystem.javaMajorVersion());
-        FsLogger.defaultLogger().info(FsSystem.nativeCharset());
+        FsLogger.defaultLogger().info(FsChars.nativeCharset());
         FsLogger.defaultLogger().info(FsSystem.getOsName());
         FsLogger.defaultLogger().info(FsSystem.isWindows());
         FsLogger.defaultLogger().info(FsSystem.isLinux());

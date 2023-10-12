@@ -1,10 +1,5 @@
 package xyz.fsgik.common.net;
 
-import xyz.fsgik.common.io.FsBuffer;
-import xyz.fsgik.common.io.FsIO;
-import xyz.fsgik.common.reflect.FsInvoker;
-
-import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -101,29 +96,29 @@ public class FsNet {
         throw new IllegalArgumentException("lengthSize must in (1, 2, 4).");
     }
 
-//    /**
-//     * Reads and split given buffer in specified length.
-//     */
-//    public static List<ByteBuffer> splitWithDelimiter(ByteBuffer buffer, byte delimiter, byte escape) {
-//        if (!buffer.hasRemaining()) {
-//            return Collections.emptyList();
-//        }
-//        List<ByteBuffer> result = new LinkedList<>();
-//        while (true) {
-//            buffer.mark();
-//            while (true) {
-//                byte b = buffer.get();
-//                if (b == delimiter) {
-//                    int pos = buffer.position();
-//                    buffer.reset();
-//                    if (buffer.position() == pos) {
-//                        result.add(FsBuffer.emptyBuffer());
-//                    } else {
-//
-//                    }
-//                }
-//            }
-//        }
-//        return result.isEmpty() ? Collections.emptyList() : result;
-//    }
+    //    /**
+    //     * Reads and split given buffer in specified length.
+    //     */
+    //    public static List<ByteBuffer> splitWithDelimiter(ByteBuffer buffer, byte delimiter, byte escape) {
+    //        if (!buffer.hasRemaining()) {
+    //            return Collections.emptyList();
+    //        }
+    //        List<ByteBuffer> result = new LinkedList<>();
+    //        while (true) {
+    //            buffer.mark();
+    //            while (true) {
+    //                byte b = buffer.get();
+    //                if (b == delimiter) {
+    //                    int pos = buffer.position();
+    //                    buffer.reset();
+    //                    if (buffer.position() == pos) {
+    //                        result.add(FsBuffer.emptyBuffer());
+    //                    } else {
+    //
+    //                    }
+    //                }
+    //            }
+    //        }
+    //        return result.isEmpty() ? Collections.emptyList() : result;
+    //    }
 }

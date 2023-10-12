@@ -2,7 +2,7 @@ package xyz.fsgik.common.net.udp;
 
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
-import xyz.fsgik.common.io.FsIO;
+import xyz.fsgik.common.base.FsBytes;
 import xyz.fsgik.common.net.FsNetException;
 
 import java.io.IOException;
@@ -131,7 +131,7 @@ public interface FsUdpClient {
                 if (buffer.hasArray()) {
                     datagramPacket = new DatagramPacket(buffer.array(), buffer.arrayOffset(), buffer.remaining());
                 } else {
-                    byte[] bytes = FsIO.getBytes(buffer);
+                    byte[] bytes = FsBytes.getBytes(buffer);
                     datagramPacket = new DatagramPacket(bytes, bytes.length);
                 }
                 datagramPacket.setSocketAddress(packet.getHeader().getInetSocketAddress());

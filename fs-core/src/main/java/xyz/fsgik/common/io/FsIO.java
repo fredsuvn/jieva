@@ -719,52 +719,6 @@ public class FsIO {
     }
 
     /**
-     * Read all bytes of given buffer into a new byte array and return.
-     * After reading, the buffer's position will be updated to its limit, its limit will not have been changed.
-     *
-     * @param buffer given buffer
-     */
-    public static byte[] getBytes(ByteBuffer buffer) {
-        byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes);
-        return bytes;
-    }
-
-    /**
-     * Read all bytes of given buffer and encodes to string with {@link FsString#CHARSET}.
-     * After reading, the buffer's position will be updated to its limit, its limit will not have been changed.
-     *
-     * @param buffer given buffer
-     */
-    public static String getString(ByteBuffer buffer) {
-        return getString(buffer, FsString.CHARSET);
-    }
-
-    /**
-     * Read all bytes of given buffer and encodes to string with given charset.
-     * After reading, the buffer's position will be updated to its limit, its limit will not have been changed.
-     *
-     * @param buffer  given buffer
-     * @param charset given charset
-     */
-    public static String getString(ByteBuffer buffer, Charset charset) {
-        byte[] bytes = getBytes(buffer);
-        return new String(bytes, charset);
-    }
-
-    /**
-     * Returns slice of given buffer by {@link ByteBuffer#slice()}, and set new buffer's limit to given limit.
-     *
-     * @param buffer given buffer
-     * @param limit  given limit
-     */
-    public static ByteBuffer slice(ByteBuffer buffer, int limit) {
-        ByteBuffer slice = buffer.slice();
-        slice.limit(limit);
-        return slice;
-    }
-
-    /**
      * Using {@link RandomAccessFile} to read all bytes of given file of path.
      *
      * @param path given file of path

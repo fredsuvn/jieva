@@ -3,6 +3,7 @@ package xyz.fsgik.common.net.udp;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
 import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsBytes;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.io.FsIO;
 import xyz.fsgik.common.net.FsNetException;
@@ -276,7 +277,7 @@ public interface FsUdpServer extends FsUdpClient {
                 if (buffer.hasArray()) {
                     datagramPacket = new DatagramPacket(buffer.array(), buffer.arrayOffset(), buffer.remaining());
                 } else {
-                    byte[] bytes = FsIO.getBytes(buffer);
+                    byte[] bytes = FsBytes.getBytes(buffer);
                     datagramPacket = new DatagramPacket(bytes, bytes.length);
                 }
                 datagramPacket.setSocketAddress(packet.getHeader().getInetSocketAddress());
@@ -457,7 +458,7 @@ public interface FsUdpServer extends FsUdpClient {
                 if (!buffer.hasRemaining()) {
                     return EMPTY_BUFFER;
                 }
-                return ByteBuffer.wrap(FsIO.getBytes(buffer)).asReadOnlyBuffer();
+                return ByteBuffer.wrap(FsBytes.getBytes(buffer)).asReadOnlyBuffer();
             }
         }
     }
