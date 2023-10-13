@@ -4,6 +4,7 @@ import xyz.fsgik.common.base.FsChars;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -214,5 +215,31 @@ public class FsHttp {
      */
     public static String encodeQuery(String queryString, Charset charset) {
         return encodeForm(queryString, charset).replaceAll("\\+", "%20");
+    }
+
+    /**
+     * Decodes given form or query string with {@link URLDecoder#decode(String, String)}.
+     * Using {@link FsChars#defaultCharset()}.
+     *
+     * @param encoded given form or query string
+     * @return decoded string
+     */
+    public static String decodeFormOrQuery(String encoded) {
+        return decodeFormOrQuery(encoded, FsChars.defaultCharset());
+    }
+
+    /**
+     * Decodes given form or query string with {@link URLDecoder#decode(String, String)}.
+     *
+     * @param encoded given form or query string
+     * @param charset charset
+     * @return decoded string
+     */
+    public static String decodeFormOrQuery(String encoded, Charset charset) {
+        try {
+            return URLDecoder.decode(encoded, charset.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new FsHttpException(e);
+        }
     }
 }
