@@ -8,121 +8,48 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Http request info, including URL, method, headers and body.
  *
  * @author fredsuvn
  */
-public class FsHttpRequest extends FsHttpContent {
-
-    private URL url;
-    private String method;
-    private @Nullable Object body;
+public interface FsHttpRequest {
 
     /**
-     * Constructs with empty parameters.
-     */
-    public FsHttpRequest() {
-    }
-
-    /**
-     * Constructs with url, method, headers and body.
-     * See {@link #getUrl()}, {@link #getMethod()}, {@link #getHeaders()} and {@link #getBody()}.
+     * Returns a new builder.
      *
-     * @param url     request url
-     * @param method  request method
-     * @param headers request headers
-     * @param body    request body
-     * @see #getUrl()
-     * @see #getMethod()
-     * @see #getHeaders()
-     * @see #getBody()
+     * @return new builder
      */
-    public FsHttpRequest(URL url, String method, @Nullable Map<String, ?> headers, @Nullable Object body) {
-        this.url = url;
-        this.method = method;
-        this.body = body;
-        if (FsCollect.isNotEmpty(headers)) {
-            addHeaders(headers);
-        }
+    static Builder newBuilder() {
+        return new Builder();
     }
 
     /**
-     * Constructs with url, method, headers and body.
-     * See {@link #getUrl()}, {@link #getMethod()}, {@link #getHeaders()} and {@link #getBody()}.
+     * Returns url.
      *
-     * @param url     request url
-     * @param method  request method
-     * @param headers request headers
-     * @param body    request body
-     * @see #getUrl()
-     * @see #getMethod()
-     * @see #getHeaders()
-     * @see #getBody()
+     * @return url
      */
-    public FsHttpRequest(String url, String method, @Nullable Map<String, ?> headers, @Nullable Object body) {
-        try {
-            this.url = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new FsHttpException(e);
-        }
-        this.method = method;
-        this.body = body;
-        if (FsCollect.isNotEmpty(headers)) {
-            addHeaders(headers);
-        }
-    }
+    URL getUrl();
 
     /**
-     * Returns request url.
-     */
-    public URL getUrl() {
-        return url;
-    }
-
-    /**
-     * Sets request url.
+     * Returns method.
      *
-     * @param url request url
+     * @return method
      */
-    public void setUrl(URL url) {
-        this.url = url;
-    }
+    String getMethod();
 
     /**
-     * Sets request url.
+     * Returns headers.
      *
-     * @param url request url
+     * @return headers
      */
-    public void setUrl(String url) {
-        try {
-            this.url = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new FsHttpException(e);
-        }
-    }
+    @Nullable
+    FsHttpHeaders getHeaders();
 
     /**
-     * Returns request method.
-     */
-    public String getMethod() {
-        return method;
-    }
-
-    /**
-     * Sets request method.
-     *
-     * @param method request method
-     */
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    /**
-     * Returns request body, maybe null.
-     * <p>
-     * The type of request body is one of:
+     * Returns body. There are two types of body.
      * <ul>
      *     <li>
      *         {@link InputStream}: if the body's type is input stream, is will be transferred in chunked stream mode.
@@ -131,31 +58,181 @@ public class FsHttpRequest extends FsHttpContent {
      *         {@link ByteBuffer}: if the body's type is byte buffer, is will be transferred in fixed length mode.
      *     </li>
      * </ul>
+     *
+     * @return body
      */
     @Nullable
-    public Object getBody() {
-        return body;
-    }
+    Object getBody();
 
     /**
-     * Sets request body.
-     * Body of input stream type will be transferred in chunked stream mode
-     *
-     * @param body request body
-     * @see #setBody(ByteBuffer)
+     * Builder for {@link FsHttpRequest}.
      */
-    public void setBody(InputStream body) {
-        this.body = body;
-    }
+    class Builder {
 
-    /**
-     * Sets request body.
-     * Body of byte buffer type will be transferred in fixed length mode
-     *
-     * @param body request body
-     * @see #setBody(InputStream)
-     */
-    public void setBody(ByteBuffer body) {
-        this.body = body;
+        private URL url;
+        private String method;
+        private @Nullable FsHttpHeaders headers;
+        private @Nullable Object body;
+
+        /**
+         * Sets url.
+         *
+         * @param url url
+         * @return this builder
+         */
+        public Builder url(URL url) {
+            this.url = url;
+            return this;
+        }
+
+        /**
+         * Sets url.
+         *
+         * @param url url
+         * @return this builder
+         */
+        public Builder url(String url) {
+            try {
+                this.url = new URL(url);
+            } catch (MalformedURLException e) {
+                throw new FsHttpException(e);
+            }
+            return this;
+        }
+
+        /**
+         * Sets url with query string.
+         *
+         * @param url         url
+         * @param queryString query string
+         * @return this builder
+         */
+        public Builder url(String url, Map<String, String> queryString) {
+            try {
+                if (FsCollect.isEmpty(queryString)) {
+                    this.url = new URL(url);
+                } else {
+                    String query = queryString.entrySet().stream().map(it ->
+                        FsHttp.encodeQuery(it.getKey()) + "=" + FsHttp.encodeQuery(it.getValue())
+                    ).collect(Collectors.joining("&"));
+                    this.url = new URL(url + "?" + query);
+                }
+            } catch (MalformedURLException e) {
+                throw new FsHttpException(e);
+            }
+            return this;
+        }
+
+        /**
+         * Sets method.
+         *
+         * @param method method
+         * @return this builder
+         */
+        public Builder method(String method) {
+            this.method = method;
+            return this;
+        }
+
+        /**
+         * Sets headers.
+         *
+         * @param headers headers
+         * @return this builder
+         */
+        public Builder headers(@Nullable FsHttpHeaders headers) {
+            this.headers = headers;
+            return this;
+        }
+
+        /**
+         * Sets body of {@link InputStream}.
+         * The input stream type indicates it will be transferred in chunked stream mode, see {@link #getBody()}.
+         *
+         * @param body body
+         * @return this builder
+         * @see #getBody()
+         */
+        public Builder body(@Nullable InputStream body) {
+            this.body = body;
+            return this;
+        }
+
+        /**
+         * Sets body of {@link ByteBuffer}.
+         * The byte buffer type indicates it will be transferred in fixed length mode, see {@link #getBody()}.
+         *
+         * @param body body
+         * @return this builder
+         * @see #getBody()
+         */
+        public Builder body(@Nullable ByteBuffer body) {
+            this.body = body;
+            return this;
+        }
+
+        /**
+         * Sets body of {@link ByteBuffer} wraps given body array.
+         * The byte buffer type indicates it will be transferred in fixed length mode, see {@link #getBody()}.
+         *
+         * @param body body
+         * @return this builder
+         * @see #getBody()
+         */
+        public Builder body(byte[] body) {
+            this.body = ByteBuffer.wrap(body);
+            return this;
+        }
+
+        /**
+         * Sets body of {@link ByteBuffer} wraps given body array of specified length from offset index.
+         * The byte buffer type indicates it will be transferred in fixed length mode, see {@link #getBody()}.
+         *
+         * @param body   body
+         * @param offset offset index
+         * @param length specified length
+         * @return this builder
+         * @see #getBody()
+         */
+        public Builder body(byte[] body, int offset, int length) {
+            this.body = ByteBuffer.wrap(body, offset, length);
+            return this;
+        }
+
+        public FsHttpRequest build() {
+            if (url == null) {
+                throw new FsHttpException("url is not set.");
+            }
+            if (method == null) {
+                throw new FsHttpException("method is not set.");
+            }
+            return new FsHttpRequest() {
+
+                private final URL url = Builder.this.url;
+                private final String method = Builder.this.method;
+                private final @Nullable FsHttpHeaders headers = Builder.this.headers;
+                private final @Nullable Object body = Builder.this.body;
+
+                @Override
+                public URL getUrl() {
+                    return url;
+                }
+
+                @Override
+                public String getMethod() {
+                    return method;
+                }
+
+                @Override
+                public @Nullable FsHttpHeaders getHeaders() {
+                    return headers;
+                }
+
+                @Override
+                public @Nullable Object getBody() {
+                    return body;
+                }
+            };
+        }
     }
 }

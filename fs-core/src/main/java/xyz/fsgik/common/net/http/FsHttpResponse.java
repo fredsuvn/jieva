@@ -1,10 +1,8 @@
 package xyz.fsgik.common.net.http;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.collect.FsCollect;
 
 import java.io.InputStream;
-import java.util.Map;
 
 /**
  * Http response info, including status, headers and body.
@@ -14,72 +12,28 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
-public class FsHttpResponse extends FsHttpContent {
-
-    private int statusCode;
-    private @Nullable String statusReason;
-    private @Nullable InputStream body;
-
-    /**
-     * Constructs with empty parameters.
-     */
-    public FsHttpResponse() {
-    }
-
-    /**
-     * Constructs with status, headers and body.
-     * See {@link #getStatusCode()}, {@link #getStatusReason()}, {@link #getHeaders()} and {@link #getBody()}.
-     *
-     * @param statusCode   status code
-     * @param statusReason status reason
-     * @param headers      response headers
-     * @param body         response body
-     * @see #getStatusCode()
-     * @see #getStatusReason()
-     * @see #getHeaders()
-     * @see #getBody()
-     */
-    public FsHttpResponse(
-        int statusCode, @Nullable String statusReason, @Nullable Map<String, ?> headers, @Nullable InputStream body) {
-        this.statusCode = statusCode;
-        this.statusReason = statusReason;
-        this.body = body;
-        if (FsCollect.isNotEmpty(headers)) {
-            addHeaders(headers);
-        }
-    }
+public interface FsHttpResponse {
 
     /**
      * Returns status code.
-     */
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    /**
-     * Sets status code.
      *
-     * @param statusCode status code
+     * @return status code
      */
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
+    int getStatusCode();
 
     /**
      * Returns status reason.
+     *
+     * @return status reason
      */
-    public String getStatusReason() {
-        return statusReason;
-    }
+    String getStatusReason();
 
     /**
-     * Sets status reason.
+     * Returns headers.
      *
-     * @param statusReason status reason
+     * @return headers
      */
-    public void setStatusReason(String statusReason) {
-        this.statusReason = statusReason;
-    }
+    FsHttpHeaders getHeaders();
 
     /**
      * Returns response body, maybe null.
@@ -88,16 +42,5 @@ public class FsHttpResponse extends FsHttpContent {
      * call {@link InputStream#close()} to release the connection.
      */
     @Nullable
-    public InputStream getBody() {
-        return body;
-    }
-
-    /**
-     * Sets response body.
-     *
-     * @param body response body
-     */
-    public void setBody(InputStream body) {
-        this.body = body;
-    }
+    InputStream getBody();
 }

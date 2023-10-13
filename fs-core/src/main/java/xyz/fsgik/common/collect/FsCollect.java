@@ -178,7 +178,8 @@ public class FsCollect {
      * @param dest      dest collection
      * @param keyValues given key-values
      */
-    public static <K, V, M extends Map<? super K, ? super V>> M toMap(M dest, Object... keyValues) {
+    @SafeVarargs
+    public static <K, V, M extends Map<? super K, ? super V>, T> M toMap(M dest, T... keyValues) {
         boolean isKey = true;
         K key = null;
         for (Object keyValue : keyValues) {
@@ -242,7 +243,8 @@ public class FsCollect {
      *
      * @param keyValues given key-values
      */
-    public static <K, V> HashMap<K, V> hashMap(Object... keyValues) {
+    @SafeVarargs
+    public static <K, V, T> HashMap<K, V> hashMap(T... keyValues) {
         return toMap(new HashMap<>(keyValues.length / 2 + 1), keyValues);
     }
 
@@ -255,7 +257,8 @@ public class FsCollect {
      *
      * @param keyValues given key-values
      */
-    public static <K, V> LinkedHashMap<K, V> linkedHashMap(Object... keyValues) {
+    @SafeVarargs
+    public static <K, V, T> LinkedHashMap<K, V> linkedHashMap(T... keyValues) {
         return toMap(new LinkedHashMap<>(keyValues.length / 2 + 1), keyValues);
     }
 
@@ -268,7 +271,8 @@ public class FsCollect {
      *
      * @param keyValues given key-values
      */
-    public static <K, V> ConcurrentHashMap<K, V> concurrentHashMap(Object... keyValues) {
+    @SafeVarargs
+    public static <K, V, T> ConcurrentHashMap<K, V> concurrentHashMap(T... keyValues) {
         return toMap(new ConcurrentHashMap<>(keyValues.length / 2 + 1), keyValues);
     }
 

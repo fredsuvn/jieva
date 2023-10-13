@@ -6,6 +6,7 @@ import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.base.FsString;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.data.FsData;
 import xyz.fsgik.common.io.FsBuffer;
@@ -13,12 +14,14 @@ import xyz.fsgik.common.io.FsIO;
 import xyz.fsgik.common.net.FsNetException;
 import xyz.fsgik.common.net.FsNetServerException;
 import xyz.fsgik.common.net.http.FsHttp;
+import xyz.fsgik.common.net.http.FsHttpHeaders;
 import xyz.fsgik.common.net.http.FsHttpResponse;
 import xyz.fsgik.common.net.tcp.*;
 import xyz.fsgik.common.net.tcp.handlers.DelimiterBasedTcpChannelHandler;
 import xyz.fsgik.common.net.tcp.handlers.LengthBasedTcpChannelHandler;
 import xyz.fsgik.common.net.udp.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -490,6 +493,7 @@ public class NetTest {
                         "Content-Length: 9\r\n" +
                         "Content-Length2: 9\r\n" +
                         "Content-Length2: 9\r\n" +
+                        "Content-Length2: 9\r\n" +
                         "\r\n" +
                         "Fuck Off!";
                     channel.sendAndFlush(response.getBytes(StandardCharsets.ISO_8859_1));
@@ -499,25 +503,85 @@ public class NetTest {
             })
             .build();
         server.start(false);
-        FsHttpResponse response = FsHttp.get(
+        FsHttpResponse response1 = FsHttp.get(
             "http://localhost:" + server.getPort(),
-            FsCollect.linkedHashMap(
+            FsHttpHeaders.of(
                 "Connection", "keep-alive"
             )
         );
-        System.out.println("Server received:");
+        System.out.println("response1 Server received:");
         System.out.println(new String(received.toByteArray(), FsChars.defaultCharset()));
-        System.out.println("Client response header:");
-        Map<String, Object> headers = response.getHeaders();
+        System.out.println("response1 Client response header:");
+        FsHttpHeaders headers = response1.getHeaders();
         System.out.println(headers);
-        InputStream body = response.getBody();
-        System.out.println("Client response body:");
+        InputStream body = response1.getBody();
+        System.out.println("response1 Client response body:");
         String bodyString = FsIO.readString(body);
         System.out.println(bodyString);
         body.close();
-        server.close();
-        Assert.assertEquals(headers.get("Content-Length"), "9");
-        Assert.assertEquals(headers.get("Content-Length2"), Arrays.asList("9", "9", "9", "9"));
+        Assert.assertEquals(headers.getHeaderFirst("Content-Length"), "9");
+        Assert.assertEquals(headers.getHeader("Content-Length2"), Arrays.asList("9", "9", "9"));
         Assert.assertEquals(bodyString, "Fuck Off!");
+        received.reset();
+        System.out.println("----------------------------------");
+        FsHttpResponse response2 = FsHttp.get(
+            "http://localhost:" + server.getPort(),
+            FsCollect.hashMap("hello", "hello world")
+        );
+        System.out.println("response2 Server received:");
+        System.out.println(new String(received.toByteArray(), FsChars.defaultCharset()));
+        System.out.println("response2 Client response header:");
+        headers = response2.getHeaders();
+        System.out.println(headers);
+        body = response2.getBody();
+        System.out.println("response2 Client response body:");
+        bodyString = FsIO.readString(body);
+        System.out.println(bodyString);
+        body.close();
+        Assert.assertEquals(headers.getHeaderFirst("Content-Length"), "9");
+        Assert.assertEquals(headers.getHeader("Content-Length2"), Arrays.asList("9", "9", "9"));
+        Assert.assertEquals(bodyString, "Fuck Off!");
+        received.reset();
+        System.out.println("----------------------------------");
+        FsHttpResponse response3 = FsHttp.post(
+            "http://localhost:" + server.getPort(),
+            new ByteArrayInputStream(FsString.encode("request3"))
+        );
+        System.out.println("response3 Server received:");
+        System.out.println(new String(received.toByteArray(), FsChars.defaultCharset()));
+        System.out.println("response3 Client response header:");
+        headers = response3.getHeaders();
+        System.out.println(headers);
+        body = response3.getBody();
+        System.out.println("response3 Client response body:");
+        bodyString = FsIO.readString(body);
+        System.out.println(bodyString);
+        body.close();
+        Assert.assertEquals(headers.getHeaderFirst("Content-Length"), "9");
+        Assert.assertEquals(headers.getHeader("Content-Length2"), Arrays.asList("9", "9", "9"));
+        Assert.assertEquals(bodyString, "Fuck Off!");
+        received.reset();
+        System.out.println("----------------------------------");
+        FsHttpResponse response4 = FsHttp.post(
+            "http://localhost:" + server.getPort(),
+            ByteBuffer.wrap(FsString.encode("request4"))
+        );
+        System.out.println("response4 Server received:");
+        System.out.println(new String(received.toByteArray(), FsChars.defaultCharset()));
+        System.out.println("response4 Client response header:");
+        headers = response4.getHeaders();
+        System.out.println(headers);
+        body = response4.getBody();
+        System.out.println("response4 Client response body:");
+        bodyString = FsIO.readString(body);
+        System.out.println(bodyString);
+        body.close();
+        Assert.assertEquals(headers.getHeaderFirst("Content-Length"), "9");
+        Assert.assertEquals(headers.getHeader("Content-Length2"), Arrays.asList("9", "9", "9"));
+        Assert.assertEquals(bodyString, "Fuck Off!");
+        received.reset();
+        System.out.println("----------------------------------");
+
+        server.close();
     }
 }
