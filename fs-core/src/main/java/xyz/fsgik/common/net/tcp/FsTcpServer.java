@@ -3,6 +3,7 @@ package xyz.fsgik.common.net.tcp;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
 import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsThread;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.data.FsData;
 import xyz.fsgik.common.io.FsBuffer;
@@ -437,7 +438,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
                             latch.countDown();
                             break;
                         }
-                        Fs.sleep(1);
+                        FsThread.sleep(1);
                     }
                 });
             }

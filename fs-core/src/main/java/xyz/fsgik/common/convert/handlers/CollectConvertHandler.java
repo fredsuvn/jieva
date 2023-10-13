@@ -7,7 +7,7 @@ import xyz.fsgik.common.base.obj.FsObj;
 import xyz.fsgik.common.base.obj.ParameterizedObj;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.convert.FsConverter;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -92,7 +92,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
     @Nullable
     private Object convertIterableType(
         @Nullable Object obj, Type sourceType, Type targetType, FsConverter converter) {
-        ParameterizedType targetItType = FsType.getGenericSuperType(targetType, Iterable.class);
+        ParameterizedType targetItType = FsReflect.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
             return Fs.CONTINUE;
         }
@@ -100,10 +100,10 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (sourceInfo == null) {
             return Fs.CONTINUE;
         }
-        if (FsType.getRawType(sourceInfo.getType()).isArray()) {
+        if (FsReflect.getRawType(sourceInfo.getType()).isArray()) {
             return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], converter);
         }
-        Generator generator = GENERATOR_MAP.get(FsType.getRawType(targetItType));
+        Generator generator = GENERATOR_MAP.get(FsReflect.getRawType(targetItType));
         if (generator == null) {
             return Fs.CONTINUE;
         }
@@ -157,7 +157,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         } else {
             srcList = FsCollect.toCollection(new LinkedList<>(), sourceInfo.getObject());
         }
-        Class<?> targetArrayClass = FsType.arrayClass(targetComponentType);
+        Class<?> targetArrayClass = FsReflect.arrayClass(targetComponentType);
         Object targetArray = FsArray.newArray(targetArrayClass.getComponentType(), srcList.size());
         int i = 0;
         for (Object srcValue : srcList) {
@@ -182,7 +182,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             return Fs.as(
                 FsObj.wrap(
                     it,
-                    FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+                    FsReflect.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
                 ).toParameterizedObj()
             );
         }
@@ -194,14 +194,14 @@ public class CollectConvertHandler implements FsConverter.Handler {
             return Fs.as(
                 FsObj.wrap(
                     it,
-                    FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+                    FsReflect.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
                 ).toParameterizedObj()
             );
         }
         if (!(obj instanceof Iterable)) {
             return null;
         }
-        ParameterizedType itType = FsType.getGenericSuperType(type, Iterable.class);
+        ParameterizedType itType = FsReflect.getGenericSuperType(type, Iterable.class);
         if (itType == null) {
             return null;
         }

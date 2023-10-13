@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.collect.FsCollect;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.*;
 import java.util.List;
@@ -124,7 +124,7 @@ final class Impls {
         @Nullable
         public Type getUpperBound() {
             if (upperBound == null) {
-                upperBound = FsType.getUpperBound(getType());
+                upperBound = FsReflect.getUpperBound(getType());
             }
             return upperBound;
         }
@@ -132,7 +132,7 @@ final class Impls {
         @Nullable
         public Type getLowerBound() {
             if (lowerBound == null) {
-                lowerBound = FsType.getLowerBound(getType());
+                lowerBound = FsReflect.getLowerBound(getType());
             }
             return lowerBound;
         }

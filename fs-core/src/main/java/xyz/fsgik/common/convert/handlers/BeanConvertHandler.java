@@ -5,7 +5,7 @@ import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.bean.FsBeanCopier;
 import xyz.fsgik.common.bean.FsBeanResolver;
 import xyz.fsgik.common.convert.FsConverter;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.Type;
 import java.time.*;
@@ -101,7 +101,7 @@ public class BeanConvertHandler implements FsConverter.Handler {
         if (source == null) {
             return null;
         }
-        Class<?> targetRawType = FsType.getRawType(targetType);
+        Class<?> targetRawType = FsReflect.getRawType(targetType);
         if (targetRawType == null || targetRawType.isArray() || UNSUPPORTED_TYPES.contains(targetRawType)) {
             return Fs.CONTINUE;
         }
@@ -110,7 +110,7 @@ public class BeanConvertHandler implements FsConverter.Handler {
         if (generator != null) {
             dest = generator.get();
         } else {
-            dest = FsType.newInstance(targetRawType);
+            dest = FsReflect.newInstance(targetRawType);
         }
         if (dest == null) {
             return Fs.CONTINUE;

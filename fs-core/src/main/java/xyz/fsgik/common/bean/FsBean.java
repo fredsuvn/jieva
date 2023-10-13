@@ -3,7 +3,7 @@ package xyz.fsgik.common.bean;
 import xyz.fsgik.annotations.Immutable;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -66,7 +66,7 @@ public interface FsBean {
      * Returns raw type of this bean.
      */
     default Class<?> getRawType() {
-        return FsType.getRawType(getType());
+        return FsReflect.getRawType(getType());
     }
 
     /**

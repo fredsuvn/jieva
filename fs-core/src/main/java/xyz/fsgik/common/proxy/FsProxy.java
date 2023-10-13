@@ -3,7 +3,7 @@ package xyz.fsgik.common.proxy;
 import xyz.fsgik.annotations.ThreadSafe;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.collect.FsCollect;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -166,11 +166,11 @@ public interface FsProxy<T> {
         }
 
         private boolean hasSpring() {
-            return FsType.hasClass("org.springframework.cglib.proxy.Enhancer");
+            return FsReflect.hasClass("org.springframework.cglib.proxy.Enhancer");
         }
 
         private boolean hasCglib() {
-            return FsType.hasClass("net.sf.cglib.proxy.Enhancer");
+            return FsReflect.hasClass("net.sf.cglib.proxy.Enhancer");
         }
 
         private static final class JdkProxyImpl<T> implements FsProxy<T> {

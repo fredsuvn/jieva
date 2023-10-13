@@ -17,9 +17,34 @@ import java.util.stream.Collectors;
  *
  * @author fredsuvn
  */
-public class FsType {
+public class FsReflect {
 
     private static final FsCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = FsCache.softCache();
+
+    /**
+     * Returns default class loader: {@link Thread#getContextClassLoader()}.
+     */
+    public static ClassLoader getClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    /**
+     * Returns new instance for given class name.
+     * This method first uses {@link Class#forName(String)} to load given class,
+     * then call the none-arguments constructor to create instance.
+     * If loading failed, return null.
+     *
+     * @param className given clas name
+     */
+    @Nullable
+    public static <T> T load(String className) {
+        try {
+            Class<?> cls = Class.forName(className);
+            return FsReflect.newInstance(cls);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
 
     /**
      * Returns last name of given class. The last name is sub-string after last dot, for example:
@@ -168,7 +193,7 @@ public class FsType {
      * @param componentType given component type
      */
     public static Class<?> arrayClass(Type componentType) {
-        return arrayClass(componentType, Fs.getClassLoader());
+        return arrayClass(componentType, getClassLoader());
     }
 
     /**
@@ -535,7 +560,7 @@ public class FsType {
                 stack.clear();
                 return nestedValue == null ? it : nestedValue;
             }).collect(Collectors.toList());
-        return FsType.parameterizedType(target, target.getDeclaringClass(), actualTypeArguments);
+        return FsReflect.parameterizedType(target, target.getDeclaringClass(), actualTypeArguments);
     }
 
     /**

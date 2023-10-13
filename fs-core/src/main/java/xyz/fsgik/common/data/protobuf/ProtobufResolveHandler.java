@@ -11,7 +11,7 @@ import xyz.fsgik.common.bean.FsBeanProperty;
 import xyz.fsgik.common.bean.FsBeanResolver;
 import xyz.fsgik.common.convert.FsConvertException;
 import xyz.fsgik.common.reflect.FsInvoker;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -79,7 +79,7 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
         if (field.isMapField()) {
             String name = rawName + "Map";
             Method getterMethod = rawClass.getMethod("get" + FsString.capitalize(name));
-            Type type = FsType.getGenericSuperType(getterMethod.getGenericReturnType(), Map.class);
+            Type type = FsReflect.getGenericSuperType(getterMethod.getGenericReturnType(), Map.class);
             FsInvoker getter = FsInvoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + FsString.capitalize(rawName));
@@ -107,7 +107,7 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
         if (field.isRepeated()) {
             String name = rawName + "List";
             Method getterMethod = rawClass.getMethod("get" + FsString.capitalize(name));
-            Type type = FsType.getGenericSuperType(getterMethod.getGenericReturnType(), List.class);
+            Type type = FsReflect.getGenericSuperType(getterMethod.getGenericReturnType(), List.class);
             FsInvoker getter = FsInvoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + FsString.capitalize(rawName));
@@ -136,7 +136,7 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
         Type type = getterMethod.getGenericReturnType();
         FsInvoker getter = FsInvoker.reflectMethod(getterMethod);
         if (isBuilder) {
-            Method setterMethod = rawClass.getMethod("set" + FsString.capitalize(rawName), FsType.getRawType(type));
+            Method setterMethod = rawClass.getMethod("set" + FsString.capitalize(rawName), FsReflect.getRawType(type));
             FsInvoker setter = FsInvoker.reflectMethod(setterMethod);
             return new PropertyImpl(rawName, type, getterMethod, setterMethod, getter, setter, builder);
         } else {

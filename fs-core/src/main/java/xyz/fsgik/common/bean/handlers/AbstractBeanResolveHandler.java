@@ -9,7 +9,7 @@ import xyz.fsgik.common.bean.FsBeanProperty;
 import xyz.fsgik.common.bean.FsBeanResolver;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.reflect.FsInvoker;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -36,12 +36,12 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
     @Override
     public @Nullable Object resolve(FsBeanResolver.BeanBuilder builder) {
         Type type = builder.getType();
-        Class<?> rawType = FsType.getRawType(type);
+        Class<?> rawType = FsReflect.getRawType(type);
         if (rawType == null) {
             throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType.");
         }
         Method[] methods = rawType.getMethods();
-        Map<TypeVariable<?>, Type> typeParameterMapping = FsType.getTypeParameterMapping(type);
+        Map<TypeVariable<?>, Type> typeParameterMapping = FsReflect.getTypeParameterMapping(type);
         Map<String, Method> getters = new LinkedHashMap<>();
         Map<String, Method> setters = new LinkedHashMap<>();
         for (Method method : methods) {

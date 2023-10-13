@@ -3,22 +3,16 @@ package xyz.fsgik.common.base;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.bean.FsBeanCopier;
 import xyz.fsgik.common.convert.FsConverter;
-import xyz.fsgik.common.reflect.FsType;
 import xyz.fsgik.common.reflect.TypeRef;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
- * Utilities for Object.
+ * Utilities for Object and common/base operation.
  *
  * @author fredsuvn
  */
@@ -337,91 +331,6 @@ public class Fs {
     }
 
     /**
-     * Returns caller stack trace of given class name and method name, or null if failed.
-     * This method is equivalent to {@link #findCallerStackTrace(String, String, int)}:
-     * <pre>
-     *     findCallerStackTrace(className, methodName, 0)
-     * </pre>
-     * <p>
-     * This method searches the result of {@link Thread#getStackTrace()} of current thread,
-     * to find first {@link StackTraceElement} of which class name and method name are match given names.
-     * Let the next of found element be the {@code caller}, the {@code caller} will be returned.
-     * <p>
-     * If stack trace element is null or empty, or the final index is out of bound, return null.
-     *
-     * @param className  given class name
-     * @param methodName given method name
-     */
-    @Nullable
-    public static StackTraceElement findCallerStackTrace(String className, String methodName) {
-        return findCallerStackTrace(className, methodName, 0);
-    }
-
-    /**
-     * Returns caller stack trace of given class name and method name, or null if failed.
-     * <p>
-     * This method searches the result of {@link Thread#getStackTrace()} of current thread,
-     * to find first {@link StackTraceElement} of which class name and method name are match given names.
-     * Let the next of found element be the {@code caller},
-     * if given {@code offset} is 0, the {@code caller} will be returned.
-     * Otherwise, the element at index of {@code (caller's index + offset)} will be returned.
-     * <p>
-     * If stack trace element is null or empty, or the final index is out of bound, return null.
-     *
-     * @param className  given class name
-     * @param methodName given method name
-     * @param offset     given offset
-     */
-    @Nullable
-    public static StackTraceElement findCallerStackTrace(String className, String methodName, int offset) {
-        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
-        if (FsArray.isEmpty(stackTraces)) {
-            return null;
-        }
-        for (int i = 0; i < stackTraces.length; i++) {
-            StackTraceElement stackTraceElement = stackTraces[i];
-            if (Fs.equals(stackTraceElement.getClassName(), className)
-                && Fs.equals(stackTraceElement.getMethodName(), methodName)) {
-                int targetIndex = i + 1 + offset;
-                if (FsCheck.isInBounds(targetIndex, 0, stackTraces.length)) {
-                    return stackTraces[targetIndex];
-                }
-                return null;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns stack trace info of given throwable as string.
-     *
-     * @param throwable given throwable
-     */
-    public static String stackTraceToString(Throwable throwable) {
-        return stackTraceToString(throwable, null);
-    }
-
-    /**
-     * Returns stack trace info of given throwable as string,
-     * the line separator of return string will be replaced by given line separator if given separator is not null.
-     *
-     * @param throwable     given throwable
-     * @param lineSeparator given separator
-     */
-    public static String stackTraceToString(Throwable throwable, @Nullable String lineSeparator) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        throwable.printStackTrace(pw);
-        pw.flush();
-        String stackTrace = sw.toString();
-        if (lineSeparator == null) {
-            return stackTrace;
-        }
-        String sysLineSeparator = System.lineSeparator();
-        return stackTrace.replaceAll(sysLineSeparator, lineSeparator);
-    }
-
-    /**
      * Finds resource of given resource path (starts with "/").
      *
      * @param resPath given resource
@@ -445,143 +354,6 @@ public class Fs {
                 result.add(urls.nextElement());
             }
             return result;
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * Runs a new thread.
-     */
-    public static Thread runThread(Runnable runnable) {
-        return runThread(null, false, runnable);
-    }
-
-    /**
-     * Runs a new thread with given thread name.
-     *
-     * @param threadName given thread name
-     * @param runnable   run content
-     */
-    public static Thread runThread(@Nullable String threadName, Runnable runnable) {
-        return runThread(threadName, false, runnable);
-    }
-
-    /**
-     * Runs a new thread with given thread name, whether the thread is daemon.
-     *
-     * @param threadName given thread name
-     * @param daemon     whether the thread is daemon
-     * @param runnable   run content
-     */
-    public static Thread runThread(@Nullable String threadName, boolean daemon, Runnable runnable) {
-        Thread thread = new Thread(runnable);
-        if (threadName != null) {
-            thread.setName(threadName);
-        }
-        if (daemon) {
-            thread.setDaemon(daemon);
-        }
-        thread.start();
-        return thread;
-    }
-
-    /**
-     * Sleeps current thread for specified milliseconds.
-     *
-     * @param millis specified milliseconds
-     */
-    public static void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * Sleeps current thread for specified duration.
-     *
-     * @param duration specified duration
-     */
-    public static void sleep(Duration duration) {
-        try {
-            Thread.sleep(duration.toMillis(), duration.getNano());
-        } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * Starts a process with given command.
-     *
-     * @param cmd given command
-     */
-    public static Process runProcess(String cmd) {
-        String[] splits = cmd.split(" ");
-        List<String> actualCmd = Arrays.stream(splits)
-            .filter(FsString::isNotBlank)
-            .map(String::trim)
-            .collect(Collectors.toList());
-        return runProcess(false, actualCmd);
-    }
-
-    /**
-     * Starts a process with given command.
-     *
-     * @param cmd given command
-     */
-    public static Process runProcess(String... cmd) {
-        return runProcess(false, cmd);
-    }
-
-    /**
-     * Starts a process with given command and whether redirect error stream.
-     *
-     * @param redirectErrorStream whether redirect error stream
-     * @param cmd                 given command
-     */
-    public static Process runProcess(boolean redirectErrorStream, String... cmd) {
-        return runProcess(redirectErrorStream, Arrays.asList(cmd));
-    }
-
-    /**
-     * Starts a process with given command and whether redirect error stream.
-     *
-     * @param redirectErrorStream whether redirect error stream
-     * @param cmd                 given command
-     */
-    public static Process runProcess(boolean redirectErrorStream, List<String> cmd) {
-        return runProcess(null, null, redirectErrorStream, cmd);
-    }
-
-    /**
-     * Starts a process with given command, given environment, given directory file, and whether redirect error stream.
-     *
-     * @param env                 given environment
-     * @param dir                 given directory file
-     * @param redirectErrorStream whether redirect error stream
-     * @param cmd                 given command
-     */
-    public static Process runProcess(
-        @Nullable Map<String, String> env,
-        @Nullable File dir,
-        boolean redirectErrorStream,
-        List<String> cmd
-    ) {
-        ProcessBuilder builder = new ProcessBuilder();
-        if (env != null) {
-            builder.environment().putAll(env);
-        }
-        if (dir != null) {
-            builder.directory(dir);
-        }
-        if (redirectErrorStream) {
-            builder.redirectErrorStream(true);
-        }
-        builder.command(cmd);
-        try {
-            return builder.start();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -826,30 +598,5 @@ public class Fs {
      */
     public static long chunkCount(long total, long chunkSize) {
         return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
-    }
-
-    /**
-     * Returns default class loader: {@link Thread#getContextClassLoader()}.
-     */
-    public static ClassLoader getClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
-    }
-
-    /**
-     * Returns new instance for given class name.
-     * This method first uses {@link Class#forName(String)} to load given class,
-     * then call the none-arguments constructor to create instance.
-     * If loading failed, return null.
-     *
-     * @param className given clas name
-     */
-    @Nullable
-    public static <T> T load(String className) {
-        try {
-            Class<?> cls = Class.forName(className);
-            return FsType.newInstance(cls);
-        } catch (ClassNotFoundException e) {
-            return null;
-        }
     }
 }

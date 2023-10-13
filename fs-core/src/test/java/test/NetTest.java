@@ -3,10 +3,10 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.base.FsChars;
 import xyz.fsgik.common.base.FsLogger;
 import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.base.FsThread;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.data.FsData;
 import xyz.fsgik.common.io.FsBuffer;
@@ -157,21 +157,21 @@ public class NetTest {
                             case "hlo": {
                                 new Thread(() -> {
                                     channel.sendAndFlush(FsData.wrap("a"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("bc"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("abc"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("ab"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("ca"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("bca"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("bc"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("abcabcabcabcabc"));
-                                    Fs.sleep(500);
+                                    FsThread.sleep(500);
                                     channel.sendAndFlush(FsData.wrap("bye"));
                                 }).start();
                                 break;
@@ -344,21 +344,21 @@ public class NetTest {
                             case "hlo": {
                                 new Thread(() -> {
                                     channel.sendAndFlush(FsData.wrap("a"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("bc|"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("abc|"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("ab"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("c|a"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("bc|a"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("bc"));
-                                    Fs.sleep(200);
+                                    FsThread.sleep(200);
                                     channel.sendAndFlush(FsData.wrap("|abc|abc|abc|abc|abc"));
-                                    Fs.sleep(500);
+                                    FsThread.sleep(500);
                                     channel.sendAndFlush(FsData.wrap("|bye|"));
                                 }).start();
                                 break;
@@ -463,7 +463,7 @@ public class NetTest {
                             ByteBuffer.wrap("udp-client".getBytes(FsChars.defaultCharset())),
                             new InetSocketAddress("localhost", udpServer.getPort()))
                         );
-                        Fs.sleep(50);
+                        FsThread.sleep(50);
                     }
                 } catch (Exception e) {
                     System.out.println(e);

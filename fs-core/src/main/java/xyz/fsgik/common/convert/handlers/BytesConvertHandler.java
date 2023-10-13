@@ -4,7 +4,7 @@ import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.convert.FsConverter;
 import xyz.fsgik.common.io.FsBuffer;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
@@ -40,7 +40,7 @@ public class BytesConvertHandler implements FsConverter.Handler {
                     return src.clone();
                 }
                 return source;
-            } else if (FsType.isAssignableFrom(ByteBuffer.class, sourceType)) {
+            } else if (FsReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = ((ByteBuffer) source).slice();
                 return FsBuffer.getBytes(src);
             } else {
@@ -53,7 +53,7 @@ public class BytesConvertHandler implements FsConverter.Handler {
                     return ByteBuffer.wrap(src.clone());
                 }
                 return ByteBuffer.wrap(src);
-            } else if (FsType.isAssignableFrom(ByteBuffer.class, sourceType)) {
+            } else if (FsReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = (ByteBuffer) source;
                 ByteBuffer slice = src.slice();
                 ByteBuffer buffer = ByteBuffer.allocate(slice.remaining());

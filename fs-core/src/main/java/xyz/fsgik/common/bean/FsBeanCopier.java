@@ -4,7 +4,7 @@ import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.convert.FsConvertException;
 import xyz.fsgik.common.convert.FsConverter;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -207,7 +207,7 @@ public interface FsBeanCopier {
             @Override
             public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
                 if (source instanceof Map) {
-                    ParameterizedType sourceMapType = FsType.getGenericSuperType(sourceType, Map.class);
+                    ParameterizedType sourceMapType = FsReflect.getGenericSuperType(sourceType, Map.class);
                     if (sourceMapType == null) {
                         throw new IllegalArgumentException("Not a map type: " + sourceType + ".");
                     }
@@ -215,7 +215,7 @@ public interface FsBeanCopier {
                     Type sourceKeyType = sourceActualTypes[0];
                     Type sourceValueType = sourceActualTypes[1];
                     if (dest instanceof Map) {
-                        ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
+                        ParameterizedType destMapType = FsReflect.getGenericSuperType(destType, Map.class);
                         if (destMapType == null) {
                             throw new IllegalArgumentException("Not a map type: " + destType + ".");
                         }
@@ -228,7 +228,7 @@ public interface FsBeanCopier {
                     }
                 } else {
                     if (dest instanceof Map) {
-                        ParameterizedType destMapType = FsType.getGenericSuperType(destType, Map.class);
+                        ParameterizedType destMapType = FsReflect.getGenericSuperType(destType, Map.class);
                         if (destMapType == null) {
                             throw new IllegalArgumentException("Not a map type: " + destType + ".");
                         }

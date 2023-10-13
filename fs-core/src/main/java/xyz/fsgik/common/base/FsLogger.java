@@ -130,7 +130,7 @@ public interface FsLogger {
             private final Level level = FsLogger.this.getLevel();
             private final Instant time = Instant.now();
             private final @Nullable StackTraceElement stackTrace =
-                Fs.findCallerStackTrace(FsLogger.class.getName(), "buildLog", stackTraceOffset);
+                FsTrace.findCallerStackTrace(FsLogger.class.getName(), "buildLog", stackTraceOffset);
             private final Object[] messages = msg.clone();
 
             @Override

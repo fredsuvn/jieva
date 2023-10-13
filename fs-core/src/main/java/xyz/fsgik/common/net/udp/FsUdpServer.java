@@ -3,6 +3,7 @@ package xyz.fsgik.common.net.udp;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
 import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsThread;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.io.FsBuffer;
 import xyz.fsgik.common.io.FsIO;
@@ -433,7 +434,7 @@ public interface FsUdpServer extends FsUdpClient {
                         }
                     }
                     while (packetCounter.get() > 0) {
-                        Fs.sleep(1);
+                        FsThread.sleep(1);
                     }
                     latch.countDown();
                 });

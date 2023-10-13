@@ -1,7 +1,7 @@
 package xyz.fsgik.common.base.obj;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -20,13 +20,13 @@ public interface WildcardObj<T> extends FsObj<T> {
     WildcardType getType();
 
     /**
-     * Returns upper bound by {@link FsType#getUpperBound(WildcardType)}.
+     * Returns upper bound by {@link FsReflect#getUpperBound(WildcardType)}.
      */
     @Nullable
     Type getUpperBound();
 
     /**
-     * Returns upper bound by {@link FsType#getLowerBound(WildcardType)}.
+     * Returns upper bound by {@link FsReflect#getLowerBound(WildcardType)}.
      */
     @Nullable
     Type getLowerBound();

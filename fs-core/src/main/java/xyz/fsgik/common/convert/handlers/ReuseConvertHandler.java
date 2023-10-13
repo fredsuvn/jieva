@@ -3,7 +3,7 @@ package xyz.fsgik.common.convert.handlers;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.convert.FsConverter;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -26,7 +26,7 @@ import java.util.Objects;
  *         </ul>
  *     </li>
  *     <li>
- *         If target type is assignable from source type by {@link FsType#isAssignableFrom(Type, Type)}:
+ *         If target type is assignable from source type by {@link FsReflect#isAssignableFrom(Type, Type)}:
  *         <ul>
  *             <li>
  *                 If {@link FsConverter.Options#reusePolicy()} is {@link FsConverter.Options#REUSE_ASSIGNABLE},
@@ -101,7 +101,7 @@ public class ReuseConvertHandler implements FsConverter.Handler {
             }
             return Fs.CONTINUE;
         }
-        if (FsType.isAssignableFrom(targetType, sourceType)) {
+        if (FsReflect.isAssignableFrom(targetType, sourceType)) {
             if (reusePolicy == FsConverter.Options.REUSE_ASSIGNABLE) {
                 return source;
             }
@@ -112,11 +112,11 @@ public class ReuseConvertHandler implements FsConverter.Handler {
         }
         if (sourceType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) sourceType;
-            Type sourceUpper = FsType.getUpperBound(wildcardType);
+            Type sourceUpper = FsReflect.getUpperBound(wildcardType);
             if (sourceUpper != null) {
                 return converter.convertObject(source, sourceUpper, targetType);
             } else {
-                Type sourceLower = FsType.getLowerBound(wildcardType);
+                Type sourceLower = FsReflect.getLowerBound(wildcardType);
                 if (sourceLower != null) {
                     return converter.convertObject(source, Object.class, targetType);
                 }
@@ -124,11 +124,11 @@ public class ReuseConvertHandler implements FsConverter.Handler {
         }
         if (targetType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) targetType;
-            Type targetUpper = FsType.getUpperBound(wildcardType);
+            Type targetUpper = FsReflect.getUpperBound(wildcardType);
             if (targetUpper != null) {
                 return converter.convertObject(source, sourceType, targetUpper);
             } else {
-                Type targetLower = FsType.getLowerBound(wildcardType);
+                Type targetLower = FsReflect.getLowerBound(wildcardType);
                 if (targetLower != null) {
                     return converter
                         .withOptions(converter.getOptions().replaceReusePolicy(FsConverter.Options.REUSE_EQUAL))

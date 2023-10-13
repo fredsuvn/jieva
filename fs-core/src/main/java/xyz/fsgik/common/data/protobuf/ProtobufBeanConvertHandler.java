@@ -6,7 +6,7 @@ import xyz.fsgik.common.bean.FsBeanResolver;
 import xyz.fsgik.common.convert.FsConvertException;
 import xyz.fsgik.common.convert.FsConverter;
 import xyz.fsgik.common.convert.handlers.BeanConvertHandler;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -50,7 +50,7 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
         if (!(targetType instanceof Class<?>)) {
             return super.convert(source, sourceType, targetType, converter);
         }
-        Class<?> rawType = FsType.getRawType(targetType);
+        Class<?> rawType = FsReflect.getRawType(targetType);
         //Check whether it is a protobuf object
         boolean isProtobuf = false;
         boolean isBuilder = false;

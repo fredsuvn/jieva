@@ -9,7 +9,7 @@ import xyz.fsgik.common.bean.handlers.JavaBeanResolveHandler;
 import xyz.fsgik.common.bean.handlers.RecordBeanResolveHandler;
 import xyz.fsgik.common.cache.FsCache;
 import xyz.fsgik.common.collect.FsCollect;
-import xyz.fsgik.common.reflect.FsType;
+import xyz.fsgik.common.reflect.FsReflect;
 import xyz.fsgik.common.reflect.TypeRef;
 
 import java.lang.annotation.Annotation;
@@ -130,7 +130,7 @@ public interface FsBeanResolver {
                 if (this.mapType == DEFAULT_MAP_BEAN_TYPE) {
                     this.valueType = Object.class;
                 } else {
-                    ParameterizedType parameterizedType = FsType.getGenericSuperType(mapType, Map.class);
+                    ParameterizedType parameterizedType = FsReflect.getGenericSuperType(mapType, Map.class);
                     if (parameterizedType == null) {
                         throw new IllegalArgumentException("Not a map type: " + mapType + ".");
                     }
