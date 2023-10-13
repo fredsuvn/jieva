@@ -8,6 +8,7 @@ import xyz.fsgik.common.base.obj.ParameterizedObj;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.convert.FsConverter;
 import xyz.fsgik.common.reflect.FsReflect;
+import xyz.fsgik.common.reflect.FsType;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -182,7 +183,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             return Fs.as(
                 FsObj.wrap(
                     it,
-                    FsReflect.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+                    FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
                 ).toParameterizedObj()
             );
         }
@@ -194,7 +195,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
             return Fs.as(
                 FsObj.wrap(
                     it,
-                    FsReflect.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+                    FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
                 ).toParameterizedObj()
             );
         }

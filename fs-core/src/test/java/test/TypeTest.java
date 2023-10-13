@@ -7,6 +7,7 @@ import xyz.fsgik.common.base.FsLogger;
 import xyz.fsgik.common.base.obj.FsObj;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.reflect.FsReflect;
+import xyz.fsgik.common.reflect.FsType;
 import xyz.fsgik.common.reflect.TypeRef;
 
 import java.lang.reflect.ParameterizedType;
@@ -75,17 +76,17 @@ public class TypeTest {
             Integer.class
         );
         FsObj<?> wType = FsObj.wrap(null,
-            FsReflect.wildcardType(Collections.singletonList(String.class), null));
+            FsType.wildcardType(Collections.singletonList(String.class), null));
         Assert.assertEquals(
             wType.toWildcardObj().getType(),
-            FsReflect.wildcardType(Collections.singletonList(String.class), null)
+            FsType.wildcardType(Collections.singletonList(String.class), null)
         );
         Assert.assertEquals(
             wType.toWildcardObj().getUpperBound(),
             String.class
         );
         wType = FsObj.wrap(null,
-            FsReflect.wildcardType(null, Collections.singletonList(Integer.class)));
+            FsType.wildcardType(null, Collections.singletonList(Integer.class)));
         Assert.assertEquals(
             wType.toWildcardObj().getLowerBound(),
             Integer.class
@@ -130,7 +131,7 @@ public class TypeTest {
             t2.toString(),
             "test.TypeTest$T<java.lang.Integer>$V<java.lang.String>"
         );
-        ParameterizedType p1 = FsReflect.parameterizedType(T.class, Arrays.asList(Integer.class));
+        ParameterizedType p1 = FsType.parameterizedType(T.class, Arrays.asList(Integer.class));
         Assert.assertEquals(
             p1.toString(),
             "test.TypeTest$T<java.lang.Integer>"
@@ -139,7 +140,7 @@ public class TypeTest {
             t1,
             p1
         );
-        ParameterizedType p2 = FsReflect.parameterizedType(T.V.class, p1, Arrays.asList(String.class));
+        ParameterizedType p2 = FsType.parameterizedType(T.V.class, p1, Arrays.asList(String.class));
         Assert.assertEquals(
             p2.toString(),
             "test.TypeTest$T<java.lang.Integer>$V<java.lang.String>"
@@ -156,7 +157,7 @@ public class TypeTest {
             t3.toString(),
             "? super java.lang.Integer"
         );
-        Type w1 = FsReflect.wildcardType(null, Arrays.asList(Integer.class));
+        Type w1 = FsType.wildcardType(null, Arrays.asList(Integer.class));
         Assert.assertEquals(
             w1.toString(),
             "? super java.lang.Integer"
@@ -171,7 +172,7 @@ public class TypeTest {
             t4.toString(),
             "? extends java.lang.Integer"
         );
-        Type w2 = FsReflect.wildcardType(Arrays.asList(Integer.class), null);
+        Type w2 = FsType.wildcardType(Arrays.asList(Integer.class), null);
         Assert.assertEquals(
             w2.toString(),
             "? extends java.lang.Integer"
@@ -188,9 +189,9 @@ public class TypeTest {
             t5.toString(),
             "java.util.List<? extends java.lang.Integer>[]"
         );
-        Type g1 = FsReflect.genericArrayType(
-            FsReflect.parameterizedType(List.class, Arrays.asList(
-                FsReflect.wildcardType(Arrays.asList(Integer.class), null))));
+        Type g1 = FsType.genericArrayType(
+            FsType.parameterizedType(List.class, Arrays.asList(
+                FsType.wildcardType(Arrays.asList(Integer.class), null))));
         Assert.assertEquals(
             g1.toString(),
             "java.util.List<? extends java.lang.Integer>[]"
@@ -525,7 +526,7 @@ public class TypeTest {
 
         Assert.assertEquals(
             FsReflect.getGenericSuperType(Iterable.class, Iterable.class),
-            FsReflect.parameterizedType(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
+            FsType.parameterizedType(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
         );
     }
 

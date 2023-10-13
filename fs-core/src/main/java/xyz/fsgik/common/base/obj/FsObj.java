@@ -1,6 +1,7 @@
 package xyz.fsgik.common.base.obj;
 
 import xyz.fsgik.common.reflect.FsReflect;
+import xyz.fsgik.common.reflect.FsType;
 import xyz.fsgik.common.reflect.TypeRef;
 
 import java.lang.reflect.*;
@@ -95,7 +96,7 @@ public interface FsObj<T> {
         }
         if (this instanceof ClassObj) {
             return new Impls.ParameterizedImpl<>(getObject(),
-                FsReflect.parameterizedType(getType(), Collections.singletonList(Object.class)));
+                FsType.parameterizedType(getType(), Collections.singletonList(Object.class)));
         }
         return new Impls.ParameterizedImpl<>(getObject(), (ParameterizedType) getType());
     }
