@@ -12,31 +12,11 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * Utilities for Object and common/base operation.
+ * Utilities for object and common/base operations.
  *
  * @author fredsuvn
  */
 public class Fs {
-
-    /**
-     * A flag object that represents 'continue' to continue a loop.
-     */
-    public static Object CONTINUE = new Object();
-
-    /**
-     * A flag object that represents 'break' to break out from a loop.
-     */
-    public static Object BREAK = new Object();
-
-    /**
-     * A flag object that represents 'return' to return from a process.
-     */
-    public static Object RETURN = new Object();
-
-    /**
-     * A flag object that represents 'goto' to jump to a process point.
-     */
-    public static Object GOTO = new Object();
 
     /**
      * Casts given object as given type T.
@@ -360,14 +340,12 @@ public class Fs {
     }
 
     /**
-     * Converts source object to target type by {@link FsConverter#defaultConverter()}.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * Converts source object from source type to target type,
+     * return null if conversion is unsupported or the result itself is null.
      *
      * @param source     source object
      * @param targetType target type
-     * @see FsConverter
+     * @see FsConverter#convert(Object, Class)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, Class<T> targetType) {
@@ -375,14 +353,12 @@ public class Fs {
     }
 
     /**
-     * Converts source object to target type by {@link FsConverter#defaultConverter()}.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * Converts source object from source type to target type,
+     * return null if conversion is unsupported or the result itself is null.
      *
      * @param source     source object
-     * @param targetType type reference of target type
-     * @see FsConverter
+     * @param targetType target type
+     * @see FsConverter#convert(Object, TypeRef)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, TypeRef<T> targetType) {
@@ -390,14 +366,12 @@ public class Fs {
     }
 
     /**
-     * Converts source object to target type by {@link FsConverter#defaultConverter()}.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * Converts source object from source type to target type,
+     * return null if conversion is unsupported or the result itself is null.
      *
      * @param source     source object
      * @param targetType target type
-     * @see FsConverter
+     * @see FsConverter#convert(Object, Type)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, Type targetType) {
@@ -405,18 +379,29 @@ public class Fs {
     }
 
     /**
-     * Converts source object from source type to target type by {@link FsConverter#defaultConverter()}.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * Converts source object from source type to target type.
+     * The result of this method in 3 types: {@code null}, {@link FsWrapper} and others:
+     * <ul>
+     *     <li>
+     *         {@code null}: means this converter can not do this conversion;
+     *     </li>
+     *     <li>
+     *         {@link FsWrapper}: wrapped object (from {@link FsWrapper#get()}) is actual result of conversion,
+     *         including {@code null} and {@link FsWrapper} itself;
+     *     </li>
+     *     <li>
+     *         Others: any other type of returned object is the actual result of conversion.
+     *     </li>
+     * </ul>
+     * Using {@link FsConverter#getResult(Object)} can get actual result object from wrapper.
      *
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
-     * @see FsConverter
+     * @see FsConverter#convertType(Object, Type, Type)
      */
     @Nullable
-    public static <T> T convertType(@Nullable Object source, Type sourceType, Type targetType) {
+    public static Object convertType(@Nullable Object source, Type sourceType, Type targetType) {
         return FsConverter.defaultConverter().convertType(source, sourceType, targetType);
     }
 

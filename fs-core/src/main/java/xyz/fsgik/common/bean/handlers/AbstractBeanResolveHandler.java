@@ -1,12 +1,9 @@
 package xyz.fsgik.common.bean.handlers;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsFinal;
-import xyz.fsgik.common.bean.FsBean;
 import xyz.fsgik.common.bean.FsBeanException;
-import xyz.fsgik.common.bean.FsBeanProperty;
 import xyz.fsgik.common.bean.FsBeanResolver;
+import xyz.fsgik.common.bean.FsPropertyBase;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.reflect.FsInvoker;
 import xyz.fsgik.common.reflect.FsReflect;
@@ -34,8 +31,8 @@ import java.util.*;
 public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handler {
 
     @Override
-    public @Nullable Object resolve(FsBeanResolver.BeanBuilder builder) {
-        Type type = builder.getType();
+    public @Nullable void resolve(FsBeanResolver.ResolveContext context) {
+        Type type = context.beanType();
         Class<?> rawType = FsReflect.getRawType(type);
         if (rawType == null) {
             throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType.");
@@ -74,16 +71,15 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
                 }
             }
             Field field = findField(name, rawType);
-            builder.getProperties().put(name, new DefaultFsBeanPropertyImpl(builder, name, getter, setter, field, returnType));
+            context.beanProperties().put(name, new PropertyBaseImpl(name, getter, setter, field, returnType));
             setters.remove(name);
         });
         setters.forEach((name, setter) -> {
             Field field = findField(name, rawType);
             Type setType = setter.getGenericParameterTypes()[0];
             setType = getActualType(setType, typeParameterMapping, stack);
-            builder.getProperties().put(name, new DefaultFsBeanPropertyImpl(builder, name, null, setter, field, setType));
+            context.beanProperties().put(name, new PropertyBaseImpl(name, null, setter, field, setType));
         });
-        return Fs.CONTINUE;
     }
 
     /**
@@ -140,9 +136,8 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
         return null;
     }
 
-    private final class DefaultFsBeanPropertyImpl extends FsFinal implements FsBeanProperty {
+    private final class PropertyBaseImpl implements FsPropertyBase {
 
-        private final FsBean owner;
         private final String name;
         private final Method getter;
         private final Method setter;
@@ -155,12 +150,11 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
         private final List<Annotation> fieldAnnotations;
         private final List<Annotation> allAnnotations;
 
-        private DefaultFsBeanPropertyImpl(
-            FsBean owner, String name,
+        private PropertyBaseImpl(
+            String name,
             @Nullable Method getter, @Nullable Method setter,
             @Nullable Field field, Type type
         ) {
-            this.owner = owner;
             this.name = name;
             this.getter = getter;
             this.setter = setter;
@@ -252,11 +246,6 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
         }
 
         @Override
-        public FsBean getOwner() {
-            return owner;
-        }
-
-        @Override
         public boolean isReadable() {
             return getterInvoker != null;
         }
@@ -264,36 +253,6 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
         @Override
         public boolean isWriteable() {
             return setterInvoker != null;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof DefaultFsBeanPropertyImpl)) {
-                return false;
-            }
-            DefaultFsBeanPropertyImpl other = (DefaultFsBeanPropertyImpl) o;
-            return Objects.equals(owner.getType(), other.owner.getType())
-                && Objects.equals(name, other.name)
-                && Objects.equals(type, other.type);
-        }
-
-        @Override
-        protected int computeHashCode() {
-            return Objects.hash(owner.getType(), name, type);
-        }
-
-        @Override
-        protected String computeToString() {
-            return "BeanProperty(name=" +
-                name +
-                ", type=" +
-                type +
-                ", ownerType=" +
-                owner.getType() +
-                ")";
         }
     }
 }

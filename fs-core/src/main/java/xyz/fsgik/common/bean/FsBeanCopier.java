@@ -268,15 +268,19 @@ public interface FsBeanCopier {
                                 return;
                             }
                             Object newDestKey = tryConvert(destKey, sourceKeyType, destKeyType, converter);
-                            if (newDestKey == Fs.RETURN) {
+                            if (newDestKey == null) {
                                 return;
+                            } else {
+                                newDestKey = FsConverter.getResult(newDestKey);
                             }
                             if (!putIfNotContained && !destMap.containsKey(newDestKey)) {
                                 return;
                             }
                             Object newDestValue = tryConvert(value, sourceValueType, destValueType, converter);
-                            if (newDestValue == Fs.RETURN) {
+                            if (newDestValue == null) {
                                 return;
+                            } else {
+                                newDestValue = FsConverter.getResult(newDestValue);
                             }
                             if (!destFilter.test(newDestKey, newDestValue)) {
                                 return;
@@ -297,17 +301,21 @@ public interface FsBeanCopier {
                                 return;
                             }
                             Object newDestNameObj = tryConvert(destNameObj, sourceKeyType, String.class, converter);
-                            if (newDestNameObj == Fs.RETURN) {
+                            if (newDestNameObj == null) {
                                 return;
+                            } else {
+                                newDestNameObj = FsConverter.getResult(newDestNameObj);
                             }
                             String newDestName = (String) newDestNameObj;
-                            FsBeanProperty destProperty = destBean.getProperty(newDestName);
+                            FsProperty destProperty = destBean.getProperty(newDestName);
                             if (destProperty == null || !destProperty.isWriteable()) {
                                 return;
                             }
                             Object newDestValue = tryConvert(value, sourceValueType, destProperty.getType(), converter);
-                            if (newDestValue == Fs.RETURN) {
+                            if (newDestValue == null) {
                                 return;
+                            } else {
+                                newDestValue = FsConverter.getResult(newDestValue);
                             }
                             if (!destFilter.test(newDestName, newDestValue)) {
                                 return;
@@ -334,15 +342,19 @@ public interface FsBeanCopier {
                                 return;
                             }
                             Object newDestKey = tryConvert(destKey, String.class, destKeyType, converter);
-                            if (newDestKey == Fs.RETURN) {
+                            if (newDestKey == null) {
                                 return;
+                            } else {
+                                newDestKey = FsConverter.getResult(newDestKey);
                             }
                             if (!putIfNotContained && !destMap.containsKey(destKey)) {
                                 return;
                             }
                             Object newDestValue = tryConvert(sourceValue, sourceProperty.getType(), destValueType, converter);
-                            if (newDestValue == Fs.RETURN) {
+                            if (newDestValue == null) {
                                 return;
+                            } else {
+                                newDestValue = FsConverter.getResult(newDestValue);
                             }
                             if (!destFilter.test(destKey, newDestValue)) {
                                 return;
@@ -364,17 +376,21 @@ public interface FsBeanCopier {
                                 return;
                             }
                             Object newDestNameObj = tryConvert(destNameObj, String.class, String.class, converter);
-                            if (newDestNameObj == Fs.RETURN) {
+                            if (newDestNameObj == null) {
                                 return;
+                            } else {
+                                newDestNameObj = FsConverter.getResult(newDestNameObj);
                             }
                             String newDestName = (String) newDestNameObj;
-                            FsBeanProperty destProperty = destBean.getProperty(newDestName);
+                            FsProperty destProperty = destBean.getProperty(newDestName);
                             if (destProperty == null || !destProperty.isWriteable()) {
                                 return;
                             }
                             Object newDestValue = tryConvert(sourceValue, sourceProperty.getType(), destProperty.getType(), converter);
-                            if (newDestValue == Fs.RETURN) {
+                            if (newDestValue == null) {
                                 return;
+                            } else {
+                                newDestValue = FsConverter.getResult(newDestValue);
                             }
                             if (!destFilter.test(newDestName, newDestValue)) {
                                 return;
@@ -385,13 +401,14 @@ public interface FsBeanCopier {
                 }
             }
 
+            @Nullable
             private Object tryConvert(Object value, Type fromType, Type destType, FsConverter converter) {
-                Object newValue = converter.convertObject(value, fromType, destType);
-                if (newValue == Fs.RETURN) {
+                Object newValue = converter.convertType(value, fromType, destType);
+                if (newValue == null) {
                     if (throwIfConvertFailed) {
                         throw new FsConvertException(fromType, destType);
                     } else {
-                        return Fs.RETURN;
+                        return null;
                     }
                 }
                 return newValue;

@@ -1,7 +1,6 @@
 package xyz.fsgik.common.convert.handlers;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
@@ -20,7 +19,7 @@ import java.util.Objects;
  *         If source object is not instance of {@link Number}, return {@link Boolean#parseBoolean(String)}.
  *     </li>
  * </ul>
- * Note if source object is null, return {@link Fs#CONTINUE}.
+ * Note if source object is null, return {@code null}.
  *
  * @author fredsuvn
  */
@@ -34,10 +33,10 @@ public class BooleanConvertHandler implements FsConverter.Handler {
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (!Objects.equals(targetType, boolean.class) && !Objects.equals(targetType, Boolean.class)) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (source instanceof Boolean) {
             return source;

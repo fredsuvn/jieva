@@ -3,12 +3,10 @@ package xyz.fsgik.common.data.protobuf;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.base.FsString;
-import xyz.fsgik.common.bean.FsBean;
 import xyz.fsgik.common.bean.FsBeanException;
-import xyz.fsgik.common.bean.FsBeanProperty;
 import xyz.fsgik.common.bean.FsBeanResolver;
+import xyz.fsgik.common.bean.FsPropertyBase;
 import xyz.fsgik.common.convert.FsConvertException;
 import xyz.fsgik.common.reflect.FsInvoker;
 import xyz.fsgik.common.reflect.FsReflect;
@@ -36,9 +34,12 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
     public static final ProtobufResolveHandler INSTANCE = new ProtobufResolveHandler();
 
     @Override
-    public @Nullable Object resolve(FsBeanResolver.BeanBuilder builder) {
+    public @Nullable void resolve(FsBeanResolver.ResolveContext context) {
         try {
-            Class<?> rawType = builder.getRawType();
+            Class<?> rawType = FsReflect.getRawType(context.beanType());
+            if (rawType == null) {
+                return;
+            }
             //Check whether it is a protobuf object
             boolean isProtobuf = false;
             boolean isBuilder = false;
@@ -50,15 +51,15 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
                 isBuilder = true;
             }
             if (!isProtobuf) {
-                return Fs.CONTINUE;
+                return;
             }
             Method getDescriptorMethod = rawType.getMethod("getDescriptor");
             Descriptors.Descriptor descriptor = (Descriptors.Descriptor) getDescriptorMethod.invoke(null);
             for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
-                FsBeanProperty property = buildProperty(builder, field, rawType, isBuilder);
-                builder.getProperties().put(property.getName(), property);
+                FsPropertyBase propBase = buildProperty(context, field, rawType, isBuilder);
+                context.beanProperties().put(propBase.getName(), propBase);
             }
-            return Fs.BREAK;
+            context.breakResolving();
         } catch (FsConvertException e) {
             throw e;
         } catch (Exception e) {
@@ -66,8 +67,8 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
         }
     }
 
-    private FsBeanProperty buildProperty(
-        FsBeanResolver.BeanBuilder builder,
+    private FsPropertyBase buildProperty(
+        FsBeanResolver.ResolveContext builder,
         Descriptors.FieldDescriptor field,
         Class<?> rawClass,
         boolean isBuilder
@@ -97,9 +98,9 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
                         }
                     }
                 };
-                return new PropertyImpl(name, type, getterMethod, null, getter, setter, builder);
+                return new PropertyImpl(name, type, getterMethod, null, getter, setter);
             } else {
-                return new PropertyImpl(name, type, getterMethod, null, getter, null, builder);
+                return new PropertyImpl(name, type, getterMethod, null, getter, null);
             }
         }
 
@@ -125,9 +126,9 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
                         }
                     }
                 };
-                return new PropertyImpl(name, type, getterMethod, null, getter, setter, builder);
+                return new PropertyImpl(name, type, getterMethod, null, getter, setter);
             } else {
-                return new PropertyImpl(name, type, getterMethod, null, getter, null, builder);
+                return new PropertyImpl(name, type, getterMethod, null, getter, null);
             }
         }
 
@@ -138,13 +139,13 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
         if (isBuilder) {
             Method setterMethod = rawClass.getMethod("set" + FsString.capitalize(rawName), FsReflect.getRawType(type));
             FsInvoker setter = FsInvoker.reflectMethod(setterMethod);
-            return new PropertyImpl(rawName, type, getterMethod, setterMethod, getter, setter, builder);
+            return new PropertyImpl(rawName, type, getterMethod, setterMethod, getter, setter);
         } else {
-            return new PropertyImpl(rawName, type, getterMethod, null, getter, null, builder);
+            return new PropertyImpl(rawName, type, getterMethod, null, getter, null);
         }
     }
 
-    private static final class PropertyImpl implements FsBeanProperty {
+    private static final class PropertyImpl implements FsPropertyBase {
 
         private final String name;
         private final Type type;
@@ -152,7 +153,6 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
         private final @Nullable Method setterMethod;
         private final FsInvoker getter;
         private final @Nullable FsInvoker setter;
-        private final FsBean owner;
 
         private PropertyImpl(
             String name,
@@ -160,8 +160,7 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
             @Nullable Method getterMethod,
             @Nullable Method setterMethod,
             FsInvoker getter,
-            @Nullable FsInvoker setter,
-            FsBean owner
+            @Nullable FsInvoker setter
         ) {
             this.name = name;
             this.type = type;
@@ -169,7 +168,6 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
             this.setterMethod = setterMethod;
             this.getter = getter;
             this.setter = setter;
-            this.owner = owner;
         }
 
         @Override
@@ -228,11 +226,6 @@ public class ProtobufResolveHandler implements FsBeanResolver.Handler {
         @Override
         public List<Annotation> getAnnotations() {
             return Collections.emptyList();
-        }
-
-        @Override
-        public FsBean getOwner() {
-            return owner;
         }
 
         @Override

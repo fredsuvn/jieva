@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents property of {@link FsBean}.
+ * Base info of property of a bean ({@link FsBean}).
  *
  * @author fredsuvn
  */
 @Immutable
 @ThreadSafe
-public interface FsBeanProperty {
+public interface FsPropertyBase {
 
     /**
      * Returns name of this property.
@@ -107,11 +107,6 @@ public interface FsBeanProperty {
         }
         return null;
     }
-
-    /**
-     * Returns owner bean of this property.
-     */
-    FsBean getOwner();
 
     /**
      * Returns whether this property is readable.

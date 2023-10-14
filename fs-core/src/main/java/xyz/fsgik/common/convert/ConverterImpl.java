@@ -1,7 +1,7 @@
 package xyz.fsgik.common.convert;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsFlag;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.convert.handlers.*;
 
@@ -102,16 +102,24 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
-        for (Handler handler : getHandlers()) {
-            Object value = handler.convert(source, sourceType, targetType, this);
-            if (value == Fs.BREAK) {
-                return Fs.BREAK;
-            }
-            if (value != Fs.CONTINUE) {
-                return value;
-            }
+    public @Nullable Object convert(
+        @Nullable Object source, Type sourceType, Type targetType, @Nullable FsConverter converter) {
+        if (converter == null) {
+            converter = this;
         }
-        return Fs.CONTINUE;
+        for (Handler handler : getHandlers()) {
+            Object value = handler.convert(source, sourceType, targetType, converter);
+            if (value == null || value == FsFlag.CONTINUE) {
+                continue;
+            }
+            if (value == FsFlag.BREAK || value == FsFlag.RETURN) {
+                return FsFlag.BREAK;
+            }
+            if (value == FsFlag.NULL) {
+                return FsFlag.NULL;
+            }
+            return value;
+        }
+        return null;
     }
 }

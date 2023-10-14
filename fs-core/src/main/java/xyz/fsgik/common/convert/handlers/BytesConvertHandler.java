@@ -1,7 +1,6 @@
 package xyz.fsgik.common.convert.handlers;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.convert.FsConverter;
 import xyz.fsgik.common.io.FsBuffer;
 import xyz.fsgik.common.reflect.FsReflect;
@@ -17,7 +16,7 @@ import java.util.Objects;
  *     <li>byte[];</li>
  *     <li>{@link ByteBuffer};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
+ * Note if the {@code obj} is null, return {@code null}.
  *
  * @author fredsuvn
  */
@@ -31,7 +30,7 @@ public class BytesConvertHandler implements FsConverter.Handler {
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (Objects.equals(targetType, byte[].class)) {
             if (Objects.equals(sourceType, byte[].class)) {
@@ -44,7 +43,7 @@ public class BytesConvertHandler implements FsConverter.Handler {
                 ByteBuffer src = ((ByteBuffer) source).slice();
                 return FsBuffer.getBytes(src);
             } else {
-                return Fs.CONTINUE;
+                return null;
             }
         } else if (Objects.equals(targetType, ByteBuffer.class)) {
             if (Objects.equals(sourceType, byte[].class)) {
@@ -61,10 +60,10 @@ public class BytesConvertHandler implements FsConverter.Handler {
                 buffer.flip();
                 return buffer;
             } else {
-                return Fs.CONTINUE;
+                return null;
             }
         } else {
-            return Fs.CONTINUE;
+            return null;
         }
     }
 }

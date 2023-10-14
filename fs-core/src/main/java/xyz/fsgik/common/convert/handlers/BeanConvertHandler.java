@@ -1,7 +1,7 @@
 package xyz.fsgik.common.convert.handlers;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsWrapper;
 import xyz.fsgik.common.bean.FsBeanCopier;
 import xyz.fsgik.common.bean.FsBeanResolver;
 import xyz.fsgik.common.convert.FsConverter;
@@ -34,7 +34,7 @@ import java.util.function.Supplier;
  * </ul>
  * For other types, it creates with their empty constructor.
  * <p>
- * Note if the {@code obj} is null, return null.
+ * Note if the {@code obj} is null, return {@link FsWrapper#empty()}.
  *
  * @author fredsuvn
  */
@@ -99,11 +99,11 @@ public class BeanConvertHandler implements FsConverter.Handler {
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
-            return null;
+            return FsWrapper.empty();
         }
         Class<?> targetRawType = FsReflect.getRawType(targetType);
         if (targetRawType == null || targetRawType.isArray() || UNSUPPORTED_TYPES.contains(targetRawType)) {
-            return Fs.CONTINUE;
+            return null;
         }
         Supplier<Object> generator = GENERATOR_MAP.get(targetRawType);
         Object dest;
@@ -113,7 +113,7 @@ public class BeanConvertHandler implements FsConverter.Handler {
             dest = FsReflect.newInstance(targetRawType);
         }
         if (dest == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         return getCopier().withConverter(converter).copyProperties(source, sourceType, dest, targetType);
     }

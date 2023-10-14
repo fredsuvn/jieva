@@ -7,6 +7,7 @@ import xyz.fsgik.common.reflect.FsReflect;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Bean info of object, usually resolved by {@link FsBeanResolver}.
@@ -58,6 +59,18 @@ public interface FsBean {
     }
 
     /**
+     * Returns a string describes given bean.
+     *
+     * @param bean given bean
+     * @return a string describes given bean
+     */
+    static String toString(FsBean bean) {
+        return "bean["
+            + bean.getProperties().entrySet().stream().map(Object::toString).collect(Collectors.joining(", "))
+            + "]";
+    }
+
+    /**
      * Returns type of this bean.
      */
     Type getType();
@@ -73,7 +86,7 @@ public interface FsBean {
      * Returns all properties in this bean.
      */
     @Immutable
-    Map<String, FsBeanProperty> getProperties();
+    Map<String, FsProperty> getProperties();
 
     /**
      * Returns property with given name in this bean.
@@ -81,7 +94,7 @@ public interface FsBean {
      * @param name given name
      */
     @Nullable
-    default FsBeanProperty getProperty(String name) {
+    default FsProperty getProperty(String name) {
         return getProperties().get(name);
     }
 }

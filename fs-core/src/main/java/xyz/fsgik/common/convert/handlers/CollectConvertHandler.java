@@ -3,6 +3,7 @@ package xyz.fsgik.common.convert.handlers;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.base.FsArray;
+import xyz.fsgik.common.base.FsFlag;
 import xyz.fsgik.common.base.obj.FsObj;
 import xyz.fsgik.common.base.obj.ParameterizedObj;
 import xyz.fsgik.common.collect.FsCollect;
@@ -38,7 +39,7 @@ import java.util.function.IntFunction;
  *     <li>{@link TreeSet};</li>
  *     <li>{@link ConcurrentSkipListSet};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
+ * Note if the {@code obj} is null, return {@code null}.
  *
  * @author fredsuvn
  */
@@ -69,13 +70,13 @@ public class CollectConvertHandler implements FsConverter.Handler {
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (targetType instanceof Class) {
             if (((Class<?>) targetType).isArray()) {
                 ParameterizedObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
                 if (sourceInfo == null) {
-                    return Fs.CONTINUE;
+                    return null;
                 }
                 return convertArray(sourceInfo, ((Class<?>) targetType).getComponentType(), converter);
             }
@@ -83,7 +84,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         } else if (targetType instanceof GenericArrayType) {
             ParameterizedObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
             if (sourceInfo == null) {
-                return Fs.CONTINUE;
+                return null;
             }
             return convertArray(sourceInfo, ((GenericArrayType) targetType).getGenericComponentType(), converter);
         }
@@ -95,18 +96,18 @@ public class CollectConvertHandler implements FsConverter.Handler {
         @Nullable Object obj, Type sourceType, Type targetType, FsConverter converter) {
         ParameterizedType targetItType = FsReflect.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         ParameterizedObj<Iterable<?>> sourceInfo = toGenericInfo(obj, sourceType);
         if (sourceInfo == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (FsReflect.getRawType(sourceInfo.getType()).isArray()) {
             return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], converter);
         }
         Generator generator = GENERATOR_MAP.get(FsReflect.getRawType(targetItType));
         if (generator == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (generator.needSize()) {
             Collection<?> srcList = FsCollect.asOrToList(sourceInfo.getObject());
@@ -137,11 +138,11 @@ public class CollectConvertHandler implements FsConverter.Handler {
         FsConverter converter
     ) {
         for (Object srcValue : source) {
-            Object targetValue = converter.convertObject(srcValue, sourceComponentType, destComponentType);
-            if (targetValue == Fs.RETURN) {
-                return Fs.BREAK;
+            Object targetValue = converter.convertType(srcValue, sourceComponentType, destComponentType);
+            if (targetValue == null) {
+                return FsFlag.BREAK;
             }
-            dest.add(targetValue);
+            dest.add(FsConverter.getResult(targetValue));
         }
         return dest;
     }
@@ -162,12 +163,12 @@ public class CollectConvertHandler implements FsConverter.Handler {
         Object targetArray = FsArray.newArray(targetArrayClass.getComponentType(), srcList.size());
         int i = 0;
         for (Object srcValue : srcList) {
-            Object targetValue = converter.convertObject(
+            Object targetValue = converter.convertType(
                 srcValue, sourceInfo.getActualTypeArgument(0), targetComponentType);
-            if (targetValue == Fs.RETURN) {
-                return Fs.BREAK;
+            if (targetValue == null) {
+                return FsFlag.BREAK;
             }
-            Array.set(targetArray, i, targetValue);
+            Array.set(targetArray, i, FsConverter.getResult(targetValue));
             i++;
         }
         return targetArray;

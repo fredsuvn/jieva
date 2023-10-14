@@ -5,6 +5,8 @@ import xyz.fsgik.annotations.Immutable;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
 import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsFlag;
+import xyz.fsgik.common.base.FsWrapper;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.convert.handlers.*;
 import xyz.fsgik.common.reflect.TypeRef;
@@ -26,16 +28,10 @@ import java.util.Objects;
  * <pre>
  *     prefix handler (if not null) -> middle handlers -> suffix converter (if not null)
  * </pre>
- * If any handler returns a non-{@link Fs#CONTINUE} and non-{@link Fs#BREAK} value,
- * that means the conversion is successful and that return value will be returned.
- * <p>
- * If a handler returns {@link Fs#CONTINUE},
- * it means that handler doesn't support current conversion and hands off to next handler;
- * If the last handler (maybe suffix handler), or any other handler returns {@link Fs#BREAK},
- * current conversion will be broken and failed.
+ * More detail of conversion process, see {@link Handler#convert(Object, Type, Type, FsConverter)}.
  *
  * @author fredsuvn
- * @see Handler
+ * @see Handler#convert(Object, Type, Type, FsConverter)
  */
 @ThreadSafe
 public interface FsConverter {
@@ -100,6 +96,23 @@ public interface FsConverter {
     }
 
     /**
+     * Returns actual result of conversion from {@link #convertType(Object, Type, Type)}.
+     *
+     * @param result result from {@link #convertType(Object, Type, Type)}
+     * @param <T>    target type
+     * @return actual result of conversion
+     */
+    static <T> T getResult(Object result) {
+        if (result == null) {
+            return null;
+        }
+        if (result instanceof FsWrapper) {
+            return Fs.as(((FsWrapper<?>) result).get());
+        }
+        return Fs.as(result);
+    }
+
+    /**
      * Returns prefix handler.
      */
     @Nullable
@@ -129,104 +142,81 @@ public interface FsConverter {
     Options getOptions();
 
     /**
-     * Converts source object to target type with given options.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * Converts source object from source type to target type,
+     * return null if conversion is unsupported or the result itself is null.
      *
      * @param source     source object
      * @param targetType target type
      */
     @Nullable
     default <T> T convert(@Nullable Object source, Class<T> targetType) {
-        return convertType(source, source == null ? Object.class : source.getClass(), targetType);
+        return getResult(
+            convertType(source, source == null ? Object.class : source.getClass(), targetType));
     }
 
     /**
-     * Converts source object to target type with given options.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * Converts source object from source type to target type,
+     * return null if conversion is unsupported or the result itself is null.
      *
      * @param source        source object
      * @param targetTypeRef type reference target type
      */
     @Nullable
     default <T> T convert(@Nullable Object source, TypeRef<T> targetTypeRef) {
-        return convertType(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType());
+        return getResult(
+            convertType(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType()));
     }
 
     /**
-     * Converts source object to target type.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * Converts source object from source type to target type,
+     * return null if conversion is unsupported or the result itself is null.
      *
      * @param source     source object
      * @param targetType target type
      */
     @Nullable
     default <T> T convert(@Nullable Object source, Type targetType) {
-        return convertType(source, source == null ? Object.class : source.getClass(), targetType);
+        return getResult(
+            convertType(source, source == null ? Object.class : source.getClass(), targetType));
     }
 
     /**
      * Converts source object from source type to target type.
-     * If the conversion is unsupported, return null.
-     * <p>
-     * <b>Note returned value after conversion itself may also be null.</b>
+     * The result of this method in 3 types: {@code null}, {@link FsWrapper} and others:
+     * <ul>
+     *     <li>
+     *         {@code null}: means this converter can not do this conversion;
+     *     </li>
+     *     <li>
+     *         {@link FsWrapper}: wrapped object (from {@link FsWrapper#get()}) is actual result of conversion,
+     *         including {@code null} and {@link FsWrapper} itself;
+     *     </li>
+     *     <li>
+     *         Others: any other type of returned object is the actual result of conversion.
+     *     </li>
+     * </ul>
+     * Using {@link #getResult(Object)} can get actual result object from wrapper.
      *
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
      */
     @Nullable
-    default <T> T convertType(@Nullable Object source, Type sourceType, Type targetType) {
-        Object value = convertObject(source, sourceType, targetType);
-        if (value == Fs.RETURN) {
-            return null;
-        }
-        return (T) value;
-    }
-
-    /**
-     * Converts source object from source type to target type.
-     * If the conversion is unsupported, an {@link FsConvertException} will be thrown
-     *
-     * @param source     source object
-     * @param sourceType source type
-     * @param targetType target type
-     */
-    @Nullable
-    default <T> T convertThrow(@Nullable Object source, Type sourceType, Type targetType) {
-        Object value = convertObject(source, sourceType, targetType);
-        if (value == Fs.RETURN) {
-            throw new FsConvertException(sourceType, targetType);
-        }
-        return (T) value;
-    }
-
-    /**
-     * Converts source object from source type to target type.
-     * If return value is {@link Fs#RETURN}, it indicates current conversion is unsupported.
-     * Any other return value indicates current conversion is successful and the return value is valid, including null.
-     *
-     * @param source     source object
-     * @param sourceType source type
-     * @param targetType target type
-     */
-    @Nullable
-    default Object convertObject(@Nullable Object source, Type sourceType, Type targetType) {
+    default Object convertType(@Nullable Object source, Type sourceType, Type targetType) {
         for (Handler handler : getHandlers()) {
             Object value = handler.convert(source, sourceType, targetType, this);
-            if (value == Fs.BREAK) {
-                return Fs.RETURN;
+            if (value == null || value == FsFlag.CONTINUE) {
+                continue;
             }
-            if (value != Fs.CONTINUE) {
-                return value;
+            if (value == FsFlag.BREAK || value == FsFlag.RETURN) {
+                return null;
             }
+            if (value == FsFlag.NULL) {
+                return FsWrapper.empty();
+            }
+            return value;
         }
-        return Fs.RETURN;
+        return null;
     }
 
     /**
@@ -292,6 +282,9 @@ public interface FsConverter {
 
     /**
      * Returns this converter as a {@link Handler}.
+     * For method {@link Handler#convert(Object, Type, Type, FsConverter)} of result handler, the 4th parameter
+     * {@link FsConverter} can be passed as {@code null}, in which case the 4th parameter will be auto passed with
+     * "this" -- the current converter itself.
      */
     Handler asHandler();
 
@@ -307,14 +300,32 @@ public interface FsConverter {
         /**
          * Converts object from source type to target type.
          * <p>
-         * If this method returns {@link Fs#CONTINUE},
-         * it means that this handler doesn't support current conversion, but it will hand off to next handler.
+         * In general, all handlers in the converter ({@link #getHandlers()}) will be invoked this method sequentially.
+         * The result of this method in 4 types: {@code null}, {@link FsFlag}, {@link FsWrapper} and others.
          * <p>
-         * If this method returns {@link Fs#BREAK},
-         * it means that this handler doesn't support current conversion, and it will break out the handler chain.
-         * This will cause the conversion failure.
-         * <p>
-         * Otherwise, other return value is the valid final conversion result.
+         * If this method returns {@code null}, means this handler can not do this conversion, and it will hand off to
+         * next handler; If this method returns an instance of {@link FsFlag}, means:
+         * <ul>
+         *     <li>
+         *         {@link FsFlag#CONTINUE}: same as {@code null},
+         *         means that this handler can not do this conversion, and it will hand off to next handler;
+         *     </li>
+         *     <li>
+         *         {@link FsFlag#BREAK} or {@link FsFlag#RETURN}:
+         *         means that this handler can not do the conversion, and it will break out the handler chain.
+         *         This will cause the conversion failure in this converter;
+         *     </li>
+         *     <li>
+         *         {@link FsFlag#NULL} or {@link FsWrapper#empty()}:
+         *         means the result of this conversion is clearly {@code null};
+         *     </li>
+         *     <li>
+         *         Other instance of {@link FsFlag} is a wrong result, will throw a {@link FsConvertException}.
+         *     </li>
+         * </ul>
+         * If this method returns a {@link FsWrapper}, wrapped object (from {@link FsWrapper#get()}) is actual result
+         * of conversion, including {@link FsFlag}, {@code null} and {@link FsWrapper} itself.
+         * Any other type of returned object is the actual result of conversion.
          *
          * @param source     source object
          * @param sourceType source type

@@ -8,7 +8,7 @@ import test.protobuf.Data;
 import test.protobuf.Enum;
 import test.protobuf.Request;
 import xyz.fsgik.common.bean.FsBean;
-import xyz.fsgik.common.bean.FsBeanProperty;
+import xyz.fsgik.common.bean.FsProperty;
 import xyz.fsgik.common.bean.FsBeanResolver;
 import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.convert.FsConverter;
@@ -35,7 +35,7 @@ public class ProtobufTest {
          */
         FsBeanResolver resolver = FsProtobuf.protobufBeanResolver();
         FsBean dataBean = resolver.resolve(Data.class);
-        Map<String, FsBeanProperty> propertyMap = dataBean.getProperties();
+        Map<String, FsProperty> propertyMap = dataBean.getProperties();
         Assert.assertEquals(propertyMap.size(), 14);
         Assert.assertEquals(propertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(propertyMap.get("str").getType(), String.class);
@@ -51,7 +51,7 @@ public class ProtobufTest {
         Assert.assertFalse(propertyMap.get("entryMap").isWriteable());
 
         FsBean dataBuilderBean = resolver.resolve(Data.newBuilder().getClass());
-        Map<String, FsBeanProperty> builderPropertyMap = dataBuilderBean.getProperties();
+        Map<String, FsProperty> builderPropertyMap = dataBuilderBean.getProperties();
         Assert.assertEquals(builderPropertyMap.size(), 14);
         Assert.assertEquals(builderPropertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(builderPropertyMap.get("str").getType(), String.class);

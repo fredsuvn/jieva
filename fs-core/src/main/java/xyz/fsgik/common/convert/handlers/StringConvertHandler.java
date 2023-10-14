@@ -1,7 +1,6 @@
 package xyz.fsgik.common.convert.handlers;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
@@ -19,7 +18,7 @@ import java.util.Objects;
  *     <li>{@link StringBuilder};</li>
  *     <li>{@link StringBuffer};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
+ * Note if the {@code obj} is null, return null.
  *
  * @author fredsuvn
  */
@@ -33,7 +32,7 @@ public class StringConvertHandler implements FsConverter.Handler {
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (Objects.equals(targetType, String.class) || Objects.equals(targetType, CharSequence.class)) {
             return source.toString();
@@ -44,7 +43,7 @@ public class StringConvertHandler implements FsConverter.Handler {
         } else if (Objects.equals(targetType, StringBuffer.class)) {
             return new StringBuffer(source.toString());
         } else {
-            return Fs.CONTINUE;
+            return null;
         }
     }
 }

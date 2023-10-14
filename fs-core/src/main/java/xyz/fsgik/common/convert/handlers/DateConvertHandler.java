@@ -1,7 +1,6 @@
 package xyz.fsgik.common.convert.handlers;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.base.FsDate;
 import xyz.fsgik.common.convert.FsConvertException;
 import xyz.fsgik.common.convert.FsConverter;
@@ -54,7 +53,7 @@ import java.util.TimeZone;
  *     <li>{@link #DateConvertHandler(PatternFunction)};</li>
  * </ul>
  * <p>
- * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
+ * Note if the {@code obj} is null, return {@code null}.
  *
  * @author fredsuvn
  */
@@ -158,7 +157,7 @@ public class DateConvertHandler implements FsConverter.Handler {
 
     public @Nullable Object convert0(@Nullable Object source, Type sourceType, Type targetType) throws ParseException {
         if (source == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (Objects.equals(targetType, String.class)) {
             Date date = tryDate(source, sourceType);
@@ -187,19 +186,19 @@ public class DateConvertHandler implements FsConverter.Handler {
                 || Objects.equals(ZoneOffset.class, sourceType)) {
                 return source.toString();
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, StringBuilder.class)) {
             Object result = convert0(source, sourceType, String.class);
             if (result != null && Objects.equals(result.getClass(), String.class)) {
                 return new StringBuilder(result.toString());
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, StringBuffer.class)) {
             Object result = convert0(source, sourceType, String.class);
             if (result != null && Objects.equals(result.getClass(), String.class)) {
                 return new StringBuffer(result.toString());
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, Date.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -225,7 +224,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (offsetDateTime != null) {
                 return Date.from(offsetDateTime.toInstant());
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, Instant.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -251,7 +250,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toInstant();
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, LocalDateTime.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -277,7 +276,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toLocalDateTime();
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, ZonedDateTime.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -303,7 +302,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (offsetDateTime != null) {
                 return offsetDateTime.toZonedDateTime();
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, OffsetDateTime.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -329,7 +328,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (zonedDateTime != null) {
                 return zonedDateTime.toOffsetDateTime();
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, Duration.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -339,7 +338,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (l != null) {
                 return Duration.ofMillis(l);
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, TimeZone.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -353,7 +352,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (zoneOffset != null) {
                 return TimeZone.getTimeZone(zoneOffset);
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, ZoneId.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -367,7 +366,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (zoneOffset != null) {
                 return zoneOffset;
             }
-            return Fs.CONTINUE;
+            return null;
         } else if (Objects.equals(targetType, ZoneOffset.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
@@ -381,9 +380,9 @@ public class DateConvertHandler implements FsConverter.Handler {
             if (zoneId != null) {
                 return FsDate.toZoneOffset(zoneId);
             }
-            return Fs.CONTINUE;
+            return null;
         }
-        return Fs.CONTINUE;
+        return null;
     }
 
     @Nullable

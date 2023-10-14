@@ -1,7 +1,7 @@
 package xyz.fsgik.common.convert.handlers;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsFlag;
 import xyz.fsgik.common.convert.FsConverter;
 import xyz.fsgik.common.reflect.FsReflect;
 
@@ -14,14 +14,14 @@ import java.util.Objects;
  * Convert handler implementation which is used to check type compatibility and reusability, it follows in order:
  * <ul>
  *     <li>
- *         If source object is null, return {@link Fs#CONTINUE};
+ *         If source object is null, return {@code null};
  *     </li>
  *     <li>
  *         If target type and source type are equal:
  *         <ul>
  *             <li>
  *                 If {@link FsConverter.Options#reusePolicy()} is not {@link FsConverter.Options#NO_REUSE},
- *                 return source object, else return {@link Fs#CONTINUE};
+ *                 return source object, else return {@code null};
  *             </li>
  *         </ul>
  *     </li>
@@ -30,12 +30,12 @@ import java.util.Objects;
  *         <ul>
  *             <li>
  *                 If {@link FsConverter.Options#reusePolicy()} is {@link FsConverter.Options#REUSE_ASSIGNABLE},
- *                 return source object, else return {@link Fs#CONTINUE};
+ *                 return source object, else return {@code null};
  *             </li>
  *         </ul>
  *     </li>
  *     <li>
- *         If target type is {@link TypeVariable}, return {@link Fs#BREAK};
+ *         If target type is {@link TypeVariable}, return {@link FsFlag#BREAK};
  *     </li>
  *     <li>
  *         If source type is {@link WildcardType}:
@@ -75,7 +75,7 @@ import java.util.Objects;
  *         </ul>
  *     </li>
  *     <li>
- *         Else return {@link Fs#CONTINUE};
+ *         Else return null;
  *     </li>
  * </ul>
  * This handler is system default prefix handler.
@@ -92,33 +92,33 @@ public class ReuseConvertHandler implements FsConverter.Handler {
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         int reusePolicy = converter.getOptions().reusePolicy();
         if (Objects.equals(targetType, sourceType)) {
             if (reusePolicy != FsConverter.Options.NO_REUSE) {
                 return source;
             }
-            return Fs.CONTINUE;
+            return null;
         }
         if (FsReflect.isAssignableFrom(targetType, sourceType)) {
             if (reusePolicy == FsConverter.Options.REUSE_ASSIGNABLE) {
                 return source;
             }
-            return Fs.CONTINUE;
+            return null;
         }
         if (targetType instanceof TypeVariable<?>) {
-            return Fs.BREAK;
+            return FsFlag.BREAK;
         }
         if (sourceType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) sourceType;
             Type sourceUpper = FsReflect.getUpperBound(wildcardType);
             if (sourceUpper != null) {
-                return converter.convertObject(source, sourceUpper, targetType);
+                return converter.asHandler().convert(source, sourceUpper, targetType, null);
             } else {
                 Type sourceLower = FsReflect.getLowerBound(wildcardType);
                 if (sourceLower != null) {
-                    return converter.convertObject(source, Object.class, targetType);
+                    return converter.asHandler().convert(source, Object.class, targetType, null);
                 }
             }
         }
@@ -126,16 +126,17 @@ public class ReuseConvertHandler implements FsConverter.Handler {
             WildcardType wildcardType = (WildcardType) targetType;
             Type targetUpper = FsReflect.getUpperBound(wildcardType);
             if (targetUpper != null) {
-                return converter.convertObject(source, sourceType, targetUpper);
+                return converter.asHandler().convert(source, sourceType, targetUpper, null);
             } else {
                 Type targetLower = FsReflect.getLowerBound(wildcardType);
                 if (targetLower != null) {
                     return converter
                         .withOptions(converter.getOptions().replaceReusePolicy(FsConverter.Options.REUSE_EQUAL))
-                        .convertObject(source, sourceType, targetLower);
+                        .asHandler()
+                        .convert(source, sourceType, targetLower, null);
                 }
             }
         }
-        return Fs.CONTINUE;
+        return null;
     }
 }

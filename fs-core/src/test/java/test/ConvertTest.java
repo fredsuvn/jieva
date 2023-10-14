@@ -8,6 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsFlag;
 import xyz.fsgik.common.convert.FsConverter;
 import xyz.fsgik.common.reflect.TypeRef;
 
@@ -266,9 +267,9 @@ public class ConvertTest {
                         return "1";
                     }
                     if (Objects.equals(source, "3")) {
-                        return Fs.CONTINUE;
+                        return null;
                     }
-                    return Fs.BREAK;
+                    return FsFlag.BREAK;
                 }
             })
             .asHandler();
@@ -279,7 +280,7 @@ public class ConvertTest {
         Assert.assertEquals(
             handler.convert("3", String.class, Integer.class, FsConverter.defaultConverter()), 3);
         Assert.assertEquals(
-            handler.convert("4", String.class, Integer.class, FsConverter.defaultConverter()), Fs.BREAK);
+            handler.convert("4", String.class, Integer.class, FsConverter.defaultConverter()), FsFlag.BREAK);
     }
 
     public enum E1 {

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
-import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.bean.handlers.AbstractBeanResolveHandler;
 import xyz.fsgik.common.bean.handlers.JavaBeanResolveHandler;
 import xyz.fsgik.common.bean.handlers.RecordBeanResolveHandler;
 import xyz.fsgik.common.cache.FsCache;
@@ -18,15 +18,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Resolver for {@link FsBean}, usually consists of {@link Handler}s.
- * There are 3 built-in resolvers:
+ * There are 2 built-in resolvers:
  * <ul>
  *     <li>{@link JavaBeanResolveHandler} (default handler);</li>
  *     <li>{@link RecordBeanResolveHandler};</li>
  * </ul>
+ * And a skeletal implementation: {@link AbstractBeanResolveHandler}.
  *
  * @author fredsuvn
  */
@@ -115,16 +115,16 @@ public interface FsBeanResolver {
      * @param mapType given map type
      */
     default FsBean wrapMap(Map<String, ?> map, @Nullable Type mapType) {
-        final class FsMapBeanImpl implements FsBean {
+        final class MapBeanImpl implements FsBean {
 
             private final Map<String, Object> mapObject;
             private final Type mapType;
             private final Type valueType;
             private final Map<String, Node> propertyNodes = new LinkedHashMap<>();
             private int propertyVersion = 0;
-            private Map<String, FsBeanProperty> properties;
+            private Map<String, FsProperty> properties;
 
-            private FsMapBeanImpl(Map<String, Object> map, @Nullable Type mapType) {
+            private MapBeanImpl(Map<String, Object> map, @Nullable Type mapType) {
                 this.mapObject = map;
                 this.mapType = mapType == null ? DEFAULT_MAP_BEAN_TYPE : mapType;
                 if (this.mapType == DEFAULT_MAP_BEAN_TYPE) {
@@ -148,11 +148,11 @@ public interface FsBeanResolver {
             }
 
             @Override
-            public synchronized Map<String, FsBeanProperty> getProperties() {
+            public synchronized Map<String, FsProperty> getProperties() {
                 // first init
                 if (properties == null) {
                     mapObject.forEach((k, v) -> {
-                        FsBeanProperty property = new FsMapBeanPropertyImpl(k);
+                        FsProperty property = new MapPropertyImpl(k);
                         propertyNodes.put(k, new Node(propertyVersion, property));
                     });
                     properties = Collections.unmodifiableMap(
@@ -167,7 +167,7 @@ public interface FsBeanResolver {
                 for (String key : keySet) {
                     Node node = propertyNodes.get(key);
                     if (node == null) {
-                        FsBeanProperty property = new FsMapBeanPropertyImpl(key);
+                        FsProperty property = new MapPropertyImpl(key);
                         propertyNodes.put(key, new Node(propertyVersion, property));
                         hasNewNode = true;
                     } else {
@@ -197,11 +197,11 @@ public interface FsBeanResolver {
                 if (this == o) {
                     return true;
                 }
-                if (!(o instanceof FsMapBeanImpl)) {
+                if (!(o instanceof MapBeanImpl)) {
                     return false;
                 }
-                return Objects.equals(mapType, ((FsMapBeanImpl) o).mapType)
-                    && Objects.equals(mapObject, ((FsMapBeanImpl) o).mapObject);
+                return Objects.equals(mapType, ((MapBeanImpl) o).mapType)
+                    && Objects.equals(mapObject, ((MapBeanImpl) o).mapObject);
             }
 
             @Override
@@ -211,23 +211,21 @@ public interface FsBeanResolver {
 
             @Override
             public String toString() {
-                return "bean(" + getProperties().entrySet().stream()
-                    .map(it -> it.getKey() + ": " + it.getValue()).collect(Collectors.joining(", ")) +
-                    ")";
+                return FsBean.toString(this);
             }
 
             @Data
             @AllArgsConstructor
             final class Node {
                 private int version;
-                private FsBeanProperty property;
+                private FsProperty property;
             }
 
-            final class FsMapBeanPropertyImpl implements FsBeanProperty {
+            final class MapPropertyImpl implements FsProperty {
 
                 private final String key;
 
-                private FsMapBeanPropertyImpl(String key) {
+                private MapPropertyImpl(String key) {
                     this.key = key;
                 }
 
@@ -288,7 +286,7 @@ public interface FsBeanResolver {
 
                 @Override
                 public FsBean getOwner() {
-                    return FsMapBeanImpl.this;
+                    return MapBeanImpl.this;
                 }
 
                 @Override
@@ -306,11 +304,11 @@ public interface FsBeanResolver {
                     if (this == o) {
                         return true;
                     }
-                    if (!(o instanceof FsMapBeanPropertyImpl)) {
+                    if (!(o instanceof MapPropertyImpl)) {
                         return false;
                     }
-                    return Objects.equals(key, ((FsMapBeanPropertyImpl) o).key)
-                        && Objects.equals(FsMapBeanImpl.this, ((FsMapBeanPropertyImpl) o).getOwner());
+                    return Objects.equals(key, ((MapPropertyImpl) o).key)
+                        && Objects.equals(MapBeanImpl.this, ((MapPropertyImpl) o).getOwner());
                 }
 
                 @Override
@@ -320,17 +318,11 @@ public interface FsBeanResolver {
 
                 @Override
                 public String toString() {
-                    return "BeanProperty(name=" +
-                        key +
-                        ", type=" +
-                        valueType +
-                        ", ownerType=" +
-                        getOwner().getType() +
-                        ")";
+                    return FsProperty.toString(this);
                 }
             }
         }
-        return new FsMapBeanImpl((Map<String, Object>) map, mapType);
+        return new MapBeanImpl((Map<String, Object>) map, mapType);
     }
 
     /**
@@ -376,33 +368,59 @@ public interface FsBeanResolver {
     interface Handler {
 
         /**
-         * Resolves given bean builder, of which properties map is readable and writeable.
-         * Each handler can build the properties map --
+         * Resolves bean from given resolving context, of which properties map
+         * (from {@link ResolveContext#beanProperties()}) is readable and writeable.
+         * Each handler can operate the properties map --
          * add new property or remove property which is resolved by previous handler.
          * <p>
-         * Given bean builder itself is the final resolved {@link FsBean}, it is mutable in resolving process,
-         * and finally it will become immutable.
-         * That means, it can be set to returned value of {@link FsBeanProperty#getOwner()} for property implementation.
-         * <p>
-         * If this method returns {@link Fs#CONTINUE}, means the resolving will continue to next handler.
-         * Otherwise, the resolving will end (such as return null or {@link Fs#BREAK}) .
+         * In general, all handlers in the resolver ({@link #getHandlers()}) will be invoked this method sequentially.
+         * If a handler want to prevent next resolving, call {@link ResolveContext#breakResolving()} to tell
+         * the resolver to break and finish resolving after current resolution.
          *
-         * @param builder given bean builder
+         * @param context given resolving context
          * @see FsBeanResolver
          */
         @Nullable
-        Object resolve(BeanBuilder builder);
+        void resolve(ResolveContext context);
     }
 
     /**
-     * Builder and subtype of {@link FsBean}.
-     * <p>
-     * The parameter instance in {@link Handler#resolve(BeanBuilder)} is the final instance of {@link FsBean}
-     * (it is mutable at the beginning, but becomes immutable after resolving),
-     * that is, it can be set into {@link FsBeanProperty#getOwner()} for property implementation.
+     * Context of bean resolving.
      *
-     * @see Handler#resolve(BeanBuilder)
+     * @see Handler#resolve(ResolveContext)
      */
-    interface BeanBuilder extends FsBean {
+    interface ResolveContext {
+
+        /**
+         * Returns type of resolved bean.
+         *
+         * @return type of resolved bean
+         */
+        Type beanType();
+
+        /**
+         * Returns bean properties map in current resolving context.
+         * The map through whole resolving process, store all properties from all handlers.
+         * Each handler can add or remove or modify properties which is resolved by previous handler in this map.
+         * <p>
+         * Note: {@link FsPropertyBase} produced by handler must be immutable, it will be directly used by the final
+         * generated {@link FsProperty} object, and any operations performed on the base object will affect the final
+         * generated object.
+         *
+         * @return properties map in current resolving context
+         */
+        Map<String, FsPropertyBase> beanProperties();
+
+        /**
+         * Tells the bean resolver to break and finish resolving after this resolution.
+         */
+        void breakResolving();
+
+        /**
+         * Returns whether the resolver is told to break and finish resolving after this resolution.
+         *
+         * @return whether the resolver is told to break and finish resolving after this resolution
+         */
+        boolean isBreakResolving();
     }
 }

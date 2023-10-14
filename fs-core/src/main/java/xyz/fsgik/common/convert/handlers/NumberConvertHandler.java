@@ -1,7 +1,6 @@
 package xyz.fsgik.common.convert.handlers;
 
 import xyz.fsgik.annotations.Nullable;
-import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.convert.FsConverter;
 
 import java.lang.reflect.Type;
@@ -21,7 +20,7 @@ import java.util.Objects;
  *     <li>{@link BigDecimal};</li>
  *     <li>{@link BigInteger};</li>
  * </ul>
- * Note if the {@code obj} is null, return {@link Fs#CONTINUE}.
+ * Note if the {@code obj} is null, return {@code null}.
  *
  * @author fredsuvn
  */
@@ -35,7 +34,7 @@ public class NumberConvertHandler implements FsConverter.Handler {
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
         if (source == null) {
-            return Fs.CONTINUE;
+            return null;
         }
         if (Objects.equals(targetType, byte.class) || Objects.equals(targetType, Byte.class)) {
             if (source instanceof Number) {
@@ -90,7 +89,7 @@ public class NumberConvertHandler implements FsConverter.Handler {
             }
             return new BigInteger(source.toString());
         } else {
-            return Fs.CONTINUE;
+            return null;
         }
     }
 }
