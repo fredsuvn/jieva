@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * Declares type of the annotated element is not allowed to be the specified types.
  * It is container of {@link RejectedType}.
  *
- * @author sunqian
+ * @author fredsuvn
  * @see RejectedType
  */
 @Documented

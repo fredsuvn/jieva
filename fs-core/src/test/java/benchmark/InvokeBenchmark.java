@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author sunqian
+ * @author fredsuvn
  */
 @BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 3, time = 5)

@@ -3,7 +3,7 @@ package test;
 import org.testng.annotations.Test;
 
 /**
- * @author sunqian
+ * @author fredsuvn
  */
 public class AnnotationTest {
 

@@ -9,7 +9,7 @@ import xyz.fsgik.common.base.FsString;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author sunqian
+ * @author fredsuvn
  */
 @BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 3, time = 5)

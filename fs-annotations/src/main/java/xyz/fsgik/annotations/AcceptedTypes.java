@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * Declares type of the annotated element is allowed to be the specified types.
  * It is container of {@link AcceptedType}.
  *
- * @author sunqian
+ * @author fredsuvn
  * @see AcceptedType
  */
 @Documented

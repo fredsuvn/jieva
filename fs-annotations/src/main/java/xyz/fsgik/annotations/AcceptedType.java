@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * Declares type of the annotated element is allowed to be the specified type.
  *
- * @author sunqian
+ * @author fredsuvn
  * @see AcceptedTypes
  */
 @Documented

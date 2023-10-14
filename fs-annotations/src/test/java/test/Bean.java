@@ -4,7 +4,7 @@ import lombok.Data;
 import xyz.fsgik.annotations.Nullable;
 
 /**
- * @author sunqian
+ * @author fredsuvn
  */
 @Data
 public class Bean {
