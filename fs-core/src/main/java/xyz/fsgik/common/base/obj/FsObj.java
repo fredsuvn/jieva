@@ -8,7 +8,7 @@ import java.lang.reflect.*;
 import java.util.Collections;
 
 /**
- * This class wraps an object and its type.
+ * This class holds an object and its type.
  * This class is usually used to specify clear type for an object.
  *
  * @author fredsuvn
@@ -16,7 +16,7 @@ import java.util.Collections;
 public interface FsObj<T> {
 
     /**
-     * Wraps with given object and its type.
+     * Wraps given object with its type.
      * <p>
      * This method will return instance of:
      * <ul>
@@ -29,6 +29,7 @@ public interface FsObj<T> {
      *
      * @param object given object
      * @param type   type of given object
+     * @return wrapped {@link FsObj} or its subtypes
      */
     static <T> FsObj<T> wrap(T object, Type type) {
         if (type instanceof Class) {
@@ -55,18 +56,23 @@ public interface FsObj<T> {
      *
      * @param object  given object
      * @param typeRef type ref of given object
+     * @return wrapped {@link FsObj} or its subtypes
      */
     static <T> FsObj<T> wrap(T object, TypeRef<T> typeRef) {
         return wrap(object, typeRef.getType());
     }
 
     /**
-     * Returns current object.
+     * Returns hold object.
+     *
+     * @return hold object
      */
     T getObject();
 
     /**
-     * Return type of current object.
+     * Return type of hold object.
+     *
+     * @return type of hold object
      */
     Type getType();
 
@@ -74,6 +80,8 @@ public interface FsObj<T> {
      * To {@link ClassObj}.
      * <p>
      * Note {@link ParameterizedObj} can convert to {@link Class} without its generic types.
+     *
+     * @return of {@link ClassObj}
      */
     default ClassObj<T> toClassObj() {
         if (this instanceof ClassObj) {
@@ -89,6 +97,8 @@ public interface FsObj<T> {
      * To {@link ParameterizedObj}.
      * <p>
      * Note {@link ClassObj} can convert to {@link ParameterizedObj} with a generic type of {@link Object} type.
+     *
+     * @return of {@link ParameterizedObj}
      */
     default ParameterizedObj<T> toParameterizedObj() {
         if (this instanceof ParameterizedObj) {
@@ -103,6 +113,8 @@ public interface FsObj<T> {
 
     /**
      * To {@link WildcardObj}.
+     *
+     * @return of {@link WildcardObj}
      */
     default WildcardObj<T> toWildcardObj() {
         if (this instanceof WildcardObj) {
@@ -113,6 +125,8 @@ public interface FsObj<T> {
 
     /**
      * To {@link TypeVariableObj}.
+     *
+     * @return of {@link TypeVariableObj}
      */
     default TypeVariableObj<T> toTypeVariableObj() {
         if (this instanceof TypeVariableObj) {
@@ -123,6 +137,8 @@ public interface FsObj<T> {
 
     /**
      * To {@link GenericArrayObj}.
+     *
+     * @return of {@link GenericArrayObj}
      */
     default GenericArrayObj<T> toGenericArrayObj() {
         if (this instanceof GenericArrayObj) {

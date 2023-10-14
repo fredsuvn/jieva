@@ -14,16 +14,18 @@ public class FloatRef {
     }
 
     /**
-     * Returns value.
+     * Returns value of this ref.
+     *
+     * @return value of this ref
      */
     public float get() {
         return value;
     }
 
     /**
-     * Sets value
+     * Sets value of this ref.
      *
-     * @param value value
+     * @param value value of this ref
      */
     public void set(float value) {
         this.value = value;
@@ -35,6 +37,8 @@ public class FloatRef {
      * <pre>
      *     return ++value;
      * </pre>
+     *
+     * @return ++value
      */
     public float incrementAndGet() {
         return ++value;
@@ -49,6 +53,7 @@ public class FloatRef {
      * </pre>
      *
      * @param addon specified number
+     * @return value += addon
      */
     public float incrementAndGet(float addon) {
         value += addon;
@@ -61,6 +66,8 @@ public class FloatRef {
      * <pre>
      *     return value++;
      * </pre>
+     *
+     * @return value++
      */
     public float getAndIncrement() {
         return value++;
@@ -76,6 +83,7 @@ public class FloatRef {
      * </pre>
      *
      * @param addon specified number
+     * @return current value
      */
     public float getAndIncrement(float addon) {
         float temp = value;

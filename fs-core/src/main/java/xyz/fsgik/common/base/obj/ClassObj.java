@@ -8,7 +8,9 @@ package xyz.fsgik.common.base.obj;
 public interface ClassObj<T> extends FsObj<T> {
 
     /**
-     * Returns type of current object as {@link Class}.
+     * Returns type of hold object as {@link Class}.
+     *
+     * @return type of hold object as {@link Class}
      */
     @Override
     Class<T> getType();

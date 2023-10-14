@@ -20,6 +20,7 @@ public class FsProcess {
      * Starts a process with given command.
      *
      * @param cmd given command
+     * @return the process
      */
     public static Process start(String cmd) {
         String[] splits = cmd.split(" ");
@@ -34,6 +35,7 @@ public class FsProcess {
      * Starts a process with given command.
      *
      * @param cmd given command
+     * @return the process
      */
     public static Process start(String... cmd) {
         return start(false, cmd);
@@ -44,6 +46,7 @@ public class FsProcess {
      *
      * @param redirectErrorStream whether redirect error stream
      * @param cmd                 given command
+     * @return the process
      */
     public static Process start(boolean redirectErrorStream, String... cmd) {
         return start(redirectErrorStream, Arrays.asList(cmd));
@@ -54,6 +57,7 @@ public class FsProcess {
      *
      * @param redirectErrorStream whether redirect error stream
      * @param cmd                 given command
+     * @return the process
      */
     public static Process start(boolean redirectErrorStream, List<String> cmd) {
         return start(null, null, redirectErrorStream, cmd);
@@ -66,6 +70,7 @@ public class FsProcess {
      * @param dir                 given directory file
      * @param redirectErrorStream whether redirect error stream
      * @param cmd                 given command
+     * @return the process
      */
     public static Process start(
         @Nullable Map<String, String> env,
@@ -89,6 +94,7 @@ public class FsProcess {
      * @param dir                 given directory file
      * @param redirectErrorStream whether redirect error stream
      * @param cmd                 given command
+     * @return the process
      */
     public static Process start(
         @Nullable Map<String, String> env,

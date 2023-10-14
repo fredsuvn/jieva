@@ -55,18 +55,20 @@ public class FsDate {
     private static final FsCache<CharSequence, DateTimeFormatter> FORMATTER_CACHE = FsCache.softCache();
 
     /**
-     * Returns DateFormat of given pattern.
+     * Returns {@link DateFormat} of given pattern.
      *
      * @param pattern given pattern
+     * @return {@link DateFormat} of given pattern
      */
     public static DateFormat toDateFormat(CharSequence pattern) {
         return new SimpleDateFormat(pattern.toString());
     }
 
     /**
-     * Returns DateTimeFormatter of given pattern.
+     * Returns {@link DateTimeFormatter} of given pattern.
      *
      * @param pattern given pattern
+     * @return {@link DateTimeFormatter} of given pattern
      */
     public static DateTimeFormatter toFormatter(CharSequence pattern) {
         if (FsString.charEquals(PATTERN, pattern)) {
@@ -85,6 +87,7 @@ public class FsDate {
      *
      * @param date    given date
      * @param pattern given pattern
+     * @return formatted string
      */
     public static String format(Date date, CharSequence pattern) {
         return toDateFormat(pattern).format(date);
@@ -94,6 +97,7 @@ public class FsDate {
      * Formats given date with {@link #PATTERN}.
      *
      * @param date given date
+     * @return formatted string
      */
     public static String format(Date date) {
         return format(date, PATTERN);
@@ -104,6 +108,7 @@ public class FsDate {
      *
      * @param date    given date string
      * @param pattern given pattern
+     * @return parsed date
      */
     public static Date parse(CharSequence date, CharSequence pattern) {
         try {
@@ -117,6 +122,7 @@ public class FsDate {
      * Parses given date string with {@link #PATTERN}.
      *
      * @param date given date string
+     * @return parsed date
      */
     public static Date parse(CharSequence date) {
         return parse(date, PATTERN);
@@ -128,6 +134,7 @@ public class FsDate {
      *
      * @param date    given date
      * @param pattern given pattern
+     * @return formatted string or null
      */
     @Nullable
     public static String toString(@Nullable Date date, @Nullable CharSequence pattern) {
@@ -142,6 +149,7 @@ public class FsDate {
      * If given date is null, return null.
      *
      * @param date given date
+     * @return formatted string or null
      */
     @Nullable
     public static String toString(@Nullable Date date) {
@@ -154,6 +162,7 @@ public class FsDate {
      *
      * @param date    given date string
      * @param pattern given pattern
+     * @return parsed date or null
      */
     @Nullable
     public static Date toDate(@Nullable CharSequence date, @Nullable CharSequence pattern) {
@@ -168,6 +177,7 @@ public class FsDate {
      * If given date string is null, return null.
      *
      * @param date given date string
+     * @return parsed date or null
      */
     @Nullable
     public static Date toDate(@Nullable CharSequence date) {
@@ -176,6 +186,8 @@ public class FsDate {
 
     /**
      * Returns current zone offset.
+     *
+     * @return current zone offset
      */
     public static ZoneOffset currentZoneOffset() {
         return ZonedDateTime.now().getOffset();
@@ -185,6 +197,7 @@ public class FsDate {
      * Returns zone offset from given zone id.
      *
      * @param zoneId given zone id
+     * @return zone offset from given zone id
      */
     public static ZoneOffset toZoneOffset(ZoneId zoneId) {
         return zoneId.getRules().getOffset(Instant.now());
@@ -215,6 +228,7 @@ public class FsDate {
      * Return null if no matched pattern.
      *
      * @param date date string
+     * @return pattern string or null
      */
     @Nullable
     public static String toPattern(CharSequence date) {
@@ -275,9 +289,10 @@ public class FsDate {
     }
 
     /**
-     * Returns Instant from given temporal, or null if failed.
+     * Returns {@link Instant} from given temporal, or null if failed.
      *
      * @param temporal given temporal
+     * @return {@link Instant} from given temporal, or null if failed
      */
     @Nullable
     public static Instant toInstant(TemporalAccessor temporal) {

@@ -48,9 +48,10 @@ public class FsChars {
     }
 
     /**
-     * Returns charset of current native environment. Generally is charset of local native OS.
+     * Returns charset of current native environment. Generally is charset of local native OS, not JVM charset.
      *
      * @return charset of current native environment
+     * @see #systemCharset()
      */
     @Nullable
     public static Charset nativeCharset() {

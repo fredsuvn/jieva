@@ -17,12 +17,16 @@ public abstract class FsFinal {
     private String toString;
 
     /**
-     * Computes hashCode of this object.
+     * Computes {@link Object#hashCode()} of this object.
+     *
+     * @return computed hash code
      */
     protected abstract int computeHashCode();
 
     /**
-     * Computes toString of this object.
+     * Computes {@link Object#toString()} of this object.
+     *
+     * @return computed string
      */
     protected abstract String computeToString();
 

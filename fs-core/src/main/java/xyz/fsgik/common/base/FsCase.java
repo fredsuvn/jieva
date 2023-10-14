@@ -47,6 +47,7 @@ public interface FsCase {
      * to check and convert a char.
      *
      * @param isUpper given upper setting
+     * @return camel case (upper or lower) with given upper setting
      */
     static FsCase camelCase(boolean isUpper) {
         return new CamelCase(isUpper);
@@ -60,6 +61,7 @@ public interface FsCase {
      *
      * @param separator given separator
      * @param upper     upper setting
+     * @return separator case with given separator and upper setting
      */
     static FsCase separatorCase(CharSequence separator, Boolean upper) {
         return new SeparatorCase(separator, upper);
@@ -70,6 +72,7 @@ public interface FsCase {
      * Default implementations use {@link FsString#subView(CharSequence, int, int)} to build sub-sequence.
      *
      * @param chars given chars
+     * @return split word list
      */
     List<CharSequence> split(CharSequence chars);
 
@@ -78,6 +81,7 @@ public interface FsCase {
      * It is assumed that the words is split by {@link #split(CharSequence)}.
      *
      * @param words given split words
+     * @return joined string
      */
     String join(List<CharSequence> words);
 
@@ -89,6 +93,7 @@ public interface FsCase {
      *
      * @param chars     given chars
      * @param otherCase other case
+     * @return converted string
      * @see #split(CharSequence)
      * @see #join(List)
      */

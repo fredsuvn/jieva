@@ -13,6 +13,8 @@ public class FsThread {
 
     /**
      * Runs a new thread.
+     *
+     * @return the thread
      */
     public static Thread start(Runnable runnable) {
         return start(null, false, runnable);
@@ -23,6 +25,7 @@ public class FsThread {
      *
      * @param threadName given thread name
      * @param runnable   run content
+     * @return the thread
      */
     public static Thread start(@Nullable String threadName, Runnable runnable) {
         return start(threadName, false, runnable);
@@ -34,6 +37,7 @@ public class FsThread {
      * @param threadName given thread name
      * @param daemon     whether the thread is daemon
      * @param runnable   run content
+     * @return the thread
      */
     public static Thread start(@Nullable String threadName, boolean daemon, Runnable runnable) {
         Thread thread = new Thread(runnable);

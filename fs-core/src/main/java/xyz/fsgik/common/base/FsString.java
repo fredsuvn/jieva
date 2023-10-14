@@ -85,6 +85,7 @@ public class FsString {
      * Returns whether given chars is null or empty.
      *
      * @param chars given chars
+     * @return whether given chars is null or empty
      */
     public static boolean isEmpty(@Nullable CharSequence chars) {
         return chars == null || chars.length() == 0;
@@ -94,6 +95,7 @@ public class FsString {
      * Returns whether given chars is not null and empty.
      *
      * @param chars given chars
+     * @return whether given chars is not null and empty
      */
     public static boolean isNotEmpty(@Nullable CharSequence chars) {
         return !isEmpty(chars);
@@ -103,6 +105,7 @@ public class FsString {
      * Returns whether given chars is blank (null, empty or whitespace).
      *
      * @param chars given chars
+     * @return whether given chars is blank
      */
     public static boolean isBlank(@Nullable CharSequence chars) {
         if (chars == null || chars.length() == 0) {
@@ -121,6 +124,7 @@ public class FsString {
      * Returns whether given chars is not blank (null, empty or whitespace).
      *
      * @param chars given chars
+     * @return whether given chars is not blank
      */
     public static boolean isNotBlank(@Nullable CharSequence chars) {
         return !isBlank(chars);
@@ -131,6 +135,7 @@ public class FsString {
      *
      * @param regex given regex
      * @param chars given chars
+     * @return whether given chars can match given regex
      */
     public static boolean matches(CharSequence regex, @Nullable CharSequence chars) {
         if (chars == null) {
@@ -140,9 +145,10 @@ public class FsString {
     }
 
     /**
-     * Returns ture if any given chars is empty.
+     * Returns ture if any given chars is empty, otherwise false.
      *
      * @param chars given chars
+     * @return ture if any given chars is empty, otherwise false
      */
     public static boolean anyEmpty(CharSequence... chars) {
         for (CharSequence c : chars) {
@@ -154,9 +160,10 @@ public class FsString {
     }
 
     /**
-     * Returns ture if any given chars is blank: null, empty or whitespace.
+     * Returns ture if any given chars is blank (null, empty or whitespace), otherwise false.
      *
      * @param chars given chars
+     * @return ture if any given chars is blank, otherwise false
      */
     public static boolean anyBlank(CharSequence... chars) {
         for (CharSequence c : chars) {
@@ -168,10 +175,11 @@ public class FsString {
     }
 
     /**
-     * Returns ture if any given chars can match given regex.
+     * Returns ture if any given chars can match given regex, otherwise false.
      *
      * @param chars given chars
      * @param regex given regex
+     * @return ture if any given chars can match given regex, otherwise false
      */
     public static boolean anyMatches(CharSequence regex, CharSequence... chars) {
         for (CharSequence c : chars) {
@@ -183,9 +191,10 @@ public class FsString {
     }
 
     /**
-     * Returns ture if all given chars is empty.
+     * Returns ture if all given chars is empty, otherwise false.
      *
      * @param chars given chars
+     * @return ture if all given chars is empty, otherwise false
      */
     public static boolean allEmpty(CharSequence... chars) {
         for (CharSequence c : chars) {
@@ -197,9 +206,10 @@ public class FsString {
     }
 
     /**
-     * Returns ture if all given chars is blank: null, empty or whitespace.
+     * Returns ture if all given chars is blank (null, empty or whitespace), otherwise false.
      *
      * @param chars given chars
+     * @return ture if all given chars is blank, otherwise false
      */
     public static boolean allBlank(CharSequence... chars) {
         for (CharSequence c : chars) {
@@ -211,10 +221,11 @@ public class FsString {
     }
 
     /**
-     * Returns ture if all given chars can match given regex.
+     * Returns ture if all given chars can match given regex, otherwise false.
      *
      * @param chars given chars
      * @param regex given regex
+     * @return ture if all given chars can match given regex, otherwise false
      */
     public static boolean allMatches(CharSequence regex, CharSequence... chars) {
         for (CharSequence c : chars) {
@@ -230,6 +241,7 @@ public class FsString {
      *
      * @param chars given chars
      * @param start given start chars
+     * @return whether given chars starts with given start chars
      */
     public static boolean startsWith(@Nullable CharSequence chars, @Nullable CharSequence start) {
         if (chars == null || start == null) {
@@ -251,6 +263,7 @@ public class FsString {
      *
      * @param chars given chars
      * @param end   given start chars
+     * @return whether given chars ends with given start chars
      */
     public static boolean endsWith(@Nullable CharSequence chars, @Nullable CharSequence end) {
         if (chars == null || end == null) {
@@ -271,6 +284,7 @@ public class FsString {
      * Returns whether all chars of given chars are upper case.
      *
      * @param chars given chars
+     * @return whether all chars of given chars are upper case
      */
     public static boolean allUpperCase(CharSequence chars) {
         if (isEmpty(chars)) {
@@ -288,6 +302,7 @@ public class FsString {
      * Returns whether all chars of given chars are lower case.
      *
      * @param chars given chars
+     * @return whether all chars of given chars are lower case
      */
     public static boolean allLowerCase(CharSequence chars) {
         if (isEmpty(chars)) {
@@ -305,15 +320,17 @@ public class FsString {
      * Capitalizes given chars, equivalent to {@code firstCase(chars, true)}.
      *
      * @param chars given chars
+     * @return capitalized string
      */
     public static String capitalize(CharSequence chars) {
         return firstCase(chars, true);
     }
 
     /**
-     * Un-capitalizes given chars, equivalent to {@code firstCase(chars, false)}.
+     * Uncapitalizes given chars, equivalent to {@code firstCase(chars, false)}.
      *
      * @param chars given chars
+     * @return uncapitalized string
      */
     public static String uncapitalize(CharSequence chars) {
         return firstCase(chars, false);
@@ -325,6 +342,7 @@ public class FsString {
      *
      * @param chars given chars
      * @param upper given upper
+     * @return converted string
      */
     public static String firstCase(CharSequence chars, boolean upper) {
         if (isEmpty(chars)) {
@@ -345,6 +363,7 @@ public class FsString {
      * Returns a String of which content is upper case of given chars.
      *
      * @param chars given chars
+     * @return converted string
      */
     public static String upperCase(CharSequence chars) {
         if (isEmpty(chars)) {
@@ -361,6 +380,7 @@ public class FsString {
      * Returns a String of which content is lower case of given chars.
      *
      * @param chars given chars
+     * @return converted string
      */
     public static String lowerCase(CharSequence chars) {
         if (isEmpty(chars)) {
@@ -384,6 +404,7 @@ public class FsString {
      *
      * @param chars     given chars
      * @param separator given separator
+     * @return split list
      */
     public static List<CharSequence> split(CharSequence chars, CharSequence separator) {
         return split(chars, separator, FsString::subView);
@@ -400,6 +421,7 @@ public class FsString {
      * @param chars     given chars
      * @param separator given separator
      * @param generator given sub-sequence generator
+     * @return split list
      */
     public static List<CharSequence> split(CharSequence chars, CharSequence separator, CharsGen generator) {
         if (isEmpty(chars) || isEmpty(separator) || separator.length() > chars.length()) {
@@ -432,6 +454,7 @@ public class FsString {
      * @param chars       given chars
      * @param matcher     given matcher (to replace)
      * @param replacement given replacement
+     * @return replaced string
      */
     public static String replace(CharSequence chars, CharSequence matcher, CharSequence replacement) {
         return replace(chars, matcher, replacement, -1);
@@ -452,6 +475,7 @@ public class FsString {
      * @param matcher     given matcher (to replace)
      * @param replacement given replacement
      * @param limit       given limit
+     * @return replaced string
      */
     public static String replace(CharSequence chars, CharSequence matcher, CharSequence replacement, int limit) {
         if (limit == 0 || isEmpty(chars) || chars.length() < matcher.length() || isEmpty(matcher)) {
@@ -510,6 +534,7 @@ public class FsString {
      *
      * @param chars  given chars
      * @param search given search word
+     * @return the index
      */
     public static int indexOf(CharSequence chars, CharSequence search) {
         return indexOf(chars, search, 0);
@@ -523,6 +548,7 @@ public class FsString {
      * @param chars  given chars
      * @param search given search word
      * @param from   given index
+     * @return the index
      */
     public static int indexOf(CharSequence chars, CharSequence search, int from) {
         if (isEmpty(chars) || chars.length() < search.length()) {
@@ -558,6 +584,7 @@ public class FsString {
      *
      * @param chars  given chars
      * @param search given search word
+     * @return the index
      */
     public static int lastIndexOf(CharSequence chars, CharSequence search) {
         if (isEmpty(chars)) {
@@ -574,6 +601,7 @@ public class FsString {
      * @param chars  given chars
      * @param search given search word
      * @param from   given index
+     * @return the index
      */
     public static int lastIndexOf(CharSequence chars, CharSequence search, int from) {
         if (isEmpty(chars) || chars.length() < search.length()) {
@@ -607,6 +635,7 @@ public class FsString {
      *
      * @param cs1 char sequence 1
      * @param cs2 char sequence 2
+     * @return whether each char of two char sequence at same index are equal
      */
     public static boolean charEquals(CharSequence cs1, CharSequence cs2) {
         if (cs1.length() != cs2.length()) {
@@ -631,6 +660,7 @@ public class FsString {
      * This method is same as: toString(obj, true, true)
      *
      * @param obj given object
+     * @return computed string
      */
     public static String toString(@Nullable Object obj) {
         return toStringWith(obj, true, true);
@@ -640,6 +670,7 @@ public class FsString {
      * Returns deep-array-to-string for given objects.
      *
      * @param objs given objects
+     * @return computed string
      */
     public static String toString(Object... objs) {
         return Arrays.deepToString(objs);
@@ -663,6 +694,7 @@ public class FsString {
      * @param obj          given object
      * @param arrayCheck   the array-check
      * @param deepToString whether deep-to-string
+     * @return computed string
      */
     public static String toStringWith(@Nullable Object obj, boolean arrayCheck, boolean deepToString) {
         if (obj == null || !arrayCheck) {
@@ -703,21 +735,6 @@ public class FsString {
     }
 
     /**
-     * Returns a string starts with given start string.
-     * If given source string starts with given start string, return itself;
-     * if not, return start + src.
-     *
-     * @param src   given source string
-     * @param start given start string
-     */
-    public static String startWith(CharSequence src, CharSequence start) {
-        if (startsWith(src, start)) {
-            return src.toString();
-        }
-        return start.toString() + src;
-    }
-
-    /**
      * Puts chars in specified length from given chars into given dest starts at given offset.
      *
      * @param chars  given chars
@@ -753,12 +770,29 @@ public class FsString {
     }
 
     /**
+     * Returns a string starts with given start string.
+     * If given source string starts with given start string, return itself;
+     * if not, return start + src.
+     *
+     * @param src   given source string
+     * @param start given start string
+     * @return a string starts with given start string
+     */
+    public static String startWith(CharSequence src, CharSequence start) {
+        if (startsWith(src, start)) {
+            return src.toString();
+        }
+        return start.toString() + src;
+    }
+
+    /**
      * Returns a string doesn't start with given start string.
      * If given source string starts with given start string, remove the start chars and return;
      * else return source string.
      *
      * @param src   given source string
      * @param start given start string
+     * @return removed string
      */
     public static String removeStart(CharSequence src, CharSequence start) {
         if (src.length() < start.length()) {
@@ -779,6 +813,7 @@ public class FsString {
      *
      * @param src given source string
      * @param end given end string
+     * @return a string ends with given end string
      */
     public static String endWith(CharSequence src, CharSequence end) {
         if (endsWith(src, end)) {
@@ -794,6 +829,7 @@ public class FsString {
      *
      * @param src given source string
      * @param end given end string
+     * @return removed string
      */
     public static String removeEnd(CharSequence src, CharSequence end) {
         if (src.length() < end.length()) {
@@ -811,6 +847,7 @@ public class FsString {
      * Concatenates toString of given arguments.
      *
      * @param args given arguments
+     * @return concatenated string
      */
     public static String concat(Object... args) {
         StringBuilder builder = new StringBuilder();
@@ -824,6 +861,7 @@ public class FsString {
      * Concatenates toString of given arguments.
      *
      * @param args given arguments
+     * @return concatenated string
      */
     public static String concat(Iterable<?> args) {
         StringBuilder builder = new StringBuilder();
@@ -838,6 +876,7 @@ public class FsString {
      *
      * @param separator given separator
      * @param args      given arguments
+     * @return joined string
      */
     public static String join(CharSequence separator, Object... args) {
         StringJoiner joiner = new StringJoiner(separator);
@@ -852,6 +891,7 @@ public class FsString {
      *
      * @param separator given separator
      * @param args      given arguments
+     * @return joined string
      */
     public static String join(CharSequence separator, Iterable<?> args) {
         StringJoiner joiner = new StringJoiner(separator);
@@ -865,6 +905,7 @@ public class FsString {
      * Converts given chars to int, if given chars is blank or failed to convert, return 0.
      *
      * @param chars given chars
+     * @return int from chars
      */
     public static int toInt(@Nullable CharSequence chars) {
         return toInt(chars, 0);
@@ -875,6 +916,7 @@ public class FsString {
      *
      * @param chars        given chars
      * @param defaultValue default value
+     * @return int from chars
      */
     public static int toInt(@Nullable CharSequence chars, int defaultValue) {
         if (isBlank(chars)) {
@@ -891,6 +933,7 @@ public class FsString {
      * Converts given chars to long, if given chars is blank or failed to convert, return 0.
      *
      * @param chars given chars
+     * @return long from chars
      */
     public static long toLong(@Nullable CharSequence chars) {
         return toLong(chars, 0);
@@ -901,6 +944,7 @@ public class FsString {
      *
      * @param chars        given chars
      * @param defaultValue default value
+     * @return long from chars
      */
     public static long toLong(@Nullable CharSequence chars, long defaultValue) {
         if (isBlank(chars)) {
@@ -917,6 +961,7 @@ public class FsString {
      * Converts given chars to float, if given chars is blank or failed to convert, return 0.
      *
      * @param chars given chars
+     * @return float from chars
      */
     public static float toFloat(@Nullable CharSequence chars) {
         return toFloat(chars, 0);
@@ -927,6 +972,7 @@ public class FsString {
      *
      * @param chars        given chars
      * @param defaultValue default value
+     * @return float from chars
      */
     public static float toFloat(@Nullable CharSequence chars, float defaultValue) {
         if (isBlank(chars)) {
@@ -943,6 +989,7 @@ public class FsString {
      * Converts given chars to double, if given chars is blank or failed to convert, return 0.
      *
      * @param chars given chars
+     * @return double from chars
      */
     public static double toDouble(@Nullable CharSequence chars) {
         return toDouble(chars, 0);
@@ -953,6 +1000,7 @@ public class FsString {
      *
      * @param chars        given chars
      * @param defaultValue default value
+     * @return double from chars
      */
     public static double toDouble(@Nullable CharSequence chars, double defaultValue) {
         if (isBlank(chars)) {
@@ -973,6 +1021,7 @@ public class FsString {
      * were based on its lazy toString().
      *
      * @param supplier given supplier
+     * @return lazy char sequence
      */
     public static CharSequence lazyString(Supplier<String> supplier) {
         return new LazyChars(supplier);
@@ -987,6 +1036,7 @@ public class FsString {
      *
      * @param chars given chars
      * @param start given start index inclusive
+     * @return sub-range view of given chars
      */
     public static CharSequence subView(CharSequence chars, int start) {
         return subView(chars, start, chars.length());
@@ -1001,6 +1051,7 @@ public class FsString {
      * @param chars given chars
      * @param start given start index inclusive
      * @param end   given end index exclusive
+     * @return sub-range view of given chars
      */
     public static CharSequence subView(CharSequence chars, int start, int end) {
         FsCheck.checkRangeInBounds(start, end, 0, chars.length());
@@ -1020,6 +1071,7 @@ public class FsString {
          * @param chars given chars
          * @param start given start index inclusive
          * @param end   given end index exclusive
+         * @return sub-sequence of given chars
          */
         CharSequence apply(CharSequence chars, int start, int end);
     }

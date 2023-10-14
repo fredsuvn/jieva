@@ -21,5 +21,10 @@ import java.lang.annotation.*;
 @Repeatable(AcceptedTypes.class)
 public @interface AcceptedType {
 
+    /**
+     * Accepted type.
+     *
+     * @return accepted type
+     */
     Class<?>[] value();
 }

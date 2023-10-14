@@ -19,10 +19,11 @@ import java.util.function.Function;
 public class Fs {
 
     /**
-     * Casts given object as given type T.
+     * Casts given object as specified type T.
      *
      * @param obj given object
-     * @param <T> given type T
+     * @param <T> specified type T
+     * @return given obj as specified type T
      */
     public static <T> T as(@Nullable Object obj) {
         return (T) obj;
@@ -36,6 +37,7 @@ public class Fs {
      *
      * @param obj          given object
      * @param defaultValue default value
+     * @return default value if given object is null, or given object itself if it is not null
      */
     public static <T> T notNull(@Nullable T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
@@ -50,6 +52,7 @@ public class Fs {
      * @param obj          given object
      * @param defaultValue default value
      * @param function     given function
+     * @return default value if given object is null, or the value computed by given function if it is not null
      */
     public static <K, V> V notNull(@Nullable K obj, V defaultValue, Function<? super K, ? extends V> function) {
         return obj == null ? defaultValue : function.apply(obj);
@@ -63,6 +66,7 @@ public class Fs {
      *
      * @param obj      given object
      * @param function given function
+     * @return the value computed by given function if it is not null, or null if it is null
      */
     @Nullable
     public static <K, V> V orNull(@Nullable K obj, Function<? super K, ? extends V> function) {
@@ -81,6 +85,7 @@ public class Fs {
      * This method is same as: hash(obj, true, true)
      *
      * @param obj given object
+     * @return the hash code
      */
     public static int hash(@Nullable Object obj) {
         return hashWith(obj, true, true);
@@ -90,6 +95,7 @@ public class Fs {
      * Returns deep-hash-code for given objects.
      *
      * @param objs given objects
+     * @return the hash code
      */
     public static int hash(Object... objs) {
         return Arrays.deepHashCode(objs);
@@ -109,6 +115,7 @@ public class Fs {
      * @param obj        given object
      * @param arrayCheck the array-check
      * @param deepHash   whether deep-hash
+     * @return the hash code
      */
     public static int hashWith(@Nullable Object obj, boolean arrayCheck, boolean deepHash) {
         if (obj == null || !arrayCheck) {
@@ -152,6 +159,7 @@ public class Fs {
      * Returns identity hash code for given object, same as {@link System#identityHashCode(Object)}.
      *
      * @param obj given object
+     * @return the system hash code
      */
     public static int systemHash(@Nullable Object obj) {
         return System.identityHashCode(obj);
@@ -170,6 +178,7 @@ public class Fs {
      *
      * @param a given object a
      * @param b given object b
+     * @return the result of equaling
      */
     public static boolean equals(@Nullable Object a, @Nullable Object b) {
         return equalsWith(a, b, true, true);
@@ -179,6 +188,7 @@ public class Fs {
      * Returns deep-equals for given objects.
      *
      * @param objs given objects
+     * @return the result of equaling
      */
     public static boolean equals(Object... objs) {
         if (objs.length <= 1) {
@@ -211,6 +221,7 @@ public class Fs {
      * @param b          given object b
      * @param arrayCheck the array-check
      * @param deepEquals whether deep-equals
+     * @return the result of equaling
      */
     public static boolean equalsWith(@Nullable Object a, @Nullable Object b, boolean arrayCheck, boolean deepEquals) {
         if (a == null && b == null) {
@@ -259,6 +270,7 @@ public class Fs {
      *
      * @param enumClass given enum class
      * @param name      specified name
+     * @return the enum object or null
      */
     @Nullable
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, String name) {
@@ -271,6 +283,7 @@ public class Fs {
      * @param enumClass  given enum class
      * @param name       specified name
      * @param ignoreCase whether ignore case for specified name
+     * @return the enum object or null
      */
     @Nullable
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, String name, boolean ignoreCase) {
@@ -297,6 +310,7 @@ public class Fs {
      *
      * @param enumClass given enum class
      * @param index     specified index
+     * @return the enum object or null
      */
     @Nullable
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, int index) {
@@ -314,6 +328,7 @@ public class Fs {
      * Finds resource of given resource path (starts with "/").
      *
      * @param resPath given resource
+     * @return url of resource of given resource path
      */
     public static URL findRes(String resPath) {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
@@ -324,6 +339,7 @@ public class Fs {
      * Finds all resources of given resource path (starts with "/").
      *
      * @param resPath given resource
+     * @return url set of resource of given resource path
      */
     public static Set<URL> findAllRes(String resPath) {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
@@ -345,6 +361,7 @@ public class Fs {
      *
      * @param source     source object
      * @param targetType target type
+     * @return converted object or null
      * @see FsConverter#convert(Object, Class)
      */
     @Nullable
@@ -358,6 +375,7 @@ public class Fs {
      *
      * @param source     source object
      * @param targetType target type
+     * @return converted object or null
      * @see FsConverter#convert(Object, TypeRef)
      */
     @Nullable
@@ -371,6 +389,7 @@ public class Fs {
      *
      * @param source     source object
      * @param targetType target type
+     * @return converted object or null
      * @see FsConverter#convert(Object, Type)
      */
     @Nullable
@@ -398,6 +417,7 @@ public class Fs {
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
+     * @return converted object or null
      * @see FsConverter#convertType(Object, Type, Type)
      */
     @Nullable
@@ -410,6 +430,7 @@ public class Fs {
      *
      * @param source source object
      * @param dest   dest object
+     * @return dest object
      * @see FsBeanCopier
      */
     public static <T> T copyProperties(Object source, T dest) {
@@ -424,6 +445,7 @@ public class Fs {
      * @param source   source object
      * @param dest     dest object
      * @param copyNull whether copy null properties
+     * @return dest object
      * @see FsBeanCopier
      */
     public static <T> T copyProperties(Object source, T dest, boolean copyNull) {
@@ -444,6 +466,7 @@ public class Fs {
      * @param source            source object
      * @param dest              dest object
      * @param ignoredProperties property names that are specified to ignore
+     * @return dest object
      * @see FsBeanCopier
      */
     public static <T> T copyProperties(Object source, T dest, String... ignoredProperties) {
@@ -465,6 +488,7 @@ public class Fs {
      * @param dest              dest object
      * @param copyNull          whether copy null properties
      * @param ignoredProperties property names that are specified to ignore
+     * @return dest object
      * @see FsBeanCopier
      */
     public static <T> T copyProperties(Object source, T dest, boolean copyNull, String... ignoredProperties) {
@@ -485,6 +509,7 @@ public class Fs {
      * @param sourceType specified type of source object
      * @param dest       dest object
      * @param destType   specified type of dest type
+     * @return dest object
      * @see FsBeanCopier
      */
     public static <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
@@ -500,6 +525,7 @@ public class Fs {
      * @param dest       dest object
      * @param destType   specified type of dest type
      * @param copyNull   whether copy null properties
+     * @return dest object
      * @see FsBeanCopier
      */
     public static <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, boolean copyNull) {
@@ -521,6 +547,7 @@ public class Fs {
      * @param dest              dest object
      * @param destType          specified type of dest type
      * @param ignoredProperties property names that are specified to ignore
+     * @return dest object
      * @see FsBeanCopier
      */
     public static <T> T copyProperties(
@@ -545,6 +572,7 @@ public class Fs {
      * @param destType          specified type of dest type
      * @param copyNull          whether copy null properties
      * @param ignoredProperties property names that are specified to ignore
+     * @return dest object
      * @see FsBeanCopier
      */
     public static <T> T copyProperties(
@@ -567,6 +595,7 @@ public class Fs {
      *
      * @param total     total value
      * @param chunkSize chunk size
+     * @return chunk count
      */
     public static int chunkCount(int total, int chunkSize) {
         return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
@@ -580,6 +609,7 @@ public class Fs {
      *
      * @param total     total value
      * @param chunkSize chunk size
+     * @return chunk count
      */
     public static long chunkCount(long total, long chunkSize) {
         return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;

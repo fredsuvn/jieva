@@ -14,16 +14,18 @@ public class CharRef {
     }
 
     /**
-     * Returns value.
+     * Returns value of this ref.
+     *
+     * @return value of this ref
      */
     public char get() {
         return value;
     }
 
     /**
-     * Sets value
+     * Sets value of this ref.
      *
-     * @param value value
+     * @param value value of this ref
      */
     public void set(char value) {
         this.value = value;
@@ -35,6 +37,8 @@ public class CharRef {
      * <pre>
      *     return ++value;
      * </pre>
+     *
+     * @return ++value
      */
     public char incrementAndGet() {
         return ++value;
@@ -49,6 +53,7 @@ public class CharRef {
      * </pre>
      *
      * @param addon specified number
+     * @return value += addon
      */
     public char incrementAndGet(char addon) {
         value += addon;
@@ -61,6 +66,8 @@ public class CharRef {
      * <pre>
      *     return value++;
      * </pre>
+     *
+     * @return value++
      */
     public char getAndIncrement() {
         return value++;
@@ -76,6 +83,7 @@ public class CharRef {
      * </pre>
      *
      * @param addon specified number
+     * @return current value
      */
     public char getAndIncrement(char addon) {
         char temp = value;

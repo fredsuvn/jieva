@@ -17,6 +17,8 @@ public interface FsRandom<T> {
 
     /**
      * Returns a new builder to build {@link FsRandom}.
+     *
+     * @return new builder
      */
     static <T> Builder<T> newBuilder() {
         return new Builder<>();
@@ -24,6 +26,8 @@ public interface FsRandom<T> {
 
     /**
      * Returns next random value in given rules.
+     *
+     * @return next random value
      */
     T next();
 
@@ -31,6 +35,7 @@ public interface FsRandom<T> {
      * Returns next {@code length} random values in given rules.
      *
      * @param length number of next random values
+     * @return next {@code length} random values
      */
     default List<T> nextList(int length) {
         ArrayList<T> result = new ArrayList<>(length);
@@ -63,6 +68,7 @@ public interface FsRandom<T> {
          *
          * @param score the score
          * @param value specified value
+         * @return this builder
          */
         public <R extends T> Builder<R> score(int score, T value) {
             parts.add(new ValuePart<>(currentScore, currentScore + score, value));
@@ -79,6 +85,7 @@ public interface FsRandom<T> {
          *
          * @param score    the score
          * @param supplier specified supplier
+         * @return this builder
          */
         public <R extends T> Builder<R> score(int score, Supplier<T> supplier) {
             parts.add(new SupplierPart<>(currentScore, currentScore + score, supplier));
@@ -90,12 +97,18 @@ public interface FsRandom<T> {
          * Specifies the underlying random.
          *
          * @param random underlying random
+         * @return this builder
          */
         public <R extends T> Builder<R> random(Random random) {
             this.random = random;
             return Fs.as(this);
         }
 
+        /**
+         * Builds the {@link FsRandom}.
+         *
+         * @return built instance of {@link FsRandom}
+         */
         public <R extends T> FsRandom<R> build() {
             return Fs.as(new Impl<>(Fs.notNull(random, new Random()), parts));
         }

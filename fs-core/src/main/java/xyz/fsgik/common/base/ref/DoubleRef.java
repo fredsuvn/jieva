@@ -14,16 +14,18 @@ public class DoubleRef {
     }
 
     /**
-     * Returns value.
+     * Returns value of this ref.
+     *
+     * @return value of this ref
      */
     public double get() {
         return value;
     }
 
     /**
-     * Sets value
+     * Sets value of this ref.
      *
-     * @param value value
+     * @param value value of this ref
      */
     public void set(double value) {
         this.value = value;
@@ -35,6 +37,8 @@ public class DoubleRef {
      * <pre>
      *     return ++value;
      * </pre>
+     *
+     * @return ++value
      */
     public double incrementAndGet() {
         return ++value;
@@ -49,6 +53,7 @@ public class DoubleRef {
      * </pre>
      *
      * @param addon specified number
+     * @return value += addon
      */
     public double incrementAndGet(double addon) {
         value += addon;
@@ -61,6 +66,8 @@ public class DoubleRef {
      * <pre>
      *     return value++;
      * </pre>
+     *
+     * @return value++
      */
     public double getAndIncrement() {
         return value++;
@@ -76,6 +83,7 @@ public class DoubleRef {
      * </pre>
      *
      * @param addon specified number
+     * @return current value
      */
     public double getAndIncrement(double addon) {
         double temp = value;

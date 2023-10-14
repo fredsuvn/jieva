@@ -14,16 +14,18 @@ public class IntRef {
     }
 
     /**
-     * Returns value.
+     * Returns value of this ref.
+     *
+     * @return value of this ref
      */
     public int get() {
         return value;
     }
 
     /**
-     * Sets value
+     * Sets value of this ref.
      *
-     * @param value value
+     * @param value value of this ref
      */
     public void set(int value) {
         this.value = value;
@@ -35,6 +37,8 @@ public class IntRef {
      * <pre>
      *     return ++value;
      * </pre>
+     *
+     * @return ++value
      */
     public int incrementAndGet() {
         return ++value;
@@ -49,6 +53,7 @@ public class IntRef {
      * </pre>
      *
      * @param addon specified number
+     * @return value += addon
      */
     public int incrementAndGet(int addon) {
         value += addon;
@@ -61,6 +66,8 @@ public class IntRef {
      * <pre>
      *     return value++;
      * </pre>
+     *
+     * @return value++
      */
     public int getAndIncrement() {
         return value++;
@@ -76,6 +83,7 @@ public class IntRef {
      * </pre>
      *
      * @param addon specified number
+     * @return current value
      */
     public int getAndIncrement(int addon) {
         int temp = value;

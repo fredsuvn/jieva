@@ -15,6 +15,8 @@ public interface FsLogger {
     /**
      * Returns default logger, which using {@link System#out} to output,
      * and its level is {@link Level#INFO}.
+     *
+     * @return default logger
      */
     static FsLogger defaultLogger() {
         return Builder.DEFAULT;
@@ -24,6 +26,7 @@ public interface FsLogger {
      * Returns a new logger with given level and default output: ({@link System#out}).
      *
      * @param level given level
+     * @return new logger with given level
      */
     static FsLogger ofLevel(Level level) {
         return newBuilder().level(level).build();
@@ -31,6 +34,8 @@ public interface FsLogger {
 
     /**
      * Returns new logger builder.
+     *
+     * @return new logger builder
      */
     static Builder newBuilder() {
         return new Builder();
@@ -93,6 +98,8 @@ public interface FsLogger {
 
     /**
      * Returns level of this log.
+     *
+     * @return level of this log
      */
     Level getLevel();
 
@@ -104,8 +111,7 @@ public interface FsLogger {
     void writeLog(LogInfo logInfo);
 
     /**
-     * Builds log info with given message array
-     * and offset between the log method and this method.
+     * Builds log info with given message array and trace offset between the log method and this method.
      * For example, calling chain from the default method {@link #info(Object...)} to this method is:
      * <pre>
      *     info(Object... messages) -> buildLog(Object[] msg, int stackTraceOffset)
@@ -123,6 +129,8 @@ public interface FsLogger {
      *
      * @param msg              given message array
      * @param stackTraceOffset offset between the point where log operation occurs and this method
+     * @return og info with given message array and trace offset between the log method and this method
+     * @see FsTrace#findCallerStackTrace(String, String, int)
      */
     default LogInfo buildLog(Object[] msg, int stackTraceOffset) {
         return new LogInfo() {
@@ -192,6 +200,8 @@ public interface FsLogger {
 
         /**
          * Returns value of this level (2000, 3000...).
+         *
+         * @return value of this level
          */
         public int value() {
             return value;
@@ -199,6 +209,8 @@ public interface FsLogger {
 
         /**
          * Returns description of this level (such as "DEBUG", "INFO"...).
+         *
+         * @return description of this level
          */
         public String description() {
             return description;
@@ -212,22 +224,30 @@ public interface FsLogger {
 
         /**
          * Returns level of this log.
+         *
+         * @return level of this log
          */
         Level level();
 
         /**
          * Returns record time of this log.
+         *
+         * @return record time of this log
          */
         Instant time();
 
         /**
-         * Returns stack trace info of this log.
+         * Returns trace info of this log.
+         *
+         * @return trace info of this log or null
          */
         @Nullable
         StackTraceElement stackTrace();
 
         /**
          * Returns message array of this log, each element represents a message to be logged.
+         *
+         * @return message array of this log
          */
         Object[] messages();
     }
@@ -278,6 +298,7 @@ public interface FsLogger {
          * Sets level, default is {@link Level#INFO}.
          *
          * @param level log level
+         * @return this builder
          */
         public Builder level(Level level) {
             this.level = level;
@@ -288,6 +309,7 @@ public interface FsLogger {
          * Sets formatter, default formatter will format and write into {@link System#out}.
          *
          * @param formatter log formatter
+         * @return this builder
          */
         public Builder formatter(Formatter formatter) {
             this.formatter = formatter;

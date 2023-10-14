@@ -240,6 +240,7 @@ public class FsCheck {
      * @param index      given index
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
+     * @return whether given index is in bounds from start index (inclusive) to end index (exclusive)
      */
     public static boolean isInBounds(int index, int startIndex, int endIndex) {
         return index >= startIndex && index < endIndex && index >= 0 && startIndex >= 0;
@@ -253,6 +254,7 @@ public class FsCheck {
      * @param index      given index
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
+     * @return whether given index is in bounds from start index (inclusive) to end index (exclusive)
      */
     public static boolean isInBounds(long index, long startIndex, long endIndex) {
         return index >= startIndex && index < endIndex && index >= 0 && startIndex >= 0;
@@ -336,6 +338,8 @@ public class FsCheck {
      * @param endRange   end range index exclusive
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
+     * @return whether given range (from start range index inclusive to end range index exclusive) is in bounds from
+     * * start index (inclusive) to end index (exclusive)
      */
     public static boolean isRangeInBounds(int startRange, int endRange, int startIndex, int endIndex) {
         return startRange >= startIndex && endRange <= endIndex && startRange <= endRange && startRange >= 0 && startIndex >= 0;
@@ -351,6 +355,8 @@ public class FsCheck {
      * @param endRange   end range index exclusive
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
+     * @return whether given range (from start range index inclusive to end range index exclusive) is in bounds from
+     * * start index (inclusive) to end index (exclusive)
      */
     public static boolean isRangeInBounds(long startRange, long endRange, long startIndex, long endIndex) {
         return startRange >= startIndex && endRange <= endIndex && startRange <= endRange && startRange >= 0 && startIndex >= 0;

@@ -14,16 +14,18 @@ public class BooleanRef {
     }
 
     /**
-     * Returns value.
+     * Returns value of this ref.
+     *
+     * @return value of this ref
      */
     public boolean get() {
         return value;
     }
 
     /**
-     * Sets value
+     * Sets value of this ref.
      *
-     * @param value value
+     * @param value value of this ref
      */
     public void set(boolean value) {
         this.value = value;

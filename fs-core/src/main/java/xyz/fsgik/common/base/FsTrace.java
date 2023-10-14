@@ -27,6 +27,7 @@ public class FsTrace {
      *
      * @param className  given class name
      * @param methodName given method name
+     * @return caller stack trace
      */
     @Nullable
     public static StackTraceElement findCallerStackTrace(String className, String methodName) {
@@ -47,6 +48,7 @@ public class FsTrace {
      * @param className  given class name
      * @param methodName given method name
      * @param offset     given offset
+     * @return caller stack trace
      */
     @Nullable
     public static StackTraceElement findCallerStackTrace(String className, String methodName, int offset) {
@@ -72,6 +74,7 @@ public class FsTrace {
      * Returns stack trace info of given throwable as string.
      *
      * @param throwable given throwable
+     * @return stack trace info as string
      */
     public static String stackTraceToString(Throwable throwable) {
         return stackTraceToString(throwable, null);
@@ -83,6 +86,7 @@ public class FsTrace {
      *
      * @param throwable     given throwable
      * @param lineSeparator given separator
+     * @return stack trace info as string
      */
     public static String stackTraceToString(Throwable throwable, @Nullable String lineSeparator) {
         StringWriter sw = new StringWriter();

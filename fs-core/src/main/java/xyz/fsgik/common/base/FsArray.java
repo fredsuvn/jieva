@@ -20,6 +20,7 @@ public class FsArray {
      * Returns given arguments as an array.
      *
      * @param args given arguments
+     * @return given arguments as an array
      */
     @SafeVarargs
     public static <T> T[] array(T... args) {
@@ -30,6 +31,7 @@ public class FsArray {
      * Returns whether given array is null or empty.
      *
      * @param array given array
+     * @return whether given array is null or empty
      */
     public static boolean isEmpty(@Nullable Object array) {
         if (array == null) {
@@ -69,6 +71,7 @@ public class FsArray {
      * Returns whether given array is not null and empty.
      *
      * @param array given array
+     * @return whether given array is not null and empty
      */
     public static boolean isNotEmpty(@Nullable Object array) {
         return !isEmpty(array);
@@ -84,6 +87,7 @@ public class FsArray {
      * @param source the source array
      * @param dest   the dest array
      * @param mapper given mapper
+     * @return the dest array
      */
     public static <T, R> R[] map(T[] source, R[] dest, Function<T, R> mapper) {
         R[] result;
@@ -104,6 +108,7 @@ public class FsArray {
      * @param componentType given component type
      * @param length        given length
      * @param <A>           type of array, including primitive array
+     * @return created array
      */
     public static <A> A newArray(Class<?> componentType, int length) {
         return Fs.as(Array.newInstance(componentType, length));
@@ -114,6 +119,7 @@ public class FsArray {
      *
      * @param array given array
      * @param index specified index
+     * @return value from given array at specified index, if failed to obtain, return null
      */
     public static <T> T get(@Nullable T[] array, int index) {
         return get(array, index, null);
@@ -125,6 +131,7 @@ public class FsArray {
      * @param array        given array
      * @param index        specified index
      * @param defaultValue default value
+     * @return value from given array at specified index, if the value is null or failed to obtain, return default value
      */
     public static <T> T get(@Nullable T[] array, int index, @Nullable T defaultValue) {
         if (array == null || index < 0 || index >= array.length) {
@@ -139,6 +146,7 @@ public class FsArray {
      *
      * @param array   given array
      * @param element given element
+     * @return index of given element at given array, or -1 if not found
      */
     public static <T> int indexOf(T[] array, T element) {
         for (int i = 0; i < array.length; i++) {
@@ -153,6 +161,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static <T> List<T> asList(T[] array) {
         return Arrays.asList(array);
@@ -162,6 +171,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static List<Boolean> asList(boolean[] array) {
         return new BooleanArrayList(array);
@@ -171,6 +181,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static List<Byte> asList(byte[] array) {
         return new ByteArrayList(array);
@@ -180,6 +191,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static List<Short> asList(short[] array) {
         return new ShortArrayList(array);
@@ -189,6 +201,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static List<Character> asList(char[] array) {
         return new CharacterArrayList(array);
@@ -198,6 +211,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static List<Integer> asList(int[] array) {
         return new IntegerArrayList(array);
@@ -207,6 +221,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static List<Long> asList(long[] array) {
         return new LongArrayList(array);
@@ -216,6 +231,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static List<Float> asList(float[] array) {
         return new FloatArrayList(array);
@@ -225,6 +241,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @return a wrapper list for given array
      */
     public static List<Double> asList(double[] array) {
         return new DoubleArrayList(array);

@@ -10,7 +10,9 @@ import java.lang.reflect.GenericArrayType;
 public interface GenericArrayObj<T> extends FsObj<T> {
 
     /**
-     * Returns type of current object as {@link GenericArrayType}.
+     * Returns type of hold object as {@link GenericArrayType}.
+     *
+     * @return type of hold object as {@link GenericArrayType}
      */
     @Override
     GenericArrayType getType();

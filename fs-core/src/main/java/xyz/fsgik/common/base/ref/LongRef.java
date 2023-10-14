@@ -14,16 +14,18 @@ public class LongRef {
     }
 
     /**
-     * Returns value.
+     * Returns value of this ref.
+     *
+     * @return value of this ref
      */
     public long get() {
         return value;
     }
 
     /**
-     * Sets value
+     * Sets value of this ref.
      *
-     * @param value value
+     * @param value value of this ref
      */
     public void set(long value) {
         this.value = value;
@@ -35,6 +37,8 @@ public class LongRef {
      * <pre>
      *     return ++value;
      * </pre>
+     *
+     * @return ++value
      */
     public long incrementAndGet() {
         return ++value;
@@ -49,6 +53,7 @@ public class LongRef {
      * </pre>
      *
      * @param addon specified number
+     * @return value += addon
      */
     public long incrementAndGet(long addon) {
         value += addon;
@@ -61,6 +66,8 @@ public class LongRef {
      * <pre>
      *     return value++;
      * </pre>
+     *
+     * @return value++
      */
     public long getAndIncrement() {
         return value++;
@@ -76,6 +83,7 @@ public class LongRef {
      * </pre>
      *
      * @param addon specified number
+     * @return current value
      */
     public long getAndIncrement(long addon) {
         long temp = value;

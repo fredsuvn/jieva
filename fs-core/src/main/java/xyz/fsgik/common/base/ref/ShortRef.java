@@ -14,16 +14,18 @@ public class ShortRef {
     }
 
     /**
-     * Returns value.
+     * Returns value of this ref.
+     *
+     * @return value of this ref
      */
     public short get() {
         return value;
     }
 
     /**
-     * Sets value
+     * Sets value of this ref.
      *
-     * @param value value
+     * @param value value of this ref
      */
     public void set(short value) {
         this.value = value;
@@ -35,6 +37,8 @@ public class ShortRef {
      * <pre>
      *     return ++value;
      * </pre>
+     *
+     * @return ++value
      */
     public short incrementAndGet() {
         return ++value;
@@ -49,6 +53,7 @@ public class ShortRef {
      * </pre>
      *
      * @param addon specified number
+     * @return value += addon
      */
     public short incrementAndGet(short addon) {
         value += addon;
@@ -61,6 +66,8 @@ public class ShortRef {
      * <pre>
      *     return value++;
      * </pre>
+     *
+     * @return value++
      */
     public short getAndIncrement() {
         return value++;
@@ -76,6 +83,7 @@ public class ShortRef {
      * </pre>
      *
      * @param addon specified number
+     * @return current value
      */
     public short getAndIncrement(short addon) {
         short temp = value;

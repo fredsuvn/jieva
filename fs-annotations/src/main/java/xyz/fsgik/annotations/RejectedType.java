@@ -21,5 +21,10 @@ import java.lang.annotation.*;
 @Repeatable(RejectedTypes.class)
 public @interface RejectedType {
 
+    /**
+     * Rejected type.
+     *
+     * @return rejected type
+     */
     Class<?> value();
 }

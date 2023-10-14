@@ -14,16 +14,18 @@ public class ByteRef {
     }
 
     /**
-     * Returns value.
+     * Returns value of this ref.
+     *
+     * @return value of this ref
      */
     public byte get() {
         return value;
     }
 
     /**
-     * Sets value
+     * Sets value of this ref.
      *
-     * @param value value
+     * @param value value of this ref
      */
     public void set(byte value) {
         this.value = value;
@@ -35,6 +37,8 @@ public class ByteRef {
      * <pre>
      *     return ++value;
      * </pre>
+     *
+     * @return ++value
      */
     public byte incrementAndGet() {
         return ++value;
@@ -49,6 +53,7 @@ public class ByteRef {
      * </pre>
      *
      * @param addon specified number
+     * @return value += addon
      */
     public byte incrementAndGet(byte addon) {
         value += addon;
@@ -61,6 +66,8 @@ public class ByteRef {
      * <pre>
      *     return value++;
      * </pre>
+     *
+     * @return value++
      */
     public byte getAndIncrement() {
         return value++;
@@ -76,6 +83,7 @@ public class ByteRef {
      * </pre>
      *
      * @param addon specified number
+     * @return current value
      */
     public byte getAndIncrement(byte addon) {
         byte temp = value;

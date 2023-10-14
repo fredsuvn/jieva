@@ -12,7 +12,9 @@ import java.util.List;
 public interface ParameterizedObj<T> extends FsObj<T> {
 
     /**
-     * Returns type of current object as {@link ParameterizedType}.
+     * Returns type of hold object as {@link ParameterizedType}.
+     *
+     * @return type of hold object as {@link ParameterizedType}
      */
     @Override
     ParameterizedType getType();
@@ -20,11 +22,16 @@ public interface ParameterizedObj<T> extends FsObj<T> {
     /**
      * Returns a list of {@link Type} objects representing the actual type arguments to this type.
      * The list comes from {@link ParameterizedType#getActualTypeArguments()}.
+     *
+     * @return actual type arguments
      */
     List<Type> getActualTypeArguments();
 
     /**
-     * Returns {@link Type} at index of {@link #getActualTypeArguments()}.
+     * Returns {@link Type} at specified index of {@link #getActualTypeArguments()}.
+     *
+     * @param index specified index
+     * @return actual type argument at specified index
      */
     default Type getActualTypeArgument(int index) {
         return getActualTypeArguments().get(index);
