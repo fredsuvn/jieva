@@ -28,6 +28,8 @@ public interface FsFileCache {
 
     /**
      * Returns a new builder for {@link FsFileCache}.
+     *
+     * @return a new builder
      */
     static Builder newBuilder() {
         return new Builder();
@@ -39,6 +41,7 @@ public interface FsFileCache {
      *
      * @param path   given path
      * @param offset specified file position
+     * @return an input stream for file of given path
      */
     InputStream getInputStream(Path path, long offset);
 
@@ -48,6 +51,7 @@ public interface FsFileCache {
      *
      * @param path   given path
      * @param offset specified file position
+     * @return an output stream for file of given path
      */
     OutputStream getOutputStream(Path path, long offset);
 
@@ -60,6 +64,8 @@ public interface FsFileCache {
 
     /**
      * Returns cached file chunk count.
+     *
+     * @return cached file chunk count
      */
     int cachedChunkCount();
 
@@ -72,6 +78,7 @@ public interface FsFileCache {
          * Generates a new file chunk cache with given remove listener.
          *
          * @param removeListener given remove listener
+         * @return new file chunk cache
          */
         ChunkCache generate(RemoveListener removeListener);
 
@@ -102,6 +109,7 @@ public interface FsFileCache {
          * If the function returns null, no value will be cached and return null.
          *
          * @param key key of the value
+         * @return cached file chunk value
          */
         @Nullable
         Chunk get(ChunkIndex key, @Nullable Function<ChunkIndex, @Nullable Chunk> function);
@@ -130,6 +138,8 @@ public interface FsFileCache {
 
         /**
          * Returns cached size.
+         *
+         * @return cached size
          */
         int size();
     }
@@ -143,6 +153,7 @@ public interface FsFileCache {
          * Generates a new {@link FsFile} to access un-cached underlying file.
          *
          * @param path file path
+         * @return a new {@link FsFile} to access un-cached underlying file
          */
         FsFile generate(Path path);
     }
@@ -258,6 +269,7 @@ public interface FsFileCache {
          * Sets file chunk size for caching, default is {@link FsIO#IO_BUFFER_SIZE}.
          *
          * @param chunkSize chunk size
+         * @return this builder
          */
         public Builder chunkSize(int chunkSize) {
             FsCheck.checkArgument(chunkSize > 0, "chunkSize must > 0.");
@@ -269,6 +281,7 @@ public interface FsFileCache {
          * Sets buffer size for IO operation, default is {@link FsIO#IO_BUFFER_SIZE}.
          *
          * @param bufferSize buffer size
+         * @return this builder
          */
         public Builder bufferSize(int bufferSize) {
             FsCheck.checkArgument(bufferSize > 0, "bufferSize must > 0.");
@@ -280,6 +293,7 @@ public interface FsFileCache {
          * Sets cache generator, default uses {@link FsCache#softCache(FsCache.RemoveListener)}.
          *
          * @param chunkCacheGenerator cache generator
+         * @return this builder
          */
         public Builder cacheGenerator(ChunkCacheGenerator chunkCacheGenerator) {
             this.chunkCacheGenerator = chunkCacheGenerator;
@@ -290,6 +304,7 @@ public interface FsFileCache {
          * Sets generator to generate un-cached underlying file access, default uses {@link FsFile#from(Path)}.
          *
          * @param fileAccessGenerator generator to generate un-cached underlying file access
+         * @return this builder
          */
         public Builder fileAccessGenerator(FileAccessGenerator fileAccessGenerator) {
             this.fileAccessGenerator = fileAccessGenerator;
@@ -300,6 +315,7 @@ public interface FsFileCache {
          * Sets cache read listener, default is null.
          *
          * @param cacheReadListener cache read listener
+         * @return this builder
          */
         public Builder cacheReadListener(@Nullable FsFileCache.CacheReadListener cacheReadListener) {
             this.cacheReadListener = cacheReadListener;
@@ -310,6 +326,7 @@ public interface FsFileCache {
          * Sets cache write listener, default is null.
          *
          * @param cacheWriteListener cache write listener
+         * @return this builder
          */
         public Builder cacheWriteListener(@Nullable FsFileCache.CacheWriteListener cacheWriteListener) {
             this.cacheWriteListener = cacheWriteListener;
@@ -320,6 +337,7 @@ public interface FsFileCache {
          * Sets underlying file read listener, default is null.
          *
          * @param fileReadListener file read listener
+         * @return this builder
          */
         public Builder fileReadListener(@Nullable FsFileCache.FileReadListener fileReadListener) {
             this.fileReadListener = fileReadListener;
@@ -330,6 +348,7 @@ public interface FsFileCache {
          * Sets underlying file write listener, default is null.
          *
          * @param fileWriteListener file write listener
+         * @return this builder
          */
         public Builder fileWriteListener(@Nullable FsFileCache.FileWriteListener fileWriteListener) {
             this.fileWriteListener = fileWriteListener;
@@ -338,6 +357,8 @@ public interface FsFileCache {
 
         /**
          * Builds {@link FsFileCache}.
+         *
+         * @return built {@link FsFileCache}
          */
         public FsFileCache build() {
             return new FsFileCacheImpl(

@@ -29,6 +29,7 @@ public class FsIO {
      * Return null if no data read out and reach to the end of stream.
      *
      * @param inputStream given input stream
+     * @return all bytes from given input stream
      */
     @Nullable
     public static byte[] readBytes(InputStream inputStream) {
@@ -83,6 +84,7 @@ public class FsIO {
      *
      * @param inputStream given input stream
      * @param limit       specified limit number
+     * @return specified limit number of bytes from given input stream
      */
     @Nullable
     public static byte[] readBytes(InputStream inputStream, int limit) {
@@ -147,6 +149,7 @@ public class FsIO {
      *
      * @param inputStream given input stream
      * @param dest        given dest stream
+     * @return actual read number
      */
     public static long readBytesTo(InputStream inputStream, OutputStream dest) {
         return readBytesTo(inputStream, dest, -1);
@@ -163,6 +166,7 @@ public class FsIO {
      * @param inputStream given input stream
      * @param dest        given dest stream
      * @param limit       specified limit number
+     * @return actual read number
      */
     public static long readBytesTo(InputStream inputStream, OutputStream dest, int limit) {
         return readBytesTo(inputStream, dest, limit, IO_BUFFER_SIZE);
@@ -180,6 +184,7 @@ public class FsIO {
      * @param dest        given dest stream
      * @param limit       specified limit number
      * @param bufferSize  buffer size for each reading and writing
+     * @return actual read number
      */
     public static long readBytesTo(InputStream inputStream, OutputStream dest, int limit, int bufferSize) {
         if (limit == 0) {
@@ -221,6 +226,7 @@ public class FsIO {
      * Return null if no data read out and reach to the end of stream.
      *
      * @param inputStream given input stream
+     * @return available bytes from given input stream
      */
     @Nullable
     public static byte[] availableBytes(InputStream inputStream) {
@@ -266,6 +272,7 @@ public class FsIO {
      *
      * @param inputStream given input stream
      * @param dest        given dest stream
+     * @return actual read number
      */
     public static long availableBytesTo(InputStream inputStream, OutputStream dest) {
         try {
@@ -292,10 +299,11 @@ public class FsIO {
     }
 
     /**
-     * Reads all chars from given reader.
+     * Reads all chars as string from given reader.
      * Return null if no data read out and reach to the end of stream.
      *
      * @param reader given reader
+     * @return all chars as string from given reader
      */
     @Nullable
     public static String readString(Reader reader) {
@@ -312,7 +320,7 @@ public class FsIO {
     }
 
     /**
-     * Reads specified limit number of chars from given reader.
+     * Reads specified limit number of chars as string from given reader.
      * Return null if no data read out and reach to the end of stream.
      * <p>
      * If the limit number &lt; 0, read all bytes;
@@ -321,6 +329,7 @@ public class FsIO {
      *
      * @param reader given reader
      * @param limit  specified limit number
+     * @return specified limit number of chars as string from given reader
      */
     @Nullable
     public static String readString(Reader reader, int limit) {
@@ -346,6 +355,7 @@ public class FsIO {
      *
      * @param reader given reader
      * @param dest   given dest stream
+     * @return actual read number
      */
     public static long readCharsTo(Reader reader, Appendable dest) {
         return readCharsTo(reader, dest, -1);
@@ -362,6 +372,7 @@ public class FsIO {
      * @param reader given reader
      * @param dest   given dest stream
      * @param limit  specified limit number
+     * @return actual read number
      */
     public static long readCharsTo(Reader reader, Appendable dest, int limit) {
         return readCharsTo(reader, dest, limit, IO_BUFFER_SIZE);
@@ -379,6 +390,7 @@ public class FsIO {
      * @param dest       given dest stream
      * @param limit      specified limit number
      * @param bufferSize buffer size for each reading and writing
+     * @return actual read number
      */
     public static long readCharsTo(Reader reader, Appendable dest, int limit, int bufferSize) {
         if (limit == 0) {
@@ -428,10 +440,11 @@ public class FsIO {
     }
 
     /**
-     * Reads String encoded by all bytes from given input stream with {@link FsChars#defaultCharset()}.
+     * Reads string encoded by all bytes from given input stream with {@link FsChars#defaultCharset()}.
      * Return null if no data read out and reach to the end of stream.
      *
      * @param inputStream given input stream
+     * @return string encoded by all bytes from given input stream with {@link FsChars#defaultCharset()}
      */
     @Nullable
     public static String readString(InputStream inputStream) {
@@ -439,11 +452,12 @@ public class FsIO {
     }
 
     /**
-     * Reads String encoded by all bytes from given input stream.
+     * Reads string encoded by all bytes from given input stream.
      * Return null if no data read out and reach to the end of stream.
      *
      * @param inputStream given input stream
      * @param charset     charset of the string
+     * @return string encoded by all bytes from given input stream
      */
     @Nullable
     public static String readString(InputStream inputStream, Charset charset) {
@@ -455,11 +469,12 @@ public class FsIO {
     }
 
     /**
-     * Reads available String encoded by all bytes from given input stream with
+     * Reads available string encoded by all bytes from given input stream with
      * {@link FsChars#defaultCharset()}, returns null if reaches end of the stream.
      * Return null if no data read out and reach to the end of stream.
      *
      * @param inputStream given input stream
+     * @return available string
      */
     @Nullable
     public static String avalaibleString(InputStream inputStream) {
@@ -467,11 +482,12 @@ public class FsIO {
     }
 
     /**
-     * Reads available String encoded by all bytes from given input stream,
+     * Reads available string encoded by all bytes from given input stream,
      * Return null if no data read out and reach to the end of stream.
      *
      * @param inputStream given input stream
      * @param charset     charset of the string
+     * @return available string
      */
     @Nullable
     public static String avalaibleString(InputStream inputStream, Charset charset) {
@@ -486,6 +502,7 @@ public class FsIO {
      * Wraps given input stream as a reader with {@link InputStreamReader} and {@link FsChars#defaultCharset()}.
      *
      * @param inputStream given input stream
+     * @return wrapped reader
      */
     public static Reader toReader(InputStream inputStream) {
         return toReader(inputStream, FsChars.defaultCharset());
@@ -496,6 +513,7 @@ public class FsIO {
      *
      * @param inputStream given input stream
      * @param charset     charset of return reader
+     * @return wrapped reader
      */
     public static Reader toReader(InputStream inputStream, Charset charset) {
         return new InputStreamReader(inputStream, charset);
@@ -505,6 +523,7 @@ public class FsIO {
      * Wraps given buffer as a reader, supports mark/reset.
      *
      * @param buffer given buffer
+     * @return wrapped reader
      */
     public static Reader toReader(CharBuffer buffer) {
         return new CharBufferReader(buffer);
@@ -514,6 +533,7 @@ public class FsIO {
      * Wraps given reader as an input stream with {@link FsChars#defaultCharset()}, doesn't support mark/reset.
      *
      * @param reader given reader
+     * @return wrapped stream
      */
     public static InputStream toInputStream(Reader reader) {
         return toInputStream(reader, FsChars.defaultCharset());
@@ -524,6 +544,7 @@ public class FsIO {
      *
      * @param reader  given reader
      * @param charset charset of given reader
+     * @return wrapped stream
      */
     public static InputStream toInputStream(Reader reader, Charset charset) {
         return new ReaderInputStream(reader, charset);
@@ -533,6 +554,7 @@ public class FsIO {
      * Wraps given array to {@link ByteArrayInputStream}.
      *
      * @param array given array
+     * @return wrapped stream
      */
     public static ByteArrayInputStream toInputStream(byte[] array) {
         return new ByteArrayInputStream(array);
@@ -544,6 +566,7 @@ public class FsIO {
      * @param array  given array
      * @param offset given offset
      * @param length specified length
+     * @return wrapped stream
      */
     public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) {
         FsCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
@@ -554,6 +577,7 @@ public class FsIO {
      * Wraps given buffer as an input stream, supports mark/reset.
      *
      * @param buffer given buffer
+     * @return wrapped stream
      */
     public static InputStream toInputStream(ByteBuffer buffer) {
         return new ByteBufferInputStream(buffer);
@@ -565,6 +589,7 @@ public class FsIO {
      * Note this method will seek position of random access file to given offset immediately.
      *
      * @param random given random access file
+     * @return wrapped stream
      */
     public static InputStream toInputStream(RandomAccessFile random) {
         return toInputStream(random, 0, -1);
@@ -581,6 +606,7 @@ public class FsIO {
      * @param random given random access file
      * @param offset offset position to start read
      * @param length length of readable bytes, or -1 to read to end of file
+     * @return wrapped stream
      */
     public static InputStream toInputStream(RandomAccessFile random, long offset, long length) {
         return new RandomInputStream(random, offset, length);
@@ -590,6 +616,7 @@ public class FsIO {
      * Wraps given output stream as a writer with {@link OutputStreamWriter} and {@link FsChars#defaultCharset()}.
      *
      * @param outputStream given out stream
+     * @return wrapped writer
      */
     public static Writer toWriter(OutputStream outputStream) {
         return toWriter(outputStream, FsChars.defaultCharset());
@@ -600,6 +627,7 @@ public class FsIO {
      *
      * @param outputStream given out stream
      * @param charset      charset writer
+     * @return wrapped writer
      */
     public static Writer toWriter(OutputStream outputStream, Charset charset) {
         return new OutputStreamWriter(outputStream, charset);
@@ -609,6 +637,7 @@ public class FsIO {
      * Wraps given buffer as a writer.
      *
      * @param buffer given buffer
+     * @return wrapped writer
      */
     public static Writer toWriter(CharBuffer buffer) {
         return new CharBufferWriter(buffer);
@@ -621,6 +650,7 @@ public class FsIO {
      * if it is instance of {@link Writer}.
      *
      * @param appendable given appendable
+     * @return wrapped stream
      */
     public static OutputStream toOutputStream(Appendable appendable) {
         return toOutputStream(appendable, FsChars.defaultCharset());
@@ -634,6 +664,7 @@ public class FsIO {
      *
      * @param appendable given appendable
      * @param charset    charset of writer
+     * @return wrapped stream
      */
     public static OutputStream toOutputStream(Appendable appendable, Charset charset) {
         return new AppendableOutputStream(appendable, charset);
@@ -643,6 +674,7 @@ public class FsIO {
      * Wraps given array as an output stream.
      *
      * @param array given array
+     * @return wrapped stream
      */
     public static OutputStream toOutputStream(byte[] array) {
         return new ByteArrayAsOutputStream(array, 0, array.length);
@@ -654,6 +686,7 @@ public class FsIO {
      * @param array  given array
      * @param offset given offset
      * @param length specified length
+     * @return wrapped stream
      */
     public static OutputStream toOutputStream(byte[] array, int offset, int length) {
         FsCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
@@ -664,6 +697,7 @@ public class FsIO {
      * Wraps given buffer as an output stream.
      *
      * @param buffer given writer
+     * @return wrapped stream
      */
     public static OutputStream toOutputStream(ByteBuffer buffer) {
         return new ByteBufferOutputStream(buffer);
@@ -676,6 +710,7 @@ public class FsIO {
      * Note this method will seek position of random access file to given offset immediately.
      *
      * @param random given random access file
+     * @return wrapped stream
      */
     public static OutputStream toOutputStream(RandomAccessFile random) {
         return toOutputStream(random, 0, -1);
@@ -692,6 +727,7 @@ public class FsIO {
      * @param random given random access file
      * @param offset offset position to start write
      * @param length length of written bytes, or -1 to write unlimitedly
+     * @return wrapped stream
      */
     public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) {
         return new RandomOutputStream(random, offset, length);
@@ -703,6 +739,7 @@ public class FsIO {
      *
      * @param source given source stream
      * @param limit  max read length, must >= 0
+     * @return wrapped stream
      */
     public static InputStream limited(InputStream source, long limit) {
         return new LimitedInputStream(source, limit);
@@ -713,6 +750,7 @@ public class FsIO {
      *
      * @param source given source stream
      * @param limit  max written length, must >= 0
+     * @return wrapped stream
      */
     public static OutputStream limited(OutputStream source, long limit) {
         return new LimitedOutputStream(source, limit);
@@ -722,6 +760,7 @@ public class FsIO {
      * Using {@link RandomAccessFile} to read all bytes of given file of path.
      *
      * @param path given file of path
+     * @return read bytes
      */
     public static byte[] readBytes(Path path) {
         return readBytes(path, 0, -1);
@@ -734,6 +773,7 @@ public class FsIO {
      * @param path   given file of path
      * @param offset offset position
      * @param length given length, maybe -1 to read to end of file
+     * @return read bytes
      */
     public static byte[] readBytes(Path path, long offset, long length) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
@@ -748,6 +788,7 @@ public class FsIO {
      * The read bytes will be encoded to String with {@link FsChars#defaultCharset()}.
      *
      * @param path given file of path
+     * @return read string
      */
     public static String readString(Path path) {
         return readString(path, FsChars.defaultCharset());
@@ -759,6 +800,7 @@ public class FsIO {
      *
      * @param path    given file of path
      * @param charset given charset
+     * @return read string
      */
     public static String readString(Path path, Charset charset) {
         return readString(path, 0, -1, charset);
@@ -772,6 +814,7 @@ public class FsIO {
      * @param path   given file of path
      * @param offset offset position
      * @param length given length, maybe -1 to read to end of file
+     * @return read string
      */
     public static String readString(Path path, long offset, long length) {
         return readString(path, offset, length, FsChars.defaultCharset());
@@ -786,6 +829,7 @@ public class FsIO {
      * @param offset  offset position
      * @param length  given length, maybe -1 to read to end of file
      * @param charset given charset
+     * @return read string
      */
     public static String readString(Path path, long offset, long length, Charset charset) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {

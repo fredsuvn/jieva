@@ -21,6 +21,7 @@ public interface FsFile {
      * and will use {@link FileChannel#tryLock(long, long, boolean)} to lock written part when writing file.
      *
      * @param path given path
+     * @return a {@link FsFile} from given path
      */
     static FsFile from(Path path) {
         return new FileImpl(path);
@@ -28,11 +29,15 @@ public interface FsFile {
 
     /**
      * Returns path of file.
+     *
+     * @return path of file
      */
     Path getPath();
 
     /**
      * Returns file object.
+     *
+     * @return file object
      */
     default File getFile() {
         return getPath().toFile();
@@ -40,6 +45,8 @@ public interface FsFile {
 
     /**
      * Returns whether current file is opened.
+     *
+     * @return whether current file is opened
      */
     boolean isOpened();
 
@@ -62,6 +69,8 @@ public interface FsFile {
 
     /**
      * Returns position of current file pointer.
+     *
+     * @return position of current file pointer
      */
     long position();
 
@@ -76,6 +85,8 @@ public interface FsFile {
 
     /**
      * Returns file length.
+     *
+     * @return file length
      */
     long length();
 
@@ -88,11 +99,15 @@ public interface FsFile {
 
     /**
      * Returns channel of file.
+     *
+     * @return channel of file
      */
     FileChannel getChannel();
 
     /**
      * Returns descriptor of file.
+     *
+     * @return descriptor of file
      */
     FileDescriptor getDescriptor();
 
@@ -115,6 +130,8 @@ public interface FsFile {
      * Returned stream doesn't support {@link InputStream#mark(int)} and {@link InputStream#reset()},
      * and {@link InputStream#close()} is also invalid. Using {@link #close()  FsFile.close} to close both binding
      * input/output stream.
+     *
+     * @return an input stream for current file
      */
     InputStream bindInputStream();
 
@@ -126,6 +143,8 @@ public interface FsFile {
      * <p>
      * {@link InputStream#close()} is invalid, using {@link #close()  FsFile.close} to close both binding
      * input/output stream.
+     *
+     * @return an output stream for current file
      */
     OutputStream bindOutputStream();
 }

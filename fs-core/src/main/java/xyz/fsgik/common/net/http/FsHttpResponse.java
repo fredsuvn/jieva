@@ -40,6 +40,8 @@ public interface FsHttpResponse {
      * <p>
      * If the stream is not null, that means the http connection may not have been released,
      * call {@link InputStream#close()} to release the connection.
+     *
+     * @return response body, maybe null
      */
     @Nullable
     InputStream getBody();

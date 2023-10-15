@@ -18,6 +18,8 @@ public interface FsHttpClient {
 
     /**
      * Return default http client.
+     *
+     * @return default http client
      */
     static FsHttpClient defaultClient() {
         return Builder.INSTANCE;
@@ -25,6 +27,8 @@ public interface FsHttpClient {
 
     /**
      * Returns new builder for this interface.
+     *
+     * @return new builder
      */
     static Builder newBuilder() {
         return new Builder();
@@ -34,6 +38,7 @@ public interface FsHttpClient {
      * Requests with given request info
      *
      * @param request request info
+     * @return response of request
      */
     FsHttpResponse request(FsHttpRequest request);
 
@@ -66,6 +71,7 @@ public interface FsHttpClient {
          * Sets connect timeout.
          *
          * @param connectTimeout connect timeout
+         * @return this builder
          */
         public Builder connectTimeout(Duration connectTimeout) {
             this.connectTimeout = connectTimeout;
@@ -76,6 +82,7 @@ public interface FsHttpClient {
          * Sets read timeout.
          *
          * @param readTimeout read timeout
+         * @return this builder
          */
         public Builder readTimeout(Duration readTimeout) {
             this.readTimeout = readTimeout;
@@ -86,6 +93,7 @@ public interface FsHttpClient {
          * Sets chunk size.
          *
          * @param chunkSize chunk size
+         * @return this builder
          */
         public Builder chunkSize(int chunkSize) {
             this.chunkSize = chunkSize;
@@ -96,12 +104,18 @@ public interface FsHttpClient {
          * Sets proxy.
          *
          * @param proxy the proxy
+         * @return this builder
          */
         public Builder proxy(Proxy proxy) {
             this.proxy = proxy;
             return this;
         }
 
+        /**
+         * Returns built {@link FsHttpClient}.
+         *
+         * @return built {@link FsHttpClient}
+         */
         FsHttpClient build() {
             return new HttpClientImpl(this);
         }

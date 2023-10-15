@@ -199,6 +199,11 @@ public interface FsHttpRequest {
             return this;
         }
 
+        /**
+         * Returns built {@link FsHttpRequest}.
+         *
+         * @return built {@link FsHttpRequest}
+         */
         public FsHttpRequest build() {
             if (url == null) {
                 throw new FsHttpException("url is not set.");

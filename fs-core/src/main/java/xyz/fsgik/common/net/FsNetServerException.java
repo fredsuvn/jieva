@@ -24,6 +24,8 @@ public class FsNetServerException extends RuntimeException {
 
     /**
      * Returns server source object, such as {@link ServerSocket}.
+     *
+     * @return server source object
      */
     public Object getSource() {
         return source;

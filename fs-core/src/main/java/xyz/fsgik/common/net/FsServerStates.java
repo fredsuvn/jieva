@@ -25,6 +25,8 @@ public class FsServerStates {
 
     /**
      * Returns whether current state is {@link #CREATED}.
+     *
+     * @return whether current state is {@link #CREATED}
      */
     public boolean isCreated() {
         return state == CREATED;
@@ -32,6 +34,8 @@ public class FsServerStates {
 
     /**
      * Returns whether current state is {@link #OPENED}.
+     *
+     * @return whether current state is {@link #OPENED}
      */
     public boolean isOpened() {
         return state == OPENED;
@@ -39,6 +43,8 @@ public class FsServerStates {
 
     /**
      * Returns whether current state is {@link #CLOSED}.
+     *
+     * @return whether current state is {@link #CLOSED}
      */
     public boolean isClosed() {
         return state == CLOSED;
@@ -46,6 +52,8 @@ public class FsServerStates {
 
     /**
      * Returns current state: {@link #CREATED}, {@link #OPENED} or {@link #CLOSED}.
+     *
+     * @return current state
      */
     public int getState() {
         return state;
