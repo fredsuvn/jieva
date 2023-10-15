@@ -155,7 +155,7 @@ public class DateConvertHandler implements FsConverter.Handler {
         }
     }
 
-    public @Nullable Object convert0(@Nullable Object source, Type sourceType, Type targetType) throws ParseException {
+    private @Nullable Object convert0(@Nullable Object source, Type sourceType, Type targetType) throws ParseException {
         if (source == null) {
             return null;
         }
@@ -478,6 +478,8 @@ public class DateConvertHandler implements FsConverter.Handler {
 
     /**
      * Returns pattern function of this handler.
+     *
+     * @return pattern function of this handler
      */
     public PatternFunction getPattern() {
         return pattern;
@@ -489,26 +491,32 @@ public class DateConvertHandler implements FsConverter.Handler {
     public interface PatternFunction {
 
         /**
-         * Returns DateFormat.
+         * Returns {@link DateFormat}.
+         *
+         * @return {@link DateFormat}
          */
         DateFormat getDateFormat();
 
         /**
-         * Returns DateTimeFormatter.
+         * Returns {@link DateTimeFormatter}.
+         *
+         * @return {@link DateTimeFormatter}
          */
         DateTimeFormatter getFormatter();
 
         /**
-         * Returns DateFormat with given date string (<b>NOT PATTERN STRING</b>)
+         * Returns {@link DateFormat} with given date string (<b>NOT PATTERN STRING</b>)
          *
          * @param date date string
+         * @return {@link DateFormat} with given date string
          */
         DateFormat getDateFormat(CharSequence date);
 
         /**
-         * Returns DateTimeFormatter with given date string (<b>NOT PATTERN STRING</b>)
+         * Returns {@link DateTimeFormatter} with given date string (<b>NOT PATTERN STRING</b>)
          *
          * @param date date string
+         * @return {@link DateTimeFormatter} with given date string
          */
         DateTimeFormatter getFormatter(CharSequence date);
     }

@@ -19,6 +19,8 @@ public class FsProtobuf {
 
     /**
      * Returns bean resolver supports protobuf based on {@link FsBeanResolver#defaultResolver()}.
+     *
+     * @return bean resolver supports protobuf based on {@link FsBeanResolver#defaultResolver()}
      */
     public static FsBeanResolver protobufBeanResolver() {
         return RESOLVER;
@@ -26,6 +28,8 @@ public class FsProtobuf {
 
     /**
      * Returns object converter supports protobuf based on {@link FsConverter#defaultConverter()}.
+     *
+     * @return object converter supports protobuf based on {@link FsConverter#defaultConverter()}
      */
     public static FsConverter protobufConverter() {
         return CONVERTER;
@@ -33,6 +37,8 @@ public class FsProtobuf {
 
     /**
      * Returns bean copier supports protobuf based on {@link FsBeanCopier#defaultCopier()}.
+     *
+     * @return bean copier supports protobuf based on {@link FsBeanCopier#defaultCopier()}
      */
     public static FsBeanCopier protobufBeanCopier() {
         return COPIER;

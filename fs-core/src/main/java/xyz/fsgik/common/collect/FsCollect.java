@@ -22,6 +22,7 @@ public class FsCollect {
      *
      * @param dest     dest collection
      * @param elements given elements
+     * @return the dest collection
      */
     @SafeVarargs
     public static <T, C extends Collection<? super T>> C toCollection(C dest, T... elements) {
@@ -37,6 +38,7 @@ public class FsCollect {
      *
      * @param dest     dest collection
      * @param elements given elements
+     * @return the dest collection
      */
     public static <T, C extends Collection<? super T>> C toCollection(C dest, Iterable<T> elements) {
         if (elements instanceof Collection) {
@@ -54,6 +56,7 @@ public class FsCollect {
      * list and returns.
      *
      * @param elements given elements
+     * @return the list
      */
     public static <T> List<T> asOrToList(Iterable<T> elements) {
         if (elements instanceof List) {
@@ -70,6 +73,7 @@ public class FsCollect {
      * set and returns.
      *
      * @param elements given elements
+     * @return the set
      */
     public static <T> Set<T> asOrToSet(Iterable<T> elements) {
         if (elements instanceof Set) {
@@ -86,6 +90,7 @@ public class FsCollect {
      * collection and returns.
      *
      * @param elements given elements
+     * @return the collection
      */
     public static <T> Collection<T> asOrToCollection(Iterable<T> elements) {
         if (elements instanceof Collection) {
@@ -98,6 +103,7 @@ public class FsCollect {
      * Returns immutable list of which elements were put from given iterable.
      *
      * @param iterable given iterable
+     * @return immutable list
      */
     public static <T> @Immutable List<T> immutableList(@Nullable Iterable<? extends T> iterable) {
         if (iterable == null) {
@@ -116,6 +122,7 @@ public class FsCollect {
      * Returns immutable list of which elements were put from given array.
      *
      * @param array given array
+     * @return immutable list
      */
     public static <T> @Immutable List<T> immutableList(@Nullable T[] array) {
         if (FsArray.isEmpty(array)) {
@@ -129,6 +136,7 @@ public class FsCollect {
      * Returns immutable set of which elements were put from given iterable.
      *
      * @param iterable given iterable
+     * @return immutable set
      */
     public static <T> @Immutable Set<T> immutableSet(@Nullable Iterable<? extends T> iterable) {
         if (iterable == null) {
@@ -147,6 +155,7 @@ public class FsCollect {
      * Returns immutable set of which elements were put from given array.
      *
      * @param array given array
+     * @return immutable set
      */
     public static <T> @Immutable Set<T> immutableSet(@Nullable T[] array) {
         if (FsArray.isEmpty(array)) {
@@ -160,6 +169,7 @@ public class FsCollect {
      * Returns immutable map of which elements were put from given map.
      *
      * @param map given map
+     * @return immutable map
      */
     public static <K, V> @Immutable Map<K, V> immutableMap(@Nullable Map<? extends K, ? extends V> map) {
         if (isEmpty(map)) {
@@ -177,6 +187,7 @@ public class FsCollect {
      *
      * @param dest      dest collection
      * @param keyValues given key-values
+     * @return dest map
      */
     @SafeVarargs
     public static <K, V, M extends Map<? super K, ? super V>, T> M toMap(M dest, T... keyValues) {
@@ -203,6 +214,7 @@ public class FsCollect {
      *
      * @param iterable given iterable
      * @param type     array's component type
+     * @return an array contains all elements from given iterable in its order
      */
     public static <T> T[] toArray(Iterable<? extends T> iterable, Class<T> type) {
         Collection<? extends T> collection = asOrToCollection(iterable);
@@ -218,6 +230,7 @@ public class FsCollect {
      * Creates an {@link ArrayList} and put all given elements into it.
      *
      * @param elements given elements
+     * @return an {@link ArrayList} and put all given elements into it
      */
     @SafeVarargs
     public static <T> ArrayList<T> arrayList(T... elements) {
@@ -228,6 +241,7 @@ public class FsCollect {
      * Creates an {@link LinkedList} and put all given elements into it.
      *
      * @param elements given elements
+     * @return an {@link LinkedList} and put all given elements into it
      */
     @SafeVarargs
     public static <T> LinkedList<T> linkedList(T... elements) {
@@ -242,6 +256,7 @@ public class FsCollect {
      * If the array miss the last value, the last value will be considered as null.
      *
      * @param keyValues given key-values
+     * @return an {@link HashMap} and put all given key-values into it
      */
     @SafeVarargs
     public static <K, V, T> HashMap<K, V> hashMap(T... keyValues) {
@@ -256,6 +271,7 @@ public class FsCollect {
      * If the array miss the last value, the last value will be considered as null.
      *
      * @param keyValues given key-values
+     * @return an {@link LinkedHashMap} and put all given key-values into it
      */
     @SafeVarargs
     public static <K, V, T> LinkedHashMap<K, V> linkedHashMap(T... keyValues) {
@@ -270,6 +286,7 @@ public class FsCollect {
      * If the array miss the last value, the last value will be considered as null.
      *
      * @param keyValues given key-values
+     * @return an {@link ConcurrentHashMap} and put all given key-values into it
      */
     @SafeVarargs
     public static <K, V, T> ConcurrentHashMap<K, V> concurrentHashMap(T... keyValues) {
@@ -280,6 +297,7 @@ public class FsCollect {
      * Returns whether given iterable is null or empty.
      *
      * @param iterable given iterable
+     * @return whether given iterable is null or empty
      */
     public static boolean isEmpty(@Nullable Iterable<?> iterable) {
         if (iterable == null) {
@@ -295,6 +313,7 @@ public class FsCollect {
      * Returns whether given iterable is not null and empty.
      *
      * @param iterable given iterable
+     * @return whether given iterable is not null and empty
      */
     public static boolean isNotEmpty(@Nullable Iterable<?> iterable) {
         return !isEmpty(iterable);
@@ -304,6 +323,7 @@ public class FsCollect {
      * Returns whether given map is null or empty.
      *
      * @param map given map
+     * @return whether given map is null or empty
      */
     public static boolean isEmpty(@Nullable Map<?, ?> map) {
         if (map == null) {
@@ -316,6 +336,7 @@ public class FsCollect {
      * Returns whether given map is not null and empty.
      *
      * @param map given map
+     * @return whether given map is not null and empty
      */
     public static boolean isNotEmpty(@Nullable Map<?, ?> map) {
         return !isEmpty(map);
@@ -326,6 +347,7 @@ public class FsCollect {
      *
      * @param iterable given iterable
      * @param index    specified index
+     * @return value from given iterable at specified index
      */
     public static <T> T get(@Nullable Iterable<T> iterable, int index) {
         return get(iterable, index, null);
@@ -338,6 +360,7 @@ public class FsCollect {
      * @param iterable     given iterable
      * @param index        specified index
      * @param defaultValue default value
+     * @return value from given iterable at specified index
      */
     public static <T> T get(@Nullable Iterable<T> iterable, int index, @Nullable T defaultValue) {
         if (iterable == null || index < 0) {
@@ -371,6 +394,7 @@ public class FsCollect {
      *
      * @param map given map
      * @param key specified key
+     * @return value from given map at specified key
      */
     public static <K, V> V get(@Nullable Map<K, V> map, K key) {
         return get(map, key, null);
@@ -382,6 +406,7 @@ public class FsCollect {
      * @param map          given map
      * @param key          specified key
      * @param defaultValue default value
+     * @return value from given map at specified key
      */
     public static <K, V> V get(@Nullable Map<K, V> map, K key, @Nullable V defaultValue) {
         if (map == null) {
@@ -395,6 +420,7 @@ public class FsCollect {
      * Converts given enumeration to iterable.
      *
      * @param enumeration given enumeration
+     * @return converted iterable
      */
     public static <T> Iterable<T> toIterable(Enumeration<T> enumeration) {
         return () -> new Iterator<T>() {
@@ -414,6 +440,7 @@ public class FsCollect {
      * Converts given iterable to string list for each element with conversion method {@link String#valueOf(Object)}.
      *
      * @param iterable given iterable
+     * @return converted string list
      */
     public static List<String> toStringList(Iterable<?> iterable) {
         return mapList(iterable, String::valueOf);
@@ -425,6 +452,7 @@ public class FsCollect {
      *
      * @param iterable given iterable of type {@link T}
      * @param function given conversion function
+     * @return converted list
      */
     public static <T, R> List<R> mapList(Iterable<T> iterable, Function<? super T, ? extends R> function) {
         if (iterable instanceof Collection) {
@@ -443,6 +471,7 @@ public class FsCollect {
      *
      * @param iterable given iterable of type {@link T}
      * @param function given conversion function
+     * @return converted set
      */
     public static <T, R> Set<R> mapSet(Iterable<T> iterable, Function<? super T, ? extends R> function) {
         if (iterable instanceof Collection) {
@@ -462,6 +491,7 @@ public class FsCollect {
      * @param source        source iterable
      * @param keyFunction   key conversion function
      * @param valueFunction value conversion function
+     * @return converted map
      */
     public static <T, K, V> Map<K, V> mapMap(
         Iterable<T> source,
@@ -490,6 +520,7 @@ public class FsCollect {
      * @param dest          dest map
      * @param keyFunction   key conversion function
      * @param valueFunction value conversion function
+     * @return converted map
      */
     public static <KS, VS, KR, VR> Map<KR, VR> mapMap(
         Map<KS, VS> source,
@@ -507,6 +538,7 @@ public class FsCollect {
      * Reads all properties into a new {@link LinkedHashMap}.
      *
      * @param properties given properties
+     * @return a new {@link LinkedHashMap}
      */
     public static LinkedHashMap<String, String> toMap(Properties properties) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
@@ -526,6 +558,7 @@ public class FsCollect {
      * @param map   given map
      * @param key   given key
      * @param stack stack to store the historical values
+     * @return nested value from given map with given key
      */
     @Nullable
     public static <T> T getNested(Map<?, T> map, T key, Set<T> stack) {

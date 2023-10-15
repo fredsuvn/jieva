@@ -54,6 +54,8 @@ public interface FsConverter {
      *     </li>
      * </ul>
      * Those are constructed from empty constructor and in the order listed.
+     *
+     * @return default converter
      */
     static FsConverter defaultConverter() {
         return ConverterImpl.INSTANCE;
@@ -66,6 +68,8 @@ public interface FsConverter {
      *         Compatibility policy: {@link Options#REUSE_ASSIGNABLE};
      *     </li>
      * </ul>
+     *
+     * @return default conversion options
      */
     static Options defaultOptions() {
         return Options.Builder.DEFAULT;
@@ -78,6 +82,7 @@ public interface FsConverter {
      * @param suffixHandler  suffix handler
      * @param middleHandlers common handlers
      * @param options        conversion options
+     * @return new converters
      */
     static FsConverter newConverter(
         @Nullable Handler prefixHandler,
@@ -90,6 +95,8 @@ public interface FsConverter {
 
     /**
      * Returns new options builder.
+     *
+     * @return new options builder
      */
     static Options.Builder optionsBuilder() {
         return new Options.Builder();
@@ -114,30 +121,40 @@ public interface FsConverter {
 
     /**
      * Returns prefix handler.
+     *
+     * @return prefix handler
      */
     @Nullable
     Handler getPrefixHandler();
 
     /**
      * Returns suffix handler.
+     *
+     * @return suffix handler
      */
     @Nullable
     Handler getSuffixHandler();
 
     /**
      * Returns middles handlers.
+     *
+     * @return middles handlers
      */
     @Immutable
     List<Handler> getMiddleHandlers();
 
     /**
      * Returns all handlers in order by: prefix handler -> middle handlers -> suffix handler.
+     *
+     * @return all handlers
      */
     @Immutable
     List<Handler> getHandlers();
 
     /**
      * Returns conversion options.
+     *
+     * @return conversion options
      */
     Options getOptions();
 
@@ -147,6 +164,7 @@ public interface FsConverter {
      *
      * @param source     source object
      * @param targetType target type
+     * @return converted object or null
      */
     @Nullable
     default <T> T convert(@Nullable Object source, Class<T> targetType) {
@@ -160,6 +178,7 @@ public interface FsConverter {
      *
      * @param source        source object
      * @param targetTypeRef type reference target type
+     * @return converted object or null
      */
     @Nullable
     default <T> T convert(@Nullable Object source, TypeRef<T> targetTypeRef) {
@@ -173,6 +192,7 @@ public interface FsConverter {
      *
      * @param source     source object
      * @param targetType target type
+     * @return converted object or null
      */
     @Nullable
     default <T> T convert(@Nullable Object source, Type targetType) {
@@ -200,6 +220,7 @@ public interface FsConverter {
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
+     * @return converted object or null
      */
     @Nullable
     default Object convertType(@Nullable Object source, Type sourceType, Type targetType) {
@@ -224,6 +245,7 @@ public interface FsConverter {
      * but the prefix handler is replaced by given handler.
      *
      * @param handler given handler
+     * @return the converter
      */
     default FsConverter withPrefixHandler(Handler handler) {
         return newConverter(handler, getSuffixHandler(), getMiddleHandlers(), getOptions());
@@ -234,6 +256,7 @@ public interface FsConverter {
      * but the suffix handler is replaced by given handler.
      *
      * @param handler given handler
+     * @return the converter
      */
     default FsConverter withSuffixHandler(Handler handler) {
         return newConverter(getPrefixHandler(), handler, getMiddleHandlers(), getOptions());
@@ -244,6 +267,7 @@ public interface FsConverter {
      * but inserts given handler at first index of middle handlers.
      *
      * @param handler given handler
+     * @return the converter
      */
     default FsConverter insertFirstMiddleHandler(Handler handler) {
         return insertMiddleHandler(0, handler);
@@ -255,6 +279,7 @@ public interface FsConverter {
      *
      * @param index   specified index
      * @param handler given handler
+     * @return the converter
      */
     default FsConverter insertMiddleHandler(int index, Handler handler) {
         List<Handler> middleHandlers = getMiddleHandlers();
@@ -272,6 +297,7 @@ public interface FsConverter {
      * but the options will be replaced by given options.
      *
      * @param options given options
+     * @return the converter
      */
     default FsConverter withOptions(Options options) {
         if (Objects.equals(getOptions(), options)) {
@@ -281,10 +307,12 @@ public interface FsConverter {
     }
 
     /**
-     * Returns this converter as a {@link Handler}.
+     * Returns this converter as {@link Handler}.
      * For method {@link Handler#convert(Object, Type, Type, FsConverter)} of result handler, the 4th parameter
      * {@link FsConverter} can be passed as {@code null}, in which case the 4th parameter will be auto passed with
      * "this" -- the current converter itself.
+     *
+     * @return this converter as {@link Handler}
      */
     Handler asHandler();
 
@@ -331,6 +359,7 @@ public interface FsConverter {
          * @param sourceType source type
          * @param targetType target type
          * @param converter  converter to help convert unsupported part of object for this handler.
+         * @return converted object or null
          */
         @Nullable
         Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter);
@@ -368,6 +397,7 @@ public interface FsConverter {
          * Returns options with given object reuse policy.
          *
          * @param reusePolicy given reuse policy, see {@link #reusePolicy()}
+         * @return options with given object reuse policy
          */
         static Options withReusePolicy(int reusePolicy) {
             return new Options() {
@@ -385,6 +415,8 @@ public interface FsConverter {
          *     <li>{@link #REUSE_EQUAL};</li>
          *     <li>{@link #NO_REUSE};</li>
          * </ul>
+         *
+         * @return object reuse policy
          */
         int reusePolicy();
 
@@ -392,6 +424,7 @@ public interface FsConverter {
          * Returns an Options of which {@link #reusePolicy()} is replaced by given policy.
          *
          * @param reusePolicy given reuse policy
+         * @return an Options of which {@link #reusePolicy()} is replaced by given policy
          */
         default Options replaceReusePolicy(int reusePolicy) {
             if (reusePolicy() == reusePolicy) {
@@ -416,12 +449,19 @@ public interface FsConverter {
              *     <li>{@link #REUSE_EQUAL};</li>
              *     <li>{@link #NO_REUSE};</li>
              * </ul>
+             *
+             * @return this builder
              */
             public Builder reusePolicy(int reusePolicy) {
                 this.reusePolicy = reusePolicy;
                 return this;
             }
 
+            /**
+             * Builds the options
+             *
+             * @return built options
+             */
             public Options build() {
                 return new OptionImpl(reusePolicy);
             }

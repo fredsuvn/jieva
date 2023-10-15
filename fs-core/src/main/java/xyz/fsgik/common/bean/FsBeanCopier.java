@@ -23,6 +23,8 @@ public interface FsBeanCopier {
 
     /**
      * Returns default bean copier.
+     *
+     * @return default bean copier
      */
     static FsBeanCopier defaultCopier() {
         return Builder.DEFAULT;
@@ -30,6 +32,8 @@ public interface FsBeanCopier {
 
     /**
      * Returns new builder of {@link FsBeanCopier}.
+     *
+     * @return new builder of {@link FsBeanCopier}
      */
     static Builder newBuilder() {
         return new Builder();
@@ -40,6 +44,7 @@ public interface FsBeanCopier {
      *
      * @param source source object
      * @param dest   dest object
+     * @return dest object
      */
     default <T> T copyProperties(Object source, T dest) {
         return copyProperties(source, source.getClass(), dest, dest.getClass());
@@ -52,6 +57,7 @@ public interface FsBeanCopier {
      * @param sourceType specified type of source object
      * @param dest       dest object
      * @param destType   specified type of dest type
+     * @return dest object
      */
     <T> T copyProperties(Object source, Type sourceType, T dest, Type destType);
 
@@ -60,6 +66,7 @@ public interface FsBeanCopier {
      * but the bean resolver will be set to given resolver.
      *
      * @param resolver given resolver
+     * @return a new copier
      */
     default FsBeanCopier withBeanResolver(FsBeanResolver resolver) {
         return toBuilder().beanResolver(resolver).build();
@@ -70,6 +77,7 @@ public interface FsBeanCopier {
      * but the object converter will be set to given converter.
      *
      * @param converter given converter
+     * @return a new copier
      */
     default FsBeanCopier withConverter(FsConverter converter) {
         return toBuilder().converter(converter).build();
@@ -77,6 +85,8 @@ public interface FsBeanCopier {
 
     /**
      * Returns a new builder of current copier.
+     *
+     * @return a new builder of current copier
      */
     Builder toBuilder();
 
@@ -98,6 +108,8 @@ public interface FsBeanCopier {
         /**
          * Sets bean resolver for copy operation.
          * Default is null, in this case the operation will use {@link FsBeanResolver#defaultResolver()}.
+         *
+         * @return this builder
          */
         public Builder beanResolver(FsBeanResolver beanResolver) {
             this.beanResolver = beanResolver;
@@ -107,6 +119,8 @@ public interface FsBeanCopier {
         /**
          * Sets object converter for copy operation.
          * Default is null, in this case the operation will use {@link FsConverter#defaultConverter()}.
+         *
+         * @return this builder
          */
         public Builder converter(FsConverter converter) {
             this.converter = converter;
@@ -116,6 +130,8 @@ public interface FsBeanCopier {
         /**
          * Sets whether throws {@link FsConvertException} if conversion operation was failed.
          * Default is false, means ignore failed properties.
+         *
+         * @return this builder
          */
         public Builder throwIfConvertFailed(boolean throwIfConvertFailed) {
             this.throwIfConvertFailed = throwIfConvertFailed;
@@ -139,6 +155,8 @@ public interface FsBeanCopier {
          *         into the final property name/key to be used.
          *     </li>
          * </ul>
+         *
+         * @return this builder
          */
         public <T> Builder propertyNameMapper(Function<T, T> propertyNameMapper) {
             this.propertyNameMapper = Fs.as(propertyNameMapper);
@@ -150,6 +168,8 @@ public interface FsBeanCopier {
          * the first param is name of source property, second is value of source property value.
          * <p>
          * Only the property that pass through this filter (return true) will be copied from.
+         *
+         * @return this builder
          */
         public Builder sourcePropertyFilter(BiPredicate<Object, @Nullable Object> sourcePropertyFilter) {
             this.sourcePropertyFilter = sourcePropertyFilter;
@@ -162,6 +182,8 @@ public interface FsBeanCopier {
          * that is prepared to copy.
          * <p>
          * Only the property that pass through this filter (return true) will be copied from.
+         *
+         * @return this builder
          */
         public Builder destPropertyFilter(BiPredicate<Object, @Nullable Object> destPropertyFilter) {
             this.destPropertyFilter = destPropertyFilter;
@@ -171,6 +193,8 @@ public interface FsBeanCopier {
         /**
          * Sets whether put the property into dest map if dest map doesn't contain corresponding property.
          * Default is true.
+         *
+         * @return this builder
          */
         public Builder putIfNotContained(boolean putIfNotContained) {
             this.putIfNotContained = putIfNotContained;
@@ -179,6 +203,8 @@ public interface FsBeanCopier {
 
         /**
          * Builds {@link FsBeanCopier}.
+         *
+         * @return built {@link FsBeanCopier}
          */
         public FsBeanCopier build() {
             return new BeanCopierImpl(this);

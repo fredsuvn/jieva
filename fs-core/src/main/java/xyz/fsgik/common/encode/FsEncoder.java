@@ -20,6 +20,8 @@ public interface FsEncoder {
 
     /**
      * Returns base64 encoder.
+     *
+     * @return base64 encoder
      */
     static FsEncoder base64() {
         return Encoders.BASE64;
@@ -27,6 +29,8 @@ public interface FsEncoder {
 
     /**
      * Returns base64 encoder (without padding).
+     *
+     * @return base64 encoder (without padding)
      */
     static FsEncoder base64NoPadding() {
         return Encoders.BASE64_NO_PADDING;
@@ -34,6 +38,8 @@ public interface FsEncoder {
 
     /**
      * Returns base64 encoder (URL format).
+     *
+     * @return base64 encoder (URL format)
      */
     static FsEncoder base64Url() {
         return Encoders.BASE64_URL;
@@ -41,6 +47,8 @@ public interface FsEncoder {
 
     /**
      * Returns base64 encoder (URL format without padding).
+     *
+     * @return base64 encoder (URL format without padding)
      */
     static FsEncoder base64UrlNoPadding() {
         return Encoders.BASE64_URL_NO_PADDING;
@@ -48,6 +56,8 @@ public interface FsEncoder {
 
     /**
      * Returns base64 encoder (MIME format).
+     *
+     * @return base64 encoder (MIME format)
      */
     static FsEncoder base64Mime() {
         return Encoders.BASE64_MIME;
@@ -55,6 +65,8 @@ public interface FsEncoder {
 
     /**
      * Returns base64 encoder (MIME format without padding).
+     *
+     * @return base64 encoder (MIME format without padding)
      */
     static FsEncoder base64MimeNoPadding() {
         return Encoders.BASE64_MIME_NO_PADDING;
@@ -62,6 +74,8 @@ public interface FsEncoder {
 
     /**
      * Returns hex encoder.
+     *
+     * @return hex encoder
      */
     static FsEncoder hex() {
         return Encoders.HEX;
@@ -71,6 +85,7 @@ public interface FsEncoder {
      * Encodes source array.
      *
      * @param source source array
+     * @return encoded bytes
      */
     default byte[] encode(byte[] source) {
         return encode(source, 0, source.length);
@@ -82,6 +97,7 @@ public interface FsEncoder {
      * @param source source array
      * @param offset offset index
      * @param length specified length
+     * @return encoded bytes
      */
     byte[] encode(byte[] source, int offset, int length);
 
@@ -90,6 +106,7 @@ public interface FsEncoder {
      *
      * @param source source array
      * @param dest   dest array
+     * @return number of bytes written
      */
     default int encode(byte[] source, byte[] dest) {
         return encode(source, 0, dest, 0, source.length);
@@ -104,6 +121,7 @@ public interface FsEncoder {
      * @param dest         dest array
      * @param destOffset   dest offset index
      * @param length       specified length
+     * @return number of bytes written
      */
     default int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
@@ -122,6 +140,7 @@ public interface FsEncoder {
      * The returned buffer's position will be set to 0 and limit is length of result bytes.
      *
      * @param source source byte buffer
+     * @return encoded buffer
      */
     default ByteBuffer encode(ByteBuffer source) {
         try {
@@ -139,6 +158,7 @@ public interface FsEncoder {
      *
      * @param source source byte buffer
      * @param dest   dest byte buffer
+     * @return number of bytes written
      */
     default int encode(ByteBuffer source, ByteBuffer dest) {
         try {
@@ -158,6 +178,7 @@ public interface FsEncoder {
      *
      * @param source source stream
      * @param dest   dest stream
+     * @return number of bytes written
      */
     long encode(InputStream source, OutputStream dest);
 
@@ -165,6 +186,7 @@ public interface FsEncoder {
      * Encodes source array and build encoding result to string with {@link StandardCharsets#ISO_8859_1}.
      *
      * @param source source array
+     * @return encoded string
      */
     default String encodeToString(byte[] source) {
         return new String(encode(source), StandardCharsets.ISO_8859_1);
@@ -175,6 +197,7 @@ public interface FsEncoder {
      * and build encoding result to string with {@link StandardCharsets#ISO_8859_1}.
      *
      * @param source source string
+     * @return encoded string
      */
     default String encodeToString(String source) {
         return encodeToString(source.getBytes(FsChars.defaultCharset()));
@@ -182,6 +205,8 @@ public interface FsEncoder {
 
     /**
      * Returns block size for encoding.
+     *
+     * @return block size for encoding
      */
     int encodeBlockSize();
 
@@ -189,6 +214,7 @@ public interface FsEncoder {
      * Decodes source array.
      *
      * @param source source array
+     * @return decoded bytes
      */
     default byte[] decode(byte[] source) {
         return decode(source, 0, source.length);
@@ -200,6 +226,7 @@ public interface FsEncoder {
      * @param source source array
      * @param offset offset index
      * @param length specified length
+     * @return decoded bytes
      */
     byte[] decode(byte[] source, int offset, int length);
 
@@ -208,6 +235,7 @@ public interface FsEncoder {
      *
      * @param source source array
      * @param dest   dest array
+     * @return number of bytes written
      */
     default int decode(byte[] source, byte[] dest) {
         return decode(source, 0, dest, 0, source.length);
@@ -222,6 +250,7 @@ public interface FsEncoder {
      * @param dest         dest array
      * @param destOffset   dest offset index
      * @param length       specified length
+     * @return number of bytes written
      */
     default int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
@@ -240,6 +269,7 @@ public interface FsEncoder {
      * The returned buffer's position will be set to 0 and limit is length of result bytes.
      *
      * @param source source byte buffer
+     * @return decoded buffer
      */
     default ByteBuffer decode(ByteBuffer source) {
         try {
@@ -257,6 +287,7 @@ public interface FsEncoder {
      *
      * @param source source byte buffer
      * @param dest   dest byte buffer
+     * @return number of bytes written
      */
     default int decode(ByteBuffer source, ByteBuffer dest) {
         try {
@@ -276,6 +307,7 @@ public interface FsEncoder {
      *
      * @param source source stream
      * @param dest   dest stream
+     * @return number of bytes written
      */
     long decode(InputStream source, OutputStream dest);
 
@@ -283,6 +315,7 @@ public interface FsEncoder {
      * Decodes source array and build encoding result to string with {@link FsChars#defaultCharset()}.
      *
      * @param source source array
+     * @return decoded string
      */
     default String decodeToString(byte[] source) {
         return new String(decode(source), FsChars.defaultCharset());
@@ -293,6 +326,7 @@ public interface FsEncoder {
      * and build encoding result to string with {@link FsChars#defaultCharset()}.
      *
      * @param source source string
+     * @return decoded string
      */
     default String decode(String source) {
         return new String(decode(source.getBytes(StandardCharsets.ISO_8859_1)), FsChars.defaultCharset());
@@ -300,6 +334,8 @@ public interface FsEncoder {
 
     /**
      * Returns block size for decoding.
+     *
+     * @return block size for decoding
      */
     int decodeBlockSize();
 }

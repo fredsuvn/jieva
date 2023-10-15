@@ -120,6 +120,8 @@ public class BeanConvertHandler implements FsConverter.Handler {
 
     /**
      * Returns bean resolver of this handler.
+     *
+     * @return bean resolver of this handler
      */
     public FsBeanResolver getBeanResolver() {
         return beanResolver;
@@ -127,6 +129,8 @@ public class BeanConvertHandler implements FsConverter.Handler {
 
     /**
      * Returns copier of this handler.
+     *
+     * @return copier of this handler
      */
     public FsBeanCopier getCopier() {
         return copier;

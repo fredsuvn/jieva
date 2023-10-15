@@ -87,6 +87,7 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
      * If it is, return name of this property, or null if it is not
      *
      * @param method given method
+     * @return whether given method is a getter
      */
     @Nullable
     protected abstract String isGetter(Method method);
@@ -96,12 +97,15 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
      * If it is, return name of this property, or null if it is not
      *
      * @param method given method
+     * @return whether given method is a setter
      */
     @Nullable
     protected abstract String isSetter(Method method);
 
     /**
      * Builds invoker of given getter/setter.
+     *
+     * @return built invoker
      */
     protected FsInvoker buildMethodInvoker(Method method) {
         return FsInvoker.reflectMethod(method);

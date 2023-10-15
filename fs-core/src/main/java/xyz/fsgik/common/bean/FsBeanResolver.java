@@ -41,6 +41,8 @@ public interface FsBeanResolver {
 
     /**
      * Returns default bean resolver of which handler is {@link JavaBeanResolveHandler}.
+     *
+     * @return default bean resolver
      */
     static FsBeanResolver defaultResolver() {
         return BeanResolverImpl.INSTANCE;
@@ -54,6 +56,7 @@ public interface FsBeanResolver {
      * </pre>
      *
      * @param handler given handler
+     * @return new bean resolver
      */
     static FsBeanResolver newResolver(Handler handler) {
         return newResolver(Collections.singleton(handler));
@@ -67,6 +70,7 @@ public interface FsBeanResolver {
      * </pre>
      *
      * @param handlers given handlers
+     * @return new bean resolver
      */
     static FsBeanResolver newResolver(Iterable<Handler> handlers) {
         return newResolver(handlers, FsCache.softCache());
@@ -78,6 +82,7 @@ public interface FsBeanResolver {
      *
      * @param handlers given handlers
      * @param cache    given cache
+     * @return new bean resolver
      */
     static FsBeanResolver newResolver(Iterable<Handler> handlers, @Nullable FsCache<Type, FsBean> cache) {
         return new BeanResolverImpl(handlers, cache);
@@ -87,6 +92,7 @@ public interface FsBeanResolver {
      * Resolves given type to {@link FsBean}.
      *
      * @param type given type
+     * @return resolved {@link FsBean}
      */
     FsBean resolve(Type type);
 
@@ -98,6 +104,7 @@ public interface FsBeanResolver {
      * </pre>
      *
      * @param map given map
+     * @return wrapped {@link FsBean}
      * @see #wrapMap(Map, Type)
      */
     default FsBean wrapMap(Map<String, ?> map) {
@@ -113,6 +120,7 @@ public interface FsBeanResolver {
      *
      * @param map     given map
      * @param mapType given map type
+     * @return wrapped {@link FsBean}
      */
     default FsBean wrapMap(Map<String, ?> map, @Nullable Type mapType) {
         final class MapBeanImpl implements FsBean {
@@ -327,6 +335,8 @@ public interface FsBeanResolver {
 
     /**
      * Returns handlers of this resolver.
+     *
+     * @return handlers of this resolver
      */
     List<Handler> getHandlers();
 
@@ -336,6 +346,7 @@ public interface FsBeanResolver {
      * The returned resolver will share the cache with this resolver.
      *
      * @param handler given handler
+     * @return a new resolver
      */
     default FsBeanResolver insertFirstHandler(Handler handler) {
         return insertHandler(0, handler);
@@ -348,11 +359,14 @@ public interface FsBeanResolver {
      *
      * @param index   specified index
      * @param handler given handler
+     * @return a new resolver
      */
     FsBeanResolver insertHandler(int index, Handler handler);
 
     /**
-     * Returns this resolver as a {@link Handler}.
+     * Returns this resolver as {@link Handler}.
+     *
+     * @return this resolver as {@link Handler}
      */
     Handler asHandler();
 
