@@ -738,7 +738,7 @@ public class FsIO {
      * Note returned stream doesn't support mark/reset.
      *
      * @param source given source stream
-     * @param limit  max read length, must >= 0
+     * @param limit  max read length, must &gt;= 0
      * @return wrapped stream
      */
     public static InputStream limited(InputStream source, long limit) {
@@ -749,7 +749,7 @@ public class FsIO {
      * Wraps given source stream to limit written length.
      *
      * @param source given source stream
-     * @param limit  max written length, must >= 0
+     * @param limit  max written length, must &gt;= 0
      * @return wrapped stream
      */
     public static OutputStream limited(OutputStream source, long limit) {
@@ -843,6 +843,7 @@ public class FsIO {
      * Using {@link RandomAccessFile} to write  bytes into given file of path.
      *
      * @param path given file of path
+     * @param data given data
      */
     public static void writeBytes(Path path, InputStream data) {
         writeBytes(path, 0, -1, data);
@@ -855,6 +856,7 @@ public class FsIO {
      * @param path   given file of path
      * @param offset offset position
      * @param length given length, maybe -1 to write unlimitedly
+     * @param data   given data
      */
     public static void writeBytes(Path path, long offset, long length, InputStream data) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
@@ -871,6 +873,7 @@ public class FsIO {
      * The written bytes will be decoded from given data with {@link FsChars#defaultCharset()}.
      *
      * @param path given file of path
+     * @param data given data
      */
     public static void writeString(Path path, CharSequence data) {
         writeString(path, data, FsChars.defaultCharset());
@@ -881,6 +884,7 @@ public class FsIO {
      * The written bytes will be decoded from given data with given charset.
      *
      * @param path    given file of path
+     * @param data    given data
      * @param charset given charset
      */
     public static void writeString(Path path, CharSequence data, Charset charset) {

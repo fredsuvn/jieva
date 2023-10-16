@@ -28,6 +28,7 @@ public class FsReflect {
      * If loading failed, return null.
      *
      * @param className given clas name
+     * @param <T>       type of result
      * @return new instance for given class name or null
      */
     @Nullable
@@ -178,6 +179,8 @@ public class FsReflect {
      * Creates a new instance of given type with empty constructor.
      * Return null if failed.
      *
+     * @param type given type
+     * @param <T>  type of instance
      * @return a new instance of given type with empty constructor or null
      */
     @Nullable
@@ -520,8 +523,8 @@ public class FsReflect {
      * <p>
      * For example, these types:
      * <pre>
-     *     private static interface Z&lt;B, T, U, R> {}
-     *     private static class ZS implements Z&lt;String, Integer, Long, Boolean> {}
+     *     private static interface Z&lt;B, T, U, R&gt; {}
+     *     private static class ZS implements Z&lt;String, Integer, Long, Boolean&gt; {}
      * </pre>
      * The result of this method:
      * <pre>
@@ -529,7 +532,7 @@ public class FsReflect {
      * </pre>
      * will be:
      * <pre>
-     *     Z&lt;String, Integer, Long, Boolean>
+     *     Z&lt;String, Integer, Long, Boolean&gt;
      * </pre>
      * Note given type must be subtype of target type, if it is not, return null.
      *
@@ -580,9 +583,9 @@ public class FsReflect {
      * <p>
      * For example, these types:
      * <pre>
-     *     private static class X extends Y&lt;Integer, Long>{}
-     *     private static class Y&lt;K, V> implements Z&lt;Float, Double, V> {}
-     *     private static interface Z&lt;T, U, R>{}
+     *     private static class X extends Y&lt;Integer, Long&gt;{}
+     *     private static class Y&lt;K, V&gt; implements Z&lt;Float, Double, V&gt; {}
+     *     private static interface Z&lt;T, U, R&gt;{}
      * </pre>
      * The result of this method
      * <pre>
@@ -590,11 +593,11 @@ public class FsReflect {
      * </pre>
      * will be:
      * <pre>
-     *     T -> Float
-     *     U -> Double
-     *     R -> V
-     *     K -> Integer
-     *     V -> Long
+     *     T -&gt; Float
+     *     U -&gt; Double
+     *     R -&gt; V
+     *     K -&gt; Integer
+     *     V -&gt; Long
      * </pre>
      *
      * @param type given type

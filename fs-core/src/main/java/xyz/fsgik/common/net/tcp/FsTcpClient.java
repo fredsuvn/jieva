@@ -109,6 +109,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Sets local port.
          *
+         * @param port local port
          * @return this builder
          */
         public Builder port(int port) {
@@ -119,6 +120,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Sets local address.
          *
+         * @param address local address
          * @return this builder
          */
         public Builder address(InetAddress address) {
@@ -129,6 +131,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Sets local host name.
          *
+         * @param hostName local host name
          * @return this builder
          */
         public Builder hostName(String hostName) {
@@ -143,6 +146,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Sets client handler.
          *
+         * @param clientHandler client handler
          * @return this builder
          */
         public Builder clientHandler(FsTcpClientHandler clientHandler) {
@@ -153,6 +157,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Adds channel handler.
          *
+         * @param channelHandler channel handler
          * @return this builder
          */
         public Builder addChannelHandler(FsTcpChannelHandler<?> channelHandler) {
@@ -163,6 +168,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Adds channel handlers.
          *
+         * @param channelHandlers channel handlers
          * @return this builder
          */
         public Builder addChannelHandlers(Iterable<FsTcpChannelHandler<?>> channelHandlers) {
@@ -173,7 +179,9 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Sets byte buffer generator: given an int returns a byte buffer with the int length.
          * The generated buffer's position must be 0, and limit must be capacity.
+         * *
          *
+         * @param bufferGenerator byte buffer generator
          * @return this builder
          */
         public Builder bufferGenerator(IntFunction<ByteBuffer> bufferGenerator) {
@@ -184,6 +192,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Sets buffer size of the channel.
          *
+         * @param channelBufferSize buffer size of the channel
          * @return this builder
          */
         public Builder channelBufferSize(int channelBufferSize) {
@@ -194,6 +203,7 @@ public interface FsTcpClient extends FsTcpEndpoint {
         /**
          * Sets other socket config.
          *
+         * @param socketConfig other socket config
          * @return this builder
          */
         public Builder socketConfig(Consumer<Socket> socketConfig) {
@@ -202,8 +212,9 @@ public interface FsTcpClient extends FsTcpEndpoint {
         }
 
         /**
-         * Sets proxy.m
+         * Sets proxy
          *
+         * @param proxy proxy
          * @return this builder
          */
         public Builder proxy(Proxy proxy) {

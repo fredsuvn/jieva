@@ -10,13 +10,13 @@ import java.lang.reflect.Type;
  * <p>
  * String.class:
  * <pre>
- *     TypeRef&lt;String> typeRef = new TypeRef&lt;String>(){};
+ *     TypeRef&lt;String&gt; typeRef = new TypeRef&lt;String&gt;(){};
  *     Type type = typeRef.getType();
  * </pre>
  * <p>
- * Generic type Map&lt;String, String>:
+ * Generic type Map&lt;String, String&gt;:
  * <pre>
- *     TypeRef&lt;Map&lt;String, String>> typeRef = new TypeRef&lt;Map&lt;String, String>>(){};
+ *     TypeRef&lt;Map&lt;String, String&gt;&gt; typeRef = new TypeRef&lt;Map&lt;String, String&gt;&gt;(){};
  *     Type type = typeRef.getType();
  * </pre>
  *

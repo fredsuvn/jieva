@@ -2,18 +2,16 @@ package xyz.fsgik.common.proxy;
 
 import xyz.fsgik.annotations.ThreadSafe;
 import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.collect.FsCollect;
 import xyz.fsgik.common.reflect.FsReflect;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.function.Predicate;
 
 /**
  * Proxy for java type, to create new proxy instance.
  *
+ * @param <T> proxied type
  * @author fredsuvn
  */
 @ThreadSafe
@@ -22,6 +20,7 @@ public interface FsProxy<T> {
     /**
      * Returns new builder of {@link FsProxy}.
      *
+     * @param <T> proxied type
      * @return new builder
      */
     static <T> Builder<T> newBuilder() {
@@ -41,6 +40,8 @@ public interface FsProxy<T> {
      * and supports using JDK proxy or cglib to proxy.
      * <p>
      * Note JDK proxy only supports proxying interfaces.
+     *
+     * @param <T> proxied type
      */
     class Builder<T> {
 
@@ -68,6 +69,7 @@ public interface FsProxy<T> {
          * Sets super class of proxy class.
          *
          * @param superClass super class
+         * @param <T1>       proxied type
          * @return this builder
          */
         public <T1 extends T> Builder<T1> superClass(Class<?> superClass) {
@@ -79,6 +81,7 @@ public interface FsProxy<T> {
          * Sets super interfaces of proxy class.
          *
          * @param superInterfaces super interfaces
+         * @param <T1>            proxied type
          * @return this builder
          */
         public <T1 extends T> Builder<T1> superInterfaces(Class<?>... superInterfaces) {
@@ -89,6 +92,7 @@ public interface FsProxy<T> {
          * Sets super interfaces of proxy class.
          *
          * @param superInterfaces super interfaces
+         * @param <T1>            proxied type
          * @return this builder
          */
         public <T1 extends T> Builder<T1> superInterfaces(Iterable<Class<?>> superInterfaces) {
@@ -101,6 +105,7 @@ public interface FsProxy<T> {
          *
          * @param predicate   given predicate
          * @param proxyMethod proxy method
+         * @param <T1>        proxied type
          * @return this builder
          */
         public <T1 extends T> Builder<T1> proxyMethod(Predicate<Method> predicate, FsProxyMethod proxyMethod) {
@@ -115,6 +120,7 @@ public interface FsProxy<T> {
          * @param methodName  given method name
          * @param paramTypes  given parameter types
          * @param proxyMethod proxy method
+         * @param <T1>        proxied type
          * @return this builder
          */
         public <T1 extends T> Builder<T1> proxyMethod(String methodName, List<Class<?>> paramTypes, FsProxyMethod proxyMethod) {
@@ -128,6 +134,7 @@ public interface FsProxy<T> {
          * @param methodName  given method name
          * @param paramTypes  given parameter types
          * @param proxyMethod proxy method
+         * @param <T1>        proxied type
          * @return this builder
          */
         public <T1 extends T> Builder<T1> proxyMethod(String methodName, Class<?>[] paramTypes, FsProxyMethod proxyMethod) {
@@ -145,11 +152,12 @@ public interface FsProxy<T> {
          *     <li>{@link #SPRING_PROXY}: using spring proxy;</li>
          * </ul>
          * By default, the builder will check the required libs in current runtime to choose a generator in priority:
-         * spring > cglib > JDK.
+         * spring &gt; cglib &gt; JDK.
          * <p>
          * Note the required libs need to be present in the runtime environment.
          *
          * @param proxyGenerator proxy generator
+         * @param <T1>           proxied type
          * @return this builder
          */
         public <T1 extends T> Builder<T1> proxyGenerator(int proxyGenerator) {
@@ -160,6 +168,7 @@ public interface FsProxy<T> {
         /**
          * Builds {@link FsProxy}.
          *
+         * @param <T1> proxied type
          * @return built {@link FsProxy}
          */
         public <T1 extends T> FsProxy<T1> build() {

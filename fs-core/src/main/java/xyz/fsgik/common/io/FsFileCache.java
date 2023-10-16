@@ -56,8 +56,9 @@ public interface FsFileCache {
     OutputStream getOutputStream(Path path, long offset);
 
     /**
-     * Sets new file length, truncated or extended.
+     * Sets new file length for given path, truncated or extended.
      *
+     * @param path      given path
      * @param newLength new length
      */
     void setFileLength(Path path, long newLength);
@@ -108,7 +109,8 @@ public interface FsFileCache {
          * If the function is null, return null else return cached or new value.
          * If the function returns null, no value will be cached and return null.
          *
-         * @param key key of the value
+         * @param key      key of the value
+         * @param function given function
          * @return cached file chunk value
          */
         @Nullable

@@ -13,9 +13,9 @@ import java.util.function.IntFunction;
 /**
  * Delimiter based handler implementation, to split passed byte buffer by delimiter:
  * <pre>
- *     buffer -> data|data|data|..
+ *     buffer -&gt; data|data|data|..
  * </pre>
- * The returned object of {@link #onMessage(FsTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}>,
+ * The returned object of {@link #onMessage(FsTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;,
  * each byte buffer is split by {@link FsBuffer#splitByDelimiter(ByteBuffer, byte, IntFunction)}
  * and make returned buffers readonly.
  *

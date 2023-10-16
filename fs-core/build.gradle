@@ -51,7 +51,7 @@ java {
 }
 
 javadoc {
-  options.addStringOption('Xdoclint:none', '-quiet')
+  //options.addStringOption('Xdoclint:none', '-quiet')
   destinationDir = file("$project.projectDir/docs/javadoc")
 }
 

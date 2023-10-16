@@ -519,9 +519,9 @@ public class FsSystem {
     }
 
     /**
-     * Returns whether current JDK version >= 9.
+     * Returns whether current JDK version &gt;= 9.
      *
-     * @return whether current JDK version >= 9
+     * @return whether current JDK version &gt;= 9
      */
     public static boolean isJdk9OrHigher() {
         return javaMajorVersion() >= 9;

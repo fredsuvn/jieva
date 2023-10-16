@@ -464,7 +464,7 @@ public class FsString {
      * Replaces given matcher in given chars with given replacement.
      * If given limit &lt; 0, replace all;
      * if given limit = 0, do nothing and return given chars to string;
-     * If given limit > 0, this method will replace given limit times.
+     * If given limit &gt; 0, this method will replace given limit times.
      * <p>
      * FOr example, replaceFirst is equivalent to
      * <pre>

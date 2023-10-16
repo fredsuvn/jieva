@@ -202,6 +202,7 @@ public interface FsUdpServer extends FsUdpClient {
         /**
          * Sets server handler.
          *
+         * @param serverHandler server handler
          * @return this builder
          */
         public Builder serverHandler(FsUdpServerHandler serverHandler) {
@@ -212,6 +213,7 @@ public interface FsUdpServer extends FsUdpClient {
         /**
          * Adds packet handler.
          *
+         * @param packetHandler packet handler
          * @return this builder
          */
         public Builder addPacketHandler(FsUdpPacketHandler<?> packetHandler) {
@@ -222,6 +224,7 @@ public interface FsUdpServer extends FsUdpClient {
         /**
          * Adds packet handlers.
          *
+         * @param packetHandlers packet handlers
          * @return this builder
          */
         public Builder addPacketHandlers(Iterable<FsUdpPacketHandler<?>> packetHandlers) {
@@ -232,6 +235,7 @@ public interface FsUdpServer extends FsUdpClient {
         /**
          * Sets executor, must be of multi-threads.
          *
+         * @param executor executor, must be of multi-threads
          * @return this builder
          */
         public Builder executor(ExecutorService executor) {
@@ -242,6 +246,7 @@ public interface FsUdpServer extends FsUdpClient {
         /**
          * Sets buffer size of the packet.
          *
+         * @param packetBufferSize buffer size of the packet
          * @return this builder
          */
         public Builder packetBufferSize(int packetBufferSize) {

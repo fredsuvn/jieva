@@ -82,6 +82,7 @@ public interface FsUdpClient {
         /**
          * Sets local port, maybe 0 to get an available one from system.
          *
+         * @param port local port
          * @return this builder
          */
         public Builder port(int port) {
@@ -92,6 +93,7 @@ public interface FsUdpClient {
         /**
          * Sets local address.
          *
+         * @param address local address
          * @return this builder
          */
         public Builder address(InetAddress address) {
@@ -102,6 +104,7 @@ public interface FsUdpClient {
         /**
          * Sets local host name.
          *
+         * @param hostName local host name
          * @return this builder
          */
         public Builder hostName(String hostName) {
@@ -116,6 +119,7 @@ public interface FsUdpClient {
         /**
          * Sets other socket config.
          *
+         * @param socketConfig other socket config
          * @return this builder
          */
         public Builder socketConfig(Consumer<DatagramSocket> socketConfig) {

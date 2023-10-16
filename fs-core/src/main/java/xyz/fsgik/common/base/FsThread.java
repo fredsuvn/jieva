@@ -14,6 +14,7 @@ public class FsThread {
     /**
      * Runs a new thread.
      *
+     * @param runnable runnable body
      * @return the thread
      */
     public static Thread start(Runnable runnable) {

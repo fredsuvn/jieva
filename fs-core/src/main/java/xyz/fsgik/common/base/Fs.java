@@ -37,6 +37,7 @@ public class Fs {
      *
      * @param obj          given object
      * @param defaultValue default value
+     * @param <T>          type of value
      * @return default value if given object is null, or given object itself if it is not null
      */
     public static <T> T notNull(@Nullable T obj, T defaultValue) {
@@ -52,6 +53,8 @@ public class Fs {
      * @param obj          given object
      * @param defaultValue default value
      * @param function     given function
+     * @param <K>          type of given object
+     * @param <V>          type of result
      * @return default value if given object is null, or the value computed by given function if it is not null
      */
     public static <K, V> V notNull(@Nullable K obj, V defaultValue, Function<? super K, ? extends V> function) {
@@ -66,6 +69,8 @@ public class Fs {
      *
      * @param obj      given object
      * @param function given function
+     * @param <K>      type of given object
+     * @param <V>      type of result
      * @return the value computed by given function if it is not null, or null if it is null
      */
     @Nullable
@@ -270,6 +275,7 @@ public class Fs {
      *
      * @param enumClass given enum class
      * @param name      specified name
+     * @param <T>       type of enum
      * @return the enum object or null
      */
     @Nullable
@@ -283,6 +289,7 @@ public class Fs {
      * @param enumClass  given enum class
      * @param name       specified name
      * @param ignoreCase whether ignore case for specified name
+     * @param <T>        type of enum
      * @return the enum object or null
      */
     @Nullable
@@ -310,6 +317,7 @@ public class Fs {
      *
      * @param enumClass given enum class
      * @param index     specified index
+     * @param <T>       type of enum
      * @return the enum object or null
      */
     @Nullable
@@ -361,6 +369,7 @@ public class Fs {
      *
      * @param source     source object
      * @param targetType target type
+     * @param <T>        target type
      * @return converted object or null
      * @see FsConverter#convert(Object, Class)
      */
@@ -375,6 +384,7 @@ public class Fs {
      *
      * @param source     source object
      * @param targetType target type
+     * @param <T>        target type
      * @return converted object or null
      * @see FsConverter#convert(Object, TypeRef)
      */
@@ -389,6 +399,7 @@ public class Fs {
      *
      * @param source     source object
      * @param targetType target type
+     * @param <T>        target type
      * @return converted object or null
      * @see FsConverter#convert(Object, Type)
      */
@@ -430,6 +441,7 @@ public class Fs {
      *
      * @param source source object
      * @param dest   dest object
+     * @param <T>    dest type
      * @return dest object
      * @see FsBeanCopier
      */
@@ -445,6 +457,7 @@ public class Fs {
      * @param source   source object
      * @param dest     dest object
      * @param copyNull whether copy null properties
+     * @param <T>      dest type
      * @return dest object
      * @see FsBeanCopier
      */
@@ -466,6 +479,7 @@ public class Fs {
      * @param source            source object
      * @param dest              dest object
      * @param ignoredProperties property names that are specified to ignore
+     * @param <T>               dest type
      * @return dest object
      * @see FsBeanCopier
      */
@@ -488,6 +502,7 @@ public class Fs {
      * @param dest              dest object
      * @param copyNull          whether copy null properties
      * @param ignoredProperties property names that are specified to ignore
+     * @param <T>               dest type
      * @return dest object
      * @see FsBeanCopier
      */
@@ -509,6 +524,7 @@ public class Fs {
      * @param sourceType specified type of source object
      * @param dest       dest object
      * @param destType   specified type of dest type
+     * @param <T>        dest type
      * @return dest object
      * @see FsBeanCopier
      */
@@ -525,6 +541,7 @@ public class Fs {
      * @param dest       dest object
      * @param destType   specified type of dest type
      * @param copyNull   whether copy null properties
+     * @param <T>        dest type
      * @return dest object
      * @see FsBeanCopier
      */
@@ -547,6 +564,7 @@ public class Fs {
      * @param dest              dest object
      * @param destType          specified type of dest type
      * @param ignoredProperties property names that are specified to ignore
+     * @param <T>               dest type
      * @return dest object
      * @see FsBeanCopier
      */
@@ -572,6 +590,7 @@ public class Fs {
      * @param destType          specified type of dest type
      * @param copyNull          whether copy null properties
      * @param ignoredProperties property names that are specified to ignore
+     * @param <T>               dest type
      * @return dest object
      * @see FsBeanCopier
      */

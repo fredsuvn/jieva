@@ -43,6 +43,8 @@ public interface FsLogger {
 
     /**
      * Logs message in level of {@link Level#TRACE}.
+     *
+     * @param messages messages
      */
     default void trace(Object... messages) {
         if (getLevel().value() > Level.TRACE.value()) {
@@ -54,6 +56,8 @@ public interface FsLogger {
 
     /**
      * Logs message in level of {@link Level#DEBUG}.
+     *
+     * @param messages messages
      */
     default void debug(Object... messages) {
         if (getLevel().value() > Level.DEBUG.value()) {
@@ -65,6 +69,8 @@ public interface FsLogger {
 
     /**
      * Logs message in level of {@link Level#INFO}.
+     *
+     * @param messages messages
      */
     default void info(Object... messages) {
         if (getLevel().value() > Level.INFO.value()) {
@@ -76,6 +82,8 @@ public interface FsLogger {
 
     /**
      * Logs message in level of {@link Level#WARN}.
+     *
+     * @param messages messages
      */
     default void warn(Object... messages) {
         if (getLevel().value() > Level.WARN.value()) {
@@ -87,6 +95,8 @@ public interface FsLogger {
 
     /**
      * Logs message in level of {@link Level#ERROR}.
+     *
+     * @param messages messages
      */
     default void error(Object... messages) {
         if (getLevel().value() > Level.ERROR.value()) {
@@ -114,12 +124,12 @@ public interface FsLogger {
      * Builds log info with given message array and trace offset between the log method and this method.
      * For example, calling chain from the default method {@link #info(Object...)} to this method is:
      * <pre>
-     *     info(Object... messages) -> buildLog(Object[] msg, int stackTraceOffset)
+     *     info(Object... messages) -&gt; buildLog(Object[] msg, int stackTraceOffset)
      * </pre>
      * In this case the {@code stackTraceOffset} is 1. And the default implementation of {@link #info(Object...)} is:
      * <pre>
      *     default void info(Object... messages) {
-     *         if (getLevel().value() > Level.INFO.value()) {
+     *         if (getLevel().value() &gt; Level.INFO.value()) {
      *             return;
      *         }
      *         LogInfo logInfo = buildLog(messages, 1);

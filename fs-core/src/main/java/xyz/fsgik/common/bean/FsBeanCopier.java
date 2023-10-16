@@ -44,6 +44,7 @@ public interface FsBeanCopier {
      *
      * @param source source object
      * @param dest   dest object
+     * @param <T>    type of dest object
      * @return dest object
      */
     default <T> T copyProperties(Object source, T dest) {
@@ -57,6 +58,7 @@ public interface FsBeanCopier {
      * @param sourceType specified type of source object
      * @param dest       dest object
      * @param destType   specified type of dest type
+     * @param <T>        type of dest object
      * @return dest object
      */
     <T> T copyProperties(Object source, Type sourceType, T dest, Type destType);
@@ -109,6 +111,7 @@ public interface FsBeanCopier {
          * Sets bean resolver for copy operation.
          * Default is null, in this case the operation will use {@link FsBeanResolver#defaultResolver()}.
          *
+         * @param beanResolver bean resolver
          * @return this builder
          */
         public Builder beanResolver(FsBeanResolver beanResolver) {
@@ -120,6 +123,7 @@ public interface FsBeanCopier {
          * Sets object converter for copy operation.
          * Default is null, in this case the operation will use {@link FsConverter#defaultConverter()}.
          *
+         * @param converter converter
          * @return this builder
          */
         public Builder converter(FsConverter converter) {
@@ -131,6 +135,7 @@ public interface FsBeanCopier {
          * Sets whether throws {@link FsConvertException} if conversion operation was failed.
          * Default is false, means ignore failed properties.
          *
+         * @param throwIfConvertFailed whether throws {@link FsConvertException} if conversion operation was failed
          * @return this builder
          */
         public Builder throwIfConvertFailed(boolean throwIfConvertFailed) {
@@ -156,6 +161,8 @@ public interface FsBeanCopier {
          *     </li>
          * </ul>
          *
+         * @param propertyNameMapper property name mapper
+         * @param <T>                type of name
          * @return this builder
          */
         public <T> Builder propertyNameMapper(Function<T, T> propertyNameMapper) {
@@ -169,6 +176,7 @@ public interface FsBeanCopier {
          * <p>
          * Only the property that pass through this filter (return true) will be copied from.
          *
+         * @param sourcePropertyFilter source property filter
          * @return this builder
          */
         public Builder sourcePropertyFilter(BiPredicate<Object, @Nullable Object> sourcePropertyFilter) {
@@ -183,6 +191,7 @@ public interface FsBeanCopier {
          * <p>
          * Only the property that pass through this filter (return true) will be copied from.
          *
+         * @param destPropertyFilter dest property filter
          * @return this builder
          */
         public Builder destPropertyFilter(BiPredicate<Object, @Nullable Object> destPropertyFilter) {
@@ -194,6 +203,7 @@ public interface FsBeanCopier {
          * Sets whether put the property into dest map if dest map doesn't contain corresponding property.
          * Default is true.
          *
+         * @param putIfNotContained whether put the property into dest map
          * @return this builder
          */
         public Builder putIfNotContained(boolean putIfNotContained) {

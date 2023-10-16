@@ -20,6 +20,7 @@ public class FsArray {
      * Returns given arguments as an array.
      *
      * @param args given arguments
+     * @param <T>  component type
      * @return given arguments as an array
      */
     @SafeVarargs
@@ -82,11 +83,11 @@ public class FsArray {
      * If the dest array's length equals to source array, the mapped elements will be put into the dest array,
      * else create and put into a new array.
      *
-     * @param <T>    component type of source array
-     * @param <R>    component type of dest array
      * @param source the source array
      * @param dest   the dest array
      * @param mapper given mapper
+     * @param <T>    component type of source array
+     * @param <R>    component type of dest array
      * @return the dest array
      */
     public static <T, R> R[] map(T[] source, R[] dest, Function<T, R> mapper) {
@@ -119,6 +120,7 @@ public class FsArray {
      *
      * @param array given array
      * @param index specified index
+     * @param <T>   component type
      * @return value from given array at specified index, if failed to obtain, return null
      */
     public static <T> T get(@Nullable T[] array, int index) {
@@ -131,6 +133,7 @@ public class FsArray {
      * @param array        given array
      * @param index        specified index
      * @param defaultValue default value
+     * @param <T>          component type
      * @return value from given array at specified index, if the value is null or failed to obtain, return default value
      */
     public static <T> T get(@Nullable T[] array, int index, @Nullable T defaultValue) {
@@ -146,6 +149,7 @@ public class FsArray {
      *
      * @param array   given array
      * @param element given element
+     * @param <T>     component type
      * @return index of given element at given array, or -1 if not found
      */
     public static <T> int indexOf(T[] array, T element) {
@@ -161,6 +165,7 @@ public class FsArray {
      * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
      *
      * @param array given array
+     * @param <T>   component type
      * @return a wrapper list for given array
      */
     public static <T> List<T> asList(T[] array) {

@@ -28,6 +28,8 @@ public interface FsProperty extends FsPropertyBase {
 
     /**
      * Returns owner bean of this property.
+     *
+     * @return owner bean of this property
      */
     FsBean getOwner();
 }

@@ -97,6 +97,8 @@ public interface FsTcpChannel {
     /**
      * Sends data to remote endpoint.
      * The written data may be buffered before the {@link #flush()} is called.
+     *
+     * @param data the data
      */
     void send(FsData data);
 

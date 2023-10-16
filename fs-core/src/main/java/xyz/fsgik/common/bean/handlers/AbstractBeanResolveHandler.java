@@ -105,6 +105,7 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
     /**
      * Builds invoker of given getter/setter.
      *
+     * @param method given getter/setter
      * @return built invoker
      */
     protected FsInvoker buildMethodInvoker(Method method) {

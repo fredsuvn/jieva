@@ -34,7 +34,7 @@ import java.util.*;
 public interface FsBeanResolver {
 
     /**
-     * Default map type for wrapping bean: Map&lt;String, Object>.
+     * Default map type for wrapping bean: Map&lt;String, Object&gt;.
      */
     Type DEFAULT_MAP_BEAN_TYPE = new TypeRef<Map<String, Object>>() {
     }.getType();
@@ -97,7 +97,7 @@ public interface FsBeanResolver {
     FsBean resolve(Type type);
 
     /**
-     * Wraps given map as a {@link FsBean}, of which type will be seen as Map&lt;String, Object>.
+     * Wraps given map as a {@link FsBean}, of which type will be seen as Map&lt;String, Object&gt;.
      * This method is same with:
      * <pre>
      *     wrapMap(map, null);
@@ -400,8 +400,6 @@ public interface FsBeanResolver {
 
     /**
      * Context of bean resolving.
-     *
-     * @see Handler#resolve(ResolveContext)
      */
     interface ResolveContext {
 

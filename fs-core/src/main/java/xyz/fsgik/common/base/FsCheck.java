@@ -235,7 +235,7 @@ public class FsCheck {
     /**
      * Returns whether given index is in bounds from start index (inclusive) to end index (exclusive).
      * <p>
-     * Note all indexed must >= 0;
+     * Note all indexed must &gt;= 0;
      *
      * @param index      given index
      * @param startIndex start index (inclusive)
@@ -249,7 +249,7 @@ public class FsCheck {
     /**
      * Returns whether given index is in bounds from start index (inclusive) to end index (exclusive).
      * <p>
-     * Note all indexed must >= 0;
+     * Note all indexed must &gt;= 0;
      *
      * @param index      given index
      * @param startIndex start index (inclusive)
@@ -264,7 +264,7 @@ public class FsCheck {
      * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
      * if it is not, throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): index.
      * <p>
-     * Note all indexed must >= 0;
+     * Note all indexed must &gt;= 0;
      *
      * @param index      given index
      * @param startIndex start index (inclusive)
@@ -280,7 +280,7 @@ public class FsCheck {
      * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
      * if it is not, throw an {@link IndexOutOfBoundsException} with given message.
      * <p>
-     * Note all indexed must >= 0;
+     * Note all indexed must &gt;= 0;
      *
      * @param index      given index
      * @param startIndex start index (inclusive)
@@ -298,7 +298,7 @@ public class FsCheck {
      * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
      * if it is not, throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): index.
      * <p>
-     * Note all indexed must >= 0;
+     * Note all indexed must &gt;= 0;
      *
      * @param index      given index
      * @param startIndex start index (inclusive)
@@ -314,7 +314,7 @@ public class FsCheck {
      * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
      * if it is not, throw an {@link IndexOutOfBoundsException} with given message.
      * <p>
-     * Note all indexed must >= 0;
+     * Note all indexed must &gt;= 0;
      *
      * @param index      given index
      * @param startIndex start index (inclusive)
@@ -332,7 +332,7 @@ public class FsCheck {
      * Returns whether given range (from start range index inclusive to end range index exclusive) is in bounds from
      * start index (inclusive) to end index (exclusive).
      * <p>
-     * Note all ranges and indexed must >= 0;
+     * Note all ranges and indexed must &gt;= 0;
      *
      * @param startRange start range index inclusive
      * @param endRange   end range index exclusive
@@ -349,7 +349,7 @@ public class FsCheck {
      * Returns whether given range (from start range index inclusive to end range index exclusive) is in bounds from
      * start index (inclusive) to end index (exclusive).
      * <p>
-     * Note all ranges and indexed must >= 0;
+     * Note all ranges and indexed must &gt;= 0;
      *
      * @param startRange start range index inclusive
      * @param endRange   end range index exclusive
@@ -367,7 +367,7 @@ public class FsCheck {
      * start index (inclusive) to end index (exclusive), if it is not,
      * throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): [startRange, endRange).
      * <p>
-     * Note all ranges and indexed must >= 0;
+     * Note all ranges and indexed must &gt;= 0;
      *
      * @param startRange start range index inclusive
      * @param endRange   end range index exclusive
@@ -386,7 +386,7 @@ public class FsCheck {
      * start index (inclusive) to end index (exclusive), if it is not,
      * throw an {@link IndexOutOfBoundsException} with given message.
      * <p>
-     * Note all ranges and indexed must >= 0;
+     * Note all ranges and indexed must &gt;= 0;
      *
      * @param startRange start range index inclusive
      * @param endRange   end range index exclusive
@@ -406,7 +406,7 @@ public class FsCheck {
      * start index (inclusive) to end index (exclusive), if it is not,
      * throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): [startRange, endRange).
      * <p>
-     * Note all ranges and indexed must >= 0;
+     * Note all ranges and indexed must &gt;= 0;
      *
      * @param startRange start range index inclusive
      * @param endRange   end range index exclusive
@@ -425,7 +425,7 @@ public class FsCheck {
      * start index (inclusive) to end index (exclusive), if it is not,
      * throw an {@link IndexOutOfBoundsException} with given message.
      * <p>
-     * Note all ranges and indexed must >= 0;
+     * Note all ranges and indexed must &gt;= 0;
      *
      * @param startRange start range index inclusive
      * @param endRange   end range index exclusive

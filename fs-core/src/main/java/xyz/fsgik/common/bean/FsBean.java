@@ -31,7 +31,7 @@ public interface FsBean {
 
     /**
      * Wraps given map as a {@link FsBean} by {@link FsBeanResolver#defaultResolver()},
-     * of which type will be seen as Map&lt;String, Object>.
+     * of which type will be seen as Map&lt;String, Object&gt;.
      * This method is equivalent to:
      * <pre>
      *     wrap(map, null);
@@ -48,7 +48,7 @@ public interface FsBean {
     /**
      * Wraps given map as a {@link FsBean} by {@link FsBeanResolver#defaultResolver()},
      * the key type of map type must be {@link String}.
-     * If the given map type is null, the map type will be seen as Map&lt;String, Object>.
+     * If the given map type is null, the map type will be seen as Map&lt;String, Object&gt;.
      * <p>
      * Result of {@link FsBean#getProperties()} is immutable, but content may be different for each time calling.
      * Because of the changes in given map, contents of return property map are also changed accordingly.

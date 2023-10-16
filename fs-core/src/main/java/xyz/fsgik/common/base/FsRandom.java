@@ -18,6 +18,7 @@ public interface FsRandom<T> {
     /**
      * Returns a new builder to build {@link FsRandom}.
      *
+     * @param <T> type of random
      * @return new builder
      */
     static <T> Builder<T> newBuilder() {
@@ -68,6 +69,7 @@ public interface FsRandom<T> {
          *
          * @param score the score
          * @param value specified value
+         * @param <R>   type of random
          * @return this builder
          */
         public <R extends T> Builder<R> score(int score, T value) {
@@ -85,6 +87,7 @@ public interface FsRandom<T> {
          *
          * @param score    the score
          * @param supplier specified supplier
+         * @param <R>      type of random
          * @return this builder
          */
         public <R extends T> Builder<R> score(int score, Supplier<T> supplier) {
@@ -97,6 +100,7 @@ public interface FsRandom<T> {
          * Specifies the underlying random.
          *
          * @param random underlying random
+         * @param <R>    type of random
          * @return this builder
          */
         public <R extends T> Builder<R> random(Random random) {
@@ -107,6 +111,7 @@ public interface FsRandom<T> {
         /**
          * Builds the {@link FsRandom}.
          *
+         * @param <R> type of random
          * @return built instance of {@link FsRandom}
          */
         public <R extends T> FsRandom<R> build() {

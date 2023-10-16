@@ -29,6 +29,7 @@ public interface FsObj<T> {
      *
      * @param object given object
      * @param type   type of given object
+     * @param <T>    type of object
      * @return wrapped {@link FsObj} or its subtypes
      */
     static <T> FsObj<T> wrap(T object, Type type) {
@@ -56,6 +57,7 @@ public interface FsObj<T> {
      *
      * @param object  given object
      * @param typeRef type ref of given object
+     * @param <T>     type of object
      * @return wrapped {@link FsObj} or its subtypes
      */
     static <T> FsObj<T> wrap(T object, TypeRef<T> typeRef) {

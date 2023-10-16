@@ -85,6 +85,7 @@ public class FsCrypto {
      * Initializes given {@link Signature}.
      *
      * @param signature given signature
+     * @param forSign   whether for sign
      * @param key       key for generating MAC
      * @param params    algorithm parameters
      */
@@ -130,7 +131,7 @@ public class FsCrypto {
     /**
      * Encrypts data from given input stream into given output stream with specified cipher,
      * returns the written bytes count.
-     * If {@code blockSize} > 0, this method will submit the data in blocks of the specified size to the cipher for
+     * If {@code blockSize} &gt; 0, this method will submit the data in blocks of the specified size to the cipher for
      * encryption, otherwise, it will submit all the data to the cipher at once.
      *
      * @param cipher    specified cipher
@@ -149,7 +150,7 @@ public class FsCrypto {
     /**
      * Decrypts data from given input stream into given output stream with specified cipher,
      * returns the written bytes count.
-     * If {@code blockSize} > 0, this method will submit the data in blocks of the specified size to the cipher for
+     * If {@code blockSize} &gt; 0, this method will submit the data in blocks of the specified size to the cipher for
      * encryption, otherwise, it will submit all the data to the cipher at once.
      *
      * @param cipher    specified cipher
@@ -168,7 +169,7 @@ public class FsCrypto {
     /**
      * Encrypts/Decrypts data from given input stream into given output stream with specified cipher,
      * returns the written bytes count.
-     * If {@code blockSize} > 0, this method will submit the data in blocks of the specified size to the cipher for
+     * If {@code blockSize} &gt; 0, this method will submit the data in blocks of the specified size to the cipher for
      * encryption, otherwise, it will submit all the data to the cipher at once.
      *
      * @param cipher    specified cipher
@@ -214,7 +215,7 @@ public class FsCrypto {
     /**
      * Encrypts data from given input buffer into given output buffer with specified cipher,
      * returns the written bytes count.
-     * If {@code blockSize} > 0, this method will submit the data in blocks of the specified size to the cipher for
+     * If {@code blockSize} &gt; 0, this method will submit the data in blocks of the specified size to the cipher for
      * encryption, otherwise, it will submit all the data to the cipher at once.
      *
      * @param cipher    specified cipher
@@ -233,7 +234,7 @@ public class FsCrypto {
     /**
      * Decrypts data from given input buffer into given output buffer with specified cipher,
      * returns the written bytes count.
-     * If {@code blockSize} > 0, this method will submit the data in blocks of the specified size to the cipher for
+     * If {@code blockSize} &gt; 0, this method will submit the data in blocks of the specified size to the cipher for
      * encryption, otherwise, it will submit all the data to the cipher at once.
      *
      * @param cipher    specified cipher
@@ -252,7 +253,7 @@ public class FsCrypto {
     /**
      * Encrypts/Decrypts data from given input buffer into given output buffer with specified cipher,
      * returns the written bytes count.
-     * If {@code blockSize} > 0, this method will submit the data in blocks of the specified size to the cipher for
+     * If {@code blockSize} &gt; 0, this method will submit the data in blocks of the specified size to the cipher for
      * encryption, otherwise, it will submit all the data to the cipher at once.
      *
      * @param cipher    specified cipher

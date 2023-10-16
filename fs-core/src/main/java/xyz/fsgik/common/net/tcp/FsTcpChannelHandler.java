@@ -44,7 +44,7 @@ public interface FsTcpChannelHandler<M> {
      * and the calling chain will also be broken. The process like:
      * <pre>
      *     Object message = ByteBuffer.wrap(...);
-     *     for (FsNetChannelHandler<...> channelHandler : channelHandlers) {
+     *     for (FsNetChannelHandler&lt;...&gt; channelHandler : channelHandlers) {
      *         try {
      *             Object result = channelHandler.onMessage(channel, message);
      *             if (result == null) {
@@ -58,7 +58,7 @@ public interface FsTcpChannelHandler<M> {
      *     }
      * </pre>
      * If buffer of the channel is full, it will not read and put again.
-     * If the buffer on this callback is not fully consumed (remaining() > 0), the remaining data will be
+     * If the buffer on this callback is not fully consumed (remaining() &gt; 0), the remaining data will be
      * reserved to next calling. However, the handler chain will be called if and only if there has new data read from
      * the remote endpoint. It's best to try to consume as much as possible for each time,
      * or using {@link FsTcpServerHandler#onLoop(FsTcpChannel, boolean, ByteBuffer)} to deal with un-consumed data.

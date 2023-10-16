@@ -13,9 +13,9 @@ import java.util.function.IntFunction;
 /**
  * Length based handler implementation, to split passed byte buffer in length:
  * <pre>
- *     buffer -> data1data2data3..
+ *     buffer -&gt; data1data2data3..
  * </pre>
- * The returned object of {@link #onMessage(FsTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}>,
+ * The returned object of {@link #onMessage(FsTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;,
  * each byte buffer is split in:
  * <ul>
  *     <li>

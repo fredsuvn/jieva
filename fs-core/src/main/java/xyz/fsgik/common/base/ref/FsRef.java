@@ -8,14 +8,15 @@ import xyz.fsgik.annotations.Nullable;
  *
  * <pre>
  *     String str = "a";
- *     FsRef&lt;String> ref = FsRef.of("a");
- *     map.computeIfAbsent(key, it -> {
+ *     FsRef&lt;String&gt; ref = FsRef.of("a");
+ *     map.computeIfAbsent(key, it -&gt; {
  *         str = "other"; //error: cannot re-assigned variable str!
  *         ref.set("other");
  *         //...
  *     });
  * </pre>
  *
+ * @param <T> type of referenced instance
  * @author fredsuvn
  */
 public class FsRef<T> {
@@ -29,6 +30,7 @@ public class FsRef<T> {
     /**
      * Return a reference instance with null value.
      *
+     * @param <T> type of instance
      * @return a reference instance with null value
      */
     public static <T> FsRef<T> ofNull() {
@@ -39,6 +41,7 @@ public class FsRef<T> {
      * Return a reference instance with given value.
      *
      * @param value given value
+     * @param <T>   type of instance
      * @return a reference instance with given value
      */
     public static <T> FsRef<T> of(@Nullable T value) {

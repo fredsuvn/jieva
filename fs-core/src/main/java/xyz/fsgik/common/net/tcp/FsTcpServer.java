@@ -103,6 +103,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets server port, maybe 0 to get an available one from system.
          *
+         * @param port server port
          * @return this builder
          */
         public Builder port(int port) {
@@ -113,6 +114,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets max connection number.
          *
+         * @param maxConnection max connection number
          * @return this builder
          */
         public Builder maxConnection(int maxConnection) {
@@ -123,6 +125,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets server address.
          *
+         * @param address server address
          * @return this builder
          */
         public Builder address(InetAddress address) {
@@ -133,6 +136,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets server host name.
          *
+         * @param hostName server host name
          * @return this builder
          */
         public Builder hostName(String hostName) {
@@ -147,6 +151,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets server handler.
          *
+         * @param serverHandler server handler
          * @return this builder
          */
         public Builder serverHandler(FsTcpServerHandler serverHandler) {
@@ -157,6 +162,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Adds channel handler.
          *
+         * @param channelHandler channel handler
          * @return this builder
          */
         public Builder addChannelHandler(FsTcpChannelHandler<?> channelHandler) {
@@ -167,6 +173,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Adds channel handlers.
          *
+         * @param channelHandlers channel handlers
          * @return this builder
          */
         public Builder addChannelHandlers(Iterable<FsTcpChannelHandler<?>> channelHandlers) {
@@ -178,6 +185,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
          * Sets byte buffer generator: given an int returns a byte buffer with the int length.
          * The generated buffer's position must be 0, and limit must be capacity.
          *
+         * @param bufferGenerator byte buffer generator
          * @return this builder
          */
         public Builder bufferGenerator(IntFunction<ByteBuffer> bufferGenerator) {
@@ -188,6 +196,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets executor service, must be of multi-threads.
          *
+         * @param executor executor service
          * @return this builder
          */
         public Builder executor(ExecutorService executor) {
@@ -198,6 +207,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets buffer size of the channel.
          *
+         * @param channelBufferSize buffer size of the channel
          * @return this builder
          */
         public Builder channelBufferSize(int channelBufferSize) {
@@ -208,6 +218,7 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets other socket config.
          *
+         * @param socketConfig other socket config
          * @return this builder
          */
         public Builder socketConfig(Consumer<ServerSocket> socketConfig) {

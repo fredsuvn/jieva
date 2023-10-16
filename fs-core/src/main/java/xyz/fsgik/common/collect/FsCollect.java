@@ -22,6 +22,8 @@ public class FsCollect {
      *
      * @param dest     dest collection
      * @param elements given elements
+     * @param <T>      type of element
+     * @param <C>      type of dest collection
      * @return the dest collection
      */
     @SafeVarargs
@@ -38,6 +40,8 @@ public class FsCollect {
      *
      * @param dest     dest collection
      * @param elements given elements
+     * @param <T>      type of element
+     * @param <C>      type of dest collection
      * @return the dest collection
      */
     public static <T, C extends Collection<? super T>> C toCollection(C dest, Iterable<T> elements) {
@@ -56,6 +60,7 @@ public class FsCollect {
      * list and returns.
      *
      * @param elements given elements
+     * @param <T>      type of element
      * @return the list
      */
     public static <T> List<T> asOrToList(Iterable<T> elements) {
@@ -73,6 +78,7 @@ public class FsCollect {
      * set and returns.
      *
      * @param elements given elements
+     * @param <T>      type of element
      * @return the set
      */
     public static <T> Set<T> asOrToSet(Iterable<T> elements) {
@@ -90,6 +96,7 @@ public class FsCollect {
      * collection and returns.
      *
      * @param elements given elements
+     * @param <T>      type of element
      * @return the collection
      */
     public static <T> Collection<T> asOrToCollection(Iterable<T> elements) {
@@ -103,6 +110,7 @@ public class FsCollect {
      * Returns immutable list of which elements were put from given iterable.
      *
      * @param iterable given iterable
+     * @param <T>      type of element
      * @return immutable list
      */
     public static <T> @Immutable List<T> immutableList(@Nullable Iterable<? extends T> iterable) {
@@ -122,6 +130,7 @@ public class FsCollect {
      * Returns immutable list of which elements were put from given array.
      *
      * @param array given array
+     * @param <T>   type of element
      * @return immutable list
      */
     public static <T> @Immutable List<T> immutableList(@Nullable T[] array) {
@@ -136,6 +145,7 @@ public class FsCollect {
      * Returns immutable set of which elements were put from given iterable.
      *
      * @param iterable given iterable
+     * @param <T>      type of element
      * @return immutable set
      */
     public static <T> @Immutable Set<T> immutableSet(@Nullable Iterable<? extends T> iterable) {
@@ -155,6 +165,7 @@ public class FsCollect {
      * Returns immutable set of which elements were put from given array.
      *
      * @param array given array
+     * @param <T>   type of element
      * @return immutable set
      */
     public static <T> @Immutable Set<T> immutableSet(@Nullable T[] array) {
@@ -169,6 +180,8 @@ public class FsCollect {
      * Returns immutable map of which elements were put from given map.
      *
      * @param map given map
+     * @param <K> key type
+     * @param <V> value type
      * @return immutable map
      */
     public static <K, V> @Immutable Map<K, V> immutableMap(@Nullable Map<? extends K, ? extends V> map) {
@@ -187,6 +200,10 @@ public class FsCollect {
      *
      * @param dest      dest collection
      * @param keyValues given key-values
+     * @param <K>       key type
+     * @param <V>       value type
+     * @param <M>       type of dest map
+     * @param <T>       type of element
      * @return dest map
      */
     @SafeVarargs
@@ -214,6 +231,7 @@ public class FsCollect {
      *
      * @param iterable given iterable
      * @param type     array's component type
+     * @param <T>      type of element
      * @return an array contains all elements from given iterable in its order
      */
     public static <T> T[] toArray(Iterable<? extends T> iterable, Class<T> type) {
@@ -230,6 +248,7 @@ public class FsCollect {
      * Creates an {@link ArrayList} and put all given elements into it.
      *
      * @param elements given elements
+     * @param <T>      type of element
      * @return an {@link ArrayList} and put all given elements into it
      */
     @SafeVarargs
@@ -241,6 +260,7 @@ public class FsCollect {
      * Creates an {@link LinkedList} and put all given elements into it.
      *
      * @param elements given elements
+     * @param <T>      type of element
      * @return an {@link LinkedList} and put all given elements into it
      */
     @SafeVarargs
@@ -256,6 +276,9 @@ public class FsCollect {
      * If the array miss the last value, the last value will be considered as null.
      *
      * @param keyValues given key-values
+     * @param <K>       key type
+     * @param <V>       value type
+     * @param <T>       type of element
      * @return an {@link HashMap} and put all given key-values into it
      */
     @SafeVarargs
@@ -271,6 +294,9 @@ public class FsCollect {
      * If the array miss the last value, the last value will be considered as null.
      *
      * @param keyValues given key-values
+     * @param <K>       key type
+     * @param <V>       value type
+     * @param <T>       type of element
      * @return an {@link LinkedHashMap} and put all given key-values into it
      */
     @SafeVarargs
@@ -286,6 +312,9 @@ public class FsCollect {
      * If the array miss the last value, the last value will be considered as null.
      *
      * @param keyValues given key-values
+     * @param <K>       key type
+     * @param <V>       value type
+     * @param <T>       type of element
      * @return an {@link ConcurrentHashMap} and put all given key-values into it
      */
     @SafeVarargs
@@ -347,6 +376,7 @@ public class FsCollect {
      *
      * @param iterable given iterable
      * @param index    specified index
+     * @param <T>      type of element
      * @return value from given iterable at specified index
      */
     public static <T> T get(@Nullable Iterable<T> iterable, int index) {
@@ -360,6 +390,7 @@ public class FsCollect {
      * @param iterable     given iterable
      * @param index        specified index
      * @param defaultValue default value
+     * @param <T>          type of element
      * @return value from given iterable at specified index
      */
     public static <T> T get(@Nullable Iterable<T> iterable, int index, @Nullable T defaultValue) {
@@ -394,6 +425,8 @@ public class FsCollect {
      *
      * @param map given map
      * @param key specified key
+     * @param <K> key type
+     * @param <V> value type
      * @return value from given map at specified key
      */
     public static <K, V> V get(@Nullable Map<K, V> map, K key) {
@@ -406,6 +439,8 @@ public class FsCollect {
      * @param map          given map
      * @param key          specified key
      * @param defaultValue default value
+     * @param <K>          key type
+     * @param <V>          value type
      * @return value from given map at specified key
      */
     public static <K, V> V get(@Nullable Map<K, V> map, K key, @Nullable V defaultValue) {
@@ -420,6 +455,7 @@ public class FsCollect {
      * Converts given enumeration to iterable.
      *
      * @param enumeration given enumeration
+     * @param <T>         type of element
      * @return converted iterable
      */
     public static <T> Iterable<T> toIterable(Enumeration<T> enumeration) {
@@ -452,6 +488,8 @@ public class FsCollect {
      *
      * @param iterable given iterable of type {@link T}
      * @param function given conversion function
+     * @param <T>      type of source element
+     * @param <R>      type of target element
      * @return converted list
      */
     public static <T, R> List<R> mapList(Iterable<T> iterable, Function<? super T, ? extends R> function) {
@@ -471,6 +509,8 @@ public class FsCollect {
      *
      * @param iterable given iterable of type {@link T}
      * @param function given conversion function
+     * @param <T>      type of source element
+     * @param <R>      type of target element
      * @return converted set
      */
     public static <T, R> Set<R> mapSet(Iterable<T> iterable, Function<? super T, ? extends R> function) {
@@ -491,6 +531,9 @@ public class FsCollect {
      * @param source        source iterable
      * @param keyFunction   key conversion function
      * @param valueFunction value conversion function
+     * @param <T>           type of source element
+     * @param <K>           key type of target map
+     * @param <V>           value type of target map
      * @return converted map
      */
     public static <T, K, V> Map<K, V> mapMap(
@@ -520,6 +563,10 @@ public class FsCollect {
      * @param dest          dest map
      * @param keyFunction   key conversion function
      * @param valueFunction value conversion function
+     * @param <KS>          key type of source map
+     * @param <VS>          value type of source map
+     * @param <KR>          key type of target map
+     * @param <VR>          value type of target map
      * @return converted map
      */
     public static <KS, VS, KR, VR> Map<KR, VR> mapMap(
@@ -558,6 +605,7 @@ public class FsCollect {
      * @param map   given map
      * @param key   given key
      * @param stack stack to store the historical values
+     * @param <T>   type of element
      * @return nested value from given map with given key
      */
     @Nullable

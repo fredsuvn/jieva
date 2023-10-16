@@ -15,6 +15,7 @@ public interface FsProxyMethod {
      * @param args             invocation arguments
      * @param sourceMethod     source method
      * @param sourceInvocation source method invocation
+     * @return result of invoking
      */
     Object invokeProxy(Object[] args, Method sourceMethod, Invoke sourceInvocation);
 
@@ -27,6 +28,8 @@ public interface FsProxyMethod {
          * Invocation body.
          *
          * @param args arguments
+         * @return result of invoking
+         * @throws Throwable error during invoking
          */
         Object invoke(Object[] args) throws Throwable;
     }

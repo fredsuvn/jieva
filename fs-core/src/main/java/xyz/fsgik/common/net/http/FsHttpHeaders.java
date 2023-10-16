@@ -20,7 +20,7 @@ public class FsHttpHeaders {
      * Returns headers of which content from given map.
      * <p>
      * If a value is instance of {@link Collection}, it will be considered as repeated header and converts to
-     * {@link List}&lt;{@link String}> by {@link String#valueOf(Object)} for each element,
+     * {@link List}&lt;{@link String}&gt; by {@link String#valueOf(Object)} for each element,
      * then add into the associated key. This method is equivalent to:
      * <pre>
      *     FsHttpHeaders headers = new FsHttpHeaders();
@@ -117,7 +117,7 @@ public class FsHttpHeaders {
      * Adds header.
      * <p>
      * If the value is instance of {@link Collection}, it will be considered as repeated header and converts to
-     * {@link List}&lt;{@link String}> by {@link String#valueOf(Object)} for each element,
+     * {@link List}&lt;{@link String}&gt; by {@link String#valueOf(Object)} for each element,
      * then add into the associated key.
      *
      * @param key   header key
@@ -139,7 +139,7 @@ public class FsHttpHeaders {
      * Adds headers.
      * <p>
      * If a value is instance of {@link Collection}, it will be considered as repeated header and converts to
-     * {@link List}&lt;{@link String}> by {@link String#valueOf(Object)} for each element,
+     * {@link List}&lt;{@link String}&gt; by {@link String#valueOf(Object)} for each element,
      * then add into the associated key. This method is equivalent to:
      * <pre>
      *     headers.forEach(this::addHeader);

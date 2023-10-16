@@ -26,7 +26,7 @@ import java.util.Objects;
  * <p>
  * The conversion is performed in the order of
  * <pre>
- *     prefix handler (if not null) -> middle handlers -> suffix converter (if not null)
+ *     prefix handler (if not null) -&gt; middle handlers -&gt; suffix converter (if not null)
  * </pre>
  * More detail of conversion process, see {@link Handler#convert(Object, Type, Type, FsConverter)}.
  *
@@ -144,7 +144,7 @@ public interface FsConverter {
     List<Handler> getMiddleHandlers();
 
     /**
-     * Returns all handlers in order by: prefix handler -> middle handlers -> suffix handler.
+     * Returns all handlers in order by: prefix handler -&gt; middle handlers -&gt; suffix handler.
      *
      * @return all handlers
      */
@@ -164,6 +164,7 @@ public interface FsConverter {
      *
      * @param source     source object
      * @param targetType target type
+     * @param <T>        target type
      * @return converted object or null
      */
     @Nullable
@@ -178,6 +179,7 @@ public interface FsConverter {
      *
      * @param source        source object
      * @param targetTypeRef type reference target type
+     * @param <T>           target type
      * @return converted object or null
      */
     @Nullable
@@ -192,6 +194,7 @@ public interface FsConverter {
      *
      * @param source     source object
      * @param targetType target type
+     * @param <T>        target type
      * @return converted object or null
      */
     @Nullable
@@ -372,24 +375,30 @@ public interface FsConverter {
 
         /**
          * Policy value for object reuse:
-         * <li>
-         * If and only if target type is assignable from source type, return the source object.
-         * </li>
+         * <ul>
+         *     <li>
+         *         If and only if target type is assignable from source type, return the source object.
+         *     </li>
+         * </ul>
          */
         int REUSE_ASSIGNABLE = 1;
         /**
          * Policy value for object reuse:
-         * <li>
-         * If and only if target type is equal to source type, return the source object.
-         * </li>
+         * <ul>
+         *     <li>
+         *         If and only if target type is equal to source type, return the source object.
+         *     </li>
+         * </ul>
          */
         int REUSE_EQUAL = 2;
         /**
          * Policy value for object reuse:
-         * <li>
-         * Never return the source object if the source object is not immutable.
-         * If the source object is immutable, it may still be returned.
-         * </li>
+         * <ul>
+         *     <li>
+         *         Never return the source object if the source object is not immutable.
+         *         If the source object is immutable, it may still be returned.
+         *     </li>
+         * </ul>
          */
         int NO_REUSE = 3;
 
@@ -450,6 +459,7 @@ public interface FsConverter {
              *     <li>{@link #NO_REUSE};</li>
              * </ul>
              *
+             * @param reusePolicy reuse policy
              * @return this builder
              */
             public Builder reusePolicy(int reusePolicy) {
