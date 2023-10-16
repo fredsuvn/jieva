@@ -521,11 +521,11 @@ public interface FsTcpServer extends FsTcpEndpoint {
             }
 
             private void compactBuffer(ChannelImpl channel) {
-                channel.buffer = TcpUtil.compact(channel.buffer, bufferGenerator);
+                channel.buffer = TcpUtils.compact(channel.buffer, bufferGenerator);
             }
 
             private void compactBuffer(ChannelImpl channel, byte[] newBytes) {
-                channel.buffer = TcpUtil.compact(channel.buffer, newBytes, bufferGenerator);
+                channel.buffer = TcpUtils.compact(channel.buffer, newBytes, bufferGenerator);
             }
 
             private final class ChannelImpl implements FsTcpChannel {

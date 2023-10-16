@@ -1,39 +1,21 @@
-package benchmark;
+package jmh.tests;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.fsgik.common.cache.FsCache;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author fredsuvn
- */
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 5)
-@Measurement(iterations = 3, time = 5)
-//@Threads(7)
+@Warmup(iterations = 1, time = 1)
+@Measurement(iterations = 1, time = 1)
 @Fork(1)
 @State(value = Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-public class CacheBenchmark {
-
-    /*
-     * Benchmark                     Mode  Cnt   Score    Error   Units
-     * CacheBenchmark.caffeine      thrpt    3   7.018 ± 15.397  ops/ms
-     * CacheBenchmark.caffeineBig   thrpt    3   6.350 ± 22.030  ops/ms
-     * CacheBenchmark.caffeineSoft  thrpt    3  14.697 ± 11.022  ops/ms
-     * CacheBenchmark.fsCache       thrpt    3  26.141 ± 12.452  ops/ms
-     * CacheBenchmark.guava         thrpt    3   3.809 ±  0.611  ops/ms
-     * CacheBenchmark.guavaBig      thrpt    3   3.241 ±  1.383  ops/ms
-     * CacheBenchmark.guavaSoft     thrpt    3  13.587 ± 29.465  ops/ms
-     */
+public class CacheJmh {
 
     private static final Integer[] keys;
     private static final Integer[] keys2;
@@ -54,11 +36,6 @@ public class CacheBenchmark {
     private com.github.benmanes.caffeine.cache.Cache<Integer, String> caffeine;
     private com.github.benmanes.caffeine.cache.Cache<Integer, String> caffeineSoft;
     private com.github.benmanes.caffeine.cache.Cache<Integer, String> caffeineBig;
-
-    public static void main(String[] args) throws Exception {
-        Options options = new OptionsBuilder().include(CacheBenchmark.class.getSimpleName()).build();
-        new Runner(options).run();
-    }
 
     @Setup(Level.Iteration)
     public void init() {

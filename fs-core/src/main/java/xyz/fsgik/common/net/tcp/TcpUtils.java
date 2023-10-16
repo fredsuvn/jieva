@@ -6,7 +6,7 @@ import xyz.fsgik.common.io.FsBuffer;
 import java.nio.ByteBuffer;
 import java.util.function.IntFunction;
 
-final class TcpUtil {
+final class TcpUtils {
 
     static ByteBuffer compact(ByteBuffer buffer, IntFunction<ByteBuffer> generator) {
         if (buffer.position() == 0) {

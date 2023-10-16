@@ -1,12 +1,9 @@
-package benchmark;
+package jmh.tests;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
 import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.fsgik.common.base.Fs;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,9 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author fredsuvn
- */
 @BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 1, time = 1)
 @Measurement(iterations = 1, time = 1)
@@ -24,24 +18,9 @@ import java.util.concurrent.TimeUnit;
 @Fork(1)
 @State(value = Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-public class CopyPropertiesBenchmark {
+public class CopyPropertiesJmh {
 
     private static final Bean bean = new Bean();
-
-    /*
-     * Benchmark                            Mode  Cnt     Score    Error   Units
-     * CopyPropertiesBenchmark.apacheCopy  thrpt    3   600.970 ± 20.965  ops/ms
-     * CopyPropertiesBenchmark.fsCopy      thrpt    3  3205.447 ± 88.343  ops/ms
-     * CopyPropertiesBenchmark.hutoolCopy  thrpt    3   563.066 ± 22.820  ops/ms
-     * CopyPropertiesBenchmark.springCopy  thrpt    3   276.925 ±  2.676  ops/ms
-     */
-    public static void main(String[] args) throws Exception {
-        Options options = new OptionsBuilder()
-            .include(CopyPropertiesBenchmark.class.getSimpleName())
-            .output(BenchmarkUtils.OUTPUT_DIR + "CopyProperties.txt")
-            .build();
-        new Runner(options).run();
-    }
 
     @Setup
     public void init() {
