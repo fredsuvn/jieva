@@ -26,6 +26,7 @@ public interface FsCipher extends Prepareable {
      * which supplied with {@link Cipher#getInstance(String)}.
      *
      * @param algorithm specified algorithm
+     * @return new instance of specified algorithm
      */
     static FsCipher getInstance(String algorithm) {
         return new CipherImpl(algorithm, () -> {
@@ -44,6 +45,7 @@ public interface FsCipher extends Prepareable {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsCipher getInstance(String algorithm, String provider) {
         return new CipherImpl(algorithm, () -> {
@@ -62,6 +64,7 @@ public interface FsCipher extends Prepareable {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsCipher getInstance(String algorithm, Provider provider) {
         return new CipherImpl(algorithm, () -> {
@@ -76,6 +79,8 @@ public interface FsCipher extends Prepareable {
     /**
      * Returns back {@link Cipher} if it has, or null if it doesn't have one.
      * The back {@link Cipher} maybe thread-local, that is, returned value may be not only one instance.
+     *
+     * @return back {@link Cipher} if it has, or null if it doesn't have one
      */
     @Nullable
     Cipher getCipher();

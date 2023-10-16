@@ -44,8 +44,10 @@ import java.util.function.Consumer;
 public interface FsUdpServer extends FsUdpClient {
 
     /**
-     * Returns new builder for this interface.
+     * Returns new builder of {@link FsUdpServer}.
      * The returned builder is based on {@link DatagramSocket}.
+     *
+     * @return new builder
      */
     static Builder newBuilder() {
         return new Builder();
@@ -73,31 +75,43 @@ public interface FsUdpServer extends FsUdpClient {
 
     /**
      * Returns bound address of this server.
+     *
+     * @return bound address of this server
      */
     InetAddress getAddress();
 
     /**
      * Returns bound port of this server.
+     *
+     * @return bound port of this server
      */
     int getPort();
 
     /**
      * Returns bound socket address of this server.
+     *
+     * @return bound socket address of this server
      */
     SocketAddress getSocketAddress();
 
     /**
      * Returns underlying object which implements this interface, such as {@link DatagramSocket}.
+     *
+     * @return underlying object
      */
     Object getSource();
 
     /**
      * Returns whether this server is opened.
+     *
+     * @return whether this server is opened
      */
     boolean isOpened();
 
     /**
      * Returns whether this server is closed.
+     *
+     * @return whether this server is closed
      */
     boolean isClosed();
 
@@ -122,6 +136,8 @@ public interface FsUdpServer extends FsUdpClient {
 
     /**
      * Returns a new builder configured with this server.
+     *
+     * @return a new builder
      */
     Builder toBuilder();
 
@@ -141,6 +157,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Sets local port, maybe 0 to get an available one from system.
+         *
+         * @return this builder
          */
         @Override
         public Builder port(int port) {
@@ -150,6 +168,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Sets local address.
+         *
+         * @return this builder
          */
         @Override
         public Builder address(InetAddress address) {
@@ -159,6 +179,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Sets local host name.
+         *
+         * @return this builder
          */
         @Override
         public Builder hostName(String hostName) {
@@ -168,6 +190,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Sets other socket config.
+         *
+         * @return this builder
          */
         @Override
         public Builder socketConfig(Consumer<DatagramSocket> socketConfig) {
@@ -177,6 +201,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Sets server handler.
+         *
+         * @return this builder
          */
         public Builder serverHandler(FsUdpServerHandler serverHandler) {
             this.serverHandler = serverHandler;
@@ -185,6 +211,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Adds packet handler.
+         *
+         * @return this builder
          */
         public Builder addPacketHandler(FsUdpPacketHandler<?> packetHandler) {
             this.packetHandlers.add(packetHandler);
@@ -193,6 +221,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Adds packet handlers.
+         *
+         * @return this builder
          */
         public Builder addPacketHandlers(Iterable<FsUdpPacketHandler<?>> packetHandlers) {
             FsCollect.toCollection(this.packetHandlers, packetHandlers);
@@ -201,6 +231,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Sets executor, must be of multi-threads.
+         *
+         * @return this builder
          */
         public Builder executor(ExecutorService executor) {
             this.executor = executor;
@@ -209,6 +241,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Sets buffer size of the packet.
+         *
+         * @return this builder
          */
         public Builder packetBufferSize(int packetBufferSize) {
             this.packetBufferSize = packetBufferSize;
@@ -217,6 +251,8 @@ public interface FsUdpServer extends FsUdpClient {
 
         /**
          * Builds the server.
+         *
+         * @return built server
          */
         public FsUdpServer build() {
             return new SocketUdpServer(this);

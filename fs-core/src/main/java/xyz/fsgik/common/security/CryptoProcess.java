@@ -23,6 +23,7 @@ public interface CryptoProcess {
      * Sets key for crypto.
      *
      * @param key key for crypto
+     * @return this object
      */
     CryptoProcess key(Key key);
 
@@ -30,6 +31,7 @@ public interface CryptoProcess {
      * Sets specification of cryptographic parameters and return itself.
      *
      * @param parameterSpec specification of cryptographic parameters
+     * @return this object
      */
     CryptoProcess algorithmParameterSpec(AlgorithmParameterSpec parameterSpec);
 
@@ -37,6 +39,7 @@ public interface CryptoProcess {
      * Sets cryptographic parameters and return itself.
      *
      * @param parameters cryptographic parameters
+     * @return this object
      */
     CryptoProcess algorithmParameters(AlgorithmParameters parameters);
 
@@ -44,6 +47,7 @@ public interface CryptoProcess {
      * Sets secure random and return itself.
      *
      * @param secureRandom secure random
+     * @return this object
      */
     CryptoProcess secureRandom(SecureRandom secureRandom);
 
@@ -51,6 +55,7 @@ public interface CryptoProcess {
      * Sets certificate info and return itself.
      *
      * @param certificate certificate info
+     * @return this object
      */
     CryptoProcess certificate(Certificate certificate);
 
@@ -58,6 +63,7 @@ public interface CryptoProcess {
      * Sets key size and return itself.
      *
      * @param keySize key size
+     * @return this object
      */
     CryptoProcess keySize(int keySize);
 
@@ -65,6 +71,7 @@ public interface CryptoProcess {
      * Sets block size and return itself.
      *
      * @param blockSize block size
+     * @return this object
      */
     CryptoProcess blockSize(int blockSize);
 
@@ -72,11 +79,14 @@ public interface CryptoProcess {
      * Sets buffer size and return itself.
      *
      * @param bufferSize buffer size
+     * @return this object
      */
     CryptoProcess bufferSize(int bufferSize);
 
     /**
      * Sets encryption mode.
+     *
+     * @return this object
      */
     default CryptoProcess encrypt() {
         throw new FsSecurityException(new UnsupportedOperationException("Encryption"));
@@ -84,6 +94,8 @@ public interface CryptoProcess {
 
     /**
      * Sets decryption mode.
+     *
+     * @return this object
      */
     default CryptoProcess decrypt() {
         throw new FsSecurityException(new UnsupportedOperationException("Decryption"));
@@ -91,6 +103,8 @@ public interface CryptoProcess {
 
     /**
      * Sets MAC mode (for {@link Mac}).
+     *
+     * @return this object
      */
     default CryptoProcess mac() {
         throw new FsSecurityException(new UnsupportedOperationException("MAC"));
@@ -98,6 +112,8 @@ public interface CryptoProcess {
 
     /**
      * Sets digestion mode (for {@link MessageDigest}).
+     *
+     * @return this object
      */
     default CryptoProcess digest() {
         throw new FsSecurityException(new UnsupportedOperationException("Digestion"));
@@ -105,6 +121,8 @@ public interface CryptoProcess {
 
     /**
      * Sets digestion mode (for {@link Signature}).
+     *
+     * @return this object
      */
     default CryptoProcess sign() {
         throw new FsSecurityException(new UnsupportedOperationException("Sign"));
@@ -112,6 +130,8 @@ public interface CryptoProcess {
 
     /**
      * Does final computation and returns result.
+     *
+     * @return result of final computation
      */
     byte[] doFinal();
 
@@ -119,6 +139,7 @@ public interface CryptoProcess {
      * Does final computation and writes result into dest array, return written bytes count.
      *
      * @param dest dest array
+     * @return result of final computation
      */
     default int doFinal(byte[] dest) {
         return doFinal(dest, 0);
@@ -129,6 +150,7 @@ public interface CryptoProcess {
      *
      * @param dest   dest array
      * @param offset start offset
+     * @return written bytes count
      */
     int doFinal(byte[] dest, int offset);
 
@@ -136,6 +158,7 @@ public interface CryptoProcess {
      * Does final computation and writes result into dest buffer, return written bytes count.
      *
      * @param dest dest buffer
+     * @return written bytes count
      */
     int doFinal(ByteBuffer dest);
 
@@ -143,6 +166,7 @@ public interface CryptoProcess {
      * Does final computation and writes result into dest stream, return written bytes count.
      *
      * @param dest dest stream
+     * @return written bytes count
      */
     long doFinal(OutputStream dest);
 
@@ -150,11 +174,15 @@ public interface CryptoProcess {
      * Does final computation and returns result as input stream.
      * <p>
      * The returned stream is lazy, it can be affected by any changes of the process before the stream is fully read.
+     *
+     * @return result of final computation
      */
     InputStream doFinalStream();
 
     /**
      * Does final computation and returns base64 string of result.
+     *
+     * @return result of final computation
      */
     default String doFinalBase64() {
         return FsEncoder.base64().encodeToString(doFinal());
@@ -164,6 +192,7 @@ public interface CryptoProcess {
      * Verifies sign for {@link FsSign}.
      *
      * @param sign sign to be verified
+     * @return result of verifying
      */
     default boolean verify(byte[] sign) {
         return verify(sign, 0, sign.length);
@@ -175,6 +204,7 @@ public interface CryptoProcess {
      * @param sign   sign to be verified
      * @param offset start offset of sign
      * @param length length of sign
+     * @return result of verifying
      */
     default boolean verify(byte[] sign, int offset, int length) {
         throw new FsSecurityException(new UnsupportedOperationException("Verification"));

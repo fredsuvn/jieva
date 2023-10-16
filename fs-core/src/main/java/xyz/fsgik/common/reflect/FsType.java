@@ -25,6 +25,7 @@ public class FsType {
      * @param rawType             given raw type
      * @param ownerType           given owner type
      * @param actualTypeArguments actual type arguments
+     * @return ParameterizedType
      */
     public static ParameterizedType parameterizedType(
         Type rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
@@ -36,6 +37,7 @@ public class FsType {
      *
      * @param rawType             given raw type
      * @param actualTypeArguments actual type arguments
+     * @return ParameterizedType
      */
     public static ParameterizedType parameterizedType(Type rawType, Iterable<Type> actualTypeArguments) {
         return parameterizedType(rawType, null, actualTypeArguments);
@@ -47,6 +49,7 @@ public class FsType {
      * @param rawType             given raw type
      * @param ownerType           given owner type
      * @param actualTypeArguments actual type arguments
+     * @return ParameterizedType
      */
     public static ParameterizedType parameterizedType(
         Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
@@ -58,6 +61,7 @@ public class FsType {
      *
      * @param rawType             given raw type
      * @param actualTypeArguments actual type arguments
+     * @return ParameterizedType
      */
     public static ParameterizedType parameterizedType(Type rawType, Type[] actualTypeArguments) {
         return parameterizedType(rawType, null, actualTypeArguments);
@@ -68,6 +72,7 @@ public class FsType {
      *
      * @param upperBounds given upper bounds
      * @param lowerBounds given lower bounds
+     * @return WildcardType
      */
     public static WildcardType wildcardType(
         @Nullable Iterable<Type> upperBounds, @Nullable Iterable<Type> lowerBounds) {
@@ -82,6 +87,7 @@ public class FsType {
      *
      * @param upperBounds given upper bounds
      * @param lowerBounds given lower bounds
+     * @return WildcardType
      */
     public static WildcardType wildcardType(
         @Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
@@ -92,6 +98,7 @@ public class FsType {
      * Returns a GenericArrayType with given component type.
      *
      * @param componentType given component type
+     * @return GenericArrayType
      */
     public static GenericArrayType genericArrayType(Type componentType) {
         return new FsGenericArrayType(componentType);

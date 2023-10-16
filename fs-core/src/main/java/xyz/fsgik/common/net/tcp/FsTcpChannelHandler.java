@@ -65,6 +65,7 @@ public interface FsTcpChannelHandler<M> {
      *
      * @param channel the channel
      * @param message the message
+     * @return result of callback
      */
     @Nullable
     Object onMessage(FsTcpChannel channel, M message);

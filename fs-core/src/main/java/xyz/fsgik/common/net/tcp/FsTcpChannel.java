@@ -21,41 +21,57 @@ public interface FsTcpChannel {
 
     /**
      * Returns address of remote endpoint.
+     *
+     * @return address of remote endpoint
      */
     InetAddress getRemoteAddress();
 
     /**
      * Returns port of remote endpoint.
+     *
+     * @return port of remote endpoint
      */
     int getRemotePort();
 
     /**
      * Returns address of local endpoint.
+     *
+     * @return address of local endpoint
      */
     InetAddress getLocalAddress();
 
     /**
      * Returns port of remote endpoint.
+     *
+     * @return port of local endpoint
      */
     int getLocalPort();
 
     /**
      * Returns socket address of remote endpoint.
+     *
+     * @return socket address of remote endpoint
      */
     SocketAddress getRemoteSocketAddress();
 
     /**
      * Returns socket address of local endpoint.
+     *
+     * @return socket address of local endpoint
      */
     SocketAddress getLocalSocketAddress();
 
     /**
      * Returns whether this channel is opened.
+     *
+     * @return whether this channel is opened
      */
     boolean isOpened();
 
     /**
      * Returns whether this channel is closed.
+     *
+     * @return whether this channel is closed
      */
     boolean isClosed();
 
@@ -177,6 +193,8 @@ public interface FsTcpChannel {
 
     /**
      * Returns underlying object which implements {@link FsTcpChannel} interface, such as {@link Socket}.
+     *
+     * @return underlying object
      */
     Object getSource();
 }

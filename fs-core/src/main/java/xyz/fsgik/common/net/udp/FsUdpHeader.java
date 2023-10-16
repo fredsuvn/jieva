@@ -16,6 +16,7 @@ public interface FsUdpHeader {
      * Returns UDP header of which content comes from given datagram packet.
      *
      * @param packet given packet
+     * @return UDP header
      */
     static FsUdpHeader from(DatagramPacket packet) {
         SocketAddress socketAddress = packet.getSocketAddress();
@@ -30,6 +31,7 @@ public interface FsUdpHeader {
      * Returns UDP header of given address.
      *
      * @param address given address
+     * @return UDP header
      */
     static FsUdpHeader of(InetSocketAddress address) {
         return new FsUdpHeader() {
@@ -53,16 +55,22 @@ public interface FsUdpHeader {
 
     /**
      * Returns address of the datagram packet.
+     *
+     * @return address of the datagram packet
      */
     InetAddress getAddress();
 
     /**
      * Returns port of the datagram packet.
+     *
+     * @return port of the datagram packet
      */
     int getPort();
 
     /**
      * Returns {@link InetSocketAddress}.
+     *
+     * @return {@link InetSocketAddress}
      */
     InetSocketAddress getInetSocketAddress();
 }

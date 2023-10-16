@@ -24,6 +24,7 @@ public interface FsKeyFactory extends SecurityAlgorithm {
      * which supplied with {@link KeyFactory#getInstance(String)}.
      *
      * @param algorithm specified algorithm
+     * @return new instance of specified algorithm
      */
     static FsKeyFactory getInstance(String algorithm) {
         return new KeyFactoryImpl(algorithm, () -> {
@@ -42,6 +43,7 @@ public interface FsKeyFactory extends SecurityAlgorithm {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsKeyFactory getInstance(String algorithm, String provider) {
         return new KeyFactoryImpl(algorithm, () -> {
@@ -60,6 +62,7 @@ public interface FsKeyFactory extends SecurityAlgorithm {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsKeyFactory getInstance(String algorithm, Provider provider) {
         return new KeyFactoryImpl(algorithm, () -> {
@@ -74,6 +77,8 @@ public interface FsKeyFactory extends SecurityAlgorithm {
     /**
      * Returns back {@link KeyFactory} if it has, or null if it doesn't have one.
      * The back {@link KeyFactory} maybe thread-local, that is, returned value may be not only one instance.
+     *
+     * @return back {@link KeyFactory} if it has, or null if it doesn't have one
      */
     @Nullable
     KeyFactory getKeyFactory();
@@ -82,6 +87,7 @@ public interface FsKeyFactory extends SecurityAlgorithm {
      * Generates public key by given key spec.
      *
      * @param spec given key spec
+     * @return public key
      */
     PublicKey generatePublic(KeySpec spec);
 
@@ -89,6 +95,7 @@ public interface FsKeyFactory extends SecurityAlgorithm {
      * Generates private key by given key spec.
      *
      * @param spec given key spec
+     * @return private key
      */
     PrivateKey generatePrivate(KeySpec spec);
 }

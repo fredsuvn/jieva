@@ -139,6 +139,7 @@ public class FsCrypto {
      * @param out       given output stream
      * @param blockSize block size for each encrypting
      * @param params    algorithm parameters
+     * @return written bytes count
      */
     public static long encrypt(
         Cipher cipher, Key key, InputStream in, OutputStream out, int blockSize, @Nullable AlgorithmParams params) {
@@ -157,6 +158,7 @@ public class FsCrypto {
      * @param out       given output stream
      * @param blockSize block size for each decrypting
      * @param params    algorithm parameters
+     * @return written bytes count
      */
     public static long decrypt(
         Cipher cipher, Key key, InputStream in, OutputStream out, int blockSize, @Nullable AlgorithmParams params) {
@@ -176,6 +178,7 @@ public class FsCrypto {
      * @param out       given output stream
      * @param blockSize block size for each decrypting
      * @param params    algorithm parameters
+     * @return written bytes count
      */
     public static long doEncrypt(
         Cipher cipher, int mode, Key key, InputStream in, OutputStream out, int blockSize, @Nullable AlgorithmParams params) {
@@ -220,6 +223,7 @@ public class FsCrypto {
      * @param out       given output buffer
      * @param blockSize block size for each encrypting
      * @param params    algorithm parameters
+     * @return written bytes count
      */
     public static int encrypt(
         Cipher cipher, Key key, ByteBuffer in, ByteBuffer out, int blockSize, @Nullable AlgorithmParams params) {
@@ -238,6 +242,7 @@ public class FsCrypto {
      * @param out       given output buffer
      * @param blockSize block size for each decrypting
      * @param params    algorithm parameters
+     * @return written bytes count
      */
     public static int decrypt(
         Cipher cipher, Key key, ByteBuffer in, ByteBuffer out, int blockSize, @Nullable AlgorithmParams params) {
@@ -257,6 +262,7 @@ public class FsCrypto {
      * @param out       given output buffer
      * @param blockSize block size for each decrypting
      * @param params    algorithm parameters
+     * @return written bytes count
      */
     public static int doEncrypt(
         Cipher cipher, int mode, Key key, ByteBuffer in, ByteBuffer out, int blockSize, @Nullable AlgorithmParams params) {
@@ -294,6 +300,7 @@ public class FsCrypto {
      * @param in         given input stream
      * @param bufferSize buffer size
      * @param params     other parameters
+     * @return result bytes
      */
     public static byte[] generateMac(
         Mac mac, Key key, InputStream in, int bufferSize, @Nullable AlgorithmParams params) {
@@ -325,6 +332,7 @@ public class FsCrypto {
      * @param key    key for generating
      * @param in     given buffer
      * @param params other parameters
+     * @return result bytes
      */
     public static byte[] generateMac(Mac mac, Key key, ByteBuffer in, @Nullable AlgorithmParams params) {
         try {
@@ -344,6 +352,7 @@ public class FsCrypto {
      * @param digest     MAC generator
      * @param in         given input stream
      * @param bufferSize buffer size
+     * @return result bytes
      */
     public static byte[] digest(MessageDigest digest, InputStream in, int bufferSize) {
         try {
@@ -371,6 +380,7 @@ public class FsCrypto {
      *
      * @param mac MAC generator
      * @param in  given buffer
+     * @return result bytes
      */
     public static byte[] digest(MessageDigest mac, ByteBuffer in) {
         try {
@@ -391,6 +401,7 @@ public class FsCrypto {
      * @param in         given input stream
      * @param bufferSize buffer size
      * @param params     other parameters
+     * @return result bytes
      */
     public static byte[] sign(
         Signature signature, Key key, InputStream in, int bufferSize, @Nullable AlgorithmParams params) {
@@ -423,6 +434,7 @@ public class FsCrypto {
      * @param key       key for generating
      * @param in        given buffer
      * @param params    other parameters
+     * @return result bytes
      */
     public static byte[] sign(Signature signature, Key key, ByteBuffer in, @Nullable AlgorithmParams params) {
         try {
@@ -447,6 +459,7 @@ public class FsCrypto {
      * @param signOffset start offset of sign
      * @param signLength length of sign
      * @param params     other parameters
+     * @return result verifying
      */
     public static boolean verify(
         Signature signature, Key key, InputStream in, int bufferSize,
@@ -484,6 +497,7 @@ public class FsCrypto {
      * @param signOffset start offset of sign
      * @param signLength length of sign
      * @param params     other parameters
+     * @return result verifying
      */
     public static boolean verify(
         Signature signature, Key key, ByteBuffer in,

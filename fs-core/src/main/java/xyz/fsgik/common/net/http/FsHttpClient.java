@@ -26,7 +26,7 @@ public interface FsHttpClient {
     }
 
     /**
-     * Returns new builder for this interface.
+     * Returns new builder of {@link FsHttpClient}.
      *
      * @return new builder
      */

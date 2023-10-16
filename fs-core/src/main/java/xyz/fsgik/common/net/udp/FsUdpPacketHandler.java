@@ -53,6 +53,7 @@ public interface FsUdpPacketHandler<P> {
      * @param header header of the packet
      * @param client the server itself as a client
      * @param packet the packet
+     * @return result of callback
      */
     @Nullable
     Object onPacket(FsUdpHeader header, FsUdpClient client, P packet);

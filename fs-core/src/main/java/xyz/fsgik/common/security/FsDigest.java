@@ -26,6 +26,7 @@ public interface FsDigest extends Prepareable {
      * which supplied with {@link MessageDigest#getInstance(String)}.
      *
      * @param algorithm specified algorithm
+     * @return new instance of specified algorithm
      */
     static FsDigest getInstance(String algorithm) {
         return new DigestImpl(algorithm, () -> {
@@ -44,6 +45,7 @@ public interface FsDigest extends Prepareable {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsDigest getInstance(String algorithm, String provider) {
         return new DigestImpl(algorithm, () -> {
@@ -62,6 +64,7 @@ public interface FsDigest extends Prepareable {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsDigest getInstance(String algorithm, Provider provider) {
         return new DigestImpl(algorithm, () -> {
@@ -76,12 +79,16 @@ public interface FsDigest extends Prepareable {
     /**
      * Returns back {@link MessageDigest} if it has, or null if it doesn't have one.
      * The back {@link MessageDigest} maybe thread-local, that is, returned value may be not only one instance.
+     *
+     * @return back {@link MessageDigest} if it has, or null if it doesn't have one
      */
     @Nullable
     MessageDigest getMessageDigest();
 
     /**
      * Returns digest length.
+     *
+     * @return digest length
      */
     int getDigestLength();
 }

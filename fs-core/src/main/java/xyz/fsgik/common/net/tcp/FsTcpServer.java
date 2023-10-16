@@ -45,8 +45,10 @@ import java.util.function.IntFunction;
 public interface FsTcpServer extends FsTcpEndpoint {
 
     /**
-     * Returns new builder for this interface.
+     * Returns new builder of {@link FsTcpServer}.
      * The returned builder is based on {@link ServerSocket}.
+     *
+     * @return new builder
      */
     static Builder newBuilder() {
         return new Builder();
@@ -74,6 +76,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
     /**
      * Returns a new builder configured with this server.
+     *
+     * @return a new builder configured with this server
      */
     Builder toBuilder();
 
@@ -98,6 +102,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Sets server port, maybe 0 to get an available one from system.
+         *
+         * @return this builder
          */
         public Builder port(int port) {
             this.port = port;
@@ -106,6 +112,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Sets max connection number.
+         *
+         * @return this builder
          */
         public Builder maxConnection(int maxConnection) {
             this.maxConnection = maxConnection;
@@ -114,6 +122,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Sets server address.
+         *
+         * @return this builder
          */
         public Builder address(InetAddress address) {
             this.address = address;
@@ -122,6 +132,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Sets server host name.
+         *
+         * @return this builder
          */
         public Builder hostName(String hostName) {
             try {
@@ -134,6 +146,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Sets server handler.
+         *
+         * @return this builder
          */
         public Builder serverHandler(FsTcpServerHandler serverHandler) {
             this.serverHandler = serverHandler;
@@ -142,6 +156,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Adds channel handler.
+         *
+         * @return this builder
          */
         public Builder addChannelHandler(FsTcpChannelHandler<?> channelHandler) {
             this.channelHandlers.add(channelHandler);
@@ -150,6 +166,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Adds channel handlers.
+         *
+         * @return this builder
          */
         public Builder addChannelHandlers(Iterable<FsTcpChannelHandler<?>> channelHandlers) {
             FsCollect.toCollection(this.channelHandlers, channelHandlers);
@@ -159,6 +177,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
         /**
          * Sets byte buffer generator: given an int returns a byte buffer with the int length.
          * The generated buffer's position must be 0, and limit must be capacity.
+         *
+         * @return this builder
          */
         public Builder bufferGenerator(IntFunction<ByteBuffer> bufferGenerator) {
             this.bufferGenerator = bufferGenerator;
@@ -167,6 +187,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Sets executor service, must be of multi-threads.
+         *
+         * @return this builder
          */
         public Builder executor(ExecutorService executor) {
             this.executor = executor;
@@ -175,6 +197,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Sets buffer size of the channel.
+         *
+         * @return this builder
          */
         public Builder channelBufferSize(int channelBufferSize) {
             this.channelBufferSize = channelBufferSize;
@@ -183,6 +207,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Sets other socket config.
+         *
+         * @return this builder
          */
         public Builder socketConfig(Consumer<ServerSocket> socketConfig) {
             this.socketConfig = socketConfig;
@@ -191,6 +217,8 @@ public interface FsTcpServer extends FsTcpEndpoint {
 
         /**
          * Builds the server.
+         *
+         * @return built server
          */
         public FsTcpServer build() {
             return new SocketTcpServer(this);

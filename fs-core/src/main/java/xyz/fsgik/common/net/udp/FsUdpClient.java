@@ -19,8 +19,10 @@ import java.util.function.Consumer;
 public interface FsUdpClient {
 
     /**
-     * Returns new builder for this interface.
+     * Returns new builder of {@link FsUdpClient}.
      * The returned builder is based on {@link DatagramSocket}.
+     *
+     * @return new builder
      */
     static Builder newBuilder() {
         return new Builder();
@@ -35,26 +37,36 @@ public interface FsUdpClient {
 
     /**
      * Returns bound address of this client.
+     *
+     * @return bound address of this client
      */
     InetAddress getAddress();
 
     /**
      * Returns bound port of this client.
+     *
+     * @return bound port of this client
      */
     int getPort();
 
     /**
      * Returns bound socket address of this client.
+     *
+     * @return bound socket address of this client
      */
     SocketAddress getSocketAddress();
 
     /**
      * Returns underlying object which implements this interface, such as {@link DatagramSocket}.
+     *
+     * @return underlying object
      */
     Object getSource();
 
     /**
-     * Returns a new builder configured with this server.
+     * Returns a new builder configured with this client.
+     *
+     * @return a new builder configured with this client
      */
     Builder toBuilder();
 
@@ -69,6 +81,8 @@ public interface FsUdpClient {
 
         /**
          * Sets local port, maybe 0 to get an available one from system.
+         *
+         * @return this builder
          */
         public Builder port(int port) {
             this.port = port;
@@ -77,6 +91,8 @@ public interface FsUdpClient {
 
         /**
          * Sets local address.
+         *
+         * @return this builder
          */
         public Builder address(InetAddress address) {
             this.address = address;
@@ -85,6 +101,8 @@ public interface FsUdpClient {
 
         /**
          * Sets local host name.
+         *
+         * @return this builder
          */
         public Builder hostName(String hostName) {
             try {
@@ -97,6 +115,8 @@ public interface FsUdpClient {
 
         /**
          * Sets other socket config.
+         *
+         * @return this builder
          */
         public Builder socketConfig(Consumer<DatagramSocket> socketConfig) {
             this.socketConfig = socketConfig;
@@ -105,6 +125,8 @@ public interface FsUdpClient {
 
         /**
          * Builds the client.
+         *
+         * @return built client
          */
         public FsUdpClient build() {
             return new SocketUdpClient(this);

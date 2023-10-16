@@ -22,19 +22,13 @@ public class FsReflect {
     private static final FsCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = FsCache.softCache();
 
     /**
-     * Returns default class loader: {@link Thread#getContextClassLoader()}.
-     */
-    public static ClassLoader getClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
-    }
-
-    /**
      * Returns new instance for given class name.
      * This method first uses {@link Class#forName(String)} to load given class,
      * then call the none-arguments constructor to create instance.
      * If loading failed, return null.
      *
      * @param className given clas name
+     * @return new instance for given class name or null
      */
     @Nullable
     public static <T> T load(String className) {
@@ -52,6 +46,7 @@ public class FsReflect {
      * {@code String} is last name of {@code java.lang.String}.
      *
      * @param cls given class
+     * @return last name of given class
      */
     public static String getLastName(Class<?> cls) {
         String name = cls.getName();
@@ -67,6 +62,7 @@ public class FsReflect {
      * Returns null if given type neither be Class nor ParameterizedType.
      *
      * @param type given type
+     * @return raw type of given type or null
      */
     @Nullable
     public static Class<?> getRawType(Type type) {
@@ -84,6 +80,7 @@ public class FsReflect {
      *
      * @param type  given parameterized type
      * @param index specified index
+     * @return actual type argument at specified index
      */
     public static Type getActualTypeArgument(ParameterizedType type, int index) {
         Type[] args = type.getActualTypeArguments();
@@ -95,6 +92,7 @@ public class FsReflect {
      * If given type has lower bounds (? super), return null.
      *
      * @param type given type
+     * @return upper bound type of given type or null
      */
     @Nullable
     public static Type getUpperBound(WildcardType type) {
@@ -110,10 +108,11 @@ public class FsReflect {
     }
 
     /**
-     * Returns upper bound type of given type (? super).
+     * Returns lower bound type of given type (? super).
      * If given type has no lower bounds, return null.
      *
      * @param type given type
+     * @return lower bound type of given type or null
      */
     @Nullable
     public static Type getLowerBound(WildcardType type) {
@@ -130,6 +129,7 @@ public class FsReflect {
      *
      * @param type given type
      * @param name specified field name
+     * @return field of specified name from given type or null
      */
     @Nullable
     public static Field getField(Type type, String name) {
@@ -155,6 +155,7 @@ public class FsReflect {
      * @param type           given type
      * @param name           specified method name
      * @param parameterTypes parameter types
+     * @return method of specified name from given type or null
      */
     @Nullable
     public static Method getMethod(Type type, String name, Class<?>... parameterTypes) {
@@ -176,6 +177,8 @@ public class FsReflect {
     /**
      * Creates a new instance of given type with empty constructor.
      * Return null if failed.
+     *
+     * @return a new instance of given type with empty constructor or null
      */
     @Nullable
     public static <T> T newInstance(Class<?> type) {
@@ -191,9 +194,10 @@ public class FsReflect {
      * Returns array class of given component type.
      *
      * @param componentType given component type
+     * @return array class of given component type
      */
     public static Class<?> arrayClass(Type componentType) {
-        return arrayClass(componentType, getClassLoader());
+        return arrayClass(componentType, componentType.getClass().getClassLoader());
     }
 
     /**
@@ -201,6 +205,7 @@ public class FsReflect {
      *
      * @param componentType given component type
      * @param classLoader   class loader
+     * @return array class of given component type
      */
     public static Class<?> arrayClass(Type componentType, ClassLoader classLoader) {
         if (componentType instanceof Class) {
@@ -267,6 +272,7 @@ public class FsReflect {
      * Returns wrapper class if given class is primitive, else return itself.
      *
      * @param cls given class
+     * @return wrapper class if given class is primitive, else return itself
      */
     public static Class<?> toWrapperClass(Class<?> cls) {
         if (cls.isPrimitive()) {
@@ -305,6 +311,7 @@ public class FsReflect {
      * Returns whether current runtime has specified class.
      *
      * @param className specified class name
+     * @return whether current runtime has specified class
      */
     public static boolean hasClass(String className) {
         try {
@@ -321,6 +328,7 @@ public class FsReflect {
      *
      * @param targetType target type
      * @param sourceType source type
+     * @return whether target type can be assigned by source type
      */
     public static boolean isAssignableFrom(Class<?> targetType, Class<?> sourceType) {
         if (targetType.isPrimitive() || sourceType.isPrimitive()) {
@@ -339,6 +347,7 @@ public class FsReflect {
      *
      * @param targetType target type
      * @param sourceType source type
+     * @return whether target type can be assigned by source type
      */
     public static boolean isAssignableFrom(Type targetType, Type sourceType) {
         if (Objects.equals(targetType, sourceType) || Objects.equals(targetType, Object.class)) {
@@ -506,7 +515,7 @@ public class FsReflect {
     }
 
     /**
-     * Returns generic super type with actual arguments for from given type to given target type
+     * Returns generic super type with actual arguments from given type to given target type
      * (target type is super type of given type).
      * <p>
      * For example, these types:
@@ -526,6 +535,7 @@ public class FsReflect {
      *
      * @param type   given type
      * @param target target type
+     * @return generic super type with actual arguments
      */
     @Nullable
     public static ParameterizedType getGenericSuperType(Type type, Class<?> target) {
@@ -588,6 +598,7 @@ public class FsReflect {
      * </pre>
      *
      * @param type given type
+     * @return a mapping of type parameters for given type
      */
     public static Map<TypeVariable<?>, Type> getTypeParameterMapping(Type type) {
         return TYPE_PARAMETER_MAPPING_CACHE.get(type, it -> {
@@ -670,6 +681,7 @@ public class FsReflect {
      * @param matcher     matcher type
      * @param replacement replacement type
      * @param deep        whether to recursively replace unmatched types
+     * @return type after replacing
      */
     public static Type replaceType(Type type, Type matcher, Type replacement, boolean deep) {
         if (Objects.equals(type, matcher)) {

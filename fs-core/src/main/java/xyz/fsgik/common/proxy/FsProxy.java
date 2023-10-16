@@ -20,14 +20,18 @@ import java.util.function.Predicate;
 public interface FsProxy<T> {
 
     /**
-     * Returns new builder.
+     * Returns new builder of {@link FsProxy}.
+     *
+     * @return new builder
      */
     static <T> Builder<T> newBuilder() {
         return new Builder<>();
     }
 
     /**
-     * Constructs new instance for this proxy class.
+     * Constructs and returns new instance of this proxy class.
+     *
+     * @return new instance of this proxy class
      */
     T newInstance();
 
@@ -57,13 +61,14 @@ public interface FsProxy<T> {
 
         private Class<?> superClass;
         private Iterable<Class<?>> superInterfaces;
-        private Map<Predicate<Method>, FsProxyMethod> proxyMap = new HashMap<>();
+        private final Map<Predicate<Method>, FsProxyMethod> proxyMap = new HashMap<>();
         private int proxyGenerator = 0;
 
         /**
          * Sets super class of proxy class.
          *
          * @param superClass super class
+         * @return this builder
          */
         public <T1 extends T> Builder<T1> superClass(Class<?> superClass) {
             this.superClass = superClass;
@@ -74,6 +79,7 @@ public interface FsProxy<T> {
          * Sets super interfaces of proxy class.
          *
          * @param superInterfaces super interfaces
+         * @return this builder
          */
         public <T1 extends T> Builder<T1> superInterfaces(Class<?>... superInterfaces) {
             return superInterfaces(Arrays.asList(superInterfaces));
@@ -83,6 +89,7 @@ public interface FsProxy<T> {
          * Sets super interfaces of proxy class.
          *
          * @param superInterfaces super interfaces
+         * @return this builder
          */
         public <T1 extends T> Builder<T1> superInterfaces(Iterable<Class<?>> superInterfaces) {
             this.superInterfaces = superInterfaces;
@@ -94,6 +101,7 @@ public interface FsProxy<T> {
          *
          * @param predicate   given predicate
          * @param proxyMethod proxy method
+         * @return this builder
          */
         public <T1 extends T> Builder<T1> proxyMethod(Predicate<Method> predicate, FsProxyMethod proxyMethod) {
             proxyMap.put(predicate, proxyMethod);
@@ -107,6 +115,7 @@ public interface FsProxy<T> {
          * @param methodName  given method name
          * @param paramTypes  given parameter types
          * @param proxyMethod proxy method
+         * @return this builder
          */
         public <T1 extends T> Builder<T1> proxyMethod(String methodName, List<Class<?>> paramTypes, FsProxyMethod proxyMethod) {
             return proxyMethod(methodName, paramTypes.toArray(new Class[0]), proxyMethod);
@@ -119,6 +128,7 @@ public interface FsProxy<T> {
          * @param methodName  given method name
          * @param paramTypes  given parameter types
          * @param proxyMethod proxy method
+         * @return this builder
          */
         public <T1 extends T> Builder<T1> proxyMethod(String methodName, Class<?>[] paramTypes, FsProxyMethod proxyMethod) {
             return proxyMethod(
@@ -140,6 +150,7 @@ public interface FsProxy<T> {
          * Note the required libs need to be present in the runtime environment.
          *
          * @param proxyGenerator proxy generator
+         * @return this builder
          */
         public <T1 extends T> Builder<T1> proxyGenerator(int proxyGenerator) {
             this.proxyGenerator = proxyGenerator;
@@ -148,6 +159,8 @@ public interface FsProxy<T> {
 
         /**
          * Builds {@link FsProxy}.
+         *
+         * @return built {@link FsProxy}
          */
         public <T1 extends T> FsProxy<T1> build() {
             if (proxyGenerator == JDK_PROXY) {
@@ -171,95 +184,6 @@ public interface FsProxy<T> {
 
         private boolean hasCglib() {
             return FsReflect.hasClass("net.sf.cglib.proxy.Enhancer");
-        }
-
-        private static final class JdkProxyImpl<T> implements FsProxy<T> {
-
-            private final Class<?>[] superInterfaces;
-            private final Map<MethodSignature, FsProxyMethod> methodMap;
-
-            private JdkProxyImpl(Iterable<Class<?>> superInterfaces, Map<Predicate<Method>, FsProxyMethod> proxyMap) {
-                if (FsCollect.isEmpty(superInterfaces)) {
-                    throw new FsProxyException("No super interface to be proxied.");
-                }
-                this.superInterfaces = FsCollect.toArray(superInterfaces, Class.class);
-                if (FsCollect.isEmpty(proxyMap)) {
-                    this.methodMap = Collections.emptyMap();
-                    return;
-                }
-                this.methodMap = new HashMap<>();
-                for (Class<?> superInterface : superInterfaces) {
-                    Method[] methods = superInterface.getMethods();
-                    proxyMap.forEach((predicate, proxy) -> {
-                        for (Method method : methods) {
-                            if (predicate.test(method)) {
-                                methodMap.put(new MethodSignature(method), proxy);
-                            }
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public T newInstance() {
-                Object inst;
-                if (methodMap.isEmpty()) {
-                    inst = Proxy.newProxyInstance(
-                        this.getClass().getClassLoader(),
-                        superInterfaces,
-                        (proxy, method, args) -> method.invoke(proxy, args));
-                } else {
-                    inst = Proxy.newProxyInstance(
-                        this.getClass().getClassLoader(),
-                        superInterfaces,
-                        (proxy, method, args) -> {
-                            FsProxyMethod proxyMethod = methodMap.get(new MethodSignature(method));
-                            if (proxyMethod == null) {
-                                return method.invoke(proxy, args);
-                            }
-                            return proxyMethod.invokeProxy(args, method, objs -> {
-                                try {
-                                    return method.invoke(proxy, objs);
-                                } catch (InvocationTargetException e) {
-                                    throw e.getCause();
-                                }
-                            });
-                        });
-                }
-                return Fs.as(inst);
-            }
-
-            private static final class MethodSignature {
-
-                private final String name;
-                private final List<Class<?>> paramTypes;
-
-                private int hash = 0;
-
-                private MethodSignature(Method method) {
-                    this.name = method.getName();
-                    this.paramTypes = Arrays.asList(method.getParameterTypes());
-                }
-
-                @Override
-                public boolean equals(Object o) {
-                    if (this == o) return true;
-                    if (o == null || getClass() != o.getClass()) return false;
-                    MethodSignature that = (MethodSignature) o;
-                    return Objects.equals(name, that.name) && Objects.equals(paramTypes, that.paramTypes);
-                }
-
-                @Override
-                public int hashCode() {
-                    if (hash == 0) {
-                        hash = Objects.hash(name, paramTypes);
-                        if (hash == 0) {
-                            hash = 1;
-                        }
-                    }
-                    return hash;
-                }
-            }
         }
     }
 }

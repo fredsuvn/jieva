@@ -18,6 +18,7 @@ public interface FsUdpPacket {
      * Returns UDP packet of which content comes from given datagram packet.
      *
      * @param packet given packet
+     * @return UDP packet
      */
     static FsUdpPacket from(DatagramPacket packet) {
         byte[] data = Arrays.copyOfRange(
@@ -44,6 +45,7 @@ public interface FsUdpPacket {
      *
      * @param buffer  given buffer
      * @param address given address
+     * @return UDP packet
      */
     static FsUdpPacket of(ByteBuffer buffer, InetSocketAddress address) {
         ByteBuffer data = ByteBuffer.wrap(FsBuffer.getBytes(buffer));
@@ -63,11 +65,15 @@ public interface FsUdpPacket {
 
     /**
      * Returns header info of this datagram packet.
+     *
+     * @return header info of this datagram packet
      */
     FsUdpHeader getHeader();
 
     /**
      * Returns readonly data of this datagram packet.
+     *
+     * @return readonly data of this datagram packet
      */
     ByteBuffer getData();
 }

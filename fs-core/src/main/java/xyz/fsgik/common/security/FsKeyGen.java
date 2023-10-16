@@ -25,6 +25,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      * which supplied with {@link KeyGenerator#getInstance(String)}.
      *
      * @param algorithm specified algorithm
+     * @return new instance of specified algorithm
      */
     static FsKeyGen getInstance(String algorithm) {
         return new KeyGenImpl(algorithm, () -> {
@@ -43,6 +44,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsKeyGen getInstance(String algorithm, String provider) {
         return new KeyGenImpl(algorithm, () -> {
@@ -61,6 +63,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsKeyGen getInstance(String algorithm, Provider provider) {
         return new KeyGenImpl(algorithm, () -> {
@@ -77,6 +80,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      *
      * @param algorithm specified algorithm
      * @param bytes     given array
+     * @return key of specified algorithm
      */
     static SecretKeySpec generate(String algorithm, byte[] bytes) {
         try {
@@ -95,6 +99,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      * @param bytes     given array
      * @param offset    start offset
      * @param length    specified length
+     * @return key of specified algorithm
      */
     static SecretKeySpec generate(String algorithm, byte[] bytes, int offset, int length) {
         try {
@@ -109,12 +114,16 @@ public interface FsKeyGen extends SecurityAlgorithm {
     /**
      * Returns back {@link KeyGenerator} if it has, or null if it doesn't have one.
      * The back {@link KeyGenerator} maybe thread-local, that is, returned value may be not only one instance.
+     *
+     * @return back {@link KeyGenerator} if it has, or null if it doesn't have one
      */
     @Nullable
     KeyGenerator getKeyGenerator();
 
     /**
      * Generates key.
+     *
+     * @return the key
      */
     Key generateKey();
 
@@ -122,6 +131,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      * Generates key with specified size.
      *
      * @param size specified key size
+     * @return the key
      */
     Key generateKey(int size);
 
@@ -130,6 +140,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      *
      * @param size         specified key size
      * @param secureRandom secure random
+     * @return the key
      */
     Key generateKey(int size, SecureRandom secureRandom);
 
@@ -137,6 +148,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      * Generates with algorithm parameter spec.
      *
      * @param spec algorithm parameter spec
+     * @return the key
      */
     Key generateKey(AlgorithmParameterSpec spec);
 
@@ -144,6 +156,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      * Generates with secure random.
      *
      * @param secureRandom secure random
+     * @return the key
      */
     Key generateKey(SecureRandom secureRandom);
 
@@ -152,6 +165,7 @@ public interface FsKeyGen extends SecurityAlgorithm {
      *
      * @param spec         algorithm parameter spec
      * @param secureRandom secure random
+     * @return the key
      */
     Key generateKey(AlgorithmParameterSpec spec, SecureRandom secureRandom);
 }

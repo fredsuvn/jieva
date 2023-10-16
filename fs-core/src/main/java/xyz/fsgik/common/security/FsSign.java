@@ -27,6 +27,7 @@ public interface FsSign extends Prepareable {
      * which supplied with {@link Signature#getInstance(String)}.
      *
      * @param algorithm specified algorithm
+     * @return new instance of specified algorithm
      */
     static FsSign getInstance(String algorithm) {
         return new SignImpl(algorithm, () -> {
@@ -45,6 +46,7 @@ public interface FsSign extends Prepareable {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsSign getInstance(String algorithm, String provider) {
         return new SignImpl(algorithm, () -> {
@@ -63,6 +65,7 @@ public interface FsSign extends Prepareable {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsSign getInstance(String algorithm, Provider provider) {
         return new SignImpl(algorithm, () -> {
@@ -77,6 +80,8 @@ public interface FsSign extends Prepareable {
     /**
      * Returns back {@link Signature} if it has, or null if it doesn't have one.
      * The back {@link Signature} maybe thread-local, that is, returned value may be not only one instance.
+     *
+     * @return back {@link Signature} if it has, or null if it doesn't have one
      */
     @Nullable
     Signature getSignature();

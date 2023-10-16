@@ -51,7 +51,9 @@ public abstract class TypeRef<T> {
     }
 
     /**
-     * Returns type referenced by this ref.
+     * Returns type of this type-ref.
+     *
+     * @return type of this type-ref
      */
     public Type getType() {
         if (type == null) {
@@ -61,14 +63,18 @@ public abstract class TypeRef<T> {
     }
 
     /**
-     * Returns {@link #getType()} as {@link ParameterizedType} referenced by this ref.
+     * Returns {@link #getType()} as {@link ParameterizedType} of this type-ref.
+     *
+     * @return type as {@link ParameterizedType} of this type-ref
      */
     public ParameterizedType asParameterized() {
         return (ParameterizedType) getType();
     }
 
     /**
-     * Returns {@link #getType()} as {@link Class} referenced by this ref.
+     * Returns {@link #getType()} as {@link Class} of this type-ref.
+     *
+     * @return type as {@link Class} of this type-ref
      */
     public Class<T> asClass() {
         return (Class<T>) getType();

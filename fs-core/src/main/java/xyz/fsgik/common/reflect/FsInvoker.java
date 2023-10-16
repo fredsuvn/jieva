@@ -19,6 +19,7 @@ public interface FsInvoker {
      * Returns FsInvoker instance of given method by reflecting.
      *
      * @param method given method
+     * @return FsInvoker instance by reflecting
      */
     static FsInvoker reflectMethod(Method method) {
         return new OfMethod(method);
@@ -28,6 +29,7 @@ public interface FsInvoker {
      * Returns FsInvoker instance of given constructor by reflecting.
      *
      * @param constructor given constructor
+     * @return FsInvoker instance by reflecting
      */
     static FsInvoker reflectConstructor(Constructor<?> constructor) {
         return new OfConstructor(constructor);
@@ -37,6 +39,7 @@ public interface FsInvoker {
      * Returns FsInvoker instance of given method by {@link MethodHandles}.
      *
      * @param method given method
+     * @return FsInvoker instance by {@link MethodHandles}
      */
     static FsInvoker unreflectMethod(Method method) {
         return new OfMethodHandle(method);
@@ -46,6 +49,7 @@ public interface FsInvoker {
      * Returns FsInvoker instance of given constructor by {@link MethodHandles}.
      *
      * @param constructor given constructor
+     * @return FsInvoker instance by {@link MethodHandles}
      */
     static FsInvoker unreflectConstructor(Constructor<?> constructor) {
         return new OfMethodHandle(constructor);
@@ -58,6 +62,7 @@ public interface FsInvoker {
      *
      * @param inst instance object
      * @param args given arguments
+     * @return result of invoking
      */
     @Nullable
     Object invoke(@Nullable Object inst, Object... args);

@@ -28,6 +28,7 @@ public interface FsKeyPairGen extends SecurityAlgorithm {
      * which supplied with {@link KeyPairGenerator#getInstance(String)}.
      *
      * @param algorithm specified algorithm
+     * @return new instance of specified algorithm
      */
     static FsKeyPairGen getInstance(String algorithm) {
         return new KeyPairGenImpl(algorithm, () -> {
@@ -46,6 +47,7 @@ public interface FsKeyPairGen extends SecurityAlgorithm {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsKeyPairGen getInstance(String algorithm, String provider) {
         return new KeyPairGenImpl(algorithm, () -> {
@@ -64,6 +66,7 @@ public interface FsKeyPairGen extends SecurityAlgorithm {
      *
      * @param algorithm specified algorithm
      * @param provider  specified provider
+     * @return new instance of specified algorithm
      */
     static FsKeyPairGen getInstance(String algorithm, Provider provider) {
         return new KeyPairGenImpl(algorithm, () -> {
@@ -79,6 +82,7 @@ public interface FsKeyPairGen extends SecurityAlgorithm {
      * Generates key of x509-format from given array.
      *
      * @param bytes given array
+     * @return key of x509-format
      */
     static X509EncodedKeySpec generateX509(byte[] bytes) {
         try {
@@ -96,6 +100,7 @@ public interface FsKeyPairGen extends SecurityAlgorithm {
      * @param bytes  given array
      * @param offset start offset
      * @param length specified length
+     * @return key of x509-format
      */
     static X509EncodedKeySpec generateX509(byte[] bytes, int offset, int length) {
         try {
@@ -109,9 +114,10 @@ public interface FsKeyPairGen extends SecurityAlgorithm {
     }
 
     /**
-     * Generates key of x509-format from given array.
+     * Generates key of PKCS8-format from given array.
      *
      * @param bytes given array
+     * @return key of PKCS8-format
      */
     static PKCS8EncodedKeySpec generatePkcs8(byte[] bytes) {
         try {
@@ -129,6 +135,7 @@ public interface FsKeyPairGen extends SecurityAlgorithm {
      * @param bytes  given array
      * @param offset start offset
      * @param length specified length
+     * @return key of PKCS8-format
      */
     static PKCS8EncodedKeySpec generatePkcs8(byte[] bytes, int offset, int length) {
         try {
@@ -144,42 +151,50 @@ public interface FsKeyPairGen extends SecurityAlgorithm {
     /**
      * Returns back {@link KeyPairGenerator} if it has, or null if it doesn't have one.
      * The back {@link KeyPairGenerator} maybe thread-local, that is, returned value may be not only one instance.
+     *
+     * @return back {@link KeyPairGenerator} if it has, or null if it doesn't have one
      */
     @Nullable
     KeyPairGenerator getKeyPairGenerator();
 
     /**
-     * Generates key.
+     * Generates key pair.
+     *
+     * @return the key pair
      */
     KeyPair generateKeyPair();
 
     /**
-     * Generates key with specified size.
+     * Generates key pair with specified size.
      *
      * @param size specified key size
+     * @return the key pair
      */
     KeyPair generateKeyPair(int size);
 
     /**
-     * Generates with specified key size and secure random.
+     * Generates key pair with specified key size and secure random.
      *
      * @param size         specified key size
      * @param secureRandom secure random
+     * @return the key pair
      */
     KeyPair generateKeyPair(int size, SecureRandom secureRandom);
 
     /**
-     * Generates with algorithm parameter spec.
+     * Generates key pair with algorithm parameter spec.
      *
      * @param spec algorithm parameter spec
+     * @return the key pair
      */
     KeyPair generateKeyPair(AlgorithmParameterSpec spec);
 
     /**
-     * Generates with algorithm parameter spec and secure random.
+     * Generates key pair with algorithm parameter spec and secure random.
      *
      * @param spec         algorithm parameter spec
      * @param secureRandom secure random
+     * @return the key pair
      */
     KeyPair generateKeyPair(AlgorithmParameterSpec spec, SecureRandom secureRandom);
 }

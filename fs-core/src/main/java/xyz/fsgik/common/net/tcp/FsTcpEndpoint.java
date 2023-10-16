@@ -19,31 +19,43 @@ public interface FsTcpEndpoint {
 
     /**
      * Returns bound address of this point.
+     *
+     * @return bound address of this point
      */
     InetAddress getAddress();
 
     /**
      * Returns bound port of this point.
+     *
+     * @return bound port of this point
      */
     int getPort();
 
     /**
      * Returns bound socket address of this point.
+     *
+     * @return bound socket address of this point
      */
     SocketAddress getSocketAddress();
 
     /**
      * Returns underlying object which implements this interface, such as {@link ServerSocket} or {@link Socket}.
+     *
+     * @return underlying object
      */
     Object getSource();
 
     /**
      * Returns whether this point is opened.
+     *
+     * @return whether this point is opened
      */
     boolean isOpened();
 
     /**
      * Returns whether this point is closed.
+     *
+     * @return whether this point is closed
      */
     boolean isClosed();
 
