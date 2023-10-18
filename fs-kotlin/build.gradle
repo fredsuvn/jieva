@@ -36,7 +36,7 @@ dokkaHtml {
 }
 
 clean {
-  delete(javadoc.destinationDir)
+  //delete(javadoc.destinationDir)
 }
 
 tasks.register('sourcesJar', Jar) {

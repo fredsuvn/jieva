@@ -28,5 +28,5 @@ javadoc {
 }
 
 clean {
-  delete(javadoc.destinationDir)
+  //delete(javadoc.destinationDir)
 }

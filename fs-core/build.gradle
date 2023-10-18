@@ -56,7 +56,7 @@ javadoc {
 }
 
 clean {
-  delete(javadoc.destinationDir)
+  //delete(javadoc.destinationDir)
 }
 
 def generatedPath = "$project.projectDir/generated"
@@ -107,4 +107,15 @@ protobuf {
 clean {
   delete("${protobuf.generatedFilesBaseDir}")
   delete("$generatedPath/temp")
+}
+
+tasks.register('benchmark') {
+  dependsOn compileTestJava
+  group = 'benchmark'
+  doLast {
+    javaexec {
+      main = 'benchmark.jmh.JmhRunner'
+      classpath = sourceSets.test.runtimeClasspath
+    }
+  }
 }

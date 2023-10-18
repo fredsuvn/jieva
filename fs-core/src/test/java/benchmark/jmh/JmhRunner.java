@@ -5,15 +5,22 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 public class JmhRunner {
 
-    private static final String OUTPUT_DIR = "fs-core/src/test/java/jmh/";
-
     public static void main(String[] args) throws Exception {
+        File resultDir = Paths.get("docs/benchmark").toFile();
+        File resultFile = Paths.get("docs/benchmark/jmhResult.txt").toFile();
+        if (!resultFile.exists()) {
+            resultDir.mkdirs();
+            resultFile.createNewFile();
+        }
         Options options = new OptionsBuilder()
-            .include("jmh.benchmarks.*Jmh")
+            .include("benchmark.jmh.*Jmh")
             .resultFormat(ResultFormatType.TEXT)
-            .result(OUTPUT_DIR + "result.text")
+            .result(resultFile.getAbsolutePath())
             .build();
         new Runner(options).run();
     }
