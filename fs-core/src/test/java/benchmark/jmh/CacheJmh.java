@@ -10,8 +10,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 1, time = 1)
-@Measurement(iterations = 1, time = 1)
+@Warmup(iterations = 3, time = 5)
+@Measurement(iterations = 3, time = 5)
 @Fork(1)
 @State(value = Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -61,7 +61,7 @@ public class CacheJmh {
     }
 
     @Benchmark
-    public void fsCache() {
+    public void fsSoft() {
         for (Integer key : keys) {
             fsCache.put(key, key.toString());
         }

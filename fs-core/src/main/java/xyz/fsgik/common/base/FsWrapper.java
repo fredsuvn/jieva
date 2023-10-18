@@ -5,9 +5,7 @@ package xyz.fsgik.common.base;
  *
  * @author fredsuvn
  */
-public class FsWrapper<T> {
-
-    private static final FsWrapper<?> NULL_WRAPPER = wrap(null);
+public interface FsWrapper<T> {
 
     /**
      * Wraps given object.
@@ -16,8 +14,13 @@ public class FsWrapper<T> {
      * @param <T> type of given object
      * @return wrapper of given object
      */
-    public static <T> FsWrapper<T> wrap(T obj) {
-        return new FsWrapper<>(obj);
+    static <T> FsWrapper<T> wrap(T obj) {
+        return new FsWrapper<T>() {
+            @Override
+            public T get() {
+                return obj;
+            }
+        };
     }
 
     /**
@@ -26,14 +29,8 @@ public class FsWrapper<T> {
      * @param <T> type of wrapped object
      * @return empty wrapper which wraps {@code null}
      */
-    public static <T> FsWrapper<T> empty() {
-        return Fs.as(NULL_WRAPPER);
-    }
-
-    private final T source;
-
-    private FsWrapper(T source) {
-        this.source = source;
+    static <T> FsWrapper<T> empty() {
+        return Fs.as(Impls.NULL_WRAPPER);
     }
 
     /**
@@ -41,7 +38,5 @@ public class FsWrapper<T> {
      *
      * @return wrapped object
      */
-    public T get() {
-        return source;
-    }
+    T get();
 }

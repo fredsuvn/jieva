@@ -2,6 +2,7 @@ package xyz.fsgik.common.cache;
 
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.annotations.ThreadSafe;
+import xyz.fsgik.common.base.FsWrapper;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -9,7 +10,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
- * Cache interface, is expected to thread-safe and doesn't support null value.
+ * Cache interface, is expected to thread-safe and supporting null value.
  *
  * @author fresduvn
  */
@@ -24,7 +25,7 @@ public interface FsCache<K, V> {
      * @return a new {@link FsCache}
      */
     static <K, V> FsCache<K, V> softCache() {
-        return new CacheImpl<>(true);
+        return new ReferencedCache<>(true);
     }
 
     /**
@@ -38,7 +39,7 @@ public interface FsCache<K, V> {
      * @return a new {@link FsCache}
      */
     static <K, V> FsCache<K, V> softCache(RemoveListener<K, V> removeListener) {
-        return new CacheImpl<>(true, removeListener);
+        return new ReferencedCache<>(true, removeListener);
     }
 
     /**
@@ -50,7 +51,7 @@ public interface FsCache<K, V> {
      * @return a new {@link FsCache}
      */
     static <K, V> FsCache<K, V> softCache(int initialCapacity) {
-        return new CacheImpl<>(true, initialCapacity);
+        return new ReferencedCache<>(true, initialCapacity, null);
     }
 
     /**
@@ -65,7 +66,7 @@ public interface FsCache<K, V> {
      * @return a new {@link FsCache}
      */
     static <K, V> FsCache<K, V> softCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new CacheImpl<>(true, initialCapacity, removeListener);
+        return new ReferencedCache<>(true, initialCapacity, removeListener);
     }
 
     /**
@@ -76,7 +77,7 @@ public interface FsCache<K, V> {
      * @return a new {@link FsCache}
      */
     static <K, V> FsCache<K, V> weakCache() {
-        return new CacheImpl<>(false);
+        return new ReferencedCache<>(false);
     }
 
     /**
@@ -90,7 +91,7 @@ public interface FsCache<K, V> {
      * @return a new {@link FsCache}
      */
     static <K, V> FsCache<K, V> weakCache(RemoveListener<K, V> removeListener) {
-        return new CacheImpl<>(false, removeListener);
+        return new ReferencedCache<>(false, removeListener);
     }
 
     /**
@@ -102,7 +103,7 @@ public interface FsCache<K, V> {
      * @return a new {@link FsCache}
      */
     static <K, V> FsCache<K, V> weakCache(int initialCapacity) {
-        return new CacheImpl<>(false, initialCapacity);
+        return new ReferencedCache<>(false, initialCapacity, null);
     }
 
     /**
@@ -117,12 +118,12 @@ public interface FsCache<K, V> {
      * @return a new {@link FsCache}
      */
     static <K, V> FsCache<K, V> weakCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new CacheImpl<>(false, initialCapacity, removeListener);
+        return new ReferencedCache<>(false, initialCapacity, removeListener);
     }
 
     /**
      * Returns value associating with given key from this cache,
-     * return null if there is no entry for given key.
+     * return null if there is no entry for given key or the value is expired or the value itself is null.
      *
      * @param key given key
      * @return value associating with given key from this cache
@@ -132,9 +133,9 @@ public interface FsCache<K, V> {
 
     /**
      * Returns value associating with given key from this cache.
-     * If there is no entry for given key, a new value will be created by given loader.
+     * If there is no entry for given key or the value is expired, a new value will be created by given loader.
      * <p>
-     * If the loader returns null, the null value will not be put and return null.
+     * This method will return null if and only if the existed value or created value itself is null.
      *
      * @param key    given key
      * @param loader given loader
@@ -142,6 +143,30 @@ public interface FsCache<K, V> {
      */
     @Nullable
     V get(K key, Function<? super K, @Nullable ? extends V> loader);
+
+    /**
+     * Returns wrapped value associating with given key from this cache,
+     * or null if there is no entry for given key or the value is expired.
+     *
+     * @param key given key
+     * @return value associating with given key from this cache
+     */
+    @Nullable
+    FsWrapper<V> getWrapper(K key);
+
+    /**
+     * Returns wrapped value associating with given key from this cache.
+     * If there is no entry for given key or the value is expired, a new wrapped value will be created by given loader.
+     * If the loader returns null, no value will be put and this method will return null.
+     * <p>
+     * This method will return null if and only if the loader returns null.
+     *
+     * @param key    given key
+     * @param loader given loader
+     * @return value associating with given key from this cache, or created one
+     */
+    @Nullable
+    FsWrapper<V> getWrapper(K key, Function<? super K, @Nullable FsWrapper<? extends V>> loader);
 
     /**
      * Sets the value associated with given key, return old value or null if there is no old value.
