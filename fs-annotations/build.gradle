@@ -7,7 +7,7 @@ plugins {
   id 'fs-publish'
 }
 
-description = "Fs Annotations"
+description = "Annotations of fs."
 
 dependencies {
 

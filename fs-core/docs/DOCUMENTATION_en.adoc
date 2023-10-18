@@ -1,168 +1,51 @@
-= image:../../logo.svg[Fs Core] `fs-core`: Fs Core -- Core interfaces and classes of Fs
+= _fs-core_ -- Core utilities and interfaces of _fs_
 :toc:
-:toclevels: 3
+:toclevels: 2
 :toc-title:
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 
-Fs Core provides core interfaces and classes of Fs, including:
+_fs-core_ provides core utilities and interfaces, it is the core and common lib of
+https://github.com/fredsuvn[me] and https://github.com/srclab-projects[SrcLab].
+Of course, it is also very suitable to be used as a user-friendly and practical basic utility class in other projects.
 
-* *<<base>>*: base package, provides base functional interfaces and utilities;
-* *<<collect>>*: collection package, provides interfaces and utilities for collection operations;
-* *<<bean>>*: provides interfaces and utilities for bean operations;
-* *<<cache>>*: provides interfaces and utilities for cache operations;
-* *<<convert>>*: provides interfaces and utilities for conversion operations;
-* *<<data>>*: provides interfaces and utilities for data operations;
-* *<<encode>>*: provides interfaces and utilities for encoding/decoding;
-* *<<io>>*: provides interfaces and utilities for IO operations;
-* *<<net>>*: provides interfaces and utilities for network operations (TCP/UDP/HTTP);
-* *<<protobuf>>*: expansion package for link:https://github.com/protocolbuffers/protobuf[protobuf];
-* *<<proxy>>*: proxy with spring-cglib or cglib or JDK;
-* *<<reflect>>*: provides interfaces and utilities for reflection;
-* *<<security>>*: provides interfaces and utilities for Crypto/Cipher/MAC/Digest/Sign/Key;
+link:javadoc/index.html[Javadoc]
 
-== Functions
+== Packages
 
-[[base]]
-=== Base package
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*base*]:
+base package about object, array, bytes, string, thread, process and more foundations;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*bean*]:
+bean package provides bean's definition, resolving and operations;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*convert*]:
+convert package provides conversion operations between objects;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*cache*]:
+a very simple and practical cache interface,
+provides built-in implementation based on reference of soft/weak ;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*collect*]:
+collection package, provides utilities for collection operations;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*data*]:
+provides interfaces and utilities for data operations, and other data support such as
+link:https://github.com/protocolbuffers/protobuf[protobuf];
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*encode*]:
+provides interfaces and utilities for encoding/decoding such as base64 and hex;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*io*]:
+provides interfaces and utilities for IO, file, cached file and stream wrappers;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*net*]:
+provides interfaces and utilities for network operations (TCP/UDP/HTTP);
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*proxy*]:
+proxy with spring-cglib or cglib or JDK;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*reflect*]:
+provides interfaces and utilities for reflection, type-reference and type implementations;
+* link:javadoc/xyz/fsgik/common/base/package-summary.html[*security*]:
+provides interfaces and utilities for Crypto/Cipher/MAC/Digest/Sign/Key;
 
-Provides base utilities:
+== Main utilities and interfaces and Samples
 
-* Fs: utilities for Object, thread, process,
-* FsArray:
+link:../src/test/java/samples/[Here is the Samples].
 
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
+== Benchmarks
 
-[[collect]]
-=== Collection
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[bean]]
-=== Bean
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[cache]]
-=== Cache
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[convert]]
-=== Conversion
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[data]]
-=== Data
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[encode]]
-=== Encoding/Decoding
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[io]]
-=== IO
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[net]]
-=== Network
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[protobuf]]
-=== Protobuf Expansion
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[proxy]]
-=== Proxy
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[reflect]]
-=== Reflection
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-[[security]]
-=== Security
-
-Provides base interfaces and utilities.
-
-[source,java]
-----
-include::../src/test/java/samples/BaseSamples.java[]
-----
-
-== Benchmark
-
-[[copyProperties]]
-=== Copy Properties
-
-----
-include::../src/test/java/benchmark/CopyProperties.txt[]
-----
+link:../src/test/java/benchmark/[Here is the Result of Benchmarks].

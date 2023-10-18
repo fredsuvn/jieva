@@ -1,10 +1,10 @@
-= image:../../logo.svg[Fs Annotations] `fs-annotations`: Fs Annotations -- Annotations of link:../../README.md[Fs]
+= _fs-annotations_: Annotations of _fs_
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 
-Fs Annotations provides a set of annotations to help your codes stay tidy and clean:
+_fs-annotations_ provides a set of annotations to help your codes stay tidy and clean:
 
 * *Nullable*/*NonNull*: tells the annotated element is nullable/non-null;
 * *DefaultNullable*/*DefaultNonNull*: tells all elements which can be annotated by *Nullable*/*NonNull*
@@ -15,4 +15,6 @@ in scope of annotated element are nullable/non-null, usually used in package-inf
 * *Immutable*: tells the annotated element is immutable;
 * *ThreadSafe*: tells the annotated element is thread-safe;
 
-== link:../src/test/java/samples/[Samples Here]
+link:../src/test/java/samples/[Samples]
+
+link:javadoc/index.html[Javadoc]

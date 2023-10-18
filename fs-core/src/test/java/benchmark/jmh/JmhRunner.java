@@ -1,11 +1,11 @@
-package jmh;
+package benchmark.jmh;
 
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-public class BenchmarkRunner {
+public class JmhRunner {
 
     private static final String OUTPUT_DIR = "fs-core/src/test/java/jmh/";
 

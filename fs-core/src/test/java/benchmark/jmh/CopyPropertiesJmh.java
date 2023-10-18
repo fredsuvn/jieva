@@ -1,4 +1,4 @@
-package jmh.tests;
+package benchmark.jmh;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;

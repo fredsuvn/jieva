@@ -8,13 +8,14 @@ plugins {
   id 'fs-publish'
 }
 
-description = 'Kotlin support for Fs.'
+description = 'Kotlin support of fs.'
 
 dependencies {
 
   implementation platform(project(':fs-dependencies'))
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
   api project(':fs-annotations')
+  api project(':fs-core')
 
   testImplementation project(":fs-test")
   testAnnotationProcessor platform(project(":fs-dependencies"))

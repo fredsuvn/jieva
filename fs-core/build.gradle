@@ -8,7 +8,7 @@ plugins {
   id 'fs-publish'
 }
 
-description = 'Fs core.'
+description = 'Core of fs.'
 
 java {
   registerFeature('proxySpringSupport') {

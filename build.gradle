@@ -4,5 +4,5 @@ plugins {
   id 'fs-doc'
 }
 
-description = "Fs Root Project"
+description = "Root Project of fs"
 

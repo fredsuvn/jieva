@@ -1,4 +1,4 @@
-package jmh.tests;
+package benchmark.jmh;
 
 import org.openjdk.jmh.annotations.*;
 import xyz.fsgik.common.base.FsString;

@@ -1,4 +1,4 @@
-package jmh.tests;
+package benchmark.jmh;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.cache.Cache;

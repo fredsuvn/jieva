@@ -6,7 +6,7 @@ plugins {
   id 'fs-publish'
 }
 
-description = 'Testing support for fs.'
+description = 'Testing support of fs.'
 
 dependencies {
   implementation platform(project(':fs-dependencies'))
