@@ -29,7 +29,8 @@ public class CacheJmh {
         }
     }
 
-    private FsCache<Integer, String> fsCache;
+    private FsCache<Integer, String> fsSoftCache;
+    private FsCache<Integer, String> fsWeakCache;
     private Cache<Integer, String> guava;
     private Cache<Integer, String> guavaSoft;
     private Cache<Integer, String> guavaBig;
@@ -39,7 +40,8 @@ public class CacheJmh {
 
     @Setup(Level.Iteration)
     public void init() {
-        fsCache = FsCache.softCache();
+        fsSoftCache = FsCache.softCache();
+        fsWeakCache = FsCache.weakCache();
         guava = CacheBuilder.newBuilder()
             .maximumSize(keys.length / 10)
             .build();
@@ -63,13 +65,26 @@ public class CacheJmh {
     @Benchmark
     public void fsSoft() {
         for (Integer key : keys) {
-            fsCache.put(key, key.toString());
+            fsSoftCache.put(key, key.toString());
         }
         for (Integer key : keys) {
-            fsCache.get(key);
+            fsSoftCache.get(key);
         }
         for (Integer key : keys2) {
-            fsCache.get(key, String::valueOf);
+            fsSoftCache.get(key, String::valueOf);
+        }
+    }
+
+    @Benchmark
+    public void fsWeak() {
+        for (Integer key : keys) {
+            fsWeakCache.put(key, key.toString());
+        }
+        for (Integer key : keys) {
+            fsWeakCache.get(key);
+        }
+        for (Integer key : keys2) {
+            fsWeakCache.get(key, String::valueOf);
         }
     }
 

@@ -212,7 +212,7 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
             }
             Entry entry = (Entry) x;
             map.remove(entry.getKey());
-            entry.clear();
+            //entry.clear();
             if (removeListener != null) {
                 removeListener.onRemove(this, Fs.as(entry.getKey()));
             }
@@ -246,6 +246,14 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
         public Object getValue() {
             return get();
         }
+
+        @Override
+        public void clear() {
+            super.clear();
+            if (removeListener != null) {
+                removeListener.onRemove(ReferencedCache.this, Fs.as(key));
+            }
+        }
     }
 
     private final class WeakEntry extends WeakReference<Object> implements Entry {
@@ -265,6 +273,14 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
         @Override
         public Object getValue() {
             return get();
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            if (removeListener != null) {
+                removeListener.onRemove(ReferencedCache.this, Fs.as(key));
+            }
         }
     }
 }
