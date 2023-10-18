@@ -18,9 +18,9 @@ It provides many fast and convenient interfaces, functions and utilities.
 
 _fs_ includes:
 
-* link:../fs-annotations/[fs-annotation]: Annotations;
-* link:../fs-core/[fs-core]: Core lib;
-* link:../fs-kotlin/[fs-kotlin]: Kotlin support;
+* link:../fs-annotations/[fs-annotation]: Annotations; link:../fs-annotations/docs/DOCUMENTATION_en.adoc[javadoc];
+* link:../fs-core/[fs-core]: Core lib; link:../fs-core/docs/DOCUMENTATION_en.adoc[javadoc];
+* link:../fs-kotlin/[fs-kotlin]: Kotlin support; link:../fs-kotlin/docs/DOCUMENTATION_en.adoc[javadoc];
 * link:../fs-test/[fs-test]: Testing support;
 * link:../fs-bom/[fs-bom]: BOM;
 

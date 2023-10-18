@@ -24,6 +24,11 @@ dependencies {
 
 javadoc {
   destinationDir = file("$project.projectDir/docs/javadoc")
+  dependsOn dokkaJavadoc
+}
+
+dokkaJavadoc {
+  outputDirectory = javadoc.destinationDir
 }
 
 dokkaHtml {
