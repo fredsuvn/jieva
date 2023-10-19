@@ -85,6 +85,10 @@ public class CacheTest {
         fsCache.getWrapper(1, k -> null);
         Assert.assertNull(fsCache.get(1));
         Assert.assertNull(fsCache.getWrapper(1));
+        fsCache.put(2, "2");
+        Assert.assertEquals(fsCache.get(2), "2");
+        Assert.assertEquals(fsCache.get(2, k -> "4"), "2");
+        Assert.assertEquals(fsCache.getWrapper(2, k -> FsWrapper.wrap("8")).get(), "2");
     }
 
     @Test

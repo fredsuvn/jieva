@@ -1,31 +1,31 @@
 Benchmark                      Mode  Cnt      Score    Error   Units
-CacheJmh.caffeine             thrpt    3     11.210 ± 35.980  ops/ms
-CacheJmh.caffeineBig          thrpt    3     13.254 ± 19.601  ops/ms
-CacheJmh.caffeineSoft         thrpt    3     20.097 ± 15.232  ops/ms
-CacheJmh.fsSoft               thrpt    3     30.546 ±  1.857  ops/ms
-CacheJmh.fsWeak               thrpt    3     27.234 ±  0.245  ops/ms
-CacheJmh.guava                thrpt    3      5.244 ±  0.638  ops/ms
-CacheJmh.guavaBig             thrpt    3      4.726 ±  0.265  ops/ms
-CacheJmh.guavaSoft            thrpt    3     22.534 ±  1.306  ops/ms
-CaseJmh.fsCamel               thrpt        1183.216           ops/ms
-CaseJmh.fsMix                 thrpt        1212.892           ops/ms
-CaseJmh.fsUnderscore          thrpt        1030.644           ops/ms
-CaseJmh.guavaCamel            thrpt        2048.325           ops/ms
-CaseJmh.guavaMix              thrpt        1956.154           ops/ms
-CaseJmh.guavaUnderscore       thrpt       17832.900           ops/ms
-CopyPropertiesJmh.apacheCopy  thrpt         140.811           ops/ms
-CopyPropertiesJmh.fsCopy      thrpt         798.559           ops/ms
-CopyPropertiesJmh.hutoolCopy  thrpt         174.648           ops/ms
-CopyPropertiesJmh.springCopy  thrpt         158.479           ops/ms
-InvokeJmh.reflectMember       thrpt       54564.570           ops/ms
-InvokeJmh.reflectStatic       thrpt       55333.184           ops/ms
-InvokeJmh.unreflectMember     thrpt       45402.357           ops/ms
-InvokeJmh.unreflectStatic     thrpt       46732.725           ops/ms
-ReplaceJmh.fsLongEq           thrpt        1090.737           ops/ms
-ReplaceJmh.fsLongNe           thrpt         694.273           ops/ms
-ReplaceJmh.fsShortEq          thrpt       13079.200           ops/ms
-ReplaceJmh.fsShortNe          thrpt        9949.313           ops/ms
-ReplaceJmh.jdkLongEq          thrpt         433.828           ops/ms
-ReplaceJmh.jdkLongNe          thrpt         404.603           ops/ms
-ReplaceJmh.jdkShortEq         thrpt        2933.775           ops/ms
-ReplaceJmh.jdkShortNe         thrpt        2644.348           ops/ms
+CacheJmh.caffeine             thrpt    3      6.272 ± 11.892  ops/ms
+CacheJmh.caffeineBig          thrpt    3      6.184 ± 10.225  ops/ms
+CacheJmh.caffeineSoft         thrpt    3     12.078 ± 19.089  ops/ms
+CacheJmh.fsSoft               thrpt    3     14.431 ±  0.280  ops/ms
+CacheJmh.fsWeak               thrpt    3     14.755 ±  6.248  ops/ms
+CacheJmh.guava                thrpt    3      3.541 ±  1.690  ops/ms
+CacheJmh.guavaBig             thrpt    3      3.261 ±  0.328  ops/ms
+CacheJmh.guavaSoft            thrpt    3     14.287 ±  5.546  ops/ms
+CaseJmh.fsCamel               thrpt         807.521           ops/ms
+CaseJmh.fsMix                 thrpt         536.390           ops/ms
+CaseJmh.fsUnderscore          thrpt         550.386           ops/ms
+CaseJmh.guavaCamel            thrpt        1354.159           ops/ms
+CaseJmh.guavaMix              thrpt        1449.618           ops/ms
+CaseJmh.guavaUnderscore       thrpt        9606.293           ops/ms
+CopyPropertiesJmh.apacheCopy  thrpt          93.760           ops/ms
+CopyPropertiesJmh.fsCopy      thrpt         663.190           ops/ms
+CopyPropertiesJmh.hutoolCopy  thrpt          92.482           ops/ms
+CopyPropertiesJmh.springCopy  thrpt          81.802           ops/ms
+InvokeJmh.reflectMember       thrpt       36110.926           ops/ms
+InvokeJmh.reflectStatic       thrpt       35847.426           ops/ms
+InvokeJmh.unreflectMember     thrpt       16961.131           ops/ms
+InvokeJmh.unreflectStatic     thrpt       24357.291           ops/ms
+ReplaceJmh.fsLongEq           thrpt         579.904           ops/ms
+ReplaceJmh.fsLongNe           thrpt         249.030           ops/ms
+ReplaceJmh.fsShortEq          thrpt        7269.262           ops/ms
+ReplaceJmh.fsShortNe          thrpt        5370.880           ops/ms
+ReplaceJmh.jdkLongEq          thrpt         246.681           ops/ms
+ReplaceJmh.jdkLongNe          thrpt         206.504           ops/ms
+ReplaceJmh.jdkShortEq         thrpt        1754.093           ops/ms
+ReplaceJmh.jdkShortNe         thrpt        1817.011           ops/ms
