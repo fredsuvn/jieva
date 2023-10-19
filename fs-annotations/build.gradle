@@ -25,6 +25,8 @@ java {
 
 javadoc {
   destinationDir = file("$project.projectDir/docs/javadoc")
+  options.encoding = 'UTF-8'
+  options.locale = 'en_US'
 }
 
 clean {

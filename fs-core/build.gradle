@@ -53,6 +53,8 @@ java {
 javadoc {
   //options.addStringOption('Xdoclint:none', '-quiet')
   destinationDir = file("$project.projectDir/docs/javadoc")
+  options.encoding = 'UTF-8'
+  options.locale = 'en_US'
 }
 
 clean {

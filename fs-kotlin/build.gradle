@@ -1,3 +1,5 @@
+import org.jetbrains.dokka.gradle.DokkaTask
+
 plugins {
   id 'fs'
   id 'fs-config'
@@ -24,7 +26,9 @@ dependencies {
 
 javadoc {
   destinationDir = file("$project.projectDir/docs/javadoc")
-  dependsOn dokkaJavadoc
+  dependsOn dokkaHtml
+  options.encoding = 'UTF-8'
+  options.locale = 'en_US'
 }
 
 dokkaJavadoc {
@@ -33,6 +37,15 @@ dokkaJavadoc {
 
 dokkaHtml {
   outputDirectory = javadoc.destinationDir
+}
+
+tasks.withType(DokkaTask).configureEach {
+  dokkaSourceSets.configureEach {
+    configuration {
+      language = "en"
+      encoding = "UTF-8"
+    }
+  }
 }
 
 clean {
