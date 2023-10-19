@@ -1,53 +1,50 @@
-= image:../logo.svg[] Boat: SrcLab的Java/kotlin核心基础库
+= _fs_: link:{srclab-url}[SrcLab] 和 link:{me-url}[我] 的JVM核心库
 :toc:
 :toclevels: 3
-:toc-title: 目录
 :last-update-label!:
-孙谦 <fredsuvn@163.com>
+Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
-:url: https://github.com/srclab-projects/boat
+:url: https://github.com/fredsuvn/fs
 :srclab-url: https://github.com/srclab-projects
-:boat-version: 0.0.1
+:me-url: https://github.com/fredsuvn
+:fs-version: 0.0.0
 
-== 简介
+== Introduction
 
-Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于 link:{srclab-url}[SrcLab] 里的项目.
-它提供了许多方便快捷的接口, 函数和工具.
+_fs_ 是一组 Java/Kotlin (JDK 1.8+)的工具库, 大部分用java写,
+广泛应用于 link:{srclab-url}[SrcLab] 和 link:{me-url}[我] 的项目中.
+它提供许多方便快捷的工具和接口.
 
-Boat 包括:
+_fs_ 包括:
 
-* link:../boat-annotations/DOCUMENTATION.md[boat-annotations]: 核心注解;
-* link:../boat-core/DOCUMENTATION.md[boat-core]: 核心库;
-* link:../boat-data/DOCUMENTATION.md[boat-data]: 序列化和反序列化核心库 (支持 `JSON`);
-* link:../boat-codec/DOCUMENTATION.md[boat-codec]: 编码核心库 (支持 `HEX`, `BASE64`, `SHA`, `MD`, `HMAC`, `AES`, `RSA`, `SM2` 等);
-* link:../boat-id/DOCUMENTATION.md[boat-id]: 快速ID生成框架;
-* link:../boat-plugins/DOCUMENTATION.md[boat-others]: 第三方支持和扩展库 (如 `protobuf`);
+* link:../fs-annotations/[fs-annotation]: 注解; link:../fs-annotations/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../fs-core/[fs-core]: 核心库; link:../fs-core/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../fs-kotlin/[fs-kotlin]: Kotlin支持; link:../fs-kotlin/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../fs-test/[fs-test]: 测试支持;
+* link:../fs-bom/[fs-bom]: BOM;
 
-* link:../boat-test/[boat-test]: 测试库的依赖管理工程;
-* link:../boat-bom/[boat-bom]: BOM (gradle platform) project;
+通常只需要引入:
 
-如果你需要一次性导入常用库 (`annotations`, `core`, `codec`, `data` and `id`), 只需要导入:
-
-* link:../boat/[boat].
+* link:../fs-core/[fs-core].
 
 == 获取
 
-=== 获取 Boat
+=== 获取 _fs_
 
 .Gradle
 [source,groovy,subs="attributes+"]
 ----
-implementation "xyz.srclab.common:boat:{boat-version}"
+implementation "xyz.fsgik:fs-core:{fs-version}"
 ----
 
 .Maven
 [source,xml,subs="attributes+"]
 ----
 <dependency>
-  <groupId>xyz.srclab.common</groupId>
-  <artifactId>boat</artifactId>
-  <version>{boat-version}</version>
+  <groupId>xyz.fsgik</groupId>
+  <artifactId>fs-core</artifactId>
+  <version>{fs-version}</version>
 </dependency>
 ----
 
@@ -56,7 +53,7 @@ implementation "xyz.srclab.common:boat:{boat-version}"
 .Gradle
 [source,groovy,subs="attributes+"]
 ----
-api implementation("xyz.srclab.common:boat-bom:{boat-version}")
+api platform("xyz.fsgik:boat-bom:{fs-version}")
 ----
 
 .Maven
@@ -65,89 +62,12 @@ api implementation("xyz.srclab.common:boat-bom:{boat-version}")
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>xyz.srclab.common</groupId>
-      <artifactId>boat</artifactId>
-      <version>{boat-version}</version>
+      <groupId>xyz.fsgik</groupId>
+      <artifactId>fs-bom</artifactId>
+      <version>{fs-version}</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
   </dependencies>
 </dependencyManagement>
 ----
-
-.Source Code
-{url}
-
-== 用法
-
-=== Boat Annotations
-
-* AsciiDoc:
-** link:../boat-annotations/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-annotations/docs/DOCUMENTATION_zh.adoc[简体中文]
-* Markdown:
-** link:../boat-annotations/docs/DOCUMENTATION_en.md[English]
-** link:../boat-annotations/docs/DOCUMENTATION_zh.md[简体中文]
-* HTML:
-** link:../boat-annotations/docs/DOCUMENTATION_en.html[English]
-** link:../boat-annotations/docs/DOCUMENTATION_zh.html[简体中文]
-
-=== Boat Core
-
-* AsciiDoc:
-** link:../boat-core/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-core/docs/DOCUMENTATION_zh.adoc[简体中文]
-* Markdown:
-** link:../boat-core/docs/DOCUMENTATION_en.md[English]
-** link:../boat-core/docs/DOCUMENTATION_zh.md[简体中文]
-* HTML:
-** link:../boat-core/docs/DOCUMENTATION_en.html[English]
-** link:../boat-core/docs/DOCUMENTATION_zh.html[简体中文]
-
-=== Boat Serialize
-
-* AsciiDoc:
-** link:../boat-data/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-data/docs/DOCUMENTATION_zh.adoc[简体中文]
-* Markdown:
-** link:../boat-data/docs/DOCUMENTATION_en.md[English]
-** link:../boat-data/docs/DOCUMENTATION_zh.md[简体中文]
-* HTML:
-** link:../boat-data/docs/DOCUMENTATION_en.html[English]
-** link:../boat-data/docs/DOCUMENTATION_zh.html[简体中文]
-
-=== Boat Codec
-
-* AsciiDoc:
-** link:../boat-codec/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-codec/docs/DOCUMENTATION_zh.adoc[简体中文]
-* Markdown:
-** link:../boat-codec/docs/DOCUMENTATION_en.md[English]
-** link:../boat-codec/docs/DOCUMENTATION_zh.md[简体中文]
-* HTML:
-** link:../boat-codec/docs/DOCUMENTATION_en.html[English]
-** link:../boat-codec/docs/DOCUMENTATION_zh.html[简体中文]
-
-=== Boat Id
-
-* AsciiDoc:
-** link:../boat-id/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-id/docs/DOCUMENTATION_zh.adoc[简体中文]
-* Markdown:
-** link:../boat-id/docs/DOCUMENTATION_en.md[English]
-** link:../boat-id/docs/DOCUMENTATION_zh.md[简体中文]
-* HTML:
-** link:../boat-id/docs/DOCUMENTATION_en.html[English]
-** link:../boat-id/docs/DOCUMENTATION_zh.html[简体中文]
-
-=== Boat Others
-
-* AsciiDoc:
-** link:../boat-plugins/docs/DOCUMENTATION_en.adoc[English]
-** link:../boat-plugins/docs/DOCUMENTATION_zh.adoc[简体中文]
-* Markdown:
-** link:../boat-plugins/docs/DOCUMENTATION_en.md[English]
-** link:../boat-plugins/docs/DOCUMENTATION_zh.md[简体中文]
-* HTML:
-** link:../boat-plugins/docs/DOCUMENTATION_en.html[English]
-** link:../boat-plugins/docs/DOCUMENTATION_zh.html[简体中文]

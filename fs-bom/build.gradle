@@ -1,0 +1,22 @@
+plugins {
+  id 'fs'
+  id 'fs-config'
+  id 'fs-repo'
+  id 'java-platform'
+  id 'fs-publish'
+}
+
+description = "BOM of fs."
+
+javaPlatform {
+  allowDependencies()
+}
+
+dependencies {
+  constraints {
+    //api project(":boat")
+    file("${rootDir}").eachDirMatch(~/fs-(?!(plugins|draft)).*/) { dir ->
+      api project(":${dir.name}")
+    }
+  }
+}

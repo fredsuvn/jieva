@@ -2,11 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.base.FsSystem;
-import xyz.srclab.common.io.FsIO;
+import xyz.fsgik.common.base.*;
+import xyz.fsgik.common.io.FsIO;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,10 +16,10 @@ public class FsTest {
 
     @Test
     public void testThrow() {
-        FsLogger.defaultLogger().info(Fs.stackTraceToString(
+        FsLogger.defaultLogger().info(FsTrace.stackTraceToString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())))
         );
-        FsLogger.defaultLogger().info(Fs.stackTraceToString(
+        FsLogger.defaultLogger().info(FsTrace.stackTraceToString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())),
             " : ")
         );
@@ -55,10 +52,10 @@ public class FsTest {
     @Test
     public void testRes() throws IOException {
         URL f1 = Fs.findRes("/t2/f1.txt");
-        Assert.assertEquals(FsIO.readString(f1.openStream(), FsString.CHARSET), "f1.txt");
+        Assert.assertEquals(FsIO.readString(f1.openStream(), FsChars.defaultCharset()), "f1.txt");
         Set<URL> set = Fs.findAllRes("/t2/f2.txt");
         for (URL url : set) {
-            Assert.assertEquals(FsIO.readString(url.openStream(), FsString.CHARSET), "f2.txt");
+            Assert.assertEquals(FsIO.readString(url.openStream(), FsChars.defaultCharset()), "f2.txt");
         }
     }
 
@@ -74,12 +71,12 @@ public class FsTest {
 
     @Test
     public void testPing() throws InterruptedException {
-        Process process = Fs.runProcess("ping", "-n", "5", "127.0.0.1");
+        Process process = FsProcess.start("ping", "-n", "5", "127.0.0.1");
         Semaphore semaphore = new Semaphore(1);
         semaphore.acquire();
-        Fs.runThread(() -> {
+        FsThread.start(() -> {
             while (true) {
-                String output = FsIO.avalaibleString(process.getInputStream(), FsSystem.nativeCharset());
+                String output = FsIO.avalaibleString(process.getInputStream(), FsChars.nativeCharset());
                 if (output == null) {
                     semaphore.release();
                     return;
@@ -87,20 +84,20 @@ public class FsTest {
                 if (FsString.isNotEmpty(output)) {
                     FsLogger.defaultLogger().info(output);
                 }
-                Fs.sleep(1);
+                FsThread.sleep(1);
             }
         });
         process.waitFor();
         while (semaphore.hasQueuedThreads()) {
-            Fs.sleep(1000);
+            FsThread.sleep(1000);
         }
         process.destroy();
     }
 
     private void testEcho(String command) throws InterruptedException {
-        Process process = Fs.runProcess(command);
+        Process process = FsProcess.start(command);
         process.waitFor();
-        String output = FsIO.avalaibleString(process.getInputStream(), FsSystem.nativeCharset());
+        String output = FsIO.avalaibleString(process.getInputStream(), FsChars.nativeCharset());
         FsLogger.defaultLogger().info(output);
         Assert.assertEquals(output, ECHO_CONTENT + FsSystem.getLineSeparator());
         process.destroy();
@@ -108,7 +105,7 @@ public class FsTest {
 
     @Test
     public void testThread() throws InterruptedException {
-        Thread thread = Fs.runThread("hahaha", () -> {
+        Thread thread = FsThread.start("hahaha", () -> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -125,7 +122,7 @@ public class FsTest {
     public void testSystem() {
         FsLogger.defaultLogger().info(FsSystem.getJavaVersion());
         FsLogger.defaultLogger().info(FsSystem.javaMajorVersion());
-        FsLogger.defaultLogger().info(FsSystem.nativeCharset());
+        FsLogger.defaultLogger().info(FsChars.nativeCharset());
         FsLogger.defaultLogger().info(FsSystem.getOsName());
         FsLogger.defaultLogger().info(FsSystem.isWindows());
         FsLogger.defaultLogger().info(FsSystem.isLinux());
@@ -146,6 +143,10 @@ public class FsTest {
         Assert.expectThrows(IllegalArgumentException.class, () -> Fs.findEnum(Fs.class, "a", true));
     }
 
+    public enum Te {
+        A, B, C
+    }
+
     private static final class T1 {
         public static void invoke1() {
             T2.invoke2();
@@ -160,19 +161,15 @@ public class FsTest {
 
     private static final class T3 {
         public static void invoke3() {
-            StackTraceElement element1 = Fs.findCallerStackTrace(T1.class.getName(), "invoke1");
+            StackTraceElement element1 = FsTrace.findCallerStackTrace(T1.class.getName(), "invoke1");
             Assert.assertEquals(element1.getClassName(), FsTest.class.getName());
             Assert.assertEquals(element1.getMethodName(), "testFindCallerStackTrace");
-            StackTraceElement element2 = Fs.findCallerStackTrace(T2.class.getName(), "invoke2");
+            StackTraceElement element2 = FsTrace.findCallerStackTrace(T2.class.getName(), "invoke2");
             Assert.assertEquals(element2.getClassName(), T1.class.getName());
             Assert.assertEquals(element2.getMethodName(), "invoke1");
-            StackTraceElement element3 = Fs.findCallerStackTrace(T3.class.getName(), "invoke3");
+            StackTraceElement element3 = FsTrace.findCallerStackTrace(T3.class.getName(), "invoke3");
             Assert.assertEquals(element3.getClassName(), T2.class.getName());
             Assert.assertEquals(element3.getMethodName(), "invoke2");
         }
-    }
-
-    public enum Te {
-        A, B, C
     }
 }

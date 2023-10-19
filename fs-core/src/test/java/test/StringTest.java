@@ -3,8 +3,8 @@ package test;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.collect.FsCollect;
+import xyz.fsgik.common.base.FsString;
+import xyz.fsgik.common.collect.FsCollect;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -164,15 +164,15 @@ public class StringTest {
     @Test
     public void testSubRef() {
         Assert.assertEquals(
-            FsString.subRef("12345678", 2, 7).toString(),
+            FsString.subView("12345678", 2, 7).toString(),
             "34567"
         );
         Assert.assertEquals(
-            FsString.subRef("12345678", 2, 7).charAt(3),
+            FsString.subView("12345678", 2, 7).charAt(3),
             '6'
         );
         Assert.assertEquals(
-            FsString.subRef("12345678", 2, 7).subSequence(1, 3).toString(),
+            FsString.subView("12345678", 2, 7).subSequence(1, 3).toString(),
             "45"
         );
     }
@@ -224,5 +224,17 @@ public class StringTest {
         Assert.assertEquals("Abc", FsString.capitalize("Abc"));
         Assert.assertEquals("abc", FsString.uncapitalize("abc"));
         Assert.assertEquals("abc", FsString.uncapitalize("Abc"));
+    }
+
+    @Test
+    public void testLazyString() {
+        int[] is = {0};
+        CharSequence lazy = FsString.lazyString(() -> {
+            is[0] = 1;
+            return "8899";
+        });
+        Assert.assertEquals(is[0], 0);
+        Assert.assertEquals(lazy.toString(), "8899");
+        Assert.assertEquals(is[0], 1);
     }
 }

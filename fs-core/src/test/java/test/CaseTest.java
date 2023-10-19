@@ -3,8 +3,8 @@ package test;
 import com.google.common.base.CaseFormat;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.FsCase;
-import xyz.srclab.common.collect.FsCollect;
+import xyz.fsgik.common.base.FsCase;
+import xyz.fsgik.common.collect.FsCollect;
 
 import java.util.Arrays;
 

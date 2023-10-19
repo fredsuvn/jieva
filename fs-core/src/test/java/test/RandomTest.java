@@ -2,8 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.base.FsRandom;
+import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.base.FsRandom;
 
 public class RandomTest {
 

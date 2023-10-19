@@ -1,0 +1,34 @@
+plugins {
+  id 'fs'
+  id 'fs-config'
+  id 'fs-repo'
+  id 'java-library'
+  id 'fs-test'
+  id 'fs-publish'
+}
+
+description = "Annotations of fs."
+
+dependencies {
+
+  implementation platform(project(":fs-dependencies"))
+  implementation "com.google.code.findbugs:jsr305"
+  compileOnly 'org.projectlombok:lombok'
+
+  testImplementation project(":fs-test")
+}
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+javadoc {
+  destinationDir = file("$project.projectDir/docs/javadoc")
+  options.encoding = 'UTF-8'
+  options.locale = 'en_US'
+}
+
+clean {
+  //delete(javadoc.destinationDir)
+}

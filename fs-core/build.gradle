@@ -1,117 +1,126 @@
 plugins {
-    id "com.google.protobuf" version "$protobufPluginVersion"
-    id 'build.jar'
-    id 'org.jetbrains.kotlin.plugin.lombok' version '1.7.0'
-    id 'io.freefair.lombok' version '5.3.0'
+  id 'fs'
+  id 'fs-config'
+  id 'fs-repo'
+  id 'java-library'
+  id 'fs-test'
+  id 'com.google.protobuf' version "$protobufPluginVersion"
+  id 'fs-publish'
 }
 
-description = "Core of mage."
+description = 'Core of fs.'
 
 java {
-    registerFeature('optionalSupport') {
-        usingSourceSet(sourceSets.main)
-    }
+  registerFeature('proxySpringSupport') {
+    usingSourceSet(sourceSets.main)
+    capability('xyz.fsgik.build', 'proxy-spring-support', projectVersion)
+  }
+  registerFeature('proxyCglibSupport') {
+    usingSourceSet(sourceSets.main)
+    capability('xyz.fsgik.build', 'proxy-cglib-support', projectVersion)
+  }
+  registerFeature('dataProtobufSupport') {
+    usingSourceSet(sourceSets.main)
+    capability('xyz.fsgik.build', 'data-protobuf-support', projectVersion)
+  }
 }
 
 dependencies {
-    api platform(project(":boat-dependencies"))
 
-    api project(":boat-annotations")
+  implementation platform(project(':fs-dependencies'))
+  annotationProcessor platform(project(':fs-dependencies'))
 
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+  api project(':fs-annotations')
 
-    compileOnly "org.springframework:spring-core"
-    compileOnly "cglib:cglib"
-    compileOnly "org.bouncycastle:bcprov-jdk15on"
-    compileOnly "com.google.protobuf:protobuf-java"
-    compileOnly "io.netty:netty-all"
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation project(":boat-test")
-    testImplementation "commons-beanutils:commons-beanutils:1.9.4"
-    testImplementation group: 'org.springframework', name: 'spring-core', version: '5.3.29'
-    testImplementation group: 'org.springframework', name: 'spring-beans', version: '5.3.29'
-    testImplementation "cglib:cglib"
-    //testImplementation "org.bouncycastle:bcprov-jdk15on"
-    testImplementation group: 'cn.hutool', name: 'hutool-all', version: '5.8.21'
-    testImplementation "com.google.protobuf:protobuf-java"
+  proxySpringSupportImplementation 'org.springframework:spring-core'
+  proxyCglibSupportImplementation 'cglib:cglib'
+  dataProtobufSupportImplementation 'com.google.protobuf:protobuf-java'
 
-    //implementation project(":fs-processor")
-    //annotationProcessor project(":fs-processor")
+  testImplementation platform(project(':fs-dependencies'))
+  testAnnotationProcessor platform(project(":fs-dependencies"))
+  testAnnotationProcessor 'org.projectlombok:lombok'
+  testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 
-    testAnnotationProcessor platform(project(":boat-dependencies"))
-    testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
-
-    //testImplementation "org.apache.velocity:velocity"
-    //testImplementation "io.netty:netty-all"
-
-    //testImplementation group: 'cn.hutool', name: 'hutool-all', version: '5.7.14'
-
-    //testImplementation 'org.apache.velocity:velocity-engine-core:2.3'
-    // https://mvnrepository.com/artifact/com.github.javaparser/javaparser-core
-    //testImplementation group: 'com.github.javaparser', name: 'javaparser-core', version: '3.25.2'
-    // https://mvnrepository.com/artifact/com.github.javaparser/javaparser-symbol-solver-core
-    //testImplementation group: 'com.github.javaparser', name: 'javaparser-symbol-solver-core', version: '3.25.2'
-
+  testImplementation project(":fs-test")
+  testImplementation "com.google.protobuf:protobuf-java"
 }
 
-//utils.writeBuildInfos(project, "src/main/resources/META-INF/build.properties")
-
-//tasks.register('buildFs') {
-//  dependsOn 'compileJava'
-//  mustRunAfter 'clean'
-//}
-
-//task compileFs {
-//  dependsOn 'clean', 'compileJava'
-//}
-
-def generatedPath = "generated"
-def protoPath = "$generatedPath/proto"
-
-sourceSets {
-    test {
-        proto {
-            srcDirs = ["src/test/proto"]
-        }
-        //java {
-        //    srcDirs += "$protoPath/test/java"
-        //}
-    }
+java {
+  withJavadocJar()
+  withSourcesJar()
 }
 
-protobuf {
-    generatedFilesBaseDir = "$protoPath"
-    protoc {
-        // Download from repositories
-        artifact = "com.google.protobuf:protoc:$protocVersion"
-        //generatedFilesBaseDir = "generated/proto"
-    }
-
-    plugins {
-        //grpc {
-        //  artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
-        //}
-        //grpckt {
-        //  artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpcKotlinVersion"
-        //}
-    }
-
-    generateProtoTasks {
-        all()*.each { task ->
-            task.plugins {
-                // Generate Java gRPC classes
-                //grpc {
-                //  setOutputSubDir "$protoGenDir"
-                //}
-                // Generate Kotlin gRPC using the custom plugin from library
-                //grpckt {}
-            }
-        }
-    }
+javadoc {
+  //options.addStringOption('Xdoclint:none', '-quiet')
+  destinationDir = file("$project.projectDir/docs/javadoc")
+  options.encoding = 'UTF-8'
+  options.locale = 'en_US'
 }
 
 clean {
-    delete("${protobuf.generatedFilesBaseDir}")
-    delete("$generatedPath/temp")
+  //delete(javadoc.destinationDir)
+}
+
+def generatedPath = "$project.projectDir/generated"
+def protoPath = "$generatedPath/proto"
+
+sourceSets {
+  test {
+    proto {
+      srcDirs = ["src/test/proto"]
+    }
+    java {
+      srcDirs += "$protoPath/test/java"
+    }
+  }
+}
+
+protobuf {
+  generatedFilesBaseDir = "$protoPath"
+  protoc {
+    // Download from repositories
+    artifact = "com.google.protobuf:protoc:$protocVersion"
+    generatedFilesBaseDir = "$protoPath"
+  }
+
+  plugins {
+    //grpc {
+    //  artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
+    //}
+    //grpckt {
+    //  artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpcKotlinVersion"
+    //}
+  }
+
+  generateProtoTasks {
+    all()*.each { task ->
+      task.plugins {
+        // Generate Java gRPC classes
+        //grpc {
+        //  setOutputSubDir "$protoGenDir"
+        //}
+        // Generate Kotlin gRPC using the custom plugin from library
+        //grpckt {}
+      }
+    }
+  }
+}
+
+clean {
+  delete("${protobuf.generatedFilesBaseDir}")
+  delete("$generatedPath/temp")
+}
+
+tasks.register('benchmark') {
+  dependsOn compileTestJava
+  group = 'benchmark'
+  doLast {
+    javaexec {
+      main = 'benchmark.jmh.JmhRunner'
+      classpath = sourceSets.test.runtimeClasspath
+    }
+  }
 }

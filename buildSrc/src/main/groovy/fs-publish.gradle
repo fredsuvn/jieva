@@ -1,0 +1,148 @@
+plugins {
+  id 'fs'
+  id 'fs-config'
+  id 'maven-publish'
+  id 'signing'
+}
+
+project.afterEvaluate {
+  fs.info "Configure fs-publish"
+  configurePublishing()
+}
+
+def configurePublishing() {
+  publishing {
+    publications {
+      mavenJar(MavenPublication) {
+        if (components.hasProperty("javaPlatform")) {
+          from components.javaPlatform
+        } else {
+          from components.java
+        }
+        //artifact sourceJar
+        //artifact javadocJar
+        configurePublishMavenPom(it, projectInfo)
+      }
+      if (project.tasks.findByName("javadocJar")) {
+        mavenJavadocJar(MavenPublication) {
+          artifact(javadocJar) {
+            classifier = 'javadoc'
+          }
+        }
+      }
+      if (project.tasks.findByName("sourcesJar")) {
+        mavenSourcesJar(MavenPublication) {
+          artifact(sourcesJar) {
+            classifier = 'sources'
+          }
+        }
+      }
+    }
+    if (publishInfo.isToRemote) {
+      repositories {
+        configurePublishRepositories(it, publishInfo)
+      }
+    }
+    if (publishInfo.isSigning) {
+      configureSigning(publishInfo)
+      signing {
+        sign publishing.publications.maven
+      }
+    }
+  }
+}
+
+def configurePublishMavenPom(MavenPublication maven, projectInfo) {
+  maven.pom {
+    name = project.name
+    description = project.description
+    url = projectInfo.url
+    inceptionYear = projectInfo.inceptionYear
+    scm {
+      connection = "scm:git:${projectInfo.url}.git"
+      developerConnection = "scm:git:${projectInfo.url}.git"
+      url = projectInfo.url
+    }
+    if (projectInfo.licenses != null) {
+      licenses {
+        projectInfo.licenses.forEach { each ->
+          license {
+            name = each.name
+            url = each.url
+          }
+        }
+      }
+    }
+    if (projectInfo.developers != null) {
+      developers {
+        projectInfo.developers.forEach { each ->
+          developer {
+            email = each.email
+          }
+        }
+      }
+    }
+    fs.debug("maven-pom.name: $name")
+    fs.debug("maven-pom.description: $description")
+  }
+}
+
+def configurePublishRepositories(RepositoryHandler repositories, publishInfo) {
+  if (publishInfo.isSnapshot) {
+    repositories.maven {
+      name = publishInfo.snapshotId
+      url = publishInfo.snapshotUrl
+      fs.debug("snapshot.name: $name")
+      fs.debug("snapshot.url: $url")
+      credentials {
+        username = getProperty("publish${name.capitalize()}Username")
+        password = getProperty("publish${name.capitalize()}Password")
+        fs.debug("snapshot.username: $username")
+        fs.debug("snapshot.password: $password")
+      }
+    }
+  } else {
+    repositories.maven {
+      name = publishInfo.releaseId
+      url = publishInfo.releaseUrl
+      fs.debug("release.name: $name")
+      fs.debug("release.url: $url")
+      credentials {
+        username = getProperty("publish${name.capitalize()}Username")
+        password = getProperty("publish${name.capitalize()}Password")
+        fs.debug("release.username: $username")
+        fs.debug("release.password: $password")
+      }
+    }
+  }
+}
+
+def configureSigning(publishInfo) {
+  signing {
+    def signingName = publishInfo.signingId
+    def signingKeyId = getProperty("signing${signingName.capitalize()}KeyId")
+    def signingPassword = getProperty("signing${signingName.capitalize()}Password")
+    def signingKey = utils.readFileAsString(getProperty("signing${signingName.capitalize()}KeyFile"), "UTF-8")
+    fs.debug("signing.signingKeyId: $signingKeyId")
+    fs.debug("signing.signingPassword: $signingPassword")
+    fs.debug("signing.signingKey: $signingKey")
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+  }
+}
+
+//ext["javaPublishing"] = this.&javaPublishing
+
+// No need:
+//javadoc {
+//  options.addStringOption('Xdoclint:none', '-quiet')
+//}
+//tasks.register('javadocJar', Jar) {
+//  dependsOn javadoc
+//  classifier 'javadoc'
+//  from javadoc.destinationDir
+//}
+//
+//tasks.register('sourceJar', Jar) {
+//  from(sourceSets.main.allSource)
+//  archiveClassifier.set('sources')
+//}

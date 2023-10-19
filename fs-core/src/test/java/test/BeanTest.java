@@ -6,17 +6,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.base.Fs;
-import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.bean.FsBean;
-import xyz.srclab.common.bean.FsBeanCopier;
-import xyz.srclab.common.bean.FsBeanProperty;
-import xyz.srclab.common.bean.FsBeanResolver;
-import xyz.srclab.common.bean.handlers.JavaBeanResolveHandler;
-import xyz.srclab.common.bean.handlers.RecordBeanResolveHandler;
-import xyz.srclab.common.convert.FsConverter;
-import xyz.srclab.common.reflect.TypeRef;
+import xyz.fsgik.annotations.Nullable;
+import xyz.fsgik.common.base.Fs;
+import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.bean.*;
+import xyz.fsgik.common.bean.handlers.JavaBeanResolveHandler;
+import xyz.fsgik.common.bean.handlers.RecordBeanResolveHandler;
+import xyz.fsgik.common.convert.FsConverter;
+import xyz.fsgik.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Type;
@@ -33,11 +30,11 @@ public class BeanTest {
         }.getType();
         FsBean ccBean = FsBean.resolve(ccType);
         FsLogger.defaultLogger().info("ccBean: ", ccBean);
-        FsBeanProperty cc = ccBean.getProperty("cc");
-        FsBeanProperty c1 = ccBean.getProperty("c1");
-        FsBeanProperty c2 = ccBean.getProperty("c2");
-        FsBeanProperty i1 = ccBean.getProperty("i1");
-        FsBeanProperty i2 = ccBean.getProperty("i2");
+        FsProperty cc = ccBean.getProperty("cc");
+        FsProperty c1 = ccBean.getProperty("c1");
+        FsProperty c2 = ccBean.getProperty("c2");
+        FsProperty i1 = ccBean.getProperty("i1");
+        FsProperty i2 = ccBean.getProperty("i2");
         Assert.assertEquals(cc.getType(), Double.class);
         Assert.assertEquals(c2.getType(), Long.class);
         Assert.assertEquals(i1.getType(), String.class);
@@ -69,13 +66,13 @@ public class BeanTest {
         Type ccType = Cc.class;
         FsBean ccBean = FsBean.resolve(ccType);
         FsLogger.defaultLogger().info("ccBean: ", ccBean);
-        FsBeanProperty cc = ccBean.getProperty("cc");
-        FsBeanProperty c1 = ccBean.getProperty("c1");
-        FsBeanProperty c2 = ccBean.getProperty("c2");
-        FsBeanProperty i1 = ccBean.getProperty("i1");
-        FsBeanProperty i2 = ccBean.getProperty("i2");
-        FsBeanProperty e1 = ccBean.getProperty("e1");
-        FsBeanProperty e2 = ccBean.getProperty("e2");
+        FsProperty cc = ccBean.getProperty("cc");
+        FsProperty c1 = ccBean.getProperty("c1");
+        FsProperty c2 = ccBean.getProperty("c2");
+        FsProperty i1 = ccBean.getProperty("i1");
+        FsProperty i2 = ccBean.getProperty("i2");
+        FsProperty e1 = ccBean.getProperty("e1");
+        FsProperty e2 = ccBean.getProperty("e2");
         Assert.assertEquals(cc.getType().toString(), "T");
         Assert.assertEquals(c2.getType(), Long.class);
         Assert.assertEquals(i1.getType(), String.class);
@@ -114,20 +111,20 @@ public class BeanTest {
         map.put("3", 10000L);
         FsBean mapBean = FsBean.wrap(map, mapType);
         FsLogger.defaultLogger().info("mapBean: ", mapBean);
-        FsBeanProperty p1 = mapBean.getProperty("1");
-        FsBeanProperty p2 = mapBean.getProperty("2");
-        FsBeanProperty p3 = mapBean.getProperty("3");
-        FsBeanProperty p4 = mapBean.getProperty("4");
+        FsProperty p1 = mapBean.getProperty("1");
+        FsProperty p2 = mapBean.getProperty("2");
+        FsProperty p3 = mapBean.getProperty("3");
+        FsProperty p4 = mapBean.getProperty("4");
         Assert.assertEquals(p1.getType(), Long.class);
         Assert.assertEquals(p2.getType(), Long.class);
         Assert.assertEquals(p3.getType(), Long.class);
         Assert.assertNull(p4);
-        Map<String, FsBeanProperty> properties = mapBean.getProperties();
+        Map<String, FsProperty> properties = mapBean.getProperties();
         Assert.assertSame(properties, mapBean.getProperties());
         map.put("4", 12345L);
         Assert.assertNotEquals(properties, mapBean.getProperties());
         Assert.assertNull(p4);
-        FsBeanProperty p42 = mapBean.getProperty("4");
+        FsProperty p42 = mapBean.getProperty("4");
         Assert.assertEquals(p42.getType(), Long.class);
         Assert.assertSame(p1, mapBean.getProperties().get("1"));
         Assert.assertSame(p1, mapBean.getProperty("1"));
@@ -136,7 +133,7 @@ public class BeanTest {
         FsLogger.defaultLogger().info("mapBean: ", mapBean);
 
         FsBean mapObjBean = FsBean.wrap(map);
-        FsBeanProperty p1Obj = mapObjBean.getProperty("1");
+        FsProperty p1Obj = mapObjBean.getProperty("1");
         Assert.assertEquals(p1Obj.getType(), Object.class);
         Assert.assertEquals(
             p1.get(map),
@@ -254,7 +251,7 @@ public class BeanTest {
                 if (Objects.equals(targetType, Kk.class)) {
                     return new Kk(String.valueOf(source));
                 }
-                return Fs.CONTINUE;
+                return null;
             }
         });
         FsBeanCopier copier = FsBeanCopier.defaultCopier();
@@ -336,43 +333,100 @@ public class BeanTest {
         FsBeanResolver.Handler handler = FsBeanResolver.defaultResolver()
             .insertFirstHandler(new FsBeanResolver.Handler() {
                 @Override
-                public @Nullable Object resolve(FsBeanResolver.BeanBuilder builder) {
-                    if (Objects.equals(builder.getType(), Integer.class)) {
+                public @Nullable void resolve(FsBeanResolver.ResolveContext context) {
+                    if (Objects.equals(context.beanType(), Integer.class)) {
                         x[0]++;
-                        return Fs.CONTINUE;
+                        return;
                     }
-                    return Fs.BREAK;
+                    context.breakResolving();
                 }
             })
             .asHandler();
-        FsBeanResolver.BeanBuilder builder1 = new FsBeanResolver.BeanBuilder() {
+        FsBeanResolver.ResolveContext context1 = new FsBeanResolver.ResolveContext() {
+
+            private boolean breakResolving = false;
 
             @Override
-            public Type getType() {
+            public Type beanType() {
                 return Integer.class;
             }
 
             @Override
-            public Map<String, FsBeanProperty> getProperties() {
+            public Map<String, FsPropertyBase> beanProperties() {
                 return new HashMap<>();
             }
-        };
-        Assert.assertEquals(handler.resolve(builder1), Fs.CONTINUE);
-        Assert.assertEquals(x[0], 1);
-        FsBeanResolver.BeanBuilder builder2 = new FsBeanResolver.BeanBuilder() {
 
             @Override
-            public Type getType() {
+            public void breakResolving() {
+                breakResolving = true;
+            }
+
+            @Override
+            public boolean isBreakResolving() {
+                return breakResolving;
+            }
+        };
+        handler.resolve(context1);
+        Assert.assertFalse(context1.isBreakResolving());
+        Assert.assertEquals(x[0], 1);
+        FsBeanResolver.ResolveContext context2 = new FsBeanResolver.ResolveContext() {
+
+            private boolean breakResolving = false;
+
+            @Override
+            public Type beanType() {
                 return String.class;
             }
 
             @Override
-            public Map<String, FsBeanProperty> getProperties() {
+            public Map<String, FsPropertyBase> beanProperties() {
                 return new HashMap<>();
             }
+
+            @Override
+            public void breakResolving() {
+                breakResolving = true;
+            }
+
+            @Override
+            public boolean isBreakResolving() {
+                return breakResolving;
+            }
         };
-        Assert.assertEquals(handler.resolve(builder2), Fs.BREAK);
+        handler.resolve(context2);
+        Assert.assertTrue(context2.isBreakResolving());
         Assert.assertEquals(x[0], 1);
+    }
+
+    public enum E1 {
+        E1, E2, E3,
+        ;
+    }
+
+    public enum E2 {
+        E1, E2, E3,
+        ;
+    }
+
+    public interface I2<T> {
+
+        T getI2();
+
+        void setI2(T t);
+    }
+
+    public interface I1 {
+
+        String getI1();
+
+        void setI1(String i1);
+    }
+
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherited
+    public @interface Ann {
+        String value();
     }
 
     @EqualsAndHashCode(callSuper = true)
@@ -416,27 +470,6 @@ public class BeanTest {
     @Data
     public static class C1 {
         private String c1;
-    }
-
-    public interface I2<T> {
-
-        T getI2();
-
-        void setI2(T t);
-    }
-
-    public interface I1 {
-
-        String getI1();
-
-        void setI1(String i1);
-    }
-
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-    @Inherited
-    public @interface Ann {
-        String value();
     }
 
     @Data
@@ -509,15 +542,5 @@ public class BeanTest {
         public String setBbb(String bbb) {
             return null;
         }
-    }
-
-    public enum E1 {
-        E1, E2, E3,
-        ;
-    }
-
-    public enum E2 {
-        E1, E2, E3,
-        ;
     }
 }

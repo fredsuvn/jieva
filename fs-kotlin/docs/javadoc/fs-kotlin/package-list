@@ -1,0 +1,6 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:xyz.fsgik.common.base////PointingToDeclaration/fs-kotlin/xyz.fsgik.common.base/index.html
+$dokka.location:xyz.fsgik.common.base//helloFsKotlin/#/PointingToDeclaration/fs-kotlin/xyz.fsgik.common.base/hello-fs-kotlin.html
+xyz.fsgik.common.base
+

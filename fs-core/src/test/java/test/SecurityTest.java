@@ -2,9 +2,10 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.FsString;
-import xyz.srclab.common.io.FsIO;
-import xyz.srclab.common.security.*;
+import xyz.fsgik.common.base.FsChars;
+import xyz.fsgik.common.io.FsBuffer;
+import xyz.fsgik.common.io.FsIO;
+import xyz.fsgik.common.security.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -87,7 +88,7 @@ public class SecurityTest {
 
     @Test
     public void testMac() throws Exception {
-        byte[] data = DATA.getBytes(FsString.CHARSET);
+        byte[] data = DATA.getBytes(FsChars.defaultCharset());
         KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
         Key macKey = keyGenerator.generateKey();
         Mac mac = Mac.getInstance("HmacSHA256");
@@ -113,13 +114,13 @@ public class SecurityTest {
         int bufferSize = fsMac.prepare(FsIO.toInputStream(data)).key(macKey).doFinal(buffer);
         Assert.assertEquals(bufferSize, mac.getMacLength());
         buffer.flip();
-        Assert.assertEquals(macBytes, FsIO.getBytes(buffer));
+        Assert.assertEquals(macBytes, FsBuffer.getBytes(buffer));
         System.out.println(destSize);
     }
 
     @Test
     public void testDigest() throws Exception {
-        byte[] data = DATA.getBytes(FsString.CHARSET);
+        byte[] data = DATA.getBytes(FsChars.defaultCharset());
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] mdBytes = md.digest(data);
         System.out.println(mdBytes.length + ", " + md.getDigestLength());
@@ -142,13 +143,13 @@ public class SecurityTest {
         int bufferSize = fd.prepare(FsIO.toInputStream(data)).doFinal(buffer);
         Assert.assertEquals(bufferSize, md.getDigestLength());
         buffer.flip();
-        Assert.assertEquals(mdBytes, FsIO.getBytes(buffer));
+        Assert.assertEquals(mdBytes, FsBuffer.getBytes(buffer));
         System.out.println(destSize);
     }
 
     @Test
     public void testSign() throws Exception {
-        byte[] data = DATA.getBytes(FsString.CHARSET);
+        byte[] data = DATA.getBytes(FsChars.defaultCharset());
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
@@ -181,7 +182,7 @@ public class SecurityTest {
         int bufferSize = fsSign.prepare(FsIO.toInputStream(data)).key(privateKey).doFinal(buffer);
         Assert.assertEquals(bufferSize, signBytes.length);
         buffer.flip();
-        Assert.assertEquals(signBytes, FsIO.getBytes(buffer));
+        Assert.assertEquals(signBytes, FsBuffer.getBytes(buffer));
         System.out.println(destSize);
 
         //verify
@@ -220,7 +221,7 @@ public class SecurityTest {
 
     @Test
     public void testCrypto() throws Exception {
-        byte[] data = DATA.getBytes(FsString.CHARSET);
+        byte[] data = DATA.getBytes(FsChars.defaultCharset());
         byte[] data2 = TestUtil.buildRandomBytes(150);
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
@@ -238,14 +239,14 @@ public class SecurityTest {
         ByteBuffer outBuffer = ByteBuffer.allocate(enBytes.length);
         FsCrypto.encrypt(cipher, publicKey, ByteBuffer.wrap(data), outBuffer, 245, null);
         outBuffer.flip();
-        byte[] enBuffer = FsIO.getBytes(outBuffer);
+        byte[] enBuffer = FsBuffer.getBytes(outBuffer);
         outBytes.reset();
         FsCrypto.encrypt(cipher, publicKey, new ByteArrayInputStream(data2), outBytes, 0, null);
         byte[] enBytes2 = outBytes.toByteArray();
         outBuffer.clear();
         FsCrypto.encrypt(cipher, publicKey, ByteBuffer.wrap(data2), outBuffer, 0, null);
         outBuffer.flip();
-        byte[] enBuffer2 = FsIO.getBytes(outBuffer);
+        byte[] enBuffer2 = FsBuffer.getBytes(outBuffer);
 
         //decrypt
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
@@ -258,7 +259,7 @@ public class SecurityTest {
         outBuffer.clear();
         FsCrypto.decrypt(cipher, privateKey, ByteBuffer.wrap(enBuffer), outBuffer, 256, null);
         outBuffer.flip();
-        byte[] deBuffer = FsIO.getBytes(outBuffer);
+        byte[] deBuffer = FsBuffer.getBytes(outBuffer);
         Assert.assertEquals(deBuffer, data);
         outBytes.reset();
         FsCrypto.decrypt(cipher, privateKey, new ByteArrayInputStream(enBytes2), outBytes, 0, null);
@@ -267,7 +268,7 @@ public class SecurityTest {
         outBuffer.clear();
         FsCrypto.decrypt(cipher, privateKey, ByteBuffer.wrap(enBuffer2), outBuffer, 0, null);
         outBuffer.flip();
-        byte[] deBuffer2 = FsIO.getBytes(outBuffer);
+        byte[] deBuffer2 = FsBuffer.getBytes(outBuffer);
         Assert.assertEquals(deBuffer2, data2);
     }
 

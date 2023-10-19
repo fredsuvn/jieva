@@ -2,10 +2,14 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.FsLogger;
-import xyz.srclab.common.base.ref.FsRef;
-import xyz.srclab.common.base.ref.IntRef;
-import xyz.srclab.common.cache.FsCache;
+import xyz.fsgik.common.base.FsLogger;
+import xyz.fsgik.common.base.FsWrapper;
+import xyz.fsgik.common.base.ref.FsRef;
+import xyz.fsgik.common.base.ref.IntRef;
+import xyz.fsgik.common.cache.FsCache;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class CacheTest {
 
@@ -73,6 +77,18 @@ public class CacheTest {
         FsLogger.defaultLogger().info("cacheLoader: 1=", fsCache.get(1));
         fsCache.get(1, k -> null);
         Assert.assertEquals(fsCache.get(1), "1");
+        fsCache.remove(1);
+        fsCache.get(1, k -> null);
+        Assert.assertNull(fsCache.get(1));
+        Assert.assertEquals(fsCache.getWrapper(1), FsWrapper.empty());
+        fsCache.remove(1);
+        fsCache.getWrapper(1, k -> null);
+        Assert.assertNull(fsCache.get(1));
+        Assert.assertNull(fsCache.getWrapper(1));
+        fsCache.put(2, "2");
+        Assert.assertEquals(fsCache.get(2), "2");
+        Assert.assertEquals(fsCache.get(2, k -> "4"), "2");
+        Assert.assertEquals(fsCache.getWrapper(2, k -> FsWrapper.wrap("8")).get(), "2");
     }
 
     @Test
@@ -114,5 +130,28 @@ public class CacheTest {
         fsCache.removeIf((k, v) -> k > 5);
         Assert.assertEquals(intRef.get(), 4);
         Assert.assertEquals(fsCache.size(), 6);
+    }
+
+    @Test
+    public void testNull() {
+        IntRef intRef = FsRef.ofInt(0);
+        Set<Integer> set = new HashSet<>();
+        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> {
+            intRef.incrementAndGet();
+            set.remove(k);
+        });
+        for (int i = 0; i < 10000; i++) {
+            fsCache.put(i, null);
+        }
+        for (int i = 0; i < 10000; i++) {
+            FsWrapper<Integer> w = fsCache.getWrapper(i);
+            if (w != null) {
+                Assert.assertNull(w.get());
+                set.add(i);
+            }
+        }
+        Assert.assertEquals(set.size() + intRef.get(), 10000);
+        fsCache.clear();
+        Assert.assertEquals(intRef.get(), 10000);
     }
 }
