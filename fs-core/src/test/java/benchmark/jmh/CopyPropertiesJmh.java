@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 1, time = 1)
-@Measurement(iterations = 1, time = 1)
+@Warmup(iterations = 3, time = 5)
+@Measurement(iterations = 3, time = 5)
 @Threads(1)
 @Fork(1)
 @State(value = Scope.Benchmark)
@@ -28,12 +28,12 @@ public class CopyPropertiesJmh {
 
     @Benchmark
     public void springCopy() {
-        org.springframework.beans.BeanUtils.copyProperties(bean, new Bean(), "s1", "i1", "l1");
+        org.springframework.beans.BeanUtils.copyProperties(bean, new Bean());
     }
 
     @Benchmark
     public void hutoolCopy() {
-        BeanUtil.copyProperties(bean, new Bean(), "s1", "i1", "l1");
+        BeanUtil.copyProperties(bean, new Bean());
     }
 
     @Benchmark
@@ -43,6 +43,21 @@ public class CopyPropertiesJmh {
 
     @Benchmark
     public void fsCopy() {
+        Fs.copyProperties(bean, new Bean());
+    }
+
+    @Benchmark
+    public void springCopyIgnore() {
+        org.springframework.beans.BeanUtils.copyProperties(bean, new Bean(), "s1", "i1", "l1");
+    }
+
+    @Benchmark
+    public void hutoolCopyIgnore() {
+        BeanUtil.copyProperties(bean, new Bean(), "s1", "i1", "l1");
+    }
+
+    @Benchmark
+    public void fsCopyIgnore() {
         Fs.copyProperties(bean, new Bean(), "s1", "i1", "l1");
     }
 

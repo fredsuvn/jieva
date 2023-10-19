@@ -16,8 +16,8 @@ dependencies {
   }
   api 'org.openjdk.jmh:jmh-core'
   api 'io.netty:netty-all'
-  api 'cn.hutool:hutool-all:5.8.21'
-  api 'org.apache.velocity:velocity-engine-core:2.3'
+  api 'cn.hutool:hutool-all'
+  api 'org.apache.velocity:velocity-engine-core'
   api 'org.slf4j:slf4j-api'
   api 'org.apache.commons:commons-lang3'
   api 'org.apache.commons:commons-collections4'
@@ -27,10 +27,11 @@ dependencies {
   api 'com.google.guava:guava'
   api 'com.github.ben-manes.caffeine:caffeine'
   api 'org.yaml:snakeyaml'
-  api 'org.bouncycastle:bcprov-jdk15on'
-  api 'org.springframework:spring-core:5.3.29'
+  api 'org.bouncycastle:bcprov-jdk18on'
+  api 'org.springframework:spring-core'
   api 'cglib:cglib'
-  api 'org.springframework:spring-beans:5.3.29'
+  api 'org.springframework:spring-beans'
+  api 'org.projectlombok:lombok'
 }
 
 java {

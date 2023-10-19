@@ -28,21 +28,23 @@ java {
 dependencies {
 
   implementation platform(project(':fs-dependencies'))
+  annotationProcessor platform(project(':fs-dependencies'))
 
   api project(':fs-annotations')
 
-  compileOnly 'org.projectlombok:lombok:1.18.26'
-  annotationProcessor 'org.projectlombok:lombok:1.18.26'
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
 
   proxySpringSupportImplementation 'org.springframework:spring-core'
   proxyCglibSupportImplementation 'cglib:cglib'
   dataProtobufSupportImplementation 'com.google.protobuf:protobuf-java'
 
-  testImplementation project(":fs-test")
-  testImplementation "com.google.protobuf:protobuf-java"
-
+  testImplementation platform(project(':fs-dependencies'))
   testAnnotationProcessor platform(project(":fs-dependencies"))
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
+
+  testImplementation project(":fs-test")
+  testImplementation "com.google.protobuf:protobuf-java"
 }
 
 java {
