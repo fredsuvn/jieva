@@ -41,6 +41,7 @@ dependencies {
 
   testImplementation platform(project(':fs-dependencies'))
   testAnnotationProcessor platform(project(":fs-dependencies"))
+  testAnnotationProcessor 'org.projectlombok:lombok'
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 
   testImplementation project(":fs-test")
