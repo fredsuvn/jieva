@@ -77,6 +77,14 @@ public class CacheTest {
         FsLogger.defaultLogger().info("cacheLoader: 1=", fsCache.get(1));
         fsCache.get(1, k -> null);
         Assert.assertEquals(fsCache.get(1), "1");
+        fsCache.remove(1);
+        fsCache.get(1, k -> null);
+        Assert.assertNull(fsCache.get(1));
+        Assert.assertEquals(fsCache.getWrapper(1), FsWrapper.empty());
+        fsCache.remove(1);
+        fsCache.getWrapper(1, k -> null);
+        Assert.assertNull(fsCache.get(1));
+        Assert.assertNull(fsCache.getWrapper(1));
     }
 
     @Test

@@ -3,6 +3,7 @@ package xyz.fsgik.common.cache;
 import xyz.fsgik.annotations.Nullable;
 import xyz.fsgik.common.base.Fs;
 import xyz.fsgik.common.base.FsWrapper;
+import xyz.fsgik.common.base.ref.FsRef;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -49,17 +50,26 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
 
     @Override
     public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
+        FsRef<Object> ref = FsRef.ofNull();
         Entry entry = map.compute(key, (k, old) -> {
             if (old == null) {
-                return newEntry(k, loader.apply(k));
+                V newValue = loader.apply(k);
+                ref.set(Fs.notNull(newValue, NULL));
+                return newEntry(k, newValue);
             }
             Object value = old.getValue();
             if (value == null) {
                 old.clear();
-                return newEntry(k, loader.apply(k));
+                V newValue = loader.apply(k);
+                ref.set(Fs.notNull(newValue, NULL));
+                return newEntry(k, newValue);
             }
             return old;
         });
+        if (ref.get() != null) {
+            cleanUp0();
+            return ref.get() == NULL ? null : Fs.as(ref.get());
+        }
         V result = get0(entry);
         cleanUp0();
         return result;
@@ -75,12 +85,15 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
 
     @Override
     public @Nullable FsWrapper<V> getWrapper(K key, Function<? super K, @Nullable FsWrapper<? extends V>> loader) {
+        FsRef<Object> ref = FsRef.ofNull();
         Entry entry = map.compute(key, (k, old) -> {
             if (old == null) {
                 FsWrapper<? extends V> newValue = loader.apply(k);
                 if (newValue == null) {
+                    ref.set(NULL);
                     return null;
                 }
+                ref.set(newValue);
                 return newEntry(k, newValue.get());
             }
             Object value = old.getValue();
@@ -88,12 +101,18 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
                 old.clear();
                 FsWrapper<? extends V> newValue = loader.apply(k);
                 if (newValue == null) {
+                    ref.set(NULL);
                     return null;
                 }
+                ref.set(newValue);
                 return newEntry(k, newValue.get());
             }
             return old;
         });
+        if (ref.get() != null) {
+            cleanUp0();
+            return ref.get() == NULL ? null : Fs.as(ref.get());
+        }
         FsWrapper<V> result = getWrapper0(entry);
         cleanUp0();
         return result;
@@ -212,8 +231,13 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
                     break;
                 }
                 Entry entry = (Entry) x;
-                map.remove(entry.getKey());
-                //entry.clear();
+                K key = Fs.as(entry.getKey());
+                map.computeIfPresent(key, (k, v) -> {
+                    if (v == entry) {
+                        return null;
+                    }
+                    return v;
+                });
                 if (removeListener != null) {
                     removeListener.onRemove(this, Fs.as(entry.getKey()));
                 }
