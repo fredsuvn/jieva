@@ -1,5 +1,7 @@
 package xyz.fsgik.common.base;
 
+import xyz.fsgik.annotations.Nullable;
+
 /**
  * Object wrapper to wrap an object.
  *
@@ -15,12 +17,7 @@ public interface FsWrapper<T> {
      * @return wrapper of given object
      */
     static <T> FsWrapper<T> wrap(T obj) {
-        return new FsWrapper<T>() {
-            @Override
-            public T get() {
-                return obj;
-            }
-        };
+        return () -> obj;
     }
 
     /**
@@ -38,5 +35,6 @@ public interface FsWrapper<T> {
      *
      * @return wrapped object
      */
+    @Nullable
     T get();
 }

@@ -205,22 +205,26 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
             }
             inCleanUp = true;
         }
-        while (true) {
-            Object x = queue.poll();
-            if (x == null) {
-                break;
+        try {
+            while (true) {
+                Object x = queue.poll();
+                if (x == null) {
+                    break;
+                }
+                Entry entry = (Entry) x;
+                map.remove(entry.getKey());
+                //entry.clear();
+                if (removeListener != null) {
+                    removeListener.onRemove(this, Fs.as(entry.getKey()));
+                }
             }
-            Entry entry = (Entry) x;
-            map.remove(entry.getKey());
-            //entry.clear();
-            if (removeListener != null) {
-                removeListener.onRemove(this, Fs.as(entry.getKey()));
-            }
+        } finally {
+            inCleanUp = false;
         }
-        inCleanUp = false;
     }
 
     private interface Entry {
+
         Object getKey();
 
         Object getValue();
