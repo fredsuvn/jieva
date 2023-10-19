@@ -26,7 +26,7 @@ dependencies {
 
 javadoc {
   destinationDir = file("$project.projectDir/docs/javadoc")
-  dependsOn dokkaHtml
+  dependsOn dokkaJavadoc
   options.encoding = 'UTF-8'
   options.locale = 'en_US'
 }
