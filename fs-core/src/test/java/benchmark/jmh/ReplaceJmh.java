@@ -1,7 +1,7 @@
 package benchmark.jmh;
 
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgik.common.base.FsString;
+import xyz.fsgek.common.base.FsString;
 
 import java.util.concurrent.TimeUnit;
 

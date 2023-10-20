@@ -98,7 +98,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>xyz.fsgik.common.proxy.FsProxy.Builder&lt;T&gt;</li>
+<li>proxy.xyz.fsgek.common.FsProxy.Builder&lt;T&gt;</li>
 </ul>
 </li>
 </ul>
@@ -200,25 +200,25 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>&lt;T1 extends <a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html" title="type parameter in FsProxy.Builder">T</a>&gt;<br><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html" title="class in xyz.fsgik.common.proxy">FsProxy.Builder</a>&lt;T1&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#proxyGenerator-int-">proxyGenerator</a></span>(int&nbsp;proxyGenerator)</code>
 <div class="block">Sets proxy generator:
- 
+
      <a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#JDK_PROXY"><code>JDK_PROXY</code></a>: using jdk proxy;
      <a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#CGLIB_PROXY"><code>CGLIB_PROXY</code></a>: using cglib proxy;
      <a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#SPRING_PROXY"><code>SPRING_PROXY</code></a>: using spring proxy;
- 
+
  By default, the builder will check the required libs in current runtime to choose a generator in priority:
  spring &gt; cglib &gt; JDK.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>&lt;T1 extends <a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html" title="type parameter in FsProxy.Builder">T</a>&gt;<br><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html" title="class in xyz.fsgik.common.proxy">FsProxy.Builder</a>&lt;T1&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#proxyMethod-java.util.function.Predicate-xyz.fsgik.common.proxy.FsProxyMethod-">proxyMethod</a></span>(java.util.function.Predicate&lt;java.lang.reflect.Method&gt;&nbsp;predicate,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#proxyMethod-java.util.function.Predicate-proxy.xyz.fsgek.common.FsProxyMethod-">proxyMethod</a></span>(java.util.function.Predicate&lt;java.lang.reflect.Method&gt;&nbsp;predicate,
            <a href="../../../../xyz/fsgik/common/proxy/FsProxyMethod.html" title="interface in xyz.fsgik.common.proxy">FsProxyMethod</a>&nbsp;proxyMethod)</code>
 <div class="block">Sets methods to be proxied, the methods pass given predicate should be proxied by given proxy method.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>&lt;T1 extends <a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html" title="type parameter in FsProxy.Builder">T</a>&gt;<br><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html" title="class in xyz.fsgik.common.proxy">FsProxy.Builder</a>&lt;T1&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#proxyMethod-java.lang.String-java.lang.Class:A-xyz.fsgik.common.proxy.FsProxyMethod-">proxyMethod</a></span>(java.lang.String&nbsp;methodName,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#proxyMethod-java.lang.String-java.lang.Class:A-proxy.xyz.fsgek.common.FsProxyMethod-">proxyMethod</a></span>(java.lang.String&nbsp;methodName,
            java.lang.Class&lt;?&gt;[]&nbsp;paramTypes,
            <a href="../../../../xyz/fsgik/common/proxy/FsProxyMethod.html" title="interface in xyz.fsgik.common.proxy">FsProxyMethod</a>&nbsp;proxyMethod)</code>
 <div class="block">Sets method of which name is given method name and parameter types are given parameter types
@@ -227,7 +227,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>&lt;T1 extends <a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html" title="type parameter in FsProxy.Builder">T</a>&gt;<br><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html" title="class in xyz.fsgik.common.proxy">FsProxy.Builder</a>&lt;T1&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#proxyMethod-java.lang.String-java.util.List-xyz.fsgik.common.proxy.FsProxyMethod-">proxyMethod</a></span>(java.lang.String&nbsp;methodName,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/proxy/FsProxy.Builder.html#proxyMethod-java.lang.String-java.util.List-proxy.xyz.fsgek.common.FsProxyMethod-">proxyMethod</a></span>(java.lang.String&nbsp;methodName,
            java.util.List&lt;java.lang.Class&lt;?&gt;&gt;&nbsp;paramTypes,
            <a href="../../../../xyz/fsgik/common/proxy/FsProxyMethod.html" title="interface in xyz.fsgik.common.proxy">FsProxyMethod</a>&nbsp;proxyMethod)</code>
 <div class="block">Sets method of which name is given method name and parameter types are given parameter types
@@ -284,7 +284,7 @@ extends java.lang.Object</pre>
 <div class="block">JDK proxy.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../constant-values.html#xyz.fsgik.common.proxy.FsProxy.Builder.JDK_PROXY">Constant Field Values</a></dd>
+<dd><a href="../../../../constant-values.html#proxy.xyz.fsgek.common.FsProxy.Builder.JDK_PROXY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -298,7 +298,7 @@ extends java.lang.Object</pre>
 <div class="block">Cglib proxy.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../constant-values.html#xyz.fsgik.common.proxy.FsProxy.Builder.CGLIB_PROXY">Constant Field Values</a></dd>
+<dd><a href="../../../../constant-values.html#proxy.xyz.fsgek.common.FsProxy.Builder.CGLIB_PROXY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -312,7 +312,7 @@ extends java.lang.Object</pre>
 <div class="block">Spring proxy.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../constant-values.html#xyz.fsgik.common.proxy.FsProxy.Builder.SPRING_PROXY">Constant Field Values</a></dd>
+<dd><a href="../../../../constant-values.html#proxy.xyz.fsgek.common.FsProxy.Builder.SPRING_PROXY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -395,7 +395,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="proxyMethod-java.util.function.Predicate-xyz.fsgik.common.proxy.FsProxyMethod-">
+<a name="proxyMethod-java.util.function.Predicate-proxy.xyz.fsgek.common.FsProxyMethod-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -415,7 +415,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="proxyMethod-java.lang.String-java.util.List-xyz.fsgik.common.proxy.FsProxyMethod-">
+<a name="proxyMethod-java.lang.String-java.util.List-proxy.xyz.fsgek.common.FsProxyMethod-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -438,7 +438,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="proxyMethod-java.lang.String-java.lang.Class:A-xyz.fsgik.common.proxy.FsProxyMethod-">
+<a name="proxyMethod-java.lang.String-java.lang.Class:A-proxy.xyz.fsgek.common.FsProxyMethod-">
 <!--   -->
 </a>
 <ul class="blockList">

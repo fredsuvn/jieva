@@ -1,7 +1,7 @@
 package benchmark.jmh;
 
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgik.common.reflect.FsInvoker;
+import xyz.fsgek.common.reflect.FsInvoker;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;

@@ -3,8 +3,8 @@ package test;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.FsString;
-import xyz.fsgik.common.collect.FsCollect;
+import xyz.fsgek.common.base.FsString;
+import xyz.fsgek.common.collect.FsCollect;
 
 import java.util.Arrays;
 import java.util.Collections;

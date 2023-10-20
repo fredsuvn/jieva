@@ -113,14 +113,14 @@ var activeTableTab = "activeTableTab";
  An implementation of <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServer.html" title="interface in xyz.fsgik.common.net.tcp"><code>FsTcpServer</code></a> has a list of <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html" title="interface in xyz.fsgik.common.net.tcp"><code>FsTcpChannelHandler</code></a>.
  <p>
  When the server receives new data from remote point, the data will be wrapped as <code>ByteBuffer</code> and passed to
- <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-M-"><code>onMessage(FsTcpChannel, Object)</code></a> of first handler. Returned object from first handler will be passed to next
+ <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-M-"><code>onMessage(FsTcpChannel, Object)</code></a> of first handler. Returned object from first handler will be passed to next
  handler as <code>message</code>, and so on.
  If null is returned, the handlers calling chain will be broken;
- if an exception is thrown, <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onException-xyz.fsgik.common.net.tcp.FsTcpChannel-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onException(FsTcpChannel, Throwable, ByteBuffer)</code></a> will be called
+ if an exception is thrown, <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onException-tcp.net.xyz.fsgek.common.FsTcpChannel-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onException(FsTcpChannel, Throwable, ByteBuffer)</code></a> will be called
  and the handlers calling chain will also be broken.
  <p>
- <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-M-"><code>onMessage(FsTcpChannel, Object)</code></a> only be called when new data was received, for more detailed operations,
- try <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onLoop-xyz.fsgik.common.net.tcp.FsTcpChannel-boolean-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onLoop(FsTcpChannel, boolean, ByteBuffer)</code></a>.
+ <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-M-"><code>onMessage(FsTcpChannel, Object)</code></a> only be called when new data was received, for more detailed operations,
+ try <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onLoop-tcp.net.xyz.fsgek.common.FsTcpChannel-boolean-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onLoop(FsTcpChannel, boolean, ByteBuffer)</code></a>.
  <p>
  If buffer of the channel is full, it will not read and put again.
  If the remaining data from the last callback has not been consumed, it will be left until the next callback.
@@ -128,7 +128,7 @@ var activeTableTab = "activeTableTab";
  See the built-in handler implementations: <a href="../../../../../xyz/fsgik/common/net/tcp/handlers/LengthBasedTcpChannelHandler.html" title="class in xyz.fsgik.common.net.tcp.handlers"><code>LengthBasedTcpChannelHandler</code></a>, <a href="../../../../../xyz/fsgik/common/net/tcp/handlers/DelimiterBasedTcpChannelHandler.html" title="class in xyz.fsgik.common.net.tcp.handlers"><code>DelimiterBasedTcpChannelHandler</code></a>.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../xyz/fsgik/common/net/tcp/handlers/LengthBasedTcpChannelHandler.html" title="class in xyz.fsgik.common.net.tcp.handlers"><code>LengthBasedTcpChannelHandler</code></a>, 
+<dd><a href="../../../../../xyz/fsgik/common/net/tcp/handlers/LengthBasedTcpChannelHandler.html" title="class in xyz.fsgik.common.net.tcp.handlers"><code>LengthBasedTcpChannelHandler</code></a>,
 <a href="../../../../../xyz/fsgik/common/net/tcp/handlers/DelimiterBasedTcpChannelHandler.html" title="class in xyz.fsgik.common.net.tcp.handlers"><code>DelimiterBasedTcpChannelHandler</code></a></dd>
 </dl>
 </li>
@@ -151,7 +151,7 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>@Nullable java.lang.Object</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-M-">onMessage</a></span>(<a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannel.html" title="interface in xyz.fsgik.common.net.tcp">FsTcpChannel</a>&nbsp;channel,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-M-">onMessage</a></span>(<a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannel.html" title="interface in xyz.fsgik.common.net.tcp">FsTcpChannel</a>&nbsp;channel,
          <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html" title="type parameter in FsTcpChannelHandler">M</a>&nbsp;message)</code>
 <div class="block">Callback when new data has received.</div>
 </td>
@@ -171,9 +171,9 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-java.lang.Object-">
+<a name="onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-java.lang.Object-">
 <!--   -->
-</a><a name="onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-M-">
+</a><a name="onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-M-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -188,7 +188,7 @@ var activeTableTab = "activeTableTab";
  the first handler will be passed a <code>ByteBuffer</code> as <code>message</code> parameter,
  then returned object from first handler will be passed to next handler as <code>message</code> parameter, and so on.
  If null is returned from any handler, the handlers calling chain will be broken at that handler;
- if an exception is thrown, <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onException-xyz.fsgik.common.net.tcp.FsTcpChannel-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onException(FsTcpChannel, Throwable, ByteBuffer)</code></a> will be called
+ if an exception is thrown, <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onException-tcp.net.xyz.fsgek.common.FsTcpChannel-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onException(FsTcpChannel, Throwable, ByteBuffer)</code></a> will be called
  and the calling chain will also be broken. The process like:
  <pre>
      Object message = ByteBuffer.wrap(...);
@@ -209,7 +209,7 @@ var activeTableTab = "activeTableTab";
  If the buffer on this callback is not fully consumed (remaining() &gt; 0), the remaining data will be
  reserved to next calling. However, the handler chain will be called if and only if there has new data read from
  the remote endpoint. It's best to try to consume as much as possible for each time,
- or using <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onLoop-xyz.fsgik.common.net.tcp.FsTcpChannel-boolean-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onLoop(FsTcpChannel, boolean, ByteBuffer)</code></a> to deal with un-consumed data.</div>
+ or using <a href="../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onLoop-tcp.net.xyz.fsgek.common.FsTcpChannel-boolean-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onLoop(FsTcpChannel, boolean, ByteBuffer)</code></a> to deal with un-consumed data.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>channel</code> - the channel</dd>

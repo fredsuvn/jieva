@@ -98,7 +98,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>xyz.fsgik.common.net.tcp.handlers.DelimiterBasedTcpChannelHandler</li>
+<li>handlers.tcp.net.xyz.fsgek.common.DelimiterBasedTcpChannelHandler</li>
 </ul>
 </li>
 </ul>
@@ -118,7 +118,7 @@ implements <a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandl
  <pre>
      buffer -&gt; data|data|data|..
  </pre>
- The returned object of <a href="../../../../../../xyz/fsgik/common/net/tcp/handlers/DelimiterBasedTcpChannelHandler.html#onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-java.nio.ByteBuffer-"><code>onMessage(FsTcpChannel, ByteBuffer)</code></a> is <code>List</code>&lt;<code>ByteBuffer</code>&gt;,
+ The returned object of <a href="../../../../../../xyz/fsgik/common/net/tcp/handlers/DelimiterBasedTcpChannelHandler.html#onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-java.nio.ByteBuffer-"><code>onMessage(FsTcpChannel, ByteBuffer)</code></a> is <code>List</code>&lt;<code>ByteBuffer</code>&gt;,
  each byte buffer is split by <a href="../../../../../../xyz/fsgik/common/io/FsBuffer.html#splitByDelimiter-java.nio.ByteBuffer-byte-java.util.function.IntFunction-"><code>FsBuffer.splitByDelimiter(ByteBuffer, byte, IntFunction)</code></a>
  and make returned buffers readonly.</div>
 </li>
@@ -166,7 +166,7 @@ implements <a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandl
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>@Nullable java.lang.Object</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../xyz/fsgik/common/net/tcp/handlers/DelimiterBasedTcpChannelHandler.html#onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-java.nio.ByteBuffer-">onMessage</a></span>(<a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannel.html" title="interface in xyz.fsgik.common.net.tcp">FsTcpChannel</a>&nbsp;channel,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../xyz/fsgik/common/net/tcp/handlers/DelimiterBasedTcpChannelHandler.html#onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-java.nio.ByteBuffer-">onMessage</a></span>(<a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannel.html" title="interface in xyz.fsgik.common.net.tcp">FsTcpChannel</a>&nbsp;channel,
          java.nio.ByteBuffer&nbsp;message)</code>
 <div class="block">Callback when new data has received.</div>
 </td>
@@ -231,7 +231,7 @@ implements <a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandl
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-java.nio.ByteBuffer-">
+<a name="onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-java.nio.ByteBuffer-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -240,14 +240,14 @@ implements <a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandl
 <pre>@Nullable
 public&nbsp;@Nullable java.lang.Object&nbsp;onMessage(<a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannel.html" title="interface in xyz.fsgik.common.net.tcp">FsTcpChannel</a>&nbsp;channel,
                                                        java.nio.ByteBuffer&nbsp;message)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-M-">FsTcpChannelHandler</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-M-">FsTcpChannelHandler</a></code></span></div>
 <div class="block">Callback when new data has received.
  <p>
  Server has a list of handlers,
  the first handler will be passed a <code>ByteBuffer</code> as <code>message</code> parameter,
  then returned object from first handler will be passed to next handler as <code>message</code> parameter, and so on.
  If null is returned from any handler, the handlers calling chain will be broken at that handler;
- if an exception is thrown, <a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onException-xyz.fsgik.common.net.tcp.FsTcpChannel-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onException(FsTcpChannel, Throwable, ByteBuffer)</code></a> will be called
+ if an exception is thrown, <a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onException-tcp.net.xyz.fsgek.common.FsTcpChannel-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onException(FsTcpChannel, Throwable, ByteBuffer)</code></a> will be called
  and the calling chain will also be broken. The process like:
  <pre>
      Object message = ByteBuffer.wrap(...);
@@ -268,10 +268,10 @@ public&nbsp;@Nullable java.lang.Object&nbsp;onMessage(<a href="../../../../../..
  If the buffer on this callback is not fully consumed (remaining() &gt; 0), the remaining data will be
  reserved to next calling. However, the handler chain will be called if and only if there has new data read from
  the remote endpoint. It's best to try to consume as much as possible for each time,
- or using <a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onLoop-xyz.fsgik.common.net.tcp.FsTcpChannel-boolean-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onLoop(FsTcpChannel, boolean, ByteBuffer)</code></a> to deal with un-consumed data.</div>
+ or using <a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpServerHandler.html#onLoop-tcp.net.xyz.fsgek.common.FsTcpChannel-boolean-java.nio.ByteBuffer-"><code>FsTcpServerHandler.onLoop(FsTcpChannel, boolean, ByteBuffer)</code></a> to deal with un-consumed data.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-xyz.fsgik.common.net.tcp.FsTcpChannel-M-">onMessage</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html" title="interface in xyz.fsgik.common.net.tcp">FsTcpChannelHandler</a>&lt;java.nio.ByteBuffer&gt;</code></dd>
+<dd><code><a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html#onMessage-tcp.net.xyz.fsgek.common.FsTcpChannel-M-">onMessage</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../xyz/fsgik/common/net/tcp/FsTcpChannelHandler.html" title="interface in xyz.fsgik.common.net.tcp">FsTcpChannelHandler</a>&lt;java.nio.ByteBuffer&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>channel</code> - the channel</dd>
 <dd><code>message</code> - the message</dd>

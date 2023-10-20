@@ -2,14 +2,14 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsChars;
-import xyz.fsgik.common.base.ref.FsRef;
-import xyz.fsgik.common.base.ref.LongRef;
-import xyz.fsgik.common.io.FsFile;
-import xyz.fsgik.common.io.FsFileCache;
-import xyz.fsgik.common.io.FsIO;
-import xyz.fsgik.common.io.FsIOException;
+import xyz.fsgek.common.base.Fs;
+import xyz.fsgek.common.base.FsChars;
+import xyz.fsgek.common.base.ref.FsRef;
+import xyz.fsgek.common.base.ref.LongRef;
+import xyz.fsgek.common.io.FsFile;
+import xyz.fsgek.common.io.FsFileCache;
+import xyz.fsgek.common.io.FsIO;
+import xyz.fsgek.common.io.FsIOException;
 
 import java.io.File;
 import java.io.FileOutputStream;

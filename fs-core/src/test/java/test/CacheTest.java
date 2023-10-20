@@ -2,11 +2,11 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.FsLogger;
-import xyz.fsgik.common.base.FsWrapper;
-import xyz.fsgik.common.base.ref.FsRef;
-import xyz.fsgik.common.base.ref.IntRef;
-import xyz.fsgik.common.cache.FsCache;
+import xyz.fsgek.common.base.FsLogger;
+import xyz.fsgek.common.base.FsWrapper;
+import xyz.fsgek.common.base.ref.FsRef;
+import xyz.fsgek.common.base.ref.IntRef;
+import xyz.fsgek.common.cache.FsCache;
 
 import java.util.HashSet;
 import java.util.Set;

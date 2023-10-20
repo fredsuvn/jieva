@@ -98,7 +98,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>xyz.fsgik.common.base.Fs</li>
+<li>base.xyz.fsgek.common.Fs</li>
 </ul>
 </li>
 </ul>
@@ -183,7 +183,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>static &lt;T&gt;&nbsp;T</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/base/Fs.html#convert-java.lang.Object-xyz.fsgik.common.reflect.TypeRef-">convert</a></span>(@Nullable java.lang.Object&nbsp;source,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/base/Fs.html#convert-java.lang.Object-reflect.xyz.fsgek.common.TypeRef-">convert</a></span>(@Nullable java.lang.Object&nbsp;source,
        <a href="../../../../xyz/fsgik/common/reflect/TypeRef.html" title="class in xyz.fsgik.common.reflect">TypeRef</a>&lt;T&gt;&nbsp;targetType)</code>
 <div class="block">Converts source object from source type to target type,
  return null if conversion is unsupported or the result itself is null.</div>
@@ -280,7 +280,7 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/base/Fs.html#equals-java.lang.Object-java.lang.Object-">equals</a></span>(@Nullable java.lang.Object&nbsp;a,
       @Nullable java.lang.Object&nbsp;b)</code>
 <div class="block">Returns result of equaling follows:
- 
+
  returns Objects.equals for given objects if they are not arrays;
  if given objects are arrays of which types are same primitive type, returns Arrays.equals for them;
  if given objects are object array, returns Arrays.deepEquals for them;
@@ -295,7 +295,7 @@ extends java.lang.Object</pre>
           boolean&nbsp;arrayCheck,
           boolean&nbsp;deepEquals)</code>
 <div class="block">Returns result of equaling follows:
- 
+
  if given objects are arrays of which types are same primitive type and array-check is true,
  returns Arrays.equals for them;
  if given objects are object array and both array-check and deep-equals are true,
@@ -350,7 +350,7 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgik/common/base/Fs.html#hash-java.lang.Object-">hash</a></span>(@Nullable java.lang.Object&nbsp;obj)</code>
 <div class="block">Returns hash code follows:
- 
+
  returns Objects.hashCode for given object if it is not an array;
  if given object is primitive array, returns Arrays.hashCode for it;
  if given object is Object[], returns Arrays.deepHashCode for it;
@@ -364,7 +364,7 @@ extends java.lang.Object</pre>
         boolean&nbsp;arrayCheck,
         boolean&nbsp;deepHash)</code>
 <div class="block">Returns hash code follows:
- 
+
  if given object is primitive array and array-check is true, returns Arrays.hashCode for it;
  if given object is Object[] and both array-check and deep-to-string are true,
  returns Arrays.deepHashCode for it;
@@ -829,7 +829,7 @@ public static&nbsp;&lt;T&gt;&nbsp;T&nbsp;convert(@Nullable
 </dl>
 </li>
 </ul>
-<a name="convert-java.lang.Object-xyz.fsgik.common.reflect.TypeRef-">
+<a name="convert-java.lang.Object-reflect.xyz.fsgek.common.TypeRef-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -850,7 +850,7 @@ public static&nbsp;&lt;T&gt;&nbsp;T&nbsp;convert(@Nullable
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>converted object or null</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../xyz/fsgik/common/convert/FsConverter.html#convert-java.lang.Object-xyz.fsgik.common.reflect.TypeRef-"><code>FsConverter.convert(Object, TypeRef)</code></a></dd>
+<dd><a href="../../../../xyz/fsgik/common/convert/FsConverter.html#convert-java.lang.Object-reflect.xyz.fsgek.common.TypeRef-"><code>FsConverter.convert(Object, TypeRef)</code></a></dd>
 </dl>
 </li>
 </ul>

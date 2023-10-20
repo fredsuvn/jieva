@@ -2,10 +2,10 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.Fs;
-import xyz.fsgik.common.base.FsChars;
-import xyz.fsgik.common.encode.FsEncodeException;
-import xyz.fsgik.common.encode.FsEncoder;
+import xyz.fsgek.common.base.Fs;
+import xyz.fsgek.common.base.FsChars;
+import xyz.fsgek.common.encode.FsEncodeException;
+import xyz.fsgek.common.encode.FsEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

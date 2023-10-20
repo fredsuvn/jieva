@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgik.common.cache.FsCache;
+import xyz.fsgek.common.cache.FsCache;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

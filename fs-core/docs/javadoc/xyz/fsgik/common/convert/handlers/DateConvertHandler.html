@@ -98,7 +98,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>xyz.fsgik.common.convert.handlers.DateConvertHandler</li>
+<li>handlers.convert.xyz.fsgek.common.DateConvertHandler</li>
 </ul>
 </li>
 </ul>
@@ -149,7 +149,7 @@ implements <a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.
  <ul>
      <li><a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.html#DateConvertHandler--"><code>DateConvertHandler()</code></a> (default);</li>
      <li><a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.html#DateConvertHandler-java.lang.CharSequence-"><code>DateConvertHandler(CharSequence)</code></a>;</li>
-     <li><a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.html#DateConvertHandler-xyz.fsgik.common.convert.handlers.DateConvertHandler.PatternFunction-"><code>DateConvertHandler(PatternFunction)</code></a>;</li>
+     <li><a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.html#DateConvertHandler-handlers.convert.xyz.fsgek.common.DateConvertHandler.PatternFunction-"><code>DateConvertHandler(PatternFunction)</code></a>;</li>
  </ul>
  <p>
  Note if the <code>obj</code> is null, return <code>null</code>.</div>
@@ -224,7 +224,7 @@ implements <a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.
 </td>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.html#DateConvertHandler-xyz.fsgik.common.convert.handlers.DateConvertHandler.PatternFunction-">DateConvertHandler</a></span>(<a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.PatternFunction.html" title="interface in xyz.fsgik.common.convert.handlers">DateConvertHandler.PatternFunction</a>&nbsp;pattern)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.html#DateConvertHandler-handlers.convert.xyz.fsgek.common.DateConvertHandler.PatternFunction-">DateConvertHandler</a></span>(<a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.PatternFunction.html" title="interface in xyz.fsgik.common.convert.handlers">DateConvertHandler.PatternFunction</a>&nbsp;pattern)</code>
 <div class="block">Constructs with given pattern function.</div>
 </td>
 </tr>
@@ -245,7 +245,7 @@ implements <a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>@Nullable java.lang.Object</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.html#convert-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type-xyz.fsgik.common.convert.FsConverter-">convert</a></span>(@Nullable java.lang.Object&nbsp;source,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../xyz/fsgik/common/convert/handlers/DateConvertHandler.html#convert-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type-convert.xyz.fsgek.common.FsConverter-">convert</a></span>(@Nullable java.lang.Object&nbsp;source,
        java.lang.reflect.Type&nbsp;sourceType,
        java.lang.reflect.Type&nbsp;targetType,
        <a href="../../../../../xyz/fsgik/common/convert/FsConverter.html" title="interface in xyz.fsgik.common.convert">FsConverter</a>&nbsp;converter)</code>
@@ -323,7 +323,7 @@ implements <a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.
 </dl>
 </li>
 </ul>
-<a name="DateConvertHandler-xyz.fsgik.common.convert.handlers.DateConvertHandler.PatternFunction-">
+<a name="DateConvertHandler-handlers.convert.xyz.fsgek.common.DateConvertHandler.PatternFunction-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -345,7 +345,7 @@ implements <a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="convert-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type-xyz.fsgik.common.convert.FsConverter-">
+<a name="convert-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type-convert.xyz.fsgek.common.FsConverter-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -357,7 +357,7 @@ public&nbsp;@Nullable java.lang.Object&nbsp;convert(@Nullable
                                                      java.lang.reflect.Type&nbsp;sourceType,
                                                      java.lang.reflect.Type&nbsp;targetType,
                                                      <a href="../../../../../xyz/fsgik/common/convert/FsConverter.html" title="interface in xyz.fsgik.common.convert">FsConverter</a>&nbsp;converter)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.html#convert-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type-xyz.fsgik.common.convert.FsConverter-">FsConverter.Handler</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.html#convert-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type-convert.xyz.fsgek.common.FsConverter-">FsConverter.Handler</a></code></span></div>
 <div class="block">Converts object from source type to target type.
  <p>
  In general, all handlers in the converter (<a href="../../../../../xyz/fsgik/common/convert/FsConverter.html#getHandlers--"><code>FsConverter.getHandlers()</code></a>) will be invoked this method sequentially.
@@ -388,7 +388,7 @@ public&nbsp;@Nullable java.lang.Object&nbsp;convert(@Nullable
  Any other type of returned object is the actual result of conversion.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.html#convert-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type-xyz.fsgik.common.convert.FsConverter-">convert</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.html" title="interface in xyz.fsgik.common.convert">FsConverter.Handler</a></code></dd>
+<dd><code><a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.html#convert-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type-convert.xyz.fsgek.common.FsConverter-">convert</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../xyz/fsgik/common/convert/FsConverter.Handler.html" title="interface in xyz.fsgik.common.convert">FsConverter.Handler</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>source</code> - source object</dd>
 <dd><code>sourceType</code> - source type</dd>

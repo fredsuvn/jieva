@@ -109,11 +109,11 @@ var activeTableTab = "activeTableTab";
  An implementation of <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpServer.html" title="interface in xyz.fsgik.common.net.udp"><code>FsUdpServer</code></a> has a list of <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpPacketHandler.html" title="interface in xyz.fsgik.common.net.udp"><code>FsUdpPacketHandler</code></a>.
  <p>
  When the server receives new packet from remote point, the data will be wrapped as <code>ByteBuffer</code> and passed to
- <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpPacketHandler.html#onPacket-xyz.fsgik.common.net.udp.FsUdpHeader-xyz.fsgik.common.net.udp.FsUdpClient-P-"><code>onPacket(FsUdpHeader, FsUdpClient, Object)</code></a> of first handler. Returned object from first handler will be passed to next
+ <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpPacketHandler.html#onPacket-udp.net.xyz.fsgek.common.FsUdpHeader-udp.net.xyz.fsgek.common.FsUdpClient-P-"><code>onPacket(FsUdpHeader, FsUdpClient, Object)</code></a> of first handler. Returned object from first handler will be passed to next
  handler as <code>packet</code>, and so on.
  If null is returned, the handlers calling chain will be broken;
- if an exception is thrown, <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpServerHandler.html#onException-xyz.fsgik.common.net.FsNetServerException-"><code>FsUdpServerHandler.onException(FsNetServerException)</code></a>
- or <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpServerHandler.html#onException-xyz.fsgik.common.net.udp.FsUdpHeader-xyz.fsgik.common.net.udp.FsUdpClient-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsUdpServerHandler.onException(FsUdpHeader, FsUdpClient, Throwable, ByteBuffer)</code></a> will be called
+ if an exception is thrown, <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpServerHandler.html#onException-net.xyz.fsgek.common.FsNetServerException-"><code>FsUdpServerHandler.onException(FsNetServerException)</code></a>
+ or <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpServerHandler.html#onException-udp.net.xyz.fsgek.common.FsUdpHeader-udp.net.xyz.fsgek.common.FsUdpClient-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsUdpServerHandler.onException(FsUdpHeader, FsUdpClient, Throwable, ByteBuffer)</code></a> will be called
  and the handlers calling chain will also be broken.
  <p>
  If there has remaining data in the buffer not be consumed, the remaining data will be discarded.</div>
@@ -137,7 +137,7 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>@Nullable java.lang.Object</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../xyz/fsgik/common/net/udp/FsUdpPacketHandler.html#onPacket-xyz.fsgik.common.net.udp.FsUdpHeader-xyz.fsgik.common.net.udp.FsUdpClient-P-">onPacket</a></span>(<a href="../../../../../xyz/fsgik/common/net/udp/FsUdpHeader.html" title="interface in xyz.fsgik.common.net.udp">FsUdpHeader</a>&nbsp;header,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../xyz/fsgik/common/net/udp/FsUdpPacketHandler.html#onPacket-udp.net.xyz.fsgek.common.FsUdpHeader-udp.net.xyz.fsgek.common.FsUdpClient-P-">onPacket</a></span>(<a href="../../../../../xyz/fsgik/common/net/udp/FsUdpHeader.html" title="interface in xyz.fsgik.common.net.udp">FsUdpHeader</a>&nbsp;header,
         <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpClient.html" title="interface in xyz.fsgik.common.net.udp">FsUdpClient</a>&nbsp;client,
         <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpPacketHandler.html" title="type parameter in FsUdpPacketHandler">P</a>&nbsp;packet)</code>
 <div class="block">Callback when new data has received.</div>
@@ -158,9 +158,9 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="onPacket-xyz.fsgik.common.net.udp.FsUdpHeader-xyz.fsgik.common.net.udp.FsUdpClient-java.lang.Object-">
+<a name="onPacket-udp.net.xyz.fsgek.common.FsUdpHeader-udp.net.xyz.fsgek.common.FsUdpClient-java.lang.Object-">
 <!--   -->
-</a><a name="onPacket-xyz.fsgik.common.net.udp.FsUdpHeader-xyz.fsgik.common.net.udp.FsUdpClient-P-">
+</a><a name="onPacket-udp.net.xyz.fsgek.common.FsUdpHeader-udp.net.xyz.fsgek.common.FsUdpClient-P-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -177,7 +177,7 @@ var activeTableTab = "activeTableTab";
  then returned object from first handler will be passed to next handler as <code>packet</code> parameter, and so on.
  If null is returned from any handler, the handlers calling chain will be broken at that handler;
  if an exception is thrown,
- <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpServerHandler.html#onException-xyz.fsgik.common.net.udp.FsUdpHeader-xyz.fsgik.common.net.udp.FsUdpClient-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsUdpServerHandler.onException(FsUdpHeader, FsUdpClient, Throwable, ByteBuffer)</code></a> will be called
+ <a href="../../../../../xyz/fsgik/common/net/udp/FsUdpServerHandler.html#onException-udp.net.xyz.fsgek.common.FsUdpHeader-udp.net.xyz.fsgek.common.FsUdpClient-java.lang.Throwable-java.nio.ByteBuffer-"><code>FsUdpServerHandler.onException(FsUdpHeader, FsUdpClient, Throwable, ByteBuffer)</code></a> will be called
  and the calling chain will also be broken. The process like:
  <pre>
      Object packet = ByteBuffer.wrap(...);

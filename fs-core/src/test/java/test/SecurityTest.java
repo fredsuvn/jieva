@@ -2,10 +2,10 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.FsChars;
-import xyz.fsgik.common.io.FsBuffer;
-import xyz.fsgik.common.io.FsIO;
-import xyz.fsgik.common.security.*;
+import xyz.fsgek.common.base.FsChars;
+import xyz.fsgek.common.io.FsBuffer;
+import xyz.fsgek.common.io.FsIO;
+import xyz.fsgek.common.security.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

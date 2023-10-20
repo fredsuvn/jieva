@@ -2,7 +2,7 @@ package benchmark.jmh;
 
 import com.google.common.base.CaseFormat;
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgik.common.base.FsCase;
+import xyz.fsgek.common.base.FsCase;
 
 import java.util.concurrent.TimeUnit;
 

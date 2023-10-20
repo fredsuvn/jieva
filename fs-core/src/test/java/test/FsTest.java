@@ -2,8 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgik.common.base.*;
-import xyz.fsgik.common.io.FsIO;
+import xyz.fsgek.common.base.*;
+import xyz.fsgek.common.io.FsIO;
 
 import java.io.IOException;
 import java.net.URL;
