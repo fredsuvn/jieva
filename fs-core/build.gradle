@@ -60,10 +60,6 @@ javadoc {
   options.locale = 'en_US'
 }
 
-clean {
-  //delete(javadoc.destinationDir)
-}
-
 def generatedPath = "$project.projectDir/generated"
 def protoPath = "$generatedPath/proto"
 
@@ -122,5 +118,13 @@ tasks.register('benchmark') {
       main = 'benchmark.jmh.JmhRunner'
       classpath = sourceSets.test.runtimeClasspath
     }
+  }
+}
+
+tasks.register('cleanWithJavadoc') {
+  dependsOn clean
+  group = 'build'
+  doLast {
+    delete(javadoc.destinationDir)
   }
 }

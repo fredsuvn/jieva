@@ -32,3 +32,11 @@ javadoc {
 clean {
   //delete(javadoc.destinationDir)
 }
+
+tasks.register('cleanWithJavadoc') {
+  dependsOn clean
+  group = 'build'
+  doLast {
+    delete(javadoc.destinationDir)
+  }
+}
