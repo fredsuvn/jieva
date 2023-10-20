@@ -48,7 +48,7 @@ public class ReflectTest {
     }
 
     @Test
-    public void testFsObj() {
+    public void testGekObj() {
         Assert.assertEquals(
             GekObj.wrap(null, new TypeRef<List<?>>() {
             }),

@@ -44,7 +44,7 @@ public interface GekTcpChannelHandler<M> {
      * and the calling chain will also be broken. The process like:
      * <pre>
      *     Object message = ByteBuffer.wrap(...);
-     *     for (FsNetChannelHandler&lt;...&gt; channelHandler : channelHandlers) {
+     *     for (GekNetChannelHandler&lt;...&gt; channelHandler : channelHandlers) {
      *         try {
      *             Object result = channelHandler.onMessage(channel, message);
      *             if (result == null) {
