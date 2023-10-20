@@ -6,8 +6,8 @@ import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.LongRef;
-import xyz.fsgek.common.io.GekFile;
-import xyz.fsgek.common.io.GekFileCache;
+import xyz.fsgek.common.file.GekFile;
+import xyz.fsgek.common.file.GekFileCache;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.io.GekIOException;
 

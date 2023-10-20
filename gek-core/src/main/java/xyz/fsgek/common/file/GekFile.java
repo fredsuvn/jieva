@@ -1,4 +1,4 @@
-package xyz.fsgek.common.io;
+package xyz.fsgek.common.file;
 
 import xyz.fsgek.annotations.ThreadSafe;
 
@@ -118,7 +118,7 @@ public interface GekFile {
         try {
             getDescriptor().sync();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 

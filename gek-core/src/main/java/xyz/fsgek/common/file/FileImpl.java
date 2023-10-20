@@ -1,4 +1,4 @@
-package xyz.fsgek.common.io;
+package xyz.fsgek.common.file;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -30,12 +30,12 @@ final class FileImpl implements GekFile {
     @Override
     public synchronized void open(String mode) {
         if (isOpened()) {
-            throw new GekIOException("The file has already opened.");
+            throw new GekFileException("The file has already opened.");
         }
         try {
             random = new RandomAccessFile(path.toFile(), mode);
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 
@@ -50,7 +50,7 @@ final class FileImpl implements GekFile {
             inputStream = null;
             outputStream = null;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 
@@ -60,7 +60,7 @@ final class FileImpl implements GekFile {
         try {
             return random.getFilePointer();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 
@@ -70,7 +70,7 @@ final class FileImpl implements GekFile {
         try {
             random.seek(pos);
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 
@@ -80,7 +80,7 @@ final class FileImpl implements GekFile {
         try {
             return random.length();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 
@@ -90,7 +90,7 @@ final class FileImpl implements GekFile {
         try {
             random.setLength(newLength);
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 
@@ -100,7 +100,7 @@ final class FileImpl implements GekFile {
         try {
             return random.getChannel();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 
@@ -110,7 +110,7 @@ final class FileImpl implements GekFile {
         try {
             return random.getFD();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new GekFileException(e);
         }
     }
 
@@ -134,7 +134,7 @@ final class FileImpl implements GekFile {
 
     private void checkOpen() {
         if (!isOpened()) {
-            throw new GekIOException("The file is closed or not yet open.");
+            throw new GekFileException("The file is closed or not yet open.");
         }
     }
 

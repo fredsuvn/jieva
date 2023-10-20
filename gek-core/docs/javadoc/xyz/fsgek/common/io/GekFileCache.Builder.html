@@ -98,7 +98,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>xyz.fsgek.common.io.GekFileCache.Builder</li>
+<li>xyz.fsgek.common.file.GekFileCache.Builder</li>
 </ul>
 </li>
 </ul>
@@ -163,19 +163,19 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#cacheGenerator-xyz.fsgek.common.io.GekFileCache.ChunkCacheGenerator-">cacheGenerator</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCacheGenerator</a>&nbsp;chunkCacheGenerator)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#cacheGenerator-xyz.fsgek.common.file.GekFileCache.ChunkCacheGenerator-">cacheGenerator</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCacheGenerator</a>&nbsp;chunkCacheGenerator)</code>
 <div class="block">Sets cache generator, default uses <a href="../../../../xyz/fsgek/common/cache/GekCache.html#softCache-xyz.fsgek.common.cache.GekCache.RemoveListener-"><code>GekCache.softCache(GekCache.RemoveListener)</code></a>.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#cacheReadListener-xyz.fsgek.common.io.GekFileCache.CacheReadListener-">cacheReadListener</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.CacheReadListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.CacheReadListener</a>&nbsp;cacheReadListener)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#cacheReadListener-xyz.fsgek.common.file.GekFileCache.CacheReadListener-">cacheReadListener</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.CacheReadListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.CacheReadListener</a>&nbsp;cacheReadListener)</code>
 <div class="block">Sets cache read listener, default is null.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#cacheWriteListener-xyz.fsgek.common.io.GekFileCache.CacheWriteListener-">cacheWriteListener</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.CacheWriteListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.CacheWriteListener</a>&nbsp;cacheWriteListener)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#cacheWriteListener-xyz.fsgek.common.file.GekFileCache.CacheWriteListener-">cacheWriteListener</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.CacheWriteListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.CacheWriteListener</a>&nbsp;cacheWriteListener)</code>
 <div class="block">Sets cache write listener, default is null.</div>
 </td>
 </tr>
@@ -187,19 +187,19 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#fileAccessGenerator-xyz.fsgek.common.io.GekFileCache.FileAccessGenerator-">fileAccessGenerator</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.FileAccessGenerator.html" title="interface in xyz.fsgek.common.io">GekFileCache.FileAccessGenerator</a>&nbsp;fileAccessGenerator)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#fileAccessGenerator-xyz.fsgek.common.file.GekFileCache.FileAccessGenerator-">fileAccessGenerator</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.FileAccessGenerator.html" title="interface in xyz.fsgek.common.io">GekFileCache.FileAccessGenerator</a>&nbsp;fileAccessGenerator)</code>
 <div class="block">Sets generator to generate un-cached underlying file access, default uses <a href="../../../../xyz/fsgek/common/io/GekFile.html#from-java.nio.file.Path-"><code>GekFile.from(Path)</code></a>.</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#fileReadListener-xyz.fsgek.common.io.GekFileCache.FileReadListener-">fileReadListener</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.FileReadListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.FileReadListener</a>&nbsp;fileReadListener)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#fileReadListener-xyz.fsgek.common.file.GekFileCache.FileReadListener-">fileReadListener</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.FileReadListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.FileReadListener</a>&nbsp;fileReadListener)</code>
 <div class="block">Sets underlying file read listener, default is null.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#fileWriteListener-xyz.fsgek.common.io.GekFileCache.FileWriteListener-">fileWriteListener</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.FileWriteListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.FileWriteListener</a>&nbsp;fileWriteListener)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekFileCache.Builder.html#fileWriteListener-xyz.fsgek.common.file.GekFileCache.FileWriteListener-">fileWriteListener</a></span>(<a href="../../../../xyz/fsgek/common/io/GekFileCache.FileWriteListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.FileWriteListener</a>&nbsp;fileWriteListener)</code>
 <div class="block">Sets underlying file write listener, default is null.</div>
 </td>
 </tr>
@@ -274,7 +274,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="cacheGenerator-xyz.fsgek.common.io.GekFileCache.ChunkCacheGenerator-">
+<a name="cacheGenerator-xyz.fsgek.common.file.GekFileCache.ChunkCacheGenerator-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -290,7 +290,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="fileAccessGenerator-xyz.fsgek.common.io.GekFileCache.FileAccessGenerator-">
+<a name="fileAccessGenerator-xyz.fsgek.common.file.GekFileCache.FileAccessGenerator-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -306,7 +306,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="cacheReadListener-xyz.fsgek.common.io.GekFileCache.CacheReadListener-">
+<a name="cacheReadListener-xyz.fsgek.common.file.GekFileCache.CacheReadListener-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -323,7 +323,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="cacheWriteListener-xyz.fsgek.common.io.GekFileCache.CacheWriteListener-">
+<a name="cacheWriteListener-xyz.fsgek.common.file.GekFileCache.CacheWriteListener-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -340,7 +340,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="fileReadListener-xyz.fsgek.common.io.GekFileCache.FileReadListener-">
+<a name="fileReadListener-xyz.fsgek.common.file.GekFileCache.FileReadListener-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -357,7 +357,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="fileWriteListener-xyz.fsgek.common.io.GekFileCache.FileWriteListener-">
+<a name="fileWriteListener-xyz.fsgek.common.file.GekFileCache.FileWriteListener-">
 <!--   -->
 </a>
 <ul class="blockList">

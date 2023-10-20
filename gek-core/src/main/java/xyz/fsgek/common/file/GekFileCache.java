@@ -1,4 +1,4 @@
-package xyz.fsgek.common.io;
+package xyz.fsgek.common.file;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +10,7 @@ import xyz.fsgek.common.base.ref.BooleanRef;
 import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.LongRef;
 import xyz.fsgek.common.cache.GekCache;
+import xyz.fsgek.common.io.GekIO;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -469,7 +470,7 @@ public interface GekFileCache {
                     random.close();
                     chunkCache.removeIf((c, v) -> Objects.equals(path.toString(), c.path));
                 } catch (Exception e) {
-                    throw new GekIOException(e);
+                    throw new GekFileException(e);
                 }
             }
 
@@ -493,7 +494,7 @@ public interface GekFileCache {
                         this.underlying = fileAccessGenerator.generate(path);
                         this.pos = offset;
                     } catch (Exception e) {
-                        throw new GekIOException(e);
+                        throw new GekFileException(e);
                     }
                 }
 
@@ -637,7 +638,7 @@ public interface GekFileCache {
                         this.underlying = fileAccessGenerator.generate(path);
                         this.pos = offset;
                     } catch (Exception e) {
-                        throw new GekIOException(e);
+                        throw new GekFileException(e);
                     }
                 }
 

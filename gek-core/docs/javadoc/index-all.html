@@ -401,14 +401,14 @@
 <dt><a href="xyz/fsgek/common/convert/handlers/BooleanConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><span class="typeNameLink">BooleanConvertHandler</span></a> - Class in <a href="xyz/fsgek/common/convert/handlers/package-summary.html">xyz.fsgek.common.convert.handlers</a></dt>
 <dd>
 <div class="block">Convert handler implementation which is used to support conversion from any object to boolean types:
- 
-     
+
+
          If source is instance of <code>Boolean</code>, return itself;
-     
-     
+
+
          If source object is instance of <code>Number</code>, return true if <code>Number.intValue()</code> is 1, else false;
-     
-     
+
+
          If source object is not instance of <code>Number</code>, return <code>Boolean.parseBoolean(String)</code>.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/handlers/BooleanConvertHandler.html#BooleanConvertHandler--">BooleanConvertHandler()</a></span> - Constructor for class xyz.fsgek.common.convert.handlers.<a href="xyz/fsgek/common/convert/handlers/BooleanConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers">BooleanConvertHandler</a></dt>
@@ -544,15 +544,15 @@
 <dd>
 <div class="block">Returns cached file chunk count.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#cacheGenerator-xyz.fsgek.common.io.GekFileCache.ChunkCacheGenerator-">cacheGenerator(GekFileCache.ChunkCacheGenerator)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#cacheGenerator-xyz.fsgek.common.file.GekFileCache.ChunkCacheGenerator-">cacheGenerator(GekFileCache.ChunkCacheGenerator)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
 <dd>
 <div class="block">Sets cache generator, default uses <a href="xyz/fsgek/common/cache/GekCache.html#softCache-xyz.fsgek.common.cache.GekCache.RemoveListener-"><code>GekCache.softCache(GekCache.RemoveListener)</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#cacheReadListener-xyz.fsgek.common.io.GekFileCache.CacheReadListener-">cacheReadListener(GekFileCache.CacheReadListener)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#cacheReadListener-xyz.fsgek.common.file.GekFileCache.CacheReadListener-">cacheReadListener(GekFileCache.CacheReadListener)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
 <dd>
 <div class="block">Sets cache read listener, default is null.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#cacheWriteListener-xyz.fsgek.common.io.GekFileCache.CacheWriteListener-">cacheWriteListener(GekFileCache.CacheWriteListener)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#cacheWriteListener-xyz.fsgek.common.file.GekFileCache.CacheWriteListener-">cacheWriteListener(GekFileCache.CacheWriteListener)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
 <dd>
 <div class="block">Sets cache write listener, default is null.</div>
 </dd>
@@ -1073,11 +1073,11 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/GekConverter.html#defaultConverter--">defaultConverter()</a></span> - Static method in interface xyz.fsgek.common.convert.<a href="xyz/fsgek/common/convert/GekConverter.html" title="interface in xyz.fsgek.common.convert">GekConverter</a></dt>
 <dd>
 <div class="block">Returns default converter, of which handlers are:
- 
+
      Prefix handler: <a href="xyz/fsgek/common/convert/handlers/ReuseConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><code>ReuseConvertHandler</code></a>;
      Suffix handler: <a href="xyz/fsgek/common/convert/handlers/BeanConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><code>BeanConvertHandler</code></a>;
      Common handlers:
-     
+
          <a href="xyz/fsgek/common/convert/handlers/EnumConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><code>EnumConvertHandler</code></a>;
          <a href="xyz/fsgek/common/convert/handlers/DateConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><code>DateConvertHandler</code></a>;
          <a href="xyz/fsgek/common/convert/handlers/BytesConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><code>BytesConvertHandler</code></a>;
@@ -1085,9 +1085,9 @@
          <a href="xyz/fsgek/common/convert/handlers/NumberConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><code>NumberConvertHandler</code></a>;
          <a href="xyz/fsgek/common/convert/handlers/StringConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><code>StringConvertHandler</code></a>;
          <a href="xyz/fsgek/common/convert/handlers/CollectConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><code>CollectConvertHandler</code></a>;
-     
-     
- 
+
+
+
  Those are constructed from empty constructor and in the order listed.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/bean/GekBeanCopier.html#defaultCopier--">defaultCopier()</a></span> - Static method in interface xyz.fsgek.common.bean.<a href="xyz/fsgek/common/bean/GekBeanCopier.html" title="interface in xyz.fsgek.common.bean">GekBeanCopier</a></dt>
@@ -1102,10 +1102,10 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/GekConverter.html#defaultOptions--">defaultOptions()</a></span> - Static method in interface xyz.fsgek.common.convert.<a href="xyz/fsgek/common/convert/GekConverter.html" title="interface in xyz.fsgek.common.convert">GekConverter</a></dt>
 <dd>
 <div class="block">Returns default conversion options with:
- 
-     
+
+
          Compatibility policy: <a href="xyz/fsgek/common/convert/GekConverter.Options.html#REUSE_ASSIGNABLE"><code>GekConverter.Options.REUSE_ASSIGNABLE</code></a>;
-     
+
  </div>
 </dd>
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/bean/GekBeanResolver.html#defaultResolver--">defaultResolver()</a></span> - Static method in interface xyz.fsgek.common.bean.<a href="xyz/fsgek/common/bean/GekBeanResolver.html" title="interface in xyz.fsgek.common.bean">GekBeanResolver</a></dt>
@@ -1305,7 +1305,7 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/base/Gek.html#equals-java.lang.Object-java.lang.Object-">equals(Object, Object)</a></span> - Static method in class xyz.fsgek.common.base.<a href="xyz/fsgek/common/base/Gek.html" title="class in xyz.fsgek.common.base">Gek</a></dt>
 <dd>
 <div class="block">Returns result of equaling follows:
- 
+
  returns Objects.equals for given objects if they are not arrays;
  if given objects are arrays of which types are same primitive type, returns Arrays.equals for them;
  if given objects are object array, returns Arrays.deepEquals for them;
@@ -1319,7 +1319,7 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/base/Gek.html#equalsWith-java.lang.Object-java.lang.Object-boolean-boolean-">equalsWith(Object, Object, boolean, boolean)</a></span> - Static method in class xyz.fsgek.common.base.<a href="xyz/fsgek/common/base/Gek.html" title="class in xyz.fsgek.common.base">Gek</a></dt>
 <dd>
 <div class="block">Returns result of equaling follows:
- 
+
  if given objects are arrays of which types are same primitive type and array-check is true,
  returns Arrays.equals for them;
  if given objects are object array and both array-check and deep-equals are true,
@@ -1355,15 +1355,15 @@
 <dd>
 <div class="block">Key of system property: file.separator.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#fileAccessGenerator-xyz.fsgek.common.io.GekFileCache.FileAccessGenerator-">fileAccessGenerator(GekFileCache.FileAccessGenerator)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#fileAccessGenerator-xyz.fsgek.common.file.GekFileCache.FileAccessGenerator-">fileAccessGenerator(GekFileCache.FileAccessGenerator)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
 <dd>
 <div class="block">Sets generator to generate un-cached underlying file access, default uses <a href="xyz/fsgek/common/io/GekFile.html#from-java.nio.file.Path-"><code>GekFile.from(Path)</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#fileReadListener-xyz.fsgek.common.io.GekFileCache.FileReadListener-">fileReadListener(GekFileCache.FileReadListener)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#fileReadListener-xyz.fsgek.common.file.GekFileCache.FileReadListener-">fileReadListener(GekFileCache.FileReadListener)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
 <dd>
 <div class="block">Sets underlying file read listener, default is null.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#fileWriteListener-xyz.fsgek.common.io.GekFileCache.FileWriteListener-">fileWriteListener(GekFileCache.FileWriteListener)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.Builder.html#fileWriteListener-xyz.fsgek.common.file.GekFileCache.FileWriteListener-">fileWriteListener(GekFileCache.FileWriteListener)</a></span> - Method in class xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.Builder.html" title="class in xyz.fsgek.common.io">GekFileCache.Builder</a></dt>
 <dd>
 <div class="block">Sets underlying file write listener, default is null.</div>
 </dd>
@@ -2130,7 +2130,7 @@
 <dd>
 <div class="block">Companion object of <a href="xyz/fsgek/common/base/GekWrapper.html" title="interface in xyz.fsgek.common.base"><code>GekWrapper</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.html#generate-xyz.fsgek.common.io.GekFileCache.ChunkCacheGenerator.RemoveListener-">generate(GekFileCache.ChunkCacheGenerator.RemoveListener)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCacheGenerator</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.html#generate-xyz.fsgek.common.file.GekFileCache.ChunkCacheGenerator.RemoveListener-">generate(GekFileCache.ChunkCacheGenerator.RemoveListener)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCacheGenerator</a></dt>
 <dd>
 <div class="block">Generates a new file chunk cache with given remove listener.</div>
 </dd>
@@ -2308,7 +2308,7 @@
 <dd>
 <div class="block">Returns value from given map at specified key, if the value is null or failed to obtain, return default value.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html#get-xyz.fsgek.common.io.GekFileCache.ChunkIndex-java.util.function.Function-">get(GekFileCache.ChunkIndex, Function&lt;GekFileCache.ChunkIndex, GekFileCache.Chunk&gt;)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCache</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html#get-xyz.fsgek.common.file.GekFileCache.ChunkIndex-java.util.function.Function-">get(GekFileCache.ChunkIndex, Function&lt;GekFileCache.ChunkIndex, GekFileCache.Chunk&gt;)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCache</a></dt>
 <dd>
 <div class="block">Gets cached file chunk value, if the value doesn't exist, create and put a new one with given function.</div>
 </dd>
@@ -3075,7 +3075,7 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/base/Gek.html#hash-java.lang.Object-">hash(Object)</a></span> - Static method in class xyz.fsgek.common.base.<a href="xyz/fsgek/common/base/Gek.html" title="class in xyz.fsgek.common.base">Gek</a></dt>
 <dd>
 <div class="block">Returns hash code follows:
- 
+
  returns Objects.hashCode for given object if it is not an array;
  if given object is primitive array, returns Arrays.hashCode for it;
  if given object is Object[], returns Arrays.deepHashCode for it;
@@ -3095,7 +3095,7 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/base/Gek.html#hashWith-java.lang.Object-boolean-boolean-">hashWith(Object, boolean, boolean)</a></span> - Static method in class xyz.fsgek.common.base.<a href="xyz/fsgek/common/base/Gek.html" title="class in xyz.fsgek.common.base">Gek</a></dt>
 <dd>
 <div class="block">Returns hash code follows:
- 
+
  if given object is primitive array and array-check is true, returns Arrays.hashCode for it;
  if given object is Object[] and both array-check and deep-to-string are true,
  returns Arrays.deepHashCode for it;
@@ -3579,10 +3579,10 @@
 <dt><a href="xyz/fsgek/common/bean/handlers/JavaBeanResolveHandler.html" title="class in xyz.fsgek.common.bean.handlers"><span class="typeNameLink">JavaBeanResolveHandler</span></a> - Class in <a href="xyz/fsgek/common/bean/handlers/package-summary.html">xyz.fsgek.common.bean.handlers</a></dt>
 <dd>
 <div class="block">Resolve handler for the classical java bean, of which getters' name are start with:
- 
+
      "get" -- for non-boolean return type;
      "set" -- for boolean return type;
- 
+
  and setters' name are start with "set".</div>
 </dd>
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/bean/handlers/JavaBeanResolveHandler.html#JavaBeanResolveHandler--">JavaBeanResolveHandler()</a></span> - Constructor for class xyz.fsgek.common.bean.handlers.<a href="xyz/fsgek/common/bean/handlers/JavaBeanResolveHandler.html" title="class in xyz.fsgek.common.bean.handlers">JavaBeanResolveHandler</a></dt>
@@ -3869,8 +3869,8 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/GekConverter.Options.html#NO_REUSE">NO_REUSE</a></span> - Static variable in interface xyz.fsgek.common.convert.<a href="xyz/fsgek/common/convert/GekConverter.Options.html" title="interface in xyz.fsgek.common.convert">GekConverter.Options</a></dt>
 <dd>
 <div class="block">Policy value for object reuse:
- 
-     
+
+
          Never return the source object if the source object is not immutable.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/base/Gek.html#notNull-T-T-">notNull(T, T)</a></span> - Static method in class xyz.fsgek.common.base.<a href="xyz/fsgek/common/base/Gek.html" title="class in xyz.fsgek.common.base">Gek</a></dt>
@@ -3970,7 +3970,7 @@
 <dd>
 <div class="block">On cache read.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.RemoveListener.html#onCacheRemove-xyz.fsgek.common.io.GekFileCache.ChunkIndex-xyz.fsgek.common.io.GekFileCache.ChunkCache-">onCacheRemove(GekFileCache.ChunkIndex, GekFileCache.ChunkCache)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.RemoveListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCacheGenerator.RemoveListener</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.RemoveListener.html#onCacheRemove-xyz.fsgek.common.file.GekFileCache.ChunkIndex-xyz.fsgek.common.file.GekFileCache.ChunkCache-">onCacheRemove(GekFileCache.ChunkIndex, GekFileCache.ChunkCache)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCacheGenerator.RemoveListener.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCacheGenerator.RemoveListener</a></dt>
 <dd>
 <div class="block">On cache remove.</div>
 </dd>
@@ -4224,11 +4224,11 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/proxy/GekProxy.Builder.html#proxyGenerator-int-">proxyGenerator(int)</a></span> - Method in class xyz.fsgek.common.proxy.<a href="xyz/fsgek/common/proxy/GekProxy.Builder.html" title="class in xyz.fsgek.common.proxy">GekProxy.Builder</a></dt>
 <dd>
 <div class="block">Sets proxy generator:
- 
+
      <a href="xyz/fsgek/common/proxy/GekProxy.Builder.html#JDK_PROXY"><code>GekProxy.Builder.JDK_PROXY</code></a>: using jdk proxy;
      <a href="xyz/fsgek/common/proxy/GekProxy.Builder.html#CGLIB_PROXY"><code>GekProxy.Builder.CGLIB_PROXY</code></a>: using cglib proxy;
      <a href="xyz/fsgek/common/proxy/GekProxy.Builder.html#SPRING_PROXY"><code>GekProxy.Builder.SPRING_PROXY</code></a>: using spring proxy;
- 
+
  By default, the builder will check the required libs in current runtime to choose a generator in priority:
  spring &gt; cglib &gt; JDK.</div>
 </dd>
@@ -4250,7 +4250,7 @@
 <dd>
 <div class="block">Sets the value associated with given key, return old value or null if there is no old value.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html#put-xyz.fsgek.common.io.GekFileCache.ChunkIndex-xyz.fsgek.common.io.GekFileCache.Chunk-">put(GekFileCache.ChunkIndex, GekFileCache.Chunk)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCache</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html#put-xyz.fsgek.common.file.GekFileCache.ChunkIndex-xyz.fsgek.common.file.GekFileCache.Chunk-">put(GekFileCache.ChunkIndex, GekFileCache.Chunk)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCache</a></dt>
 <dd>
 <div class="block">Puts new value of specified key</div>
 </dd>
@@ -4366,7 +4366,7 @@
 <dd>
 <div class="block">Removes the value associated with given key.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html#remove-xyz.fsgek.common.io.GekFileCache.ChunkIndex-">remove(GekFileCache.ChunkIndex)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCache</a></dt>
+<dt><span class="memberNameLink"><a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html#remove-xyz.fsgek.common.file.GekFileCache.ChunkIndex-">remove(GekFileCache.ChunkIndex)</a></span> - Method in interface xyz.fsgek.common.io.<a href="xyz/fsgek/common/io/GekFileCache.ChunkCache.html" title="interface in xyz.fsgek.common.io">GekFileCache.ChunkCache</a></dt>
 <dd>
 <div class="block">Removes the value associated with given key.</div>
 </dd>
@@ -4435,49 +4435,49 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/GekConverter.Options.html#REUSE_ASSIGNABLE">REUSE_ASSIGNABLE</a></span> - Static variable in interface xyz.fsgek.common.convert.<a href="xyz/fsgek/common/convert/GekConverter.Options.html" title="interface in xyz.fsgek.common.convert">GekConverter.Options</a></dt>
 <dd>
 <div class="block">Policy value for object reuse:
- 
-     
+
+
          If and only if target type is assignable from source type, return the source object.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/GekConverter.Options.html#REUSE_EQUAL">REUSE_EQUAL</a></span> - Static variable in interface xyz.fsgek.common.convert.<a href="xyz/fsgek/common/convert/GekConverter.Options.html" title="interface in xyz.fsgek.common.convert">GekConverter.Options</a></dt>
 <dd>
 <div class="block">Policy value for object reuse:
- 
-     
+
+
          If and only if target type is equal to source type, return the source object.</div>
 </dd>
 <dt><a href="xyz/fsgek/common/convert/handlers/ReuseConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers"><span class="typeNameLink">ReuseConvertHandler</span></a> - Class in <a href="xyz/fsgek/common/convert/handlers/package-summary.html">xyz.fsgek.common.convert.handlers</a></dt>
 <dd>
 <div class="block">Convert handler implementation which is used to check type compatibility and reusability, it follows in order:
- 
-     
+
+
          If source object is null, return <code>null</code>;
-     
-     
+
+
          If target type and source type are equal:
-         
-             
+
+
                  If <code>GekConverter.Options#reusePolicy()</code> is not <code>GekConverter.Options#NO_REUSE</code>,
                  return source object, else return <code>null</code>;
-             
-         
-     
-     
+
+
+
+
          If target type is assignable from source type by <a href="xyz/fsgek/common/reflect/GekReflect.html#isAssignableFrom-java.lang.reflect.Type-java.lang.reflect.Type-"><code>GekReflect.isAssignableFrom(Type, Type)</code></a>:
-         
-             
+
+
                  If <code>GekConverter.Options#reusePolicy()</code> is <code>GekConverter.Options#REUSE_ASSIGNABLE</code>,
                  return source object, else return <code>null</code>;
-             
-         
-     
-     
+
+
+
+
          If target type is <code>TypeVariable</code>, return <a href="xyz/fsgek/common/base/GekFlag.html#BREAK"><code>GekFlag.BREAK</code></a>;
-     
-     
+
+
          If source type is <code>WildcardType</code>:
-         
-             
+
+
                  If source type has an upper bound (? extends), return:</div>
 </dd>
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/handlers/ReuseConvertHandler.html#ReuseConvertHandler--">ReuseConvertHandler()</a></span> - Constructor for class xyz.fsgek.common.convert.handlers.<a href="xyz/fsgek/common/convert/handlers/ReuseConvertHandler.html" title="class in xyz.fsgek.common.convert.handlers">ReuseConvertHandler</a></dt>
@@ -4485,7 +4485,7 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/GekConverter.Options.Builder.html#reusePolicy-int-">reusePolicy(int)</a></span> - Method in class xyz.fsgek.common.convert.<a href="xyz/fsgek/common/convert/GekConverter.Options.Builder.html" title="class in xyz.fsgek.common.convert">GekConverter.Options.Builder</a></dt>
 <dd>
 <div class="block">Sets object reuse policy:
- 
+
      <a href="xyz/fsgek/common/convert/GekConverter.Options.html#REUSE_ASSIGNABLE"><code>GekConverter.Options.REUSE_ASSIGNABLE</code></a> (default);
      <a href="xyz/fsgek/common/convert/GekConverter.Options.html#REUSE_EQUAL"><code>GekConverter.Options.REUSE_EQUAL</code></a>;
      <a href="xyz/fsgek/common/convert/GekConverter.Options.html#NO_REUSE"><code>GekConverter.Options.NO_REUSE</code></a>;
@@ -4494,7 +4494,7 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/convert/GekConverter.Options.html#reusePolicy--">reusePolicy()</a></span> - Method in interface xyz.fsgek.common.convert.<a href="xyz/fsgek/common/convert/GekConverter.Options.html" title="interface in xyz.fsgek.common.convert">GekConverter.Options</a></dt>
 <dd>
 <div class="block">Returns object reuse policy:
- 
+
      <a href="xyz/fsgek/common/convert/GekConverter.Options.html#REUSE_ASSIGNABLE"><code>GekConverter.Options.REUSE_ASSIGNABLE</code></a>;
      <a href="xyz/fsgek/common/convert/GekConverter.Options.html#REUSE_EQUAL"><code>GekConverter.Options.REUSE_EQUAL</code></a>;
      <a href="xyz/fsgek/common/convert/GekConverter.Options.html#NO_REUSE"><code>GekConverter.Options.NO_REUSE</code></a>;
@@ -5116,12 +5116,12 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/base/GekString.html#toString-java.lang.Object-">toString(Object)</a></span> - Static method in class xyz.fsgek.common.base.<a href="xyz/fsgek/common/base/GekString.html" title="class in xyz.fsgek.common.base">GekString</a></dt>
 <dd>
 <div class="block">Returns a string follows:
- 
+
      returns String.valueOf for given object if it is not an array;
      if given object is primitive array, returns Arrays.toString for it;
      if given object is Object[], returns Arrays.deepToString for it;
      else returns String.valueOf for given object
- 
+
  This method is same as: toString(obj, true, true)</div>
 </dd>
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/base/GekString.html#toString-java.lang.Object...-">toString(Object...)</a></span> - Static method in class xyz.fsgek.common.base.<a href="xyz/fsgek/common/base/GekString.html" title="class in xyz.fsgek.common.base">GekString</a></dt>
@@ -5149,16 +5149,16 @@
 <dt><span class="memberNameLink"><a href="xyz/fsgek/common/base/GekString.html#toStringWith-java.lang.Object-boolean-boolean-">toStringWith(Object, boolean, boolean)</a></span> - Static method in class xyz.fsgek.common.base.<a href="xyz/fsgek/common/base/GekString.html" title="class in xyz.fsgek.common.base">GekString</a></dt>
 <dd>
 <div class="block">Returns a string follows:
- 
+
      if given object is primitive array and array-check is true, returns Arrays.toString for it;
-     
+
          if given object is Object[] and both array-check and deep-to-string are true,
          returns Arrays.deepToString for it;
-     
-     
+
+
          if given object is Object[] and array-check is true and deep-to-string is false,
          returns Arrays.toString for it;
-     
+
      else returns String.valueOf for given object
  </div>
 </dd>
