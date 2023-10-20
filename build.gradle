@@ -1,8 +1,8 @@
 plugins {
-  id 'fs'
-  id 'fs-config'
-  id 'fs-doc'
+  id 'gek'
+  id 'gek-config'
+  id 'gek-doc'
 }
 
-description = "Root Project of fs"
+description = "Root Project of Gek"
 

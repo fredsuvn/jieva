@@ -18,9 +18,9 @@ dependencies {
 
 gradlePlugin {
   plugins {
-    fsPlugin {
-      id = 'xyz.fsgik.build.fs'
-      implementationClass = 'xyz.fsgik.build.FsPlugin'
+    gekPlugin {
+      id = 'xyz.fsgek.build.gek'
+      implementationClass = 'xyz.fsgek.build.GekPlugin'
     }
   }
 }

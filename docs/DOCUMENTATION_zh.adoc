@@ -1,50 +1,50 @@
-= _fs_: link:{srclab-url}[SrcLab] 和 link:{me-url}[我] 的JVM核心库
+= _Gek_: link:{srclab-url}[SrcLab] 和 link:{me-url}[我] 的JVM核心库
 :toc:
 :toclevels: 3
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
-:url: https://github.com/fredsuvn/fs
+:url: https://github.com/fredsuvn/gek
 :srclab-url: https://github.com/srclab-projects
 :me-url: https://github.com/fredsuvn
-:fs-version: 0.0.0
+:gek-version: 0.0.0
 
 == Introduction
 
-_fs_ 是一组 Java/Kotlin (JDK 1.8+)的工具库, 大部分用java写,
+_Gek_ 是一组 Java/Kotlin (JDK 1.8+)的工具库, 大部分用java写,
 广泛应用于 link:{srclab-url}[SrcLab] 和 link:{me-url}[我] 的项目中.
 它提供许多方便快捷的工具和接口.
 
-_fs_ 包括:
+_Gek_ 包括:
 
-* link:../fs-annotations/[fs-annotation]: 注解; link:../fs-annotations/docs/DOCUMENTATION_zh.adoc[javadoc];
-* link:../fs-core/[fs-core]: 核心库; link:../fs-core/docs/DOCUMENTATION_zh.adoc[javadoc];
-* link:../fs-kotlin/[fs-kotlin]: Kotlin支持; link:../fs-kotlin/docs/DOCUMENTATION_zh.adoc[javadoc];
-* link:../fs-test/[fs-test]: 测试支持;
-* link:../fs-bom/[fs-bom]: BOM;
+* link:../gek-annotations/[gek-annotation]: 注解; link:../gek-annotations/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../gek-core/[gek-core]: 核心库; link:../gek-core/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../gek-kotlin/[gek-kotlin]: Kotlin支持; link:../gek-kotlin/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../gek-test/[gek-test]: 测试支持;
+* link:../gek-bom/[gek-bom]: BOM;
 
 通常只需要引入:
 
-* link:../fs-core/[fs-core].
+* link:../gek-core/[gek-core].
 
 == 获取
 
-=== 获取 _fs_
+=== 获取 _Gek_
 
 .Gradle
 [source,groovy,subs="attributes+"]
 ----
-implementation "xyz.fsgik:fs-core:{fs-version}"
+implementation "xyz.fsgek:gek-core:{gek-version}"
 ----
 
 .Maven
 [source,xml,subs="attributes+"]
 ----
 <dependency>
-  <groupId>xyz.fsgik</groupId>
-  <artifactId>fs-core</artifactId>
-  <version>{fs-version}</version>
+  <groupId>xyz.fsgek</groupId>
+  <artifactId>gek-core</artifactId>
+  <version>{gek-version}</version>
 </dependency>
 ----
 
@@ -53,7 +53,7 @@ implementation "xyz.fsgik:fs-core:{fs-version}"
 .Gradle
 [source,groovy,subs="attributes+"]
 ----
-api platform("xyz.fsgik:boat-bom:{fs-version}")
+api platform("xyz.fsgek:boat-bom:{gek-version}")
 ----
 
 .Maven
@@ -62,9 +62,9 @@ api platform("xyz.fsgik:boat-bom:{fs-version}")
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>xyz.fsgik</groupId>
-      <artifactId>fs-bom</artifactId>
-      <version>{fs-version}</version>
+      <groupId>xyz.fsgek</groupId>
+      <artifactId>gek-bom</artifactId>
+      <version>{gek-version}</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
