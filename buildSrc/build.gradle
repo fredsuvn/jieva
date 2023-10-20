@@ -1,4 +1,5 @@
 plugins {
+  id 'java-gradle-plugin'
   id 'groovy-gradle-plugin'
 }
 
@@ -6,10 +7,20 @@ repositories {
   maven {
     url "https://maven.aliyun.com/repository/gradle-plugin"
   }
+  mavenCentral()
   gradlePluginPortal()
 }
 
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
   implementation "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
+}
+
+gradlePlugin {
+  plugins {
+    gekPlugin {
+      id = 'xyz.fsgek.build.gek'
+      implementationClass = 'xyz.fsgek.build.GekPlugin'
+    }
+  }
 }

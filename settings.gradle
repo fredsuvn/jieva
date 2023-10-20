@@ -1,28 +1,14 @@
-//pluginManagement {
-//  repositories {
-//    maven {
-//      url "https://maven.aliyun.com/repository/gradle-plugin"
-//    }
-//    gradlePluginPortal()
-//  }
-//  plugins {
-//    id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
-//  }
-//}
+pluginManagement {
+  repositories {
+    maven {
+      url "https://maven.aliyun.com/repository/gradle-plugin"
+    }
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}
 
-rootProject.name = 'boat-build'
-
-//boat:
-include ":boat"
-file("${rootDir}/").eachDirMatch(~/boat-(?!plugins).*/) { dir ->
+rootProject.name = 'gek-root'
+file("${rootDir}/").eachDirMatch(~/gek-(?!(plugins|draft)).*/) { dir ->
   include ":${dir.name}"
 }
-file("${rootDir}/").eachDirMatch(~/fs-(?!plugins).*/) { dir ->
-  include ":${dir.name}"
-}
-//plugins:
-file("${rootDir}/boat-plugins").eachDirMatch(~/boat-.*/) { dir ->
-  include ":boat-plugins:${dir.name}"
-}
-//processor
-include ":fs-processor"
