@@ -1,4 +1,4 @@
-package xyz.fsgik.build
+package xyz.fsgek.build
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -6,7 +6,7 @@ import org.gradle.api.Project
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class FsPlugin implements Plugin<Project> {
+class GekPlugin implements Plugin<Project> {
 
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
@@ -18,7 +18,7 @@ class FsPlugin implements Plugin<Project> {
   @Override
   void apply(Project project) {
     this.project = project
-    project.extensions.add("fs", this)
+    project.extensions.add("gek", this)
   }
 
   private void beforeConfiguration(String... configs) {
@@ -26,7 +26,7 @@ class FsPlugin implements Plugin<Project> {
       if (configurations.contains(config)) {
         continue
       }
-      String gradleConfigName = "fs" + config.capitalize()
+      String gradleConfigName = "gek" + config.capitalize()
       def gradleConfig = project.findProperty(gradleConfigName)
       if (gradleConfig != null) {
         this[config] = gradleConfig.toString()

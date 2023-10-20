@@ -1,21 +1,21 @@
 plugins {
-  id 'fs'
-  id 'fs-config'
-  id 'fs-repo'
+  id 'gek'
+  id 'gek-config'
+  id 'gek-repo'
   id 'java-library'
-  id 'fs-test'
-  id 'fs-publish'
+  id 'gek-test'
+  id 'gek-publish'
 }
 
-description = "Annotations of fs."
+description = "Annotations of Gek."
 
 dependencies {
 
-  implementation platform(project(":fs-dependencies"))
+  implementation platform(project(":gek-dependencies"))
   implementation "com.google.code.findbugs:jsr305"
   compileOnly 'org.projectlombok:lombok'
 
-  testImplementation project(":fs-test")
+  testImplementation project(":gek-test")
 }
 
 java {

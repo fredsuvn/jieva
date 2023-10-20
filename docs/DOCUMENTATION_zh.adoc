@@ -18,15 +18,15 @@ _fs_ 是一组 Java/Kotlin (JDK 1.8+)的工具库, 大部分用java写,
 
 _fs_ 包括:
 
-* link:../fs-annotations/[fs-annotation]: 注解; link:../fs-annotations/docs/DOCUMENTATION_zh.adoc[javadoc];
-* link:../fs-core/[fs-core]: 核心库; link:../fs-core/docs/DOCUMENTATION_zh.adoc[javadoc];
-* link:../fs-kotlin/[fs-kotlin]: Kotlin支持; link:../fs-kotlin/docs/DOCUMENTATION_zh.adoc[javadoc];
-* link:../fs-test/[fs-test]: 测试支持;
-* link:../fs-bom/[fs-bom]: BOM;
+* link:../gek-annotations/[fs-annotation]: 注解; link:../gek-annotations/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../gek-core/[fs-core]: 核心库; link:../gek-core/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../gek-kotlin/[fs-kotlin]: Kotlin支持; link:../gek-kotlin/docs/DOCUMENTATION_zh.adoc[javadoc];
+* link:../gek-test/[fs-test]: 测试支持;
+* link:../gek-bom/[fs-bom]: BOM;
 
 通常只需要引入:
 
-* link:../fs-core/[fs-core].
+* link:../gek-core/[fs-core].
 
 == 获取
 
@@ -35,14 +35,14 @@ _fs_ 包括:
 .Gradle
 [source,groovy,subs="attributes+"]
 ----
-implementation "xyz.fsgik:fs-core:{fs-version}"
+implementation "xyz.fsgek:fs-core:{fs-version}"
 ----
 
 .Maven
 [source,xml,subs="attributes+"]
 ----
 <dependency>
-  <groupId>xyz.fsgik</groupId>
+  <groupId>xyz.fsgek</groupId>
   <artifactId>fs-core</artifactId>
   <version>{fs-version}</version>
 </dependency>
@@ -53,7 +53,7 @@ implementation "xyz.fsgik:fs-core:{fs-version}"
 .Gradle
 [source,groovy,subs="attributes+"]
 ----
-api platform("xyz.fsgik:boat-bom:{fs-version}")
+api platform("xyz.fsgek:boat-bom:{fs-version}")
 ----
 
 .Maven
@@ -62,7 +62,7 @@ api platform("xyz.fsgik:boat-bom:{fs-version}")
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>xyz.fsgik</groupId>
+      <groupId>xyz.fsgek</groupId>
       <artifactId>fs-bom</artifactId>
       <version>{fs-version}</version>
       <type>pom</type>

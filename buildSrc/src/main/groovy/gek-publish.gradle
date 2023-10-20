@@ -1,12 +1,12 @@
 plugins {
-  id 'fs'
-  id 'fs-config'
+  id 'gek'
+  id 'gek-config'
   id 'maven-publish'
   id 'signing'
 }
 
 project.afterEvaluate {
-  fs.info "Configure fs-publish"
+  gek.info "Configure gek-publish"
   configurePublishing()
 }
 
@@ -82,8 +82,8 @@ def configurePublishMavenPom(MavenPublication maven, projectInfo) {
         }
       }
     }
-    fs.debug("maven-pom.name: $name")
-    fs.debug("maven-pom.description: $description")
+    gek.debug("maven-pom.name: $name")
+    gek.debug("maven-pom.description: $description")
   }
 }
 
@@ -92,26 +92,26 @@ def configurePublishRepositories(RepositoryHandler repositories, publishInfo) {
     repositories.maven {
       name = publishInfo.snapshotId
       url = publishInfo.snapshotUrl
-      fs.debug("snapshot.name: $name")
-      fs.debug("snapshot.url: $url")
+      gek.debug("snapshot.name: $name")
+      gek.debug("snapshot.url: $url")
       credentials {
         username = getProperty("publish${name.capitalize()}Username")
         password = getProperty("publish${name.capitalize()}Password")
-        fs.debug("snapshot.username: $username")
-        fs.debug("snapshot.password: $password")
+        gek.debug("snapshot.username: $username")
+        gek.debug("snapshot.password: $password")
       }
     }
   } else {
     repositories.maven {
       name = publishInfo.releaseId
       url = publishInfo.releaseUrl
-      fs.debug("release.name: $name")
-      fs.debug("release.url: $url")
+      gek.debug("release.name: $name")
+      gek.debug("release.url: $url")
       credentials {
         username = getProperty("publish${name.capitalize()}Username")
         password = getProperty("publish${name.capitalize()}Password")
-        fs.debug("release.username: $username")
-        fs.debug("release.password: $password")
+        gek.debug("release.username: $username")
+        gek.debug("release.password: $password")
       }
     }
   }
@@ -123,26 +123,9 @@ def configureSigning(publishInfo) {
     def signingKeyId = getProperty("signing${signingName.capitalize()}KeyId")
     def signingPassword = getProperty("signing${signingName.capitalize()}Password")
     def signingKey = utils.readFileAsString(getProperty("signing${signingName.capitalize()}KeyFile"), "UTF-8")
-    fs.debug("signing.signingKeyId: $signingKeyId")
-    fs.debug("signing.signingPassword: $signingPassword")
-    fs.debug("signing.signingKey: $signingKey")
+    gek.debug("signing.signingKeyId: $signingKeyId")
+    gek.debug("signing.signingPassword: $signingPassword")
+    gek.debug("signing.signingKey: $signingKey")
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
   }
 }
-
-//ext["javaPublishing"] = this.&javaPublishing
-
-// No need:
-//javadoc {
-//  options.addStringOption('Xdoclint:none', '-quiet')
-//}
-//tasks.register('javadocJar', Jar) {
-//  dependsOn javadoc
-//  classifier 'javadoc'
-//  from javadoc.destinationDir
-//}
-//
-//tasks.register('sourceJar', Jar) {
-//  from(sourceSets.main.allSource)
-//  archiveClassifier.set('sources')
-//}

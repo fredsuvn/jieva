@@ -1,15 +1,15 @@
 plugins {
-  id 'fs'
-  id 'fs-config'
-  id 'fs-repo'
+  id 'gek'
+  id 'gek-config'
+  id 'gek-repo'
   id 'java-library'
-  id 'fs-publish'
+  id 'gek-publish'
 }
 
-description = 'Testing support of fs.'
+description = 'Testing support of Gek.'
 
 dependencies {
-  implementation platform(project(':fs-dependencies'))
+  implementation platform(project(':gek-dependencies'))
   api 'org.testng:testng:7.5.1'
   api("org.jetbrains.kotlin:kotlin-test-testng:$kotlinVersion") {
     exclude(group: "org.testng", module: "testng")

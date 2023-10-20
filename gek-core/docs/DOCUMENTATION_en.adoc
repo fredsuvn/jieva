@@ -15,31 +15,31 @@ link:javadoc/index.html[Javadoc]
 
 == Packages
 
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*base*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*base*]:
 base package about object, array, bytes, string, thread, process and more foundations;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*bean*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*bean*]:
 bean package provides bean's definition, resolving and operations;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*convert*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*convert*]:
 convert package provides conversion operations between objects;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*cache*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*cache*]:
 a very simple and practical cache interface,
 provides built-in implementation based on reference of soft/weak ;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*collect*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*collect*]:
 collection package, provides utilities for collection operations;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*data*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*data*]:
 provides interfaces and utilities for data operations, and other data support such as
 link:https://github.com/protocolbuffers/protobuf[protobuf];
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*encode*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*encode*]:
 provides interfaces and utilities for encoding/decoding such as base64 and hex;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*io*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*io*]:
 provides interfaces and utilities for IO, file, cached file and stream wrappers;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*net*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*net*]:
 provides interfaces and utilities for network operations (TCP/UDP/HTTP);
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*proxy*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*proxy*]:
 proxy with spring-cglib or cglib or JDK;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*reflect*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*reflect*]:
 provides interfaces and utilities for reflection, type-reference and type implementations;
-* link:javadoc/xyz/fsgik/common/base/package-summary.html[*security*]:
+* link:javadoc/xyz/fsgek/common/base/package-summary.html[*security*]:
 provides interfaces and utilities for Crypto/Cipher/MAC/Digest/Sign/Key;
 
 == Main utilities and interfaces and Samples

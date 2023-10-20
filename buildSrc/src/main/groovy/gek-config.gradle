@@ -1,13 +1,13 @@
 plugins {
-  id 'fs'
+  id 'gek'
 }
 
 ext {
 
   projectInfo = [
     version      : '0.0.0',
-    group        : 'xyz.fsgik',
-    url          : 'https://github.com/fredsuvn/fs',
+    group        : 'xyz.fsgek',
+    url          : 'https://github.com/fredsuvn/gek',
     inceptionYear: '2020',
     licenses     : [
       [
@@ -54,5 +54,5 @@ ext {
 
 project.group = projectInfo.group
 project.version = publishInfo.isSnapshot ? "${projectInfo.version}-SNAPSHOT" : projectInfo.version
-fs.info("Configure $project - ${project.group}:${project.name}:${project.version}\
+gek.info("Configure $project - ${project.group}:${project.name}:${project.version}\
 ${project == rootProject ? " (root)" : ""}")

@@ -1,36 +1,36 @@
 plugins {
-  id 'fs'
-  id 'fs-config'
-  id 'fs-repo'
+  id 'gek'
+  id 'gek-config'
+  id 'gek-repo'
   id 'java-library'
-  id 'fs-test'
+  id 'gek-test'
   id 'com.google.protobuf' version "$protobufPluginVersion"
-  id 'fs-publish'
+  id 'gek-publish'
 }
 
-description = 'Core of fs.'
+description = 'Core of Gek.'
 
 java {
   registerFeature('proxySpringSupport') {
     usingSourceSet(sourceSets.main)
-    capability('xyz.fsgik.build', 'proxy-spring-support', projectVersion)
+    capability('xyz.fsgek.build', 'proxy-spring-support', projectVersion)
   }
   registerFeature('proxyCglibSupport') {
     usingSourceSet(sourceSets.main)
-    capability('xyz.fsgik.build', 'proxy-cglib-support', projectVersion)
+    capability('xyz.fsgek.build', 'proxy-cglib-support', projectVersion)
   }
   registerFeature('dataProtobufSupport') {
     usingSourceSet(sourceSets.main)
-    capability('xyz.fsgik.build', 'data-protobuf-support', projectVersion)
+    capability('xyz.fsgek.build', 'data-protobuf-support', projectVersion)
   }
 }
 
 dependencies {
 
-  implementation platform(project(':fs-dependencies'))
-  annotationProcessor platform(project(':fs-dependencies'))
+  implementation platform(project(':gek-dependencies'))
+  annotationProcessor platform(project(':gek-dependencies'))
 
-  api project(':fs-annotations')
+  api project(':gek-annotations')
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
@@ -39,12 +39,12 @@ dependencies {
   proxyCglibSupportImplementation 'cglib:cglib'
   dataProtobufSupportImplementation 'com.google.protobuf:protobuf-java'
 
-  testImplementation platform(project(':fs-dependencies'))
-  testAnnotationProcessor platform(project(":fs-dependencies"))
+  testImplementation platform(project(':gek-dependencies'))
+  testAnnotationProcessor platform(project(":gek-dependencies"))
   testAnnotationProcessor 'org.projectlombok:lombok'
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 
-  testImplementation project(":fs-test")
+  testImplementation project(":gek-test")
   testImplementation "com.google.protobuf:protobuf-java"
 }
 
