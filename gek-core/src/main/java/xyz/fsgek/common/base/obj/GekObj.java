@@ -8,12 +8,12 @@ import java.lang.reflect.*;
 import java.util.Collections;
 
 /**
- * This class holds an object and its type.
+ * Object and its type.
  * This class is usually used to specify clear type for an object.
  *
  * @author fredsuvn
  */
-public interface FsObj<T> {
+public interface GekObj<T> {
 
     /**
      * Wraps given object with its type.
@@ -30,9 +30,9 @@ public interface FsObj<T> {
      * @param object given object
      * @param type   type of given object
      * @param <T>    type of object
-     * @return wrapped {@link FsObj} or its subtypes
+     * @return wrapped {@link GekObj} or its subtypes
      */
-    static <T> FsObj<T> wrap(T object, Type type) {
+    static <T> GekObj<T> wrap(T object, Type type) {
         if (type instanceof Class) {
             return new Impls.ClassImpl<>(object, (Class<?>) type);
         }
@@ -58,9 +58,9 @@ public interface FsObj<T> {
      * @param object  given object
      * @param typeRef type ref of given object
      * @param <T>     type of object
-     * @return wrapped {@link FsObj} or its subtypes
+     * @return wrapped {@link GekObj} or its subtypes
      */
-    static <T> FsObj<T> wrap(T object, TypeRef<T> typeRef) {
+    static <T> GekObj<T> wrap(T object, TypeRef<T> typeRef) {
         return wrap(object, typeRef.getType());
     }
 

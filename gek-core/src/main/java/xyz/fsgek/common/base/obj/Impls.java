@@ -12,7 +12,7 @@ import java.util.List;
 final class Impls {
 
     @EqualsAndHashCode
-    static class BaseImpl<T> implements FsObj<T> {
+    static class BaseImpl<T> implements GekObj<T> {
 
         protected final T obj;
         protected final Type type;

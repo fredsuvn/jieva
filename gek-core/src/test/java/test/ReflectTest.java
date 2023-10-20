@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekLogger;
-import xyz.fsgek.common.base.obj.FsObj;
+import xyz.fsgek.common.base.obj.GekObj;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.reflect.GekReflect;
 import xyz.fsgek.common.reflect.GekType;
@@ -50,17 +50,17 @@ public class ReflectTest {
     @Test
     public void testFsObj() {
         Assert.assertEquals(
-            FsObj.wrap(null, new TypeRef<List<?>>() {
+            GekObj.wrap(null, new TypeRef<List<?>>() {
             }),
-            FsObj.wrap(null, new TypeRef<List<?>>() {
+            GekObj.wrap(null, new TypeRef<List<?>>() {
             })
         );
-        FsObj<?> cType = FsObj.wrap(null, String.class);
+        GekObj<?> cType = GekObj.wrap(null, String.class);
         Assert.assertEquals(
             cType.toClassObj().getType(),
             String.class
         );
-        FsObj<?> pType = FsObj.wrap(null, new TypeRef<Map<String, Integer>>() {
+        GekObj<?> pType = GekObj.wrap(null, new TypeRef<Map<String, Integer>>() {
         }.getType());
         Assert.assertEquals(
             pType.toParameterizedObj().getType(),
@@ -75,7 +75,7 @@ public class ReflectTest {
             pType.toParameterizedObj().getActualTypeArgument(1),
             Integer.class
         );
-        FsObj<?> wType = FsObj.wrap(null,
+        GekObj<?> wType = GekObj.wrap(null,
             GekType.wildcardType(Collections.singletonList(String.class), null));
         Assert.assertEquals(
             wType.toWildcardObj().getType(),
@@ -85,13 +85,13 @@ public class ReflectTest {
             wType.toWildcardObj().getUpperBound(),
             String.class
         );
-        wType = FsObj.wrap(null,
+        wType = GekObj.wrap(null,
             GekType.wildcardType(null, Collections.singletonList(Integer.class)));
         Assert.assertEquals(
             wType.toWildcardObj().getLowerBound(),
             Integer.class
         );
-        FsObj<?> gType = FsObj.wrap(null, new TypeRef<Map<String, Integer>[]>() {
+        GekObj<?> gType = GekObj.wrap(null, new TypeRef<Map<String, Integer>[]>() {
         }.getType());
         Assert.assertEquals(
             gType.toGenericArrayObj().getType(),
@@ -105,7 +105,7 @@ public class ReflectTest {
         );
         class OT<OTP extends Float> {
         }
-        FsObj<?> tType = FsObj.wrap(null, OT.class.getTypeParameters()[0]);
+        GekObj<?> tType = GekObj.wrap(null, OT.class.getTypeParameters()[0]);
         Assert.assertEquals(
             tType.toTypeVariableObj().getType(),
             OT.class.getTypeParameters()[0]

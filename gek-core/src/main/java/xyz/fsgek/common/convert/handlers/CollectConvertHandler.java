@@ -7,7 +7,7 @@ import xyz.fsgek.common.reflect.GekReflect;
 import xyz.fsgek.common.reflect.GekType;
 import xyz.fsgek.common.base.GekArray;
 import xyz.fsgek.common.base.GekFlag;
-import xyz.fsgek.common.base.obj.FsObj;
+import xyz.fsgek.common.base.obj.GekObj;
 import xyz.fsgek.common.base.obj.ParameterizedObj;
 import xyz.fsgek.common.collect.GekColl;
 
@@ -182,7 +182,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
                 return null;
             }
             return Gek.as(
-                FsObj.wrap(
+                GekObj.wrap(
                     it,
                     GekType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
                 ).toParameterizedObj()
@@ -194,7 +194,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
                 return null;
             }
             return Gek.as(
-                FsObj.wrap(
+                GekObj.wrap(
                     it,
                     GekType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
                 ).toParameterizedObj()
@@ -212,7 +212,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
             return null;
         }
         return Gek.as(
-            FsObj.wrap(it, itType).toParameterizedObj()
+            GekObj.wrap(it, itType).toParameterizedObj()
         );
     }
 

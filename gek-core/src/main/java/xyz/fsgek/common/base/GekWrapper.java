@@ -16,7 +16,7 @@ public interface GekWrapper<T> {
      * @param <T> type of given object
      * @return wrapper of given object
      */
-    static <T> GekWrapper<T> wrap(T obj) {
+    static <T> GekWrapper<T> wrap(@Nullable T obj) {
         return () -> obj;
     }
 
@@ -27,7 +27,7 @@ public interface GekWrapper<T> {
      * @return empty wrapper which wraps {@code null}
      */
     static <T> GekWrapper<T> empty() {
-        return Gek.as(Impls.NULL_WRAPPER);
+        return Gek.as(Companion.NULL_WRAPPER);
     }
 
     /**
@@ -37,4 +37,11 @@ public interface GekWrapper<T> {
      */
     @Nullable
     T get();
+
+    /**
+     * Companion object of {@link GekWrapper}.
+     */
+    class Companion {
+        private static final GekWrapper<?> NULL_WRAPPER = GekWrapper.wrap(null);
+    }
 }

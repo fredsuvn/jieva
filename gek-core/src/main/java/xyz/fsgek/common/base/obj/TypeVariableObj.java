@@ -6,11 +6,11 @@ import java.lang.reflect.TypeVariable;
 import java.util.List;
 
 /**
- * Specified object type of {@link TypeVariable} for {@link FsObj}.
+ * Specified object type of {@link TypeVariable} for {@link GekObj}.
  *
  * @author fredsuvn
  */
-public interface TypeVariableObj<T> extends FsObj<T> {
+public interface TypeVariableObj<T> extends GekObj<T> {
 
     /**
      * Returns type of hold object as {@link TypeVariable}.

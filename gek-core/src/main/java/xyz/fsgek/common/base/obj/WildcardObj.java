@@ -7,11 +7,11 @@ import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 
 /**
- * Specified object type of {@link WildcardType} for {@link FsObj}.
+ * Specified object type of {@link WildcardType} for {@link GekObj}.
  *
  * @author fredsuvn
  */
-public interface WildcardObj<T> extends FsObj<T> {
+public interface WildcardObj<T> extends GekObj<T> {
 
     /**
      * Returns type of hold object as {@link WildcardType}.

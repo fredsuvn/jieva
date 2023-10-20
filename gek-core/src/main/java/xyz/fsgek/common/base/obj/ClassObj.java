@@ -1,11 +1,11 @@
 package xyz.fsgek.common.base.obj;
 
 /**
- * Specified object type of {@link Class} for {@link FsObj}.
+ * Specified object type of {@link Class} for {@link GekObj}.
  *
  * @author fredsuvn
  */
-public interface ClassObj<T> extends FsObj<T> {
+public interface ClassObj<T> extends GekObj<T> {
 
     /**
      * Returns type of hold object as {@link Class}.

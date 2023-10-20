@@ -3,11 +3,11 @@ package xyz.fsgek.common.base.obj;
 import java.lang.reflect.GenericArrayType;
 
 /**
- * Specified object type of {@link GenericArrayType} for {@link FsObj}.
+ * Specified object type of {@link GenericArrayType} for {@link GekObj}.
  *
  * @author fredsuvn
  */
-public interface GenericArrayObj<T> extends FsObj<T> {
+public interface GenericArrayObj<T> extends GekObj<T> {
 
     /**
      * Returns type of hold object as {@link GenericArrayType}.
