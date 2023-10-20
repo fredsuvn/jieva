@@ -1,39 +1,39 @@
 package xyz.fsgek.common.encode;
 
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-final class HexEncoder implements FsEncoder {
+final class HexEncoder implements GekEncoder {
 
     private static final String MUST_EVEN = "Length of hex data must be even number.";
 
     @Override
     public byte[] encode(byte[] source, int offset, int length) {
         try {
-            FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
+            GekCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
             byte[] dest = new byte[length * 2];
             encode0(source, offset, dest, 0, length);
             return dest;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
     @Override
     public int encode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
-            FsCheck.checkRangeInBounds(sourceOffset, sourceOffset + length, 0, source.length);
-            FsCheck.checkRangeInBounds(destOffset, destOffset + length * 2, 0, dest.length);
+            GekCheck.checkRangeInBounds(sourceOffset, sourceOffset + length, 0, source.length);
+            GekCheck.checkRangeInBounds(destOffset, destOffset + length * 2, 0, dest.length);
             return encode0(source, sourceOffset, dest, destOffset, length);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -55,25 +55,25 @@ final class HexEncoder implements FsEncoder {
             encode0(source, result);
             result.flip();
             return result;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
     @Override
     public int encode(ByteBuffer source, ByteBuffer dest) {
         try {
-            FsCheck.checkArgument(
+            GekCheck.checkArgument(
                 dest.remaining() >= source.remaining() * 2,
                 "Remaining of dest buffer is not enough."
             );
             return encode0(source, dest);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -102,10 +102,10 @@ final class HexEncoder implements FsEncoder {
                 count += 2;
             }
             return count;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -113,10 +113,10 @@ final class HexEncoder implements FsEncoder {
     public int encodeBlockSize() {
         try {
             return 1;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -161,29 +161,29 @@ final class HexEncoder implements FsEncoder {
     @Override
     public byte[] decode(byte[] source, int offset, int length) {
         try {
-            FsCheck.checkArgument(length % 2 == 0, MUST_EVEN);
-            FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
+            GekCheck.checkArgument(length % 2 == 0, MUST_EVEN);
+            GekCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
             byte[] result = new byte[length / 2];
             decode0(source, offset, result, 0, length);
             return result;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
     @Override
     public int decode(byte[] source, int sourceOffset, byte[] dest, int destOffset, int length) {
         try {
-            FsCheck.checkArgument(length % 2 == 0, MUST_EVEN);
-            FsCheck.checkRangeInBounds(sourceOffset, sourceOffset + length, 0, source.length);
-            FsCheck.checkRangeInBounds(destOffset, destOffset + length / 2, 0, dest.length);
+            GekCheck.checkArgument(length % 2 == 0, MUST_EVEN);
+            GekCheck.checkRangeInBounds(sourceOffset, sourceOffset + length, 0, source.length);
+            GekCheck.checkRangeInBounds(destOffset, destOffset + length / 2, 0, dest.length);
             return decode0(source, sourceOffset, dest, destOffset, length);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -191,12 +191,12 @@ final class HexEncoder implements FsEncoder {
         for (int i = sourceOffset, j = destOffset, c = 0; c < length; i++, j++, c += 2) {
             int i1 = decodeByte(source[i]);
             if (i1 == -1) {
-                throw new FsEncodeException("Wrong data at index " + i + ": " + (char) (source[i] & 0x00ff) + ".");
+                throw new GekEncodeException("Wrong data at index " + i + ": " + (char) (source[i] & 0x00ff) + ".");
             }
             i++;
             int i2 = decodeByte(source[i]);
             if (i2 == -1) {
-                throw new FsEncodeException("Wrong data at index " + i + ": " + (char) (source[i + 1] & 0x00ff) + ".");
+                throw new GekEncodeException("Wrong data at index " + i + ": " + (char) (source[i + 1] & 0x00ff) + ".");
             }
             dest[j] = mergeByte(i1, i2);
         }
@@ -206,31 +206,31 @@ final class HexEncoder implements FsEncoder {
     @Override
     public ByteBuffer decode(ByteBuffer source) {
         try {
-            FsCheck.checkArgument(source.remaining() % 2 == 0, MUST_EVEN);
+            GekCheck.checkArgument(source.remaining() % 2 == 0, MUST_EVEN);
             ByteBuffer result = ByteBuffer.allocate(source.remaining() / 2);
             decode0(source, result);
             result.flip();
             return result;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
     @Override
     public int decode(ByteBuffer source, ByteBuffer dest) {
         try {
-            FsCheck.checkArgument(source.remaining() % 2 == 0, MUST_EVEN);
-            FsCheck.checkArgument(
+            GekCheck.checkArgument(source.remaining() % 2 == 0, MUST_EVEN);
+            GekCheck.checkArgument(
                 dest.remaining() >= source.remaining() / 2,
                 "Remaining of dest buffer is not enough."
             );
             return decode0(source, dest);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -240,12 +240,12 @@ final class HexEncoder implements FsEncoder {
             byte b1 = source.get();
             int i1 = decodeByte(b1);
             if (i1 == -1) {
-                throw new FsEncodeException("Wrong data at position " + source.position() + ": " + (char) (b1 & 0x00ff) + ".");
+                throw new GekEncodeException("Wrong data at position " + source.position() + ": " + (char) (b1 & 0x00ff) + ".");
             }
             byte b2 = source.get();
             int i2 = decodeByte(b2);
             if (i2 == -1) {
-                throw new FsEncodeException("Wrong data at position " + source.position() + ": " + (char) (b2 & 0x00ff) + ".");
+                throw new GekEncodeException("Wrong data at position " + source.position() + ": " + (char) (b2 & 0x00ff) + ".");
             }
             dest.put(mergeByte(i1, i2));
             count++;
@@ -264,24 +264,24 @@ final class HexEncoder implements FsEncoder {
                 }
                 int i1 = decodeByte((byte) b1);
                 if (i1 == -1) {
-                    throw new FsEncodeException("Wrong source data at position " + count * 2 + ": " + (char) (b1 & 0x00ff) + ".");
+                    throw new GekEncodeException("Wrong source data at position " + count * 2 + ": " + (char) (b1 & 0x00ff) + ".");
                 }
                 int b2 = source.read();
                 if (b2 == -1) {
-                    throw new FsEncodeException("Wrong source data at position " + (count * 2 + 1) + ", unexpected end of stream.");
+                    throw new GekEncodeException("Wrong source data at position " + (count * 2 + 1) + ", unexpected end of stream.");
                 }
                 int i2 = decodeByte((byte) b2);
                 if (i2 == -1) {
-                    throw new FsEncodeException("Wrong source data at position " + (count * 2 + 1) + ": " + (char) (b2 & 0x00ff) + ".");
+                    throw new GekEncodeException("Wrong source data at position " + (count * 2 + 1) + ": " + (char) (b2 & 0x00ff) + ".");
                 }
                 dest.write(mergeByte(i1, i2));
                 count++;
             }
             return count;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -289,10 +289,10 @@ final class HexEncoder implements FsEncoder {
     public int decodeBlockSize() {
         try {
             return 2;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 

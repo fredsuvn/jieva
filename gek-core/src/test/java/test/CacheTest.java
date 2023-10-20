@@ -2,11 +2,11 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.FsLogger;
-import xyz.fsgek.common.base.FsWrapper;
-import xyz.fsgek.common.base.ref.FsRef;
+import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.GekWrapper;
+import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
-import xyz.fsgek.common.cache.FsCache;
+import xyz.fsgek.common.cache.GekCache;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +16,7 @@ public class CacheTest {
     @Test
     public void testCache() {
         final int[] detected = {0};
-        FsCache<Integer, String> softCache = FsCache.softCache((cache, key) -> {
+        GekCache<Integer, String> softCache = GekCache.softCache((cache, key) -> {
             detected[0]++;
             cache.cleanUp();
         });
@@ -36,7 +36,7 @@ public class CacheTest {
                 //Assert.assertEquals(map.get(i), fsValue);
             }
         }
-        FsLogger.defaultLogger().info("Soft---> total: " + times +
+        GekLogger.defaultLogger().info("Soft---> total: " + times +
             ", removed: " + removed +
             ", detected: " + detected[0] +
             ", cached: " + (times - removed) +
@@ -45,7 +45,7 @@ public class CacheTest {
         Assert.assertEquals(removed, detected[0]);
 
         detected[0] = 0;
-        FsCache<Integer, String> weakCache = FsCache.weakCache((cache, key) -> {
+        GekCache<Integer, String> weakCache = GekCache.weakCache((cache, key) -> {
             detected[0]++;
             cache.cleanUp();
         });
@@ -59,7 +59,7 @@ public class CacheTest {
                 removed++;
             }
         }
-        FsLogger.defaultLogger().info("Weak---> total: " + times +
+        GekLogger.defaultLogger().info("Weak---> total: " + times +
             ", removed: " + removed +
             ", detected: " + detected[0] +
             ", cached: " + (times - removed) +
@@ -70,88 +70,88 @@ public class CacheTest {
 
     @Test
     public void testCacheLoader() {
-        FsCache<Integer, String> fsCache = FsCache.softCache();
-        Assert.assertNull(fsCache.get(1));
-        Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
-        Assert.assertEquals(fsCache.get(1, String::valueOf), "1");
-        FsLogger.defaultLogger().info("cacheLoader: 1=", fsCache.get(1));
-        fsCache.get(1, k -> null);
-        Assert.assertEquals(fsCache.get(1), "1");
-        fsCache.remove(1);
-        fsCache.get(1, k -> null);
-        Assert.assertNull(fsCache.get(1));
-        Assert.assertEquals(fsCache.getWrapper(1), FsWrapper.empty());
-        fsCache.remove(1);
-        fsCache.getWrapper(1, k -> null);
-        Assert.assertNull(fsCache.get(1));
-        Assert.assertNull(fsCache.getWrapper(1));
-        fsCache.put(2, "2");
-        Assert.assertEquals(fsCache.get(2), "2");
-        Assert.assertEquals(fsCache.get(2, k -> "4"), "2");
-        Assert.assertEquals(fsCache.getWrapper(2, k -> FsWrapper.wrap("8")).get(), "2");
+        GekCache<Integer, String> gekCache = GekCache.softCache();
+        Assert.assertNull(gekCache.get(1));
+        Assert.assertEquals(gekCache.get(1, String::valueOf), "1");
+        Assert.assertEquals(gekCache.get(1, String::valueOf), "1");
+        GekLogger.defaultLogger().info("cacheLoader: 1=", gekCache.get(1));
+        gekCache.get(1, k -> null);
+        Assert.assertEquals(gekCache.get(1), "1");
+        gekCache.remove(1);
+        gekCache.get(1, k -> null);
+        Assert.assertNull(gekCache.get(1));
+        Assert.assertEquals(gekCache.getWrapper(1), GekWrapper.empty());
+        gekCache.remove(1);
+        gekCache.getWrapper(1, k -> null);
+        Assert.assertNull(gekCache.get(1));
+        Assert.assertNull(gekCache.getWrapper(1));
+        gekCache.put(2, "2");
+        Assert.assertEquals(gekCache.get(2), "2");
+        Assert.assertEquals(gekCache.get(2, k -> "4"), "2");
+        Assert.assertEquals(gekCache.getWrapper(2, k -> GekWrapper.wrap("8")).get(), "2");
     }
 
     @Test
     public void testCleanUp() {
-        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> c.cleanUp());
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> c.cleanUp());
         for (int i = 0; i < 10000; i++) {
-            fsCache.put(i, i);
+            gekCache.put(i, i);
         }
-        fsCache.cleanUp();
+        gekCache.cleanUp();
     }
 
     @Test
     public void testRemove() {
-        IntRef intRef = FsRef.ofInt(0);
-        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
-        fsCache.put(1, 1);
-        fsCache.remove(1);
+        IntRef intRef = GekRef.ofInt(0);
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> intRef.incrementAndGet());
+        gekCache.put(1, 1);
+        gekCache.remove(1);
         Assert.assertEquals(intRef.get(), 1);
     }
 
     @Test
     public void testClear() {
-        IntRef intRef = FsRef.ofInt(0);
-        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
+        IntRef intRef = GekRef.ofInt(0);
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> intRef.incrementAndGet());
         for (int i = 0; i < 10000; i++) {
-            fsCache.put(i, i);
+            gekCache.put(i, i);
         }
-        fsCache.clear();
+        gekCache.clear();
         Assert.assertEquals(intRef.get(), 10000);
     }
 
     @Test
     public void testRemoveIf() {
-        IntRef intRef = FsRef.ofInt(0);
-        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> intRef.incrementAndGet());
+        IntRef intRef = GekRef.ofInt(0);
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> intRef.incrementAndGet());
         for (int i = 0; i < 10; i++) {
-            fsCache.put(i, i);
+            gekCache.put(i, i);
         }
-        fsCache.removeIf((k, v) -> k > 5);
+        gekCache.removeIf((k, v) -> k > 5);
         Assert.assertEquals(intRef.get(), 4);
-        Assert.assertEquals(fsCache.size(), 6);
+        Assert.assertEquals(gekCache.size(), 6);
     }
 
     @Test
     public void testNull() {
-        IntRef intRef = FsRef.ofInt(0);
+        IntRef intRef = GekRef.ofInt(0);
         Set<Integer> set = new HashSet<>();
-        FsCache<Integer, Integer> fsCache = FsCache.softCache((c, k) -> {
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> {
             intRef.incrementAndGet();
             set.remove(k);
         });
         for (int i = 0; i < 10000; i++) {
-            fsCache.put(i, null);
+            gekCache.put(i, null);
         }
         for (int i = 0; i < 10000; i++) {
-            FsWrapper<Integer> w = fsCache.getWrapper(i);
+            GekWrapper<Integer> w = gekCache.getWrapper(i);
             if (w != null) {
                 Assert.assertNull(w.get());
                 set.add(i);
             }
         }
         Assert.assertEquals(set.size() + intRef.get(), 10000);
-        fsCache.clear();
+        gekCache.clear();
         Assert.assertEquals(intRef.get(), 10000);
     }
 }

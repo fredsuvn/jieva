@@ -1,8 +1,8 @@
 package xyz.fsgek.common.security;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsIO;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.base.GekCheck;
 
 import javax.crypto.Mac;
 import java.io.InputStream;
@@ -15,7 +15,7 @@ import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Supplier;
 
-final class MacImpl implements FsMac {
+final class MacImpl implements GekMac {
 
     private final String algorithm;
     private final ThreadLocal<Mac> local;
@@ -37,7 +37,7 @@ final class MacImpl implements FsMac {
 
     @Override
     public CryptoProcess prepare(byte[] source, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
         return new ByteArrayCryptoProcess(source, offset, length);
     }
 
@@ -73,11 +73,11 @@ final class MacImpl implements FsMac {
             try {
                 ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
                 Mac mac = local.get();
-                return FsCrypto.generateMac(mac, key, src, params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.generateMac(mac, key, src, params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }
@@ -94,11 +94,11 @@ final class MacImpl implements FsMac {
         public byte[] doFinal() {
             try {
                 Mac mac = local.get();
-                return FsCrypto.generateMac(mac, key, source, params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.generateMac(mac, key, source, params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }
@@ -115,11 +115,11 @@ final class MacImpl implements FsMac {
         public byte[] doFinal() {
             try {
                 Mac mac = local.get();
-                return FsCrypto.generateMac(mac, key, in, bufferSize, params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.generateMac(mac, key, in, bufferSize, params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }
@@ -194,15 +194,15 @@ final class MacImpl implements FsMac {
         public int doFinal(byte[] dest, int offset) {
             try {
                 if (dest.length - offset < getMacLength()) {
-                    throw new FsSecurityException("length of dest remaining is not enough.");
+                    throw new GekSecurityException("length of dest remaining is not enough.");
                 }
                 byte[] en = doFinal();
                 System.arraycopy(en, 0, dest, offset, en.length);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -210,15 +210,15 @@ final class MacImpl implements FsMac {
         public int doFinal(ByteBuffer dest) {
             try {
                 if (dest.remaining() < getMacLength()) {
-                    throw new FsSecurityException("length of dest remaining is not enough.");
+                    throw new GekSecurityException("length of dest remaining is not enough.");
                 }
                 byte[] en = doFinal();
                 dest.put(en);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -228,10 +228,10 @@ final class MacImpl implements FsMac {
                 byte[] en = doFinal();
                 dest.write(en);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -239,11 +239,11 @@ final class MacImpl implements FsMac {
         public InputStream doFinalStream() {
             try {
                 byte[] en = doFinal();
-                return FsIO.toInputStream(en);
-            } catch (FsSecurityException e) {
+                return GekIO.toInputStream(en);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }

@@ -3,8 +3,8 @@ package test;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.FsString;
-import xyz.fsgek.common.collect.FsCollect;
+import xyz.fsgek.common.base.GekString;
+import xyz.fsgek.common.collect.GekColl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,11 +23,11 @@ public class StringTest {
             "fsafsaf"
         );
         Assert.assertEquals(
-            FsString.concat(list.toArray()),
+            GekString.concat(list.toArray()),
             String.join("", list)
         );
         Assert.assertEquals(
-            FsString.concat(list),
+            GekString.concat(list),
             String.join("", list)
         );
     }
@@ -36,35 +36,35 @@ public class StringTest {
     public void testStartWith() {
         String a = "123abc123";
         Assert.assertEquals(
-            FsString.startWith(a, "456"),
+            GekString.startWith(a, "456"),
             "456" + a
         );
         Assert.assertEquals(
-            FsString.startWith(a, "123"),
+            GekString.startWith(a, "123"),
             a
         );
         Assert.assertEquals(
-            FsString.endWith(a, "456"),
+            GekString.endWith(a, "456"),
             a + "456"
         );
         Assert.assertEquals(
-            FsString.endWith(a, "123"),
+            GekString.endWith(a, "123"),
             a
         );
         Assert.assertEquals(
-            FsString.removeStart(a, "456"),
+            GekString.removeStart(a, "456"),
             a
         );
         Assert.assertEquals(
-            FsString.removeStart(a, "123"),
+            GekString.removeStart(a, "123"),
             "abc123"
         );
         Assert.assertEquals(
-            FsString.removeEnd(a, "456"),
+            GekString.removeEnd(a, "456"),
             a
         );
         Assert.assertEquals(
-            FsString.removeEnd(a, "123"),
+            GekString.removeEnd(a, "123"),
             "123abc"
         );
     }
@@ -72,43 +72,43 @@ public class StringTest {
     @Test
     public void testIndexOf() {
         Assert.assertEquals(
-            FsString.indexOf("1234567890", "2"),
+            GekString.indexOf("1234567890", "2"),
             1
         );
         Assert.assertEquals(
-            FsString.lastIndexOf("1234567890", "2"),
+            GekString.lastIndexOf("1234567890", "2"),
             1
         );
         Assert.assertEquals(
-            FsString.indexOf("12345678901234567890", "2", 9),
+            GekString.indexOf("12345678901234567890", "2", 9),
             11
         );
         Assert.assertEquals(
-            FsString.lastIndexOf("12345678901234567890", "2", 9),
+            GekString.lastIndexOf("12345678901234567890", "2", 9),
             1
         );
         Assert.assertEquals(
-            FsString.indexOf("11", "11"),
+            GekString.indexOf("11", "11"),
             0
         );
         Assert.assertEquals(
-            FsString.lastIndexOf("11", "11"),
+            GekString.lastIndexOf("11", "11"),
             0
         );
         Assert.assertEquals(
-            FsString.indexOf("", ""),
+            GekString.indexOf("", ""),
             -1
         );
         Assert.assertEquals(
-            FsString.indexOf("1", "11"),
+            GekString.indexOf("1", "11"),
             -1
         );
         Assert.assertEquals(
-            FsString.lastIndexOf("", ""),
+            GekString.lastIndexOf("", ""),
             -1
         );
         Assert.assertEquals(
-            FsString.lastIndexOf("1", "11"),
+            GekString.lastIndexOf("1", "11"),
             -1
         );
     }
@@ -116,27 +116,27 @@ public class StringTest {
     @Test
     public void testSplit() {
         Assert.assertEquals(
-            FsCollect.toStringList(FsString.split("123--123--123--", "--")),
+            GekColl.toStringList(GekString.split("123--123--123--", "--")),
             Arrays.asList("123", "123", "123", "")
         );
         Assert.assertEquals(
-            FsCollect.toStringList(FsString.split("123", "1234")),
+            GekColl.toStringList(GekString.split("123", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            FsCollect.toStringList(FsString.split("", "1234")),
+            GekColl.toStringList(GekString.split("", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            FsCollect.toStringList(FsString.split("123", "123")),
+            GekColl.toStringList(GekString.split("123", "123")),
             Arrays.asList("", "")
         );
         Assert.assertEquals(
-            FsCollect.toStringList(FsString.split("123--123--123----", "--")),
+            GekColl.toStringList(GekString.split("123--123--123----", "--")),
             Arrays.asList("123", "123", "123", "", "")
         );
         Assert.assertEquals(
-            FsCollect.toStringList(FsString.split("--123--123--123----", "--")),
+            GekColl.toStringList(GekString.split("--123--123--123----", "--")),
             Arrays.asList("", "123", "123", "123", "", "")
         );
     }
@@ -144,19 +144,19 @@ public class StringTest {
     @Test
     public void testReplace() {
         Assert.assertEquals(
-            FsString.replace("123--123--123--", "--", "66"),
+            GekString.replace("123--123--123--", "--", "66"),
             "123661236612366"
         );
         Assert.assertEquals(
-            FsString.replace("----123--123--123----", "--", "+++"),
+            GekString.replace("----123--123--123----", "--", "+++"),
             "++++++123+++123+++123++++++"
         );
         Assert.assertEquals(
-            FsString.replace("-----123--123---123----", "--", "+++"),
+            GekString.replace("-----123--123---123----", "--", "+++"),
             "++++++-123+++123+++-123++++++"
         );
         Assert.assertEquals(
-            FsString.replace("-----123--123---123----", "--", ""),
+            GekString.replace("-----123--123---123----", "--", ""),
             "-123123-123"
         );
     }
@@ -164,15 +164,15 @@ public class StringTest {
     @Test
     public void testSubRef() {
         Assert.assertEquals(
-            FsString.subView("12345678", 2, 7).toString(),
+            GekString.subView("12345678", 2, 7).toString(),
             "34567"
         );
         Assert.assertEquals(
-            FsString.subView("12345678", 2, 7).charAt(3),
+            GekString.subView("12345678", 2, 7).charAt(3),
             '6'
         );
         Assert.assertEquals(
-            FsString.subView("12345678", 2, 7).subSequence(1, 3).toString(),
+            GekString.subView("12345678", 2, 7).subSequence(1, 3).toString(),
             "45"
         );
     }
@@ -180,16 +180,16 @@ public class StringTest {
     @Test
     public void testEqual() {
         Assert.assertTrue(
-            FsString.charEquals("123", "123")
+            GekString.charEquals("123", "123")
         );
         Assert.assertTrue(
-            FsString.charEquals("123", "1123".substring(1))
+            GekString.charEquals("123", "1123".substring(1))
         );
         Assert.assertFalse(
-            FsString.charEquals("1234", "123")
+            GekString.charEquals("1234", "123")
         );
         Assert.assertTrue(
-            FsString.charEquals("123", new CharSequence() {
+            GekString.charEquals("123", new CharSequence() {
                 @Override
                 public int length() {
                     return 3;
@@ -220,16 +220,16 @@ public class StringTest {
 
     @Test
     public void testCapitalize() {
-        Assert.assertEquals("Abc", FsString.capitalize("abc"));
-        Assert.assertEquals("Abc", FsString.capitalize("Abc"));
-        Assert.assertEquals("abc", FsString.uncapitalize("abc"));
-        Assert.assertEquals("abc", FsString.uncapitalize("Abc"));
+        Assert.assertEquals("Abc", GekString.capitalize("abc"));
+        Assert.assertEquals("Abc", GekString.capitalize("Abc"));
+        Assert.assertEquals("abc", GekString.uncapitalize("abc"));
+        Assert.assertEquals("abc", GekString.uncapitalize("Abc"));
     }
 
     @Test
     public void testLazyString() {
         int[] is = {0};
-        CharSequence lazy = FsString.lazyString(() -> {
+        CharSequence lazy = GekString.lazyString(() -> {
             is[0] = 1;
             return "8899";
         });

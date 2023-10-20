@@ -1,9 +1,9 @@
 package xyz.fsgek.common.net.tcp.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsBuffer;
-import xyz.fsgek.common.net.tcp.FsTcpChannel;
-import xyz.fsgek.common.net.tcp.FsTcpChannelHandler;
+import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.net.tcp.GekTcpChannel;
+import xyz.fsgek.common.net.tcp.GekTcpChannelHandler;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -15,13 +15,13 @@ import java.util.function.IntFunction;
  * <pre>
  *     buffer -&gt; data|data|data|..
  * </pre>
- * The returned object of {@link #onMessage(FsTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;,
- * each byte buffer is split by {@link FsBuffer#splitByDelimiter(ByteBuffer, byte, IntFunction)}
+ * The returned object of {@link #onMessage(GekTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;,
+ * each byte buffer is split by {@link GekBuffer#splitByDelimiter(ByteBuffer, byte, IntFunction)}
  * and make returned buffers readonly.
  *
  * @author fredsuvn
  */
-public class DelimiterBasedTcpChannelHandler implements FsTcpChannelHandler<ByteBuffer> {
+public class DelimiterBasedTcpChannelHandler implements GekTcpChannelHandler<ByteBuffer> {
 
     private final byte delimiter;
     private final IntFunction<ByteBuffer> generator;
@@ -47,8 +47,8 @@ public class DelimiterBasedTcpChannelHandler implements FsTcpChannelHandler<Byte
     }
 
     @Override
-    public @Nullable Object onMessage(FsTcpChannel channel, ByteBuffer message) {
-        List<ByteBuffer> result = FsBuffer.splitByDelimiter(message, delimiter, generator);
+    public @Nullable Object onMessage(GekTcpChannel channel, ByteBuffer message) {
+        List<ByteBuffer> result = GekBuffer.splitByDelimiter(message, delimiter, generator);
         return result.isEmpty() ? null : asReadOnly(result);
     }
 

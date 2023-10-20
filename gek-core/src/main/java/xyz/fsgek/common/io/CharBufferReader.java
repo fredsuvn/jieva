@@ -1,6 +1,6 @@
 package xyz.fsgek.common.io;
 
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -17,7 +17,7 @@ final class CharBufferReader extends Reader {
     @Override
     public synchronized int read(char[] b, int off, int len) throws IOException {
         try {
-            FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (len == 0) {
                 return 0;
             }

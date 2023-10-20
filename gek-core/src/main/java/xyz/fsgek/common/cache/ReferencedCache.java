@@ -1,9 +1,9 @@
 package xyz.fsgek.common.cache;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.Fs;
-import xyz.fsgek.common.base.FsWrapper;
-import xyz.fsgek.common.base.ref.FsRef;
+import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.base.GekWrapper;
+import xyz.fsgek.common.base.ref.GekRef;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -13,11 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-final class ReferencedCache<K, V> implements FsCache<K, V> {
+final class ReferencedCache<K, V> implements GekCache<K, V> {
 
     private static final Object NULL = new Object();
 
-    private final FsCache.RemoveListener<K, V> removeListener;
+    private final GekCache.RemoveListener<K, V> removeListener;
     private final boolean isSoft;
 
     private final Map<K, Entry> map;
@@ -50,25 +50,25 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
 
     @Override
     public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
-        FsRef<Object> ref = FsRef.ofNull();
+        GekRef<Object> ref = GekRef.ofNull();
         Entry entry = map.compute(key, (k, old) -> {
             if (old == null) {
                 V newValue = loader.apply(k);
-                ref.set(Fs.notNull(newValue, NULL));
+                ref.set(Gek.notNull(newValue, NULL));
                 return newEntry(k, newValue);
             }
             Object value = old.getValue();
             if (value == null) {
                 old.clear();
                 V newValue = loader.apply(k);
-                ref.set(Fs.notNull(newValue, NULL));
+                ref.set(Gek.notNull(newValue, NULL));
                 return newEntry(k, newValue);
             }
             return old;
         });
         if (ref.get() != null) {
             cleanUp0();
-            return ref.get() == NULL ? null : Fs.as(ref.get());
+            return ref.get() == NULL ? null : Gek.as(ref.get());
         }
         V result = get0(entry);
         cleanUp0();
@@ -76,19 +76,19 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
     }
 
     @Override
-    public @Nullable FsWrapper<V> getWrapper(K key) {
+    public @Nullable GekWrapper<V> getWrapper(K key) {
         Entry entry = map.get(key);
-        FsWrapper<V> result = getWrapper0(entry);
+        GekWrapper<V> result = getWrapper0(entry);
         cleanUp0();
         return result;
     }
 
     @Override
-    public @Nullable FsWrapper<V> getWrapper(K key, Function<? super K, @Nullable FsWrapper<? extends V>> loader) {
-        FsRef<Object> ref = FsRef.ofNull();
+    public @Nullable GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable GekWrapper<? extends V>> loader) {
+        GekRef<Object> ref = GekRef.ofNull();
         Entry entry = map.compute(key, (k, old) -> {
             if (old == null) {
-                FsWrapper<? extends V> newValue = loader.apply(k);
+                GekWrapper<? extends V> newValue = loader.apply(k);
                 if (newValue == null) {
                     ref.set(NULL);
                     return null;
@@ -99,7 +99,7 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
             Object value = old.getValue();
             if (value == null) {
                 old.clear();
-                FsWrapper<? extends V> newValue = loader.apply(k);
+                GekWrapper<? extends V> newValue = loader.apply(k);
                 if (newValue == null) {
                     ref.set(NULL);
                     return null;
@@ -111,9 +111,9 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
         });
         if (ref.get() != null) {
             cleanUp0();
-            return ref.get() == NULL ? null : Fs.as(ref.get());
+            return ref.get() == NULL ? null : Gek.as(ref.get());
         }
-        FsWrapper<V> result = getWrapper0(entry);
+        GekWrapper<V> result = getWrapper0(entry);
         cleanUp0();
         return result;
     }
@@ -152,7 +152,7 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
                     return false;
                 }
             }
-            if (predicate.test(key, Fs.as(value))) {
+            if (predicate.test(key, Gek.as(value))) {
                 entry.clear();
                 return true;
             }
@@ -190,11 +190,11 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
         if (obj == NULL) {
             return null;
         }
-        return Fs.as(obj);
+        return Gek.as(obj);
     }
 
     @Nullable
-    private FsWrapper<V> getWrapper0(@Nullable Entry entry) {
+    private GekWrapper<V> getWrapper0(@Nullable Entry entry) {
         if (entry == null) {
             return null;
         }
@@ -204,9 +204,9 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
             return null;
         }
         if (obj == NULL) {
-            return FsWrapper.empty();
+            return GekWrapper.empty();
         }
-        return Fs.as(FsWrapper.wrap(obj));
+        return Gek.as(GekWrapper.wrap(obj));
     }
 
     private Entry newEntry(Object key, @Nullable Object value) {
@@ -231,7 +231,7 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
                     break;
                 }
                 Entry entry = (Entry) x;
-                K key = Fs.as(entry.getKey());
+                K key = Gek.as(entry.getKey());
                 map.computeIfPresent(key, (k, v) -> {
                     if (v == entry) {
                         return null;
@@ -239,7 +239,7 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
                     return v;
                 });
                 if (removeListener != null) {
-                    removeListener.onRemove(this, Fs.as(entry.getKey()));
+                    removeListener.onRemove(this, Gek.as(entry.getKey()));
                 }
             }
         } finally {
@@ -279,7 +279,7 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
         public void clear() {
             super.clear();
             if (removeListener != null) {
-                removeListener.onRemove(ReferencedCache.this, Fs.as(key));
+                removeListener.onRemove(ReferencedCache.this, Gek.as(key));
             }
         }
     }
@@ -307,7 +307,7 @@ final class ReferencedCache<K, V> implements FsCache<K, V> {
         public void clear() {
             super.clear();
             if (removeListener != null) {
-                removeListener.onRemove(ReferencedCache.this, Fs.as(key));
+                removeListener.onRemove(ReferencedCache.this, Gek.as(key));
             }
         }
     }

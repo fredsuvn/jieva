@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.FsBytesBuilder;
-import xyz.fsgek.common.base.FsString;
-import xyz.fsgek.common.io.FsBuffer;
+import xyz.fsgek.common.base.GekBytesBuilder;
+import xyz.fsgek.common.base.GekString;
+import xyz.fsgek.common.io.GekBuffer;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -14,11 +14,11 @@ public class BufferTest {
 
     @Test
     public void testRead() {
-        ByteBuffer buffer = ByteBuffer.wrap(FsString.encode("123456789"));
+        ByteBuffer buffer = ByteBuffer.wrap(GekString.encode("123456789"));
         buffer.mark();
         Assert.assertEquals(
-            FsString.encode("123456789"),
-            FsBuffer.getBytes(buffer)
+            GekString.encode("123456789"),
+            GekBuffer.getBytes(buffer)
         );
         Assert.assertEquals(
             buffer.position(),
@@ -26,8 +26,8 @@ public class BufferTest {
         );
         buffer.reset();
         Assert.assertEquals(
-            FsString.encode("12345"),
-            FsBuffer.getBytes(buffer, 5)
+            GekString.encode("12345"),
+            GekBuffer.getBytes(buffer, 5)
         );
         Assert.assertEquals(
             buffer.position(),
@@ -36,7 +36,7 @@ public class BufferTest {
         buffer.reset();
         Assert.assertEquals(
             "123456789",
-            FsBuffer.getString(buffer)
+            GekBuffer.getString(buffer)
         );
         Assert.assertEquals(
             buffer.position(),
@@ -44,8 +44,8 @@ public class BufferTest {
         );
         buffer.reset();
         Assert.assertEquals(
-            FsString.encode("12345"),
-            FsBuffer.getBytes(FsBuffer.slice(buffer, 5))
+            GekString.encode("12345"),
+            GekBuffer.getBytes(GekBuffer.slice(buffer, 5))
         );
         Assert.assertEquals(
             buffer.position(),
@@ -53,8 +53,8 @@ public class BufferTest {
         );
         buffer.reset();
         Assert.assertEquals(
-            FsString.encode("56789"),
-            FsBuffer.getBytes(FsBuffer.subView(buffer, 4))
+            GekString.encode("56789"),
+            GekBuffer.getBytes(GekBuffer.subView(buffer, 4))
         );
         Assert.assertEquals(
             buffer.position(),
@@ -62,8 +62,8 @@ public class BufferTest {
         );
         buffer.reset();
         Assert.assertEquals(
-            FsString.encode("567"),
-            FsBuffer.getBytes(FsBuffer.subView(buffer, 4, 3))
+            GekString.encode("567"),
+            GekBuffer.getBytes(GekBuffer.subView(buffer, 4, 3))
         );
         Assert.assertEquals(
             buffer.position(),
@@ -73,11 +73,11 @@ public class BufferTest {
 
     @Test
     public void testBytesBuilder() {
-        FsBytesBuilder builder = new FsBytesBuilder();
+        GekBytesBuilder builder = new GekBytesBuilder();
         builder.append((byte) 'a');
-        builder.append(FsString.encode("123456789"));
-        builder.append(FsString.encode("123456789"), 2, 5);
-        ByteBuffer buffer1 = ByteBuffer.wrap(FsString.encode("123456789"));
+        builder.append(GekString.encode("123456789"));
+        builder.append(GekString.encode("123456789"), 2, 5);
+        ByteBuffer buffer1 = ByteBuffer.wrap(GekString.encode("123456789"));
         Assert.assertTrue(buffer1.hasArray());
         buffer1.mark();
         buffer1.position(3);
@@ -90,40 +90,40 @@ public class BufferTest {
         buffer2.position(4);
         builder.append(buffer2);
         Assert.assertEquals(
-            FsBuffer.getBytes(builder.toByteBuffer()),
-            FsString.encode("a1234567893456745678956789")
+            GekBuffer.getBytes(builder.toByteBuffer()),
+            GekString.encode("a1234567893456745678956789")
         );
     }
 
     @Test
     public void testSplit() {
-        ByteBuffer buffer = ByteBuffer.wrap(FsString.encode("1234567890"));
+        ByteBuffer buffer = ByteBuffer.wrap(GekString.encode("1234567890"));
         Assert.assertEquals(
-            FsBuffer.splitInLength(buffer, 4).stream().map(FsBuffer::getString).collect(Collectors.toList()),
+            GekBuffer.splitInLength(buffer, 4).stream().map(GekBuffer::getString).collect(Collectors.toList()),
             Arrays.asList("1234", "5678")
         );
         Assert.assertEquals(buffer.position(), 8);
-        buffer = ByteBuffer.wrap(FsString.encode("1234567890"));
+        buffer = ByteBuffer.wrap(GekString.encode("1234567890"));
         Assert.assertEquals(
-            FsBuffer.splitInLength(buffer, 5).stream().map(FsBuffer::getString).collect(Collectors.toList()),
+            GekBuffer.splitInLength(buffer, 5).stream().map(GekBuffer::getString).collect(Collectors.toList()),
             Arrays.asList("12345", "67890")
         );
         Assert.assertEquals(buffer.position(), 10);
-        buffer = ByteBuffer.wrap(FsString.encode("123|456|"));
+        buffer = ByteBuffer.wrap(GekString.encode("123|456|"));
         Assert.assertEquals(
-            FsBuffer.splitByDelimiter(buffer, (byte) '|').stream().map(FsBuffer::getString).collect(Collectors.toList()),
+            GekBuffer.splitByDelimiter(buffer, (byte) '|').stream().map(GekBuffer::getString).collect(Collectors.toList()),
             Arrays.asList("123", "456")
         );
         Assert.assertEquals(buffer.position(), 8);
-        buffer = ByteBuffer.wrap(FsString.encode("|123|456|"));
+        buffer = ByteBuffer.wrap(GekString.encode("|123|456|"));
         Assert.assertEquals(
-            FsBuffer.splitByDelimiter(buffer, (byte) '|').stream().map(FsBuffer::getString).collect(Collectors.toList()),
+            GekBuffer.splitByDelimiter(buffer, (byte) '|').stream().map(GekBuffer::getString).collect(Collectors.toList()),
             Arrays.asList("", "123", "456")
         );
         Assert.assertEquals(buffer.position(), 9);
-        buffer = ByteBuffer.wrap(FsString.encode("|123|456"));
+        buffer = ByteBuffer.wrap(GekString.encode("|123|456"));
         Assert.assertEquals(
-            FsBuffer.splitByDelimiter(buffer, (byte) '|').stream().map(FsBuffer::getString).collect(Collectors.toList()),
+            GekBuffer.splitByDelimiter(buffer, (byte) '|').stream().map(GekBuffer::getString).collect(Collectors.toList()),
             Arrays.asList("", "123")
         );
         Assert.assertEquals(buffer.position(), 5);

@@ -8,7 +8,7 @@ import java.security.PublicKey;
 import java.security.spec.KeySpec;
 import java.util.function.Supplier;
 
-final class KeyFactoryImpl implements FsKeyFactory {
+final class KeyFactoryImpl implements GekKeyFactory {
 
     private final String algorithm;
     private final ThreadLocal<KeyFactory> local;
@@ -28,10 +28,10 @@ final class KeyFactoryImpl implements FsKeyFactory {
         try {
             KeyFactory factory = local.get();
             return factory.generatePublic(spec);
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -40,10 +40,10 @@ final class KeyFactoryImpl implements FsKeyFactory {
         try {
             KeyFactory factory = local.get();
             return factory.generatePrivate(spec);
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 

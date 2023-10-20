@@ -1,8 +1,8 @@
 package xyz.fsgek.common.security;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsIO;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,7 +15,7 @@ import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Supplier;
 
-final class DigestImpl implements FsDigest {
+final class DigestImpl implements GekDigest {
 
     private final String algorithm;
     private final ThreadLocal<MessageDigest> local;
@@ -37,7 +37,7 @@ final class DigestImpl implements FsDigest {
 
     @Override
     public CryptoProcess prepare(byte[] source, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
         return new ByteArrayCryptoProcess(source, offset, length);
     }
 
@@ -73,11 +73,11 @@ final class DigestImpl implements FsDigest {
             try {
                 ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
                 MessageDigest digest = local.get();
-                return FsCrypto.digest(digest, src);
-            } catch (FsSecurityException e) {
+                return GekCrypto.digest(digest, src);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }
@@ -94,11 +94,11 @@ final class DigestImpl implements FsDigest {
         public byte[] doFinal() {
             try {
                 MessageDigest digest = local.get();
-                return FsCrypto.digest(digest, source);
-            } catch (FsSecurityException e) {
+                return GekCrypto.digest(digest, source);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }
@@ -115,11 +115,11 @@ final class DigestImpl implements FsDigest {
         public byte[] doFinal() {
             try {
                 MessageDigest digest = local.get();
-                return FsCrypto.digest(digest, in, bufferSize);
-            } catch (FsSecurityException e) {
+                return GekCrypto.digest(digest, in, bufferSize);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }
@@ -178,15 +178,15 @@ final class DigestImpl implements FsDigest {
         public int doFinal(byte[] dest, int offset) {
             try {
                 if (dest.length - offset < getDigestLength()) {
-                    throw new FsSecurityException("length of dest remaining is not enough.");
+                    throw new GekSecurityException("length of dest remaining is not enough.");
                 }
                 byte[] en = doFinal();
                 System.arraycopy(en, 0, dest, offset, en.length);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -194,15 +194,15 @@ final class DigestImpl implements FsDigest {
         public int doFinal(ByteBuffer dest) {
             try {
                 if (dest.remaining() < getDigestLength()) {
-                    throw new FsSecurityException("length of dest remaining is not enough.");
+                    throw new GekSecurityException("length of dest remaining is not enough.");
                 }
                 byte[] en = doFinal();
                 dest.put(en);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -212,10 +212,10 @@ final class DigestImpl implements FsDigest {
                 byte[] en = doFinal();
                 dest.write(en);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -223,11 +223,11 @@ final class DigestImpl implements FsDigest {
         public InputStream doFinalStream() {
             try {
                 byte[] en = doFinal();
-                return FsIO.toInputStream(en);
-            } catch (FsSecurityException e) {
+                return GekIO.toInputStream(en);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }

@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.FsChars;
-import xyz.fsgek.common.data.FsData;
-import xyz.fsgek.common.io.FsIO;
+import xyz.fsgek.common.base.GekChars;
+import xyz.fsgek.common.data.GekData;
+import xyz.fsgek.common.io.GekIO;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,7 +16,7 @@ public class DataTest {
 
     private static final String DATA = TestUtil.buildRandomString(256, 256);
 
-    public static void testData(byte[] bytes, Supplier<FsData> supplier) {
+    public static void testData(byte[] bytes, Supplier<GekData> supplier) {
         testArray(supplier.get(), bytes);
         testWriteArray(supplier.get(), bytes);
         testBuffer(supplier.get(), bytes);
@@ -25,33 +25,33 @@ public class DataTest {
         testOutputStream(supplier.get(), bytes);
     }
 
-    private static void testArray(FsData data, byte[] bytes) {
-        Assert.assertEquals(data.toString(FsChars.defaultCharset()), DATA);
+    private static void testArray(GekData data, byte[] bytes) {
+        Assert.assertEquals(data.toString(GekChars.defaultCharset()), DATA);
     }
 
-    private static void testWriteArray(FsData data, byte[] bytes) {
+    private static void testWriteArray(GekData data, byte[] bytes) {
         byte[] dest = new byte[1024];
         int size = data.write(dest, 8, 88);
         Assert.assertEquals(Arrays.copyOfRange(dest, 8, 8 + 88), Arrays.copyOfRange(bytes, 0, 88));
         Assert.assertEquals(size, 88);
     }
 
-    private static void testBuffer(FsData data, byte[] bytes) {
+    private static void testBuffer(GekData data, byte[] bytes) {
         Assert.assertEquals(data.toBuffer(), ByteBuffer.wrap(bytes));
     }
 
-    private static void testWriteBuffer(FsData data, byte[] bytes) {
+    private static void testWriteBuffer(GekData data, byte[] bytes) {
         byte[] dest = new byte[1024];
         int size = data.write(ByteBuffer.wrap(dest, 8, 88));
         Assert.assertEquals(Arrays.copyOfRange(dest, 8, 8 + 88), Arrays.copyOfRange(bytes, 0, 88));
         Assert.assertEquals(size, 88);
     }
 
-    private static void testInputStream(FsData data, byte[] bytes) {
-        Assert.assertEquals(FsIO.readBytes(data.toInputStream()), bytes);
+    private static void testInputStream(GekData data, byte[] bytes) {
+        Assert.assertEquals(GekIO.readBytes(data.toInputStream()), bytes);
     }
 
-    private static void testOutputStream(FsData data, byte[] bytes) {
+    private static void testOutputStream(GekData data, byte[] bytes) {
         ByteArrayOutputStream dest = new ByteArrayOutputStream();
         long size = data.write(dest);
         Assert.assertEquals(dest.toByteArray(), bytes);
@@ -60,19 +60,19 @@ public class DataTest {
 
     @Test
     public void testData() {
-        byte[] bytes = DATA.getBytes(FsChars.defaultCharset());
-        FsData fromBytes = FsData.wrap(bytes);
+        byte[] bytes = DATA.getBytes(GekChars.defaultCharset());
+        GekData fromBytes = GekData.wrap(bytes);
         testData(bytes, () -> fromBytes);
-        testData(bytes, () -> FsData.wrap(ByteBuffer.wrap(bytes)));
-        testData(bytes, () -> FsData.from(new ByteArrayInputStream(bytes)));
-        testData(bytes, () -> FsData.from(() -> Arrays.copyOf(bytes, bytes.length)));
+        testData(bytes, () -> GekData.wrap(ByteBuffer.wrap(bytes)));
+        testData(bytes, () -> GekData.from(new ByteArrayInputStream(bytes)));
+        testData(bytes, () -> GekData.from(() -> Arrays.copyOf(bytes, bytes.length)));
     }
 
     @Test
     public void testMisc() {
-        byte[] bytes = DATA.getBytes(FsChars.defaultCharset());
+        byte[] bytes = DATA.getBytes(GekChars.defaultCharset());
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        FsData fromBuffer = FsData.wrap(buffer);
+        GekData fromBuffer = GekData.wrap(buffer);
         testWriteBuffer(fromBuffer, bytes);
         Assert.assertEquals(buffer.position(), 88);
     }

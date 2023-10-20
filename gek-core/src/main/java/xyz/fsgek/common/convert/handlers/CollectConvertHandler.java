@@ -1,15 +1,15 @@
 package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.convert.FsConverter;
-import xyz.fsgek.common.reflect.FsReflect;
-import xyz.fsgek.common.reflect.FsType;
-import xyz.fsgek.common.base.Fs;
-import xyz.fsgek.common.base.FsArray;
-import xyz.fsgek.common.base.FsFlag;
+import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.reflect.GekReflect;
+import xyz.fsgek.common.reflect.GekType;
+import xyz.fsgek.common.base.GekArray;
+import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.obj.FsObj;
 import xyz.fsgek.common.base.obj.ParameterizedObj;
-import xyz.fsgek.common.collect.FsCollect;
+import xyz.fsgek.common.collect.GekColl;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -43,7 +43,7 @@ import java.util.function.IntFunction;
  *
  * @author fredsuvn
  */
-public class CollectConvertHandler implements FsConverter.Handler {
+public class CollectConvertHandler implements GekConverter.Handler {
 
     /**
      * An instance.
@@ -68,7 +68,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         if (source == null) {
             return null;
         }
@@ -93,8 +93,8 @@ public class CollectConvertHandler implements FsConverter.Handler {
 
     @Nullable
     private Object convertIterableType(
-        @Nullable Object obj, Type sourceType, Type targetType, FsConverter converter) {
-        ParameterizedType targetItType = FsReflect.getGenericSuperType(targetType, Iterable.class);
+        @Nullable Object obj, Type sourceType, Type targetType, GekConverter converter) {
+        ParameterizedType targetItType = GekReflect.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
             return null;
         }
@@ -102,15 +102,15 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (sourceInfo == null) {
             return null;
         }
-        if (FsReflect.getRawType(sourceInfo.getType()).isArray()) {
+        if (GekReflect.getRawType(sourceInfo.getType()).isArray()) {
             return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], converter);
         }
-        Generator generator = GENERATOR_MAP.get(FsReflect.getRawType(targetItType));
+        Generator generator = GENERATOR_MAP.get(GekReflect.getRawType(targetItType));
         if (generator == null) {
             return null;
         }
         if (generator.needSize()) {
-            Collection<?> srcList = FsCollect.asOrToList(sourceInfo.getObject());
+            Collection<?> srcList = GekColl.asOrToList(sourceInfo.getObject());
             return convertCollection(
                 srcList,
                 generator.generate(srcList.size()),
@@ -135,14 +135,14 @@ public class CollectConvertHandler implements FsConverter.Handler {
         Collection<Object> dest,
         Type sourceComponentType,
         Type destComponentType,
-        FsConverter converter
+        GekConverter converter
     ) {
         for (Object srcValue : source) {
             Object targetValue = converter.convertType(srcValue, sourceComponentType, destComponentType);
             if (targetValue == null) {
-                return FsFlag.BREAK;
+                return GekFlag.BREAK;
             }
-            dest.add(FsConverter.getResult(targetValue));
+            dest.add(GekConverter.getResult(targetValue));
         }
         return dest;
     }
@@ -151,24 +151,24 @@ public class CollectConvertHandler implements FsConverter.Handler {
     private Object convertArray(
         ParameterizedObj<Iterable<?>> sourceInfo,
         Type targetComponentType,
-        FsConverter converter
+        GekConverter converter
     ) {
         Collection<?> srcList;
         if (sourceInfo.getObject() instanceof Collection) {
             srcList = (Collection<?>) sourceInfo.getObject();
         } else {
-            srcList = FsCollect.toCollection(new LinkedList<>(), sourceInfo.getObject());
+            srcList = GekColl.toCollection(new LinkedList<>(), sourceInfo.getObject());
         }
-        Class<?> targetArrayClass = FsReflect.arrayClass(targetComponentType);
-        Object targetArray = FsArray.newArray(targetArrayClass.getComponentType(), srcList.size());
+        Class<?> targetArrayClass = GekReflect.arrayClass(targetComponentType);
+        Object targetArray = GekArray.newArray(targetArrayClass.getComponentType(), srcList.size());
         int i = 0;
         for (Object srcValue : srcList) {
             Object targetValue = converter.convertType(
                 srcValue, sourceInfo.getActualTypeArgument(0), targetComponentType);
             if (targetValue == null) {
-                return FsFlag.BREAK;
+                return GekFlag.BREAK;
             }
-            Array.set(targetArray, i, FsConverter.getResult(targetValue));
+            Array.set(targetArray, i, GekConverter.getResult(targetValue));
             i++;
         }
         return targetArray;
@@ -181,10 +181,10 @@ public class CollectConvertHandler implements FsConverter.Handler {
             if (it == null) {
                 return null;
             }
-            return Fs.as(
+            return Gek.as(
                 FsObj.wrap(
                     it,
-                    FsType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+                    GekType.parameterizedType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
                 ).toParameterizedObj()
             );
         }
@@ -193,17 +193,17 @@ public class CollectConvertHandler implements FsConverter.Handler {
             if (it == null) {
                 return null;
             }
-            return Fs.as(
+            return Gek.as(
                 FsObj.wrap(
                     it,
-                    FsType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+                    GekType.parameterizedType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
                 ).toParameterizedObj()
             );
         }
         if (!(obj instanceof Iterable)) {
             return null;
         }
-        ParameterizedType itType = FsReflect.getGenericSuperType(type, Iterable.class);
+        ParameterizedType itType = GekReflect.getGenericSuperType(type, Iterable.class);
         if (itType == null) {
             return null;
         }
@@ -211,7 +211,7 @@ public class CollectConvertHandler implements FsConverter.Handler {
         if (it == null) {
             return null;
         }
-        return Fs.as(
+        return Gek.as(
             FsObj.wrap(it, itType).toParameterizedObj()
         );
     }
@@ -222,31 +222,31 @@ public class CollectConvertHandler implements FsConverter.Handler {
             return (Iterable<?>) obj;
         }
         if (obj instanceof Object[]) {
-            return FsArray.asList((Object[]) obj);
+            return GekArray.asList((Object[]) obj);
         }
         if (obj instanceof boolean[]) {
-            return FsArray.asList((boolean[]) obj);
+            return GekArray.asList((boolean[]) obj);
         }
         if (obj instanceof byte[]) {
-            return FsArray.asList((byte[]) obj);
+            return GekArray.asList((byte[]) obj);
         }
         if (obj instanceof short[]) {
-            return FsArray.asList((short[]) obj);
+            return GekArray.asList((short[]) obj);
         }
         if (obj instanceof char[]) {
-            return FsArray.asList((char[]) obj);
+            return GekArray.asList((char[]) obj);
         }
         if (obj instanceof int[]) {
-            return FsArray.asList((int[]) obj);
+            return GekArray.asList((int[]) obj);
         }
         if (obj instanceof long[]) {
-            return FsArray.asList((long[]) obj);
+            return GekArray.asList((long[]) obj);
         }
         if (obj instanceof float[]) {
-            return FsArray.asList((float[]) obj);
+            return GekArray.asList((float[]) obj);
         }
         if (obj instanceof double[]) {
-            return FsArray.asList((double[]) obj);
+            return GekArray.asList((double[]) obj);
         }
         return null;
     }

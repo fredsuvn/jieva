@@ -3,7 +3,7 @@ package xyz.fsgek.common.proxy;
 import org.springframework.cglib.core.SpringNamingPolicy;
 import org.springframework.cglib.proxy.*;
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.collect.FsCollect;
+import xyz.fsgek.common.collect.GekColl;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-final class SpringProxyImpl<T> implements FsProxy<T> {
+final class SpringProxyImpl<T> implements GekProxy<T> {
 
     private final Enhancer enhancer;
 
     SpringProxyImpl(
         @Nullable Class<?> superClass,
         @Nullable Iterable<Class<?>> superInterfaces,
-        Map<Predicate<Method>, FsProxyMethod> proxyMap
+        Map<Predicate<Method>, GekProxyMethod> proxyMap
     ) {
         Enhancer enhancer = new Enhancer();
         boolean inherited = false;
@@ -26,18 +26,18 @@ final class SpringProxyImpl<T> implements FsProxy<T> {
             enhancer.setSuperclass(superClass);
             inherited = true;
         }
-        if (FsCollect.isNotEmpty(superInterfaces)) {
-            enhancer.setInterfaces(FsCollect.toArray(superInterfaces, Class.class));
+        if (GekColl.isNotEmpty(superInterfaces)) {
+            enhancer.setInterfaces(GekColl.toArray(superInterfaces, Class.class));
             inherited = true;
         }
         if (!inherited) {
-            throw new FsProxyException("No super class or interface to be proxied.");
+            throw new GekProxyException("No super class or interface to be proxied.");
         }
         List<MethodInterceptor> interceptorList = new ArrayList<>();
         interceptorList.add((obj, method, args, proxy) -> proxy.invokeSuper(obj, args));
         Predicate<Method>[] predicates = proxyMap.keySet().toArray(new Predicate[0]);
         for (Predicate<Method> predicate : predicates) {
-            FsProxyMethod proxy = proxyMap.get(predicate);
+            GekProxyMethod proxy = proxyMap.get(predicate);
             MethodInterceptor interceptor = new MethodInterceptorImpl(proxy);
             interceptorList.add(interceptor);
         }
@@ -62,15 +62,15 @@ final class SpringProxyImpl<T> implements FsProxy<T> {
 
     private static final class MethodInterceptorImpl implements MethodInterceptor {
 
-        private final FsProxyMethod fsProxyMethod;
+        private final GekProxyMethod gekProxyMethod;
 
-        private MethodInterceptorImpl(FsProxyMethod fsProxyMethod) {
-            this.fsProxyMethod = fsProxyMethod;
+        private MethodInterceptorImpl(GekProxyMethod gekProxyMethod) {
+            this.gekProxyMethod = gekProxyMethod;
         }
 
         @Override
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
-            return fsProxyMethod.invokeProxy(args, method, args1 -> proxy.invokeSuper(obj, args1));
+            return gekProxyMethod.invokeProxy(args, method, args1 -> proxy.invokeSuper(obj, args1));
         }
     }
 }

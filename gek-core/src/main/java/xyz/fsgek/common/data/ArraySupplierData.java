@@ -1,14 +1,14 @@
 package xyz.fsgek.common.data;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsIO;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.function.Supplier;
 
-final class ArraySupplierData implements FsData {
+final class ArraySupplierData implements GekData {
 
     private final Supplier<byte[]> supplier;
 
@@ -23,7 +23,7 @@ final class ArraySupplierData implements FsData {
 
     @Override
     public synchronized int write(byte[] dest, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
         byte[] bytes = supplier.get();
         int len = Math.min(bytes.length, length);
         System.arraycopy(bytes, 0, dest, offset, len);
@@ -43,7 +43,7 @@ final class ArraySupplierData implements FsData {
 
     @Override
     public synchronized InputStream toInputStream() {
-        return FsIO.toInputStream(supplier.get());
+        return GekIO.toInputStream(supplier.get());
     }
 
     @Override

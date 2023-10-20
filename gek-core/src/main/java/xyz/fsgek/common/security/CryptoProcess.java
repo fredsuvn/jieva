@@ -1,6 +1,6 @@
 package xyz.fsgek.common.security;
 
-import xyz.fsgek.common.encode.FsEncoder;
+import xyz.fsgek.common.encode.GekEncoder;
 
 import javax.crypto.Mac;
 import java.io.InputStream;
@@ -14,8 +14,8 @@ import java.security.spec.AlgorithmParameterSpec;
  * Provides method chaining operation for crypto operation.
  *
  * @author fredsuvn
- * @see FsCipher
- * @see FsMac
+ * @see GekCipher
+ * @see GekMac
  */
 public interface CryptoProcess {
 
@@ -89,7 +89,7 @@ public interface CryptoProcess {
      * @return this object
      */
     default CryptoProcess encrypt() {
-        throw new FsSecurityException(new UnsupportedOperationException("Encryption"));
+        throw new GekSecurityException(new UnsupportedOperationException("Encryption"));
     }
 
     /**
@@ -98,7 +98,7 @@ public interface CryptoProcess {
      * @return this object
      */
     default CryptoProcess decrypt() {
-        throw new FsSecurityException(new UnsupportedOperationException("Decryption"));
+        throw new GekSecurityException(new UnsupportedOperationException("Decryption"));
     }
 
     /**
@@ -107,7 +107,7 @@ public interface CryptoProcess {
      * @return this object
      */
     default CryptoProcess mac() {
-        throw new FsSecurityException(new UnsupportedOperationException("MAC"));
+        throw new GekSecurityException(new UnsupportedOperationException("MAC"));
     }
 
     /**
@@ -116,7 +116,7 @@ public interface CryptoProcess {
      * @return this object
      */
     default CryptoProcess digest() {
-        throw new FsSecurityException(new UnsupportedOperationException("Digestion"));
+        throw new GekSecurityException(new UnsupportedOperationException("Digestion"));
     }
 
     /**
@@ -125,7 +125,7 @@ public interface CryptoProcess {
      * @return this object
      */
     default CryptoProcess sign() {
-        throw new FsSecurityException(new UnsupportedOperationException("Sign"));
+        throw new GekSecurityException(new UnsupportedOperationException("Sign"));
     }
 
     /**
@@ -185,11 +185,11 @@ public interface CryptoProcess {
      * @return result of final computation
      */
     default String doFinalBase64() {
-        return FsEncoder.base64().encodeToString(doFinal());
+        return GekEncoder.base64().encodeToString(doFinal());
     }
 
     /**
-     * Verifies sign for {@link FsSign}.
+     * Verifies sign for {@link GekSign}.
      *
      * @param sign sign to be verified
      * @return result of verifying
@@ -199,7 +199,7 @@ public interface CryptoProcess {
     }
 
     /**
-     * Verifies sign for {@link FsSign}.
+     * Verifies sign for {@link GekSign}.
      *
      * @param sign   sign to be verified
      * @param offset start offset of sign
@@ -207,6 +207,6 @@ public interface CryptoProcess {
      * @return result of verifying
      */
     default boolean verify(byte[] sign, int offset, int length) {
-        throw new FsSecurityException(new UnsupportedOperationException("Verification"));
+        throw new GekSecurityException(new UnsupportedOperationException("Verification"));
     }
 }

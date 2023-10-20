@@ -1,7 +1,7 @@
 package xyz.fsgek.common.base.ref;
 
 /**
- * {@link FsRef} for boolean type.
+ * {@link GekRef} for boolean type.
  *
  * @author fredsuvn
  */

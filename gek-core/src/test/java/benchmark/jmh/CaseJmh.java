@@ -2,7 +2,7 @@ package benchmark.jmh;
 
 import com.google.common.base.CaseFormat;
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgek.common.base.FsCase;
+import xyz.fsgek.common.base.GekCase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,10 +17,10 @@ public class CaseJmh {
     private static final String TEST_CAMEL = "getSimpleNameOptionsBuilder";
     private static final String TEST_SEPARATOR = "get_Simple_Name_Options_Builder";
 
-    private FsCase fsUpperCamel = FsCase.UPPER_CAMEL;
-    private FsCase fsLowerCamel = FsCase.LOWER_CAMEL;
-    private FsCase fsUpperUnderscore = FsCase.UPPER_UNDERSCORE;
-    private FsCase fsLowerUnderscore = FsCase.LOWER_UNDERSCORE;
+    private GekCase fsUpperCamel = GekCase.UPPER_CAMEL;
+    private GekCase fsLowerCamel = GekCase.LOWER_CAMEL;
+    private GekCase fsUpperUnderscore = GekCase.UPPER_UNDERSCORE;
+    private GekCase fsLowerUnderscore = GekCase.LOWER_UNDERSCORE;
     private CaseFormat guavaUpperCamel = CaseFormat.UPPER_CAMEL;
     private CaseFormat guavaLowerCamel = CaseFormat.LOWER_CAMEL;
     private CaseFormat guavaUpperUnderscore = CaseFormat.UPPER_UNDERSCORE;

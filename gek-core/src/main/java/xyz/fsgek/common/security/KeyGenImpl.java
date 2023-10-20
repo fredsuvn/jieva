@@ -8,7 +8,7 @@ import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Supplier;
 
-final class KeyGenImpl implements FsKeyGen {
+final class KeyGenImpl implements GekKeyGen {
 
     private final String algorithm;
     private final ThreadLocal<KeyGenerator> local;
@@ -28,10 +28,10 @@ final class KeyGenImpl implements FsKeyGen {
         try {
             KeyGenerator generator = local.get();
             return generator.generateKey();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -41,10 +41,10 @@ final class KeyGenImpl implements FsKeyGen {
             KeyGenerator generator = local.get();
             generator.init(size);
             return generator.generateKey();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -54,10 +54,10 @@ final class KeyGenImpl implements FsKeyGen {
             KeyGenerator generator = local.get();
             generator.init(size, secureRandom);
             return generator.generateKey();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -67,10 +67,10 @@ final class KeyGenImpl implements FsKeyGen {
             KeyGenerator generator = local.get();
             generator.init(spec);
             return generator.generateKey();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -80,10 +80,10 @@ final class KeyGenImpl implements FsKeyGen {
             KeyGenerator generator = local.get();
             generator.init(secureRandom);
             return generator.generateKey();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -93,10 +93,10 @@ final class KeyGenImpl implements FsKeyGen {
             KeyGenerator generator = local.get();
             generator.init(spec, secureRandom);
             return generator.generateKey();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 

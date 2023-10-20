@@ -1,7 +1,7 @@
 package xyz.fsgek.common.base.ref;
 
 /**
- * {@link FsRef} for long type.
+ * {@link GekRef} for long type.
  *
  * @author fredsuvn
  */

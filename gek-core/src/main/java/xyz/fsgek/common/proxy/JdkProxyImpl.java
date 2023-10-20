@@ -1,7 +1,7 @@
 package xyz.fsgek.common.proxy;
 
-import xyz.fsgek.common.collect.FsCollect;
-import xyz.fsgek.common.base.Fs;
+import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.collect.GekColl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,17 +9,17 @@ import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.function.Predicate;
 
-final class JdkProxyImpl<T> implements FsProxy<T> {
+final class JdkProxyImpl<T> implements GekProxy<T> {
 
     private final Class<?>[] superInterfaces;
-    private final Map<MethodSignature, FsProxyMethod> methodMap;
+    private final Map<MethodSignature, GekProxyMethod> methodMap;
 
-    JdkProxyImpl(Iterable<Class<?>> superInterfaces, Map<Predicate<Method>, FsProxyMethod> proxyMap) {
-        if (FsCollect.isEmpty(superInterfaces)) {
-            throw new FsProxyException("No super interface to be proxied.");
+    JdkProxyImpl(Iterable<Class<?>> superInterfaces, Map<Predicate<Method>, GekProxyMethod> proxyMap) {
+        if (GekColl.isEmpty(superInterfaces)) {
+            throw new GekProxyException("No super interface to be proxied.");
         }
-        this.superInterfaces = FsCollect.toArray(superInterfaces, Class.class);
-        if (FsCollect.isEmpty(proxyMap)) {
+        this.superInterfaces = GekColl.toArray(superInterfaces, Class.class);
+        if (GekColl.isEmpty(proxyMap)) {
             this.methodMap = Collections.emptyMap();
             return;
         }
@@ -49,7 +49,7 @@ final class JdkProxyImpl<T> implements FsProxy<T> {
                 this.getClass().getClassLoader(),
                 superInterfaces,
                 (proxy, method, args) -> {
-                    FsProxyMethod proxyMethod = methodMap.get(new MethodSignature(method));
+                    GekProxyMethod proxyMethod = methodMap.get(new MethodSignature(method));
                     if (proxyMethod == null) {
                         return method.invoke(proxy, args);
                     }
@@ -62,7 +62,7 @@ final class JdkProxyImpl<T> implements FsProxy<T> {
                     });
                 });
         }
-        return Fs.as(inst);
+        return Gek.as(inst);
     }
 
     private static final class MethodSignature {

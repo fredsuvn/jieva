@@ -1,14 +1,14 @@
 package xyz.fsgek.common.data;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-final class ArrayData implements FsData {
+final class ArrayData implements GekData {
 
     private final byte[] array;
     private final int offset;
@@ -27,7 +27,7 @@ final class ArrayData implements FsData {
 
     @Override
     public synchronized int write(byte[] dest, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
         int len = Math.min(this.length, length);
         System.arraycopy(array, this.offset, dest, offset, len);
         return len;

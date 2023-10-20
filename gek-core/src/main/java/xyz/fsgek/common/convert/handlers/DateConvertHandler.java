@@ -1,9 +1,9 @@
 package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.convert.FsConverter;
-import xyz.fsgek.common.base.FsDate;
-import xyz.fsgek.common.convert.FsConvertException;
+import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.base.GekDate;
+import xyz.fsgek.common.convert.GekConvertException;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -57,7 +57,7 @@ import java.util.TimeZone;
  *
  * @author fredsuvn
  */
-public class DateConvertHandler implements FsConverter.Handler {
+public class DateConvertHandler implements GekConverter.Handler {
 
     /**
      * An instance with {@link #DateConvertHandler()}.
@@ -68,30 +68,30 @@ public class DateConvertHandler implements FsConverter.Handler {
 
         @Override
         public DateFormat getDateFormat() {
-            return FsDate.toDateFormat(FsDate.PATTERN);
+            return GekDate.toDateFormat(GekDate.PATTERN);
         }
 
         @Override
         public DateTimeFormatter getFormatter() {
-            return FsDate.FORMATTER;
+            return GekDate.FORMATTER;
         }
 
         @Override
         public DateFormat getDateFormat(CharSequence date) {
-            String pattern = FsDate.toPattern(date);
+            String pattern = GekDate.toPattern(date);
             if (pattern == null) {
                 throw new IllegalArgumentException("Unknown date pattern for string: " + date + ".");
             }
-            return FsDate.toDateFormat(pattern);
+            return GekDate.toDateFormat(pattern);
         }
 
         @Override
         public DateTimeFormatter getFormatter(CharSequence date) {
-            String pattern = FsDate.toPattern(date);
+            String pattern = GekDate.toPattern(date);
             if (pattern == null) {
                 throw new IllegalArgumentException("Unknown date pattern for string: " + date + ".");
             }
-            return FsDate.toFormatter(pattern);
+            return GekDate.toFormatter(pattern);
         }
     };
 
@@ -99,7 +99,7 @@ public class DateConvertHandler implements FsConverter.Handler {
 
     /**
      * Constructs with default pattern function,
-     * the default function of which pattern from {@link FsDate#PATTERN} and {@link FsDate#toPattern(CharSequence)}.
+     * the default function of which pattern from {@link GekDate#PATTERN} and {@link GekDate#toPattern(CharSequence)}.
      */
     public DateConvertHandler() {
         this(DEFAULT_PATTERN_FUNCTION);
@@ -117,7 +117,7 @@ public class DateConvertHandler implements FsConverter.Handler {
 
             @Override
             public DateFormat getDateFormat() {
-                return FsDate.toDateFormat(pattern);
+                return GekDate.toDateFormat(pattern);
             }
 
             @Override
@@ -147,11 +147,11 @@ public class DateConvertHandler implements FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         try {
             return convert0(source, sourceType, targetType);
         } catch (ParseException e) {
-            throw new FsConvertException(e);
+            throw new GekConvertException(e);
         }
     }
 
@@ -214,7 +214,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             }
             LocalDateTime localDateTime = tryLocalDateTime(source, sourceType);
             if (localDateTime != null) {
-                return Date.from(localDateTime.toInstant(FsDate.currentZoneOffset()));
+                return Date.from(localDateTime.toInstant(GekDate.currentZoneOffset()));
             }
             ZonedDateTime zonedDateTime = tryZonedDateTime(source, sourceType);
             if (zonedDateTime != null) {
@@ -228,7 +228,7 @@ public class DateConvertHandler implements FsConverter.Handler {
         } else if (Objects.equals(targetType, Instant.class)) {
             String str = tryString(source, sourceType);
             if (str != null) {
-                return FsDate.toInstant(pattern.getFormatter(str).parse(str));
+                return GekDate.toInstant(pattern.getFormatter(str).parse(str));
             }
             Long l = tryLong(source, sourceType);
             if (l != null) {
@@ -240,7 +240,7 @@ public class DateConvertHandler implements FsConverter.Handler {
             }
             LocalDateTime localDateTime = tryLocalDateTime(source, sourceType);
             if (localDateTime != null) {
-                return localDateTime.toInstant(FsDate.currentZoneOffset());
+                return localDateTime.toInstant(GekDate.currentZoneOffset());
             }
             ZonedDateTime zonedDateTime = tryZonedDateTime(source, sourceType);
             if (zonedDateTime != null) {
@@ -374,11 +374,11 @@ public class DateConvertHandler implements FsConverter.Handler {
             }
             TimeZone timeZone = tryTimeZone(source, sourceType);
             if (timeZone != null) {
-                return FsDate.toZoneOffset(timeZone.toZoneId());
+                return GekDate.toZoneOffset(timeZone.toZoneId());
             }
             ZoneId zoneId = tryZoneId(source, sourceType);
             if (zoneId != null) {
-                return FsDate.toZoneOffset(zoneId);
+                return GekDate.toZoneOffset(zoneId);
             }
             return null;
         }

@@ -7,12 +7,12 @@ import org.testng.annotations.Test;
 import test.protobuf.Data;
 import test.protobuf.Enum;
 import test.protobuf.Request;
-import xyz.fsgek.common.bean.FsBean;
-import xyz.fsgek.common.bean.FsProperty;
-import xyz.fsgek.common.bean.FsBeanResolver;
-import xyz.fsgek.common.collect.FsCollect;
-import xyz.fsgek.common.convert.FsConverter;
-import xyz.fsgek.common.data.protobuf.FsProtobuf;
+import xyz.fsgek.common.bean.GekBean;
+import xyz.fsgek.common.bean.GekProperty;
+import xyz.fsgek.common.bean.GekBeanResolver;
+import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.data.protobuf.GekProtobuf;
 import xyz.fsgek.common.reflect.TypeRef;
 
 import java.nio.ByteBuffer;
@@ -33,9 +33,9 @@ public class ProtobufTest {
             map<string, string> entry = 5;
         }
          */
-        FsBeanResolver resolver = FsProtobuf.protobufBeanResolver();
-        FsBean dataBean = resolver.resolve(Data.class);
-        Map<String, FsProperty> propertyMap = dataBean.getProperties();
+        GekBeanResolver resolver = GekProtobuf.protobufBeanResolver();
+        GekBean dataBean = resolver.resolve(Data.class);
+        Map<String, GekProperty> propertyMap = dataBean.getProperties();
         Assert.assertEquals(propertyMap.size(), 14);
         Assert.assertEquals(propertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(propertyMap.get("str").getType(), String.class);
@@ -50,8 +50,8 @@ public class ProtobufTest {
         Assert.assertFalse(propertyMap.get("textList").isWriteable());
         Assert.assertFalse(propertyMap.get("entryMap").isWriteable());
 
-        FsBean dataBuilderBean = resolver.resolve(Data.newBuilder().getClass());
-        Map<String, FsProperty> builderPropertyMap = dataBuilderBean.getProperties();
+        GekBean dataBuilderBean = resolver.resolve(Data.newBuilder().getClass());
+        Map<String, GekProperty> builderPropertyMap = dataBuilderBean.getProperties();
         Assert.assertEquals(builderPropertyMap.size(), 14);
         Assert.assertEquals(builderPropertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(builderPropertyMap.get("str").getType(), String.class);
@@ -71,29 +71,29 @@ public class ProtobufTest {
             .setStr("888")
             .setNum(999)
             .addAllText(Arrays.asList("2", "4", "6"))
-            .putAllEntry(FsCollect.hashMap("1", "1", "3", "3"));
+            .putAllEntry(GekColl.hashMap("1", "1", "3", "3"));
         Data data = dataBuilder.build();
         Assert.assertEquals(propertyMap.get("em").get(data), Enum.E2);
         Assert.assertEquals(propertyMap.get("str").get(data), "888");
         Assert.assertEquals(propertyMap.get("num").get(data), 999L);
         Assert.assertEquals(propertyMap.get("textList").get(data), Arrays.asList("2", "4", "6"));
-        Assert.assertEquals(propertyMap.get("entryMap").get(data), FsCollect.hashMap("1", "1", "3", "3"));
+        Assert.assertEquals(propertyMap.get("entryMap").get(data), GekColl.hashMap("1", "1", "3", "3"));
         Assert.assertEquals(builderPropertyMap.get("em").get(dataBuilder), Enum.E2);
         Assert.assertEquals(builderPropertyMap.get("str").get(dataBuilder), "888");
         Assert.assertEquals(builderPropertyMap.get("num").get(dataBuilder), 999L);
         Assert.assertEquals(builderPropertyMap.get("textList").get(dataBuilder), Arrays.asList("2", "4", "6"));
-        Assert.assertEquals(builderPropertyMap.get("entryMap").get(dataBuilder), FsCollect.hashMap("1", "1", "3", "3"));
+        Assert.assertEquals(builderPropertyMap.get("entryMap").get(dataBuilder), GekColl.hashMap("1", "1", "3", "3"));
         builderPropertyMap.get("em").set(dataBuilder, Enum.E1);
         builderPropertyMap.get("str").set(dataBuilder, "777");
         builderPropertyMap.get("num").set(dataBuilder, 888L);
         builderPropertyMap.get("textList").set(dataBuilder, Arrays.asList("3", "5", "7"));
-        builderPropertyMap.get("entryMap").set(dataBuilder, FsCollect.hashMap("8", "8", "9", "9"));
+        builderPropertyMap.get("entryMap").set(dataBuilder, GekColl.hashMap("8", "8", "9", "9"));
         Data data2 = dataBuilder.build();
         Assert.assertEquals(propertyMap.get("em").get(data2), Enum.E1);
         Assert.assertEquals(propertyMap.get("str").get(data2), "777");
         Assert.assertEquals(propertyMap.get("num").get(data2), 888L);
         Assert.assertEquals(propertyMap.get("textList").get(data2), Arrays.asList("3", "5", "7"));
-        Assert.assertEquals(propertyMap.get("entryMap").get(data2), FsCollect.hashMap("8", "8", "9", "9"));
+        Assert.assertEquals(propertyMap.get("entryMap").get(data2), GekColl.hashMap("8", "8", "9", "9"));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ProtobufTest {
         dataDto.setTextList(Arrays.asList("11", "22", "33"));
         dataDto.setNum(777);
         dataDto.setBytes("123".getBytes());
-        dataDto.setEntryMap(FsCollect.hashMap("88", "99"));
+        dataDto.setEntryMap(GekColl.hashMap("88", "99"));
         dataDto.setFixed32(132);
         dataDto.setFixed64(164);
         dataDto.setSfixed32(232);
@@ -119,7 +119,7 @@ public class ProtobufTest {
         requestDto.setData(dataDto);
 
         //dto -> protobuf
-        ResponseDto responseDto = FsProtobuf.protobufConverter().convert(requestDto, ResponseDto.class);
+        ResponseDto responseDto = GekProtobuf.protobufConverter().convert(requestDto, ResponseDto.class);
         Assert.assertEquals(responseDto.getCode(), "111");
         Assert.assertEquals(responseDto.getMessage(), 111L);
         Data data = responseDto.getData();
@@ -138,7 +138,7 @@ public class ProtobufTest {
         Assert.assertEquals(data.getSint64(), dataDto.getSint64());
 
         //dto -> protobuf builder
-        Data.Builder dataBuilder = FsProtobuf.protobufConverter().convert(requestDto.getData(), Data.Builder.class);
+        Data.Builder dataBuilder = GekProtobuf.protobufConverter().convert(requestDto.getData(), Data.Builder.class);
         Assert.assertEquals(dataBuilder.getEm(), Enum.E2);
         Assert.assertEquals(dataBuilder.getStr(), dataDto.getStr());
         Assert.assertEquals(dataBuilder.getTextList(), dataDto.getTextList());
@@ -154,7 +154,7 @@ public class ProtobufTest {
         Assert.assertEquals(dataBuilder.getSint64(), dataDto.getSint64());
 
         //protobuf -> dto
-        DataDto dataDto1 = FsProtobuf.protobufConverter().convert(data, DataDto.class);
+        DataDto dataDto1 = GekProtobuf.protobufConverter().convert(data, DataDto.class);
         Assert.assertEquals(data.getEm(), Enum.E2);
         Assert.assertEquals(data.getStr(), dataDto.getStr());
         Assert.assertEquals(data.getTextList(), dataDto.getTextList());
@@ -170,7 +170,7 @@ public class ProtobufTest {
         Assert.assertEquals(data.getSint64(), dataDto.getSint64());
 
         //protobuf builder -> dto
-        DataDto dataDto2 = FsProtobuf.protobufConverter().convert(dataBuilder, DataDto.class);
+        DataDto dataDto2 = GekProtobuf.protobufConverter().convert(dataBuilder, DataDto.class);
         Assert.assertEquals(dataBuilder.getEm(), Enum.E2);
         Assert.assertEquals(dataBuilder.getStr(), dataDto.getStr());
         Assert.assertEquals(dataBuilder.getTextList(), dataDto.getTextList());
@@ -186,14 +186,14 @@ public class ProtobufTest {
         Assert.assertEquals(dataBuilder.getSint64(), dataDto.getSint64());
 
         //protobuf -> protobuf
-        Data.Builder dataBuilder1 = FsProtobuf.protobufConverter().convert(data, Data.Builder.class);
+        Data.Builder dataBuilder1 = GekProtobuf.protobufConverter().convert(data, Data.Builder.class);
         Assert.assertEquals(dataBuilder1.build(), dataBuilder.build());
-        Data data1 = FsProtobuf.protobufConverter().convert(dataBuilder1, Data.class);
+        Data data1 = GekProtobuf.protobufConverter().convert(dataBuilder1, Data.class);
         Assert.assertEquals(data1, dataBuilder1.build());
 
         Request request = Request.newBuilder()
             .setCode(3).setMessage(ByteString.copyFromUtf8("xxxx")).setData(data).build();
-        RequestDto requestDto1 = FsProtobuf.protobufConverter().convert(request, RequestDto.class);
+        RequestDto requestDto1 = GekProtobuf.protobufConverter().convert(request, RequestDto.class);
         Assert.assertEquals(requestDto1.getCode(), request.getCode());
         Assert.assertEquals(requestDto1.getMessage(), request.getMessage().toStringUtf8());
         Assert.assertEquals(requestDto1.getData(), dataDto);
@@ -205,7 +205,7 @@ public class ProtobufTest {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         ByteString bs = ByteString.copyFrom(bytes);
         String str = bs.toStringUtf8();
-        FsConverter converter = FsProtobuf.protobufConverter();
+        GekConverter converter = GekProtobuf.protobufConverter();
         Assert.assertEquals(converter.convert(bytes, ByteBuffer.class), buffer.slice());
         Assert.assertEquals(converter.convert(bs, ByteBuffer.class), buffer.slice());
         Assert.assertEquals(converter.convert(buffer, ByteBuffer.class), buffer.slice());

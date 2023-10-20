@@ -1,7 +1,7 @@
 package xyz.fsgek.common.io;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,13 +40,13 @@ final class ReaderInputStream extends InputStream {
     }
 
     ReaderInputStream(Reader reader, Charset charset) {
-        this(reader, charset, FsIO.IO_BUFFER_SIZE);
+        this(reader, charset, GekIO.IO_BUFFER_SIZE);
     }
 
     @Override
     public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
-            FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (len == 0) {
                 return 0;
             }

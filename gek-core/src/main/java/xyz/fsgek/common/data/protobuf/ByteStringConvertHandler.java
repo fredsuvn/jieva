@@ -2,8 +2,8 @@ package xyz.fsgek.common.data.protobuf;
 
 import com.google.protobuf.ByteString;
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.FsChars;
-import xyz.fsgek.common.convert.FsConverter;
+import xyz.fsgek.common.base.GekChars;
+import xyz.fsgek.common.convert.GekConverter;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
@@ -25,7 +25,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class ByteStringConvertHandler implements FsConverter.Handler {
+public class ByteStringConvertHandler implements GekConverter.Handler {
 
     /**
      * An instance with {@link #ByteStringConvertHandler()}.
@@ -35,10 +35,10 @@ public class ByteStringConvertHandler implements FsConverter.Handler {
     private final Charset charset;
 
     /**
-     * Constructs with {@link FsChars#defaultCharset()}.
+     * Constructs with {@link GekChars#defaultCharset()}.
      */
     public ByteStringConvertHandler() {
-        this.charset = FsChars.defaultCharset();
+        this.charset = GekChars.defaultCharset();
     }
 
     /**
@@ -51,7 +51,7 @@ public class ByteStringConvertHandler implements FsConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         if (source == null) {
             return null;
         }

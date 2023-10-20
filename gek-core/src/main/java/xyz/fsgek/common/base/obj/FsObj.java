@@ -1,7 +1,7 @@
 package xyz.fsgek.common.base.obj;
 
-import xyz.fsgek.common.reflect.FsReflect;
-import xyz.fsgek.common.reflect.FsType;
+import xyz.fsgek.common.reflect.GekReflect;
+import xyz.fsgek.common.reflect.GekType;
 import xyz.fsgek.common.reflect.TypeRef;
 
 import java.lang.reflect.*;
@@ -90,7 +90,7 @@ public interface FsObj<T> {
             return (ClassObj<T>) this;
         }
         if (this instanceof ParameterizedObj) {
-            return new Impls.ClassImpl<>(getObject(), FsReflect.getRawType(getType()));
+            return new Impls.ClassImpl<>(getObject(), GekReflect.getRawType(getType()));
         }
         return new Impls.ClassImpl<>(getObject(), (Class<?>) getType());
     }
@@ -108,7 +108,7 @@ public interface FsObj<T> {
         }
         if (this instanceof ClassObj) {
             return new Impls.ParameterizedImpl<>(getObject(),
-                FsType.parameterizedType(getType(), Collections.singletonList(Object.class)));
+                GekType.parameterizedType(getType(), Collections.singletonList(Object.class)));
         }
         return new Impls.ParameterizedImpl<>(getObject(), (ParameterizedType) getType());
     }

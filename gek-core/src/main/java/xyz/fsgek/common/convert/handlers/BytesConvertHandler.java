@@ -1,9 +1,9 @@
 package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.convert.FsConverter;
-import xyz.fsgek.common.io.FsBuffer;
-import xyz.fsgek.common.reflect.FsReflect;
+import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
@@ -20,7 +20,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class BytesConvertHandler implements FsConverter.Handler {
+public class BytesConvertHandler implements GekConverter.Handler {
 
     /**
      * An instance.
@@ -28,31 +28,31 @@ public class BytesConvertHandler implements FsConverter.Handler {
     public static final BytesConvertHandler INSTANCE = new BytesConvertHandler();
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         if (source == null) {
             return null;
         }
         if (Objects.equals(targetType, byte[].class)) {
             if (Objects.equals(sourceType, byte[].class)) {
                 byte[] src = (byte[]) source;
-                if (converter.getOptions().reusePolicy() == FsConverter.Options.NO_REUSE) {
+                if (converter.getOptions().reusePolicy() == GekConverter.Options.NO_REUSE) {
                     return src.clone();
                 }
                 return source;
-            } else if (FsReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
+            } else if (GekReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = ((ByteBuffer) source).slice();
-                return FsBuffer.getBytes(src);
+                return GekBuffer.getBytes(src);
             } else {
                 return null;
             }
         } else if (Objects.equals(targetType, ByteBuffer.class)) {
             if (Objects.equals(sourceType, byte[].class)) {
                 byte[] src = (byte[]) source;
-                if (converter.getOptions().reusePolicy() == FsConverter.Options.NO_REUSE) {
+                if (converter.getOptions().reusePolicy() == GekConverter.Options.NO_REUSE) {
                     return ByteBuffer.wrap(src.clone());
                 }
                 return ByteBuffer.wrap(src);
-            } else if (FsReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
+            } else if (GekReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = (ByteBuffer) source;
                 ByteBuffer slice = src.slice();
                 ByteBuffer buffer = ByteBuffer.allocate(slice.remaining());

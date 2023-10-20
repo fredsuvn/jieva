@@ -2,8 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.FsLogger;
-import xyz.fsgek.common.base.ref.FsRef;
+import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
 
 public class LoggerTest {
@@ -11,15 +11,15 @@ public class LoggerTest {
     @Test
     public void testLogger() {
         //info
-        FsLogger logger = FsLogger.defaultLogger();
+        GekLogger logger = GekLogger.defaultLogger();
         logger.trace("test trace");
         logger.debug("test debug");
         logger.info("test info");
         logger.warn("test warn");
         logger.error("test error");
-        IntRef count = FsRef.ofInt(0);
-        FsLogger logger2 = FsLogger.newBuilder()
-            .level(FsLogger.Level.DEBUG).formatter(it -> {
+        IntRef count = GekRef.ofInt(0);
+        GekLogger logger2 = GekLogger.newBuilder()
+            .level(GekLogger.Level.DEBUG).formatter(it -> {
                 count.getAndIncrement();
             }).build();
         logger2.trace("test trace");

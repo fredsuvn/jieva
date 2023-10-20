@@ -1,9 +1,9 @@
 package xyz.fsgek.common.security;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsIO;
-import xyz.fsgek.common.base.FsArray;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.base.GekArray;
+import xyz.fsgek.common.base.GekCheck;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
@@ -18,7 +18,7 @@ import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Supplier;
 
-final class CipherImpl implements FsCipher {
+final class CipherImpl implements GekCipher {
 
     private final String algorithm;
     private final ThreadLocal<Cipher> local;
@@ -35,7 +35,7 @@ final class CipherImpl implements FsCipher {
 
     @Override
     public CryptoProcess prepare(byte[] source, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
         return new ByteArrayCryptoProcess(source, offset, length);
     }
 
@@ -72,18 +72,18 @@ final class CipherImpl implements FsCipher {
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             try {
-                FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+                GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
                 if (len == 0) {
                     return 0;
                 }
-                FsCrypto.initCipher(cipher, process.mode, process.key, process.params);
+                GekCrypto.initCipher(cipher, process.mode, process.key, process.params);
                 int count = 0;
                 int bOff = off;
                 int bLen = len;
                 while (bLen > 0) {
                     if (buffer == null) {
-                        byte[] nextIn = FsIO.readBytes(in, process.blockSize);
-                        if (FsArray.isEmpty(nextIn)) {
+                        byte[] nextIn = GekIO.readBytes(in, process.blockSize);
+                        if (GekArray.isEmpty(nextIn)) {
                             if (count == 0) {
                                 return -1;
                             } else {
@@ -224,15 +224,15 @@ final class CipherImpl implements FsCipher {
         @Override
         public byte[] doFinal() {
             try {
-                InputStream in = FsIO.toInputStream(source, offset, length);
+                InputStream in = GekIO.toInputStream(source, offset, length);
                 Cipher cipher = local.get();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
+                GekCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
                 return out.toByteArray();
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -242,11 +242,11 @@ final class CipherImpl implements FsCipher {
                 ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
                 ByteBuffer out = ByteBuffer.wrap(dest, offset, dest.length - offset);
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(cipher, mode, key, src, out, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.doEncrypt(cipher, mode, key, src, out, getBlockSize(cipher), params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -255,24 +255,24 @@ final class CipherImpl implements FsCipher {
             try {
                 ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(cipher, mode, key, src, dest, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.doEncrypt(cipher, mode, key, src, dest, getBlockSize(cipher), params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
         @Override
         public long doFinal(OutputStream dest) {
             try {
-                InputStream in = FsIO.toInputStream(source, offset, length);
+                InputStream in = GekIO.toInputStream(source, offset, length);
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(cipher, mode, key, in, dest, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.doEncrypt(cipher, mode, key, in, dest, getBlockSize(cipher), params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -280,11 +280,11 @@ final class CipherImpl implements FsCipher {
         public InputStream doFinalStream() {
             try {
                 Cipher cipher = local.get();
-                return new EncryptStream(cipher, this, FsIO.toInputStream(source, offset, length));
-            } catch (FsSecurityException e) {
+                return new EncryptStream(cipher, this, GekIO.toInputStream(source, offset, length));
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }
@@ -302,13 +302,13 @@ final class CipherImpl implements FsCipher {
             try {
                 Cipher cipher = local.get();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.doEncrypt(
-                    cipher, mode, key, FsIO.toInputStream(source), out, getBlockSize(cipher), params);
+                GekCrypto.doEncrypt(
+                    cipher, mode, key, GekIO.toInputStream(source), out, getBlockSize(cipher), params);
                 return out.toByteArray();
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -317,12 +317,12 @@ final class CipherImpl implements FsCipher {
             try {
                 ByteBuffer out = ByteBuffer.wrap(dest, offset, dest.length - offset);
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(
+                return GekCrypto.doEncrypt(
                     cipher, mode, key, source, out, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -330,12 +330,12 @@ final class CipherImpl implements FsCipher {
         public int doFinal(ByteBuffer dest) {
             try {
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(
+                return GekCrypto.doEncrypt(
                     cipher, mode, key, source, dest, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -343,12 +343,12 @@ final class CipherImpl implements FsCipher {
         public long doFinal(OutputStream dest) {
             try {
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(
-                    cipher, mode, key, FsIO.toInputStream(source), dest, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.doEncrypt(
+                    cipher, mode, key, GekIO.toInputStream(source), dest, getBlockSize(cipher), params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -356,11 +356,11 @@ final class CipherImpl implements FsCipher {
         public InputStream doFinalStream() {
             try {
                 Cipher cipher = local.get();
-                return new EncryptStream(cipher, this, FsIO.toInputStream(source));
-            } catch (FsSecurityException e) {
+                return new EncryptStream(cipher, this, GekIO.toInputStream(source));
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }
@@ -378,38 +378,38 @@ final class CipherImpl implements FsCipher {
             try {
                 Cipher cipher = local.get();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
+                GekCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
                 return out.toByteArray();
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
         @Override
         public int doFinal(byte[] dest, int offset) {
             try {
-                OutputStream out = FsIO.toOutputStream(dest, offset, dest.length - offset);
+                OutputStream out = GekIO.toOutputStream(dest, offset, dest.length - offset);
                 Cipher cipher = local.get();
-                return (int) FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+                return (int) GekCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
         @Override
         public int doFinal(ByteBuffer dest) {
             try {
-                OutputStream out = FsIO.toOutputStream(dest);
+                OutputStream out = GekIO.toOutputStream(dest);
                 Cipher cipher = local.get();
-                return (int) FsCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+                return (int) GekCrypto.doEncrypt(cipher, mode, key, in, out, getBlockSize(cipher), params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -417,11 +417,11 @@ final class CipherImpl implements FsCipher {
         public long doFinal(OutputStream dest) {
             try {
                 Cipher cipher = local.get();
-                return FsCrypto.doEncrypt(cipher, mode, key, in, dest, getBlockSize(cipher), params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.doEncrypt(cipher, mode, key, in, dest, getBlockSize(cipher), params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -430,10 +430,10 @@ final class CipherImpl implements FsCipher {
             try {
                 Cipher cipher = local.get();
                 return new EncryptStream(cipher, this, in);
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }

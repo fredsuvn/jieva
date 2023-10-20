@@ -1,6 +1,6 @@
 package xyz.fsgek.common.io;
 
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,7 @@ final class RandomInputStream extends InputStream {
     RandomInputStream(RandomAccessFile random, long offset, long length) {
         try {
             if (length != -1) {
-                FsCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
+                GekCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
                 this.limit = offset + length;
             } else {
                 this.limit = length;
@@ -25,14 +25,14 @@ final class RandomInputStream extends InputStream {
             this.pos = offset;
             this.random.seek(pos);
         } catch (IOException e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
     @Override
     public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
-            FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (len == 0) {
                 return 0;
             }

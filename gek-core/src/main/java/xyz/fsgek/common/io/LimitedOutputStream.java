@@ -1,6 +1,6 @@
 package xyz.fsgek.common.io;
 
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,18 +12,18 @@ final class LimitedOutputStream extends OutputStream {
 
     LimitedOutputStream(OutputStream source, long limit) {
         try {
-            FsCheck.checkArgument(limit >= 0, "limit must >= 0.");
+            GekCheck.checkArgument(limit >= 0, "limit must >= 0.");
             this.source = source;
             this.remaining = limit;
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
     @Override
     public synchronized void write(byte[] b, int off, int len) throws IOException {
         try {
-            FsCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (len == 0) {
                 return;
             }

@@ -1,12 +1,12 @@
 package xyz.fsgek.common.bean.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.bean.FsPropertyBase;
-import xyz.fsgek.common.collect.FsCollect;
-import xyz.fsgek.common.reflect.FsInvoker;
-import xyz.fsgek.common.reflect.FsReflect;
-import xyz.fsgek.common.bean.FsBeanException;
-import xyz.fsgek.common.bean.FsBeanResolver;
+import xyz.fsgek.common.bean.GekPropertyBase;
+import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.invoke.GekInvoker;
+import xyz.fsgek.common.reflect.GekReflect;
+import xyz.fsgek.common.bean.GekBeanException;
+import xyz.fsgek.common.bean.GekBeanResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -16,7 +16,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 /**
- * Base abstract bean resolve handler, provides a skeletal implementation of the {@link FsBeanResolver.Handler}
+ * Base abstract bean resolve handler, provides a skeletal implementation of the {@link GekBeanResolver.Handler}
  * to minimize the effort required to implement the interface backed by "method-based" getters/setters.
  * <p>
  * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
@@ -24,21 +24,21 @@ import java.util.*;
  * If it is, it will be wrapped to a property.
  * <p>
  * {@link #buildMethodInvoker(Method)} can be overridden to build custom method invoker.
- * Default is {@link FsInvoker#reflectMethod(Method)}.
+ * Default is {@link GekInvoker#reflectMethod(Method)}.
  *
  * @author fredsuvn
  */
-public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handler {
+public abstract class AbstractBeanResolveHandler implements GekBeanResolver.Handler {
 
     @Override
-    public @Nullable void resolve(FsBeanResolver.ResolveContext context) {
+    public @Nullable void resolve(GekBeanResolver.ResolveContext context) {
         Type type = context.beanType();
-        Class<?> rawType = FsReflect.getRawType(type);
+        Class<?> rawType = GekReflect.getRawType(type);
         if (rawType == null) {
             throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType.");
         }
         Method[] methods = rawType.getMethods();
-        Map<TypeVariable<?>, Type> typeParameterMapping = FsReflect.getTypeParameterMapping(type);
+        Map<TypeVariable<?>, Type> typeParameterMapping = GekReflect.getTypeParameterMapping(type);
         Map<String, Method> getters = new LinkedHashMap<>();
         Map<String, Method> setters = new LinkedHashMap<>();
         for (Method method : methods) {
@@ -108,8 +108,8 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
      * @param method given getter/setter
      * @return built invoker
      */
-    protected FsInvoker buildMethodInvoker(Method method) {
-        return FsInvoker.reflectMethod(method);
+    protected GekInvoker buildMethodInvoker(Method method) {
+        return GekInvoker.reflectMethod(method);
     }
 
     private Type getActualType(Type type, Map<TypeVariable<?>, Type> typeParameterMapping, Set<Type> stack) {
@@ -117,7 +117,7 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
             return type;
         }
         stack.clear();
-        Type result = FsCollect.getNested(typeParameterMapping, type, stack);
+        Type result = GekColl.getNested(typeParameterMapping, type, stack);
         if (result == null) {
             return type;
         }
@@ -141,15 +141,15 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
         return null;
     }
 
-    private final class PropertyBaseImpl implements FsPropertyBase {
+    private final class PropertyBaseImpl implements GekPropertyBase {
 
         private final String name;
         private final Method getter;
         private final Method setter;
         private final Field field;
         private final Type type;
-        private final FsInvoker getterInvoker;
-        private final FsInvoker setterInvoker;
+        private final GekInvoker getterInvoker;
+        private final GekInvoker setterInvoker;
         private final List<Annotation> getterAnnotations;
         private final List<Annotation> setterAnnotations;
         private final List<Annotation> fieldAnnotations;
@@ -197,7 +197,7 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
         @Override
         public @Nullable Object get(Object bean) {
             if (getterInvoker == null) {
-                throw new FsBeanException("Property is not readable: " + name + ".");
+                throw new GekBeanException("Property is not readable: " + name + ".");
             }
             return getterInvoker.invoke(bean);
         }
@@ -205,7 +205,7 @@ public abstract class AbstractBeanResolveHandler implements FsBeanResolver.Handl
         @Override
         public void set(Object bean, @Nullable Object value) {
             if (setterInvoker == null) {
-                throw new FsBeanException("Property is not writeable: " + name + ".");
+                throw new GekBeanException("Property is not writeable: " + name + ".");
             }
             setterInvoker.invoke(bean, value);
         }

@@ -2,14 +2,14 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.FsLogger;
-import xyz.fsgek.common.base.FsRandom;
+import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.GekRandom;
 
 public class RandomTest {
 
     @Test
     public void testRandom() {
-        FsRandom<String> fsRandom = FsRandom.newBuilder()
+        GekRandom<String> gekRandom = GekRandom.newBuilder()
             .score(20, "A")
             .score(20, "B")
             .score(60, () -> "C")
@@ -18,7 +18,7 @@ public class RandomTest {
         int countB = 0;
         int countC = 0;
         for (int i = 0; i < 1000; i++) {
-            Object result = fsRandom.next();
+            Object result = gekRandom.next();
             if (result.equals("A")) {
                 countA++;
             } else if (result.equals("B")) {
@@ -29,10 +29,10 @@ public class RandomTest {
         }
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
-        FsLogger.defaultLogger().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
+        GekLogger.defaultLogger().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
 
-        String randomStr = String.join("", fsRandom.nextList(100));
-        FsLogger.defaultLogger().info("randomStr: ", randomStr);
+        String randomStr = String.join("", gekRandom.nextList(100));
+        GekLogger.defaultLogger().info("randomStr: ", randomStr);
         Assert.assertEquals(randomStr.length(), 100);
     }
 }

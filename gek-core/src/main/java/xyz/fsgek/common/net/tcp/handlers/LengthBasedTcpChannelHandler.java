@@ -1,9 +1,9 @@
 package xyz.fsgek.common.net.tcp.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsBuffer;
-import xyz.fsgek.common.net.tcp.FsTcpChannel;
-import xyz.fsgek.common.net.tcp.FsTcpChannelHandler;
+import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.net.tcp.GekTcpChannel;
+import xyz.fsgek.common.net.tcp.GekTcpChannelHandler;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -15,26 +15,26 @@ import java.util.function.IntFunction;
  * <pre>
  *     buffer -&gt; data1data2data3..
  * </pre>
- * The returned object of {@link #onMessage(FsTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;,
+ * The returned object of {@link #onMessage(GekTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;,
  * each byte buffer is split in:
  * <ul>
  *     <li>
  *         Fixed length: created by {@link #LengthBasedTcpChannelHandler(int)}
  *         or {@link #LengthBasedTcpChannelHandler(int, IntFunction)},
- *         to split in fixed length with {@link FsBuffer#splitInLength(ByteBuffer, int)}
+ *         to split in fixed length with {@link GekBuffer#splitInLength(ByteBuffer, int)}
  *         and make returned buffers readonly;
  *     </li>
  *     <li>
  *         Specified length: created by {@link #LengthBasedTcpChannelHandler(int, int)}
  *         or {@link #LengthBasedTcpChannelHandler(int, int, IntFunction)},
- *         to split in specified length with {@link FsBuffer#splitInLength(ByteBuffer, int, int)}
+ *         to split in specified length with {@link GekBuffer#splitInLength(ByteBuffer, int, int)}
  *         and make returned buffers readonly;
  *     </li>
  * </ul>
  *
  * @author fredsuvn
  */
-public class LengthBasedTcpChannelHandler implements FsTcpChannelHandler<ByteBuffer> {
+public class LengthBasedTcpChannelHandler implements GekTcpChannelHandler<ByteBuffer> {
 
     private final int lengthOffset;
     private final int lengthSize;
@@ -88,17 +88,17 @@ public class LengthBasedTcpChannelHandler implements FsTcpChannelHandler<ByteBuf
     }
 
     @Override
-    public @Nullable Object onMessage(FsTcpChannel channel, ByteBuffer message) {
+    public @Nullable Object onMessage(GekTcpChannel channel, ByteBuffer message) {
         return lengthSize == -1 ? onFixed(channel, message) : onSpecified(channel, message);
     }
 
-    private @Nullable Object onFixed(FsTcpChannel channel, ByteBuffer message) {
-        List<ByteBuffer> result = FsBuffer.splitInLength(message, lengthOffset, generator);
+    private @Nullable Object onFixed(GekTcpChannel channel, ByteBuffer message) {
+        List<ByteBuffer> result = GekBuffer.splitInLength(message, lengthOffset, generator);
         return result.isEmpty() ? null : asReadOnly(result);
     }
 
-    private @Nullable Object onSpecified(FsTcpChannel channel, ByteBuffer message) {
-        List<ByteBuffer> result = FsBuffer.splitInLength(message, lengthOffset, lengthSize, generator);
+    private @Nullable Object onSpecified(GekTcpChannel channel, ByteBuffer message) {
+        List<ByteBuffer> result = GekBuffer.splitInLength(message, lengthOffset, lengthSize, generator);
         return result.isEmpty() ? null : asReadOnly(result);
     }
 

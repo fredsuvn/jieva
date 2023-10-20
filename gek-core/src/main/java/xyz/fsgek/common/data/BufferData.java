@@ -1,14 +1,14 @@
 package xyz.fsgek.common.data;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsBuffer;
-import xyz.fsgek.common.io.FsIO;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-final class BufferData implements FsData {
+final class BufferData implements GekData {
 
     private final ByteBuffer buffer;
 
@@ -18,12 +18,12 @@ final class BufferData implements FsData {
 
     @Override
     public synchronized byte[] toBytes() {
-        return FsBuffer.getBytes(buffer);
+        return GekBuffer.getBytes(buffer);
     }
 
     @Override
     public synchronized int write(byte[] dest, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
         int len = Math.min(buffer.remaining(), length);
         buffer.get(dest, offset, len);
         return len;
@@ -47,7 +47,7 @@ final class BufferData implements FsData {
 
     @Override
     public synchronized InputStream toInputStream() {
-        return FsIO.toInputStream(buffer);
+        return GekIO.toInputStream(buffer);
     }
 
     @Override

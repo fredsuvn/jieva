@@ -1,6 +1,6 @@
 package xyz.fsgek.common.reflect;
 
-import xyz.fsgek.common.base.Fs;
+import xyz.fsgek.common.base.Gek;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -39,11 +39,11 @@ public abstract class TypeRef<T> {
         Type generic = getClass().getGenericSuperclass();
         if (generic instanceof ParameterizedType) {
             ParameterizedType p = (ParameterizedType) generic;
-            if (Fs.equals(p.getRawType(), TypeRef.class)) {
+            if (Gek.equals(p.getRawType(), TypeRef.class)) {
                 return p.getActualTypeArguments()[0];
             }
         }
-        ParameterizedType parameterizedType = FsReflect.getGenericSuperType(generic, TypeRef.class);
+        ParameterizedType parameterizedType = GekReflect.getGenericSuperType(generic, TypeRef.class);
         if (parameterizedType == null) {
             throw new IllegalStateException("Current type is not subtype of TypeRef: " + getClass().getName());
         }

@@ -8,7 +8,7 @@ import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Supplier;
 
-final class KeyPairGenImpl implements FsKeyPairGen {
+final class KeyPairGenImpl implements GekKeyPairGen {
 
     private final String algorithm;
     private final ThreadLocal<KeyPairGenerator> local;
@@ -28,10 +28,10 @@ final class KeyPairGenImpl implements FsKeyPairGen {
         try {
             KeyPairGenerator generator = local.get();
             return generator.generateKeyPair();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -41,10 +41,10 @@ final class KeyPairGenImpl implements FsKeyPairGen {
             KeyPairGenerator generator = local.get();
             generator.initialize(size);
             return generator.generateKeyPair();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -54,10 +54,10 @@ final class KeyPairGenImpl implements FsKeyPairGen {
             KeyPairGenerator generator = local.get();
             generator.initialize(size, secureRandom);
             return generator.generateKeyPair();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -67,10 +67,10 @@ final class KeyPairGenImpl implements FsKeyPairGen {
             KeyPairGenerator generator = local.get();
             generator.initialize(spec);
             return generator.generateKeyPair();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 
@@ -80,10 +80,10 @@ final class KeyPairGenImpl implements FsKeyPairGen {
             KeyPairGenerator generator = local.get();
             generator.initialize(spec, secureRandom);
             return generator.generateKeyPair();
-        } catch (FsSecurityException e) {
+        } catch (GekSecurityException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsSecurityException(e);
+            throw new GekSecurityException(e);
         }
     }
 

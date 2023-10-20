@@ -1,8 +1,8 @@
 package xyz.fsgek.common.security;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsIO;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,7 +15,7 @@ import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Supplier;
 
-final class SignImpl implements FsSign {
+final class SignImpl implements GekSign {
 
     private final String algorithm;
     private final ThreadLocal<Signature> local;
@@ -32,7 +32,7 @@ final class SignImpl implements FsSign {
 
     @Override
     public CryptoProcess prepare(byte[] source, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, source.length);
         return new ByteArrayCryptoProcess(source, offset, length);
     }
 
@@ -68,11 +68,11 @@ final class SignImpl implements FsSign {
             try {
                 ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
                 Signature signature = local.get();
-                return FsCrypto.sign(signature, key, src, params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.sign(signature, key, src, params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -80,7 +80,7 @@ final class SignImpl implements FsSign {
         public boolean verify(byte[] sign, int offset, int length) {
             ByteBuffer src = ByteBuffer.wrap(source, this.offset, this.length);
             Signature signature = local.get();
-            return FsCrypto.verify(signature, key, src, sign, offset, length, params);
+            return GekCrypto.verify(signature, key, src, sign, offset, length, params);
         }
     }
 
@@ -96,18 +96,18 @@ final class SignImpl implements FsSign {
         public byte[] doFinal() {
             try {
                 Signature signature = local.get();
-                return FsCrypto.sign(signature, key, source, params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.sign(signature, key, source, params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
         @Override
         public boolean verify(byte[] sign, int offset, int length) {
             Signature signature = local.get();
-            return FsCrypto.verify(signature, key, source, sign, offset, length, params);
+            return GekCrypto.verify(signature, key, source, sign, offset, length, params);
         }
     }
 
@@ -123,18 +123,18 @@ final class SignImpl implements FsSign {
         public byte[] doFinal() {
             try {
                 Signature signature = local.get();
-                return FsCrypto.sign(signature, key, in, bufferSize, params);
-            } catch (FsSecurityException e) {
+                return GekCrypto.sign(signature, key, in, bufferSize, params);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
         @Override
         public boolean verify(byte[] sign, int offset, int length) {
             Signature signature = local.get();
-            return FsCrypto.verify(signature, key, in, bufferSize, sign, offset, length, params);
+            return GekCrypto.verify(signature, key, in, bufferSize, sign, offset, length, params);
         }
     }
 
@@ -209,14 +209,14 @@ final class SignImpl implements FsSign {
             try {
                 byte[] en = doFinal();
                 if (dest.length - offset < en.length) {
-                    throw new FsSecurityException("length of dest remaining is not enough.");
+                    throw new GekSecurityException("length of dest remaining is not enough.");
                 }
                 System.arraycopy(en, 0, dest, offset, en.length);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -225,14 +225,14 @@ final class SignImpl implements FsSign {
             try {
                 byte[] en = doFinal();
                 if (dest.remaining() < en.length) {
-                    throw new FsSecurityException("length of dest remaining is not enough.");
+                    throw new GekSecurityException("length of dest remaining is not enough.");
                 }
                 dest.put(en);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -242,10 +242,10 @@ final class SignImpl implements FsSign {
                 byte[] en = doFinal();
                 dest.write(en);
                 return en.length;
-            } catch (FsSecurityException e) {
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
 
@@ -253,11 +253,11 @@ final class SignImpl implements FsSign {
         public InputStream doFinalStream() {
             try {
                 byte[] en = doFinal();
-                return FsIO.toInputStream(en);
-            } catch (FsSecurityException e) {
+                return GekIO.toInputStream(en);
+            } catch (GekSecurityException e) {
                 throw e;
             } catch (Exception e) {
-                throw new FsSecurityException(e);
+                throw new GekSecurityException(e);
             }
         }
     }

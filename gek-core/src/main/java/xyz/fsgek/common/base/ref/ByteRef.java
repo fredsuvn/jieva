@@ -1,7 +1,7 @@
 package xyz.fsgek.common.base.ref;
 
 /**
- * {@link FsRef} for byte type.
+ * {@link GekRef} for byte type.
  *
  * @author fredsuvn
  */

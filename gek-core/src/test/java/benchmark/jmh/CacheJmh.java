@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgek.common.cache.FsCache;
+import xyz.fsgek.common.cache.GekCache;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -29,8 +29,8 @@ public class CacheJmh {
         }
     }
 
-    private FsCache<Integer, String> fsSoftCache;
-    private FsCache<Integer, String> fsWeakCache;
+    private GekCache<Integer, String> fsSoftCache;
+    private GekCache<Integer, String> fsWeakCache;
     private Cache<Integer, String> guava;
     private Cache<Integer, String> guavaSoft;
     private Cache<Integer, String> guavaBig;
@@ -40,8 +40,8 @@ public class CacheJmh {
 
     @Setup(Level.Iteration)
     public void init() {
-        fsSoftCache = FsCache.softCache();
-        fsWeakCache = FsCache.weakCache();
+        fsSoftCache = GekCache.softCache();
+        fsWeakCache = GekCache.weakCache();
         guava = CacheBuilder.newBuilder()
             .maximumSize(keys.length / 10)
             .build();

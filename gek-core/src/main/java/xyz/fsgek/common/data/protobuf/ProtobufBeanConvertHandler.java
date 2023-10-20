@@ -2,11 +2,11 @@ package xyz.fsgek.common.data.protobuf;
 
 import com.google.protobuf.Message;
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.bean.FsBeanResolver;
-import xyz.fsgek.common.convert.FsConvertException;
-import xyz.fsgek.common.convert.FsConverter;
+import xyz.fsgek.common.bean.GekBeanResolver;
+import xyz.fsgek.common.convert.GekConvertException;
+import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.convert.handlers.BeanConvertHandler;
-import xyz.fsgek.common.reflect.FsReflect;
+import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -25,12 +25,12 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
     public static final ProtobufBeanConvertHandler INSTANCE = new ProtobufBeanConvertHandler();
 
     /**
-     * Constructs with {@link FsProtobuf#protobufBeanCopier()}.
+     * Constructs with {@link GekProtobuf#protobufBeanCopier()}.
      *
-     * @see #ProtobufBeanConvertHandler(FsBeanResolver)
+     * @see #ProtobufBeanConvertHandler(GekBeanResolver)
      */
     public ProtobufBeanConvertHandler() {
-        this(FsProtobuf.protobufBeanResolver());
+        this(GekProtobuf.protobufBeanResolver());
     }
 
     /**
@@ -38,19 +38,19 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
      *
      * @param resolver given object converter
      */
-    public ProtobufBeanConvertHandler(FsBeanResolver resolver) {
+    public ProtobufBeanConvertHandler(GekBeanResolver resolver) {
         super(resolver);
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         if (source == null) {
             return null;
         }
         if (!(targetType instanceof Class<?>)) {
             return super.convert(source, sourceType, targetType, converter);
         }
-        Class<?> rawType = FsReflect.getRawType(targetType);
+        Class<?> rawType = GekReflect.getRawType(targetType);
         //Check whether it is a protobuf object
         boolean isProtobuf = false;
         boolean isBuilder = false;
@@ -70,10 +70,10 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
 
                 .copyProperties(source, sourceType, builder, builder.getClass());
             return build(builder, isBuilder);
-        } catch (FsConvertException e) {
+        } catch (GekConvertException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsConvertException(e);
+            throw new GekConvertException(e);
         }
     }
 

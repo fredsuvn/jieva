@@ -2,15 +2,15 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.proxy.FsProxy;
+import xyz.fsgek.common.proxy.GekProxy;
 
 public class ProxyTest {
 
     @Test
     public void testProxy() {
-        testProxy(FsProxy.Builder.JDK_PROXY);
-        testProxy(FsProxy.Builder.CGLIB_PROXY);
-        testProxy(FsProxy.Builder.SPRING_PROXY);
+        testProxy(GekProxy.Builder.JDK_PROXY);
+        testProxy(GekProxy.Builder.CGLIB_PROXY);
+        testProxy(GekProxy.Builder.SPRING_PROXY);
     }
 
     @Test
@@ -19,7 +19,7 @@ public class ProxyTest {
     }
 
     private void testProxy(int proxyGenerator) {
-        FsProxy<FooInter1> fooProxy = FsProxy.newBuilder()
+        GekProxy<FooInter1> fooProxy = GekProxy.newBuilder()
             .superClass(FooClass.class)
             .superInterfaces(FooInter1.class, FooInter2.class)
             .proxyMethod("foo0", new Class[]{String.class},
@@ -35,7 +35,7 @@ public class ProxyTest {
             .build();
         Assert.assertEquals(fooProxy.newInstance().foo1("fuck!"), "foo1");
         Assert.assertEquals(((FooInter2) (fooProxy.newInstance())).foo2("fuck!"), "foo2");
-        if (proxyGenerator != FsProxy.Builder.JDK_PROXY) {
+        if (proxyGenerator != GekProxy.Builder.JDK_PROXY) {
             Assert.assertEquals(((FooClass) (fooProxy.newInstance())).foo0("fuck!"), "foo0");
             Assert.assertEquals(((FooClass) (fooProxy.newInstance())).bar0("fuck!"), "fuck!");
         }

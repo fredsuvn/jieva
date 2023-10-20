@@ -1,8 +1,8 @@
 package xyz.fsgek.common.net.http;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.FsIO;
-import xyz.fsgek.common.base.Fs;
+import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.io.GekIO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,14 +14,14 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 
-final class HttpClientImpl implements FsHttpClient {
+final class HttpClientImpl implements GekHttpClient {
 
     private final @Nullable Duration connectTimeout;
     private final @Nullable Duration readTimeout;
     private final int chunkSize;
     private final @Nullable Proxy proxy;
 
-    HttpClientImpl(FsHttpClient.Builder builder) {
+    HttpClientImpl(GekHttpClient.Builder builder) {
         this.connectTimeout = builder.getConnectTimeout();
         this.readTimeout = builder.getReadTimeout();
         this.chunkSize = builder.getChunkSize();
@@ -29,38 +29,38 @@ final class HttpClientImpl implements FsHttpClient {
     }
 
     @Override
-    public FsHttpResponse request(FsHttpRequest request) {
+    public GekHttpResponse request(GekHttpRequest request) {
         try {
             return doRequest(request);
-        } catch (FsHttpException e) {
+        } catch (GekHttpException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsHttpException(e);
+            throw new GekHttpException(e);
         }
     }
 
-    private FsHttpResponse doRequest(FsHttpRequest request) throws Exception {
+    private GekHttpResponse doRequest(GekHttpRequest request) throws Exception {
         URL url = request.getUrl();
         if (url == null) {
-            throw new FsHttpException("Null url.");
+            throw new GekHttpException("Null url.");
         }
         HttpURLConnection connection;
         if (proxy == null) {
             URLConnection urlConnection = url.openConnection();
             if (!(urlConnection instanceof HttpURLConnection)) {
-                throw new FsHttpException("Not a http url: " + urlConnection);
+                throw new GekHttpException("Not a http url: " + urlConnection);
             }
-            connection = Fs.as(urlConnection);
+            connection = Gek.as(urlConnection);
         } else {
             URLConnection urlConnection = url.openConnection(proxy);
             if (!(urlConnection instanceof HttpURLConnection)) {
-                throw new FsHttpException("Not a http url: " + urlConnection);
+                throw new GekHttpException("Not a http url: " + urlConnection);
             }
-            connection = Fs.as(urlConnection);
+            connection = Gek.as(urlConnection);
         }
         connection.setDoInput(true);
         connection.setRequestMethod(request.getMethod());
-        FsHttpHeaders headers = request.getHeaders();
+        GekHttpHeaders headers = request.getHeaders();
         if (headers != null) {
             headers.asMap().forEach((k, v) -> {
                 for (String o : v) {
@@ -79,19 +79,19 @@ final class HttpClientImpl implements FsHttpClient {
             InputStream bodyStream = prepareWriting(connection, requestBody);
             connection.setDoOutput(true);
             OutputStream out = connection.getOutputStream();
-            FsIO.readBytesTo(bodyStream, out);
+            GekIO.readBytesTo(bodyStream, out);
             out.flush();
             out.close();
         }
         int responseCode = connection.getResponseCode();
         String responseMessage = connection.getResponseMessage();
-        FsHttpHeaders responseHeaders = FsHttpHeaders.from(connection.getHeaderFields());
+        GekHttpHeaders responseHeaders = GekHttpHeaders.from(connection.getHeaderFields());
         InputStream connectInput = connection.getInputStream();
         if (connectInput == null) {
             connection.disconnect();
         }
         InputStream responseBody = connectInput == null ? null : new InputWithConnection(connectInput, connection);
-        return new FsHttpResponse() {
+        return new GekHttpResponse() {
 
             @Override
             public int getStatusCode() {
@@ -104,7 +104,7 @@ final class HttpClientImpl implements FsHttpClient {
             }
 
             @Override
-            public FsHttpHeaders getHeaders() {
+            public GekHttpHeaders getHeaders() {
                 return responseHeaders;
             }
 
@@ -121,9 +121,9 @@ final class HttpClientImpl implements FsHttpClient {
             return (InputStream) requestBody;
         } else if (requestBody instanceof ByteBuffer) {
             connection.setFixedLengthStreamingMode(((ByteBuffer) requestBody).remaining());
-            return FsIO.toInputStream((ByteBuffer) requestBody);
+            return GekIO.toInputStream((ByteBuffer) requestBody);
         } else {
-            throw new FsHttpException("Invalid body type: " + requestBody.getClass());
+            throw new GekHttpException("Invalid body type: " + requestBody.getClass());
         }
     }
 
@@ -135,7 +135,7 @@ final class HttpClientImpl implements FsHttpClient {
             try {
                 this.source = source;
             } catch (Exception e) {
-                throw new FsHttpException(e);
+                throw new GekHttpException(e);
             }
             this.connection = connection;
         }

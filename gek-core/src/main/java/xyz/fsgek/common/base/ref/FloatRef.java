@@ -1,7 +1,7 @@
 package xyz.fsgek.common.base.ref;
 
 /**
- * {@link FsRef} for float type.
+ * {@link GekRef} for float type.
  *
  * @author fredsuvn
  */

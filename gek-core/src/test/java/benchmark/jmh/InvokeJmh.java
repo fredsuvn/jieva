@@ -1,7 +1,7 @@
 package benchmark.jmh;
 
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgek.common.reflect.FsInvoker;
+import xyz.fsgek.common.invoke.GekInvoker;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -16,20 +16,20 @@ public class InvokeJmh {
 
     private static final Method helloStatic;
     private static final Method helloMember;
-    private static final FsInvoker reflectStaticInvoker;
-    private static final FsInvoker reflectMemberInvoker;
-    private static final FsInvoker unreflectStaticInvoker;
-    private static final FsInvoker unreflectMemberInvoker;
+    private static final GekInvoker reflectStaticInvoker;
+    private static final GekInvoker reflectMemberInvoker;
+    private static final GekInvoker unreflectStaticInvoker;
+    private static final GekInvoker unreflectMemberInvoker;
     private static final TT tt = new TT();
 
     static {
         try {
             helloStatic = TT.class.getDeclaredMethod("helloStatic", String.class, String.class);
             helloMember = TT.class.getDeclaredMethod("helloMember", String.class, String.class);
-            reflectStaticInvoker = FsInvoker.reflectMethod(helloStatic);
-            reflectMemberInvoker = FsInvoker.reflectMethod(helloMember);
-            unreflectStaticInvoker = FsInvoker.unreflectMethod(helloStatic);
-            unreflectMemberInvoker = FsInvoker.unreflectMethod(helloMember);
+            reflectStaticInvoker = GekInvoker.reflectMethod(helloStatic);
+            reflectMemberInvoker = GekInvoker.reflectMethod(helloMember);
+            unreflectStaticInvoker = GekInvoker.unreflectMethod(helloStatic);
+            unreflectMemberInvoker = GekInvoker.unreflectMethod(helloMember);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

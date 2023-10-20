@@ -1,7 +1,7 @@
 package xyz.fsgek.common.encode;
 
-import xyz.fsgek.common.io.FsIO;
-import xyz.fsgek.common.base.FsCheck;
+import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.base.GekCheck;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Base64;
 
-final class Base64Encoder implements FsEncoder {
+final class Base64Encoder implements GekEncoder {
 
     private final Base64.Encoder encoder;
     private final Base64.Decoder decoder;
@@ -24,10 +24,10 @@ final class Base64Encoder implements FsEncoder {
     public byte[] encode(byte[] source) {
         try {
             return encoder.encode(source);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -38,10 +38,10 @@ final class Base64Encoder implements FsEncoder {
                 return encoder.encode(source);
             }
             return encoder.encode(copyArray(source, offset, length));
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -49,10 +49,10 @@ final class Base64Encoder implements FsEncoder {
     public int encode(byte[] source, byte[] dest) {
         try {
             return encoder.encode(source, dest);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -61,17 +61,17 @@ final class Base64Encoder implements FsEncoder {
         if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
             return encoder.encode(source, dest);
         }
-        return FsEncoder.super.encode(source, sourceOffset, dest, destOffset, length);
+        return GekEncoder.super.encode(source, sourceOffset, dest, destOffset, length);
     }
 
     @Override
     public ByteBuffer encode(ByteBuffer source) {
         try {
             return encoder.encode(source);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -80,13 +80,13 @@ final class Base64Encoder implements FsEncoder {
         try {
             OutputStreamWrapper wrapper = new OutputStreamWrapper(dest);
             OutputStream out = encoder.wrap(wrapper);
-            FsIO.readBytesTo(source, out);
+            GekIO.readBytesTo(source, out);
             out.flush();
             return wrapper.count;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -94,10 +94,10 @@ final class Base64Encoder implements FsEncoder {
     public String encodeToString(byte[] source) {
         try {
             return encoder.encodeToString(source);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -110,10 +110,10 @@ final class Base64Encoder implements FsEncoder {
     public byte[] decode(byte[] source) {
         try {
             return decoder.decode(source);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -124,10 +124,10 @@ final class Base64Encoder implements FsEncoder {
                 return decoder.decode(source);
             }
             return decoder.decode(copyArray(source, offset, length));
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -135,10 +135,10 @@ final class Base64Encoder implements FsEncoder {
     public int decode(byte[] source, byte[] dest) {
         try {
             return decoder.decode(source, dest);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -147,17 +147,17 @@ final class Base64Encoder implements FsEncoder {
         if (sourceOffset == 0 && destOffset == 0 && length == source.length) {
             return decoder.decode(source, dest);
         }
-        return FsEncoder.super.decode(source, sourceOffset, dest, destOffset, length);
+        return GekEncoder.super.decode(source, sourceOffset, dest, destOffset, length);
     }
 
     @Override
     public ByteBuffer decode(ByteBuffer source) {
         try {
             return decoder.decode(source);
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -166,12 +166,12 @@ final class Base64Encoder implements FsEncoder {
         try {
             OutputStreamWrapper wrapper = new OutputStreamWrapper(dest);
             InputStream in = decoder.wrap(source);
-            FsIO.readBytesTo(in, wrapper);
+            GekIO.readBytesTo(in, wrapper);
             return wrapper.count;
-        } catch (FsEncodeException e) {
+        } catch (GekEncodeException e) {
             throw e;
         } catch (Exception e) {
-            throw new FsEncodeException(e);
+            throw new GekEncodeException(e);
         }
     }
 
@@ -181,7 +181,7 @@ final class Base64Encoder implements FsEncoder {
     }
 
     private byte[] copyArray(byte[] src, int offset, int length) {
-        FsCheck.checkRangeInBounds(offset, offset + length, 0, src.length);
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, src.length);
         return Arrays.copyOfRange(src, offset, offset + length);
     }
 

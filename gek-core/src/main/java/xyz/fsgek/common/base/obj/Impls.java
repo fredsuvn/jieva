@@ -2,9 +2,9 @@ package xyz.fsgek.common.base.obj;
 
 import lombok.EqualsAndHashCode;
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.collect.FsCollect;
-import xyz.fsgek.common.reflect.FsReflect;
-import xyz.fsgek.common.base.Fs;
+import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.*;
 import java.util.List;
@@ -41,7 +41,7 @@ final class Impls {
 
         @Override
         public Class<T> getType() {
-            return Fs.as(type);
+            return Gek.as(type);
         }
     }
 
@@ -53,7 +53,7 @@ final class Impls {
 
         @Override
         public GenericArrayType getType() {
-            return Fs.as(type);
+            return Gek.as(type);
         }
     }
 
@@ -67,12 +67,12 @@ final class Impls {
 
         @Override
         public ParameterizedType getType() {
-            return Fs.as(type);
+            return Gek.as(type);
         }
 
         public List<Type> getActualTypeArguments() {
             if (actualTypeArguments == null) {
-                actualTypeArguments = FsCollect.immutableList(getType().getActualTypeArguments());
+                actualTypeArguments = GekColl.immutableList(getType().getActualTypeArguments());
             }
             return actualTypeArguments;
         }
@@ -89,19 +89,19 @@ final class Impls {
 
         @Override
         public TypeVariable<?> getType() {
-            return Fs.as(type);
+            return Gek.as(type);
         }
 
         public List<Type> getBounds() {
             if (bounds == null) {
-                bounds = FsCollect.immutableList(getType().getBounds());
+                bounds = GekColl.immutableList(getType().getBounds());
             }
             return bounds;
         }
 
         public List<AnnotatedType> getAnnotatedBounds() {
             if (annotatedBounds == null) {
-                annotatedBounds = FsCollect.immutableList(getType().getAnnotatedBounds());
+                annotatedBounds = GekColl.immutableList(getType().getAnnotatedBounds());
             }
             return annotatedBounds;
         }
@@ -118,13 +118,13 @@ final class Impls {
 
         @Override
         public WildcardType getType() {
-            return Fs.as(type);
+            return Gek.as(type);
         }
 
         @Nullable
         public Type getUpperBound() {
             if (upperBound == null) {
-                upperBound = FsReflect.getUpperBound(getType());
+                upperBound = GekReflect.getUpperBound(getType());
             }
             return upperBound;
         }
@@ -132,7 +132,7 @@ final class Impls {
         @Nullable
         public Type getLowerBound() {
             if (lowerBound == null) {
-                lowerBound = FsReflect.getLowerBound(getType());
+                lowerBound = GekReflect.getLowerBound(getType());
             }
             return lowerBound;
         }

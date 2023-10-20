@@ -1,8 +1,8 @@
 package xyz.fsgek.common.convert;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.FsFlag;
-import xyz.fsgek.common.collect.FsCollect;
+import xyz.fsgek.common.base.GekFlag;
+import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.convert.handlers.*;
 
 import java.lang.reflect.Type;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-final class ConverterImpl implements FsConverter, FsConverter.Handler {
+final class ConverterImpl implements GekConverter, GekConverter.Handler {
 
     static final ConverterImpl INSTANCE = new ConverterImpl(
         ReuseConvertHandler.INSTANCE,
@@ -25,24 +25,24 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
             StringConvertHandler.INSTANCE,
             CollectConvertHandler.INSTANCE
         ),
-        FsConverter.defaultOptions()
+        GekConverter.defaultOptions()
     );
 
-    private final @Nullable FsConverter.Handler prefixHandler;
-    private final @Nullable FsConverter.Handler suffixHandler;
-    private final List<FsConverter.Handler> middleHandlers;
-    private final FsConverter.Options options;
-    private final List<FsConverter.Handler> handlers;
+    private final @Nullable GekConverter.Handler prefixHandler;
+    private final @Nullable GekConverter.Handler suffixHandler;
+    private final List<GekConverter.Handler> middleHandlers;
+    private final GekConverter.Options options;
+    private final List<GekConverter.Handler> handlers;
 
     ConverterImpl(
-        @Nullable FsConverter.Handler prefixHandler,
-        @Nullable FsConverter.Handler suffixHandler,
-        Iterable<FsConverter.Handler> middleHandlers,
-        FsConverter.Options options
+        @Nullable GekConverter.Handler prefixHandler,
+        @Nullable GekConverter.Handler suffixHandler,
+        Iterable<GekConverter.Handler> middleHandlers,
+        GekConverter.Options options
     ) {
         this.prefixHandler = prefixHandler;
         this.suffixHandler = suffixHandler;
-        this.middleHandlers = FsCollect.immutableList(middleHandlers);
+        this.middleHandlers = GekColl.immutableList(middleHandlers);
         this.options = options;
         int total = 0;
         if (this.prefixHandler != null) {
@@ -51,15 +51,15 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
         if (this.suffixHandler != null) {
             total++;
         }
-        if (FsCollect.isNotEmpty(this.middleHandlers)) {
+        if (GekColl.isNotEmpty(this.middleHandlers)) {
             total += this.middleHandlers.size();
         }
         if (total > 0) {
-            ArrayList<FsConverter.Handler> handlers = new ArrayList<>(total);
+            ArrayList<GekConverter.Handler> handlers = new ArrayList<>(total);
             if (this.prefixHandler != null) {
                 handlers.add(prefixHandler);
             }
-            if (FsCollect.isNotEmpty(this.middleHandlers)) {
+            if (GekColl.isNotEmpty(this.middleHandlers)) {
                 handlers.addAll(this.middleHandlers);
             }
             if (this.suffixHandler != null) {
@@ -72,17 +72,17 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
     }
 
     @Override
-    public @Nullable FsConverter.Handler getPrefixHandler() {
+    public @Nullable GekConverter.Handler getPrefixHandler() {
         return prefixHandler;
     }
 
     @Override
-    public @Nullable FsConverter.Handler getSuffixHandler() {
+    public @Nullable GekConverter.Handler getSuffixHandler() {
         return suffixHandler;
     }
 
     @Override
-    public List<FsConverter.Handler> getMiddleHandlers() {
+    public List<GekConverter.Handler> getMiddleHandlers() {
         return middleHandlers;
     }
 
@@ -92,31 +92,31 @@ final class ConverterImpl implements FsConverter, FsConverter.Handler {
     }
 
     @Override
-    public FsConverter.Options getOptions() {
+    public GekConverter.Options getOptions() {
         return options;
     }
 
     @Override
-    public FsConverter.Handler asHandler() {
+    public GekConverter.Handler asHandler() {
         return this;
     }
 
     @Override
     public @Nullable Object convert(
-        @Nullable Object source, Type sourceType, Type targetType, @Nullable FsConverter converter) {
+        @Nullable Object source, Type sourceType, Type targetType, @Nullable GekConverter converter) {
         if (converter == null) {
             converter = this;
         }
         for (Handler handler : getHandlers()) {
             Object value = handler.convert(source, sourceType, targetType, converter);
-            if (value == null || value == FsFlag.CONTINUE) {
+            if (value == null || value == GekFlag.CONTINUE) {
                 continue;
             }
-            if (value == FsFlag.BREAK || value == FsFlag.RETURN) {
-                return FsFlag.BREAK;
+            if (value == GekFlag.BREAK || value == GekFlag.RETURN) {
+                return GekFlag.BREAK;
             }
-            if (value == FsFlag.NULL) {
-                return FsFlag.NULL;
+            if (value == GekFlag.NULL) {
+                return GekFlag.NULL;
             }
             return value;
         }

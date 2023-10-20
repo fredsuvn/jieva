@@ -1,9 +1,9 @@
 package xyz.fsgek.common.bean.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.collect.FsCollect;
-import xyz.fsgek.common.base.FsCase;
-import xyz.fsgek.common.base.FsString;
+import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.base.GekCase;
+import xyz.fsgek.common.base.GekString;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -26,7 +26,7 @@ public class JavaBeanResolveHandler extends AbstractBeanResolveHandler {
      */
     public static final JavaBeanResolveHandler INSTANCE = new JavaBeanResolveHandler();
 
-    private final FsCase namingCase = FsCase.LOWER_CAMEL;
+    private final GekCase namingCase = GekCase.LOWER_CAMEL;
 
     @Nullable
     protected String isGetter(Method method) {
@@ -39,8 +39,8 @@ public class JavaBeanResolveHandler extends AbstractBeanResolveHandler {
             || Objects.equals(method.getReturnType(), Boolean.class)))
         ) {
             List<CharSequence> words = namingCase.split(method.getName());
-            if (FsCollect.isNotEmpty(words) && words.size() > 1
-                && (FsString.charEquals(words.get(0), "get") || FsString.charEquals(words.get(0), "is"))) {
+            if (GekColl.isNotEmpty(words) && words.size() > 1
+                && (GekString.charEquals(words.get(0), "get") || GekString.charEquals(words.get(0), "is"))) {
                 return namingCase.join(words.subList(1, words.size()));
             }
         }
@@ -54,7 +54,7 @@ public class JavaBeanResolveHandler extends AbstractBeanResolveHandler {
         }
         if ((method.getName().length() > 3 && method.getName().startsWith("set"))) {
             List<CharSequence> words = namingCase.split(method.getName());
-            if (FsCollect.isNotEmpty(words) && words.size() > 1 && FsString.charEquals(words.get(0), "set")) {
+            if (GekColl.isNotEmpty(words) && words.size() > 1 && GekString.charEquals(words.get(0), "set")) {
                 return namingCase.join(words.subList(1, words.size()));
             }
         }

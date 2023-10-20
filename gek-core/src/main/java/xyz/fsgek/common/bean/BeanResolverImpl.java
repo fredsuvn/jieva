@@ -1,9 +1,9 @@
 package xyz.fsgek.common.bean;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.cache.FsCache;
-import xyz.fsgek.common.collect.FsCollect;
-import xyz.fsgek.common.base.Fs;
+import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.cache.GekCache;
+import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.bean.handlers.JavaBeanResolveHandler;
 
 import java.lang.annotation.Annotation;
@@ -12,21 +12,21 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
-final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
+final class BeanResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
 
     static final BeanResolverImpl INSTANCE =
-        new BeanResolverImpl(Collections.singletonList(JavaBeanResolveHandler.INSTANCE), FsCache.softCache());
+        new BeanResolverImpl(Collections.singletonList(JavaBeanResolveHandler.INSTANCE), GekCache.softCache());
 
-    private final List<FsBeanResolver.Handler> handlers;
-    private final @Nullable FsCache<Type, FsBean> cache;
+    private final List<GekBeanResolver.Handler> handlers;
+    private final @Nullable GekCache<Type, GekBean> cache;
 
-    BeanResolverImpl(Iterable<FsBeanResolver.Handler> handlers, @Nullable FsCache<Type, FsBean> cache) {
-        this.handlers = FsCollect.immutableList(handlers);
+    BeanResolverImpl(Iterable<GekBeanResolver.Handler> handlers, @Nullable GekCache<Type, GekBean> cache) {
+        this.handlers = GekColl.immutableList(handlers);
         this.cache = cache;
     }
 
     @Override
-    public FsBean resolve(Type type) {
+    public GekBean resolve(Type type) {
         if (cache == null) {
             return resolve0(type);
         }
@@ -34,26 +34,26 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
     }
 
     @Override
-    public List<FsBeanResolver.Handler> getHandlers() {
+    public List<GekBeanResolver.Handler> getHandlers() {
         return handlers;
     }
 
     @Override
-    public FsBeanResolver insertHandler(int index, FsBeanResolver.Handler handler) {
-        List<FsBeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
+    public GekBeanResolver insertHandler(int index, GekBeanResolver.Handler handler) {
+        List<GekBeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
         newHandlers.addAll(handlers);
         newHandlers.add(index, handler);
         return new BeanResolverImpl(newHandlers, cache);
     }
 
     @Override
-    public FsBeanResolver.Handler asHandler() {
+    public GekBeanResolver.Handler asHandler() {
         return this;
     }
 
     @Override
     public @Nullable void resolve(ResolveContext builder) {
-        for (FsBeanResolver.Handler handler : handlers) {
+        for (GekBeanResolver.Handler handler : handlers) {
             handler.resolve(builder);
             if (builder.isBreakResolving()) {
                 break;
@@ -61,7 +61,7 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
         }
     }
 
-    private FsBean resolve0(Type type) {
+    private GekBean resolve0(Type type) {
         ContextImpl builder = new ContextImpl(type);
         for (Handler handler : handlers) {
             handler.resolve(builder);
@@ -75,7 +75,7 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
     static final class ContextImpl implements ResolveContext {
 
         private final Type type;
-        private final Map<String, FsPropertyBase> properties = new LinkedHashMap<>();
+        private final Map<String, GekPropertyBase> properties = new LinkedHashMap<>();
         private boolean breakResolving = false;
 
         ContextImpl(Type type) {
@@ -88,7 +88,7 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
         }
 
         @Override
-        public Map<String, FsPropertyBase> beanProperties() {
+        public Map<String, GekPropertyBase> beanProperties() {
             return properties;
         }
 
@@ -102,19 +102,19 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
             return breakResolving;
         }
 
-        private FsBean build() {
+        private GekBean build() {
             return new BeanImpl(type, properties);
         }
 
-        private static final class BeanImpl implements FsBean {
+        private static final class BeanImpl implements GekBean {
 
             private final Type type;
-            private final Map<String, FsProperty> properties;
+            private final Map<String, GekProperty> properties;
             private String toString = null;
 
-            private BeanImpl(Type type, Map<String, FsPropertyBase> properties) {
+            private BeanImpl(Type type, Map<String, GekPropertyBase> properties) {
                 this.type = type;
-                Map<String, FsProperty> props = new LinkedHashMap<>();
+                Map<String, GekProperty> props = new LinkedHashMap<>();
                 properties.forEach((name, propBase) -> props.put(name, new PropertyImpl(propBase)));
                 this.properties = Collections.unmodifiableMap(props);
             }
@@ -125,7 +125,7 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
             }
 
             @Override
-            public Map<String, FsProperty> getProperties() {
+            public Map<String, GekProperty> getProperties() {
                 return properties;
             }
 
@@ -140,7 +140,7 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
                 if (!Objects.equals(getClass(), o.getClass())) {
                     return false;
                 }
-                BeanImpl ob = Fs.as(o);
+                BeanImpl ob = Gek.as(o);
                 return Objects.equals(getType(), ob.getType());
             }
 
@@ -152,24 +152,24 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
             @Override
             public String toString() {
                 if (toString == null) {
-                    String finalToString = FsBean.toString(this);
+                    String finalToString = GekBean.toString(this);
                     toString = finalToString;
                     return finalToString;
                 }
                 return toString;
             }
 
-            private final class PropertyImpl implements FsProperty {
+            private final class PropertyImpl implements GekProperty {
 
-                private final FsPropertyBase propBase;
+                private final GekPropertyBase propBase;
                 private String toString = null;
 
-                private PropertyImpl(FsPropertyBase propBase) {
+                private PropertyImpl(GekPropertyBase propBase) {
                     this.propBase = propBase;
                 }
 
                 @Override
-                public FsBean getOwner() {
+                public GekBean getOwner() {
                     return BeanImpl.this;
                 }
 
@@ -260,7 +260,7 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
                     if (!Objects.equals(getClass(), o.getClass())) {
                         return false;
                     }
-                    PropertyImpl op = Fs.as(o);
+                    PropertyImpl op = Gek.as(o);
                     return Objects.equals(getOwner(), op.getOwner()) && Objects.equals(getName(), op.getName());
                 }
 
@@ -272,7 +272,7 @@ final class BeanResolverImpl implements FsBeanResolver, FsBeanResolver.Handler {
                 @Override
                 public String toString() {
                     if (toString == null) {
-                        String finalToString = FsProperty.toString(this);
+                        String finalToString = GekProperty.toString(this);
                         toString = finalToString;
                         return finalToString;
                     }

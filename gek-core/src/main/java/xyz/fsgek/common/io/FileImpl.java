@@ -5,7 +5,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
 
-final class FileImpl implements FsFile {
+final class FileImpl implements GekFile {
 
     private final Path path;
 
@@ -30,12 +30,12 @@ final class FileImpl implements FsFile {
     @Override
     public synchronized void open(String mode) {
         if (isOpened()) {
-            throw new FsIOException("The file has already opened.");
+            throw new GekIOException("The file has already opened.");
         }
         try {
             random = new RandomAccessFile(path.toFile(), mode);
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
@@ -50,7 +50,7 @@ final class FileImpl implements FsFile {
             inputStream = null;
             outputStream = null;
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
@@ -60,7 +60,7 @@ final class FileImpl implements FsFile {
         try {
             return random.getFilePointer();
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
@@ -70,7 +70,7 @@ final class FileImpl implements FsFile {
         try {
             random.seek(pos);
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
@@ -80,7 +80,7 @@ final class FileImpl implements FsFile {
         try {
             return random.length();
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
@@ -90,7 +90,7 @@ final class FileImpl implements FsFile {
         try {
             random.setLength(newLength);
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
@@ -100,7 +100,7 @@ final class FileImpl implements FsFile {
         try {
             return random.getChannel();
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
@@ -110,7 +110,7 @@ final class FileImpl implements FsFile {
         try {
             return random.getFD();
         } catch (Exception e) {
-            throw new FsIOException(e);
+            throw new GekIOException(e);
         }
     }
 
@@ -134,7 +134,7 @@ final class FileImpl implements FsFile {
 
     private void checkOpen() {
         if (!isOpened()) {
-            throw new FsIOException("The file is closed or not yet open.");
+            throw new GekIOException("The file is closed or not yet open.");
         }
     }
 

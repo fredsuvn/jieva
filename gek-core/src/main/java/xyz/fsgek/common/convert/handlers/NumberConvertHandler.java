@@ -1,7 +1,7 @@
 package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.convert.FsConverter;
+import xyz.fsgek.common.convert.GekConverter;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class NumberConvertHandler implements FsConverter.Handler {
+public class NumberConvertHandler implements GekConverter.Handler {
 
     /**
      * An instance.
@@ -32,7 +32,7 @@ public class NumberConvertHandler implements FsConverter.Handler {
     public static final NumberConvertHandler INSTANCE = new NumberConvertHandler();
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         if (source == null) {
             return null;
         }

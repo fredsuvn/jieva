@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.Fs;
-import xyz.fsgek.common.base.FsFlag;
-import xyz.fsgek.common.convert.FsConverter;
+import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.base.GekFlag;
+import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
@@ -27,16 +27,16 @@ public class ConvertTest {
         long now = System.currentTimeMillis();
         Assert.assertEquals(
             Instant.ofEpochMilli(now),
-            Fs.convert(new Date(now), Instant.class)
+            Gek.convert(new Date(now), Instant.class)
         );
         Instant instant = Instant.ofEpochMilli(now);
         Assert.assertSame(
             instant,
-            Fs.convert(instant, Instant.class)
+            Gek.convert(instant, Instant.class)
         );
         Assert.assertEquals(
             Arrays.asList("1", "2", "3"),
-            Fs.convertType(
+            Gek.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<String>>() {
                 }.getType(),
                 new TypeRef<List<String>>() {
@@ -45,7 +45,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Fs.convertType(
+            Gek.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -54,7 +54,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Fs.convertType(
+            Gek.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -63,7 +63,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Fs.convertType(
+            Gek.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? extends String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -72,7 +72,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Fs.convertType(
+            Gek.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super Integer>>() {
@@ -81,7 +81,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Fs.convertType(
+            Gek.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? extends Integer>>() {
@@ -91,7 +91,7 @@ public class ConvertTest {
         List<String> strList = Arrays.asList("1", "2", "3");
         Assert.assertSame(
             strList,
-            Fs.convertType(
+            Gek.convertType(
                 strList, new TypeRef<List<? super CharSequence>>() {
                 }.getType(),
                 new TypeRef<List<? super String>>() {
@@ -100,7 +100,7 @@ public class ConvertTest {
         );
         Assert.assertNotSame(
             strList,
-            Fs.convertType(
+            Gek.convertType(
                 strList, new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super CharSequence>>() {
@@ -109,7 +109,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             strList,
-            Fs.convertType(
+            Gek.convertType(
                 strList, new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super CharSequence>>() {
@@ -118,13 +118,13 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             strList,
-            Fs.convert(
+            Gek.convert(
                 strList, List.class
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Fs.convert(
+            Gek.convert(
                 strList,
                 new TypeRef<List<? super Integer>>() {
                 }.getType()
@@ -132,7 +132,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(new T1("1"), new T1("2")),
-            Fs.convertType(
+            Gek.convertType(
                 Arrays.asList(new T2("1"), new T2("2")),
                 new TypeRef<List<T2>>() {
                 }.getType(),
@@ -142,7 +142,7 @@ public class ConvertTest {
         );
         Assert.assertNotEquals(
             Arrays.asList(new T1("1"), new T1("2")),
-            Fs.convertType(
+            Gek.convertType(
                 Arrays.asList(new T2("1"), new T2("2")),
                 new TypeRef<List<T2>>() {
                 }.getType(),
@@ -152,28 +152,28 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             E1.E1,
-            Fs.convert(
+            Gek.convert(
                 "E1",
                 E1.class
             )
         );
         Assert.assertEquals(
             "E2",
-            Fs.convert(
+            Gek.convert(
                 E1.E2,
                 String.class
             )
         );
         Assert.assertEquals(
             E2.E1,
-            Fs.convert(
+            Gek.convert(
                 E1.E1,
                 E2.class
             )
         );
         Assert.assertEquals(
             E1.E2,
-            Fs.convert(
+            Gek.convert(
                 E2.E2,
                 E1.class
             )
@@ -184,9 +184,9 @@ public class ConvertTest {
     public void testConvertBytes() {
         byte[] low = {1, 2, 3};
         ByteBuffer buffer = ByteBuffer.wrap(new byte[]{1, 2, 3});
-        FsConverter converter = FsConverter.defaultConverter();
-        FsConverter newConverter = converter.withOptions(
-            converter.getOptions().replaceReusePolicy(FsConverter.Options.NO_REUSE));
+        GekConverter converter = GekConverter.defaultConverter();
+        GekConverter newConverter = converter.withOptions(
+            converter.getOptions().replaceReusePolicy(GekConverter.Options.NO_REUSE));
         Assert.assertEquals(
             converter.convert(low, byte[].class),
             low
@@ -224,14 +224,14 @@ public class ConvertTest {
     @Test
     public void testConvertHandler() {
         Object x = new Object();
-        FsConverter.Handler handler = new FsConverter.Handler() {
+        GekConverter.Handler handler = new GekConverter.Handler() {
             @Override
             public @Nullable Object convert(
-                @Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+                @Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
                 return x;
             }
         };
-        FsConverter converter = FsConverter.defaultConverter().insertFirstMiddleHandler(handler);
+        GekConverter converter = GekConverter.defaultConverter().insertFirstMiddleHandler(handler);
         Assert.assertSame(
             x,
             converter.convert(
@@ -240,7 +240,7 @@ public class ConvertTest {
                 }.getType()
             )
         );
-        FsConverter converter2 = converter.withOptions(converter.getOptions());
+        GekConverter converter2 = converter.withOptions(converter.getOptions());
         Assert.assertSame(converter, converter2);
         converter2 = converter.withOptions(converter.getOptions()
             .replaceReusePolicy(converter.getOptions().reusePolicy()));
@@ -256,10 +256,10 @@ public class ConvertTest {
 
     @Test
     public void testConvertAsHandler() {
-        FsConverter.Handler handler = FsConverter.defaultConverter()
-            .insertFirstMiddleHandler(new FsConverter.Handler() {
+        GekConverter.Handler handler = GekConverter.defaultConverter()
+            .insertFirstMiddleHandler(new GekConverter.Handler() {
                 @Override
-                public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+                public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
                     if (Objects.equals(source, "1")) {
                         return "2";
                     }
@@ -269,18 +269,18 @@ public class ConvertTest {
                     if (Objects.equals(source, "3")) {
                         return null;
                     }
-                    return FsFlag.BREAK;
+                    return GekFlag.BREAK;
                 }
             })
             .asHandler();
         Assert.assertEquals(
-            handler.convert("1", String.class, Integer.class, FsConverter.defaultConverter()), "2");
+            handler.convert("1", String.class, Integer.class, GekConverter.defaultConverter()), "2");
         Assert.assertEquals(
-            handler.convert("2", String.class, Integer.class, FsConverter.defaultConverter()), "1");
+            handler.convert("2", String.class, Integer.class, GekConverter.defaultConverter()), "1");
         Assert.assertEquals(
-            handler.convert("3", String.class, Integer.class, FsConverter.defaultConverter()), 3);
+            handler.convert("3", String.class, Integer.class, GekConverter.defaultConverter()), 3);
         Assert.assertEquals(
-            handler.convert("4", String.class, Integer.class, FsConverter.defaultConverter()), FsFlag.BREAK);
+            handler.convert("4", String.class, Integer.class, GekConverter.defaultConverter()), GekFlag.BREAK);
     }
 
     public enum E1 {

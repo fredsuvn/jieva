@@ -1,11 +1,11 @@
 package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.reflect.FsReflect;
-import xyz.fsgek.common.base.FsWrapper;
-import xyz.fsgek.common.bean.FsBeanCopier;
-import xyz.fsgek.common.bean.FsBeanResolver;
-import xyz.fsgek.common.convert.FsConverter;
+import xyz.fsgek.common.reflect.GekReflect;
+import xyz.fsgek.common.base.GekWrapper;
+import xyz.fsgek.common.bean.GekBeanCopier;
+import xyz.fsgek.common.bean.GekBeanResolver;
+import xyz.fsgek.common.convert.GekConverter;
 
 import java.lang.reflect.Type;
 import java.time.*;
@@ -34,11 +34,11 @@ import java.util.function.Supplier;
  * </ul>
  * For other types, it creates with their empty constructor.
  * <p>
- * Note if the {@code obj} is null, return {@link FsWrapper#empty()}.
+ * Note if the {@code obj} is null, return {@link GekWrapper#empty()}.
  *
  * @author fredsuvn
  */
-public class BeanConvertHandler implements FsConverter.Handler {
+public class BeanConvertHandler implements GekConverter.Handler {
 
     /**
      * An instance with {@link #BeanConvertHandler()}.
@@ -72,16 +72,16 @@ public class BeanConvertHandler implements FsConverter.Handler {
         GENERATOR_MAP.put(ConcurrentSkipListMap.class, ConcurrentSkipListMap::new);
     }
 
-    private final FsBeanResolver beanResolver;
-    private final FsBeanCopier copier;
+    private final GekBeanResolver beanResolver;
+    private final GekBeanCopier copier;
 
     /**
-     * Constructs with {@link FsBeanResolver#defaultResolver()}.
+     * Constructs with {@link GekBeanResolver#defaultResolver()}.
      *
-     * @see #BeanConvertHandler(FsBeanResolver)
+     * @see #BeanConvertHandler(GekBeanResolver)
      */
     public BeanConvertHandler() {
-        this(FsBeanResolver.defaultResolver());
+        this(GekBeanResolver.defaultResolver());
     }
 
     /**
@@ -89,19 +89,19 @@ public class BeanConvertHandler implements FsConverter.Handler {
      *
      * @param beanResolver bean resolver
      */
-    public BeanConvertHandler(FsBeanResolver beanResolver) {
+    public BeanConvertHandler(GekBeanResolver beanResolver) {
         this.beanResolver = beanResolver;
-        this.copier = FsBeanCopier.defaultCopier().toBuilder()
+        this.copier = GekBeanCopier.defaultCopier().toBuilder()
             .beanResolver(beanResolver)
             .build();
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         if (source == null) {
-            return FsWrapper.empty();
+            return GekWrapper.empty();
         }
-        Class<?> targetRawType = FsReflect.getRawType(targetType);
+        Class<?> targetRawType = GekReflect.getRawType(targetType);
         if (targetRawType == null || targetRawType.isArray() || UNSUPPORTED_TYPES.contains(targetRawType)) {
             return null;
         }
@@ -110,7 +110,7 @@ public class BeanConvertHandler implements FsConverter.Handler {
         if (generator != null) {
             dest = generator.get();
         } else {
-            dest = FsReflect.newInstance(targetRawType);
+            dest = GekReflect.newInstance(targetRawType);
         }
         if (dest == null) {
             return null;
@@ -123,7 +123,7 @@ public class BeanConvertHandler implements FsConverter.Handler {
      *
      * @return bean resolver of this handler
      */
-    public FsBeanResolver getBeanResolver() {
+    public GekBeanResolver getBeanResolver() {
         return beanResolver;
     }
 
@@ -132,7 +132,7 @@ public class BeanConvertHandler implements FsConverter.Handler {
      *
      * @return copier of this handler
      */
-    public FsBeanCopier getCopier() {
+    public GekBeanCopier getCopier() {
         return copier;
     }
 }

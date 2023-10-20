@@ -1,8 +1,8 @@
 package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.Fs;
-import xyz.fsgek.common.convert.FsConverter;
+import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.convert.GekConverter;
 
 import java.lang.reflect.Type;
 
@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
  *
  * @author fredsuvn
  */
-public class EnumConvertHandler implements FsConverter.Handler {
+public class EnumConvertHandler implements GekConverter.Handler {
 
     /**
      * An instance.
@@ -20,7 +20,7 @@ public class EnumConvertHandler implements FsConverter.Handler {
     public static final EnumConvertHandler INSTANCE = new EnumConvertHandler();
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, FsConverter converter) {
+    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         if (source == null) {
             return null;
         }
@@ -32,6 +32,6 @@ public class EnumConvertHandler implements FsConverter.Handler {
             return null;
         }
         String name = source.toString();
-        return Fs.findEnum(enumType, name);
+        return Gek.findEnum(enumType, name);
     }
 }
