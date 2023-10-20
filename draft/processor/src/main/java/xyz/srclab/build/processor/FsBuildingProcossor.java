@@ -49,7 +49,7 @@
 //        //elementUtils = processingEnv.getElementUtils();
 //        //typeUtils = processingEnv.getTypeUtils();
 //        //String rootProjectPath = System.getProperty("rootProjectPath");
-//        //fsPath = Paths.get(rootProjectPath, "fs-core/src/main/java/xyz/srclab/common/base/Fs.java");
+//        //fsPath = Paths.get(rootProjectPath, "gek-core/src/main/java/xyz/srclab/common/base/Fs.java");
 //        //fsTemplate = getFsVm();
 //        //
 //        //System.out.println(">>>[[[ " + System.getProperties());
@@ -321,7 +321,7 @@
 //    //public static void main(String[] args) {
 //    //    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 //    //    int result = compiler.run(null, null, null,
-//    //        "D:\\Projects\\SrcLab\\boat\\fs-core\\src\\main\\java\\xyz\\srclab\\common\\base\\FsCheck.java");
+//    //        "D:\\Projects\\SrcLab\\boat\\gek-core\\src\\main\\java\\xyz\\srclab\\common\\base\\FsCheck.java");
 //    //    if (result == 0) {
 //    //        System.out.println("Compilation completed successfully.");
 //    //    } else {

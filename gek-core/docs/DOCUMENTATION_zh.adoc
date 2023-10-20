@@ -1,4 +1,4 @@
-= _fs-core_ -- _fs_的核心工具类和接口
+= _gek-core_ -- _Gek_的核心工具类和接口
 :toc:
 :toclevels: 3
 :toc-title: 目录
@@ -7,7 +7,7 @@
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 
-_fs-core_ 提供核心的工具类和接口, 它是
+_gek-core_ 提供核心的工具类和接口, 它是
 https://github.com/fredsuvn[我] 和 https://github.com/srclab-projects[SrcLab]
 的核心基础库. 当然, 它也非常适合在别的项目作为一个易用实用的基础工具类使用.
 

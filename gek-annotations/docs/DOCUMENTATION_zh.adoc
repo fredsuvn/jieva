@@ -1,10 +1,10 @@
-= _fs-annotations_: Annotations of _fs_
+= _gek-annotations_: Annotations of _Gek_
 :last-update-label!:
 孙谦 <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 
-_fs-annotations_ 提供了一系列的注解来帮助你的代码保持整洁和干净:
+_gek-annotations_ 提供了一系列的注解来帮助你的代码保持整洁和干净:
 
 * *Nullable*/*NonNull*: 标注注解对象是可空的或者非空的;
 * *DefaultNullable*/*DefaultNonNull*: 标注注解对象的作用域内的所有可被 *Nullable*/*NonNull*

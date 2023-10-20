@@ -1,41 +1,41 @@
-= _fs_: Core Libraries of link:{srclab-url}[SrcLab] and link:{me-url}[Me] for JVM
+= _Gek_: Core Libraries of link:{srclab-url}[SrcLab] and link:{me-url}[Me] for JVM
 :toc:
 :toclevels: 3
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
-:url: https://github.com/fredsuvn/fs
+:url: https://github.com/fredsuvn/gek
 :srclab-url: https://github.com/srclab-projects
 :me-url: https://github.com/fredsuvn
-:fs-version: 0.0.0
+:gek-version: 0.0.0
 
 == Introduction
 
-_fs_ is a set of Java/Kotlin libraries (JDK 1.8+), mostly written by java,
+_Gek_ is a set of Java/Kotlin libraries (JDK 1.8+), mostly written by java,
 widely used in projects of link:{srclab-url}[SrcLab] and link:{me-url}[me].
 It provides many fast and convenient interfaces, functions and utilities.
 
-_fs_ includes:
+_Gek_ includes:
 
-* link:../gek-annotations/[fs-annotation]: Annotations; link:../gek-annotations/docs/DOCUMENTATION_en.adoc[javadoc];
-* link:../gek-core/[fs-core]: Core lib; link:../gek-core/docs/DOCUMENTATION_en.adoc[javadoc];
-* link:../gek-kotlin/[fs-kotlin]: Kotlin support; link:../gek-kotlin/docs/DOCUMENTATION_en.adoc[javadoc];
-* link:../gek-test/[fs-test]: Testing support;
-* link:../gek-bom/[fs-bom]: BOM;
+* link:../gek-annotations/[gek-annotation]: Annotations; link:../gek-annotations/docs/DOCUMENTATION_en.adoc[javadoc];
+* link:../gek-core/[gek-core]: Core lib; link:../gek-core/docs/DOCUMENTATION_en.adoc[javadoc];
+* link:../gek-kotlin/[gek-kotlin]: Kotlin support; link:../gek-kotlin/docs/DOCUMENTATION_en.adoc[javadoc];
+* link:../gek-test/[gek-test]: Testing support;
+* link:../gek-bom/[gek-bom]: BOM;
 
 Generally just import:
 
-* link:../gek-core/[fs-core].
+* link:../gek-core/[gek-core].
 
 == Getting
 
-=== Get _fs_
+=== Get _Gek_
 
 .Gradle
 [source,groovy,subs="attributes+"]
 ----
-implementation "xyz.fsgek:fs-core:{fs-version}"
+implementation "xyz.fsgek:gek-core:{gek-version}"
 ----
 
 .Maven
@@ -43,8 +43,8 @@ implementation "xyz.fsgek:fs-core:{fs-version}"
 ----
 <dependency>
   <groupId>xyz.fsgek</groupId>
-  <artifactId>fs-core</artifactId>
-  <version>{fs-version}</version>
+  <artifactId>gek-core</artifactId>
+  <version>{gek-version}</version>
 </dependency>
 ----
 
@@ -53,7 +53,7 @@ implementation "xyz.fsgek:fs-core:{fs-version}"
 .Gradle
 [source,groovy,subs="attributes+"]
 ----
-api platform("xyz.fsgek:boat-bom:{fs-version}")
+api platform("xyz.fsgek:boat-bom:{gek-version}")
 ----
 
 .Maven
@@ -63,8 +63,8 @@ api platform("xyz.fsgek:boat-bom:{fs-version}")
   <dependencies>
     <dependency>
       <groupId>xyz.fsgek</groupId>
-      <artifactId>fs-bom</artifactId>
-      <version>{fs-version}</version>
+      <artifactId>gek-bom</artifactId>
+      <version>{gek-version}</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>

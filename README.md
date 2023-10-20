@@ -1,4 +1,4 @@
-# ![](logo.svg) fs: Core Libraries of [SrcLab](https://github.com/srclab-projects) and [Me](https://github.com/fredsuvn) for JVM
+# ![](logo.svg) Gek: Core Libraries of [SrcLab](https://github.com/srclab-projects) and [Me](https://github.com/fredsuvn) for JVM
 
 ## Documentation:
 
@@ -10,17 +10,9 @@ More see [docs/](docs/)
 
 ## Build
 
-This project depends on [srclab-dependencies](https://github.com/srclab-projects/srclab-dependencies), you may:
-
 ```shell
-# install srclab-dependencies
-git clone -b master https://github.com/srclab-projects/srclab-dependencies.git
-
-cd srclab-dependencies && mvn clean install
-
-# build fs
-git clone -b master https://github.com/fredsuvn/fs.git
-
+# build Gek
+git clone -b master https://github.com/fredsuvn/gek.git
 cd boat && gradle clean build
 ```
 
@@ -28,7 +20,7 @@ cd boat && gradle clean build
 
 * Some properties should be configured if you want to enable publish to remote, see publish info part
   of [build.gradle](build.gradle)
-* `fs-core` need `protoc` to compile protobuf files, some architectures don't support it (such as `ARM`);
+* `gek-core` need `protoc` to compile protobuf files, some architectures don't support it (such as `ARM`);
 
 ## Join
 

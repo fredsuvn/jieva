@@ -1,10 +1,10 @@
-= _fs-annotations_: Annotations of _fs_
+= _gek-annotations_: Annotations of _Gek_
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 
-_fs-annotations_ provides a set of annotations to help your codes stay tidy and clean:
+_gek-annotations_ provides a set of annotations to help your codes stay tidy and clean:
 
 * *Nullable*/*NonNull*: tells the annotated element is nullable/non-null;
 * *DefaultNullable*/*DefaultNonNull*: tells all elements which can be annotated by *Nullable*/*NonNull*

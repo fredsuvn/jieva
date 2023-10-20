@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.Date;
 
 /**
- * Logging for fs.
+ * Simple logger interface.
  *
  * @author fredsuvn
  */

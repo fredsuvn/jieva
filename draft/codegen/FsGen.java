@@ -56,9 +56,9 @@
 //
 //    static {
 //        String currentDir = System.getProperty("user.dir");
-//        corePath = Paths.get(currentDir, "fs-core/src/main/java");
-//        processorPath = Paths.get(currentDir, "fs-processor/src/main/java");
-//        fsPath = Paths.get(currentDir, "fs-core/src/main/java/xyz/srclab/common/base/Fs.java");
+//        corePath = Paths.get(currentDir, "gek-core/src/main/java");
+//        processorPath = Paths.get(currentDir, "gek-processor/src/main/java");
+//        fsPath = Paths.get(currentDir, "gek-core/src/main/java/xyz/srclab/common/base/Fs.java");
 //        parserConfig = new ParserConfiguration();
 //        CombinedTypeSolver typeSolver = new CombinedTypeSolver(new ReflectionTypeSolver());
 //        typeSolver.add(new JavaParserTypeSolver(corePath));

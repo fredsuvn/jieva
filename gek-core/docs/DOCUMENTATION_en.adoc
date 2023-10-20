@@ -1,4 +1,4 @@
-= _fs-core_ -- Core utilities and interfaces of _fs_
+= _gek-core_ -- Core utilities and interfaces of _Gek_
 :toc:
 :toclevels: 2
 :toc-title:
@@ -7,7 +7,7 @@ Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 
-_fs-core_ provides core utilities and interfaces, it is the core and common lib of
+_gek-core_ provides core utilities and interfaces, it is the core and common lib of
 https://github.com/fredsuvn[me] and https://github.com/srclab-projects[SrcLab].
 Of course, it is also very suitable to be used as a user-friendly and practical basic utility class in other projects.
 
