@@ -31,6 +31,18 @@ public class GekBuffer {
     }
 
     /**
+     * Puts data from source buffer into dest buffer. It will try to put data of specified max length if remaining space
+     * of both buffers are enough. Otherwise, it will put
+     * @param source
+     * @param dest
+     * @param maxLength
+     * @return
+     */
+    public static int put(ByteBuffer source, ByteBuffer dest, int maxLength) {
+
+    }
+
+    /**
      * Read all bytes of given buffer into a new byte array and return.
      * After reading, the buffer's position will be updated to its limit, its limit will not have been changed.
      *

@@ -1,60 +1,124 @@
 package xyz.fsgek.common.data;
 
-import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekCheck;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-final class ArrayData implements GekData {
+final class ArrayData implements GekData.OfArray {
 
     private final byte[] array;
-    private final int offset;
-    private final int length;
+    private final int arrayOffset;
+    private final int arrayLength;
 
-    ArrayData(byte[] array, int offset, int length) {
+    ArrayData(byte[] array, int arrayOffset, int arrayLength) {
         this.array = array;
-        this.offset = offset;
-        this.length = length;
+        this.arrayOffset = arrayOffset;
+        this.arrayLength = arrayLength;
     }
 
     @Override
-    public synchronized byte[] toBytes() {
-        return Arrays.copyOfRange(array, offset, offset + length);
-    }
-
-    @Override
-    public synchronized int write(byte[] dest, int offset, int length) {
-        GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
-        int len = Math.min(this.length, length);
-        System.arraycopy(array, this.offset, dest, offset, len);
-        return len;
-    }
-
-    @Override
-    public synchronized int write(ByteBuffer dest) {
-        int len = Math.min(this.length, dest.remaining());
-        if (len == 0) {
-            return 0;
-        }
-        dest.put(array, offset, len);
-        return len;
-    }
-
-    @Override
-    public synchronized InputStream toInputStream() {
-        return new ByteArrayInputStream(array, offset, length);
-    }
-
-    @Override
-    public boolean hasBackArray() {
+    public boolean isArrayData() {
         return true;
     }
 
     @Override
-    public @Nullable byte[] backArray() {
+    public OfArray asArrayData() {
+        return this;
+    }
+
+    @Override
+    public boolean isBufferData() {
+        return false;
+    }
+
+    @Override
+    public OfBuffer asBufferData() {
+        throw new GekDataException("Not a buffer data.");
+    }
+
+    @Override
+    public boolean isStreamData() {
+        return false;
+    }
+
+    @Override
+    public OfStream asStreamData() {
+        throw new GekDataException("Not a stream data.");
+    }
+
+    @Override
+    public byte[] array() {
         return array;
+    }
+
+    @Override
+    public int arrayOffset() {
+        return arrayOffset;
+    }
+
+    @Override
+    public int length() {
+        return arrayLength;
+    }
+
+    @Override
+    public int write(byte[] dest, int offset, int length) {
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+        int len = Math.min(length(), length);
+        if (len <= 0) {
+            return 0;
+        }
+        System.arraycopy(array, arrayOffset, dest, offset, len);
+        return len;
+    }
+
+    @Override
+    public int write(ByteBuffer dest, int length) {
+        int len = Math.min(dest.remaining(), length);
+        len = Math.min(len, length());
+        if (len <= 0) {
+            return 0;
+        }
+        dest.put(array, arrayOffset, len);
+        return len;
+    }
+
+    @Override
+    public long write(OutputStream dest) {
+        try {
+            dest.write(array, arrayOffset, arrayLength);
+            return arrayLength;
+        } catch (IOException e) {
+            throw new GekDataException(e);
+        }
+    }
+
+    @Override
+    public long write(OutputStream dest, long length) {
+        int len = (int) Math.min(length, length());
+        if (len <= 0) {
+            return 0;
+        }
+        try {
+            dest.write(array, arrayOffset, len);
+            return len;
+        } catch (IOException e) {
+            throw new GekDataException(e);
+        }
+    }
+
+    @Override
+    public byte[] toArray() {
+        return Arrays.copyOfRange(array, arrayOffset, arrayOffset + arrayLength);
+    }
+
+    @Override
+    public InputStream asInputStream() {
+        return new ByteArrayInputStream(array, arrayOffset, arrayLength);
     }
 }

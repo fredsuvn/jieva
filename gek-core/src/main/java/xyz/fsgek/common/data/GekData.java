@@ -1,15 +1,11 @@
 package xyz.fsgek.common.data;
 
-import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
-import xyz.fsgek.common.encode.GekEncoder;
-import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.base.GekCheck;
 import xyz.fsgek.common.base.GekString;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.function.Supplier;
@@ -20,7 +16,7 @@ import java.util.function.Supplier;
  * @author fredsuvn
  */
 @ThreadSafe
-public interface GekData {
+public interface GekData extends GekDataOutput {
 
     /**
      * Wraps given string to {@link GekData}.
@@ -92,99 +88,113 @@ public interface GekData {
     }
 
     /**
-     * Writes the data into a byte array and returns.
-     *
-     * @return the byte array
-     */
-    byte[] toBytes();
-
-    /**
-     * Writes the data into dest byte array, returns actual written count.
-     *
-     * @param dest dest byte array
-     * @return actual written count
-     */
-    default int write(byte[] dest) {
-        return write(dest, 0, dest.length);
-    }
-
-    /**
-     * Writes the data into dest byte array of specified length from specified offset, returns actual written count.
-     *
-     * @param dest   dest byte array
-     * @param offset specified offset
-     * @param length specified length
-     * @return actual written count
-     */
-    int write(byte[] dest, int offset, int length);
-
-    /**
-     * Writes the data into a byte buffer and returns.
-     *
-     * @return the byte buffer
-     */
-    default ByteBuffer toBuffer() {
-        return ByteBuffer.wrap(toBytes());
-    }
-
-    /**
-     * Writes the data into dest byte buffer, returns actual written count.
-     *
-     * @param dest dest byte buffer
-     * @return actual written count
-     */
-    default int write(ByteBuffer dest) {
-        return (int) write(GekIO.toOutputStream(dest));
-    }
-
-    /**
-     * Returns an input stream for reading bytes from this data.
-     *
-     * @return an input stream for reading bytes from this data
-     */
-    InputStream toInputStream();
-
-    /**
-     * Writes the data into dest output stream, returns actual written count.
-     *
-     * @param dest dest output stream
-     * @return actual written count
-     */
-    default long write(OutputStream dest) {
-        return GekIO.readBytesTo(toInputStream(), dest);
-    }
-
-    /**
      * Returns string with specified charset of this data.
      *
      * @param charset specified charset
      * @return string with specified charset of this data
      */
     default String toString(Charset charset) {
-        return new String(toBytes(), charset);
+        return new String(toArray(), charset);
     }
 
     /**
-     * Returns base64 string of this data.
+     * Returns whether this data is type of {@link OfArray} which has a back array.
      *
-     * @return base64 string of this data
+     * @return whether this data is type of {@link OfArray} which has a back array
      */
-    default String toBase64String() {
-        return GekEncoder.base64().encodeToString(toBytes());
+    boolean isArrayData();
+
+    /**
+     * Returns this data as {@link OfArray} if this is type of {@link OfArray}.
+     * Otherwise, it throws {@link GekDataException}.
+     *
+     * @return this data as {@link OfArray} if this is type of {@link OfArray}
+     */
+    OfArray asArrayData();
+
+    /**
+     * Returns whether this data is type of {@link OfBuffer} which has a back buffer.
+     *
+     * @return whether this data is type of {@link OfBuffer} which has a back buffer
+     */
+    boolean isBufferData();
+
+    /**
+     * Returns this data as {@link OfBuffer} if this is type of {@link OfBuffer}.
+     * Otherwise, it throws {@link GekDataException}.
+     *
+     * @return this data as {@link OfBuffer} if this is type of {@link OfBuffer}
+     */
+    OfBuffer asBufferData();
+
+    /**
+     * Returns whether this data is type of {@link OfStream} which has a back stream.
+     *
+     * @return whether this data is type of {@link OfStream} which has a back stream
+     */
+    boolean isStreamData();
+
+    /**
+     * Returns this data as {@link OfStream} if this is type of {@link OfStream}.
+     * Otherwise, it throws {@link GekDataException}.
+     *
+     * @return this data as {@link OfStream} if this is type of {@link OfStream}
+     */
+    OfStream asStreamData();
+
+    /**
+     * A type of {@link GekData} which has a back array to be wrapped.
+     * Any operation to back array will be reflected to this data, and vice versa.
+     */
+    interface OfArray extends GekData {
+
+        /**
+         * Returns back array to be wrapped.
+         *
+         * @return back array to be wrapped
+         */
+        byte[] array();
+
+        /**
+         * Returns wrapped offset of back array.
+         *
+         * @return wrapped offset of back array
+         */
+        int arrayOffset();
+
+        /**
+         * Returns length of this data, it is also wrapped length of back array.
+         *
+         * @return length of this data
+         */
+        int length();
     }
 
     /**
-     * Returns whether this data is backed by an array.
-     *
-     * @return whether this data is backed by an array
+     * A type of {@link GekData} which has a back buffer.
+     * Any operation to back buffer will be reflected to this data
+     * (such as moving of position caused by reading/writing), and vice versa.
      */
-    boolean hasBackArray();
+    interface OfBuffer extends GekData {
+        /**
+         * Returns back buffer.
+         *
+         * @return back buffer
+         */
+        ByteBuffer buffer();
+    }
 
     /**
-     * Returns array which back this data, or null if it hasn't.
-     *
-     * @return array which back this data, or null if it hasn't
+     * A type of {@link GekData} which has a back stream.
+     * Any operation to back stream will be reflected to this data
+     * (such as moving of position caused by reading/writing), and vice versa.
      */
-    @Nullable
-    byte[] backArray();
+    interface OfStream extends GekData {
+        /**
+         * Returns back stream.
+         *
+         * @return back stream
+         */
+        InputStream stream();
+    }
 }
