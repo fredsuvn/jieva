@@ -1,19 +1,18 @@
 package xyz.fsgek.common.data;
 
 import xyz.fsgek.common.base.GekCheck;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-final class BufferData implements GekData.OfBuffer {
+final class StreamData implements GekData.OfStream {
 
-    private final ByteBuffer buffer;
+    private final InputStream stream;
 
-    BufferData(ByteBuffer buffer) {
-        this.buffer = buffer;
+    StreamData(InputStream stream) {
+        this.stream = stream;
     }
 
     @Override
@@ -28,69 +27,65 @@ final class BufferData implements GekData.OfBuffer {
 
     @Override
     public boolean isBufferData() {
-        return true;
-    }
-
-    @Override
-    public OfBuffer asBufferData() {
-        return this;
-    }
-
-    @Override
-    public boolean isStreamData() {
         return false;
     }
 
     @Override
-    public OfStream asStreamData() {
-        throw new GekDataException("Not a stream data.");
+    public OfBuffer asBufferData() {
+        throw new GekDataException("Not a buffer data.");
     }
 
     @Override
-    public ByteBuffer buffer() {
-        return buffer;
+    public boolean isStreamData() {
+        return true;
+    }
+
+    @Override
+    public OfStream asStreamData() {
+        return this;
+    }
+
+    @Override
+    public InputStream stream() {
+        return stream;
     }
 
     @Override
     public int write(byte[] dest, int offset, int length) {
         GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
-        int remaining = buffer.remaining();
-        if (remaining <= 0) {
+        byte[] buffer = GekIO.readBytes(stream, length);
+        if (buffer == null) {
             return -1;
         }
-        int len = Math.min(remaining, length);
-        if (len <= 0) {
+        if (buffer.length == 0) {
             return 0;
         }
-        buffer.get(dest, offset, len);
-        return len;
+        System.arraycopy(buffer, 0, dest, offset, buffer.length);
+        return buffer.length;
     }
 
     @Override
     public int write(ByteBuffer dest, int length) {
-        return GekBuffer.put(buffer, dest, length);
+        return (int) GekIO.readBytesTo(stream, GekIO.toOutputStream(dest), length);
     }
 
     @Override
     public long write(OutputStream dest) {
-        return GekIO.readBytesTo(GekIO.toInputStream(buffer), dest);
+        return GekIO.readBytesTo(stream, dest);
     }
 
     @Override
     public long write(OutputStream dest, long length) {
-        return GekIO.readBytesTo(GekIO.toInputStream(buffer), dest, length);
+        return GekIO.readBytesTo(stream, dest, length);
     }
 
     @Override
     public byte[] toArray() {
-        if (!buffer.hasRemaining()) {
-            return null;
-        }
-        return GekBuffer.getBytes(buffer);
+        return GekIO.readBytes(stream);
     }
 
     @Override
     public InputStream asInputStream() {
-        return GekIO.toInputStream(buffer);
+        return stream;
     }
 }

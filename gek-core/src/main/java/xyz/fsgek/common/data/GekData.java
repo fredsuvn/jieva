@@ -8,7 +8,6 @@ import xyz.fsgek.common.base.GekString;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.function.Supplier;
 
 /**
  * This interface represents data adapter to convert or write data into other types.
@@ -19,72 +18,59 @@ import java.util.function.Supplier;
 public interface GekData extends GekDataOutput {
 
     /**
-     * Wraps given string to {@link GekData}.
+     * Wraps given string to {@link OfArray}.
      * The given string will be decoded by {@link GekChars#defaultCharset()}.
      *
      * @param str given string
-     * @return wrapped {@link GekData}
+     * @return the {@link OfArray}
      */
-    static GekData wrap(String str) {
+    static GekData.OfArray wrap(String str) {
         return wrap(GekString.encode(str));
     }
 
     /**
-     * Wraps given array to {@link GekData}.
+     * Wraps given array to {@link OfArray}.
      * The given array will be back array of returned data.
      *
      * @param array given array
-     * @return wrapped {@link GekData}
+     * @return the {@link OfArray}
      */
-    static GekData wrap(byte[] array) {
+    static GekData.OfArray wrap(byte[] array) {
         return wrap(array, 0, array.length);
     }
 
     /**
-     * Wraps given array of specified length to {@link GekData}, start from offset index.
+     * Wraps given array of specified length to {@link OfArray} from given offset.
      * The given array will be back array of returned data.
      *
      * @param array  given array
-     * @param offset specified length
-     * @param length start offset index
-     * @return wrapped {@link GekData}
+     * @param offset given offset
+     * @param length specified length
+     * @return the {@link OfArray}
      */
-    static GekData wrap(byte[] array, int offset, int length) {
+    static GekData.OfArray wrap(byte[] array, int offset, int length) {
         GekCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
         return new ArrayData(array, offset, length);
     }
 
     /**
-     * Wraps given buffer to {@link GekData}.
+     * Wraps given buffer to {@link OfBuffer}.
      *
      * @param buffer given buffer
-     * @return wrapped {@link GekData}
+     * @return the {@link OfBuffer}
      */
     static GekData wrap(ByteBuffer buffer) {
         return new BufferData(buffer);
     }
 
     /**
-     * Returns an instance of {@link GekData} of which data comes from given input stream.
-     * <p>
-     * Note the state of stream reflects methods of returned data.
+     * Wraps given stream to {@link OfStream}.
      *
-     * @param inputStream given input stream
-     * @return an instance of {@link GekData} of which data comes from given input stream
+     * @param stream given stream
+     * @return the {@link OfStream}
      */
-    static GekData from(InputStream inputStream) {
-        return new InputStreamData(inputStream);
-    }
-
-    /**
-     * Returns an instance of {@link GekData} of which data comes from given supplier.
-     * The returned data will call {@link Supplier#get()} for each method calling of {@link GekData}.
-     *
-     * @param supplier given supplier
-     * @return an instance of {@link GekData} of which data comes from given supplier
-     */
-    static GekData from(Supplier<byte[]> supplier) {
-        return new ArraySupplierData(supplier);
+    static GekData wrap(InputStream stream) {
+        return new StreamData(stream);
     }
 
     /**

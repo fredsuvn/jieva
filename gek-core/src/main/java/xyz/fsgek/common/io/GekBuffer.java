@@ -31,15 +31,34 @@ public class GekBuffer {
     }
 
     /**
-     * Puts data from source buffer into dest buffer. It will try to put data of specified max length if remaining space
-     * of both buffers are enough. Otherwise, it will put
-     * @param source
-     * @param dest
-     * @param maxLength
-     * @return
+     * Puts data of specified length from source buffer into dest buffer.
+     * The putting operation is limited by remaining of source and dest (Math.min()).
+     * Returns actual put number (maybe 0) or -1 if end of source buffer is reached.
+     *
+     * @param source source buffer
+     * @param dest   dest buffer
+     * @param length specified length
+     * @return actual written number (maybe 0) or -1 if end of source buffer is reached
      */
-    public static int put(ByteBuffer source, ByteBuffer dest, int maxLength) {
-
+    public static int put(ByteBuffer source, ByteBuffer dest, int length) {
+        int sourceRemaining = source.remaining();
+        if (sourceRemaining <= 0) {
+            return -1;
+        }
+        int destRemaining = dest.remaining();
+        int len = Math.min(sourceRemaining, destRemaining);
+        len = Math.min(len, length);
+        if (len <= 0) {
+            return 0;
+        }
+        int sourceLimit = source.limit();
+        int destLimit = dest.limit();
+        source.limit(len);
+        dest.limit(len);
+        dest.put(source);
+        source.limit(sourceLimit);
+        dest.limit(destLimit);
+        return len;
     }
 
     /**

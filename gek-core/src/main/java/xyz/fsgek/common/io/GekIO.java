@@ -168,7 +168,7 @@ public class GekIO {
      * @param limit       specified limit number
      * @return actual read number
      */
-    public static long readBytesTo(InputStream inputStream, OutputStream dest, int limit) {
+    public static long readBytesTo(InputStream inputStream, OutputStream dest, long limit) {
         return readBytesTo(inputStream, dest, limit, IO_BUFFER_SIZE);
     }
 
@@ -186,13 +186,13 @@ public class GekIO {
      * @param bufferSize  buffer size for each reading and writing
      * @return actual read number
      */
-    public static long readBytesTo(InputStream inputStream, OutputStream dest, int limit, int bufferSize) {
+    public static long readBytesTo(InputStream inputStream, OutputStream dest, long limit, int bufferSize) {
         if (limit == 0) {
             return 0;
         }
         try {
             long readNum = 0;
-            int actualBufferSize = limit < 0 ? bufferSize : Math.min(limit, bufferSize);
+            int actualBufferSize = limit < 0 ? bufferSize : (int) Math.min(limit, bufferSize);
             byte[] buffer = new byte[actualBufferSize];
             while (true) {
                 int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);

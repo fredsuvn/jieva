@@ -1,5 +1,6 @@
 package xyz.fsgek.common.data;
 
+import xyz.fsgek.common.base.GekBytes;
 import xyz.fsgek.common.base.GekCheck;
 
 import java.io.ByteArrayInputStream;
@@ -69,6 +70,9 @@ final class ArrayData implements GekData.OfArray {
     @Override
     public int write(byte[] dest, int offset, int length) {
         GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+        if (arrayLength == 0) {
+            return -1;
+        }
         int len = Math.min(length(), length);
         if (len <= 0) {
             return 0;
@@ -79,6 +83,9 @@ final class ArrayData implements GekData.OfArray {
 
     @Override
     public int write(ByteBuffer dest, int length) {
+        if (arrayLength == 0) {
+            return -1;
+        }
         int len = Math.min(dest.remaining(), length);
         len = Math.min(len, length());
         if (len <= 0) {
@@ -90,6 +97,9 @@ final class ArrayData implements GekData.OfArray {
 
     @Override
     public long write(OutputStream dest) {
+        if (arrayLength == 0) {
+            return -1;
+        }
         try {
             dest.write(array, arrayOffset, arrayLength);
             return arrayLength;
@@ -100,6 +110,9 @@ final class ArrayData implements GekData.OfArray {
 
     @Override
     public long write(OutputStream dest, long length) {
+        if (arrayLength == 0) {
+            return -1;
+        }
         int len = (int) Math.min(length, length());
         if (len <= 0) {
             return 0;
@@ -114,6 +127,9 @@ final class ArrayData implements GekData.OfArray {
 
     @Override
     public byte[] toArray() {
+        if (arrayLength == 0) {
+            return null;
+        }
         return Arrays.copyOfRange(array, arrayOffset, arrayOffset + arrayLength);
     }
 

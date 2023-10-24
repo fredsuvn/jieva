@@ -1,22 +1,24 @@
 package xyz.fsgek.common.data;
 
+import xyz.fsgek.annotations.Nullable;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 /**
- * Output interface used to write data into different types of destinations.
- * This is base interface of {@link GekData}.
+ * Data output interface, to write data into different types of destinations
+ * such as byte array, byte buffer and output stream.
  */
 public interface GekDataOutput {
 
     /**
      * Writes data into dest array as possible.
      * The writing operation is limited by readable length of this and writable space of dest.
-     * Returns actual written number or -1 if no readable data remaining.
+     * Returns actual written number (maybe 0) or -1 if end of the data is reached.
      *
      * @param dest dest array
-     * @return actual written number or -1 if no readable data remaining
+     * @return actual written number (maybe 0) or -1 if end of the data is reached
      */
     default int write(byte[] dest) {
         return write(dest, 0);
@@ -25,11 +27,11 @@ public interface GekDataOutput {
     /**
      * Writes data into dest array from given offset to end as possible.
      * The writing operation is limited by readable length of this and writable space of dest.
-     * Returns actual written number or -1 if no readable data remaining.
+     * Returns actual written number (maybe 0) or -1 if end of the data is reached.
      *
      * @param dest   dest array
      * @param offset given offset
-     * @return actual written number or -1 if no readable data remaining
+     * @return actual written number (maybe 0) or -1 if end of the data is reached
      */
     default int write(byte[] dest, int offset) {
         return write(dest, 0, dest.length);
@@ -38,22 +40,22 @@ public interface GekDataOutput {
     /**
      * Writes data of specified length into dest array from given offset to end as possible.
      * The writing operation is limited by readable length of this and writable space of dest.
-     * Returns actual written number or -1 if no readable data remaining.
+     * Returns actual written number (maybe 0) or -1 if end of the data is reached.
      *
      * @param dest   dest array
      * @param offset given offset
      * @param length specified length
-     * @return actual written number or -1 if no readable data remaining
+     * @return actual written number (maybe 0) or -1 if end of the data is reached
      */
     int write(byte[] dest, int offset, int length);
 
     /**
      * Writes data into dest buffer as possible.
      * The writing operation is limited by readable length of this and writable space of dest.
-     * Returns actual written number or -1 if no readable data remaining.
+     * Returns actual written number (maybe 0) or -1 if end of the data is reached.
      *
      * @param dest dest buffer
-     * @return actual written number or -1 if no readable data remaining
+     * @return actual written number (maybe 0) or -1 if end of the data is reached
      */
     default int write(ByteBuffer dest) {
         return write(dest, dest.remaining());
@@ -62,49 +64,56 @@ public interface GekDataOutput {
     /**
      * Writes data of specified length into dest buffer as possible.
      * The writing operation is limited by readable length of this and writable space of dest.
-     * Returns actual written number or -1 if no readable data remaining.
+     * Returns actual written number (maybe 0) or -1 if end of the data is reached.
      *
      * @param dest   dest buffer
      * @param length specified length
-     * @return actual written number or -1 if no readable data remaining
+     * @return actual written number (maybe 0) or -1 if end of the data is reached
      */
     int write(ByteBuffer dest, int length);
 
     /**
      * Writes data into dest stream as possible.
      * The writing operation is limited by readable length of this and writable space of dest.
-     * Returns actual written number or -1 if no readable data remaining.
+     * Returns actual written number (maybe 0) or -1 if end of the data is reached.
      *
      * @param dest dest stream
-     * @return actual written number or -1 if no readable data remaining
+     * @return actual written number (maybe 0) or -1 if end of the data is reached
      */
     long write(OutputStream dest);
 
     /**
      * Writes data of specified length into dest stream as possible.
      * The writing operation is limited by readable length of this and writable space of dest.
-     * Returns actual written number or -1 if no readable data remaining.
+     * Returns actual written number (maybe 0) or -1 if end of the data is reached.
      *
      * @param dest   dest stream
      * @param length specified length
-     * @return actual written number or -1 if no readable data remaining
+     * @return actual written number (maybe 0) or -1 if end of the data is reached
      */
     long write(OutputStream dest, long length);
 
     /**
-     * Writes all data into an array and returns.
+     * Writes all data into an array and returns, return null if end of the data is reached.
      *
-     * @return the array which was written into all data
+     * @return the array which was written into all data, or null if end of the data is reached
      */
+    @Nullable
     byte[] toArray();
 
     /**
-     * Writes all data into a buffer and returns.
+     * Writes all data into a buffer and returns, return null if end of the data is reached.
      *
-     * @return the buffer which was written into all data, the position is 0, limit and capacity is length of data
+     * @return The buffer which was written into all data, or null if end of the data is reached.
+     * The position is 0, limit and capacity is length of data
      */
+    @Nullable
     default ByteBuffer toBuffer() {
-        return ByteBuffer.wrap(toArray());
+        byte[] array = toArray();
+        if (array == null) {
+            return null;
+        }
+        return ByteBuffer.wrap(array);
     }
 
     /**
