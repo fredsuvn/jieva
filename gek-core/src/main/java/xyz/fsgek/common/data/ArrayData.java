@@ -1,6 +1,5 @@
 package xyz.fsgek.common.data;
 
-import xyz.fsgek.common.base.GekBytes;
 import xyz.fsgek.common.base.GekCheck;
 
 import java.io.ByteArrayInputStream;

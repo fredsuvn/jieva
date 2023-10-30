@@ -51,24 +51,6 @@ public class BufferTest {
             buffer.position(),
             0
         );
-        buffer.reset();
-        Assert.assertEquals(
-            GekString.encode("56789"),
-            GekBuffer.getBytes(GekBuffer.subView(buffer, 4))
-        );
-        Assert.assertEquals(
-            buffer.position(),
-            0
-        );
-        buffer.reset();
-        Assert.assertEquals(
-            GekString.encode("567"),
-            GekBuffer.getBytes(GekBuffer.subView(buffer, 4, 3))
-        );
-        Assert.assertEquals(
-            buffer.position(),
-            0
-        );
     }
 
     @Test
@@ -127,5 +109,67 @@ public class BufferTest {
             Arrays.asList("", "123")
         );
         Assert.assertEquals(buffer.position(), 5);
+    }
+
+    @Test
+    public void testSubView() {
+        ByteBuffer buffer = ByteBuffer.wrap(GekString.encode("123456789"));
+        buffer.mark();
+        Assert.assertEquals(
+            GekString.encode("12345"),
+            GekBuffer.getBytes(GekBuffer.slice(buffer, 5))
+        );
+        Assert.assertEquals(
+            buffer.position(),
+            0
+        );
+        buffer.reset();
+        Assert.assertEquals(
+            GekString.encode("56789"),
+            GekBuffer.getBytes(GekBuffer.subView(buffer, 4))
+        );
+        Assert.assertEquals(
+            buffer.position(),
+            0
+        );
+        buffer.reset();
+        Assert.assertEquals(
+            GekString.encode("567"),
+            GekBuffer.getBytes(GekBuffer.subView(buffer, 4, 3))
+        );
+        Assert.assertEquals(
+            buffer.position(),
+            0
+        );
+
+        ByteBuffer bf = ByteBuffer.wrap(GekString.encode("123456789"), 1, 7).slice();
+        ByteBuffer slice = GekBuffer.slice(bf, 1);
+        Assert.assertEquals(
+            slice.position(),
+            0
+        );
+        Assert.assertEquals(
+            slice.limit(),
+            1
+        );
+        Assert.assertTrue(slice.hasArray());
+        Assert.assertEquals(
+            slice.arrayOffset(),
+            1
+        );
+        ByteBuffer view = GekBuffer.subView(bf, 2, 2);
+        Assert.assertEquals(
+            view.position(),
+            0
+        );
+        Assert.assertEquals(
+            view.limit(),
+            2
+        );
+        Assert.assertTrue(view.hasArray());
+        Assert.assertEquals(
+            view.arrayOffset(),
+            3
+        );
     }
 }
