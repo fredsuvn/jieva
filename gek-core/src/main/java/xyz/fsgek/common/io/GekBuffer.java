@@ -169,6 +169,20 @@ public class GekBuffer {
     }
 
     /**
+     * Slices given buffer of specified length by {@link #slice(ByteBuffer, int)}, and add given buffer's position to
+     * {@code buffer.position() + length}.
+     *
+     * @param buffer given buffer
+     * @param length specified length
+     * @return shared buffer
+     */
+    public static ByteBuffer getShared(ByteBuffer buffer, int length) {
+        ByteBuffer slice = slice(buffer, length);
+        buffer.position(buffer.position() + length);
+        return slice;
+    }
+
+    /**
      * Reads and split given buffer in fixed length. This method will move buffer's position by reading.
      * If the remaining length of buffer is not enough to split,
      * the buffer's position will be reset to last start position.

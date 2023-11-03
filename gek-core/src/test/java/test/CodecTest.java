@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 
 public class CodecTest {
 
@@ -120,67 +121,60 @@ public class CodecTest {
         return Math.max(max, cipher.getBlockSize());
     }
 
-    //    @Test
-    //    public void testCipher() throws Exception {
-    //        testCipherAsymmetric(150, 88, 256, "RSA", "RSA/ECB/PKCS1Padding");
-    //        testCipherAsymmetric(1500, 188, 256, "RSA", "RSA");
-    //        testCipherSymmetric(150, 999, 9999, "AES", "AES");
-    //        testCipherSymmetric(1500, 16, 32, "AES", "AES");
-    //    }
-    //
-    //    private void testCipherAsymmetric(
-    //        int dataSize, int enBlockSize, int deBlockSize, String keyAlgorithm, String cryptoAlgorithm) throws Exception {
-    //        byte[] data = TestUtil.buildRandomBytes(dataSize);
-    //        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(keyAlgorithm);
-    //        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-    //        PublicKey publicKey = keyPair.getPublic();
-    //        PrivateKey privateKey = keyPair.getPrivate();
-    //        GekCipher cipher = GekCipher.getInstance(cryptoAlgorithm);
-    //        byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).key(publicKey).encrypt().doFinal();
-    //        byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
-    //        Assert.assertEquals(data, deBytes);
-    //        enBytes = cipher.prepare(ByteBuffer.wrap(data)).blockSize(enBlockSize).key(publicKey).encrypt().doFinal();
-    //        deBytes = cipher.prepare(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
-    //        Assert.assertEquals(data, deBytes);
-    //        enBytes = cipher.prepare(GekIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().doFinal();
-    //        deBytes = cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
-    //        Assert.assertEquals(data, deBytes);
-    //        enBytes = GekIO.readBytes(
-    //            cipher.prepare(GekIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().doFinalStream());
-    //        deBytes = GekIO.readBytes(
-    //            cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinalStream());
-    //        Assert.assertEquals(data, deBytes);
-    //        byte[] enDest = new byte[dataSize * 10];
-    //        int destSize = cipher.prepare(data, 2, data.length - 2).blockSize(enBlockSize).key(publicKey).encrypt().doFinal(enDest, 1);
-    //        enBytes = Arrays.copyOfRange(enDest, 1, destSize + 1);
-    //        deBytes = cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
-    //        Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
-    //    }
-    //
-    //    private void testCipherSymmetric(
-    //        int dataSize, int enBlockSize, int deBlockSize, String keyAlgorithm, String cryptoAlgorithm) throws Exception {
-    //        byte[] data = TestUtil.buildRandomBytes(dataSize);
-    //        KeyGenerator keyGenerator = KeyGenerator.getInstance(keyAlgorithm);
-    //        SecretKey key = keyGenerator.generateKey();
-    //        GekCipher cipher = GekCipher.getInstance(cryptoAlgorithm);
-    //        byte[] enBytes = cipher.prepare(data).blockSize(enBlockSize).key(key).encrypt().doFinal();
-    //        byte[] deBytes = cipher.prepare(enBytes).blockSize(deBlockSize).key(key).decrypt().doFinal();
-    //        Assert.assertEquals(data, deBytes);
-    //        enBytes = cipher.prepare(ByteBuffer.wrap(data)).blockSize(enBlockSize).key(key).encrypt().doFinal();
-    //        deBytes = cipher.prepare(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinal();
-    //        Assert.assertEquals(data, deBytes);
-    //        enBytes = cipher.prepare(GekIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().doFinal();
-    //        deBytes = cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinal();
-    //        Assert.assertEquals(data, deBytes);
-    //        enBytes = GekIO.readBytes(
-    //            cipher.prepare(GekIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().doFinalStream());
-    //        deBytes = GekIO.readBytes(
-    //            cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinalStream());
-    //        Assert.assertEquals(data, deBytes);
-    //        byte[] enDest = new byte[dataSize * 10];
-    //        int destSize = cipher.prepare(data, 2, data.length - 2).blockSize(enBlockSize).key(key).encrypt().doFinal(enDest, 1);
-    //        enBytes = Arrays.copyOfRange(enDest, 1, destSize + 1);
-    //        deBytes = cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinal();
-    //        Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
-    //    }
+//    private void testCodecDigest(int dataSize, String algorithm) throws Exception {
+//        byte[] data = GekString.encode(TestUtil.buildRandomString(dataSize, 0));
+//        MessageDigest digest = MessageDigest.getInstance(algorithm);
+//
+//        //buffer -> buffer
+//        ByteBuffer inBuffer = ByteBuffer.wrap(data);
+//        ByteBuffer outBuffer = ByteBuffer.allocate(digest.getDigestLength());
+//        byte[] result = GekCodec.doDigest(inBuffer);
+//        Assert.assertEquals(enResultSize, enOutSize);
+//        outBuffer.flip();
+//        cipher.init(Cipher.DECRYPT_MODE, decryptKey);
+//        System.out.println(cipher.getOutputSize(deBlockSize) + ", " + cipher.getBlockSize());
+//        ByteBuffer comBuffer = ByteBuffer.allocate(decodeSize(cipher, data.length, deBlockSize));
+//        long deResultSize = GekCodec.doCipher(cipher, outBuffer, comBuffer, deBlockSize);
+//        Assert.assertEquals(deResultSize, dataSize);
+//        comBuffer.flip();
+//        Assert.assertEquals(GekBuffer.getBytes(comBuffer), data);
+//
+//        //buffer -> stream
+//        cipher.init(Cipher.ENCRYPT_MODE, encryptKey);
+//        inBuffer = ByteBuffer.wrap(data);
+//        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+//        enResultSize = GekCodec.doCipher(cipher, inBuffer, outStream, enBlockSize);
+//        Assert.assertEquals(enResultSize, enOutSize);
+//        cipher.init(Cipher.DECRYPT_MODE, decryptKey);
+//        ByteArrayOutputStream comStream = new ByteArrayOutputStream();
+//        deResultSize = GekCodec.doCipher(cipher, ByteBuffer.wrap(outStream.toByteArray()), comStream, deBlockSize);
+//        Assert.assertEquals(deResultSize, dataSize);
+//        Assert.assertEquals(comStream.toByteArray(), data);
+//
+//        //stream -> buffer
+//        cipher.init(Cipher.ENCRYPT_MODE, encryptKey);
+//        ByteArrayInputStream inStream = new ByteArrayInputStream(data);
+//        outBuffer.clear();
+//        enResultSize = GekCodec.doCipher(cipher, inStream, outBuffer, enBlockSize);
+//        Assert.assertEquals(enResultSize, enOutSize);
+//        outBuffer.flip();
+//        cipher.init(Cipher.DECRYPT_MODE, decryptKey);
+//        comBuffer.clear();
+//        deResultSize = GekCodec.doCipher(cipher, new ByteArrayInputStream(GekBuffer.getBytes(outBuffer)), comBuffer, deBlockSize);
+//        Assert.assertEquals(deResultSize, dataSize);
+//        comBuffer.flip();
+//        Assert.assertEquals(GekBuffer.getBytes(comBuffer), data);
+//
+//        //stream -> stream
+//        cipher.init(Cipher.ENCRYPT_MODE, encryptKey);
+//        inStream = new ByteArrayInputStream(data);
+//        outStream.reset();
+//        enResultSize = GekCodec.doCipher(cipher, inStream, outStream, enBlockSize);
+//        Assert.assertEquals(enResultSize, enOutSize);
+//        cipher.init(Cipher.DECRYPT_MODE, decryptKey);
+//        comStream.reset();
+//        deResultSize = GekCodec.doCipher(cipher, ByteBuffer.wrap(outStream.toByteArray()), comStream, deBlockSize);
+//        Assert.assertEquals(deResultSize, dataSize);
+//        Assert.assertEquals(comStream.toByteArray(), data);
+//    }
 }
