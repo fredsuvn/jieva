@@ -69,7 +69,7 @@ public interface GekCase {
 
     /**
      * Splits given chars into a word list with rules of this implementation.
-     * Default implementations use {@link GekString#subView(CharSequence, int, int)} to build sub-sequence.
+     * Default implementations use {@link GekString#subChars(CharSequence, int, int)} to build sub-sequence.
      *
      * @param chars given chars
      * @return split word list
@@ -105,7 +105,7 @@ public interface GekCase {
      * Camel case implementation. This implementation uses
      * {@link Character#isUpperCase(char)}, {@link Character#toUpperCase(char)} and {@link Character#toLowerCase(char)}
      * to check and convert a char.
-     * And use {@link GekString#subView(CharSequence, int, int)} to split string.
+     * And use {@link GekString#subChars(CharSequence, int, int)} to split string.
      */
     class CamelCase implements GekCase {
 
@@ -142,21 +142,21 @@ public interface GekCase {
                 if (lastIsUpper && !currentIsUpper) {
                     int wordEnd = i - 1;
                     if (wordEnd > wordStart) {
-                        result.add(GekString.subView(chars, wordStart, wordEnd));
+                        result.add(GekString.subChars(chars, wordStart, wordEnd));
                     }
                     wordStart = wordEnd;
                 }
                 // aA: two words
                 else {
                     if (i > wordStart) {
-                        result.add(GekString.subView(chars, wordStart, i));
+                        result.add(GekString.subChars(chars, wordStart, i));
                     }
                     wordStart = i;
                 }
                 lastIsUpper = currentIsUpper;
             }
             if (wordStart < len) {
-                result.add(GekString.subView(chars, wordStart, len));
+                result.add(GekString.subChars(chars, wordStart, len));
             }
             return result;
         }

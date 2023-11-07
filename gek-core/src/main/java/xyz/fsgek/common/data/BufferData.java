@@ -73,12 +73,12 @@ final class BufferData implements GekData.OfBuffer {
 
     @Override
     public long write(OutputStream dest) {
-        return GekIO.readBytesTo(GekIO.toInputStream(buffer), dest);
+        return GekIO.readTo(GekIO.toInputStream(buffer), dest);
     }
 
     @Override
     public long write(OutputStream dest, long length) {
-        return GekIO.readBytesTo(GekIO.toInputStream(buffer), dest, length);
+        return GekIO.readTo(GekIO.toInputStream(buffer), dest, length);
     }
 
     @Override

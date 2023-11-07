@@ -63,6 +63,6 @@ public class DataTest {
         //to/as:
         Assert.assertEquals(supplier.get().toArray(), data);
         Assert.assertEquals(GekBuffer.getBytes(supplier.get().toBuffer()), data);
-        Assert.assertEquals(GekIO.readBytes(supplier.get().asInputStream()), data);
+        Assert.assertEquals(GekIO.read(supplier.get().asInputStream()), data);
     }
 }

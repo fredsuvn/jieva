@@ -164,15 +164,15 @@ public class StringTest {
     @Test
     public void testSubRef() {
         Assert.assertEquals(
-            GekString.subView("12345678", 2, 7).toString(),
+            GekString.subChars("12345678", 2, 7).toString(),
             "34567"
         );
         Assert.assertEquals(
-            GekString.subView("12345678", 2, 7).charAt(3),
+            GekString.subChars("12345678", 2, 7).charAt(3),
             '6'
         );
         Assert.assertEquals(
-            GekString.subView("12345678", 2, 7).subSequence(1, 3).toString(),
+            GekString.subChars("12345678", 2, 7).subSequence(1, 3).toString(),
             "45"
         );
     }
@@ -229,7 +229,7 @@ public class StringTest {
     @Test
     public void testLazyString() {
         int[] is = {0};
-        CharSequence lazy = GekString.lazyString(() -> {
+        CharSequence lazy = GekString.lazyChars(() -> {
             is[0] = 1;
             return "8899";
         });

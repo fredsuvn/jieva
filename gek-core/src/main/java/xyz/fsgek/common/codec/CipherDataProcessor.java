@@ -250,12 +250,12 @@ public class CipherDataProcessor implements GekDataProcessor<CipherDataProcessor
     private int streamToBuffer(InputStream in, ByteBuffer out)
         throws ShortBufferException, IllegalBlockSizeException, BadPaddingException {
         if (blockSize <= 0) {
-            byte[] inBytes = GekIO.readBytes(in);
+            byte[] inBytes = GekIO.read(in);
             return cipher.doFinal(ByteBuffer.wrap(inBytes), out);
         }
         int outSize = 0;
         while (true) {
-            byte[] inBytes = GekIO.readBytes(in, blockSize);
+            byte[] inBytes = GekIO.read(in, blockSize);
             if (GekArray.isEmpty(inBytes)) {
                 break;
             }
@@ -271,14 +271,14 @@ public class CipherDataProcessor implements GekDataProcessor<CipherDataProcessor
     private long streamToStream(InputStream in, OutputStream out)
         throws IllegalBlockSizeException, BadPaddingException, IOException {
         if (blockSize <= 0) {
-            byte[] inBytes = GekIO.readBytes(in);
+            byte[] inBytes = GekIO.read(in);
             byte[] result = cipher.doFinal(inBytes);
             out.write(result);
             return result.length;
         }
         int outSize = 0;
         while (true) {
-            byte[] inBytes = GekIO.readBytes(in, blockSize);
+            byte[] inBytes = GekIO.read(in, blockSize);
             if (GekArray.isEmpty(inBytes)) {
                 break;
             }

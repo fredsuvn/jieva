@@ -47,9 +47,9 @@ public class SecurityTest {
         enBytes = cipher.prepare(GekIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().doFinal();
         deBytes = cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinal();
         Assert.assertEquals(data, deBytes);
-        enBytes = GekIO.readBytes(
+        enBytes = GekIO.read(
             cipher.prepare(GekIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().doFinalStream());
-        deBytes = GekIO.readBytes(
+        deBytes = GekIO.read(
             cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().doFinalStream());
         Assert.assertEquals(data, deBytes);
         byte[] enDest = new byte[dataSize * 10];
@@ -74,9 +74,9 @@ public class SecurityTest {
         enBytes = cipher.prepare(GekIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().doFinal();
         deBytes = cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinal();
         Assert.assertEquals(data, deBytes);
-        enBytes = GekIO.readBytes(
+        enBytes = GekIO.read(
             cipher.prepare(GekIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().doFinalStream());
-        deBytes = GekIO.readBytes(
+        deBytes = GekIO.read(
             cipher.prepare(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().doFinalStream());
         Assert.assertEquals(data, deBytes);
         byte[] enDest = new byte[dataSize * 10];
@@ -105,7 +105,7 @@ public class SecurityTest {
         Assert.assertEquals(destSize, mac.getMacLength());
         macBytes = mac.doFinal(data);
         InputStream enStream = fsMac.prepare(data).key(macKey).doFinalStream();
-        Assert.assertEquals(macBytes, GekIO.readBytes(enStream));
+        Assert.assertEquals(macBytes, GekIO.read(enStream));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         long outSize = fsMac.prepare(ByteBuffer.wrap(data)).key(macKey).doFinal(out);
         Assert.assertEquals(outSize, mac.getMacLength());
@@ -134,7 +134,7 @@ public class SecurityTest {
         Assert.assertEquals(destSize, md.getDigestLength());
         mdBytes = md.digest(data);
         InputStream enStream = fd.prepare(data).doFinalStream();
-        Assert.assertEquals(mdBytes, GekIO.readBytes(enStream));
+        Assert.assertEquals(mdBytes, GekIO.read(enStream));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         long outSize = fd.prepare(ByteBuffer.wrap(data)).doFinal(out);
         Assert.assertEquals(outSize, md.getDigestLength());
@@ -173,7 +173,7 @@ public class SecurityTest {
         signature.update(data);
         signBytes = signature.sign();
         InputStream enStream = gekSign.prepare(data).key(privateKey).doFinalStream();
-        Assert.assertEquals(signBytes, GekIO.readBytes(enStream));
+        Assert.assertEquals(signBytes, GekIO.read(enStream));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         long outSize = gekSign.prepare(ByteBuffer.wrap(data)).key(privateKey).doFinal(out);
         Assert.assertEquals(outSize, signBytes.length);

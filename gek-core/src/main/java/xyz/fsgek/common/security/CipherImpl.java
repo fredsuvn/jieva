@@ -82,7 +82,7 @@ final class CipherImpl implements GekCipher {
                 int bLen = len;
                 while (bLen > 0) {
                     if (buffer == null) {
-                        byte[] nextIn = GekIO.readBytes(in, process.blockSize);
+                        byte[] nextIn = GekIO.read(in, process.blockSize);
                         if (GekArray.isEmpty(nextIn)) {
                             if (count == 0) {
                                 return -1;

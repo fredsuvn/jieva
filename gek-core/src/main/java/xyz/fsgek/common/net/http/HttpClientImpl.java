@@ -79,7 +79,7 @@ final class HttpClientImpl implements GekHttpClient {
             InputStream bodyStream = prepareWriting(connection, requestBody);
             connection.setDoOutput(true);
             OutputStream out = connection.getOutputStream();
-            GekIO.readBytesTo(bodyStream, out);
+            GekIO.readTo(bodyStream, out);
             out.flush();
             out.close();
         }

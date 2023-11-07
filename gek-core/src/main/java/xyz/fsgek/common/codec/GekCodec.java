@@ -100,7 +100,7 @@ public class GekCodec {
     public static int doCipher(Cipher cipher, InputStream in, ByteBuffer out, int blockSize) throws GekCodecException {
         try {
             if (blockSize <= 0) {
-                byte[] inBytes = GekIO.readBytes(in);
+                byte[] inBytes = GekIO.read(in);
                 return cipher.doFinal(ByteBuffer.wrap(inBytes), out);
             }
             int outSize = 0;
@@ -139,7 +139,7 @@ public class GekCodec {
     public static long doCipher(Cipher cipher, InputStream in, OutputStream out, int blockSize) throws GekCodecException {
         try {
             if (blockSize <= 0) {
-                byte[] inBytes = GekIO.readBytes(in);
+                byte[] inBytes = GekIO.read(in);
                 byte[] result = cipher.doFinal(inBytes);
                 out.write(result);
                 return result.length;
@@ -206,7 +206,7 @@ public class GekCodec {
     public static byte[] doDigest(MessageDigest digest, InputStream in, int bufferSize) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.readBytes(in);
+                byte[] input = GekIO.read(in);
                 return digest.digest(input);
             }
             byte[] inBytes = new byte[bufferSize];
@@ -260,7 +260,7 @@ public class GekCodec {
     public static byte[] doMac(Mac mac, InputStream in, int bufferSize) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.readBytes(in);
+                byte[] input = GekIO.read(in);
                 return mac.doFinal(input);
             }
             byte[] inBytes = new byte[bufferSize];
@@ -314,7 +314,7 @@ public class GekCodec {
     public static byte[] doSign(Signature sign, InputStream in, int bufferSize) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.readBytes(in);
+                byte[] input = GekIO.read(in);
                 sign.update(input);
                 return sign.sign();
             }
@@ -390,7 +390,7 @@ public class GekCodec {
     public static boolean doVerify(Signature sign, InputStream in, int bufferSize, byte[] signature) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.readBytes(in);
+                byte[] input = GekIO.read(in);
                 sign.update(input);
                 return sign.verify(signature);
             }
@@ -428,7 +428,7 @@ public class GekCodec {
     public static boolean doVerify(Signature sign, InputStream in, int bufferSize, ByteBuffer signature) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.readBytes(in);
+                byte[] input = GekIO.read(in);
                 sign.update(input);
                 return doVerifyFinal(sign, signature);
             }

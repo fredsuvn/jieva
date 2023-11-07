@@ -54,7 +54,7 @@ public class FileTest {
         InputStream bin = gekFile.bindInputStream();
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);
         gekFile.position(2);
-        IOTest.testInputStream(data, 2, 130, GekIO.limited(gekFile.bindInputStream(), 130), false);
+        IOTest.testInputStream(data, 2, 130, GekIO.limit(gekFile.bindInputStream(), 130), false);
         gekFile.close();
         Assert.expectThrows(GekIOException.class, () -> gekFile.bindInputStream());
         Assert.expectThrows(GekIOException.class, () -> bin.read());
@@ -62,7 +62,7 @@ public class FileTest {
         gekFile.position(3);
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);
         gekFile.position(2);
-        IOTest.testInputStream(data, 2, 130, GekIO.limited(gekFile.bindInputStream(), 130), false);
+        IOTest.testInputStream(data, 2, 130, GekIO.limit(gekFile.bindInputStream(), 130), false);
         gekFile.position(4);
         IOTest.testOutStream(-1, gekFile.bindOutputStream(), (offset, length) ->
             GekIO.readBytes(file.toPath(), offset + 4, length));
@@ -75,7 +75,7 @@ public class FileTest {
         });
         Assert.assertEquals(gekFile.length(), newLength.get());
         gekFile.position(8);
-        IOTest.testOutStream(233, GekIO.limited(gekFile.bindOutputStream(), 233), (offset, length) ->
+        IOTest.testOutStream(233, GekIO.limit(gekFile.bindOutputStream(), 233), (offset, length) ->
             GekIO.readBytes(file.toPath(), offset + 8, length));
         file.delete();
     }
@@ -97,8 +97,8 @@ public class FileTest {
             .bufferSize(bufferSize)
             .build();
         IOTest.testInputStream(data, 0, bytes.length, fileCache.getInputStream(file.toPath(), 0), false);
-        IOTest.testInputStream(data, 5, 230, GekIO.limited(fileCache.getInputStream(file.toPath(), 5), 230), false);
-        IOTest.testInputStream(data, 0, 230, GekIO.limited(fileCache.getInputStream(file.toPath(), 0), 230), false);
+        IOTest.testInputStream(data, 5, 230, GekIO.limit(fileCache.getInputStream(file.toPath(), 5), 230), false);
+        IOTest.testInputStream(data, 0, 230, GekIO.limit(fileCache.getInputStream(file.toPath(), 0), 230), false);
         IOTest.testInputStream(data, 0, bytes.length, fileCache.getInputStream(file.toPath(), 0), false);
         IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), 4), (offset, length) ->
             GekIO.readBytes(file.toPath(), offset + 4, length));
@@ -109,9 +109,9 @@ public class FileTest {
             return GekIO.readBytes(file.toPath(), offset + fileLength, length);
         });
         Assert.assertEquals(file.length(), newLength.get());
-        IOTest.testOutStream(233, GekIO.limited(fileCache.getOutputStream(file.toPath(), 0), 233), (offset, length) ->
+        IOTest.testOutStream(233, GekIO.limit(fileCache.getOutputStream(file.toPath(), 0), 233), (offset, length) ->
             GekIO.readBytes(file.toPath(), offset, length));
-        IOTest.testOutStream(233, GekIO.limited(fileCache.getOutputStream(file.toPath(), 3), 233), (offset, length) ->
+        IOTest.testOutStream(233, GekIO.limit(fileCache.getOutputStream(file.toPath(), 3), 233), (offset, length) ->
             GekIO.readBytes(file.toPath(), offset + 3, length));
         file.delete();
     }

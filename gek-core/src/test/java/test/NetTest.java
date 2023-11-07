@@ -488,7 +488,7 @@ public class NetTest {
             .addChannelHandler(new GekTcpChannelHandler<ByteBuffer>() {
                 @Override
                 public @Nullable Object onMessage(GekTcpChannel channel, ByteBuffer message) {
-                    GekIO.readBytesTo(GekIO.toInputStream(message), received);
+                    GekIO.readTo(GekIO.toInputStream(message), received);
                     String response = "HTTP/1.1 200 OK\r\n" +
                         "Content-Length: 9\r\n" +
                         "Content-Length2: 9\r\n" +

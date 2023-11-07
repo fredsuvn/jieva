@@ -545,7 +545,7 @@ public interface GekFileCache {
                                 }
                                 buffered = new BufferedInputStream(underlying.bindInputStream(), bufferSize);
                             }
-                            byte[] readBytes = GekIO.readBytes(buffered, chunkSize);
+                            byte[] readBytes = GekIO.read(buffered, chunkSize);
                             if (readBytes == null) {
                                 return EOF;
                             }

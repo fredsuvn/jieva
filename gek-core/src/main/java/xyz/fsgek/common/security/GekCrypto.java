@@ -186,7 +186,7 @@ public class GekCrypto {
         try {
             initCipher(cipher, mode, key, params);
             if (blockSize <= 0) {
-                byte[] src = GekIO.readBytes(in);
+                byte[] src = GekIO.read(in);
                 byte[] de = cipher.doFinal(src);
                 out.write(de);
                 return de.length;
@@ -308,7 +308,7 @@ public class GekCrypto {
         try {
             initMac(mac, key, params);
             if (bufferSize <= 0) {
-                byte[] src = GekIO.readBytes(in);
+                byte[] src = GekIO.read(in);
                 return mac.doFinal(src);
             }
             byte[] buffer = new byte[bufferSize];
@@ -358,7 +358,7 @@ public class GekCrypto {
     public static byte[] digest(MessageDigest digest, InputStream in, int bufferSize) {
         try {
             if (bufferSize <= 0) {
-                byte[] src = GekIO.readBytes(in);
+                byte[] src = GekIO.read(in);
                 return digest.digest(src);
             }
             byte[] buffer = new byte[bufferSize];
@@ -409,7 +409,7 @@ public class GekCrypto {
         try {
             initSignature(signature, true, key, params);
             if (bufferSize <= 0) {
-                byte[] src = GekIO.readBytes(in);
+                byte[] src = GekIO.read(in);
                 signature.update(src);
                 return signature.sign();
             }
@@ -469,7 +469,7 @@ public class GekCrypto {
         try {
             initSignature(signature, false, key, params);
             if (bufferSize <= 0) {
-                byte[] src = GekIO.readBytes(in);
+                byte[] src = GekIO.read(in);
                 signature.update(src);
                 return signature.verify(sign, signOffset, signLength);
             }

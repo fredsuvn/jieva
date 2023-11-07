@@ -24,16 +24,18 @@ public class GekIO {
      */
     public static final int IO_BUFFER_SIZE = 1024 * 8;
 
+    // Common IO methods:
+
     /**
-     * Reads all bytes from source stream.
-     * Return null if no data read out and reach to the end of stream.
+     * Reads all bytes from source stream into an array.
+     * Returns the array, or null if no data read out and reaches to the end of stream.
      *
      * @param source source stream
-     * @return all bytes from source stream, or null if no data read out and reach to the end of stream
+     * @return the array, or null if no data read out and reaches to the end of stream
      * @throws GekIOException IO exception
      */
     @Nullable
-    public static byte[] readBytes(InputStream source) throws GekIOException {
+    public static byte[] read(InputStream source) throws GekIOException {
         try {
             int available = source.available();
             ByteArrayOutputStream dest;
@@ -62,7 +64,7 @@ public class GekIO {
             } else {
                 dest = new ByteArrayOutputStream();
             }
-            long readCount = readBytesTo(source, dest);
+            long readCount = readTo(source, dest);
             if (readCount == -1) {
                 if (hasRead) {
                     return dest.toByteArray();
@@ -76,23 +78,23 @@ public class GekIO {
     }
 
     /**
-     * Reads specified number of bytes from source stream.
-     * Return null if no data read out and reach to the end of stream.
+     * Reads specified number of bytes from source stream into an array.
+     * Returns the array, or null if no data read out and reaches to the end of stream.
      * <p>
-     * If the number &lt; 0, read all bytes as {@link #readBytes(InputStream)};
+     * If the number &lt; 0, read all as {@link #read(InputStream)};
      * els if the number is 0, no read and return an empty array;
-     * else this method will keep reading bytes until the read bytes number reaches to the specified number,
+     * else this method will keep reading until the read number reaches to the specified number,
      * or the reading reaches the end of the stream.
      *
      * @param source source stream
      * @param number specified number
-     * @return specified number of bytes from source stream, or null if no data read out and reach to the end of stream
+     * @return the array, or null if no data read out and reaches to the end of stream
      * @throws GekIOException IO exception
      */
     @Nullable
-    public static byte[] readBytes(InputStream source, int number) throws GekIOException {
+    public static byte[] read(InputStream source, int number) throws GekIOException {
         if (number < 0) {
-            return readBytes(source);
+            return read(source);
         }
         if (number == 0) {
             return new byte[0];
@@ -122,13 +124,13 @@ public class GekIO {
 
     /**
      * Reads bytes from source stream into dest array,
-     * returns actual read number or -1 if the stream is ended and no byte read.
-     * This method will keep reading bytes until the read bytes filled the array,
+     * returns actual read number, or -1 if no data read out and reaches to the end of stream.
+     * This method will keep reading until the dest array is filled up,
      * or the reading reaches the end of the stream.
      *
      * @param source source stream
      * @param dest   dest array
-     * @return actual read number or -1 if the stream is ended and no byte read
+     * @return actual read number, or -1 if no data read out and reaches to the end of stream
      * @throws GekIOException IO exception
      */
     public static int readTo(InputStream source, byte[] dest) {
@@ -137,15 +139,15 @@ public class GekIO {
 
     /**
      * Reads bytes of specified length from source stream into dest array starting from given offset,
-     * returns actual read number or -1 if the stream is ended and no byte read.
-     * This method will keep reading bytes until the read bytes number reaches to the specified number,
+     * returns actual read number, or -1 if no data read out and reaches to the end of stream.
+     * This method will keep reading until the read number reaches to the specified length,
      * or the reading reaches the end of the stream.
      *
      * @param source source stream
      * @param dest   dest array
      * @param offset given offset
      * @param length specified length
-     * @return actual read number or -1 if the stream is ended and no byte read
+     * @return actual read number, or -1 if no data read out and reaches to the end of stream
      * @throws GekIOException IO exception
      */
     public static int readTo(InputStream source, byte[] dest, int offset, int length) throws GekIOException {
@@ -177,65 +179,105 @@ public class GekIO {
     }
 
     /**
-     * Reads all bytes from source stream and writes into dest stream,
-     * returns actual read number or -1 if source stream is ended and no byte read.
+     * Reads bytes from source stream into dest buffer,
+     * returns actual read number, or -1 if no data read out and reaches to the end of stream.
+     * This method will keep reading until the dest buffer is filled up,
+     * or the reading reaches the end of the stream.
      *
      * @param source source stream
-     * @param dest   dest stream
-     * @return actual read number or -1 if the stream is ended and no byte read
+     * @param dest   dest buffer
+     * @return actual read number, or -1 if no data read out and reaches to the end of stream
      * @throws GekIOException IO exception
      */
-    public static long readBytesTo(InputStream source, OutputStream dest) throws GekIOException {
-        return readBytesTo(source, dest, -1);
+    public static int readTo(InputStream source, ByteBuffer dest) {
+        try {
+            if (dest.remaining() <= 0) {
+                return 0;
+            }
+            if (dest.hasArray()) {
+                int readSize = readTo(source, dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
+                if (readSize > 0) {
+                    dest.position(dest.position() + readSize);
+                }
+                return readSize;
+            }
+            byte[] bytes = read(source, dest.remaining());
+            if (bytes == null) {
+                return -1;
+            }
+            if (bytes.length == 0) {
+                return 0;
+            }
+            dest.put(bytes);
+            return bytes.length;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
     }
 
     /**
-     * Reads specified number of bytes from source stream and writes into dest stream,
-     * returns actual read number or -1 if source stream is ended and no byte read.
+     * Reads all bytes from source stream into dest stream,
+     * returns actual read number, or -1 if no data read out and reaches to the end of source stream.
+     * This method will keep reading until the reading reaches the end of source stream.
+     *
+     * @param source source stream
+     * @param dest   dest stream
+     * @return actual read number, or -1 if no data read out and reaches to the end of source stream
+     * @throws GekIOException IO exception
+     */
+    public static long readTo(InputStream source, OutputStream dest) throws GekIOException {
+        return readTo(source, dest, -1);
+    }
+
+    /**
+     * Reads specified number of bytes from source stream into dest stream,
+     * returns actual read number, or -1 if no data read out and reaches to the end of source stream.
      * <p>
-     * If the number &lt; 0, read and write all bytes;
+     * If the number &lt; 0, read all;
      * els if the number is 0, no read and return 0;
-     * else this method will keep reading bytes until the read bytes number reaches to the specified number,
+     * else this method will keep reading until the read number reaches to the specified number,
      * or the reading reaches the end of the stream.
      *
      * @param source source stream
      * @param dest   dest stream
      * @param number specified number
-     * @return actual read number or -1 if the stream is ended and no byte read
+     * @return actual read number, or -1 if no data read out and reaches to the end of source stream
      * @throws GekIOException IO exception
      */
-    public static long readBytesTo(InputStream source, OutputStream dest, long number) throws GekIOException {
-        return readBytesTo(source, dest, number, IO_BUFFER_SIZE);
+    public static long readTo(InputStream source, OutputStream dest, long number) throws GekIOException {
+        return readTo(source, dest, number, IO_BUFFER_SIZE);
     }
 
     /**
-     * Reads specified number of bytes from source stream and writes into dest stream,
-     * returns actual read number or -1 if source stream is ended and no byte read.
+     * Reads specified number of bytes from source stream into dest stream,
+     * returns actual read number, or -1 if no data read out and reaches to the end of source stream.
      * <p>
-     * If the number &lt; 0, read and write all bytes;
+     * If the number &lt; 0, read all;
      * els if the number is 0, no read and return 0;
-     * else this method will keep reading bytes until the read bytes number reaches to the specified number,
+     * else this method will keep reading until the read number reaches to the specified number,
      * or the reading reaches the end of the stream.
      *
      * @param source     source stream
      * @param dest       dest stream
      * @param number     specified number
-     * @param bufferSize IO buffer size
-     * @return actual read number or -1 if the stream is ended and no byte read
+     * @param bufferSize buffer size for each IO operation
+     * @return actual read number, or -1 if no data read out and reaches to the end of source stream
      * @throws GekIOException IO exception
      */
-    public static long readBytesTo(
-        InputStream source, OutputStream dest, long number, int bufferSize) throws GekIOException {
-        if (number == 0) {
-            return 0;
-        }
+    public static long readTo(InputStream source, OutputStream dest, long number, int bufferSize) throws GekIOException {
         try {
+            if (bufferSize <= 0) {
+                throw new IllegalArgumentException("bufferSize <= 0.");
+            }
+            if (number == 0) {
+                return 0;
+            }
             long readNum = 0;
-            int actualBufferSize = number < 0 ? bufferSize : (int) Math.min(number, bufferSize);
-            byte[] buffer = new byte[actualBufferSize];
+            int bufSize = number < 0 ? bufferSize : (int) Math.min(number, bufferSize);
+            byte[] buffer = new byte[bufSize];
             while (true) {
-                int readLen = number < 0 ? buffer.length : (int) Math.min(number - readNum, buffer.length);
-                int readSize = source.read(buffer, 0, readLen);
+                int tryReadLen = number < 0 ? buffer.length : (int) Math.min(number - readNum, buffer.length);
+                int readSize = source.read(buffer, 0, tryReadLen);
                 if (readSize < 0) {
                     if (readNum == 0) {
                         return -1;
@@ -249,8 +291,7 @@ public class GekIO {
                 if (number < 0) {
                     continue;
                 }
-                long remaining = number - readNum;
-                if (remaining <= 0) {
+                if (number - readNum <= 0) {
                     break;
                 }
             }
@@ -261,15 +302,15 @@ public class GekIO {
     }
 
     /**
-     * Reads available bytes from source stream.
-     * Return null if no data read out and reaches to the end of stream.
+     * Reads available bytes from source stream into an array.
+     * Returns the array, or null if no data read out and reaches to the end of stream.
      *
      * @param source source stream
-     * @return available bytes from source stream, or null if no data read out and reaches to the end of stream
+     * @return the array, or null if no data read out and reaches to the end of stream
      * @throws GekIOException IO exception
      */
     @Nullable
-    public static byte[] availableBytes(InputStream source) throws GekIOException {
+    public static byte[] available(InputStream source) throws GekIOException {
         try {
             int available = source.available();
             if (available > 0) {
@@ -301,17 +342,17 @@ public class GekIO {
     }
 
     /**
-     * Reads available bytes from source stream and writes into dest stream,
-     * returns actual read number or -1 if source stream is ended and no byte read.
+     * Reads available bytes from source stream into dest stream,
+     * returns actual read number, or -1 if no data read out and reaches to the end of source stream.
      *
      * @param source source stream
      * @param dest   dest stream
-     * @return actual read number, or -1 if source stream is ended and no byte read
+     * @return actual read number, or -1 if no data read out and reaches to the end of source stream
      * @throws GekIOException IO exception
      */
-    public static long availableBytesTo(InputStream source, OutputStream dest) throws GekIOException {
+    public static long availableTo(InputStream source, OutputStream dest) throws GekIOException {
         try {
-            byte[] available = availableBytes(source);
+            byte[] available = available(source);
             if (available == null) {
                 return -1;
             }
@@ -326,17 +367,18 @@ public class GekIO {
     }
 
     /**
-     * Reads all chars as string from source reader.
-     * Return null if no data read out and reach to the end of stream.
+     * Reads all chars from source reader into a string.
+     * Returns the string, or null if no data read out and reaches to the end of reader.
      *
      * @param source source reader
-     * @return all chars as string from given reader
+     * @return the string, or null if no data read out and reaches to the end of reader
+     * @throws GekIOException IO exception
      */
     @Nullable
-    public static String readString(Reader source) throws GekIOException{
+    public static String read(Reader source) throws GekIOException {
         try {
             StringBuilder dest = new StringBuilder();
-            long readCount = readCharsTo(source, dest);
+            long readCount = readTo(source, dest);
             if (readCount == -1) {
                 return null;
             }
@@ -347,22 +389,24 @@ public class GekIO {
     }
 
     /**
-     * Reads specified limit number of chars as string from given reader.
-     * Return null if no data read out and reach to the end of stream.
+     * Reads specified number of chars from source reader into a string.
+     * Returns the string, or null if no data read out and reaches to the end of reader.
      * <p>
-     * If the limit number &lt; 0, read all bytes;
-     * els if limit number is 0, no read and return;
-     * else this method will keep reading chars until it reaches the limit or the end of the reader.
+     * If the number &lt; 0, read all as {@link #read(Reader)};
+     * els if the number is 0, no read and return an empty array;
+     * else this method will keep reading until the read number reaches to the specified number,
+     * or the reading reaches the end of the reader.
      *
-     * @param reader given reader
-     * @param limit  specified limit number
-     * @return specified limit number of chars as string from given reader
+     * @param source source reader
+     * @param number specified number
+     * @return the string, or null if no data read out and reaches to the end of reader
+     * @throws GekIOException IO exception
      */
     @Nullable
-    public static String readString(Reader reader, int limit) {
+    public static String read(Reader source, int number) throws GekIOException {
         try {
             StringBuilder dest = new StringBuilder();
-            long readCount = readCharsTo(reader, dest, limit);
+            long readCount = readTo(source, dest, number);
             if (readCount == -1) {
                 return null;
             }
@@ -373,63 +417,75 @@ public class GekIO {
     }
 
     /**
-     * Reads all chars from given reader to given dest output, returns actual read number.
-     * Return -1 if no data read out and reach to the end of stream.
-     * <p>
-     * If the limit number &lt; 0, read all chars;
-     * els if limit number is 0, no read and return;
-     * else this method will keep reading chars until it reaches the limit or the end of the reader.
+     * Reads chars from source reader into dest appendable,
+     * returns actual read number, or -1 if no data read out and reaches to the end of reader.
+     * This method will keep reading until the reading reaches the end of source reader.
      *
-     * @param reader given reader
-     * @param dest   given dest stream
-     * @return actual read number
+     * @param source source reader
+     * @param dest   dest appendable
+     * @return actual read number, or -1 if no data read out and reaches to the end of reader
+     * @throws GekIOException IO exception
      */
-    public static long readCharsTo(Reader reader, Appendable dest) {
-        return readCharsTo(reader, dest, -1);
-    }
-
-    /**
-     * Reads specified limit number of chars from given reader to given dest output, returns actual read number.
-     * Return -1 if no data read out and reach to the end of stream.
-     * <p>
-     * If the limit number &lt; 0, read all chars;
-     * els if limit number is 0, no read and return;
-     * else this method will keep reading chars until it reaches the limit or the end of the reader.
-     *
-     * @param reader given reader
-     * @param dest   given dest stream
-     * @param limit  specified limit number
-     * @return actual read number
-     */
-    public static long readCharsTo(Reader reader, Appendable dest, int limit) {
-        return readCharsTo(reader, dest, limit, IO_BUFFER_SIZE);
-    }
-
-    /**
-     * Reads specified limit number of chars from given reader to given dest output, returns actual read number.
-     * Return -1 if no data read out and reach to the end of stream.
-     * <p>
-     * If the limit number &lt; 0, read all chars;
-     * els if limit number is 0, no read and return;
-     * else this method will keep reading chars until it reaches the limit or the end of the reader.
-     *
-     * @param reader     given reader
-     * @param dest       given dest stream
-     * @param limit      specified limit number
-     * @param bufferSize buffer size for each reading and writing
-     * @return actual read number
-     */
-    public static long readCharsTo(Reader reader, Appendable dest, int limit, int bufferSize) {
-        if (limit == 0) {
-            return 0;
+    public static long readTo(Reader source, Appendable dest) throws GekIOException {
+        if (dest instanceof CharBuffer) {
+            try {
+                return source.read((CharBuffer) dest);
+            } catch (IOException e) {
+                throw new GekIOException(e);
+            }
         }
+        return readTo(source, dest, -1);
+    }
+
+    /**
+     * Reads specified number of chars from source reader into dest appendable,
+     * returns actual read number, or -1 if no data read out and reaches to the end of source reader.
+     * <p>
+     * If the number &lt; 0, read all;
+     * els if the number is 0, no read and return 0;
+     * else this method will keep reading until the read number reaches to the specified number,
+     * or the reading reaches the end of the reader.
+     *
+     * @param source source reader
+     * @param dest   dest appendable
+     * @param number specified number
+     * @return actual read number, or -1 if no data read out and reaches to the end of source reader
+     * @throws GekIOException IO exception
+     */
+    public static long readTo(Reader source, Appendable dest, int number) throws GekIOException {
+        return readTo(source, dest, number, IO_BUFFER_SIZE);
+    }
+
+    /**
+     * Reads specified number of chars from source reader into dest appendable,
+     * returns actual read number, or -1 if no data read out and reaches to the end of source reader.
+     * <p>
+     * If the number &lt; 0, read all;
+     * els if the number is 0, no read and return 0;
+     * else this method will keep reading until the read number reaches to the specified number,
+     * or the reading reaches the end of the reader.
+     *
+     * @param source     source reader
+     * @param dest       dest appendable
+     * @param number     specified number
+     * @param bufferSize buffer size for each IO operation
+     * @return actual read number, or -1 if no data read out and reaches to the end of source reader
+     * @throws GekIOException IO exception
+     */
+    public static long readTo(Reader source, Appendable dest, int number, int bufferSize) throws GekIOException {
         try {
+            if (bufferSize <= 0) {
+                throw new IllegalArgumentException("bufferSize <= 0.");
+            }
+            if (number == 0) {
+                return 0;
+            }
             long readNum = 0;
-            int actualBufferSize = limit < 0 ? bufferSize : Math.min(limit, bufferSize);
-            char[] buffer = new char[actualBufferSize];
+            int bufSize = number < 0 ? bufferSize : Math.min(number, bufferSize);
+            char[] buffer = new char[bufSize];
             while (true) {
-                int readLen = limit < 0 ? buffer.length : (int) Math.min(limit - readNum, buffer.length);
-                int readSize = reader.read(buffer, 0, readLen);
+                int tryReadLen = number < 0 ? buffer.length : (int) Math.min(number - readNum, buffer.length);
+                int readSize = source.read(buffer, 0, tryReadLen);
                 if (readSize < 0) {
                     if (readNum == 0) {
                         return -1;
@@ -440,11 +496,10 @@ public class GekIO {
                     append(dest, buffer, 0, readSize);
                     readNum += readSize;
                 }
-                if (limit < 0) {
+                if (number < 0) {
                     continue;
                 }
-                long remaining = limit - readNum;
-                if (remaining <= 0) {
+                if (number - readNum <= 0) {
                     break;
                 }
             }
@@ -461,154 +516,308 @@ public class GekIO {
             ((StringBuffer) dest).append(chars, off, len);
         } else if (dest instanceof Writer) {
             ((Writer) dest).write(chars, off, len);
+        } else if (dest instanceof CharBuffer) {
+            ((CharBuffer) dest).put(chars, off, len);
         } else {
             dest.append(new String(chars, off, len));
         }
     }
 
     /**
-     * Reads string encoded by all bytes from given input stream with {@link GekChars#defaultCharset()}.
-     * Return null if no data read out and reach to the end of stream.
+     * Reads all bytes from source stream into a string with {@link GekChars#defaultCharset()}.
+     * Returns the string, or null if no data read out and reaches to the end of stream.
      *
-     * @param inputStream given input stream
-     * @return string encoded by all bytes from given input stream with {@link GekChars#defaultCharset()}
+     * @param source source stream
+     * @return the string, or null if no data read out and reaches to the end of stream
+     * @throws GekIOException IO exception
      */
     @Nullable
-    public static String readString(InputStream inputStream) {
-        return readString(inputStream, GekChars.defaultCharset());
+    public static String readString(InputStream source) throws GekIOException {
+        return readString(source, GekChars.defaultCharset());
     }
 
     /**
-     * Reads string encoded by all bytes from given input stream.
-     * Return null if no data read out and reach to the end of stream.
+     * Reads all bytes from source stream into a string with specified charset.
+     * Returns the string, or null if no data read out and reaches to the end of stream.
      *
-     * @param inputStream given input stream
-     * @param charset     charset of the string
-     * @return string encoded by all bytes from given input stream
+     * @param source  source stream
+     * @param charset specified charset
+     * @return the string, or null if no data read out and reaches to the end of stream
+     * @throws GekIOException IO exception
      */
     @Nullable
-    public static String readString(InputStream inputStream, Charset charset) {
-        byte[] bytes = readBytes(inputStream);
-        if (bytes == null) {
-            return null;
+    public static String readString(InputStream source, Charset charset) throws GekIOException {
+        try {
+            byte[] bytes = read(source);
+            if (bytes == null) {
+                return null;
+            }
+            return new String(bytes, charset);
+        } catch (Exception e) {
+            throw new GekIOException(e);
         }
-        return new String(bytes, charset);
     }
 
     /**
-     * Reads available string encoded by all bytes from given input stream with
-     * {@link GekChars#defaultCharset()}, returns null if reaches end of the stream.
-     * Return null if no data read out and reach to the end of stream.
+     * Reads available bytes from source stream into a string with {@link GekChars#defaultCharset()}.
+     * Returns the string, or null if no data read out and reaches to the end of stream.
      *
-     * @param inputStream given input stream
-     * @return available string
+     * @param source source stream
+     * @return the string, or null if no data read out and reaches to the end of stream
+     * @throws GekIOException IO exception
      */
     @Nullable
-    public static String avalaibleString(InputStream inputStream) {
-        return avalaibleString(inputStream, GekChars.defaultCharset());
+    public static String avalaibleString(InputStream source) throws GekIOException {
+        return avalaibleString(source, GekChars.defaultCharset());
     }
 
     /**
-     * Reads available string encoded by all bytes from given input stream,
-     * Return null if no data read out and reach to the end of stream.
+     * Reads available bytes from source stream into a string with specified charset.
+     * Returns the string, or null if no data read out and reaches to the end of stream.
      *
-     * @param inputStream given input stream
-     * @param charset     charset of the string
-     * @return available string
+     * @param source  source stream
+     * @param charset specified charset
+     * @return the string, or null if no data read out and reaches to the end of stream
+     * @throws GekIOException IO exception
      */
     @Nullable
-    public static String avalaibleString(InputStream inputStream, Charset charset) {
-        byte[] bytes = availableBytes(inputStream);
-        if (bytes == null) {
-            return null;
+    public static String avalaibleString(InputStream source, Charset charset) throws GekIOException {
+        try {
+            byte[] bytes = available(source);
+            if (bytes == null) {
+                return null;
+            }
+            return new String(bytes, charset);
+        } catch (Exception e) {
+            throw new GekIOException(e);
         }
-        return new String(bytes, charset);
     }
 
     /**
-     * Wraps given input stream as a reader with {@link InputStreamReader} and {@link GekChars#defaultCharset()}.
+     * Wraps given stream as {@link Reader} with {@link GekChars#defaultCharset()}.
      *
-     * @param inputStream given input stream
-     * @return wrapped reader
+     * @param stream given stream
+     * @return given stream as {@link Reader}
+     * @throws GekIOException IO exception
      */
-    public static Reader toReader(InputStream inputStream) {
-        return toReader(inputStream, GekChars.defaultCharset());
+    public static Reader toReader(InputStream stream) throws GekIOException {
+        return toReader(stream, GekChars.defaultCharset());
     }
 
     /**
-     * Wraps given input stream as a reader with {@link InputStreamReader}.
+     * Wraps given stream as {@link Reader} with specified charset.
      *
-     * @param inputStream given input stream
-     * @param charset     charset of return reader
-     * @return wrapped reader
+     * @param stream  given stream
+     * @param charset specified charset
+     * @return given stream as {@link Reader}
+     * @throws GekIOException IO exception
      */
-    public static Reader toReader(InputStream inputStream, Charset charset) {
-        return new InputStreamReader(inputStream, charset);
+    public static Reader toReader(InputStream stream, Charset charset) throws GekIOException {
+        return new InputStreamReader(stream, charset);
     }
 
     /**
-     * Wraps given buffer as a reader, supports mark/reset.
+     * Wraps given buffer as {@link Reader}.
      *
      * @param buffer given buffer
-     * @return wrapped reader
+     * @return given buffer as {@link Reader}
+     * @throws GekIOException IO exception
      */
-    public static Reader toReader(CharBuffer buffer) {
+    public static Reader toReader(CharBuffer buffer) throws GekIOException {
         return new CharBufferReader(buffer);
     }
 
     /**
-     * Wraps given reader as an input stream with {@link GekChars#defaultCharset()}, doesn't support mark/reset.
+     * Wraps given reader as {@link InputStream} with {@link GekChars#defaultCharset()}.
+     * The returned stream doesn't support mark/reset methods.
      *
      * @param reader given reader
-     * @return wrapped stream
+     * @return given reader as {@link InputStream}
+     * @throws GekIOException IO exception
      */
-    public static InputStream toInputStream(Reader reader) {
+    public static InputStream toInputStream(Reader reader) throws GekIOException {
         return toInputStream(reader, GekChars.defaultCharset());
     }
 
     /**
-     * Wraps given reader as an input stream, doesn't support mark/reset.
+     * Wraps given reader as {@link InputStream} with specified charset.
+     * The returned stream doesn't support mark/reset methods.
      *
      * @param reader  given reader
-     * @param charset charset of given reader
-     * @return wrapped stream
+     * @param charset specified charset
+     * @return given reader as {@link InputStream}
+     * @throws GekIOException IO exception
      */
-    public static InputStream toInputStream(Reader reader, Charset charset) {
+    public static InputStream toInputStream(Reader reader, Charset charset) throws GekIOException {
         return new ReaderInputStream(reader, charset);
     }
 
     /**
-     * Wraps given array to {@link ByteArrayInputStream}.
+     * Wraps given array as {@link ByteArrayInputStream}.
      *
      * @param array given array
-     * @return wrapped stream
+     * @return given array as {@link ByteArrayInputStream}
+     * @throws GekIOException IO exception
      */
-    public static ByteArrayInputStream toInputStream(byte[] array) {
+    public static ByteArrayInputStream toInputStream(byte[] array) throws GekIOException {
         return new ByteArrayInputStream(array);
     }
 
     /**
-     * Wraps given array to {@link ByteArrayInputStream}, the wrapped range of specified length start from given offset.
+     * Wraps given array as {@link ByteArrayInputStream}, starting from given offset with specified length.
      *
      * @param array  given array
      * @param offset given offset
      * @param length specified length
-     * @return wrapped stream
+     * @return given array as {@link ByteArrayInputStream}
+     * @throws GekIOException IO exception
      */
-    public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) {
-        GekCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
+    public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) throws GekIOException {
         return new ByteArrayInputStream(array, offset, length);
     }
 
     /**
-     * Wraps given buffer as an input stream, supports mark/reset.
+     * Wraps given buffer as {@link InputStream}.
      *
      * @param buffer given buffer
-     * @return wrapped stream
+     * @return given buffer as {@link InputStream}
+     * @throws GekIOException IO exception
      */
-    public static InputStream toInputStream(ByteBuffer buffer) {
+    public static InputStream toInputStream(ByteBuffer buffer) throws GekIOException {
         return new ByteBufferInputStream(buffer);
     }
+
+    /**
+     * Wraps given stream as {@link Writer} with {@link GekChars#defaultCharset()}.
+     *
+     * @param stream given stream
+     * @return given stream as {@link Writer}
+     * @throws GekIOException IO exception
+     */
+    public static Writer toWriter(OutputStream stream) throws GekIOException {
+        return toWriter(stream, GekChars.defaultCharset());
+    }
+
+    /**
+     * Wraps given stream as {@link Writer} with {@link GekChars#defaultCharset()}.
+     *
+     * @param stream  given stream
+     * @param charset specified charset
+     * @return given stream as {@link Writer}
+     * @throws GekIOException IO exception
+     */
+    public static Writer toWriter(OutputStream stream, Charset charset) throws GekIOException {
+        return new OutputStreamWriter(stream, charset);
+    }
+
+    /**
+     * Wraps given buffer as {@link Writer}.
+     *
+     * @param buffer given buffer
+     * @return given buffer as {@link Writer}
+     * @throws GekIOException IO exception
+     */
+    public static Writer toWriter(CharBuffer buffer) throws GekIOException {
+        return new CharBufferWriter(buffer);
+    }
+
+    /**
+     * Wraps given appendable as {@link OutputStream} with {@link GekChars#defaultCharset()}.
+     * <p>
+     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid
+     * if given appendable is instance of {@link Writer}.
+     *
+     * @param appendable given appendable
+     * @return given appendable as {@link OutputStream}
+     * @throws GekIOException IO exception
+     */
+    public static OutputStream toOutputStream(Appendable appendable) throws GekIOException {
+        return toOutputStream(appendable, GekChars.defaultCharset());
+    }
+
+    /**
+     * Wraps given appendable as {@link OutputStream} with specified charset.
+     * <p>
+     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid
+     * if given appendable is instance of {@link Writer}.
+     *
+     * @param appendable given appendable
+     * @param charset    specified charset
+     * @return given appendable as {@link OutputStream}
+     * @throws GekIOException IO exception
+     */
+    public static OutputStream toOutputStream(Appendable appendable, Charset charset) throws GekIOException {
+        return new AppendableOutputStream(appendable, charset);
+    }
+
+    /**
+     * Wraps given array as {@link OutputStream}.
+     *
+     * @param array given array
+     * @return given array as {@link OutputStream}
+     * @throws GekIOException IO exception
+     */
+    public static OutputStream toOutputStream(byte[] array) throws GekIOException {
+        return new ByteArrayAsOutputStream(array, 0, array.length);
+    }
+
+    /**
+     * Wraps given array as {@link OutputStream}, starting from given offset with specified length.
+     *
+     * @param array  given array
+     * @param offset given offset
+     * @param length specified length
+     * @return given array as {@link OutputStream}
+     * @throws GekIOException IO exception
+     */
+    public static OutputStream toOutputStream(byte[] array, int offset, int length) throws GekIOException {
+        GekCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
+        return new ByteArrayAsOutputStream(array, offset, length);
+    }
+
+    /**
+     * Wraps given buffer as {@link OutputStream}.
+     *
+     * @param buffer given buffer
+     * @return given buffer as {@link OutputStream}
+     * @throws GekIOException IO exception
+     */
+    public static OutputStream toOutputStream(ByteBuffer buffer) throws GekIOException {
+        return new ByteBufferOutputStream(buffer);
+    }
+
+    /**
+     * Limits given stream to a specified number for readable bytes.
+     * The returned stream doesn't support mark/reset methods.
+     *
+     * @param stream given stream
+     * @param number number of readable bytes, must &gt;= 0
+     * @return limited {@link InputStream}
+     * @throws GekIOException IO exception
+     */
+    public static InputStream limit(InputStream stream, long number) throws GekIOException {
+        if (number < 0) {
+            throw new IllegalArgumentException("number < 0.");
+        }
+        return new LimitedInputStream(stream, number);
+    }
+
+    /**
+     * Limits given stream to a specified number for writeable bytes.
+     *
+     * @param stream given stream
+     * @param number number of writeable bytes, must &gt;= 0
+     * @return limited {@link OutputStream}
+     * @throws GekIOException IO exception
+     */
+    public static OutputStream limit(OutputStream stream, long number) throws GekIOException {
+        if (number < 0) {
+            throw new IllegalArgumentException("number < 0.");
+        }
+        return new LimitedOutputStream(stream, number);
+    }
+
+    // File methods:
 
     /**
      * Wraps given random access file as an input stream, supports mark/reset.
@@ -617,8 +826,9 @@ public class GekIO {
      *
      * @param random given random access file
      * @return wrapped stream
+     * @throws GekIOException IO exception
      */
-    public static InputStream toInputStream(RandomAccessFile random) {
+    public static InputStream toInputStream(RandomAccessFile random) throws GekIOException {
         return toInputStream(random, 0, -1);
     }
 
@@ -634,100 +844,10 @@ public class GekIO {
      * @param offset offset position to start read
      * @param length length of readable bytes, or -1 to read to end of file
      * @return wrapped stream
+     * @throws GekIOException IO exception
      */
-    public static InputStream toInputStream(RandomAccessFile random, long offset, long length) {
+    public static InputStream toInputStream(RandomAccessFile random, long offset, long length) throws GekIOException {
         return new RandomInputStream(random, offset, length);
-    }
-
-    /**
-     * Wraps given output stream as a writer with {@link OutputStreamWriter} and {@link GekChars#defaultCharset()}.
-     *
-     * @param outputStream given out stream
-     * @return wrapped writer
-     */
-    public static Writer toWriter(OutputStream outputStream) {
-        return toWriter(outputStream, GekChars.defaultCharset());
-    }
-
-    /**
-     * Wraps given output stream as a writer with {@link OutputStreamWriter}.
-     *
-     * @param outputStream given out stream
-     * @param charset      charset writer
-     * @return wrapped writer
-     */
-    public static Writer toWriter(OutputStream outputStream, Charset charset) {
-        return new OutputStreamWriter(outputStream, charset);
-    }
-
-    /**
-     * Wraps given buffer as a writer.
-     *
-     * @param buffer given buffer
-     * @return wrapped writer
-     */
-    public static Writer toWriter(CharBuffer buffer) {
-        return new CharBufferWriter(buffer);
-    }
-
-    /**
-     * Wraps given appendable as an output stream with {@link GekChars#defaultCharset()}.
-     * <p>
-     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid for given {@code appendable}
-     * if it is instance of {@link Writer}.
-     *
-     * @param appendable given appendable
-     * @return wrapped stream
-     */
-    public static OutputStream toOutputStream(Appendable appendable) {
-        return toOutputStream(appendable, GekChars.defaultCharset());
-    }
-
-    /**
-     * Wraps given appendable as an output stream.
-     * <p>
-     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid for given {@code appendable}
-     * if it is instance of {@link Writer}.
-     *
-     * @param appendable given appendable
-     * @param charset    charset of writer
-     * @return wrapped stream
-     */
-    public static OutputStream toOutputStream(Appendable appendable, Charset charset) {
-        return new AppendableOutputStream(appendable, charset);
-    }
-
-    /**
-     * Wraps given array as an output stream.
-     *
-     * @param array given array
-     * @return wrapped stream
-     */
-    public static OutputStream toOutputStream(byte[] array) {
-        return new ByteArrayAsOutputStream(array, 0, array.length);
-    }
-
-    /**
-     * Wraps given array as an output stream, the wrapped range of specified length start from given offset.
-     *
-     * @param array  given array
-     * @param offset given offset
-     * @param length specified length
-     * @return wrapped stream
-     */
-    public static OutputStream toOutputStream(byte[] array, int offset, int length) {
-        GekCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
-        return new ByteArrayAsOutputStream(array, offset, length);
-    }
-
-    /**
-     * Wraps given buffer as an output stream.
-     *
-     * @param buffer given writer
-     * @return wrapped stream
-     */
-    public static OutputStream toOutputStream(ByteBuffer buffer) {
-        return new ByteBufferOutputStream(buffer);
     }
 
     /**
@@ -738,8 +858,9 @@ public class GekIO {
      *
      * @param random given random access file
      * @return wrapped stream
+     * @throws GekIOException IO exception
      */
-    public static OutputStream toOutputStream(RandomAccessFile random) {
+    public static OutputStream toOutputStream(RandomAccessFile random) throws GekIOException {
         return toOutputStream(random, 0, -1);
     }
 
@@ -755,32 +876,10 @@ public class GekIO {
      * @param offset offset position to start write
      * @param length length of written bytes, or -1 to write unlimitedly
      * @return wrapped stream
+     * @throws GekIOException IO exception
      */
-    public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) {
+    public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) throws GekIOException {
         return new RandomOutputStream(random, offset, length);
-    }
-
-    /**
-     * Wraps given source stream to limit read length.
-     * Note returned stream doesn't support mark/reset.
-     *
-     * @param source given source stream
-     * @param limit  max read length, must &gt;= 0
-     * @return wrapped stream
-     */
-    public static InputStream limited(InputStream source, long limit) {
-        return new LimitedInputStream(source, limit);
-    }
-
-    /**
-     * Wraps given source stream to limit written length.
-     *
-     * @param source given source stream
-     * @param limit  max written length, must &gt;= 0
-     * @return wrapped stream
-     */
-    public static OutputStream limited(OutputStream source, long limit) {
-        return new LimitedOutputStream(source, limit);
     }
 
     /**
@@ -804,7 +903,7 @@ public class GekIO {
      */
     public static byte[] readBytes(Path path, long offset, long length) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
-            return GekIO.readBytes(GekIO.toInputStream(random, offset, length));
+            return GekIO.read(GekIO.toInputStream(random, offset, length));
         } catch (Exception e) {
             throw new GekIOException(e);
         }
@@ -888,7 +987,7 @@ public class GekIO {
     public static void writeBytes(Path path, long offset, long length, InputStream data) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
             OutputStream dest = GekIO.toOutputStream(random, offset, length);
-            GekIO.readBytesTo(data, dest);
+            GekIO.readTo(data, dest);
             dest.flush();
         } catch (Exception e) {
             throw new GekIOException(e);

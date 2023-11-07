@@ -53,7 +53,7 @@ final class StreamData implements GekData.OfStream {
     @Override
     public int write(byte[] dest, int offset, int length) {
         GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
-        byte[] buffer = GekIO.readBytes(stream, length);
+        byte[] buffer = GekIO.read(stream, length);
         if (buffer == null) {
             return -1;
         }
@@ -66,22 +66,22 @@ final class StreamData implements GekData.OfStream {
 
     @Override
     public int write(ByteBuffer dest, int length) {
-        return (int) GekIO.readBytesTo(stream, GekIO.toOutputStream(dest), length);
+        return (int) GekIO.readTo(stream, GekIO.toOutputStream(dest), length);
     }
 
     @Override
     public long write(OutputStream dest) {
-        return GekIO.readBytesTo(stream, dest);
+        return GekIO.readTo(stream, dest);
     }
 
     @Override
     public long write(OutputStream dest, long length) {
-        return GekIO.readBytesTo(stream, dest, length);
+        return GekIO.readTo(stream, dest, length);
     }
 
     @Override
     public byte[] toArray() {
-        return GekIO.readBytes(stream);
+        return GekIO.read(stream);
     }
 
     @Override

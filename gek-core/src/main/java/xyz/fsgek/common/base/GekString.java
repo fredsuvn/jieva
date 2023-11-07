@@ -395,7 +395,7 @@ public class GekString {
 
     /**
      * Splits given chars by given separator,
-     * using {@link #subView(CharSequence, int, int)} to generate sub CharSequence.
+     * using {@link #subChars(CharSequence, int, int)} to generate sub CharSequence.
      * If chars or separator is empty, or separator's length is greater than chars' length,
      * or separator is never matched, return an empty list.
      * <p>
@@ -407,7 +407,7 @@ public class GekString {
      * @return split list
      */
     public static List<CharSequence> split(CharSequence chars, CharSequence separator) {
-        return split(chars, separator, GekString::subView);
+        return split(chars, separator, GekString::subChars);
     }
 
     /**
@@ -1014,7 +1014,21 @@ public class GekString {
     }
 
     /**
-     * Returns an object which is lazy for executing method {@link Object#toString()},
+     * Returns a {@link CharSequence} of which contents are shared with given char array, starting from {@code start}
+     * index inclusive and ending with {@code end} index exclusive.
+     *
+     * @param array given char array
+     * @param start start index inclusive
+     * @param end   end index exclusive
+     * @return a {@link CharSequence} of which contents are shared with given char array
+     */
+    public static CharSequence chars(char[] array, int start, int end) {
+        GekCheck.checkRangeInBounds(start, end, 0, array.length);
+        return new Chars(array, start, end);
+    }
+
+    /**
+     * Returns a {@link CharSequence} which is lazy for executing method {@link Object#toString()},
      * the executing was provided by given supplier.
      * <p>
      * Note returned {@link CharSequence}'s other methods (such as {@link CharSequence#length()})
@@ -1023,7 +1037,7 @@ public class GekString {
      * @param supplier given supplier
      * @return lazy char sequence
      */
-    public static CharSequence lazyString(Supplier<String> supplier) {
+    public static CharSequence lazyChars(Supplier<String> supplier) {
         return new LazyChars(supplier);
     }
 
@@ -1032,14 +1046,14 @@ public class GekString {
      * The two chars will share the same data so any operation will reflect each other.
      * <p>
      * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence will still use
-     * {@link #subView(CharSequence, int, int)}.
+     * {@link #subChars(CharSequence, int, int)}.
      *
      * @param chars given chars
      * @param start given start index inclusive
      * @return sub-range view of given chars
      */
-    public static CharSequence subView(CharSequence chars, int start) {
-        return subView(chars, start, chars.length());
+    public static CharSequence subChars(CharSequence chars, int start) {
+        return subChars(chars, start, chars.length());
     }
 
     /**
@@ -1053,7 +1067,7 @@ public class GekString {
      * @param end   given end index exclusive
      * @return sub-range view of given chars
      */
-    public static CharSequence subView(CharSequence chars, int start, int end) {
+    public static CharSequence subChars(CharSequence chars, int start, int end) {
         GekCheck.checkRangeInBounds(start, end, 0, chars.length());
         return new SubChars(chars, start, end);
     }
@@ -1074,6 +1088,39 @@ public class GekString {
          * @return sub-sequence of given chars
          */
         CharSequence apply(CharSequence chars, int start, int end);
+    }
+
+    private static final class Chars implements CharSequence {
+
+        private final char[] source;
+        private final int start;
+        private final int end;
+
+        private Chars(char[] source, int start, int end) {
+            this.source = source;
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        public int length() {
+            return end - start;
+        }
+
+        @Override
+        public char charAt(int index) {
+            return source[start + index];
+        }
+
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            return GekString.chars(source, this.start + start, this.start + end);
+        }
+
+        @Override
+        public String toString() {
+            return new String(source, start, end - start);
+        }
     }
 
     private static final class LazyChars implements CharSequence {
@@ -1138,13 +1185,12 @@ public class GekString {
 
         @Override
         public char charAt(int index) {
-            GekCheck.checkInBounds(start + index, start, end);
             return source.charAt(start + index);
         }
 
         @Override
         public CharSequence subSequence(int start, int end) {
-            return subView(source, this.start + start, this.start + end);
+            return subChars(source, this.start + start, this.start + end);
         }
 
         @Override

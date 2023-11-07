@@ -3,6 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekChars;
+import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 
 import java.io.*;
@@ -33,15 +34,15 @@ public class IOTest {
             long available = inputStream.available();
             Assert.assertEquals(available, length);
             inputStream.mark(length);
-            byte[] readBytes = GekIO.readBytes(inputStream, 6);
+            byte[] readBytes = GekIO.read(inputStream, 6);
             Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, offset, 6 + offset));
             Assert.assertEquals(inputStream.available(), available - 6);
             inputStream.reset();
             Assert.assertEquals(inputStream.available(), available);
-            readBytes = GekIO.readBytes(inputStream, 6);
+            readBytes = GekIO.read(inputStream, 6);
             Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, offset, 6 + offset));
             Assert.assertEquals(inputStream.available(), available - 6);
-            readBytes = GekIO.readBytes(inputStream);
+            readBytes = GekIO.read(inputStream);
             Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, 6 + offset, offset + length));
             Assert.assertEquals(inputStream.available(), 0);
             Assert.assertEquals(inputStream.read(), -1);
@@ -49,14 +50,14 @@ public class IOTest {
             inputStream.reset();
             inputStream.mark(length);
             inputStream.skip(10);
-            readBytes = GekIO.readBytes(inputStream, 6);
+            readBytes = GekIO.read(inputStream, 6);
             Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, 10 + offset, 16 + offset));
             inputStream.reset();
         }
         Assert.assertEquals(inputStream.read(), bytes[offset] & 0x000000ff);
         int k = (int) inputStream.skip(10);
-        Assert.assertEquals(GekIO.readBytes(inputStream, 12), Arrays.copyOfRange(bytes, 1 + k + offset, 13 + k + offset));
-        Assert.assertEquals(GekIO.readBytes(inputStream), Arrays.copyOfRange(bytes, 13 + k + offset, offset + length));
+        Assert.assertEquals(GekIO.read(inputStream, 12), Arrays.copyOfRange(bytes, 1 + k + offset, 13 + k + offset));
+        Assert.assertEquals(GekIO.read(inputStream), Arrays.copyOfRange(bytes, 13 + k + offset, offset + length));
     }
 
     public static void testReader(
@@ -72,25 +73,25 @@ public class IOTest {
         if (testMark) {
             Assert.assertTrue(reader.markSupported());
             reader.mark(length);
-            String readString = GekIO.readString(reader, 6);
+            String readString = GekIO.read(reader, 6);
             Assert.assertEquals(readString, data.substring(offset, 6 + offset));
             reader.reset();
-            readString = GekIO.readString(reader, 6);
+            readString = GekIO.read(reader, 6);
             Assert.assertEquals(readString, data.substring(offset, 6 + offset));
-            readString = GekIO.readString(reader);
+            readString = GekIO.read(reader);
             Assert.assertEquals(readString, data.substring(6 + offset, offset + length));
             Assert.assertEquals(reader.read(), -1);
             reader.reset();
             reader.mark(length);
             reader.skip(10);
-            readString = GekIO.readString(reader, 6);
+            readString = GekIO.read(reader, 6);
             Assert.assertEquals(readString, data.substring(10 + offset, 16 + offset));
             reader.reset();
         }
         Assert.assertEquals(reader.read(), data.charAt(offset));
         int k = (int) reader.skip(10);
-        Assert.assertEquals(GekIO.readString(reader, 12), data.substring(1 + k + offset, 13 + k + offset));
-        Assert.assertEquals(GekIO.readString(reader), data.substring(13 + k + offset, offset + length));
+        Assert.assertEquals(GekIO.read(reader, 12), data.substring(1 + k + offset, 13 + k + offset));
+        Assert.assertEquals(GekIO.read(reader), data.substring(13 + k + offset, offset + length));
     }
 
     public static void testOutStream(
@@ -144,22 +145,22 @@ public class IOTest {
     public void testRead() {
         String str = DATA;
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-        Assert.assertEquals(GekIO.readBytes(new ByteArrayInputStream(bytes)), bytes);
-        Assert.assertEquals(GekIO.readBytes(new ByteArrayInputStream(bytes), 22), Arrays.copyOf(bytes, 22));
-        Assert.assertEquals(GekIO.readString(new StringReader(str)), str);
-        Assert.assertEquals(GekIO.readString(new StringReader(str), 11), str.substring(0, 11));
+        Assert.assertEquals(GekIO.read(new ByteArrayInputStream(bytes)), bytes);
+        Assert.assertEquals(GekIO.read(new ByteArrayInputStream(bytes), 22), Arrays.copyOf(bytes, 22));
+        Assert.assertEquals(GekIO.read(new StringReader(str)), str);
+        Assert.assertEquals(GekIO.read(new StringReader(str), 11), str.substring(0, 11));
         Assert.assertEquals(GekIO.readString(new ByteArrayInputStream(bytes)), str);
         Assert.assertEquals(GekIO.readString(new ByteArrayInputStream(bytes, 0, 8)), str.substring(0, 8));
-        Assert.assertEquals(GekIO.readBytes(new TestInput(new ByteArrayInputStream(bytes))), bytes);
-        Assert.assertEquals(GekIO.readBytes(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
+        Assert.assertEquals(GekIO.read(new TestInput(new ByteArrayInputStream(bytes))), bytes);
+        Assert.assertEquals(GekIO.read(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
 
         byte[] empty = new byte[0];
         InputStream emptyInput = new ByteArrayInputStream(empty);
-        Assert.assertNull(GekIO.readBytes(emptyInput));
-        Assert.assertNull(GekIO.availableBytes(emptyInput));
+        Assert.assertNull(GekIO.read(emptyInput));
+        Assert.assertNull(GekIO.available(emptyInput));
         Assert.assertNull(GekIO.readString(emptyInput));
         Assert.assertNull(GekIO.avalaibleString(emptyInput));
-        Assert.assertNull(GekIO.readString(GekIO.toReader(emptyInput)));
+        Assert.assertNull(GekIO.read(GekIO.toReader(emptyInput)));
     }
 
     @Test
@@ -167,46 +168,54 @@ public class IOTest {
         String str = DATA;
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        GekIO.readBytesTo(new ByteArrayInputStream(bytes), outputStream, -1, 1);
+        GekIO.readTo(new ByteArrayInputStream(bytes), outputStream, -1, 1);
         Assert.assertEquals(outputStream.toByteArray(), bytes);
         outputStream.reset();
-        GekIO.readBytesTo(new ByteArrayInputStream(bytes), outputStream, -1, 1024 * 16);
+        GekIO.readTo(new ByteArrayInputStream(bytes), outputStream, -1, 1024 * 16);
         Assert.assertEquals(outputStream.toByteArray(), bytes);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
+        GekIO.readTo(new ByteArrayInputStream(bytes), buffer);
+        buffer.flip();
+        Assert.assertEquals(GekBuffer.getBytes(buffer), bytes);
+        buffer = ByteBuffer.allocate(bytes.length);
+        GekIO.readTo(new ByteArrayInputStream(bytes), buffer);
+        buffer.flip();
+        Assert.assertEquals(GekBuffer.getBytes(buffer), bytes);
     }
 
     @Test
     public void testAvailable() {
         String str = DATA;
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-        Assert.assertEquals(GekIO.availableBytes(new ByteArrayInputStream(bytes)), bytes);
+        Assert.assertEquals(GekIO.available(new ByteArrayInputStream(bytes)), bytes);
         Assert.assertEquals(GekIO.avalaibleString(new ByteArrayInputStream(bytes)), str);
-        Assert.assertEquals(GekIO.availableBytes(
+        Assert.assertEquals(GekIO.available(
             new ByteArrayInputStream(bytes, 1, bytes.length)), Arrays.copyOfRange(bytes, 1, bytes.length));
         Assert.assertEquals(GekIO.avalaibleString(
             new ByteArrayInputStream(bytes, 1, bytes.length)), str.substring(1));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        GekIO.availableBytesTo(new ByteArrayInputStream(bytes), out);
+        GekIO.availableTo(new ByteArrayInputStream(bytes), out);
         Assert.assertEquals(out.toByteArray(), bytes);
         out.reset();
-        GekIO.availableBytesTo(new ByteArrayInputStream(bytes, 1, bytes.length), out);
+        GekIO.availableTo(new ByteArrayInputStream(bytes, 1, bytes.length), out);
         Assert.assertEquals(out.toByteArray(), Arrays.copyOfRange(bytes, 1, bytes.length));
-        Assert.assertEquals(GekIO.availableBytes(new TestInput(new ByteArrayInputStream(bytes))), Arrays.copyOf(bytes, 1));
+        Assert.assertEquals(GekIO.available(new TestInput(new ByteArrayInputStream(bytes))), Arrays.copyOf(bytes, 1));
     }
 
     @Test
     public void testLimit() throws IOException {
         String str = DATA;
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-        InputStream in = GekIO.limited(new ByteArrayInputStream(bytes), 6);
+        InputStream in = GekIO.limit(new ByteArrayInputStream(bytes), 6);
         in.skip(5);
         in.read();
         Assert.assertEquals(in.read(), -1);
         Assert.assertEquals(in.read(bytes), -1);
-        InputStream in2 = GekIO.limited(new ByteArrayInputStream(bytes), 6);
+        InputStream in2 = GekIO.limit(new ByteArrayInputStream(bytes), 6);
         Assert.assertEquals(in2.read(bytes), 6);
         Assert.assertEquals(in2.read(), -1);
         Assert.assertEquals(in2.read(bytes), -1);
-        OutputStream out = GekIO.limited(new ByteArrayOutputStream(), 6);
+        OutputStream out = GekIO.limit(new ByteArrayOutputStream(), 6);
         Assert.expectThrows(IOException.class, () -> out.write(bytes));
         out.write(bytes, 0, 6);
         Assert.expectThrows(IOException.class, () -> out.write(1));
@@ -224,7 +233,7 @@ public class IOTest {
         testInputStream(data, 0, dataBytes.length, GekIO.toInputStream(new StringReader(DATA)), false);
         testInputStream(data, 0, dataBytes.length, GekIO.toInputStream(random), true);
         testInputStream(data, 2, 131, GekIO.toInputStream(random, 2, 131), true);
-        testInputStream(data, 2, 131, GekIO.limited(GekIO.toInputStream(dataBytes, 2, 131), 131), false);
+        testInputStream(data, 2, 131, GekIO.limit(GekIO.toInputStream(dataBytes, 2, 131), 131), false);
         testReader(data, 5, 155, new StringReader(data.substring(5, 5 + 155)), true);
         testReader(data, 0, data.length(), GekIO.toReader(CharBuffer.wrap(DATA)), true);
         testReader(data, 0, data.length(), GekIO.toReader(new ByteArrayInputStream(DATA.getBytes(GekChars.defaultCharset()))), false);
@@ -236,7 +245,7 @@ public class IOTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024);
         testOutStream(bytes.length, GekIO.toOutputStream(buffer), (off, len) ->
             Arrays.copyOfRange(bytes, off, off + len));
-        testOutStream(bytes.length, GekIO.limited(outputStream, 1024), (off, len) ->
+        testOutStream(bytes.length, GekIO.limit(outputStream, 1024), (off, len) ->
             Arrays.copyOfRange(outputStream.toByteArray(), off, off + len));
         testOutStream(-1, GekIO.toOutputStream(sb), (off, len) ->
             Arrays.copyOfRange(sb.toString().getBytes(GekChars.defaultCharset()), off, off + len));

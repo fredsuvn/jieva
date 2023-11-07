@@ -613,7 +613,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
 
                 @Override
                 public synchronized void send(GekData data) {
-                    GekIO.readBytesTo(data.asInputStream(), getOutputStream());
+                    GekIO.readTo(data.asInputStream(), getOutputStream());
                 }
 
                 @Override
@@ -645,7 +645,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
 
                 @Override
                 public synchronized void send(InputStream data) {
-                    GekIO.readBytesTo(data, getOutputStream());
+                    GekIO.readTo(data, getOutputStream());
                 }
 
                 @Override

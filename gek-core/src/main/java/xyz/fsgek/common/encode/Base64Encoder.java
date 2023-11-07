@@ -80,7 +80,7 @@ final class Base64Encoder implements GekEncoder {
         try {
             OutputStreamWrapper wrapper = new OutputStreamWrapper(dest);
             OutputStream out = encoder.wrap(wrapper);
-            GekIO.readBytesTo(source, out);
+            GekIO.readTo(source, out);
             out.flush();
             return wrapper.count;
         } catch (GekEncodeException e) {
@@ -166,7 +166,7 @@ final class Base64Encoder implements GekEncoder {
         try {
             OutputStreamWrapper wrapper = new OutputStreamWrapper(dest);
             InputStream in = decoder.wrap(source);
-            GekIO.readBytesTo(in, wrapper);
+            GekIO.readTo(in, wrapper);
             return wrapper.count;
         } catch (GekEncodeException e) {
             throw e;
