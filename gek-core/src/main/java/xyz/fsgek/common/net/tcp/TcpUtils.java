@@ -1,7 +1,7 @@
 package xyz.fsgek.common.net.tcp;
 
 import xyz.fsgek.common.base.GekArray;
-import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.io.GekIO;
 
 import java.nio.ByteBuffer;
 import java.util.function.IntFunction;
@@ -13,7 +13,7 @@ final class TcpUtils {
             return buffer;
         }
         if (buffer.remaining() <= 0) {
-            return GekBuffer.emptyBuffer();
+            return GekIO.emptyBuffer();
         }
         ByteBuffer newBuffer = generator.apply(buffer.remaining());
         newBuffer.put(buffer);
@@ -24,7 +24,7 @@ final class TcpUtils {
     static ByteBuffer compact(ByteBuffer buffer, byte[] newBytes, IntFunction<ByteBuffer> generator) {
         if (buffer.remaining() <= 0) {
             if (GekArray.isEmpty(newBytes)) {
-                return GekBuffer.emptyBuffer();
+                return GekIO.emptyBuffer();
             }
             ByteBuffer newBuffer = generator.apply(newBytes.length);
             newBuffer.put(newBytes);

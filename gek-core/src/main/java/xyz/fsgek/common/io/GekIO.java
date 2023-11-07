@@ -1,6 +1,7 @@
 package xyz.fsgek.common.io;
 
 import xyz.fsgek.annotations.Nullable;
+import xyz.fsgek.common.base.GekBytes;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.base.GekCheck;
 
@@ -23,6 +24,8 @@ public class GekIO {
      * Default IO buffer size: 1024 * 8 = 8192.
      */
     public static final int IO_BUFFER_SIZE = 1024 * 8;
+
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(GekBytes.emptyBytes());
 
     // Common IO methods:
 
@@ -815,6 +818,250 @@ public class GekIO {
             throw new IllegalArgumentException("number < 0.");
         }
         return new LimitedOutputStream(stream, number);
+    }
+
+    // Buffer methods:
+
+    /**
+     * Returns an empty byte buffer.
+     *
+     * @return an empty byte buffer
+     */
+    public static ByteBuffer emptyBuffer() {
+        return EMPTY_BUFFER;
+    }
+
+    /**
+     * Reads all bytes from source buffer into an array.
+     * Returns the array, or null if no data read out and reaches to the end of buffer.
+     *
+     * @param source source buffer
+     * @return the array, or null if no data read out and reaches to the end of buffer
+     * @throws GekIOException IO exception
+     */
+    @Nullable
+    public static byte[] read(ByteBuffer source) throws GekIOException {
+        try {
+            int length = source.remaining();
+            if (length <= 0) {
+                return null;
+            }
+            byte[] result = new byte[length];
+            source.get(result);
+            return result;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Reads specified number of bytes from source buffer into an array.
+     * Returns the array, or null if no data read out and reaches to the end of buffer.
+     * <p>
+     * If the number &lt; 0, read all as {@link #read(ByteBuffer)};
+     * els if the number is 0, no read and return an empty array;
+     * else this method will keep reading until the read number reaches to the specified number,
+     * or the reading reaches the end of the buffer.
+     *
+     * @param source source buffer
+     * @param number specified number
+     * @return the array, or null if no data read out and reaches to the end of buffer
+     * @throws GekIOException IO exception
+     */
+    @Nullable
+    public static byte[] read(ByteBuffer source, int number) throws GekIOException {
+        if (number < 0) {
+            return read(source);
+        }
+        if (number == 0) {
+            return new byte[0];
+        }
+        try {
+            int length = Math.min(number, source.remaining());
+            if (length <= 0) {
+                return null;
+            }
+            byte[] result = new byte[length];
+            source.get(result);
+            return result;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Reads bytes from source buffer into dest buffer,
+     * returns actual read number, or -1 if no data read out and reaches to the end of buffer.
+     * This method will keep reading until the dest buffer is filled up,
+     * or the reading reaches the end of the buffer.
+     *
+     * @param source source buffer
+     * @param dest   dest buffer
+     * @return actual read number, or -1 if no data read out and reaches to the end of buffer
+     * @throws GekIOException IO exception
+     */
+    public static int readTo(ByteBuffer source, ByteBuffer dest) throws GekIOException {
+        try {
+            int sr = source.remaining();
+            int dr = dest.remaining();
+            if (sr <= dr) {
+                dest.put(source);
+                return sr;
+            }
+            ByteBuffer slice = readSlice(source, dr);
+            dest.put(slice);
+            return dr;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Reads bytes from source buffer into dest stream,
+     * returns actual read number, or -1 if no data read out and reaches to the end of buffer.
+     * This method will keep reading until the reading reaches the end of the buffer.
+     *
+     * @param source source buffer
+     * @param dest   dest stream
+     * @return actual read number, or -1 if no data read out and reaches to the end of buffer
+     * @throws GekIOException IO exception
+     */
+    public static int readTo(ByteBuffer source, OutputStream dest) throws GekIOException {
+        try {
+            if (source.hasArray()) {
+                int remaining = source.remaining();
+                dest.write(source.array(), source.arrayOffset() + source.position(), remaining);
+                source.position(source.position() + remaining);
+                return remaining;
+            }
+            byte[] bytes = read(source);
+            dest.write(bytes);
+            return bytes.length;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Reads all bytes from source buffer into a string with {@link GekChars#defaultCharset()}.
+     * Returns the string, or null if no data read out and reaches to the end of buffer.
+     *
+     * @param source source buffer
+     * @return the string, or null if no data read out and reaches to the end of buffer
+     * @throws GekIOException IO exception
+     */
+    @Nullable
+    public static String readString(ByteBuffer source) throws GekIOException {
+        return readString(source, GekChars.defaultCharset());
+    }
+
+    /**
+     * Reads all bytes from source buffer into a string with specified charset.
+     * Returns the string, or null if no data read out and reaches to the end of buffer.
+     *
+     * @param source  source buffer
+     * @param charset specified charset
+     * @return the string, or null if no data read out and reaches to the end of buffer
+     * @throws GekIOException IO exception
+     */
+    @Nullable
+    public static String readString(ByteBuffer source, Charset charset) throws GekIOException {
+        try {
+            byte[] bytes = read(source);
+            if (bytes == null) {
+                return null;
+            }
+            return new String(bytes, charset);
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Returns slice of given buffer by {@link ByteBuffer#slice()}, and sets the slice's limit to specified number
+     * (or remaining if remaining is less than specified number).
+     * Position of given buffer will not be changed.
+     *
+     * @param buffer given buffer
+     * @param number specified number
+     * @return the slice buffer
+     * @throws GekIOException IO exception
+     */
+    public static ByteBuffer slice(ByteBuffer buffer, int number) throws GekIOException {
+        try {
+            ByteBuffer slice = buffer.slice();
+            slice.limit(Math.min(number, buffer.remaining()));
+            return slice;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Returns slice of given buffer by {@link ByteBuffer#slice()}, and sets the slice's limit to specified number
+     * (or remaining if remaining is less than specified number).
+     * Position of given buffer will be set to {@code (buffer.position + length)}.
+     *
+     * @param buffer given buffer
+     * @param number specified number
+     * @return the slice buffer
+     * @throws GekIOException IO exception
+     */
+    public static ByteBuffer readSlice(ByteBuffer buffer, int number) throws GekIOException {
+        try {
+            ByteBuffer slice = buffer.slice();
+            slice.limit(Math.min(number, buffer.remaining()));
+            buffer.position(buffer.position() + slice.remaining());
+            return slice;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Returns a sub-range view of given buffer, starting from given offset to end of the buffer.
+     * The two buffers will share the same data so any operation will reflect each other.
+     *
+     * @param buffer given buffer
+     * @param offset given offset
+     * @return the sub-buffer
+     * @throws GekIOException IO exception
+     */
+    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset) throws GekIOException {
+        try {
+            GekCheck.checkInBounds(offset, 0, buffer.remaining());
+            int pos = buffer.position();
+            buffer.position(offset);
+            ByteBuffer slice = buffer.slice();
+            buffer.position(pos);
+            return slice;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Returns a sub-range view of given buffer, starting from given offset to specified length.
+     * The two buffers will share the same data so any operation will reflect each other.
+     *
+     * @param buffer given buffer
+     * @param offset given offset
+     * @param length specified length
+     * @return the sub-buffer
+     * @throws GekIOException IO exception
+     */
+    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset, int length) throws GekIOException {
+        try {
+            GekCheck.checkRangeInBounds(offset, offset + length, 0, buffer.limit());
+            int pos = buffer.position();
+            buffer.position(offset);
+            ByteBuffer slice = buffer.slice();
+            slice.limit(length);
+            buffer.position(pos);
+            return slice;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
     }
 
     // File methods:

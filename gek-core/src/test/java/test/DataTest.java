@@ -4,7 +4,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.data.GekData;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 
 import java.io.ByteArrayInputStream;
@@ -27,9 +26,9 @@ public class DataTest {
 
         Assert.assertEquals(GekData.wrap(bytes, 0, 0).write(new byte[0]), -1);
         Assert.assertEquals(GekData.wrap(bytes, 0, 0).write(new byte[bytes.length], 2, 9), -1);
-        Assert.assertEquals(GekData.wrap(GekBuffer.emptyBuffer()).write(new byte[bytes.length], 2, 9), -1);
+        Assert.assertEquals(GekData.wrap(GekIO.emptyBuffer()).write(new byte[bytes.length], 2, 9), -1);
         Assert.assertEquals(GekData.wrap(new ByteArrayInputStream(new byte[0])).write(new byte[bytes.length], 2, 9), -1);
-        Assert.assertNull(GekData.wrap(GekBuffer.emptyBuffer()).toBuffer());
+        Assert.assertNull(GekData.wrap(GekIO.emptyBuffer()).toBuffer());
         Assert.assertEquals(GekData.wrap(bytes).write(new byte[bytes.length], 2, 0), 0);
     }
 
@@ -46,11 +45,11 @@ public class DataTest {
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
         supplier.get().write(buffer);
         buffer.flip();
-        Assert.assertEquals(GekBuffer.getBytes(buffer), data);
+        Assert.assertEquals(GekIO.read(buffer), data);
         buffer.clear();
         supplier.get().write(buffer, 11);
         buffer.flip();
-        Assert.assertEquals(GekBuffer.getBytes(buffer, 11), Arrays.copyOfRange(data, 0, 11));
+        Assert.assertEquals(GekIO.read(buffer, 11), Arrays.copyOfRange(data, 0, 11));
 
         //stream:
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -62,7 +61,7 @@ public class DataTest {
 
         //to/as:
         Assert.assertEquals(supplier.get().toArray(), data);
-        Assert.assertEquals(GekBuffer.getBytes(supplier.get().toBuffer()), data);
+        Assert.assertEquals(GekIO.read(supplier.get().toBuffer()), data);
         Assert.assertEquals(GekIO.read(supplier.get().asInputStream()), data);
     }
 }
