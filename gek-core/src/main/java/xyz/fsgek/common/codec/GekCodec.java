@@ -1,5 +1,6 @@
 package xyz.fsgek.common.codec;
 
+import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.BadPaddingException;
@@ -15,8 +16,8 @@ import java.security.SignatureException;
 
 public class GekCodec {
 
-    public static CipherDataProcessor cipher(Cipher cipher) {
-        return new CipherDataProcessor(cipher);
+    public static CipherProcess cipher(Cipher cipher) {
+        return new CipherProcess(() -> cipher);
     }
 
     /**
@@ -39,10 +40,9 @@ public class GekCodec {
             int outSize = 0;
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
-                ByteBuffer r = GekIO.slice(in, inSize);
+                ByteBuffer r = GekIO.readSlice(in, inSize);
                 outSize += cipher.doFinal(r, out);
                 remaining -= inSize;
-                in.position(in.position() + inSize);
             }
             return outSize;
         } catch (Exception e) {
@@ -65,6 +65,9 @@ public class GekCodec {
         try {
             if (blockSize <= 0) {
                 byte[] result = doFinal(cipher, in);
+                if (result == null) {
+                    return 0;
+                }
                 out.write(result);
                 return result.length;
             }
@@ -72,12 +75,13 @@ public class GekCodec {
             long outSize = 0;
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
-                ByteBuffer r = GekIO.slice(in, inSize);
+                ByteBuffer r = GekIO.readSlice(in, inSize);
                 byte[] outBytes = doFinal(cipher, r);
-                out.write(outBytes);
-                outSize += outBytes.length;
-                remaining -= inSize;
-                in.position(in.position() + inSize);
+                if (outBytes != null) {
+                    out.write(outBytes);
+                    outSize += outBytes.length;
+                    remaining -= inSize;
+                }
             }
             return outSize;
         } catch (Exception e) {
@@ -100,12 +104,15 @@ public class GekCodec {
         try {
             if (blockSize <= 0) {
                 byte[] inBytes = GekIO.read(in);
+                if (inBytes == null) {
+                    return 0;
+                }
                 return cipher.doFinal(ByteBuffer.wrap(inBytes), out);
             }
             int outSize = 0;
             byte[] inBytes = new byte[blockSize];
             while (true) {
-                int readCount = in.read(inBytes);
+                int readCount = GekIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -139,6 +146,9 @@ public class GekCodec {
         try {
             if (blockSize <= 0) {
                 byte[] inBytes = GekIO.read(in);
+                if (inBytes == null) {
+                    return 0;
+                }
                 byte[] result = cipher.doFinal(inBytes);
                 out.write(result);
                 return result.length;
@@ -146,7 +156,7 @@ public class GekCodec {
             int outSize = 0;
             byte[] inBytes = new byte[blockSize];
             while (true) {
-                int readCount = in.read(inBytes);
+                int readCount = GekIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -166,7 +176,11 @@ public class GekCodec {
         }
     }
 
+    @Nullable
     private static byte[] doFinal(Cipher cipher, ByteBuffer in) throws IllegalBlockSizeException, BadPaddingException {
+        if (!in.hasRemaining()) {
+            return null;
+        }
         if (in.hasArray()) {
             return cipher.doFinal(in.array(), in.arrayOffset() + in.position(), in.remaining());
         }
@@ -210,7 +224,7 @@ public class GekCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = in.read(inBytes);
+                int readCount = GekIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -264,7 +278,7 @@ public class GekCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = in.read(inBytes);
+                int readCount = GekIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -319,7 +333,7 @@ public class GekCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = in.read(inBytes);
+                int readCount = GekIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -395,7 +409,7 @@ public class GekCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = in.read(inBytes);
+                int readCount = GekIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -433,7 +447,7 @@ public class GekCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = in.read(inBytes);
+                int readCount = GekIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
