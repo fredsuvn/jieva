@@ -5,7 +5,6 @@ import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.data.GekData;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.net.GekNetException;
 import xyz.fsgek.common.net.GekServerStates;
@@ -556,7 +555,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
                     if (data.hasArray()) {
                         send(data.array(), data.arrayOffset(), data.remaining());
                     } else {
-                        send(GekBuffer.getBytes(data));
+                        send(GekIO.read(data));
                     }
                 }
 

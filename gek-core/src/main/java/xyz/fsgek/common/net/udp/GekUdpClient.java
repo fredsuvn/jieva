@@ -2,7 +2,7 @@ package xyz.fsgek.common.net.udp;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
-import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.net.GekNetException;
 
 import java.io.IOException;
@@ -157,7 +157,7 @@ public interface GekUdpClient {
                 if (buffer.hasArray()) {
                     datagramPacket = new DatagramPacket(buffer.array(), buffer.arrayOffset(), buffer.remaining());
                 } else {
-                    byte[] bytes = GekBuffer.getBytes(buffer);
+                    byte[] bytes = GekIO.read(buffer);
                     datagramPacket = new DatagramPacket(bytes, bytes.length);
                 }
                 datagramPacket.setSocketAddress(packet.getHeader().getInetSocketAddress());

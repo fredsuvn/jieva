@@ -1,7 +1,6 @@
 package xyz.fsgek.common.data;
 
 import xyz.fsgek.common.base.GekCheck;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 
 import java.io.InputStream;
@@ -68,7 +67,7 @@ final class BufferData implements GekData.OfBuffer {
 
     @Override
     public int write(ByteBuffer dest, int length) {
-        return GekBuffer.put(buffer, dest, length);
+        return GekIO.readTo(buffer, dest, length);
     }
 
     @Override
@@ -86,7 +85,7 @@ final class BufferData implements GekData.OfBuffer {
         if (!buffer.hasRemaining()) {
             return null;
         }
-        return GekBuffer.getBytes(buffer);
+        return GekIO.read(buffer);
     }
 
     @Override

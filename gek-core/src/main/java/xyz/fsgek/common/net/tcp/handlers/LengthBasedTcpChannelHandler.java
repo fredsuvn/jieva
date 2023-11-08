@@ -1,7 +1,7 @@
 package xyz.fsgek.common.net.tcp.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.net.tcp.GekTcpChannel;
 import xyz.fsgek.common.net.tcp.GekTcpChannelHandler;
 
@@ -21,13 +21,13 @@ import java.util.function.IntFunction;
  *     <li>
  *         Fixed length: created by {@link #LengthBasedTcpChannelHandler(int)}
  *         or {@link #LengthBasedTcpChannelHandler(int, IntFunction)},
- *         to split in fixed length with {@link GekBuffer#splitInLength(ByteBuffer, int)}
+ *         to split in fixed length with {@link GekIO#split(ByteBuffer, int)}
  *         and make returned buffers readonly;
  *     </li>
  *     <li>
  *         Specified length: created by {@link #LengthBasedTcpChannelHandler(int, int)}
  *         or {@link #LengthBasedTcpChannelHandler(int, int, IntFunction)},
- *         to split in specified length with {@link GekBuffer#splitInLength(ByteBuffer, int, int)}
+ *         to split in specified length with {@link GekIO#split(ByteBuffer, int, int)}
  *         and make returned buffers readonly;
  *     </li>
  * </ul>
@@ -93,12 +93,12 @@ public class LengthBasedTcpChannelHandler implements GekTcpChannelHandler<ByteBu
     }
 
     private @Nullable Object onFixed(GekTcpChannel channel, ByteBuffer message) {
-        List<ByteBuffer> result = GekBuffer.splitInLength(message, lengthOffset, generator);
+        List<ByteBuffer> result = GekIO.split(message, lengthOffset, generator);
         return result.isEmpty() ? null : asReadOnly(result);
     }
 
     private @Nullable Object onSpecified(GekTcpChannel channel, ByteBuffer message) {
-        List<ByteBuffer> result = GekBuffer.splitInLength(message, lengthOffset, lengthSize, generator);
+        List<ByteBuffer> result = GekIO.split(message, lengthOffset, lengthSize, generator);
         return result.isEmpty() ? null : asReadOnly(result);
     }
 

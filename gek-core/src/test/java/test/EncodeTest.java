@@ -44,20 +44,20 @@ public class EncodeTest {
         Arrays.fill(bytes, (byte) 0);
         Assert.assertEquals(
             encoder.encode(srcBytes, bytes),
-            Gek.chunkCount(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
+            Gek.countBlock(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
         );
         Assert.assertEquals(Arrays.copyOf(bytes, destBytes.length), destBytes);
         Arrays.fill(bytes, (byte) 0);
         Assert.assertEquals(
             encoder.encode(srcBytes, 0, bytes, 0, srcBytes.length),
-            Gek.chunkCount(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
+            Gek.countBlock(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
         );
         Assert.assertEquals(Arrays.copyOf(bytes, destBytes.length), destBytes);
 
         Arrays.fill(bytes, (byte) 0);
         Assert.assertEquals(
             encoder.encode(srcBytesPadding, 10, bytes, 10, srcBytes.length),
-            Gek.chunkCount(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
+            Gek.countBlock(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
         );
         Assert.assertEquals(Arrays.copyOfRange(bytes, 10, 10 + destBytes.length), destBytes);
 
@@ -69,7 +69,7 @@ public class EncodeTest {
         Assert.assertEquals(encoder.encode(ByteBuffer.wrap(srcBytes)), ByteBuffer.wrap(destBytes));
         Assert.assertEquals(
             encoder.encode(ByteBuffer.wrap(srcBytes), ByteBuffer.wrap(bytes)),
-            Gek.chunkCount(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
+            Gek.countBlock(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
         );
         Assert.assertEquals(Arrays.copyOf(bytes, destBytes.length), destBytes);
 
@@ -77,7 +77,7 @@ public class EncodeTest {
         ByteArrayOutputStream destOut = new ByteArrayOutputStream();
         Assert.assertEquals(
             encoder.encode(new ByteArrayInputStream(srcBytes), destOut),
-            (long) Gek.chunkCount(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
+            (long) Gek.countBlock(srcBytes.length, encoder.encodeBlockSize()) * encoder.decodeBlockSize()
         );
         Assert.assertEquals(destOut.toByteArray(), destBytes);
 
@@ -94,20 +94,20 @@ public class EncodeTest {
         Arrays.fill(bytes, (byte) 0);
         Assert.assertEquals(
             encoder.decode(destBytes, bytes),
-            Gek.chunkCount(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
+            Gek.countBlock(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
         );
         Assert.assertEquals(Arrays.copyOf(bytes, srcBytes.length), srcBytes);
         Arrays.fill(bytes, (byte) 0);
         Assert.assertEquals(
             encoder.decode(destBytes, 0, bytes, 0, destBytes.length),
-            Gek.chunkCount(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
+            Gek.countBlock(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
         );
         Assert.assertEquals(Arrays.copyOf(bytes, srcBytes.length), srcBytes);
 
         Arrays.fill(bytes, (byte) 0);
         Assert.assertEquals(
             encoder.decode(destBytesPadding, 10, bytes, 10, destBytes.length),
-            Gek.chunkCount(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
+            Gek.countBlock(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
         );
         Assert.assertEquals(Arrays.copyOfRange(bytes, 10, 10 + srcBytes.length), srcBytes);
 
@@ -119,7 +119,7 @@ public class EncodeTest {
         Assert.assertEquals(encoder.decode(ByteBuffer.wrap(destBytes)), ByteBuffer.wrap(srcBytes));
         Assert.assertEquals(
             encoder.decode(ByteBuffer.wrap(destBytes), ByteBuffer.wrap(bytes)),
-            Gek.chunkCount(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
+            Gek.countBlock(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
         );
         Assert.assertEquals(Arrays.copyOf(bytes, srcBytes.length), srcBytes);
 
@@ -127,7 +127,7 @@ public class EncodeTest {
         destOut.reset();
         Assert.assertEquals(
             encoder.decode(new ByteArrayInputStream(destBytes), destOut),
-            (long) Gek.chunkCount(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
+            (long) Gek.countBlock(destBytes.length, encoder.decodeBlockSize()) * encoder.encodeBlockSize()
         );
         Assert.assertEquals(destOut.toByteArray(), srcBytes);
 

@@ -9,7 +9,6 @@ import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.base.GekThread;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.data.GekData;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.net.GekNetException;
 import xyz.fsgek.common.net.GekNetServerException;
@@ -17,9 +16,9 @@ import xyz.fsgek.common.net.http.GekHttp;
 import xyz.fsgek.common.net.http.GekHttpHeaders;
 import xyz.fsgek.common.net.http.GekHttpResponse;
 import xyz.fsgek.common.net.tcp.*;
-import xyz.fsgek.common.net.udp.*;
 import xyz.fsgek.common.net.tcp.handlers.DelimiterBasedTcpChannelHandler;
 import xyz.fsgek.common.net.tcp.handlers.LengthBasedTcpChannelHandler;
+import xyz.fsgek.common.net.udp.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -102,7 +101,7 @@ public class NetTest {
                 @Override
                 public @Nullable Object onMessage(GekTcpChannel channel, List<ByteBuffer> message) {
                     for (ByteBuffer buffer : message) {
-                        String str = GekBuffer.getString(buffer);
+                        String str = GekIO.readString(buffer);
                         TestUtil.count(str, data);
                         System.out.println("TCP receive (" + channel.getRemoteSocketAddress() + "): " + str);
                         switch (str) {
@@ -240,7 +239,7 @@ public class NetTest {
     }
 
     private String parseServerData(ByteBuffer buffer) {
-        byte[] bytes = GekBuffer.getBytes(buffer);
+        byte[] bytes = GekIO.read(buffer);
         if (bytes.length != 6) {
             throw new GekNetException("bytes.length != 6");
         }
@@ -289,7 +288,7 @@ public class NetTest {
                 @Override
                 public @Nullable Object onMessage(GekTcpChannel channel, List<ByteBuffer> message) {
                     for (ByteBuffer buffer : message) {
-                        String str = GekBuffer.getString(buffer);
+                        String str = GekIO.readString(buffer);
                         TestUtil.count(str, data);
                         System.out.println("TCP receive (" + channel.getRemoteSocketAddress() + "): " + str);
                         switch (str) {
@@ -338,7 +337,7 @@ public class NetTest {
                 @Override
                 public @Nullable Object onMessage(GekTcpChannel channel, List<ByteBuffer> message) {
                     for (ByteBuffer buffer : message) {
-                        String str = GekBuffer.getString(buffer);
+                        String str = GekIO.readString(buffer);
                         TestUtil.count(str, data);
                         switch (str) {
                             case "hlo": {
@@ -436,7 +435,7 @@ public class NetTest {
             .addPacketHandler(new GekUdpPacketHandler<ByteBuffer>() {
                 @Override
                 public @Nullable Object onPacket(GekUdpHeader header, GekUdpClient client, ByteBuffer buffer) {
-                    String str = GekBuffer.getString(buffer);
+                    String str = GekIO.readString(buffer);
                     TestUtil.count(str, data);
                     System.out.println("UDP receive (" + header.getInetSocketAddress() + "): " + str);
                     return null;

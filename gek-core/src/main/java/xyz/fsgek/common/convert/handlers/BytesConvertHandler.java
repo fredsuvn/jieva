@@ -2,7 +2,7 @@ package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.convert.GekConverter;
-import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.Type;
@@ -41,7 +41,7 @@ public class BytesConvertHandler implements GekConverter.Handler {
                 return source;
             } else if (GekReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = ((ByteBuffer) source).slice();
-                return GekBuffer.getBytes(src);
+                return GekIO.read(src);
             } else {
                 return null;
             }

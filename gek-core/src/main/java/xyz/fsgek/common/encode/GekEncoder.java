@@ -1,9 +1,8 @@
 package xyz.fsgek.common.encode;
 
 import xyz.fsgek.annotations.ThreadSafe;
-import xyz.fsgek.common.io.GekBuffer;
-import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.base.GekChars;
+import xyz.fsgek.common.io.GekIO;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -144,7 +143,7 @@ public interface GekEncoder {
      */
     default ByteBuffer encode(ByteBuffer source) {
         try {
-            byte[] src = GekBuffer.getBytes(source);
+            byte[] src = GekIO.read(source);
             return ByteBuffer.wrap(encode(src));
         } catch (GekEncodeException e) {
             throw e;
@@ -273,7 +272,7 @@ public interface GekEncoder {
      */
     default ByteBuffer decode(ByteBuffer source) {
         try {
-            byte[] src = GekBuffer.getBytes(source);
+            byte[] src = GekIO.read(source);
             return ByteBuffer.wrap(decode(src));
         } catch (GekEncodeException e) {
             throw e;

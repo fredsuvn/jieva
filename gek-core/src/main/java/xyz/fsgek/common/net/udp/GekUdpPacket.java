@@ -1,6 +1,6 @@
 package xyz.fsgek.common.net.udp;
 
-import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.io.GekIO;
 
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
@@ -48,7 +48,7 @@ public interface GekUdpPacket {
      * @return UDP packet
      */
     static GekUdpPacket of(ByteBuffer buffer, InetSocketAddress address) {
-        ByteBuffer data = ByteBuffer.wrap(GekBuffer.getBytes(buffer));
+        ByteBuffer data = ByteBuffer.wrap(GekIO.read(buffer));
         return new GekUdpPacket() {
 
             @Override

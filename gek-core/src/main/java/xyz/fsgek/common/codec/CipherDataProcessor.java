@@ -3,7 +3,6 @@ package xyz.fsgek.common.codec;
 import org.springframework.core.codec.CodecException;
 import xyz.fsgek.common.base.GekArray;
 import xyz.fsgek.common.data.GekDataProcessor;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.BadPaddingException;
@@ -218,7 +217,7 @@ public class CipherDataProcessor implements GekDataProcessor<CipherDataProcessor
         int outSize = 0;
         while (remaining > 0) {
             int inSize = Math.min(remaining, blockSize);
-            ByteBuffer r = GekBuffer.slice(in, inSize);
+            ByteBuffer r = GekIO.slice(in, inSize);
             outSize += cipher.doFinal(r, out);
             remaining -= inSize;
             in.position(in.position() + inSize);
@@ -237,7 +236,7 @@ public class CipherDataProcessor implements GekDataProcessor<CipherDataProcessor
         long outSize = 0;
         while (remaining > 0) {
             int inSize = Math.min(remaining, blockSize);
-            ByteBuffer r = GekBuffer.slice(in, inSize);
+            ByteBuffer r = GekIO.slice(in, inSize);
             byte[] outBytes = doFinal(r);
             out.write(outBytes);
             outSize += outBytes.length;
@@ -296,7 +295,7 @@ public class CipherDataProcessor implements GekDataProcessor<CipherDataProcessor
         if (in.hasArray()) {
             return cipher.doFinal(in.array(), in.arrayOffset() + in.position(), in.remaining());
         }
-        byte[] inBytes = GekBuffer.getBytes(in);
+        byte[] inBytes = GekIO.read(in);
         return cipher.doFinal(inBytes);
     }
 }

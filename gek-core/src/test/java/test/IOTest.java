@@ -3,7 +3,6 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekChars;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 
 import java.io.*;
@@ -176,11 +175,23 @@ public class IOTest {
         ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
         GekIO.readTo(new ByteArrayInputStream(bytes), buffer);
         buffer.flip();
-        Assert.assertEquals(GekBuffer.getBytes(buffer), bytes);
+        Assert.assertEquals(GekIO.read(buffer), bytes);
         buffer = ByteBuffer.allocate(bytes.length);
         GekIO.readTo(new ByteArrayInputStream(bytes), buffer);
         buffer.flip();
-        Assert.assertEquals(GekBuffer.getBytes(buffer), bytes);
+        Assert.assertEquals(GekIO.read(buffer), bytes);
+        ByteBuffer source = ByteBuffer.wrap(bytes);
+        buffer = ByteBuffer.allocate(bytes.length);
+        GekIO.readTo(source, buffer);
+        buffer.flip();
+        Assert.assertEquals(GekIO.read(buffer), bytes);
+        Assert.assertEquals(source.remaining(), 0);
+        source.flip();
+        buffer = ByteBuffer.allocate(bytes.length);
+        GekIO.readTo(source, buffer, 2);
+        buffer.flip();
+        Assert.assertEquals(GekIO.read(buffer), Arrays.copyOf(bytes, 2));
+        Assert.assertEquals(source.remaining(), bytes.length - 2);
     }
 
     @Test

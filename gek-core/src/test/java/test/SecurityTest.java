@@ -3,7 +3,6 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekChars;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.security.*;
 
@@ -114,7 +113,7 @@ public class SecurityTest {
         int bufferSize = fsMac.prepare(GekIO.toInputStream(data)).key(macKey).doFinal(buffer);
         Assert.assertEquals(bufferSize, mac.getMacLength());
         buffer.flip();
-        Assert.assertEquals(macBytes, GekBuffer.getBytes(buffer));
+        Assert.assertEquals(macBytes, GekIO.read(buffer));
         System.out.println(destSize);
     }
 
@@ -143,7 +142,7 @@ public class SecurityTest {
         int bufferSize = fd.prepare(GekIO.toInputStream(data)).doFinal(buffer);
         Assert.assertEquals(bufferSize, md.getDigestLength());
         buffer.flip();
-        Assert.assertEquals(mdBytes, GekBuffer.getBytes(buffer));
+        Assert.assertEquals(mdBytes, GekIO.read(buffer));
         System.out.println(destSize);
     }
 
@@ -182,7 +181,7 @@ public class SecurityTest {
         int bufferSize = gekSign.prepare(GekIO.toInputStream(data)).key(privateKey).doFinal(buffer);
         Assert.assertEquals(bufferSize, signBytes.length);
         buffer.flip();
-        Assert.assertEquals(signBytes, GekBuffer.getBytes(buffer));
+        Assert.assertEquals(signBytes, GekIO.read(buffer));
         System.out.println(destSize);
 
         //verify
@@ -239,14 +238,14 @@ public class SecurityTest {
         ByteBuffer outBuffer = ByteBuffer.allocate(enBytes.length);
         GekCrypto.encrypt(cipher, publicKey, ByteBuffer.wrap(data), outBuffer, 245, null);
         outBuffer.flip();
-        byte[] enBuffer = GekBuffer.getBytes(outBuffer);
+        byte[] enBuffer = GekIO.read(outBuffer);
         outBytes.reset();
         GekCrypto.encrypt(cipher, publicKey, new ByteArrayInputStream(data2), outBytes, 0, null);
         byte[] enBytes2 = outBytes.toByteArray();
         outBuffer.clear();
         GekCrypto.encrypt(cipher, publicKey, ByteBuffer.wrap(data2), outBuffer, 0, null);
         outBuffer.flip();
-        byte[] enBuffer2 = GekBuffer.getBytes(outBuffer);
+        byte[] enBuffer2 = GekIO.read(outBuffer);
 
         //decrypt
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
@@ -259,7 +258,7 @@ public class SecurityTest {
         outBuffer.clear();
         GekCrypto.decrypt(cipher, privateKey, ByteBuffer.wrap(enBuffer), outBuffer, 256, null);
         outBuffer.flip();
-        byte[] deBuffer = GekBuffer.getBytes(outBuffer);
+        byte[] deBuffer = GekIO.read(outBuffer);
         Assert.assertEquals(deBuffer, data);
         outBytes.reset();
         GekCrypto.decrypt(cipher, privateKey, new ByteArrayInputStream(enBytes2), outBytes, 0, null);
@@ -268,7 +267,7 @@ public class SecurityTest {
         outBuffer.clear();
         GekCrypto.decrypt(cipher, privateKey, ByteBuffer.wrap(enBuffer2), outBuffer, 0, null);
         outBuffer.flip();
-        byte[] deBuffer2 = GekBuffer.getBytes(outBuffer);
+        byte[] deBuffer2 = GekIO.read(outBuffer);
         Assert.assertEquals(deBuffer2, data2);
     }
 

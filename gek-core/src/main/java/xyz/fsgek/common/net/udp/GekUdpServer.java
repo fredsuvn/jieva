@@ -5,7 +5,6 @@ import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekThread;
 import xyz.fsgek.common.collect.GekColl;
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.net.GekNetException;
 import xyz.fsgek.common.net.GekServerStates;
@@ -319,7 +318,7 @@ public interface GekUdpServer extends GekUdpClient {
                 if (buffer.hasArray()) {
                     datagramPacket = new DatagramPacket(buffer.array(), buffer.arrayOffset(), buffer.remaining());
                 } else {
-                    byte[] bytes = GekBuffer.getBytes(buffer);
+                    byte[] bytes = GekIO.read(buffer);
                     datagramPacket = new DatagramPacket(bytes, bytes.length);
                 }
                 datagramPacket.setSocketAddress(packet.getHeader().getInetSocketAddress());
@@ -500,7 +499,7 @@ public interface GekUdpServer extends GekUdpClient {
                 if (!buffer.hasRemaining()) {
                     return EMPTY_BUFFER;
                 }
-                return ByteBuffer.wrap(GekBuffer.getBytes(buffer)).asReadOnlyBuffer();
+                return ByteBuffer.wrap(GekIO.read(buffer)).asReadOnlyBuffer();
             }
         }
     }

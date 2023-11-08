@@ -1,6 +1,6 @@
 package xyz.fsgek.common.base;
 
-import xyz.fsgek.common.io.GekBuffer;
+import xyz.fsgek.common.io.GekIO;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -78,7 +78,7 @@ public class GekBytesBuilder extends ByteArrayOutputStream {
             write(bytes.array(), bytes.arrayOffset() + bytes.position(), bytes.remaining());
             bytes.position(bytes.position() + bytes.remaining());
         } else {
-            byte[] remaining = GekBuffer.getBytes(bytes);
+            byte[] remaining = GekIO.read(bytes);
             write(remaining, 0, remaining.length);
         }
         return this;

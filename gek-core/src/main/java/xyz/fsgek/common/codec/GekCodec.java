@@ -1,6 +1,5 @@
 package xyz.fsgek.common.codec;
 
-import xyz.fsgek.common.io.GekBuffer;
 import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.BadPaddingException;
@@ -40,7 +39,7 @@ public class GekCodec {
             int outSize = 0;
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
-                ByteBuffer r = GekBuffer.slice(in, inSize);
+                ByteBuffer r = GekIO.slice(in, inSize);
                 outSize += cipher.doFinal(r, out);
                 remaining -= inSize;
                 in.position(in.position() + inSize);
@@ -73,7 +72,7 @@ public class GekCodec {
             long outSize = 0;
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
-                ByteBuffer r = GekBuffer.slice(in, inSize);
+                ByteBuffer r = GekIO.slice(in, inSize);
                 byte[] outBytes = doFinal(cipher, r);
                 out.write(outBytes);
                 outSize += outBytes.length;
@@ -171,7 +170,7 @@ public class GekCodec {
         if (in.hasArray()) {
             return cipher.doFinal(in.array(), in.arrayOffset() + in.position(), in.remaining());
         }
-        byte[] inBytes = GekBuffer.getBytes(in);
+        byte[] inBytes = GekIO.read(in);
         return cipher.doFinal(inBytes);
     }
 
@@ -457,7 +456,7 @@ public class GekCodec {
             return sign.verify(
                 signature.array(), signature.arrayOffset() + signature.position(), signature.remaining());
         }
-        byte[] bytes = GekBuffer.getBytes(signature);
+        byte[] bytes = GekIO.read(signature);
         return sign.verify(bytes);
     }
 }

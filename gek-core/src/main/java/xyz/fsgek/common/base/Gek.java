@@ -607,30 +607,30 @@ public class Gek {
     }
 
     /**
-     * Returns chunk count of total value and chunk size:
+     * Returns block count of total value and block size:
      * <pre>
-     *     return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+     *     return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
      * </pre>
      *
-     * @param total     total value
-     * @param chunkSize chunk size
-     * @return chunk count
+     * @param totalSize total size
+     * @param blockSize block size
+     * @return block count
      */
-    public static int chunkCount(int total, int chunkSize) {
-        return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+    public static int countBlock(int totalSize, int blockSize) {
+        return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
     }
 
     /**
-     * Returns chunk count of total value and chunk size:
+     * Returns block count of total value and block size:
      * <pre>
-     *     return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+     *     return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
      * </pre>
      *
-     * @param total     total value
-     * @param chunkSize chunk size
-     * @return chunk count
+     * @param totalSize total size
+     * @param blockSize block size
+     * @return block count
      */
-    public static long chunkCount(long total, long chunkSize) {
-        return total % chunkSize == 0 ? total / chunkSize : total / chunkSize + 1;
+    public static long countBlock(long totalSize, long blockSize) {
+        return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
     }
 }
