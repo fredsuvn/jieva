@@ -1,6 +1,5 @@
 package xyz.fsgek.common.io;
 
-import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekCheck;
 
 import java.io.IOException;
@@ -8,18 +7,45 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.function.Function;
 
+/**
+ * This input stream is used to transform data from {@code source} stream into this new one. For example:
+ * <pre>
+ *     TransformInputStream trans = new TransformInputStream(source, 8, buffer-&gt;{
+ *         byte[] bytes = GekIO.read(buffer);
+ *         return ByteBuffer.wrap(Arrays.copyOf(bytes, bytes.length / 2));
+ *     });
+ * </pre>
+ * Example shows how to remove half of the data every 8-bytes:
+ * <pre>
+ *     "12345678" -&gt; "1234"
+ *     "1234567887654321" -&gt; "12348765"
+ * </pre>
+ * This stream doesn't support mark/reset methods.
+ *
+ * @author fredsuvn
+ */
 public class TransformInputStream extends InputStream {
 
     private final InputStream source;
-    private final int bufferSize;
+    private final int blockSize;
     private final Function<ByteBuffer, ByteBuffer> transformer;
 
     private ByteBuffer buffer;
     private boolean end = false;
 
-    public TransformInputStream(InputStream source, int bufferSize, Function<ByteBuffer, ByteBuffer> transformer) {
+    /**
+     * Constructs with source stream, block size and transformer.
+     * The block size specifies how much data is read each time from source stream, and the data will be wrapped as
+     * {@link ByteBuffer} to transform by given transformer. If remaining bytes is less than block size, all remaining
+     * bytes will be read and wrapped and to transform.
+     *
+     * @param source      source stream
+     * @param blockSize   block size
+     * @param transformer given transformer
+     */
+    public TransformInputStream(InputStream source, int blockSize, Function<ByteBuffer, ByteBuffer> transformer) {
         this.source = source;
-        this.bufferSize = bufferSize;
+        this.blockSize = blockSize;
         this.transformer = transformer;
     }
 
@@ -68,7 +94,7 @@ public class TransformInputStream extends InputStream {
 
     private void refreshBuffer() {
         if (buffer == null || !buffer.hasRemaining()) {
-            byte[] sourceBytes = GekIO.read(source, bufferSize);
+            byte[] sourceBytes = GekIO.read(source, blockSize);
             if (sourceBytes == null) {
                 end = true;
                 return;
@@ -79,31 +105,25 @@ public class TransformInputStream extends InputStream {
 
     @Override
     public long skip(long n) throws IOException {
-        GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
-        if (end) {
-            return -1;
+        if (n <= 0) {
+            return 0;
         }
-        int offset = off;
-        int remaining = len;
+        long remaining = n;
         while (remaining > 0) {
             refreshBuffer();
             if (end) {
                 break;
             }
-            int minLen = Math.min(buffer.remaining(), remaining);
-            buffer.get(b, offset, minLen);
+            int minLen = (int) Math.min(buffer.remaining(), remaining);
+            buffer.position(buffer.position() + minLen);
             remaining -= minLen;
-            offset += minLen;
         }
-        int readSize = len - remaining;
-        if (readSize == 0 && end) {
-            return -1;
-        }
-        return readSize;
+        return n - remaining;
     }
 
     @Override
     public int available() throws IOException {
-        return super.available();
+        refreshBuffer();
+        return buffer.remaining();
     }
 }

@@ -12,6 +12,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 
 /**
@@ -819,6 +820,23 @@ public class GekIO {
             throw new IllegalArgumentException("number < 0.");
         }
         return new LimitedOutputStream(stream, number);
+    }
+
+    /**
+     * Returns a {@link TransformInputStream} from source stream, block size and transformer.
+     * See {@link TransformInputStream} and
+     * {@link TransformInputStream#TransformInputStream(InputStream, int, Function)}.
+     *
+     * @param source      source stream
+     * @param blockSize   block size
+     * @param transformer given transformer
+     * @return a {@link TransformInputStream}
+     * @see TransformInputStream
+     * @see TransformInputStream#TransformInputStream(InputStream, int, Function)
+     */
+    public static TransformInputStream transform(
+        InputStream source, int blockSize, Function<ByteBuffer, ByteBuffer> transformer) {
+        return new TransformInputStream(source, blockSize, transformer);
     }
 
     // Buffer methods:
