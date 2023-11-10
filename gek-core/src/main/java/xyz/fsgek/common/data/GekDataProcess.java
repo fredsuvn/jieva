@@ -1,10 +1,13 @@
 package xyz.fsgek.common.data;
 
+import xyz.fsgek.common.base.GekChars;
+import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.io.GekIO;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 /**
  * This is base interface for data process.
@@ -28,9 +31,7 @@ public interface GekDataProcess<T extends GekDataProcess<T>> {
      * @param array given array
      * @return this
      */
-    default T input(byte[] array) {
-        return input(array, 0);
-    }
+    T input(byte[] array);
 
     /**
      * Sets input to given array, starting from given offset to end of array.
@@ -72,14 +73,43 @@ public interface GekDataProcess<T extends GekDataProcess<T>> {
     T input(InputStream in);
 
     /**
+     * Sets input to given string with {@link GekChars#defaultCharset()}.
+     *
+     * @param str given string
+     * @return this
+     */
+    default T input(String str) {
+        return input(str, GekChars.defaultCharset());
+    }
+
+    /**
+     * Sets input to given string with specified charset.
+     *
+     * @param str     given string
+     * @param charset specified charset
+     * @return this
+     */
+    default T input(String str, Charset charset) {
+        return input(GekString.encode(str, charset));
+    }
+
+    /**
+     * Sets input to given string with {@link GekChars#ISO_8859_1}.
+     *
+     * @param str given string
+     * @return this
+     */
+    default T inputLatin(String str) {
+        return input(GekString.encode(str, GekChars.ISO_8859_1));
+    }
+
+    /**
      * Sets output to given array.
      *
      * @param array given array
      * @return this
      */
-    default T output(byte[] array) {
-        return output(array, 0);
-    }
+    T output(byte[] array);
 
     /**
      * Sets output to given array, starting from given offset.
@@ -131,4 +161,32 @@ public interface GekDataProcess<T extends GekDataProcess<T>> {
      * @return an input stream which contains all configurations of current process
      */
     InputStream finalStream();
+
+    /**
+     * Starts and does final data process, builds result as string with {@link GekChars#defaultCharset()} and returns.
+     *
+     * @return result as string with specified charset
+     */
+    default String finalString() {
+        return finalString(GekChars.defaultCharset());
+    }
+
+    /**
+     * Starts and does final data process, builds result as string with specified charset and returns.
+     *
+     * @param charset specified charset
+     * @return result as string with specified charset
+     */
+    default String finalString(Charset charset) {
+        return GekString.of(finalBytes(), charset);
+    }
+
+    /**
+     * Starts and does final data process, builds result as string with {@link GekChars#ISO_8859_1} and returns.
+     *
+     * @return result as string with ISO_8859_1 charset
+     */
+    default String finalLatinString() {
+        return finalString(GekChars.ISO_8859_1);
+    }
 }

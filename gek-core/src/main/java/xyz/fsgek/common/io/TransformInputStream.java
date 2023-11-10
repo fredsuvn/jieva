@@ -55,7 +55,7 @@ public class TransformInputStream extends InputStream {
     }
 
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
+    public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
             GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (end) {
@@ -84,7 +84,7 @@ public class TransformInputStream extends InputStream {
     }
 
     @Override
-    public int read() throws IOException {
+    public synchronized int read() throws IOException {
         try {
             while (true) {
                 refreshBuffer();
@@ -101,7 +101,7 @@ public class TransformInputStream extends InputStream {
     }
 
     @Override
-    public long skip(long n) throws IOException {
+    public synchronized long skip(long n) throws IOException {
         try {
             if (n <= 0) {
                 return 0;
@@ -125,7 +125,7 @@ public class TransformInputStream extends InputStream {
     }
 
     @Override
-    public int available() throws IOException {
+    public synchronized int available() throws IOException {
         try {
             refreshBuffer();
             return buffer.remaining();

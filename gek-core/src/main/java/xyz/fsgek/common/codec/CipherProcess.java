@@ -44,6 +44,11 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
     }
 
     @Override
+    public CipherProcess input(byte[] array) {
+        return input(ByteBuffer.wrap(array));
+    }
+
+    @Override
     public CipherProcess input(ByteBuffer buffer) {
         this.input = buffer;
         return this;
@@ -53,6 +58,11 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
     public CipherProcess input(InputStream in) {
         this.input = in;
         return this;
+    }
+
+    @Override
+    public CipherProcess output(byte[] array) {
+        return output(ByteBuffer.wrap(array));
     }
 
     @Override
@@ -68,7 +78,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
     }
 
     /**
-     * Sets block size.
+     * Sets block size for encryption/decryption operations.
      *
      * @param blockSize block size
      * @return this
