@@ -1,7 +1,9 @@
 package xyz.fsgek.common.codec;
 
 import org.springframework.core.codec.CodecException;
+import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.data.GekDataProcess;
+import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.Cipher;
 import java.io.InputStream;
@@ -33,6 +35,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
 
     /**
      * Constructs with given {@link Cipher} supplier.
+     * {@link Supplier#get()} will be called before encryption/decryption each time.
      *
      * @param cipher given {@link Cipher} supplier
      */
@@ -151,7 +154,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
     }
 
     @Override
-    public long start() {
+    public long doFinal() {
         try {
             Cipher cipher = this.cipher.get();
             initCipher(cipher);
@@ -183,7 +186,28 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
 
     @Override
     public InputStream finalStream() {
-        return null;
+        InputStream source;
+        if (input instanceof ByteBuffer) {
+            source = GekIO.toInputStream((ByteBuffer) input);
+        } else if (input instanceof InputStream) {
+            source = (InputStream) input;
+        } else {
+            throw new CodecException("Unknown input type: " + input.getClass());
+        }
+        GekRef<Cipher> cipherRef = GekRef.ofNull();
+        return GekIO.transform(source, blockSize, buffer -> {
+            Cipher c = cipherRef.get();
+            if (c == null) {
+                c = cipher.get();
+                try {
+                    initCipher(c);
+                } catch (Exception e) {
+                    throw new GekCodecException(e);
+                }
+                cipherRef.set(c);
+            }
+            return ByteBuffer.wrap(GekCodec.doCipher(c, buffer));
+        });
     }
 
     private void initCipher(Cipher cipher) throws InvalidKeyException, InvalidAlgorithmParameterException {
@@ -209,6 +233,4 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
             }
         }
     }
-
-    //private
 }

@@ -3,9 +3,7 @@ package xyz.fsgek.common.codec;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.io.GekIO;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,11 +11,30 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.function.Supplier;
 
 public class GekCodec {
 
+    /**
+     * Returns a cipher process of specified cipher to encryption/decryption.
+     * Note when the process starts, the status of the cipher cannot be changed.
+     *
+     * @param cipher specified cipher
+     * @return a cipher process of specified cipher
+     */
     public static CipherProcess cipher(Cipher cipher) {
-        return new CipherProcess(() -> cipher);
+        return cipher(() -> cipher);
+    }
+
+    /**
+     * Returns a cipher process of specified cipher supplier to encryption/decryption.
+     * {@link Supplier#get()} will be called before encryption/decryption each time.
+     *
+     * @param cipher specified cipher supplier
+     * @return a cipher process of specified cipher supplier
+     */
+    public static CipherProcess cipher(Supplier<Cipher> cipher) {
+        return new CipherProcess(cipher);
     }
 
     /**
@@ -64,7 +81,7 @@ public class GekCodec {
     public static long doCipher(Cipher cipher, ByteBuffer in, OutputStream out, int blockSize) throws GekCodecException {
         try {
             if (blockSize <= 0) {
-                byte[] result = doFinal(cipher, in);
+                byte[] result = doCipher(cipher, in);
                 if (result == null) {
                     return 0;
                 }
@@ -76,7 +93,7 @@ public class GekCodec {
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
                 ByteBuffer r = GekIO.readSlice(in, inSize);
-                byte[] outBytes = doFinal(cipher, r);
+                byte[] outBytes = doCipher(cipher, r);
                 if (outBytes != null) {
                     out.write(outBytes);
                     outSize += outBytes.length;
@@ -176,16 +193,55 @@ public class GekCodec {
         }
     }
 
+    /**
+     * Encrypts/Decrypts with given {@link Cipher} from input buffer into an array and returns.
+     * If input is ended without any byte read, return null.
+     * This method will encrypt/decrypt all the data at once without blocking.
+     * This method does not initialize the cipher, so it needs to be initialized before calling this method.
+     *
+     * @param cipher given {@link Cipher}
+     * @param in     input buffer
+     * @return an array, or null if input is ended without any byte read
+     * @throws GekCodecException codec exception
+     */
     @Nullable
-    private static byte[] doFinal(Cipher cipher, ByteBuffer in) throws IllegalBlockSizeException, BadPaddingException {
-        if (!in.hasRemaining()) {
-            return null;
+    public static byte[] doCipher(Cipher cipher, ByteBuffer in) throws GekCodecException {
+        try {
+            if (!in.hasRemaining()) {
+                return null;
+            }
+            if (in.hasArray()) {
+                return cipher.doFinal(in.array(), in.arrayOffset() + in.position(), in.remaining());
+            }
+            byte[] inBytes = GekIO.read(in);
+            return cipher.doFinal(inBytes);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
         }
-        if (in.hasArray()) {
-            return cipher.doFinal(in.array(), in.arrayOffset() + in.position(), in.remaining());
+    }
+
+    /**
+     * Encrypts/Decrypts with given {@link Cipher} from input stream into an array and returns.
+     * If input is ended without any byte read, return null.
+     * This method will encrypt/decrypt all the data at once without blocking.
+     * This method does not initialize the cipher, so it needs to be initialized before calling this method.
+     *
+     * @param cipher given {@link Cipher}
+     * @param in     input stream
+     * @return an array, or null if input is ended without any byte read
+     * @throws GekCodecException codec exception
+     */
+    @Nullable
+    public static byte[] doCipher(Cipher cipher, InputStream in) throws GekCodecException {
+        try {
+            byte[] inBytes = GekIO.read(in);
+            if (inBytes == null) {
+                return null;
+            }
+            return cipher.doFinal(inBytes);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
         }
-        byte[] inBytes = GekIO.read(in);
-        return cipher.doFinal(inBytes);
     }
 
     /**

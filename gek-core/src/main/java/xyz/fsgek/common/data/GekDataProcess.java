@@ -109,14 +109,14 @@ public interface GekDataProcess<T extends GekDataProcess<T>> {
     T output(OutputStream out);
 
     /**
-     * Starts data process, returns number of bytes written in output.
+     * Starts and does final data process, returns number of bytes written in output.
      *
      * @return number of bytes written in output
      */
-    long start();
+    long doFinal();
 
     /**
-     * Starts data process, writes result into an array and returns.
+     * Starts and does final data process, writes result into an array and returns.
      *
      * @return result array
      */
@@ -125,11 +125,10 @@ public interface GekDataProcess<T extends GekDataProcess<T>> {
     }
 
     /**
-     * Returns an input stream which contains all configurations of current process, and will start process when call
-     * read methods are called.
+     * Returns an input stream which contains all configurations of current process,
+     * and will start and do final data process when read methods are called.
      *
-     * @return an input stream which contains all configurations of current process, and will start process when call
-     * read methods are called
+     * @return an input stream which contains all configurations of current process
      */
     InputStream finalStream();
 }
