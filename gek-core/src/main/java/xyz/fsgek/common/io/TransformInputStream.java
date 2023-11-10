@@ -56,39 +56,81 @@ public class TransformInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
-        if (end) {
-            return -1;
-        }
-        int offset = off;
-        int remaining = len;
-        while (remaining > 0) {
-            refreshBuffer();
+        try {
+            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (end) {
-                break;
+                return -1;
             }
-            int minLen = Math.min(buffer.remaining(), remaining);
-            buffer.get(b, offset, minLen);
-            remaining -= minLen;
-            offset += minLen;
+            int offset = off;
+            int remaining = len;
+            while (remaining > 0) {
+                refreshBuffer();
+                if (end) {
+                    break;
+                }
+                int minLen = Math.min(buffer.remaining(), remaining);
+                buffer.get(b, offset, minLen);
+                remaining -= minLen;
+                offset += minLen;
+            }
+            int readSize = len - remaining;
+            if (readSize == 0 && end) {
+                return -1;
+            }
+            return readSize;
+        } catch (Exception e) {
+            throw new IOException(e);
         }
-        int readSize = len - remaining;
-        if (readSize == 0 && end) {
-            return -1;
-        }
-        return readSize;
     }
 
     @Override
     public int read() throws IOException {
-        while (true) {
+        try {
+            while (true) {
+                refreshBuffer();
+                if (end) {
+                    return -1;
+                }
+                if (buffer.hasRemaining()) {
+                    return buffer.get() & 0x000000ff;
+                }
+            }
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+        try {
+            if (n <= 0) {
+                return 0;
+            }
+            long remaining = n;
+            while (remaining > 0) {
+                refreshBuffer();
+                if (end) {
+                    break;
+                }
+                int minLen = (int) Math.min(buffer.remaining(), remaining);
+                if (minLen > 0) {
+                    buffer.position(buffer.position() + minLen);
+                    remaining -= minLen;
+                }
+            }
+            return n - remaining;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public int available() throws IOException {
+        try {
             refreshBuffer();
-            if (end) {
-                return -1;
-            }
-            if (buffer.hasRemaining()) {
-                return buffer.get() & 0x000000ff;
-            }
+            return buffer.remaining();
+        } catch (Exception e) {
+            throw new IOException(e);
         }
     }
 
@@ -101,29 +143,5 @@ public class TransformInputStream extends InputStream {
             }
             buffer = transformer.apply(ByteBuffer.wrap(sourceBytes));
         }
-    }
-
-    @Override
-    public long skip(long n) throws IOException {
-        if (n <= 0) {
-            return 0;
-        }
-        long remaining = n;
-        while (remaining > 0) {
-            refreshBuffer();
-            if (end) {
-                break;
-            }
-            int minLen = (int) Math.min(buffer.remaining(), remaining);
-            buffer.position(buffer.position() + minLen);
-            remaining -= minLen;
-        }
-        return n - remaining;
-    }
-
-    @Override
-    public int available() throws IOException {
-        refreshBuffer();
-        return buffer.remaining();
     }
 }

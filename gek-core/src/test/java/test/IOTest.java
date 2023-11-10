@@ -281,18 +281,21 @@ public class IOTest {
     @Test
     public void testTransform() throws IOException {
         byte[] bytes = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1, 1, 2, 3, 4};
-        InputStream source = new ByteArrayInputStream(bytes);
+        ByteArrayInputStream source = new ByteArrayInputStream(bytes);
+        source.mark(0);
         InputStream trans = GekIO.transform(source, 8, buffer -> {
             byte[] bs = GekIO.read(buffer);
             return ByteBuffer.wrap(Arrays.copyOf(bs, bs.length / 2));
         });
         Assert.assertEquals(GekIO.read(trans), new byte[]{1, 2, 3, 4, 8, 7, 6, 5, 1, 2});
+        source.reset();
         trans = GekIO.transform(source, 8, buffer -> {
             byte[] bs = GekIO.read(buffer);
             return ByteBuffer.wrap(Arrays.copyOf(bs, bs.length / 2));
         });
         Assert.assertEquals(trans.skip(5), 5);
-        Assert.assertEquals(GekIO.read(trans), new byte[]{7, 6, 5, 1, 2});
+        Assert.assertEquals(trans.read(), 7);
+        Assert.assertEquals(GekIO.read(trans), new byte[]{6, 5, 1, 2});
     }
 
     @Test
