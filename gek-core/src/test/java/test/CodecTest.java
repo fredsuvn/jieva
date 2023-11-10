@@ -1,5 +1,6 @@
 package test;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
@@ -10,6 +11,7 @@ import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +20,8 @@ import java.security.*;
 import java.util.Arrays;
 
 public class CodecTest {
+
+    private static final Provider BC = new BouncyCastleProvider();
 
     @Test
     public void testCodec() throws Exception {
@@ -125,19 +129,25 @@ public class CodecTest {
     public void testCipher() throws Exception {
         testCipherAsymmetric(150, 88, 256, "RSA", "RSA/ECB/PKCS1Padding", null);
         testCipherAsymmetric(1500, 188, 256, "RSA", "RSA", null);
+        testCipherAsymmetric(1025, 222, 256, "RSA", "RSA", null);
         testCipherSymmetric(150, 999, 9999, "AES", "AES", null);
         testCipherSymmetric(1500, 16, 32, "AES", "AES", null);
+
+        testCipherAsymmetric(150, 88, 256, "RSA", "RSA/ECB/PKCS1Padding", BC);
+        testCipherAsymmetric(1500, 188, 256, "RSA", "RSA", BC);
+        testCipherAsymmetric(1025, 222, 256, "RSA", "RSA", BC);
+        testCipherSymmetric(150, 999, 9999, "AES", "AES", BC);
+        testCipherSymmetric(1500, 16, 32, "AES", "AES", BC);
     }
 
     private void testCipherAsymmetric(
         int dataSize, int enBlockSize, int deBlockSize, String keyAlgorithm, String cryptoAlgorithm, @Nullable Provider provider) throws Exception {
         byte[] data = TestUtil.buildRandomBytes(dataSize);
-        KeyPairGenerator keyPairGenerator = provider == null ?
-            KeyPairGenerator.getInstance(keyAlgorithm) : KeyPairGenerator.getInstance(keyAlgorithm, provider);
+        KeyPairGenerator keyPairGenerator = GekCodec.keyPairGenerator(keyAlgorithm, provider);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
-        Cipher c = provider == null ? Cipher.getInstance(cryptoAlgorithm) : Cipher.getInstance(cryptoAlgorithm, provider);
+        Cipher c = GekCodec.cipher(cryptoAlgorithm);
         CipherProcess cipher = GekCodec.cipher(c);
         byte[] enBytes = cipher.input(data).blockSize(enBlockSize).key(publicKey).encrypt().finalBytes();
         byte[] deBytes = cipher.input(enBytes).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
@@ -163,10 +173,9 @@ public class CodecTest {
     private void testCipherSymmetric(
         int dataSize, int enBlockSize, int deBlockSize, String keyAlgorithm, String cryptoAlgorithm, @Nullable Provider provider) throws Exception {
         byte[] data = TestUtil.buildRandomBytes(dataSize);
-        KeyGenerator keyGenerator = provider == null ?
-            KeyGenerator.getInstance(keyAlgorithm) : KeyGenerator.getInstance(keyAlgorithm, provider);
+        KeyGenerator keyGenerator = GekCodec.keyGenerator(keyAlgorithm, provider);
         SecretKey key = keyGenerator.generateKey();
-        Cipher c = provider == null ? Cipher.getInstance(cryptoAlgorithm) : Cipher.getInstance(cryptoAlgorithm, provider);
+        Cipher c = GekCodec.cipher(cryptoAlgorithm, provider);
         CipherProcess cipher = GekCodec.cipher(c);
         byte[] enBytes = cipher.input(data).blockSize(enBlockSize).key(key).encrypt().finalBytes();
         byte[] deBytes = cipher.input(enBytes).blockSize(deBlockSize).key(key).decrypt().finalBytes();
@@ -187,5 +196,90 @@ public class CodecTest {
         enBytes = Arrays.copyOfRange(enDest, 1, destSize + 1);
         deBytes = cipher.input(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().finalBytes();
         Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
+    }
+
+    @Test
+    public void testDigest() throws Exception {
+        testDigest("MD5", 1111, null);
+        testDigest("MD5", 1, null);
+        testDigest("MD5", 256, null);
+        testDigest("MD5", 1111, BC);
+        testDigest("MD5", 1, BC);
+        testDigest("MD5", 256, BC);
+    }
+
+    private void testDigest(String algorithm, int size, @Nullable Provider provider) {
+        byte[] data = TestUtil.buildRandomBytes(size);
+        MessageDigest md = GekCodec.messageDigest(algorithm, provider);
+        byte[] mdBytes = md.digest(data);
+        System.out.println(mdBytes.length + ", " + md.getDigestLength());
+        byte[] bfBytes = GekCodec.doDigest(md, ByteBuffer.wrap(data));
+        Assert.assertEquals(mdBytes, bfBytes);
+        byte[] inBytes = GekCodec.doDigest(md, new ByteArrayInputStream(data));
+        Assert.assertEquals(mdBytes, inBytes);
+    }
+
+    @Test
+    public void testMac() throws InvalidKeyException {
+        testMac("HmacSHA256", 1111, null);
+        testMac("HmacSHA256", 1, null);
+        testMac("HmacSHA256", 256, null);
+        testMac("HmacSHA256", 1111, BC);
+        testMac("HmacSHA256", 1, BC);
+        testMac("HmacSHA256", 256, BC);
+    }
+
+    private void testMac(String algorithm, int size, @Nullable Provider provider) throws InvalidKeyException {
+        byte[] data = TestUtil.buildRandomBytes(size);
+        KeyGenerator keyGenerator = GekCodec.keyGenerator(algorithm, provider);
+        SecretKey secretKey = keyGenerator.generateKey();
+        Mac md = GekCodec.mac(algorithm, provider);
+        md.init(secretKey);
+        byte[] mdBytes = md.doFinal(data);
+        System.out.println(mdBytes.length + ", " + md.getMacLength());
+        byte[] bfBytes = GekCodec.doMac(md, ByteBuffer.wrap(data));
+        Assert.assertEquals(mdBytes, bfBytes);
+        byte[] inBytes = GekCodec.doMac(md, new ByteArrayInputStream(data));
+        Assert.assertEquals(mdBytes, inBytes);
+    }
+
+    @Test
+    public void testSign() throws Exception {
+        testSign("RSA", "SHA256withRSA", 1111, null);
+        testSign("RSA", "SHA256withRSA", 1, null);
+        testSign("RSA", "SHA256withRSA", 256, null);
+        testSign("RSA", "SHA256withRSA", 1111, BC);
+        testSign("RSA", "SHA256withRSA", 1, BC);
+        testSign("RSA", "SHA256withRSA", 256, BC);
+    }
+
+    private void testSign(String keyAlgorithm, String signAlgorithm, int size, @Nullable Provider provider) throws Exception {
+        byte[] data = TestUtil.buildRandomBytes(size);
+        KeyPairGenerator keyPairGenerator = GekCodec.keyPairGenerator(keyAlgorithm, provider);
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+
+        //sign
+        Signature signature = GekCodec.signature(signAlgorithm, provider);
+        signature.initSign(privateKey);
+        signature.update(data);
+        byte[] signBytes = signature.sign();
+        System.out.println(signBytes.length);
+        signature.initSign(privateKey);
+        byte[] bfBytes = GekCodec.doSign(signature, ByteBuffer.wrap(data));
+        Assert.assertEquals(signBytes, bfBytes);
+        signature.initSign(privateKey);
+        byte[] inBytes = GekCodec.doSign(signature, new ByteArrayInputStream(data));
+        Assert.assertEquals(signBytes, inBytes);
+
+        //verify
+        signature.initVerify(publicKey);
+        signature.update(data);
+        Assert.assertTrue(signature.verify(signBytes));
+        signature.initVerify(publicKey);
+        Assert.assertTrue(GekCodec.doVerify(signature, ByteBuffer.wrap(data), signBytes));
+        signature.initVerify(publicKey);
+        Assert.assertTrue(GekCodec.doVerify(signature, new ByteArrayInputStream(data), signBytes));
     }
 }

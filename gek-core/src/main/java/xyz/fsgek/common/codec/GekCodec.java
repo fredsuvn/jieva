@@ -4,16 +4,237 @@ import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.security.MessageDigest;
-import java.security.Signature;
-import java.security.SignatureException;
+import java.security.*;
 import java.util.function.Supplier;
 
+/**
+ * Codec utilities.
+ *
+ * @author fredsuvn
+ */
 public class GekCodec {
+
+    /**
+     * Returns key factory with specified algorithm.
+     *
+     * @param algorithm specified algorithm
+     * @return key factory with specified algorithm
+     * @throws GekCodecException codec exception
+     */
+    public static KeyFactory keyFactory(String algorithm) throws GekCodecException {
+        try {
+            return KeyFactory.getInstance(algorithm);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns key factory with specified algorithm and provider.
+     *
+     * @param algorithm specified algorithm
+     * @param provider  specified provider
+     * @return key factory with specified algorithm and provider
+     * @throws GekCodecException codec exception
+     */
+    public static KeyFactory keyFactory(String algorithm, @Nullable Provider provider) throws GekCodecException {
+        try {
+            return provider == null ? KeyFactory.getInstance(algorithm) : KeyFactory.getInstance(algorithm, provider);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns key generator with specified algorithm.
+     *
+     * @param algorithm specified algorithm
+     * @return key generator with specified algorithm
+     * @throws GekCodecException codec exception
+     */
+    public static KeyGenerator keyGenerator(String algorithm) throws GekCodecException {
+        try {
+            return KeyGenerator.getInstance(algorithm);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns key generator with specified algorithm and provider.
+     *
+     * @param algorithm specified algorithm
+     * @param provider  specified provider
+     * @return key generator with specified algorithm and provider
+     * @throws GekCodecException codec exception
+     */
+    public static KeyGenerator keyGenerator(String algorithm, @Nullable Provider provider) throws GekCodecException {
+        try {
+            return provider == null ? KeyGenerator.getInstance(algorithm) : KeyGenerator.getInstance(algorithm, provider);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns key pair generator with specified algorithm.
+     *
+     * @param algorithm specified algorithm
+     * @return key pair generator with specified algorithm
+     * @throws GekCodecException codec exception
+     */
+    public static KeyPairGenerator keyPairGenerator(String algorithm) throws GekCodecException {
+        try {
+            return KeyPairGenerator.getInstance(algorithm);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns key pair generator with specified algorithm and provider.
+     *
+     * @param algorithm specified algorithm
+     * @param provider  specified provider
+     * @return key pair generator with specified algorithm and provider
+     * @throws GekCodecException codec exception
+     */
+    public static KeyPairGenerator keyPairGenerator(String algorithm, @Nullable Provider provider) throws GekCodecException {
+        try {
+            return provider == null ? KeyPairGenerator.getInstance(algorithm) : KeyPairGenerator.getInstance(algorithm, provider);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns cipher with specified algorithm.
+     *
+     * @param algorithm specified algorithm
+     * @return cipher with specified algorithm
+     * @throws GekCodecException codec exception
+     */
+    public static Cipher cipher(String algorithm) throws GekCodecException {
+        try {
+            return Cipher.getInstance(algorithm);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns cipher with specified algorithm and provider.
+     *
+     * @param algorithm specified algorithm
+     * @param provider  specified provider
+     * @return cipher with specified algorithm and provider
+     * @throws GekCodecException codec exception
+     */
+    public static Cipher cipher(String algorithm, @Nullable Provider provider) throws GekCodecException {
+        try {
+            return provider == null ? Cipher.getInstance(algorithm) : Cipher.getInstance(algorithm, provider);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns message digest with specified algorithm.
+     *
+     * @param algorithm specified algorithm
+     * @return message digest with specified algorithm
+     * @throws GekCodecException codec exception
+     */
+    public static MessageDigest messageDigest(String algorithm) throws GekCodecException {
+        try {
+            return MessageDigest.getInstance(algorithm);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns message digest with specified algorithm and provider.
+     *
+     * @param algorithm specified algorithm
+     * @param provider  specified provider
+     * @return message digest with specified algorithm and provider
+     * @throws GekCodecException codec exception
+     */
+    public static MessageDigest messageDigest(String algorithm, @Nullable Provider provider) throws GekCodecException {
+        try {
+            return provider == null ? MessageDigest.getInstance(algorithm) : MessageDigest.getInstance(algorithm, provider);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns MAC with specified algorithm.
+     *
+     * @param algorithm specified algorithm
+     * @return MAC with specified algorithm
+     * @throws GekCodecException codec exception
+     */
+    public static Mac mac(String algorithm) throws GekCodecException {
+        try {
+            return Mac.getInstance(algorithm);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns MAC with specified algorithm and provider.
+     *
+     * @param algorithm specified algorithm
+     * @param provider  specified provider
+     * @return MAC with specified algorithm and provider
+     * @throws GekCodecException codec exception
+     */
+    public static Mac mac(String algorithm, @Nullable Provider provider) throws GekCodecException {
+        try {
+            return provider == null ? Mac.getInstance(algorithm) : Mac.getInstance(algorithm, provider);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns signature with specified algorithm.
+     *
+     * @param algorithm specified algorithm
+     * @return signature with specified algorithm
+     * @throws GekCodecException codec exception
+     */
+    public static Signature signature(String algorithm) throws GekCodecException {
+        try {
+            return Signature.getInstance(algorithm);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
+
+    /**
+     * Returns signature with specified algorithm and provider.
+     *
+     * @param algorithm specified algorithm
+     * @param provider  specified provider
+     * @return signature with specified algorithm and provider
+     * @throws GekCodecException codec exception
+     */
+    public static Signature signature(String algorithm, @Nullable Provider provider) throws GekCodecException {
+        try {
+            return provider == null ? Signature.getInstance(algorithm) : Signature.getInstance(algorithm, provider);
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
+    }
 
     /**
      * Returns a cipher process of specified cipher to encryption/decryption.
@@ -266,9 +487,22 @@ public class GekCodec {
      * Digests with given {@link MessageDigest} from input stream, and return digest result.
      * This method does not initialize the digest, so it needs to be initialized before calling this method.
      *
+     * @param digest given {@link MessageDigest}
+     * @param in     input stream
+     * @return digest result
+     * @throws GekCodecException codec exception
+     */
+    public static byte[] doDigest(MessageDigest digest, InputStream in) throws GekCodecException {
+        return doDigest(digest, in, GekIO.IO_BUFFER_SIZE);
+    }
+
+    /**
+     * Digests with given {@link MessageDigest} from input stream, and return digest result.
+     * This method does not initialize the digest, so it needs to be initialized before calling this method.
+     *
      * @param digest     given {@link MessageDigest}
      * @param in         input stream
-     * @param bufferSize buffer size of input data, maybe 0 if computing without dividing in blocks
+     * @param bufferSize buffer size, may &lt;= 0 to read all bytes at once
      * @return digest result
      * @throws GekCodecException codec exception
      */
@@ -320,9 +554,22 @@ public class GekCodec {
      * Generates MAC with given {@link Mac} from input stream, and return MAC result.
      * This method does not initialize the mac, so it needs to be initialized before calling this method.
      *
+     * @param mac given {@link Mac}
+     * @param in  input stream
+     * @return MAC result
+     * @throws GekCodecException codec exception
+     */
+    public static byte[] doMac(Mac mac, InputStream in) throws GekCodecException {
+        return doMac(mac, in, GekIO.IO_BUFFER_SIZE);
+    }
+
+    /**
+     * Generates MAC with given {@link Mac} from input stream, and return MAC result.
+     * This method does not initialize the mac, so it needs to be initialized before calling this method.
+     *
      * @param mac        given {@link Mac}
      * @param in         input stream
-     * @param bufferSize buffer size of input data, maybe 0 if computing without dividing in blocks
+     * @param bufferSize buffer size, may &lt;= 0 to read all bytes at once
      * @return MAC result
      * @throws GekCodecException codec exception
      */
@@ -374,9 +621,22 @@ public class GekCodec {
      * Generates signature with given {@link Signature} from input stream, and return signature result.
      * This method does not initialize the sign, so it needs to be initialized before calling this method.
      *
+     * @param sign given {@link Signature}
+     * @param in   input stream
+     * @return signature result
+     * @throws GekCodecException codec exception
+     */
+    public static byte[] doSign(Signature sign, InputStream in) throws GekCodecException {
+        return doSign(sign, in, GekIO.IO_BUFFER_SIZE);
+    }
+
+    /**
+     * Generates signature with given {@link Signature} from input stream, and return signature result.
+     * This method does not initialize the sign, so it needs to be initialized before calling this method.
+     *
      * @param sign       given {@link Signature}
      * @param in         input stream
-     * @param bufferSize buffer size of input data, maybe 0 if computing without dividing in blocks
+     * @param bufferSize buffer size, may &lt;= 0 to read all bytes at once
      * @return signature result
      * @throws GekCodecException codec exception
      */
@@ -427,22 +687,17 @@ public class GekCodec {
     }
 
     /**
-     * Verifies signature with given {@link Signature} from input buffer and signature.
+     * Verifies signature with given {@link Signature} from input stream and signature.
      * This method does not initialize the sign, so it needs to be initialized before calling this method.
      *
      * @param sign      given {@link Signature}
-     * @param in        input buffer
+     * @param in        input stream
      * @param signature signature
      * @return result of verifying
      * @throws GekCodecException codec exception
      */
-    public static boolean doVerify(Signature sign, ByteBuffer in, ByteBuffer signature) throws GekCodecException {
-        try {
-            sign.update(in);
-            return doVerifyFinal(sign, signature);
-        } catch (Exception e) {
-            throw new GekCodecException(e);
-        }
+    public static boolean doVerify(Signature sign, InputStream in, byte[] signature) throws GekCodecException {
+        return doVerify(sign, in, GekIO.IO_BUFFER_SIZE, signature);
     }
 
     /**
@@ -451,7 +706,7 @@ public class GekCodec {
      *
      * @param sign       given {@link Signature}
      * @param in         input stream
-     * @param bufferSize buffer size of input data, maybe 0 if computing without dividing in blocks
+     * @param bufferSize buffer size, may &lt;= 0 to read all bytes at once
      * @param signature  signature
      * @return result of verifying
      * @throws GekCodecException codec exception
@@ -481,52 +736,5 @@ public class GekCodec {
         } catch (Exception e) {
             throw new GekCodecException(e);
         }
-    }
-
-    /**
-     * Verifies signature with given {@link Signature} from input buffer and signature.
-     * This method does not initialize the sign, so it needs to be initialized before calling this method.
-     *
-     * @param sign       given {@link Signature}
-     * @param in         input stream
-     * @param bufferSize buffer size of input data, maybe 0 if computing without dividing in blocks
-     * @param signature  signature
-     * @return result of verifying
-     * @throws GekCodecException codec exception
-     */
-    public static boolean doVerify(Signature sign, InputStream in, int bufferSize, ByteBuffer signature) throws GekCodecException {
-        try {
-            if (bufferSize <= 0) {
-                byte[] input = GekIO.read(in);
-                sign.update(input);
-                return doVerifyFinal(sign, signature);
-            }
-            byte[] inBytes = new byte[bufferSize];
-            while (true) {
-                int readCount = GekIO.readTo(in, inBytes);
-                if (readCount < 0) {
-                    break;
-                }
-                if (readCount == 0) {
-                    continue;
-                }
-                sign.update(inBytes, 0, readCount);
-                if (readCount < bufferSize) {
-                    break;
-                }
-            }
-            return doVerifyFinal(sign, signature);
-        } catch (Exception e) {
-            throw new GekCodecException(e);
-        }
-    }
-
-    private static boolean doVerifyFinal(Signature sign, ByteBuffer signature) throws SignatureException {
-        if (signature.hasArray()) {
-            return sign.verify(
-                signature.array(), signature.arrayOffset() + signature.position(), signature.remaining());
-        }
-        byte[] bytes = GekIO.read(signature);
-        return sign.verify(bytes);
     }
 }
