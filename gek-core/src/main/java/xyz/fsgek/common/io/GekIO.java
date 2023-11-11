@@ -835,7 +835,7 @@ public class GekIO {
      * @see TransformInputStream#TransformInputStream(InputStream, int, Function)
      */
     public static TransformInputStream transform(
-        InputStream source, int blockSize, Function<ByteBuffer, ByteBuffer> transformer) {
+        InputStream source, int blockSize, Function<byte[], byte[]> transformer) {
         return new TransformInputStream(source, blockSize, transformer);
     }
 
@@ -1375,6 +1375,30 @@ public class GekIO {
         }
         buffer.reset();
         return result == null ? Collections.emptyList() : result;
+    }
+
+    /**
+     * Returns back array of given buffer if:
+     * <pre>
+     *     buffer.hasArray() && buffer.position() == 0
+     *             && buffer.arrayOffset() == 0
+     *             && buffer.limit() == buffer.capacity()
+     * </pre>
+     * And the position will be set to {@code buffer.limit()}.
+     * Otherwise, return {@link #read(ByteBuffer)}.
+     *
+     * @param buffer given buffer
+     * @return back array of given buffer or {@link #read(ByteBuffer)}
+     */
+    public static byte[] readBack(ByteBuffer buffer) {
+        if (buffer.hasArray() && buffer.position() == 0
+            && buffer.arrayOffset() == 0
+            && buffer.limit() == buffer.capacity()
+        ) {
+            buffer.position(buffer.limit());
+            return buffer.array();
+        }
+        return read(buffer);
     }
 
     // File methods:

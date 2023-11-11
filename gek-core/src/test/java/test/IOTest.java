@@ -283,16 +283,10 @@ public class IOTest {
         byte[] bytes = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1, 1, 2, 3, 4};
         ByteArrayInputStream source = new ByteArrayInputStream(bytes);
         source.mark(0);
-        InputStream trans = GekIO.transform(source, 8, buffer -> {
-            byte[] bs = GekIO.read(buffer);
-            return ByteBuffer.wrap(Arrays.copyOf(bs, bs.length / 2));
-        });
+        InputStream trans = GekIO.transform(source, 8, bs -> Arrays.copyOf(bs, bs.length / 2));
         Assert.assertEquals(GekIO.read(trans), new byte[]{1, 2, 3, 4, 8, 7, 6, 5, 1, 2});
         source.reset();
-        trans = GekIO.transform(source, 8, buffer -> {
-            byte[] bs = GekIO.read(buffer);
-            return ByteBuffer.wrap(Arrays.copyOf(bs, bs.length / 2));
-        });
+        trans = GekIO.transform(source, 8, bs -> Arrays.copyOf(bs, bs.length / 2));
         Assert.assertEquals(trans.skip(5), 5);
         Assert.assertEquals(trans.read(), 7);
         Assert.assertEquals(GekIO.read(trans), new byte[]{6, 5, 1, 2});

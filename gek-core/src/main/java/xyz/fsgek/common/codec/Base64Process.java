@@ -7,7 +7,10 @@ import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.data.GekDataProcess;
 import xyz.fsgek.common.io.GekIO;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
@@ -177,19 +180,32 @@ public class Base64Process implements GekDataProcess<Base64Process> {
                 if (output instanceof byte[]) {
                     return encoder.encode((byte[]) input, (byte[]) output);
                 } else if (output instanceof ByteBuffer) {
-                    return doEncode(encoder, GekIO.toInputStream((byte[]) input), GekIO.toOutputStream((ByteBuffer) output));
+                    byte[] result = encoder.encode((byte[]) input);
+                    ((ByteBuffer) output).put(result);
+                    return result.length;
                 } else if (output instanceof OutputStream) {
-                    return doEncode(encoder, GekIO.toInputStream((byte[]) input), (OutputStream) output);
+                    byte[] result = encoder.encode((byte[]) input);
+                    ((OutputStream) output).write(result);
+                    return result.length;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
             } else if (input instanceof ByteBuffer) {
                 if (output instanceof byte[]) {
-                    return doEncode(encoder, GekIO.toInputStream((ByteBuffer) input), GekIO.toOutputStream((byte[]) output));
+                    ByteBuffer result = encoder.encode((ByteBuffer) input);
+                    int remaining = result.remaining();
+                    result.get((byte[]) output);
+                    return remaining;
                 } else if (output instanceof ByteBuffer) {
-                    return doEncode(encoder, GekIO.toInputStream((ByteBuffer) input), GekIO.toOutputStream((ByteBuffer) output));
+                    ByteBuffer result = encoder.encode((ByteBuffer) input);
+                    int remaining = result.remaining();
+                    ((ByteBuffer) output).put(result);
+                    return remaining;
                 } else if (output instanceof OutputStream) {
-                    return doEncode(encoder, GekIO.toInputStream((ByteBuffer) input), (OutputStream) output);
+                    ByteBuffer result = encoder.encode((ByteBuffer) input);
+                    int remaining = result.remaining();
+                    ((OutputStream) output).write(GekIO.readBack(result));
+                    return remaining;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -293,6 +309,34 @@ public class Base64Process implements GekDataProcess<Base64Process> {
         throw new IllegalStateException("Unknown mode: " + mode);
     }
 
+    @Override
+    public InputStream finalStream() {
+        switch (mode) {
+            case ENCODE_MODE:
+                Base64.Encoder encoder = getEncoder();
+                InputStream enIn = inputToInputStream();
+                ByteArrayOutputStream bsOut = new ByteArrayOutputStream();
+                OutputStream wrapper = encoder.wrap(bsOut);
+                return GekIO.transform(enIn, bufferSize, bytes -> {
+                    try {
+                        wrapper.write(bytes);
+                        if (bytes.length != bufferSize) {
+                            wrapper.close();
+                        }
+                        return bsOut.toByteArray();
+                    } catch (IOException e) {
+                        throw new GekCodecException(e);
+                    }
+                });
+
+            case DECODE_MODE:
+                Base64.Decoder decoder = getDecoder();
+                InputStream deIn = inputToInputStream();
+                return decoder.wrap(deIn);
+        }
+        throw new IllegalStateException("Unknown mode: " + mode);
+    }
+
     private byte[] inputToBytes() {
         if (input instanceof byte[]) {
             return (byte[]) input;
@@ -304,23 +348,6 @@ public class Base64Process implements GekDataProcess<Base64Process> {
             return GekIO.read((InputStream) input);
         }
         throw new CodecException("Unknown input type: " + input.getClass());
-    }
-
-    @Override
-    public InputStream finalStream() {
-        switch (mode) {
-            case ENCODE_MODE:
-                Base64.Encoder encoder = getEncoder();
-                InputStream enIn = inputToInputStream();
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                OutputStream wrapper = encoder.wrap(out);
-                
-            case DECODE_MODE:
-                Base64.Decoder decoder = getDecoder();
-                InputStream deIn = inputToInputStream();
-                return decoder.wrap(deIn);
-        }
-        throw new IllegalStateException("Unknown mode: " + mode);
     }
 
     private InputStream inputToInputStream() {

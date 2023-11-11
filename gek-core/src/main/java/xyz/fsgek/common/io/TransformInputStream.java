@@ -1,5 +1,6 @@
 package xyz.fsgek.common.io;
 
+import xyz.fsgek.common.base.GekArray;
 import xyz.fsgek.common.base.GekCheck;
 
 import java.io.IOException;
@@ -8,12 +9,11 @@ import java.nio.ByteBuffer;
 import java.util.function.Function;
 
 /**
- * This input stream is used to transform data from {@code source} stream into this new one. For example:
+ * This input stream is used to transform data from {@code source} stream by specified transformer. For example:
  * <pre>
- *     TransformInputStream trans = new TransformInputStream(source, 8, buffer-&gt;{
- *         byte[] bytes = GekIO.read(buffer);
- *         return ByteBuffer.wrap(Arrays.copyOf(bytes, bytes.length / 2));
- *     });
+ *     TransformInputStream trans = new TransformInputStream(source, 8, bytes-&gt;
+ *         Arrays.copyOf(bytes, bytes.length / 2)
+ *     );
  * </pre>
  * Example shows how to remove half of the data every 8-bytes:
  * <pre>
@@ -28,22 +28,24 @@ public class TransformInputStream extends InputStream {
 
     private final InputStream source;
     private final int blockSize;
-    private final Function<ByteBuffer, ByteBuffer> transformer;
+    private final Function<byte[], byte[]> transformer;
 
     private ByteBuffer buffer;
     private boolean end = false;
 
     /**
      * Constructs with source stream, block size and transformer.
-     * The block size specifies how much data is read each time from source stream, and the data will be wrapped as
-     * {@link ByteBuffer} to transform by given transformer. If remaining bytes is less than block size, all remaining
-     * bytes will be read and wrapped and to transform.
+     * The block size specifies how much data is read each time from source stream, and the read data will be pass to
+     * given transformer and the transformer return transformed result.
+     * If remaining bytes is less than block size, all remaining bytes will be read and pass to transform.
+     * Transformer may return empty or null, in this case the passed read data is not enough to transform and need next
+     * more read data.
      *
      * @param source      source stream
      * @param blockSize   block size
      * @param transformer given transformer
      */
-    public TransformInputStream(InputStream source, int blockSize, Function<ByteBuffer, ByteBuffer> transformer) {
+    public TransformInputStream(InputStream source, int blockSize, Function<byte[], byte[]> transformer) {
         this.source = source;
         this.blockSize = blockSize;
         this.transformer = transformer;
@@ -135,13 +137,17 @@ public class TransformInputStream extends InputStream {
     }
 
     private void refreshBuffer() {
-        if (buffer == null || !buffer.hasRemaining()) {
+        while (buffer == null || !buffer.hasRemaining()) {
             byte[] sourceBytes = GekIO.read(source, blockSize);
             if (sourceBytes == null) {
                 end = true;
                 return;
             }
-            buffer = transformer.apply(ByteBuffer.wrap(sourceBytes));
+            byte[] transformed = transformer.apply(sourceBytes);
+            if (GekArray.isNotEmpty(transformed)) {
+                buffer = ByteBuffer.wrap(transformed);
+                return;
+            }
         }
     }
 }

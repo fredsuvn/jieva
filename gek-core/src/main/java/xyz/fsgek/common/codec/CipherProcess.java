@@ -205,7 +205,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
             throw new CodecException("Unknown input type: " + input.getClass());
         }
         GekRef<Cipher> cipherRef = GekRef.ofNull();
-        return GekIO.transform(source, blockSize, buffer -> {
+        return GekIO.transform(source, blockSize, bytes -> {
             Cipher c = cipherRef.get();
             if (c == null) {
                 c = cipher.get();
@@ -216,7 +216,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
                 }
                 cipherRef.set(c);
             }
-            return ByteBuffer.wrap(GekCodec.doCipher(c, buffer));
+            return GekCodec.doCipher(c, ByteBuffer.wrap(bytes));
         });
     }
 
