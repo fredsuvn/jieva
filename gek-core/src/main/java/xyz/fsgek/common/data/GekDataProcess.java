@@ -146,6 +146,18 @@ public interface GekDataProcess<T extends GekDataProcess<T>> {
     long doFinal();
 
     /**
+     * Starts and does final data process, returns int number of bytes written in output, or {@link Integer#MAX_VALUE}
+     * if the number is greater than {@link Integer#MAX_VALUE}.
+     *
+     * @return int number of bytes written in output or {@link Integer#MAX_VALUE} if the number is greater than
+     * {@link Integer#MAX_VALUE}.
+     */
+    default int doFinalInt() {
+        long num = doFinal();
+        return (int) (num > Integer.MAX_VALUE ? Integer.MAX_VALUE : num);
+    }
+
+    /**
      * Starts and does final data process, writes result into an array and returns.
      *
      * @return result array

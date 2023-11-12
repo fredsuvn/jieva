@@ -210,7 +210,7 @@ public class Base64Codec implements GekDataProcess<Base64Codec> {
                     }
                     ByteBuffer encoded = encoder.encode(src);
                     int writeNum = encoded.remaining();
-                    encoded.get(dest);
+                    GekIO.readTo(encoded, dest);
                     return writeNum;
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
@@ -310,7 +310,7 @@ public class Base64Codec implements GekDataProcess<Base64Codec> {
                     }
                     ByteBuffer encoded = decoder.decode(src);
                     int writeNum = encoded.remaining();
-                    encoded.get(dest);
+                    GekIO.readTo(encoded, dest);
                     return writeNum;
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
@@ -392,6 +392,24 @@ public class Base64Codec implements GekDataProcess<Base64Codec> {
                 return GekString.of(getDecoder().decode(inputToBytes()), GekChars.ISO_8859_1);
         }
         throw new IllegalStateException("Unknown mode: " + mode);
+    }
+
+    /**
+     * For base64:
+     * <ul>
+     *     <li>
+     *         If it is encode mode, same with {@link #finalLatinString()};
+     *     </li>
+     *     <li>
+     *         Otherwise with {@link GekChars#defaultCharset()}.
+     *     </li>
+     * </ul>
+     *
+     * @return encode mode same with {@link #finalLatinString()}, otherwise {@link GekChars#defaultCharset()}
+     */
+    @Override
+    public String finalString() {
+        return mode == ENCODE_MODE ? finalLatinString() : finalString(GekChars.defaultCharset());
     }
 
     @Override

@@ -192,6 +192,18 @@ public class IOTest {
         buffer.flip();
         Assert.assertEquals(GekIO.read(buffer), Arrays.copyOf(bytes, 2));
         Assert.assertEquals(source.remaining(), bytes.length - 2);
+
+        byte[] dest = new byte[bytes.length * 2];
+        buffer = ByteBuffer.wrap(bytes);
+        int size = GekIO.readTo(buffer, dest);
+        Assert.assertEquals(buffer.position(), bytes.length);
+        Assert.assertEquals(size, bytes.length);
+        Assert.assertEquals(bytes, Arrays.copyOf(dest, bytes.length));
+        buffer = ByteBuffer.wrap(bytes, 10, 10);
+        size = GekIO.readTo(ByteBuffer.wrap(bytes, 10, 10), dest, 5);
+        Assert.assertEquals(buffer.position(), 10);
+        Assert.assertEquals(size, 10);
+        Assert.assertEquals(Arrays.copyOfRange(bytes, 10, 10 + 10), Arrays.copyOfRange(dest, 5, 5 + 10));
     }
 
     @Test
@@ -290,6 +302,17 @@ public class IOTest {
         Assert.assertEquals(trans.skip(5), 5);
         Assert.assertEquals(trans.read(), 7);
         Assert.assertEquals(GekIO.read(trans), new byte[]{6, 5, 1, 2});
+    }
+
+    @Test
+    public void testSimpleBuffer() {
+        byte[] bytes = TestUtil.buildRandomBytes(111);
+        Assert.assertTrue(GekIO.isSimpleWrapper(ByteBuffer.wrap(bytes)));
+        Assert.assertFalse(GekIO.isSimpleWrapper(ByteBuffer.wrap(bytes, 0, 1)));
+        Assert.assertFalse(GekIO.isSimpleWrapper(ByteBuffer.wrap(bytes, 1, 1)));
+        Assert.assertFalse(GekIO.isSimpleWrapper(ByteBuffer.wrap(bytes).get(new byte[5])));
+        Assert.assertSame(GekIO.readBack(ByteBuffer.wrap(bytes)), bytes);
+        Assert.assertEquals(GekIO.readBack(ByteBuffer.wrap(bytes, 0, 1)), Arrays.copyOf(bytes, 1));
     }
 
     @Test

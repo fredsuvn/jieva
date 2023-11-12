@@ -947,7 +947,7 @@ public class GekIO {
      * @param source source buffer
      * @param dest   dest buffer
      * @param number specified number
-     * @return actual read number, or -1 if no data read out and reaches to the end of source or dest buffer
+     * @return actual read number, or -1 if no data read out and reaches to the end of buffer
      * @throws GekIOException IO exception
      */
     public static int readTo(ByteBuffer source, ByteBuffer dest, int number) throws GekIOException {
@@ -964,6 +964,48 @@ public class GekIO {
                 source.position(source.position() + readNum);
             }
             return readNum;
+        } catch (Exception e) {
+            throw new GekIOException(e);
+        }
+    }
+
+    /**
+     * Reads specified number of bytes from source buffer into dest array,
+     * returns actual read number, or -1 if no data read out and reaches to the end of buffer or array.
+     *
+     * @param source source buffer
+     * @param dest   dest array
+     * @return actual read number, or -1 if no data read out and reaches to the end of buffer or array
+     * @throws GekIOException IO exception
+     */
+    public static int readTo(ByteBuffer source, byte[] dest) throws GekIOException {
+        return readTo(source, dest, 0);
+    }
+
+    /**
+     * Reads specified number of bytes from source buffer into dest array starting from given offset,
+     * returns actual read number, or -1 if no data read out and reaches to the end of buffer or array.
+     *
+     * @param source source buffer
+     * @param dest   dest array
+     * @param offset given offset
+     * @return actual read number, or -1 if no data read out and reaches to the end of buffer or array
+     * @throws GekIOException IO exception
+     */
+    public static int readTo(ByteBuffer source, byte[] dest, int offset) throws GekIOException {
+        try {
+            GekCheck.checkInBounds(offset, 0, dest.length);
+            int minLen = Math.min(source.remaining(), dest.length - offset);
+            if (minLen <= 0) {
+                return 0;
+            }
+            if (source.remaining() >= minLen) {
+                source.get(dest, offset, minLen);
+            } else {
+                ByteBuffer slice = readSlice(source, minLen);
+                slice.get(dest, offset, minLen);
+            }
+            return minLen;
         } catch (Exception e) {
             throw new GekIOException(e);
         }
