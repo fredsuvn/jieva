@@ -15,11 +15,11 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 /**
- * {@link GekDataProcess} to encode/decode base64.
+ * Base64 implementation of {@link GekDataProcess} to encode/decode base64 with {@link Base64}.
  *
  * @author fredsuvn
  */
-public class Base64Process implements GekDataProcess<Base64Process> {
+public class Base64Codec implements GekDataProcess<Base64Codec> {
 
     private static final int ENCODE_MODE = 0;
     private static final int DECODE_MODE = 1;
@@ -29,7 +29,7 @@ public class Base64Process implements GekDataProcess<Base64Process> {
 
     private Object input;
     private Object output;
-    private int bufferSize = GekIO.IO_BUFFER_SIZE;
+    private int blockSize = GekIO.IO_BUFFER_SIZE;
     private int mode = ENCODE_MODE;
     private int type = BASIC_TYPE;
     private boolean withoutPadding = false;
@@ -37,49 +37,49 @@ public class Base64Process implements GekDataProcess<Base64Process> {
     private MimeParams mimeParams;
 
     @Override
-    public Base64Process input(byte[] array) {
+    public Base64Codec input(byte[] array) {
         this.input = array;
         return this;
     }
 
     @Override
-    public Base64Process input(ByteBuffer buffer) {
+    public Base64Codec input(ByteBuffer buffer) {
         this.input = buffer;
         return this;
     }
 
     @Override
-    public Base64Process input(InputStream in) {
+    public Base64Codec input(InputStream in) {
         this.input = in;
         return this;
     }
 
     @Override
-    public Base64Process output(byte[] array) {
+    public Base64Codec output(byte[] array) {
         this.output = array;
         return this;
     }
 
     @Override
-    public Base64Process output(ByteBuffer buffer) {
+    public Base64Codec output(ByteBuffer buffer) {
         this.output = buffer;
         return this;
     }
 
     @Override
-    public Base64Process output(OutputStream out) {
+    public Base64Codec output(OutputStream out) {
         this.output = out;
         return this;
     }
 
     /**
-     * Sets buffer size for IO operations.
+     * Sets block size for encoding/decoding operations.
      *
-     * @param bufferSize buffer size
+     * @param blockSize block size
      * @return this
      */
-    public Base64Process bufferSize(int bufferSize) {
-        this.bufferSize = bufferSize;
+    public Base64Codec blockSize(int blockSize) {
+        this.blockSize = blockSize;
         return this;
     }
 
@@ -88,7 +88,7 @@ public class Base64Process implements GekDataProcess<Base64Process> {
      *
      * @return this
      */
-    public Base64Process encode() {
+    public Base64Codec encode() {
         this.mode = ENCODE_MODE;
         return this;
     }
@@ -98,7 +98,7 @@ public class Base64Process implements GekDataProcess<Base64Process> {
      *
      * @return this
      */
-    public Base64Process decode() {
+    public Base64Codec decode() {
         this.mode = DECODE_MODE;
         return this;
     }
@@ -109,7 +109,7 @@ public class Base64Process implements GekDataProcess<Base64Process> {
      *
      * @return this
      */
-    public Base64Process basic() {
+    public Base64Codec basic() {
         this.type = BASIC_TYPE;
         return this;
     }
@@ -120,7 +120,7 @@ public class Base64Process implements GekDataProcess<Base64Process> {
      *
      * @return this
      */
-    public Base64Process url() {
+    public Base64Codec url() {
         this.type = URL_TYPE;
         return this;
     }
@@ -131,7 +131,7 @@ public class Base64Process implements GekDataProcess<Base64Process> {
      *
      * @return this
      */
-    public Base64Process mime() {
+    public Base64Codec mime() {
         this.type = URL_TYPE;
         return this;
     }
@@ -146,7 +146,7 @@ public class Base64Process implements GekDataProcess<Base64Process> {
      * @param lineSeparator the line separator for each output line
      * @return this
      */
-    public Base64Process mime(int lineLength, byte[] lineSeparator) {
+    public Base64Codec mime(int lineLength, byte[] lineSeparator) {
         this.type = URL_TYPE;
         this.mimeParams = new MimeParams(lineLength, lineSeparator);
         return this;
@@ -157,7 +157,7 @@ public class Base64Process implements GekDataProcess<Base64Process> {
      *
      * @return this
      */
-    public Base64Process withoutPadding(boolean withoutPadding) {
+    public Base64Codec withoutPadding(boolean withoutPadding) {
         this.withoutPadding = withoutPadding;
         return this;
     }
@@ -177,45 +177,89 @@ public class Base64Process implements GekDataProcess<Base64Process> {
         try {
             Base64.Encoder encoder = getEncoder();
             if (input instanceof byte[]) {
+                byte[] src = (byte[]) input;
                 if (output instanceof byte[]) {
-                    return encoder.encode((byte[]) input, (byte[]) output);
+                    byte[] dest = (byte[]) output;
+                    return encoder.encode(src, dest);
                 } else if (output instanceof ByteBuffer) {
-                    byte[] result = encoder.encode((byte[]) input);
-                    ((ByteBuffer) output).put(result);
-                    return result.length;
+                    ByteBuffer dest = (ByteBuffer) output;
+                    if (GekIO.isSimpleWrapper(dest)) {
+                        int writeNum = encoder.encode(src, dest.array());
+                        dest.position(writeNum);
+                        return writeNum;
+                    }
+                    byte[] encoded = encoder.encode(src);
+                    dest.put(encoded);
+                    return encoded.length;
                 } else if (output instanceof OutputStream) {
-                    byte[] result = encoder.encode((byte[]) input);
-                    ((OutputStream) output).write(result);
-                    return result.length;
+                    OutputStream dest = (OutputStream) output;
+                    byte[] encoded = encoder.encode(src);
+                    dest.write(encoded);
+                    return encoded.length;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
             } else if (input instanceof ByteBuffer) {
+                ByteBuffer src = (ByteBuffer) input;
                 if (output instanceof byte[]) {
-                    ByteBuffer result = encoder.encode((ByteBuffer) input);
-                    int remaining = result.remaining();
-                    result.get((byte[]) output);
-                    return remaining;
+                    byte[] dest = (byte[]) output;
+                    if (GekIO.isSimpleWrapper(src)) {
+                        int writeNum = encoder.encode(src.array(), dest);
+                        src.position(src.limit());
+                        return writeNum;
+                    }
+                    ByteBuffer encoded = encoder.encode(src);
+                    int writeNum = encoded.remaining();
+                    encoded.get(dest);
+                    return writeNum;
                 } else if (output instanceof ByteBuffer) {
-                    ByteBuffer result = encoder.encode((ByteBuffer) input);
-                    int remaining = result.remaining();
-                    ((ByteBuffer) output).put(result);
-                    return remaining;
+                    ByteBuffer dest = (ByteBuffer) output;
+                    if (GekIO.isSimpleWrapper(src) && GekIO.isSimpleWrapper(dest)) {
+                        int writeNum = encoder.encode(src.array(), dest.array());
+                        src.position(src.limit());
+                        dest.position(writeNum);
+                        return writeNum;
+                    }
+                    ByteBuffer encoded = encoder.encode(src);
+                    int writeNum = encoded.remaining();
+                    dest.put(encoded);
+                    return writeNum;
                 } else if (output instanceof OutputStream) {
-                    ByteBuffer result = encoder.encode((ByteBuffer) input);
-                    int remaining = result.remaining();
-                    ((OutputStream) output).write(GekIO.readBack(result));
-                    return remaining;
+                    OutputStream dest = (OutputStream) output;
+                    ByteBuffer encoded = encoder.encode(src);
+                    int writeNum = encoded.remaining();
+                    if (GekIO.isSimpleWrapper(encoded)) {
+                        dest.write(encoded.array());
+                    } else {
+                        dest.write(GekIO.read(encoded));
+                    }
+                    return writeNum;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
             } else if (input instanceof InputStream) {
+                InputStream src = (InputStream) input;
                 if (output instanceof byte[]) {
-                    return doEncode(encoder, (InputStream) input, GekIO.toOutputStream((byte[]) output));
+                    byte[] dest = (byte[]) output;
+                    byte[] in = GekIO.read(src);
+                    return encoder.encode(in, dest);
                 } else if (output instanceof ByteBuffer) {
-                    return doEncode(encoder, (InputStream) input, GekIO.toOutputStream((ByteBuffer) output));
+                    ByteBuffer dest = (ByteBuffer) output;
+                    if (GekIO.isSimpleWrapper(dest)) {
+                        int writeNum = encoder.encode(GekIO.read(src), dest.array());
+                        dest.position(writeNum);
+                        return writeNum;
+                    }
+                    byte[] encoded = encoder.encode(GekIO.read(src));
+                    dest.put(encoded);
+                    return encoded.length;
                 } else if (output instanceof OutputStream) {
-                    return doEncode(encoder, (InputStream) input, (OutputStream) output);
+                    OutputStream dest = (OutputStream) output;
+                    OutputCounter counter = new OutputCounter(dest);
+                    OutputStream wrapper = encoder.wrap(counter);
+                    GekIO.readTo(src, wrapper, -1, blockSize);
+                    wrapper.close();
+                    return counter.count;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -227,46 +271,94 @@ public class Base64Process implements GekDataProcess<Base64Process> {
         } catch (Exception e) {
             throw new GekCodecException(e);
         }
-    }
-
-    private long doEncode(Base64.Encoder encoder, InputStream in, OutputStream out) throws IOException {
-        OutputCounter counter = new OutputCounter(out);
-        OutputStream encOut = encoder.wrap(counter);
-        GekIO.readTo(in, encOut, -1, bufferSize);
-        encOut.close();
-        return counter.count;
     }
 
     private long doDecode() {
         try {
             Base64.Decoder decoder = getDecoder();
             if (input instanceof byte[]) {
+                byte[] src = (byte[]) input;
                 if (output instanceof byte[]) {
-                    return decoder.decode((byte[]) input, (byte[]) output);
+                    byte[] dest = (byte[]) output;
+                    return decoder.decode(src, dest);
                 } else if (output instanceof ByteBuffer) {
-                    return doDecode(decoder, GekIO.toInputStream((byte[]) input), GekIO.toOutputStream((ByteBuffer) output));
+                    ByteBuffer dest = (ByteBuffer) output;
+                    if (GekIO.isSimpleWrapper(dest)) {
+                        int writeNum = decoder.decode(src, dest.array());
+                        dest.position(writeNum);
+                        return writeNum;
+                    }
+                    byte[] encoded = decoder.decode(src);
+                    dest.put(encoded);
+                    return encoded.length;
                 } else if (output instanceof OutputStream) {
-                    return doDecode(decoder, GekIO.toInputStream((byte[]) input), (OutputStream) output);
+                    OutputStream dest = (OutputStream) output;
+                    byte[] encoded = decoder.decode(src);
+                    dest.write(encoded);
+                    return encoded.length;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
             } else if (input instanceof ByteBuffer) {
+                ByteBuffer src = (ByteBuffer) input;
                 if (output instanceof byte[]) {
-                    return doDecode(decoder, GekIO.toInputStream((ByteBuffer) input), GekIO.toOutputStream((byte[]) output));
+                    byte[] dest = (byte[]) output;
+                    if (GekIO.isSimpleWrapper(src)) {
+                        int writeNum = decoder.decode(src.array(), dest);
+                        src.position(src.limit());
+                        return writeNum;
+                    }
+                    ByteBuffer encoded = decoder.decode(src);
+                    int writeNum = encoded.remaining();
+                    encoded.get(dest);
+                    return writeNum;
                 } else if (output instanceof ByteBuffer) {
-                    return doDecode(decoder, GekIO.toInputStream((ByteBuffer) input), GekIO.toOutputStream((ByteBuffer) output));
+                    ByteBuffer dest = (ByteBuffer) output;
+                    if (GekIO.isSimpleWrapper(src) && GekIO.isSimpleWrapper(dest)) {
+                        int writeNum = decoder.decode(src.array(), dest.array());
+                        src.position(src.limit());
+                        dest.position(writeNum);
+                        return writeNum;
+                    }
+                    ByteBuffer encoded = decoder.decode(src);
+                    int writeNum = encoded.remaining();
+                    dest.put(encoded);
+                    return writeNum;
                 } else if (output instanceof OutputStream) {
-                    return doDecode(decoder, GekIO.toInputStream((ByteBuffer) input), (OutputStream) output);
+                    OutputStream dest = (OutputStream) output;
+                    ByteBuffer encoded = decoder.decode(src);
+                    int writeNum = encoded.remaining();
+                    if (GekIO.isSimpleWrapper(encoded)) {
+                        dest.write(encoded.array());
+                    } else {
+                        dest.write(GekIO.read(encoded));
+                    }
+                    return writeNum;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
             } else if (input instanceof InputStream) {
+                InputStream src = (InputStream) input;
                 if (output instanceof byte[]) {
-                    return doDecode(decoder, (InputStream) input, GekIO.toOutputStream((byte[]) output));
+                    byte[] dest = (byte[]) output;
+                    byte[] in = GekIO.read(src);
+                    return decoder.decode(in, dest);
                 } else if (output instanceof ByteBuffer) {
-                    return doDecode(decoder, (InputStream) input, GekIO.toOutputStream((ByteBuffer) output));
+                    ByteBuffer dest = (ByteBuffer) output;
+                    if (GekIO.isSimpleWrapper(dest)) {
+                        int writeNum = decoder.decode(GekIO.read(src), dest.array());
+                        dest.position(writeNum);
+                        return writeNum;
+                    }
+                    byte[] encoded = decoder.decode(GekIO.read(src));
+                    dest.put(encoded);
+                    return encoded.length;
                 } else if (output instanceof OutputStream) {
-                    return doDecode(decoder, (InputStream) input, (OutputStream) output);
+                    OutputStream dest = (OutputStream) output;
+                    InputStream wrapper = decoder.wrap(src);
+                    OutputCounter counter = new OutputCounter(dest);
+                    GekIO.readTo(wrapper, counter, -1, blockSize);
+                    return counter.count;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -278,13 +370,6 @@ public class Base64Process implements GekDataProcess<Base64Process> {
         } catch (Exception e) {
             throw new GekCodecException(e);
         }
-    }
-
-    private long doDecode(Base64.Decoder decoder, InputStream in, OutputStream out) throws IOException {
-        InputStream wrapper = decoder.wrap(in);
-        OutputCounter counter = new OutputCounter(out);
-        GekIO.readTo(wrapper, counter, -1, bufferSize);
-        return counter.count;
     }
 
     @Override
@@ -317,10 +402,10 @@ public class Base64Process implements GekDataProcess<Base64Process> {
                 InputStream enIn = inputToInputStream();
                 ByteArrayOutputStream bsOut = new ByteArrayOutputStream();
                 OutputStream wrapper = encoder.wrap(bsOut);
-                return GekIO.transform(enIn, bufferSize, bytes -> {
+                return GekIO.transform(enIn, blockSize, bytes -> {
                     try {
                         wrapper.write(bytes);
-                        if (bytes.length != bufferSize) {
+                        if (bytes.length != blockSize) {
                             wrapper.close();
                         }
                         return bsOut.toByteArray();

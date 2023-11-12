@@ -15,12 +15,12 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Supplier;
 
 /**
- * {@link GekDataProcess} to encrypt/decrypt with {@link Cipher}.
+ * Codec implementation of {@link GekDataProcess} to encrypt/decrypt with {@link Cipher}.
  * When the process starts, the status of the cipher cannot be changed.
  *
  * @author fredsuvn
  */
-public class CipherProcess implements GekDataProcess<CipherProcess> {
+public class CipherCodec implements GekDataProcess<CipherCodec> {
 
     private final Supplier<Cipher> cipher;
     private Object input;
@@ -39,40 +39,40 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      *
      * @param cipher given {@link Cipher} supplier
      */
-    public CipherProcess(Supplier<Cipher> cipher) {
+    public CipherCodec(Supplier<Cipher> cipher) {
         this.cipher = cipher;
     }
 
     @Override
-    public CipherProcess input(byte[] array) {
+    public CipherCodec input(byte[] array) {
         return input(ByteBuffer.wrap(array));
     }
 
     @Override
-    public CipherProcess input(ByteBuffer buffer) {
+    public CipherCodec input(ByteBuffer buffer) {
         this.input = buffer;
         return this;
     }
 
     @Override
-    public CipherProcess input(InputStream in) {
+    public CipherCodec input(InputStream in) {
         this.input = in;
         return this;
     }
 
     @Override
-    public CipherProcess output(byte[] array) {
+    public CipherCodec output(byte[] array) {
         return output(ByteBuffer.wrap(array));
     }
 
     @Override
-    public CipherProcess output(ByteBuffer buffer) {
+    public CipherCodec output(ByteBuffer buffer) {
         this.output = buffer;
         return this;
     }
 
     @Override
-    public CipherProcess output(OutputStream out) {
+    public CipherCodec output(OutputStream out) {
         this.output = out;
         return this;
     }
@@ -83,7 +83,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      * @param blockSize block size
      * @return this
      */
-    public CipherProcess blockSize(int blockSize) {
+    public CipherCodec blockSize(int blockSize) {
         this.blockSize = blockSize;
         return this;
     }
@@ -94,7 +94,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      * @param secureRandom secure random
      * @return this
      */
-    public CipherProcess secureRandom(SecureRandom secureRandom) {
+    public CipherCodec secureRandom(SecureRandom secureRandom) {
         this.secureRandom = secureRandom;
         return this;
     }
@@ -105,7 +105,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      * @param certificate certificate
      * @return this
      */
-    public CipherProcess certificate(Certificate certificate) {
+    public CipherCodec certificate(Certificate certificate) {
         this.certificate = certificate;
         return this;
     }
@@ -116,7 +116,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      * @param algorithmParameters algorithm parameters
      * @return this
      */
-    public CipherProcess algorithmParameters(AlgorithmParameters algorithmParameters) {
+    public CipherCodec algorithmParameters(AlgorithmParameters algorithmParameters) {
         this.algorithmParameters = algorithmParameters;
         return this;
     }
@@ -127,7 +127,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      * @param algorithmParameterSpec algorithm parameter spec
      * @return this
      */
-    public CipherProcess algorithmParameterSpec(AlgorithmParameterSpec algorithmParameterSpec) {
+    public CipherCodec algorithmParameterSpec(AlgorithmParameterSpec algorithmParameterSpec) {
         this.algorithmParameterSpec = algorithmParameterSpec;
         return this;
     }
@@ -137,7 +137,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      *
      * @return this
      */
-    public CipherProcess encrypt() {
+    public CipherCodec encrypt() {
         this.mode = Cipher.ENCRYPT_MODE;
         return this;
     }
@@ -147,7 +147,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      *
      * @return this
      */
-    public CipherProcess decrypt() {
+    public CipherCodec decrypt() {
         this.mode = Cipher.DECRYPT_MODE;
         return this;
     }
@@ -158,7 +158,7 @@ public class CipherProcess implements GekDataProcess<CipherProcess> {
      * @param key key
      * @return this
      */
-    public CipherProcess key(Key key) {
+    public CipherCodec key(Key key) {
         this.key = key;
         return this;
     }

@@ -243,7 +243,7 @@ public class GekCodec {
      * @param cipher specified cipher
      * @return a cipher process of specified cipher
      */
-    public static CipherProcess cipher(Cipher cipher) {
+    public static CipherCodec cipher(Cipher cipher) {
         return cipher(() -> cipher);
     }
 
@@ -254,8 +254,8 @@ public class GekCodec {
      * @param cipher specified cipher supplier
      * @return a cipher process of specified cipher supplier
      */
-    public static CipherProcess cipher(Supplier<Cipher> cipher) {
-        return new CipherProcess(cipher);
+    public static CipherCodec cipher(Supplier<Cipher> cipher) {
+        return new CipherCodec(cipher);
     }
 
     /**

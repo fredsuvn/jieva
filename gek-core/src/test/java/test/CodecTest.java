@@ -5,7 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.codec.CipherProcess;
+import xyz.fsgek.common.codec.CipherCodec;
 import xyz.fsgek.common.codec.GekCodec;
 import xyz.fsgek.common.io.GekIO;
 
@@ -148,7 +148,7 @@ public class CodecTest {
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
         Cipher c = GekCodec.cipher(cryptoAlgorithm);
-        CipherProcess cipher = GekCodec.cipher(c);
+        CipherCodec cipher = GekCodec.cipher(c);
         byte[] enBytes = cipher.input(data).blockSize(enBlockSize).key(publicKey).encrypt().finalBytes();
         byte[] deBytes = cipher.input(enBytes).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
@@ -176,7 +176,7 @@ public class CodecTest {
         KeyGenerator keyGenerator = GekCodec.keyGenerator(keyAlgorithm, provider);
         SecretKey key = keyGenerator.generateKey();
         Cipher c = GekCodec.cipher(cryptoAlgorithm, provider);
-        CipherProcess cipher = GekCodec.cipher(c);
+        CipherCodec cipher = GekCodec.cipher(c);
         byte[] enBytes = cipher.input(data).blockSize(enBlockSize).key(key).encrypt().finalBytes();
         byte[] deBytes = cipher.input(enBytes).blockSize(deBlockSize).key(key).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);

@@ -1378,23 +1378,34 @@ public class GekIO {
     }
 
     /**
-     * Returns back array of given buffer if:
+     * Returns whether given buffer is a simple wrapper of back array:
      * <pre>
-     *     buffer.hasArray() && buffer.position() == 0
+     *     return buffer.hasArray()
+     *             && buffer.position() == 0
      *             && buffer.arrayOffset() == 0
-     *             && buffer.limit() == buffer.capacity()
+     *             && buffer.limit() == buffer.array().length;
      * </pre>
-     * And the position will be set to {@code buffer.limit()}.
+     *
+     * @param buffer given buffer
+     * @return whether given buffer is a simple wrapper of back array
+     */
+    public static boolean isSimpleWrapper(ByteBuffer buffer) {
+        return buffer.hasArray()
+            && buffer.position() == 0
+            && buffer.arrayOffset() == 0
+            && buffer.limit() == buffer.array().length;
+    }
+
+    /**
+     * Returns back array if {@link #isSimpleWrapper(ByteBuffer)} returns true for given buffer,
+     * and the position will be set to {@code buffer.limit()}.
      * Otherwise, return {@link #read(ByteBuffer)}.
      *
      * @param buffer given buffer
-     * @return back array of given buffer or {@link #read(ByteBuffer)}
+     * @return back array if {@link #isSimpleWrapper(ByteBuffer)} returns true for given buffer
      */
     public static byte[] readBack(ByteBuffer buffer) {
-        if (buffer.hasArray() && buffer.position() == 0
-            && buffer.arrayOffset() == 0
-            && buffer.limit() == buffer.capacity()
-        ) {
+        if (isSimpleWrapper(buffer)) {
             buffer.position(buffer.limit());
             return buffer.array();
         }
