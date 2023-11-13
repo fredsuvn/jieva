@@ -33,7 +33,6 @@ public class Base64Codec implements GekDataProcess<Base64Codec> {
     private int mode = ENCODE_MODE;
     private int type = BASIC_TYPE;
     private boolean withoutPadding = false;
-
     private MimeParams mimeParams;
 
     @Override

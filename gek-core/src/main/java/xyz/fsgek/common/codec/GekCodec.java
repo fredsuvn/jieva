@@ -29,6 +29,37 @@ public class GekCodec {
     }
 
     /**
+     * Returns a hex codec process.
+     *
+     * @return a hex codec process
+     */
+    public static HexCodec hex() {
+        return new HexCodec();
+    }
+
+    /**
+     * Returns a cipher codec process of specified cipher to encryption/decryption.
+     * Note when the process starts, the status of the cipher cannot be changed.
+     *
+     * @param cipher specified cipher
+     * @return a cipher codec process of specified cipher
+     */
+    public static CipherCodec cipher(Cipher cipher) {
+        return cipher(() -> cipher);
+    }
+
+    /**
+     * Returns a cipher codec process of specified cipher supplier to encryption/decryption.
+     * {@link Supplier#get()} will be called before encryption/decryption each time.
+     *
+     * @param cipher specified cipher supplier
+     * @return a cipher codec process of specified cipher supplier
+     */
+    public static CipherCodec cipher(Supplier<Cipher> cipher) {
+        return new CipherCodec(cipher);
+    }
+
+    /**
      * Returns key factory with specified algorithm.
      *
      * @param algorithm specified algorithm
@@ -243,28 +274,6 @@ public class GekCodec {
         } catch (Exception e) {
             throw new GekCodecException(e);
         }
-    }
-
-    /**
-     * Returns a cipher codec process of specified cipher to encryption/decryption.
-     * Note when the process starts, the status of the cipher cannot be changed.
-     *
-     * @param cipher specified cipher
-     * @return a cipher codec process of specified cipher
-     */
-    public static CipherCodec cipher(Cipher cipher) {
-        return cipher(() -> cipher);
-    }
-
-    /**
-     * Returns a cipher codec process of specified cipher supplier to encryption/decryption.
-     * {@link Supplier#get()} will be called before encryption/decryption each time.
-     *
-     * @param cipher specified cipher supplier
-     * @return a cipher codec process of specified cipher supplier
-     */
-    public static CipherCodec cipher(Supplier<Cipher> cipher) {
-        return new CipherCodec(cipher);
     }
 
     /**
