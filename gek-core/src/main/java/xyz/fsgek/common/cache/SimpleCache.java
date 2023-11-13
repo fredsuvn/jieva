@@ -8,12 +8,17 @@ import xyz.fsgek.common.base.ref.GekRef;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-final class ReferencedCache<K, V> implements GekCache<K, V> {
+final class SimpleCache<K, V> implements GekCache<K, V> {
+
+    /*
+     * This implementation doesn't support expiration.
+     */
 
     private static final Object NULL = new Object();
 
@@ -24,17 +29,17 @@ final class ReferencedCache<K, V> implements GekCache<K, V> {
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
     private volatile boolean inCleanUp = false;
 
-    ReferencedCache(boolean isSoft) {
+    SimpleCache(boolean isSoft) {
         this(isSoft, null);
     }
 
-    ReferencedCache(boolean isSoft, RemoveListener<K, V> removeListener) {
+    SimpleCache(boolean isSoft, RemoveListener<K, V> removeListener) {
         this.isSoft = isSoft;
         this.map = new ConcurrentHashMap<>();
         this.removeListener = removeListener;
     }
 
-    ReferencedCache(boolean isSoft, int initialCapacity, RemoveListener<K, V> removeListener) {
+    SimpleCache(boolean isSoft, int initialCapacity, RemoveListener<K, V> removeListener) {
         this.isSoft = isSoft;
         this.map = new ConcurrentHashMap<>(initialCapacity);
         this.removeListener = removeListener;
@@ -84,11 +89,11 @@ final class ReferencedCache<K, V> implements GekCache<K, V> {
     }
 
     @Override
-    public @Nullable GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable GekWrapper<? extends V>> loader) {
+    public @Nullable GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable ValueInfo<? extends V>> loader) {
         GekRef<Object> ref = GekRef.ofNull();
         Entry entry = map.compute(key, (k, old) -> {
             if (old == null) {
-                GekWrapper<? extends V> newValue = loader.apply(k);
+                ValueInfo<? extends V> newValue = loader.apply(k);
                 if (newValue == null) {
                     ref.set(NULL);
                     return null;
@@ -99,7 +104,7 @@ final class ReferencedCache<K, V> implements GekCache<K, V> {
             Object value = old.getValue();
             if (value == null) {
                 old.clear();
-                GekWrapper<? extends V> newValue = loader.apply(k);
+                ValueInfo<? extends V> newValue = loader.apply(k);
                 if (newValue == null) {
                     ref.set(NULL);
                     return null;
@@ -124,6 +129,24 @@ final class ReferencedCache<K, V> implements GekCache<K, V> {
         V result = get0(old);
         cleanUp0();
         return result;
+    }
+
+    @Override
+    public V put(K key, V value, long expiration) {
+        return put(key, value);
+    }
+
+    @Override
+    public V put(K key, V value, @Nullable Duration expiration) {
+        return put(key, value);
+    }
+
+    @Override
+    public void expire(K key, long expiration) {
+    }
+
+    @Override
+    public void expire(K key, @Nullable Duration expiration) {
     }
 
     @Override
@@ -159,6 +182,11 @@ final class ReferencedCache<K, V> implements GekCache<K, V> {
             return false;
         });
         cleanUp0();
+    }
+
+    @Override
+    public void removeEntry(BiPredicate<K, ValueInfo<V>> predicate) {
+        removeIf((k, v) -> predicate.test(k, ValueInfo.of(v, null)));
     }
 
     @Override
@@ -279,7 +307,7 @@ final class ReferencedCache<K, V> implements GekCache<K, V> {
         public void clear() {
             super.clear();
             if (removeListener != null) {
-                removeListener.onRemove(ReferencedCache.this, Gek.as(key));
+                removeListener.onRemove(SimpleCache.this, Gek.as(key));
             }
         }
     }
@@ -307,7 +335,7 @@ final class ReferencedCache<K, V> implements GekCache<K, V> {
         public void clear() {
             super.clear();
             if (removeListener != null) {
-                removeListener.onRemove(ReferencedCache.this, Gek.as(key));
+                removeListener.onRemove(SimpleCache.this, Gek.as(key));
             }
         }
     }

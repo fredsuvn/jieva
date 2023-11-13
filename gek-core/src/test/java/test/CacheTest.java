@@ -16,54 +16,47 @@ public class CacheTest {
     @Test
     public void testCache() {
         final int[] detected = {0};
-        GekCache<Integer, String> softCache = GekCache.softCache((cache, key) -> {
-            detected[0]++;
-            cache.cleanUp();
-        });
+//        testCache(
+//            GekCache.newBuilder().removeListener((cache, key) -> {
+//                detected[0]++;
+//                cache.cleanUp();
+//            }).build(),
+//            detected,
+//            "Full-soft"
+//        );
+        testCache(
+            GekCache.newBuilder().removeListener((cache, key) -> {
+                detected[0]++;
+                cache.cleanUp();
+            }).weakReference().build(),
+            detected,
+            "Weak-soft"
+        );
+    }
+
+    private void testCache(GekCache<Integer, String> cache, int[] detected, String name) {
+        detected[0] = 0;
         //Map<Integer, String> map = new HashMap<>();
         int times = 1000 * 3;
-        String value = TestUtil.buildRandomString(1024 * 100, 1024 * 100);
+        String value = TestUtil.buildRandomString(1024 * 100, 0);
         for (int i = 0; i < times; i++) {
-            softCache.put(i, value + "i");
+            cache.put(i, value + "i");
             //map.put(i, String.valueOf(i * 10086));
         }
         int removed = 0;
         for (int i = 0; i < times; i++) {
-            String fsValue = softCache.get(i);
+            String fsValue = cache.get(i);
             if (fsValue == null) {
                 removed++;
             } else {
                 //Assert.assertEquals(map.get(i), fsValue);
             }
         }
-        GekLogger.defaultLogger().info("Soft---> total: " + times +
+        GekLogger.defaultLogger().info(name + "---> total: " + times +
             ", removed: " + removed +
             ", detected: " + detected[0] +
             ", cached: " + (times - removed) +
-            ", size: " + softCache.size()
-        );
-        Assert.assertEquals(removed, detected[0]);
-
-        detected[0] = 0;
-        GekCache<Integer, String> weakCache = GekCache.weakCache((cache, key) -> {
-            detected[0]++;
-            cache.cleanUp();
-        });
-        for (int i = 0; i < times; i++) {
-            weakCache.put(i, value + "i");
-        }
-        removed = 0;
-        for (int i = 0; i < times; i++) {
-            String fsValue = weakCache.get(i);
-            if (fsValue == null) {
-                removed++;
-            }
-        }
-        GekLogger.defaultLogger().info("Weak---> total: " + times +
-            ", removed: " + removed +
-            ", detected: " + detected[0] +
-            ", cached: " + (times - removed) +
-            ", size: " + weakCache.size()
+            ", size: " + cache.size()
         );
         Assert.assertEquals(removed, detected[0]);
     }
@@ -88,7 +81,7 @@ public class CacheTest {
         gekCache.put(2, "2");
         Assert.assertEquals(gekCache.get(2), "2");
         Assert.assertEquals(gekCache.get(2, k -> "4"), "2");
-        Assert.assertEquals(gekCache.getWrapper(2, k -> GekWrapper.wrap("8")).get(), "2");
+        Assert.assertEquals(gekCache.getWrapper(2, k -> GekCache.ValueInfo.of("8", null)).get(), "2");
     }
 
     @Test
