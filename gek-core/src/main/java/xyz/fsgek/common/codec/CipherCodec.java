@@ -1,7 +1,7 @@
 package xyz.fsgek.common.codec;
 
 import org.springframework.core.codec.CodecException;
-import xyz.fsgek.common.base.ref.GekRef;
+import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.data.GekDataProcess;
 import xyz.fsgek.common.io.GekIO;
 
@@ -12,17 +12,16 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.function.Supplier;
 
 /**
- * Codec implementation of {@link GekDataProcess} to encrypt/decrypt with {@link Cipher}.
- * When the process starts, the status of the cipher cannot be changed.
+ * Cipher codec implementation of {@link GekDataProcess} to encrypt/decrypt with {@link Cipher}.
+ * When the process starts, the status of the {@link Cipher} instance cannot be changed.
  *
  * @author fredsuvn
  */
 public class CipherCodec implements GekDataProcess<CipherCodec> {
 
-    private final Supplier<Cipher> cipher;
+    private Cipher cipher;
     private Object input;
     private Object output;
     private int blockSize = 0;
@@ -32,16 +31,6 @@ public class CipherCodec implements GekDataProcess<CipherCodec> {
     private AlgorithmParameterSpec algorithmParameterSpec;
     private int mode;
     private Key key;
-
-    /**
-     * Constructs with given {@link Cipher} supplier.
-     * {@link Supplier#get()} will be called before encryption/decryption each time.
-     *
-     * @param cipher given {@link Cipher} supplier
-     */
-    public CipherCodec(Supplier<Cipher> cipher) {
-        this.cipher = cipher;
-    }
 
     @Override
     public CipherCodec input(byte[] array) {
@@ -75,6 +64,43 @@ public class CipherCodec implements GekDataProcess<CipherCodec> {
     public CipherCodec output(OutputStream out) {
         this.output = out;
         return this;
+    }
+
+    /**
+     * Sets cipher algorithm.
+     *
+     * @param cipher cipher algorithm
+     * @return this
+     */
+    public CipherCodec algorithm(Cipher cipher) {
+        this.cipher = cipher;
+        return this;
+    }
+
+    /**
+     * Sets cipher algorithm and provider.
+     *
+     * @param algorithm cipher algorithm
+     * @return this
+     */
+    public CipherCodec algorithm(String algorithm) {
+        return algorithm(algorithm, null);
+    }
+
+    /**
+     * Sets cipher algorithm and provider.
+     *
+     * @param algorithm cipher algorithm
+     * @param provider  cipher provider
+     * @return this
+     */
+    public CipherCodec algorithm(String algorithm, @Nullable Provider provider) {
+        try {
+            this.cipher = provider == null ? Cipher.getInstance(algorithm) : Cipher.getInstance(algorithm, provider);
+            return this;
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
     }
 
     /**
@@ -166,7 +192,9 @@ public class CipherCodec implements GekDataProcess<CipherCodec> {
     @Override
     public long doFinal() {
         try {
-            Cipher cipher = this.cipher.get();
+            if (cipher == null) {
+                throw new GekCodecException("Cipher algorithm is not set.");
+            }
             initCipher(cipher);
             if (input instanceof ByteBuffer) {
                 if (output instanceof ByteBuffer) {
@@ -196,28 +224,25 @@ public class CipherCodec implements GekDataProcess<CipherCodec> {
 
     @Override
     public InputStream finalStream() {
-        InputStream source;
-        if (input instanceof ByteBuffer) {
-            source = GekIO.toInputStream((ByteBuffer) input);
-        } else if (input instanceof InputStream) {
-            source = (InputStream) input;
-        } else {
-            throw new CodecException("Unknown input type: " + input.getClass());
-        }
-        GekRef<Cipher> cipherRef = GekRef.ofNull();
-        return GekIO.transform(source, blockSize, bytes -> {
-            Cipher c = cipherRef.get();
-            if (c == null) {
-                c = cipher.get();
-                try {
-                    initCipher(c);
-                } catch (Exception e) {
-                    throw new GekCodecException(e);
-                }
-                cipherRef.set(c);
+        try {
+            if (cipher == null) {
+                throw new GekCodecException("Cipher algorithm is not set.");
             }
-            return GekCodec.doCipher(c, ByteBuffer.wrap(bytes));
-        });
+            initCipher(cipher);
+            InputStream source;
+            if (input instanceof ByteBuffer) {
+                source = GekIO.toInputStream((ByteBuffer) input);
+            } else if (input instanceof InputStream) {
+                source = (InputStream) input;
+            } else {
+                throw new CodecException("Unknown input type: " + input.getClass());
+            }
+            return GekIO.transform(source, blockSize, bytes -> GekCodec.doCipher(cipher, ByteBuffer.wrap(bytes)));
+        } catch (CodecException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GekCodecException(e);
+        }
     }
 
     private void initCipher(Cipher cipher) throws InvalidKeyException, InvalidAlgorithmParameterException {

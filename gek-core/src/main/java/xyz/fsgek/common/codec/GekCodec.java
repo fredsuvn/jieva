@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.*;
-import java.util.function.Supplier;
 
 /**
  * Codec utilities.
@@ -38,25 +37,12 @@ public class GekCodec {
     }
 
     /**
-     * Returns a cipher codec process of specified cipher to encryption/decryption.
-     * Note when the process starts, the status of the cipher cannot be changed.
+     * Returns a cipher codec process.
      *
-     * @param cipher specified cipher
-     * @return a cipher codec process of specified cipher
+     * @return a cipher codec process
      */
-    public static CipherCodec cipher(Cipher cipher) {
-        return cipher(() -> cipher);
-    }
-
-    /**
-     * Returns a cipher codec process of specified cipher supplier to encryption/decryption.
-     * {@link Supplier#get()} will be called before encryption/decryption each time.
-     *
-     * @param cipher specified cipher supplier
-     * @return a cipher codec process of specified cipher supplier
-     */
-    public static CipherCodec cipher(Supplier<Cipher> cipher) {
-        return new CipherCodec(cipher);
+    public static CipherCodec cipher() {
+        return new CipherCodec();
     }
 
     /**

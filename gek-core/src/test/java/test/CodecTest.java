@@ -149,8 +149,7 @@ public class CodecTest {
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
-        Cipher c = GekCodec.cipher(cryptoAlgorithm);
-        CipherCodec cipher = GekCodec.cipher(c);
+        CipherCodec cipher = GekCodec.cipher().algorithm(cryptoAlgorithm, provider);
         byte[] enBytes = cipher.input(data).blockSize(enBlockSize).key(publicKey).encrypt().finalBytes();
         byte[] deBytes = cipher.input(enBytes).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
@@ -177,8 +176,7 @@ public class CodecTest {
         byte[] data = TestUtil.buildRandomBytes(dataSize);
         KeyGenerator keyGenerator = GekCodec.keyGenerator(keyAlgorithm, provider);
         SecretKey key = keyGenerator.generateKey();
-        Cipher c = GekCodec.cipher(cryptoAlgorithm, provider);
-        CipherCodec cipher = GekCodec.cipher(c);
+        CipherCodec cipher = GekCodec.cipher().algorithm(cryptoAlgorithm, provider);
         byte[] enBytes = cipher.input(data).blockSize(enBlockSize).key(key).encrypt().finalBytes();
         byte[] deBytes = cipher.input(enBytes).blockSize(deBlockSize).key(key).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
