@@ -2,6 +2,7 @@ package xyz.fsgek.common.cache;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fsgek.common.base.Gek;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -18,18 +19,33 @@ import java.util.function.Function;
  * <p>
  * This cache supports set different expiration for each entry, and null value is permitted.
  * However, default implementation is based on GC (Garbage Collection, {@link Reference}), invalidation of values is
- * unclear, even if a value hasn't exceeded the expiration, it's still possible to not be retrieved.
+ * hard to estimate. Even if a value hasn't exceeded the expiration, it's still possible to not be retrieved.
+ * <p>
+ * Default implementation will call {@link #cleanUp()} before end of each other method calling to clean up expired data.
+ * This means that expired data may still occupy memory until the next invocation of {@link #cleanUp()}.
+ * Scheduling task for {@link #cleanUp()} can effectively resolve this problem.
  * <p>
  * {@link RemoveListener} is used to listen removing action of ths cache.
  * As mentioned above, if a value is cleared by GC before {@link RemoveListener#onRemove(Object, Object, GekCache)} is
  * called, the value parameter will be passed to null.
  *
- * @param <K> type of key
- * @param <V> type of value
+ * @param <K> key type
+ * @param <V> value type
  * @author fresduvn
  */
 @ThreadSafe
 public interface GekCache<K, V> {
+
+    /**
+     * Returns new builder of {@link GekCache}.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     * @return new builder of {@link GekCache}
+     */
+    static <K, V> Builder<K, V> newBuilder() {
+        return new Builder<>();
+    }
 
     /**
      * Creates a new {@link GekCache} based on {@link SoftReference}.
@@ -39,7 +55,7 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache() {
-        return new GcCache<>(true, -1, null);
+        return newBuilder().build();
     }
 
     /**
@@ -53,34 +69,7 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache(RemoveListener<K, V> removeListener) {
-        return new GcCache<>(true, -1, removeListener);
-    }
-
-    /**
-     * Creates a new {@link GekCache} based on {@link SoftReference} with initial capacity.
-     *
-     * @param initialCapacity initial capacity
-     * @param <K>             key type
-     * @param <V>             value type
-     * @return a new {@link GekCache}
-     */
-    static <K, V> GekCache<K, V> softCache(int initialCapacity) {
-        return new GcCache<>(true, initialCapacity, null);
-    }
-
-    /**
-     * Creates a new {@link GekCache} based on {@link SoftReference} with initial capacity and remove listener,
-     * the listener will be called <b>after</b> removing from the cache.
-     *
-     * @param initialCapacity initial capacity
-     * @param removeListener  remove listener called <b>after</b> removing from the cache,
-     *                        the first argument is current cache and second is the key.
-     * @param <K>             key type
-     * @param <V>             value type
-     * @return a new {@link GekCache}
-     */
-    static <K, V> GekCache<K, V> softCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new GcCache<>(true, initialCapacity, removeListener);
+        return newBuilder().removeListener(removeListener).build();
     }
 
     /**
@@ -91,7 +80,7 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache() {
-        return new GcCache<>(false, -1, null);
+        return newBuilder().useSoft(false).build();
     }
 
     /**
@@ -105,34 +94,7 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache(RemoveListener<K, V> removeListener) {
-        return new GcCache<>(false, -1, removeListener);
-    }
-
-    /**
-     * Creates a new {@link GekCache} based on {@link WeakReference} with initial capacity.
-     *
-     * @param initialCapacity initial capacity
-     * @param <K>             key type
-     * @param <V>             value type
-     * @return a new {@link GekCache}
-     */
-    static <K, V> GekCache<K, V> weakCache(int initialCapacity) {
-        return new GcCache<>(false, initialCapacity, null);
-    }
-
-    /**
-     * Creates a new {@link GekCache} based on {@link WeakReference} with initial capacity and remove listener,
-     * the listener will be called <b>after</b> removing from the cache.
-     *
-     * @param initialCapacity initial capacity
-     * @param removeListener  remove listener called <b>after</b> removing from the cache,
-     *                        the first argument is current cache and second is the key.
-     * @param <K>             key type
-     * @param <V>             value type
-     * @return a new {@link GekCache}
-     */
-    static <K, V> GekCache<K, V> weakCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new GcCache<>(false, initialCapacity, removeListener);
+        return newBuilder().useSoft(false).removeListener(removeListener).build();
     }
 
     /**
@@ -383,5 +345,93 @@ public interface GekCache<K, V> {
          * @return expiration in milliseconds, may be -1 if set to use default expiration rule
          */
         long expirationMillis();
+    }
+
+    /**
+     * Builder for {@link GekCache}.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     */
+    class Builder<K, V> {
+
+        private boolean useSoft = true;
+        private int initialCapacity = -1;
+        private GekCache.RemoveListener<K, V> removeListener;
+        private long defaultExpirationMillis = -1;
+
+        /**
+         * Set whether based on {@link SoftReference}, true for {@link SoftReference}, false for {@link WeakReference}.
+         *
+         * @param useSoft whether based on {@link SoftReference}
+         * @param <K1>    key type
+         * @param <V1>    value type
+         * @return this builder
+         */
+        public <K1 extends K, V1 extends V> Builder<K1, V1> useSoft(boolean useSoft) {
+            this.useSoft = useSoft;
+            return Gek.as(this);
+        }
+
+        /**
+         * Set initial capacity.
+         *
+         * @param initialCapacity initial capacity
+         * @param <K1>            key type
+         * @param <V1>            value type
+         * @return this builder
+         */
+        public <K1 extends K, V1 extends V> Builder<K1, V1> initialCapacity(int initialCapacity) {
+            this.initialCapacity = initialCapacity;
+            return Gek.as(this);
+        }
+
+        /**
+         * Set removing event listener.
+         *
+         * @param removeListener removing event listener
+         * @param <K1>           key type
+         * @param <V1>           value type
+         * @return this builder
+         */
+        public <K1 extends K, V1 extends V> Builder<K1, V1> removeListener(GekCache.RemoveListener<K1, V1> removeListener) {
+            this.removeListener = (RemoveListener<K, V>) removeListener;
+            return Gek.as(this);
+        }
+
+        /**
+         * Set default expiration in milliseconds, may be -1 if set to expired by GC
+         *
+         * @param defaultExpirationMillis default expiration in milliseconds, may be -1 if set to expired by GC
+         * @param <K1>                    key type
+         * @param <V1>                    value type
+         * @return this builder
+         */
+        public <K1 extends K, V1 extends V> Builder<K1, V1> defaultExpirationMillis(long defaultExpirationMillis) {
+            this.defaultExpirationMillis = defaultExpirationMillis;
+            return Gek.as(this);
+        }
+
+        /**
+         * Set default expiration, may be null if set to expired by GC
+         *
+         * @param defaultExpiration default expiration, may be null if set to expired by GC
+         * @param <K1>              key type
+         * @param <V1>              value type
+         * @return this builder
+         */
+        public <K1 extends K, V1 extends V> Builder<K1, V1> defaultExpiration(@Nullable Duration defaultExpiration) {
+            this.defaultExpirationMillis = defaultExpiration == null ? -1 : defaultExpiration.toMillis();
+            return Gek.as(this);
+        }
+
+        /**
+         * Builds {@link GekCache}.
+         *
+         * @return built {@link GekCache}
+         */
+        public <K1 extends K, V1 extends V> GekCache<K1, V1> build() {
+            return Gek.as(new GcCache<>(useSoft, defaultExpirationMillis, initialCapacity, removeListener));
+        }
     }
 }
