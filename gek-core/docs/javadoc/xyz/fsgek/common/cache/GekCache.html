@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":17,"i11":17,"i12":17,"i13":17,"i14":17,"i15":17,"i16":17,"i17":17};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":17,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":17,"i19":17,"i20":17,"i21":17};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],16:["t5","Default Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li>Prev&nbsp;Class</li>
-<li><a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="class in xyz.fsgek.common.cache"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?xyz/fsgek/common/cache/GekCache.html" target="_top">Frames</a></li>
@@ -97,11 +97,29 @@ var activeTableTab = "activeTableTab";
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>K</code> - key type</dd>
+<dd><code>V</code> - value type</dd>
+</dl>
 <hr>
 <br>
 <pre>@ThreadSafe
 public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
-<div class="block">Cache interface, is expected to thread-safe and supporting null value.</div>
+<div class="block">Cache interface, provides get/compute/put/contains/expire/remove/clear/clean methods which perform like
+ <code>ConcurrentHashMap</code>. Implementations should be thread-safe, this is defined in this interface.
+ <p>
+ This cache supports set different expiration for each entry, and null value is permitted.
+ However, default implementation is based on GC (Garbage Collection, <code>Reference</code>), invalidation of values is
+ hard to estimate. Even if a value hasn't exceeded the expiration, it's still possible to not be retrieved.
+ <p>
+ Default implementation will call <a href="../../../../xyz/fsgek/common/cache/GekCache.html#cleanUp--"><code>cleanUp()</code></a> before end of each other method calling to clean up expired data.
+ This means that expired data may still occupy memory until the next invocation of <a href="../../../../xyz/fsgek/common/cache/GekCache.html#cleanUp--"><code>cleanUp()</code></a>.
+ Scheduling task for <a href="../../../../xyz/fsgek/common/cache/GekCache.html#cleanUp--"><code>cleanUp()</code></a> can effectively resolve this problem.
+ <p>
+ <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache"><code>GekCache.RemoveListener</code></a> is used to listen removing action of ths cache.
+ As mentioned above, if a value is cleared by GC before <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html#onRemove-K-V-xyz.fsgek.common.cache.GekCache-"><code>GekCache.RemoveListener.onRemove(Object, Object, GekCache)</code></a> is
+ called, the value parameter will be passed to null.</div>
 </li>
 </ul>
 </div>
@@ -121,9 +139,21 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <th class="colLast" scope="col">Interface and Description</th>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="class in xyz.fsgek.common.cache">GekCache.Builder</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="type parameter in GekCache.Builder">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="type parameter in GekCache.Builder">V</a>&gt;</span></code>
+<div class="block">Builder for <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a>.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>static interface&nbsp;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">V</a>&gt;</span></code>
 <div class="block">Removing listener of <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static interface&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache">GekCache.Value</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="type parameter in GekCache.Value">V</a>&gt;</span></code>
+<div class="block">Cache value info with expiration.</div>
 </td>
 </tr>
 </table>
@@ -144,7 +174,7 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#cleanUp--">cleanUp</a></span>()</code>
-<div class="block">Removes all expired values.</div>
+<div class="block">Removes all expired values in this cache.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -154,109 +184,141 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#get-K-">get</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</code>
-<div class="block">Returns value associating with given key from this cache,
- return null if there is no entry for given key or the value is expired or the value itself is null.</div>
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#contains-K-">contains</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</code>
+<div class="block">Returns whether this cache contains the value associating with specified key and the value is valid.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#get-K-java.util.function.Function-">get</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
-   java.util.function.Function&lt;? super <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,? extends <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;loader)</code>
-<div class="block">Returns value associating with given key from this cache.</div>
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#expire-K-java.time.Duration-java.time.Duration-">expire</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+      @Nullable java.time.Duration&nbsp;expireAfterWrite,
+      @Nullable java.time.Duration&nbsp;expireAfterAccess)</code>
+<div class="block">Sets expiration for value associated with specified key, can be null if set to default rule.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>@Nullable <a href="../../../../xyz/fsgek/common/base/GekWrapper.html" title="interface in xyz.fsgek.common.base">GekWrapper</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#getWrapper-K-">getWrapper</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</code>
-<div class="block">Returns wrapped value associating with given key from this cache,
- or null if there is no entry for given key or the value is expired.</div>
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#expire-K-long-">expire</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+      long&nbsp;expireAfterWriteMillis)</code>
+<div class="block">Sets expiration in milliseconds of values which are written after once compute/put operation for value
+ associated with specified key, can be -1 if set to default rule.</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>@Nullable <a href="../../../../xyz/fsgek/common/base/GekWrapper.html" title="interface in xyz.fsgek.common.base">GekWrapper</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#getWrapper-K-java.util.function.Function-">getWrapper</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
-          java.util.function.Function&lt;? super <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/base/GekWrapper.html" title="interface in xyz.fsgek.common.base">GekWrapper</a>&lt;? extends <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&gt;&nbsp;loader)</code>
-<div class="block">Returns wrapped value associating with given key from this cache.</div>
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#expire-K-long-long-">expire</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+      long&nbsp;expireAfterWriteMillis,
+      long&nbsp;expireAfterAccessMillis)</code>
+<div class="block">Sets expiration in milliseconds for value associated with specified key, can be -1 if set to default rule.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#put-K-V-">put</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
-   <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;value)</code>
-<div class="block">Sets the value associated with given key, return old value or null if there is no old value.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#get-K-">get</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</code>
+<div class="block">Returns value associating with specified key.</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#remove-K-">remove</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</code>
-<div class="block">Removes the value associated with given key.</div>
+<td class="colFirst"><code><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#get-K-java.util.function.Function-">get</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+   java.util.function.Function&lt;? super <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,? extends <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;loader)</code>
+<div class="block">Returns value associating with specified key, and it performs like
+ <code>ConcurrentHashMap.computeIfAbsent(Object, Function)</code>:</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>@Nullable java.util.Optional&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#getOptional-K-">getOptional</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</code>
+<div class="block">Returns value wrapped by <code>Optional</code> associating with specified key.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>@Nullable java.util.Optional&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#getOptional-K-java.util.function.Function-">getOptional</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+           java.util.function.Function&lt;? super <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache">GekCache.Value</a>&lt;? extends <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&gt;&nbsp;loader)</code>
+<div class="block">Returns value wrapped by <code>Optional</code> associating with specified key, and it performs like
+ <code>ConcurrentHashMap.computeIfAbsent(Object, Function)</code>:</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="class in xyz.fsgek.common.cache">GekCache.Builder</a>&lt;K,V&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#newBuilder--">newBuilder</a></span>()</code>
+<div class="block">Returns new builder of <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a>.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#put-K-xyz.fsgek.common.cache.GekCache.Value-">put</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+   <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache">GekCache.Value</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;value)</code>
+<div class="block">Puts the value wrapped by <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache"><code>GekCache.Value</code></a> associated with specified key,
+ return old value or null if there is no old value or old value is expired.</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#put-K-V-">put</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+   <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;value)</code>
+<div class="block">Puts the value associated with specified key,
+ return old value or null if there is no old value or old value is expired.</div>
+</td>
+</tr>
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#put-K-V-long-">put</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+   <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;value,
+   long&nbsp;expireAfterWriteMillis)</code>
+<div class="block">Puts the value associated with specified key and expiration in milliseconds of values which are written after
+ once compute/put operation.</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#remove-K-">remove</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</code>
+<div class="block">Removes the value associated with specified key.</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#removeEntry-java.util.function.BiPredicate-">removeEntry</a></span>(java.util.function.BiPredicate&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache">GekCache.Value</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&gt;&nbsp;predicate)</code>
+<div class="block">Removes values of which key and value info (first and second param) pass given predicate.</div>
+</td>
+</tr>
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#removeIf-java.util.function.BiPredicate-">removeIf</a></span>(java.util.function.BiPredicate&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;predicate)</code>
 <div class="block">Removes values of which key and value (first and second param) pass given predicate.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#size--">size</a></span>()</code>
 <div class="block">Returns current size.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#softCache--">softCache</a></span>()</code>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>SoftReference</code>.</div>
+<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based on <code>SoftReference</code>.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#softCache-xyz.fsgek.common.cache.GekCache.RemoveListener-">softCache</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;K,V&gt;&nbsp;removeListener)</code>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>SoftReference</code> with remove listener,
+<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based on <code>SoftReference</code> with remove listener,
  the listener will be called <b>after</b> removing from the cache.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
-<td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#softCache-int-">softCache</a></span>(int&nbsp;initialCapacity)</code>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>SoftReference</code> with initial capacity.</div>
-</td>
-</tr>
-<tr id="i13" class="rowColor">
-<td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#softCache-int-xyz.fsgek.common.cache.GekCache.RemoveListener-">softCache</a></span>(int&nbsp;initialCapacity,
-         <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;K,V&gt;&nbsp;removeListener)</code>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>SoftReference</code> with initial capacity and remove listener,
- the listener will be called <b>after</b> removing from the cache.</div>
-</td>
-</tr>
-<tr id="i14" class="altColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#weakCache--">weakCache</a></span>()</code>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>WeakReference</code>.</div>
+<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based on <code>WeakReference</code>.</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#weakCache-xyz.fsgek.common.cache.GekCache.RemoveListener-">weakCache</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;K,V&gt;&nbsp;removeListener)</code>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>WeakReference</code> with remove listener,
- the listener will be called <b>after</b> removing from the cache.</div>
-</td>
-</tr>
-<tr id="i16" class="altColor">
-<td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#weakCache-int-">weakCache</a></span>(int&nbsp;initialCapacity)</code>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>WeakReference</code> with initial capacity.</div>
-</td>
-</tr>
-<tr id="i17" class="rowColor">
-<td class="colFirst"><code>static &lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.html#weakCache-int-xyz.fsgek.common.cache.GekCache.RemoveListener-">weakCache</a></span>(int&nbsp;initialCapacity,
-         <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;K,V&gt;&nbsp;removeListener)</code>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>WeakReference</code> with initial capacity and remove listener,
+<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based on <code>WeakReference</code> with remove listener,
  the listener will be called <b>after</b> removing from the cache.</div>
 </td>
 </tr>
@@ -275,6 +337,23 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="newBuilder--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newBuilder</h4>
+<pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="class in xyz.fsgek.common.cache">GekCache.Builder</a>&lt;K,V&gt;&nbsp;newBuilder()</pre>
+<div class="block">Returns new builder of <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a>.</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>K</code> - key type</dd>
+<dd><code>V</code> - value type</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>new builder of <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a></dd>
+</dl>
+</li>
+</ul>
 <a name="softCache--">
 <!--   -->
 </a>
@@ -282,7 +361,7 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <li class="blockList">
 <h4>softCache</h4>
 <pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;&nbsp;softCache()</pre>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>SoftReference</code>.</div>
+<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based on <code>SoftReference</code>.</div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
 <dd><code>K</code> - key type</dd>
@@ -299,7 +378,7 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <li class="blockList">
 <h4>softCache</h4>
 <pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;&nbsp;softCache(<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;K,V&gt;&nbsp;removeListener)</pre>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>SoftReference</code> with remove listener,
+<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based on <code>SoftReference</code> with remove listener,
  the listener will be called <b>after</b> removing from the cache.</div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
@@ -313,48 +392,6 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 </dl>
 </li>
 </ul>
-<a name="softCache-int-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>softCache</h4>
-<pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;&nbsp;softCache(int&nbsp;initialCapacity)</pre>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>SoftReference</code> with initial capacity.</div>
-<dl>
-<dt><span class="paramLabel">Type Parameters:</span></dt>
-<dd><code>K</code> - key type</dd>
-<dd><code>V</code> - value type</dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>initialCapacity</code> - initial capacity</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a></dd>
-</dl>
-</li>
-</ul>
-<a name="softCache-int-xyz.fsgek.common.cache.GekCache.RemoveListener-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>softCache</h4>
-<pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;&nbsp;softCache(int&nbsp;initialCapacity,
-                                     <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;K,V&gt;&nbsp;removeListener)</pre>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>SoftReference</code> with initial capacity and remove listener,
- the listener will be called <b>after</b> removing from the cache.</div>
-<dl>
-<dt><span class="paramLabel">Type Parameters:</span></dt>
-<dd><code>K</code> - key type</dd>
-<dd><code>V</code> - value type</dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>initialCapacity</code> - initial capacity</dd>
-<dd><code>removeListener</code> - remove listener called <b>after</b> removing from the cache,
-                        the first argument is current cache and second is the key.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a></dd>
-</dl>
-</li>
-</ul>
 <a name="weakCache--">
 <!--   -->
 </a>
@@ -362,7 +399,7 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <li class="blockList">
 <h4>weakCache</h4>
 <pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;&nbsp;weakCache()</pre>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>WeakReference</code>.</div>
+<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based on <code>WeakReference</code>.</div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
 <dd><code>K</code> - key type</dd>
@@ -379,7 +416,7 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <li class="blockList">
 <h4>weakCache</h4>
 <pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;&nbsp;weakCache(<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;K,V&gt;&nbsp;removeListener)</pre>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>WeakReference</code> with remove listener,
+<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based on <code>WeakReference</code> with remove listener,
  the listener will be called <b>after</b> removing from the cache.</div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
@@ -388,48 +425,6 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>removeListener</code> - remove listener called <b>after</b> removing from the cache,
                        the first argument is current cache and second is the key.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a></dd>
-</dl>
-</li>
-</ul>
-<a name="weakCache-int-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>weakCache</h4>
-<pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;&nbsp;weakCache(int&nbsp;initialCapacity)</pre>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>WeakReference</code> with initial capacity.</div>
-<dl>
-<dt><span class="paramLabel">Type Parameters:</span></dt>
-<dd><code>K</code> - key type</dd>
-<dd><code>V</code> - value type</dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>initialCapacity</code> - initial capacity</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a></dd>
-</dl>
-</li>
-</ul>
-<a name="weakCache-int-xyz.fsgek.common.cache.GekCache.RemoveListener-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>weakCache</h4>
-<pre>static&nbsp;&lt;K,V&gt;&nbsp;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;K,V&gt;&nbsp;weakCache(int&nbsp;initialCapacity,
-                                     <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache">GekCache.RemoveListener</a>&lt;K,V&gt;&nbsp;removeListener)</pre>
-<div class="block">Creates a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a> based by <code>WeakReference</code> with initial capacity and remove listener,
- the listener will be called <b>after</b> removing from the cache.</div>
-<dl>
-<dt><span class="paramLabel">Type Parameters:</span></dt>
-<dd><code>K</code> - key type</dd>
-<dd><code>V</code> - value type</dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>initialCapacity</code> - initial capacity</dd>
-<dd><code>removeListener</code> - remove listener called <b>after</b> removing from the cache,
-                        the first argument is current cache and second is the key.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a new <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><code>GekCache</code></a></dd>
 </dl>
@@ -445,13 +440,15 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <h4>get</h4>
 <pre>@Nullable
 <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;get(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</pre>
-<div class="block">Returns value associating with given key from this cache,
- return null if there is no entry for given key or the value is expired or the value itself is null.</div>
+<div class="block">Returns value associating with specified key.
+ The value will be null if there is no entry for specified key or is expired or itself is null.
+ <p>
+ This is a <code>get</code> operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - given key</dd>
+<dd><code>key</code> - specified key</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>value associating with given key from this cache</dd>
+<dd>value associating with specified key</dd>
 </dl>
 </li>
 </ul>
@@ -466,61 +463,93 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <pre>@Nullable
 <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;get(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
                  java.util.function.Function&lt;? super <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,? extends <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;loader)</pre>
-<div class="block">Returns value associating with given key from this cache.
- If there is no entry for given key or the value is expired, a new value will be created by given loader.
+<div class="block">Returns value associating with specified key, and it performs like
+ <code>ConcurrentHashMap.computeIfAbsent(Object, Function)</code>:
  <p>
- This method will return null if and only if the existed value or created value itself is null.</div>
+ If the specified key is not already associated with a value, attempts to compute its value using the given
+ loader and enters it into this cache. Null is permitted so the null value will also be entered.
+ <p>
+ This cache is thread-safe so the loader function is applied at most once per key, and blocks other thread.
+ <p>
+ This is a <code>compute</code> operation if the computation is occurred, otherwise this is a <code>get</code> operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - given key</dd>
+<dd><code>key</code> - specified key</dd>
 <dd><code>loader</code> - given loader</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>value associating with given key from this cache, or created one</dd>
+<dd>value associating with specified key, may be computed from given loader</dd>
 </dl>
 </li>
 </ul>
-<a name="getWrapper-java.lang.Object-">
+<a name="getOptional-java.lang.Object-">
 <!--   -->
-</a><a name="getWrapper-K-">
+</a><a name="getOptional-K-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getWrapper</h4>
+<h4>getOptional</h4>
 <pre>@Nullable
-@Nullable <a href="../../../../xyz/fsgek/common/base/GekWrapper.html" title="interface in xyz.fsgek.common.base">GekWrapper</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;getWrapper(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</pre>
-<div class="block">Returns wrapped value associating with given key from this cache,
- or null if there is no entry for given key or the value is expired.</div>
+@Nullable java.util.Optional&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;getOptional(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</pre>
+<div class="block">Returns value wrapped by <code>Optional</code> associating with specified key.
+ The returned <code>Optional</code> will be null if there is no entry for specified key.
+ <p>
+ This is a <code>get</code> operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - given key</dd>
+<dd><code>key</code> - specified key</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>value associating with given key from this cache</dd>
+<dd>value wrapped by <code>Optional</code> associating with specified key, or null if not found</dd>
 </dl>
 </li>
 </ul>
-<a name="getWrapper-java.lang.Object-java.util.function.Function-">
+<a name="getOptional-java.lang.Object-java.util.function.Function-">
 <!--   -->
-</a><a name="getWrapper-K-java.util.function.Function-">
+</a><a name="getOptional-K-java.util.function.Function-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getWrapper</h4>
+<h4>getOptional</h4>
 <pre>@Nullable
-@Nullable <a href="../../../../xyz/fsgek/common/base/GekWrapper.html" title="interface in xyz.fsgek.common.base">GekWrapper</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;getWrapper(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
-                                              java.util.function.Function&lt;? super <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/base/GekWrapper.html" title="interface in xyz.fsgek.common.base">GekWrapper</a>&lt;? extends <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&gt;&nbsp;loader)</pre>
-<div class="block">Returns wrapped value associating with given key from this cache.
- If there is no entry for given key or the value is expired, a new wrapped value will be created by given loader.
- If the loader returns null, no value will be put and this method will return null.
+@Nullable java.util.Optional&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;getOptional(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+                                                       java.util.function.Function&lt;? super <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache">GekCache.Value</a>&lt;? extends <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&gt;&nbsp;loader)</pre>
+<div class="block">Returns value wrapped by <code>Optional</code> associating with specified key, and it performs like
+ <code>ConcurrentHashMap.computeIfAbsent(Object, Function)</code>:
  <p>
- This method will return null if and only if the loader returns null.</div>
+ If the specified key is not already associated with a value, attempts to compute its value as <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache"><code>GekCache.Value</code></a>
+ using the given loader and enters it into this cache. If the loader returns null, no mapping will be recorded and
+ this method will return null.
+ <p>
+ This cache is thread-safe so the loader function is applied at most once per key, and blocks other thread.
+ <p>
+ This is a <code>compute</code> operation if the computation is occurred, otherwise this is a <code>get</code> operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - given key</dd>
+<dd><code>key</code> - specified key</dd>
 <dd><code>loader</code> - given loader</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>value associating with given key from this cache, or created one</dd>
+<dd>value associating with specified key, may be computed from given loader</dd>
+</dl>
+</li>
+</ul>
+<a name="contains-java.lang.Object-">
+<!--   -->
+</a><a name="contains-K-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>contains</h4>
+<pre>boolean&nbsp;contains(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</pre>
+<div class="block">Returns whether this cache contains the value associating with specified key and the value is valid.
+ <p>
+ This is a <code>contains</code> operation.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - specified key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>whether this cache contains the value associating with specified key and the value is valid</dd>
 </dl>
 </li>
 </ul>
@@ -534,13 +563,138 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <h4>put</h4>
 <pre><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;put(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
       <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;value)</pre>
-<div class="block">Sets the value associated with given key, return old value or null if there is no old value.</div>
+<div class="block">Puts the value associated with specified key,
+ return old value or null if there is no old value or old value is expired.
+ <p>
+ This is a <code>put</code> operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - given key</dd>
+<dd><code>key</code> - specified key</dd>
 <dd><code>value</code> - the value</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>old value or null</dd>
+</dl>
+</li>
+</ul>
+<a name="put-java.lang.Object-java.lang.Object-long-">
+<!--   -->
+</a><a name="put-K-V-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>put</h4>
+<pre><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;put(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+      <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;value,
+      long&nbsp;expireAfterWriteMillis)</pre>
+<div class="block">Puts the value associated with specified key and expiration in milliseconds of values which are written after
+ once compute/put operation.
+ return old value or null if there is no old value or old value is expired.
+ The expiration can be -1 if set to default rule.
+ <p>
+ This is a <code>put</code> operation.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - specified key</dd>
+<dd><code>value</code> - the value</dd>
+<dd><code>expireAfterWriteMillis</code> - expiration in milliseconds after once writing</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>old value or null</dd>
+</dl>
+</li>
+</ul>
+<a name="put-java.lang.Object-xyz.fsgek.common.cache.GekCache.Value-">
+<!--   -->
+</a><a name="put-K-xyz.fsgek.common.cache.GekCache.Value-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>put</h4>
+<pre><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&nbsp;put(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+      <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache">GekCache.Value</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;value)</pre>
+<div class="block">Puts the value wrapped by <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache"><code>GekCache.Value</code></a> associated with specified key,
+ return old value or null if there is no old value or old value is expired.
+ <p>
+ This is a <code>put</code> operation.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - specified key</dd>
+<dd><code>value</code> - the value wrapped by <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache"><code>GekCache.Value</code></a></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>old value or null</dd>
+</dl>
+</li>
+</ul>
+<a name="expire-java.lang.Object-long-">
+<!--   -->
+</a><a name="expire-K-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>expire</h4>
+<pre>void&nbsp;expire(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+            long&nbsp;expireAfterWriteMillis)</pre>
+<div class="block">Sets expiration in milliseconds of values which are written after once compute/put operation for value
+ associated with specified key, can be -1 if set to default rule.
+ Concept of this expiration are same with <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html#expireAfterWriteMillis--"><code>GekCache.Value.expireAfterWriteMillis()</code></a>.
+ <p>
+ This is a <code>put</code> operation.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - specified key</dd>
+<dd><code>expireAfterWriteMillis</code> - expiration in milliseconds after once writing</dd>
+</dl>
+</li>
+</ul>
+<a name="expire-java.lang.Object-long-long-">
+<!--   -->
+</a><a name="expire-K-long-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>expire</h4>
+<pre>void&nbsp;expire(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+            long&nbsp;expireAfterWriteMillis,
+            long&nbsp;expireAfterAccessMillis)</pre>
+<div class="block">Sets expiration in milliseconds for value associated with specified key, can be -1 if set to default rule.
+ Concept of these expirations are same with
+ <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html#expireAfterWriteMillis--"><code>GekCache.Value.expireAfterWriteMillis()</code></a> and <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html#expireAfterAccessMillis--"><code>GekCache.Value.expireAfterAccessMillis()</code></a>.
+ <p>
+ This is a <code>put</code> operation.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - specified key</dd>
+<dd><code>expireAfterWriteMillis</code> - expiration in milliseconds after once writing</dd>
+<dd><code>expireAfterAccessMillis</code> - expiration in milliseconds after once access</dd>
+</dl>
+</li>
+</ul>
+<a name="expire-java.lang.Object-java.time.Duration-java.time.Duration-">
+<!--   -->
+</a><a name="expire-K-java.time.Duration-java.time.Duration-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>expire</h4>
+<pre>void&nbsp;expire(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key,
+            @Nullable
+            @Nullable java.time.Duration&nbsp;expireAfterWrite,
+            @Nullable
+            @Nullable java.time.Duration&nbsp;expireAfterAccess)</pre>
+<div class="block">Sets expiration for value associated with specified key, can be null if set to default rule.
+ Concept of these expirations are same with
+ <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html#expireAfterWrite--"><code>GekCache.Value.expireAfterWrite()</code></a> and <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html#expireAfterAccess--"><code>GekCache.Value.expireAfterAccess()</code></a>.
+ <p>
+ This is a <code>put</code> operation.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - specified key</dd>
+<dd><code>expireAfterWrite</code> - expiration in milliseconds after once writing</dd>
+<dd><code>expireAfterAccess</code> - expiration in milliseconds after once access</dd>
 </dl>
 </li>
 </ul>
@@ -553,10 +707,12 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <li class="blockList">
 <h4>remove</h4>
 <pre>void&nbsp;remove(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>&nbsp;key)</pre>
-<div class="block">Removes the value associated with given key.</div>
+<div class="block">Removes the value associated with specified key.
+ <p>
+ This is a <code>remove</code> operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - given key</dd>
+<dd><code>key</code> - specified key</dd>
 </dl>
 </li>
 </ul>
@@ -567,7 +723,26 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <li class="blockList">
 <h4>removeIf</h4>
 <pre>void&nbsp;removeIf(java.util.function.BiPredicate&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&nbsp;predicate)</pre>
-<div class="block">Removes values of which key and value (first and second param) pass given predicate.</div>
+<div class="block">Removes values of which key and value (first and second param) pass given predicate.
+ <p>
+ This is a <code>remove</code> operation.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>predicate</code> - given predicate</dd>
+</dl>
+</li>
+</ul>
+<a name="removeEntry-java.util.function.BiPredicate-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeEntry</h4>
+<pre>void&nbsp;removeEntry(java.util.function.BiPredicate&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache">GekCache.Value</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;&gt;&nbsp;predicate)</pre>
+<div class="block">Removes values of which key and value info (first and second param) pass given predicate.
+ This method is <a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache"><code>GekCache.Value</code></a> version of <a href="../../../../xyz/fsgek/common/cache/GekCache.html#removeIf-java.util.function.BiPredicate-"><code>removeIf(BiPredicate)</code></a>.
+ <p>
+ This is a <code>remove</code> operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>predicate</code> - given predicate</dd>
@@ -605,7 +780,7 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <li class="blockList">
 <h4>cleanUp</h4>
 <pre>void&nbsp;cleanUp()</pre>
-<div class="block">Removes all expired values.</div>
+<div class="block">Removes all expired values in this cache.</div>
 </li>
 </ul>
 </li>
@@ -636,7 +811,7 @@ public interface <span class="typeNameLabel">GekCache&lt;K,V&gt;</span></pre>
 <div class="subNav">
 <ul class="navList">
 <li>Prev&nbsp;Class</li>
-<li><a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="interface in xyz.fsgek.common.cache"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="class in xyz.fsgek.common.cache"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?xyz/fsgek/common/cache/GekCache.html" target="_top">Frames</a></li>

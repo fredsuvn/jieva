@@ -14,7 +14,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
- * Cache interface, provides get/compute/put/expire/remove/clear/clean methods which perform like
+ * Cache interface, provides get/compute/put/contains/expire/remove/clear/clean methods which perform like
  * {@link ConcurrentHashMap}. Implementations should be thread-safe, this is defined in this interface.
  * <p>
  * This cache supports set different expiration for each entry, and null value is permitted.
@@ -100,6 +100,8 @@ public interface GekCache<K, V> {
     /**
      * Returns value associating with specified key.
      * The value will be null if there is no entry for specified key or is expired or itself is null.
+     * <p>
+     * This is a {@code get} operation.
      *
      * @param key specified key
      * @return value associating with specified key
@@ -115,6 +117,8 @@ public interface GekCache<K, V> {
      * loader and enters it into this cache. Null is permitted so the null value will also be entered.
      * <p>
      * This cache is thread-safe so the loader function is applied at most once per key, and blocks other thread.
+     * <p>
+     * This is a {@code compute} operation if the computation is occurred, otherwise this is a {@code get} operation.
      *
      * @param key    specified key
      * @param loader given loader
@@ -126,6 +130,8 @@ public interface GekCache<K, V> {
     /**
      * Returns value wrapped by {@link Optional} associating with specified key.
      * The returned {@link Optional} will be null if there is no entry for specified key.
+     * <p>
+     * This is a {@code get} operation.
      *
      * @param key specified key
      * @return value wrapped by {@link Optional} associating with specified key, or null if not found
@@ -137,22 +143,36 @@ public interface GekCache<K, V> {
      * Returns value wrapped by {@link Optional} associating with specified key, and it performs like
      * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)}:
      * <p>
-     * If the specified key is not already associated with a value, attempts to compute its value as {@link ValueInfo}
+     * If the specified key is not already associated with a value, attempts to compute its value as {@link Value}
      * using the given loader and enters it into this cache. If the loader returns null, no mapping will be recorded and
      * this method will return null.
      * <p>
      * This cache is thread-safe so the loader function is applied at most once per key, and blocks other thread.
+     * <p>
+     * This is a {@code compute} operation if the computation is occurred, otherwise this is a {@code get} operation.
      *
      * @param key    specified key
      * @param loader given loader
      * @return value associating with specified key, may be computed from given loader
      */
     @Nullable
-    Optional<V> getOptional(K key, Function<? super K, @Nullable ValueInfo<? extends V>> loader);
+    Optional<V> getOptional(K key, Function<? super K, @Nullable Value<? extends V>> loader);
 
     /**
-     * Sets the value associated with specified key,
+     * Returns whether this cache contains the value associating with specified key and the value is valid.
+     * <p>
+     * This is a {@code contains} operation.
+     *
+     * @param key specified key
+     * @return whether this cache contains the value associating with specified key and the value is valid
+     */
+    boolean contains(K key);
+
+    /**
+     * Puts the value associated with specified key,
      * return old value or null if there is no old value or old value is expired.
+     * <p>
+     * This is a {@code put} operation.
      *
      * @param key   specified key
      * @param value the value
@@ -161,51 +181,74 @@ public interface GekCache<K, V> {
     V put(K key, V value);
 
     /**
-     * Sets the value info associated with specified key and specified expiration in milliseconds,
+     * Puts the value associated with specified key and expiration in milliseconds of values which are written after
+     * once compute/put operation.
      * return old value or null if there is no old value or old value is expired.
-     * The expiration can be set to -1, in this case the value uses default expiration rule.
+     * The expiration can be -1 if set to default rule.
+     * <p>
+     * This is a {@code put} operation.
      *
-     * @param key              specified key
-     * @param value            the value
-     * @param expirationMillis specified expiration in milliseconds
+     * @param key                    specified key
+     * @param value                  the value
+     * @param expireAfterWriteMillis expiration in milliseconds after once writing
      * @return old value or null
      */
-    V put(K key, V value, long expirationMillis);
+    V put(K key, V value, long expireAfterWriteMillis);
 
     /**
-     * Sets the value info associated with specified key and specified expiration,
+     * Puts the value wrapped by {@link Value} associated with specified key,
      * return old value or null if there is no old value or old value is expired.
-     * The expiration can be set to null, in this case the value uses default expiration rule.
+     * <p>
+     * This is a {@code put} operation.
      *
-     * @param key        specified key
-     * @param value      the value
-     * @param expiration specified expiration
+     * @param key   specified key
+     * @param value the value wrapped by {@link Value}
      * @return old value or null
      */
-    V put(K key, V value, @Nullable Duration expiration);
+    V put(K key, Value<V> value);
 
     /**
-     * Sets expiration in milliseconds for value associated with specified key.
-     * No effect if there is no old value or old value is expired.
-     * The expiration can be set to -1, in this case the value uses default expiration rule.
+     * Sets expiration in milliseconds of values which are written after once compute/put operation for value
+     * associated with specified key, can be -1 if set to default rule.
+     * Concept of this expiration are same with {@link Value#expireAfterWriteMillis()}.
+     * <p>
+     * This is a {@code put} operation.
      *
-     * @param key              specified key
-     * @param expirationMillis expiration in milliseconds
+     * @param key                    specified key
+     * @param expireAfterWriteMillis expiration in milliseconds after once writing
      */
-    void expire(K key, long expirationMillis);
+    void expire(K key, long expireAfterWriteMillis);
 
     /**
-     * Sets expiration for value associated with specified key.
-     * No effect if there is no old value or old value is expired.
-     * The expiration can be set to null, in this case the value uses default expiration rule.
+     * Sets expiration in milliseconds for value associated with specified key, can be -1 if set to default rule.
+     * Concept of these expirations are same with
+     * {@link Value#expireAfterWriteMillis()} and {@link Value#expireAfterAccessMillis()}.
+     * <p>
+     * This is a {@code put} operation.
      *
-     * @param key        specified key
-     * @param expiration expiration
+     * @param key                     specified key
+     * @param expireAfterWriteMillis  expiration in milliseconds after once writing
+     * @param expireAfterAccessMillis expiration in milliseconds after once access
      */
-    void expire(K key, @Nullable Duration expiration);
+    void expire(K key, long expireAfterWriteMillis, long expireAfterAccessMillis);
+
+    /**
+     * Sets expiration for value associated with specified key, can be null if set to default rule.
+     * Concept of these expirations are same with
+     * {@link Value#expireAfterWrite()} and {@link Value#expireAfterAccess()}.
+     * <p>
+     * This is a {@code put} operation.
+     *
+     * @param key               specified key
+     * @param expireAfterWrite  expiration in milliseconds after once writing
+     * @param expireAfterAccess expiration in milliseconds after once access
+     */
+    void expire(K key, @Nullable Duration expireAfterWrite, @Nullable Duration expireAfterAccess);
 
     /**
      * Removes the value associated with specified key.
+     * <p>
+     * This is a {@code remove} operation.
      *
      * @param key specified key
      */
@@ -213,6 +256,8 @@ public interface GekCache<K, V> {
 
     /**
      * Removes values of which key and value (first and second param) pass given predicate.
+     * <p>
+     * This is a {@code remove} operation.
      *
      * @param predicate given predicate
      */
@@ -220,11 +265,13 @@ public interface GekCache<K, V> {
 
     /**
      * Removes values of which key and value info (first and second param) pass given predicate.
-     * This method is {@link ValueInfo} version of {@link #removeIf(BiPredicate)}.
+     * This method is {@link Value} version of {@link #removeIf(BiPredicate)}.
+     * <p>
+     * This is a {@code remove} operation.
      *
      * @param predicate given predicate
      */
-    void removeEntry(BiPredicate<K, ValueInfo<V>> predicate);
+    void removeEntry(BiPredicate<K, Value<V>> predicate);
 
     /**
      * Returns current size.
@@ -266,59 +313,86 @@ public interface GekCache<K, V> {
      *
      * @param <V> value type
      */
-    interface ValueInfo<V> {
+    interface Value<V> {
 
         /**
          * Returns a new instance with given value and specified expiration in milliseconds.
+         * See {@link #expireAfterWriteMillis()} and {@link #expireAfterWriteMillis()}.
          *
-         * @param value            given value
-         * @param expirationMillis specified expiration in milliseconds, may be -1 if set to use default expiration rule
-         * @param <V>              value type
+         * @param value                   given value
+         * @param expireAfterWriteMillis  expiration in milliseconds after once writing, may be -1
+         * @param expireAfterAccessMillis expiration in milliseconds after once access, may be -1
+         * @param <V>                     value type
          * @return a new instance with given value and specified expiration in milliseconds
          */
-        static <V> ValueInfo<V> of(@Nullable V value, long expirationMillis) {
-            Duration duration = expirationMillis < 0 ? null : Duration.ofMillis(expirationMillis);
-            return new ValueInfo<V>() {
+        static <V> Value<V> of(@Nullable V value, long expireAfterWriteMillis, long expireAfterAccessMillis) {
+            Duration expireAfterWrite = expireAfterWriteMillis < 0 ? null : Duration.ofMillis(expireAfterWriteMillis);
+            Duration expireAfterAccess = expireAfterAccessMillis < 0 ? null : Duration.ofMillis(expireAfterAccessMillis);
+            return new Value<V>() {
+
                 @Override
                 public @Nullable V get() {
                     return value;
                 }
 
                 @Override
-                public @Nullable Duration expiration() {
-                    return duration;
+                public long expireAfterWriteMillis() {
+                    return expireAfterWriteMillis;
                 }
 
                 @Override
-                public long expirationMillis() {
-                    return expirationMillis;
+                public @Nullable Duration expireAfterWrite() {
+                    return expireAfterWrite;
+                }
+
+                @Override
+                public long expireAfterAccessMillis() {
+                    return expireAfterAccessMillis;
+                }
+
+                @Override
+                public @Nullable Duration expireAfterAccess() {
+                    return expireAfterAccess;
                 }
             };
         }
 
         /**
          * Returns a new instance with given value and specified expiration.
+         * See {@link #expireAfterWrite()} and {@link #expireAfterWrite()}.
          *
-         * @param value      given value
-         * @param expiration specified expiration, may be null if set to use default expiration rule
-         * @param <V>        value type
+         * @param value             given value
+         * @param expireAfterWrite  expiration after once writing, may be null
+         * @param expireAfterAccess expiration after once access, may be null
+         * @param <V>               value type
          * @return a new instance with given value and specified expiration
          */
-        static <V> ValueInfo<V> of(@Nullable V value, @Nullable Duration expiration) {
-            return new ValueInfo<V>() {
+        static <V> Value<V> of(@Nullable V value, @Nullable Duration expireAfterWrite, @Nullable Duration expireAfterAccess) {
+            return new Value<V>() {
+
                 @Override
                 public @Nullable V get() {
                     return value;
                 }
 
                 @Override
-                public @Nullable Duration expiration() {
-                    return expiration;
+                public long expireAfterWriteMillis() {
+                    return expireAfterWrite == null ? -1 : expireAfterWrite.toMillis();
                 }
 
                 @Override
-                public long expirationMillis() {
-                    return expiration == null ? -1 : expiration.toMillis();
+                public @Nullable Duration expireAfterWrite() {
+                    return expireAfterWrite;
+                }
+
+                @Override
+                public long expireAfterAccessMillis() {
+                    return expireAfterAccess == null ? -1 : expireAfterAccess.toMillis();
+                }
+
+                @Override
+                public @Nullable Duration expireAfterAccess() {
+                    return expireAfterAccess;
                 }
             };
         }
@@ -332,19 +406,40 @@ public interface GekCache<K, V> {
         V get();
 
         /**
-         * Returns expiration, may be null if set to use default expiration rule.
+         * Returns expiration in milliseconds of values which are written after once compute/put operation.
+         * It can be -1 if set to default rule.
          *
-         * @return expiration, may be null if set to use default expiration rule
+         * @return expiration in milliseconds after once writing
          */
-        @Nullable
-        Duration expiration();
+        long expireAfterWriteMillis();
 
         /**
-         * Returns expiration in milliseconds, may be -1 if set to use default expiration rule.
+         * Returns expiration of values which are written after once compute/put operation.
+         * It can be null if set to default rule.
          *
-         * @return expiration in milliseconds, may be -1 if set to use default expiration rule
+         * @return expiration after once writing
          */
-        long expirationMillis();
+        @Nullable
+        Duration expireAfterWrite();
+
+        /**
+         * Returns expiration in milliseconds of values which are accessed after once get/compute/put operation,
+         * but not includes contains operation.
+         * It can be -1 if set to default rule.
+         *
+         * @return expiration in milliseconds after once access
+         */
+        long expireAfterAccessMillis();
+
+        /**
+         * Returns expiration of values which are accessed after once get/compute/put operation,
+         * but not includes contains methods.
+         * It can be null if set to default rule.
+         *
+         * @return expiration after once access
+         */
+        @Nullable
+        Duration expireAfterAccess();
     }
 
     /**
@@ -358,10 +453,11 @@ public interface GekCache<K, V> {
         private boolean useSoft = true;
         private int initialCapacity = -1;
         private GekCache.RemoveListener<K, V> removeListener;
-        private long defaultExpirationMillis = -1;
+        private long expireAfterWrite = -1;
+        private long expireAfterAccess = -1;
 
         /**
-         * Set whether based on {@link SoftReference}, true for {@link SoftReference}, false for {@link WeakReference}.
+         * Sets whether based on {@link SoftReference}, true for {@link SoftReference}, false for {@link WeakReference}.
          *
          * @param useSoft whether based on {@link SoftReference}
          * @param <K1>    key type
@@ -374,7 +470,18 @@ public interface GekCache<K, V> {
         }
 
         /**
-         * Set initial capacity.
+         * Returns whether based on {@link SoftReference},
+         * true for {@link SoftReference}, false for {@link WeakReference}.
+         *
+         * @return whether based on {@link SoftReference},
+         * true for {@link SoftReference}, false for {@link WeakReference}
+         */
+        public boolean useSoft() {
+            return useSoft;
+        }
+
+        /**
+         * Sets initial capacity.
          *
          * @param initialCapacity initial capacity
          * @param <K1>            key type
@@ -387,7 +494,16 @@ public interface GekCache<K, V> {
         }
 
         /**
-         * Set removing event listener.
+         * Returns initial capacity.
+         *
+         * @return initial capacity
+         */
+        public int initialCapacity() {
+            return initialCapacity;
+        }
+
+        /**
+         * Sets removing event listener.
          *
          * @param removeListener removing event listener
          * @param <K1>           key type
@@ -400,29 +516,115 @@ public interface GekCache<K, V> {
         }
 
         /**
-         * Set default expiration in milliseconds, may be -1 if set to expired by GC
+         * Returns removing event listener.
          *
-         * @param defaultExpirationMillis default expiration in milliseconds, may be -1 if set to expired by GC
-         * @param <K1>                    key type
-         * @param <V1>                    value type
+         * @return removing event listener
+         */
+        @Nullable
+        public GekCache.RemoveListener<K, V> removeListener() {
+            return removeListener;
+        }
+
+        /**
+         * Sets default expiration in milliseconds of values which are written after once compute/put operation.
+         * It can be -1 if set to expired by GC.
+         *
+         * @param expireAfterWriteMillis expiration in milliseconds after once writing
+         * @param <K1>                   key type
+         * @param <V1>                   value type
          * @return this builder
          */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> defaultExpirationMillis(long defaultExpirationMillis) {
-            this.defaultExpirationMillis = defaultExpirationMillis;
+        public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterWrite(long expireAfterWriteMillis) {
+            this.expireAfterWrite = expireAfterWriteMillis;
             return Gek.as(this);
         }
 
         /**
-         * Set default expiration, may be null if set to expired by GC
+         * Returns default expiration in milliseconds of values which are written after once compute/put operation.
+         * It can be -1 if set to expired by GC.
          *
-         * @param defaultExpiration default expiration, may be null if set to expired by GC
+         * @return expiration in milliseconds after once writing
+         */
+        public long expireAfterWriteMillis() {
+            return expireAfterWrite;
+        }
+
+        /**
+         * Sets default expiration of values which are written after once compute/put operation.
+         * It can be null if set to expired by GC.
+         *
+         * @param expireAfterWrite expiration after once writing
+         * @param <K1>             key type
+         * @param <V1>             value type
+         * @return this builder
+         */
+        public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterWrite(@Nullable Duration expireAfterWrite) {
+            this.expireAfterWrite = expireAfterWrite == null ? -1 : expireAfterWrite.toMillis();
+            return Gek.as(this);
+        }
+
+        /**
+         * Returns default expiration of values which are written after once compute/put operation.
+         * It can be null if set to expired by GC.
+         *
+         * @return expiration after once writing
+         */
+        @Nullable
+        public Duration expireAfterWrite() {
+            return expireAfterWrite < 0 ? null : Duration.ofMillis(expireAfterWrite);
+        }
+
+        /**
+         * Sets default expiration in milliseconds of values which are accessed after once get/compute/put operation,
+         * but not includes contains methods.
+         * It can be -1 if set to expired by GC.
+         *
+         * @param expireAfterAccessMillis expiration in milliseconds after once access
+         * @param <K1>                    key type
+         * @param <V1>                    value type
+         * @return this builder
+         */
+        public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterAccess(long expireAfterAccessMillis) {
+            this.expireAfterAccess = expireAfterAccessMillis;
+            return Gek.as(this);
+        }
+
+        /**
+         * Returns default expiration in milliseconds of values which are accessed after once get/compute/put operation,
+         * but not includes contains methods.
+         * It can be -1 if set to expired by GC.
+         *
+         * @return expiration in milliseconds after once access
+         */
+        public long expireAfterAccessMillis() {
+            return expireAfterAccess;
+        }
+
+        /**
+         * Sets default expiration of values which are accessed after once get/compute/put operation,
+         * but not includes contains methods.
+         * It can be null if set to expired by GC.
+         *
+         * @param expireAfterAccess expiration after once access
          * @param <K1>              key type
          * @param <V1>              value type
          * @return this builder
          */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> defaultExpiration(@Nullable Duration defaultExpiration) {
-            this.defaultExpirationMillis = defaultExpiration == null ? -1 : defaultExpiration.toMillis();
+        public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterAccess(@Nullable Duration expireAfterAccess) {
+            this.expireAfterAccess = expireAfterAccess == null ? -1 : expireAfterAccess.toMillis();
             return Gek.as(this);
+        }
+
+        /**
+         * Returns default expiration of values which are accessed after once get/compute/put operation,
+         * but not includes contains methods.
+         * It can be null if set to expired by GC.
+         *
+         * @return expiration after once access
+         */
+        @Nullable
+        public Duration expireAfterAccess() {
+            return expireAfterAccess < 0 ? null : Duration.ofMillis(expireAfterAccess);
         }
 
         /**
@@ -431,7 +633,7 @@ public interface GekCache<K, V> {
          * @return built {@link GekCache}
          */
         public <K1 extends K, V1 extends V> GekCache<K1, V1> build() {
-            return Gek.as(new GcCache<>(useSoft, defaultExpirationMillis, initialCapacity, removeListener));
+            return Gek.as(new GcCache<>(this));
         }
     }
 }

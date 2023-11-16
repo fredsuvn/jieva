@@ -119,7 +119,7 @@ implements <a href="../../../../../../xyz/fsgek/common/net/tcp/GekTcpChannelHand
      buffer -&gt; data|data|data|..
  </pre>
  The returned object of <a href="../../../../../../xyz/fsgek/common/net/tcp/handlers/DelimiterBasedTcpChannelHandler.html#onMessage-xyz.fsgek.common.net.tcp.GekTcpChannel-java.nio.ByteBuffer-"><code>onMessage(GekTcpChannel, ByteBuffer)</code></a> is <code>List</code>&lt;<code>ByteBuffer</code>&gt;,
- each byte buffer is split by <a href="../../../../../../xyz/fsgek/common/io/GekBuffer.html#splitByDelimiter-java.nio.ByteBuffer-byte-java.util.function.IntFunction-"><code>GekBuffer.splitByDelimiter(ByteBuffer, byte, IntFunction)</code></a>
+ each byte buffer is split by <a href="../../../../../../xyz/fsgek/common/io/GekIO.html#split-java.nio.ByteBuffer-byte-java.util.function.IntFunction-"><code>GekIO.split(ByteBuffer, byte, IntFunction)</code></a>
  and make returned buffers readonly.</div>
 </li>
 </ul>

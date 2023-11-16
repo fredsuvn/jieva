@@ -73,7 +73,7 @@ public class CacheTest {
         gekCache.put(2, "2");
         Assert.assertEquals(gekCache.get(2), "2");
         Assert.assertEquals(gekCache.get(2, k -> "4"), "2");
-        Assert.assertEquals(gekCache.getOptional(2, k -> GekCache.ValueInfo.of("8", null)).get(), "2");
+        Assert.assertEquals(gekCache.getOptional(2, k -> GekCache.Value.of("8", null, null)).get(), "2");
     }
 
     @Test
@@ -126,7 +126,7 @@ public class CacheTest {
             set.remove(k);
         });
         for (int i = 0; i < 10000; i++) {
-            gekCache.put(i, null);
+            gekCache.put(i, (Integer) null);
         }
         for (int i = 0; i < 10000; i++) {
             Optional<Integer> w = gekCache.getOptional(i);
@@ -143,20 +143,27 @@ public class CacheTest {
     @Test
     public void testExpiration() throws InterruptedException {
         int[] l = {0};
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> l[0]++);
-        gekCache.put(1, 1, 1000);
-        Assert.assertEquals(gekCache.get(1), 1);
+        GekCache<Integer, Integer> cache = GekCache.softCache((k, v, c) -> l[0]++);
+        cache.put(1, 1, 1000);
+        Assert.assertEquals(cache.get(1), 1);
         Assert.assertEquals(l[0], 0);
         Thread.sleep(1001);
-        Assert.assertNull(gekCache.get(1));
+        Assert.assertNull(cache.get(1));
         Assert.assertEquals(l[0], 1);
-        gekCache.put(2, 2, 1000);
-        gekCache.expire(2, 1500);
+        cache.put(2, 2, 1000);
+        cache.expire(2, 1500);
         Thread.sleep(1111);
-        Assert.assertEquals(gekCache.get(2), 2);
+        Assert.assertEquals(cache.get(2), 2);
         Assert.assertEquals(l[0], 1);
         Thread.sleep(1000);
-        Assert.assertNull(gekCache.get(2));
+        Assert.assertNull(cache.get(2));
         Assert.assertEquals(l[0], 2);
+        cache.put(3, GekCache.Value.of(3, 1000, 1000));
+        Thread.sleep(500);
+        Assert.assertEquals(cache.get(3), 3);
+        Thread.sleep(500);
+        Assert.assertEquals(cache.get(3), 3);
+        Thread.sleep(1001);
+        Assert.assertNull(cache.get(3));
     }
 }

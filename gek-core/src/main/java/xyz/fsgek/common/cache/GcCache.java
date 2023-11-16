@@ -17,23 +17,25 @@ import java.util.function.Function;
 final class GcCache<K, V> implements GekCache<K, V> {
 
     private final GekCache.RemoveListener<K, V> removeListener;
-    private final boolean isSoft;
+    private final boolean useSoft;
     private final Map<K, Entry<K, V>> map;
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
-    private final long defaultExpirationMillis;
+    private long expireAfterWrite = -1;
+    private long expireAfterAccess = -1;
 
-    GcCache(
-        boolean isSoft, long defaultExpirationMillis, int initialCapacity, @Nullable RemoveListener<K, V> removeListener) {
-        this.isSoft = isSoft;
-        this.defaultExpirationMillis = defaultExpirationMillis;
-        this.map = initialCapacity <= 0 ? new ConcurrentHashMap<>() : new ConcurrentHashMap<>(initialCapacity);
-        this.removeListener = removeListener;
+    GcCache(Builder<K, V> builder) {
+        this.useSoft = builder.useSoft();
+        this.expireAfterAccess = builder.expireAfterAccessMillis();
+        this.expireAfterWrite = builder.expireAfterWriteMillis();
+        this.map = builder.initialCapacity() <= 0 ?
+            new ConcurrentHashMap<>() : new ConcurrentHashMap<>(builder.initialCapacity());
+        this.removeListener = builder.removeListener();
     }
 
     @Override
     public @Nullable V get(K key) {
         Entry<K, V> entry = map.get(key);
-        Value v = checkEntry(entry);
+        ValuePack v = checkEntry(entry, false);
         cleanUp();
         return v == null ? null : v.value;
     }
@@ -41,19 +43,19 @@ final class GcCache<K, V> implements GekCache<K, V> {
     @Override
     public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
         Entry<K, V> entry = map.get(key);
-        Value v = checkEntry(entry);
+        ValuePack v = checkEntry(entry, false);
         if (v != null) {
             cleanUp();
             return v.value;
         }
-        GekRef<Value> result = GekRef.ofNull();
+        GekRef<ValuePack> result = GekRef.ofNull();
         map.compute(key, (k, old) -> {
-            Value oldValue = checkEntry(old);
+            ValuePack oldValue = checkEntry(old, false);
             if (oldValue != null) {
                 result.set(oldValue);
                 return old;
             }
-            Value newValue = new Value(loader.apply(k), defaultExpirationMillis);
+            ValuePack newValue = new ValuePack(loader.apply(k), expireAfterWrite, expireAfterAccess);
             result.set(newValue);
             return newEntry(k, newValue);
         });
@@ -64,76 +66,107 @@ final class GcCache<K, V> implements GekCache<K, V> {
     @Override
     public @Nullable Optional<V> getOptional(K key) {
         Entry<K, V> entry = map.get(key);
-        Value v = checkEntry(entry);
+        ValuePack v = checkEntry(entry, false);
         cleanUp();
         return v == null ? null : Optional.ofNullable(v.value);
     }
 
     @Override
-    public @Nullable Optional<V> getOptional(K key, Function<? super K, @Nullable ValueInfo<? extends V>> loader) {
+    public @Nullable Optional<V> getOptional(K key, Function<? super K, @Nullable Value<? extends V>> loader) {
         Entry<K, V> entry = map.get(key);
-        Value v = checkEntry(entry);
+        ValuePack v = checkEntry(entry, false);
         if (v != null) {
             cleanUp();
             return Optional.ofNullable(v.value);
         }
-        GekRef<Value> result = GekRef.ofNull();
+        GekRef<ValuePack> result = GekRef.ofNull();
         map.compute(key, (k, old) -> {
-            Value oldValue = checkEntry(old);
+            ValuePack oldValue = checkEntry(old, false);
             if (oldValue != null) {
                 result.set(oldValue);
                 return old;
             }
-            ValueInfo<? extends V> vi = loader.apply(k);
+            Value<? extends V> vi = loader.apply(k);
             if (vi == null) {
                 return null;
             }
-            Value newValue = new Value(vi.get(), vi.expirationMillis());
+            ValuePack newValue = new ValuePack(vi.get(), vi.expireAfterWriteMillis(), vi.expireAfterAccessMillis());
             result.set(newValue);
             return newEntry(k, newValue);
         });
         cleanUp();
-        Value rv = result.get();
+        ValuePack rv = result.get();
         return rv == null ? null : Optional.ofNullable(rv.value);
     }
 
     @Override
-    public V put(K key, V value) {
-        return put(key, value, defaultExpirationMillis);
+    public boolean contains(K key) {
+        Entry<K, V> entry = map.get(key);
+        ValuePack v = checkEntry(entry, null);
+        cleanUp();
+        return v != null;
     }
 
     @Override
-    public V put(K key, V value, long expirationMillis) {
-        Entry<K, V> old = map.put(key, newEntry(key, value, expirationMillis));
-        Value v = checkEntry(old);
+    public V put(K key, V value) {
+        return put(key, value, expireAfterWrite);
+    }
+
+    @Override
+    public V put(K key, V value, long expireAfterWriteMillis) {
+        Entry<K, V> old = map.put(key, newEntry(key, value, expireAfterWriteMillis, expireAfterAccess));
+        ValuePack v = checkEntry(old, null);
         cleanUp();
         return v == null ? null : v.value;
     }
 
     @Override
-    public V put(K key, V value, @Nullable Duration expiration) {
-        return put(key, value, expiration == null ? defaultExpirationMillis : expiration.toMillis());
+    public V put(K key, Value<V> value) {
+        Entry<K, V> old = map.put(key,
+            newEntry(key, value.get(), value.expireAfterWriteMillis(), value.expireAfterAccessMillis()));
+        ValuePack v = checkEntry(old, null);
+        cleanUp();
+        return v == null ? null : v.value;
     }
 
     @Override
-    public void expire(K key, long expiration) {
+    public void expire(K key, long expireAfterWriteMillis) {
         Entry<K, V> entry = map.get(key);
-        Value v = checkEntry(entry);
+        ValuePack v = checkEntry(entry, null);
         if (v != null) {
-            v.refreshExpiration(expiration);
+            v.customExpireAfterWrite = expireAfterWriteMillis;
+            v.refreshWrite();
         }
         cleanUp();
     }
 
     @Override
-    public void expire(K key, @Nullable Duration expiration) {
-        expire(key, expiration == null ? defaultExpirationMillis : expiration.toMillis());
+    public void expire(K key, long expireAfterWriteMillis, long expireAfterAccessMillis) {
+        Entry<K, V> entry = map.get(key);
+        ValuePack v = checkEntry(entry, null);
+        if (v != null) {
+            v.customExpireAfterWrite = expireAfterWriteMillis;
+            v.customExpireAfterAccess = expireAfterAccessMillis;
+            v.refreshWrite();
+        }
+        cleanUp();
+    }
+
+    @Override
+    public void expire(K key, @Nullable Duration expireAfterWrite, @Nullable Duration expireAfterAccess) {
+        expire(
+            key,
+            expireAfterWrite == null ? -1 : expireAfterWrite.toMillis(),
+            expireAfterAccess == null ? -1 : expireAfterAccess.toMillis()
+        );
     }
 
     @Override
     public void remove(K key) {
         Entry<K, V> entry = map.remove(key);
-        entry.clear();
+        if (entry != null) {
+            entry.clear();
+        }
         cleanUp();
     }
 
@@ -142,7 +175,7 @@ final class GcCache<K, V> implements GekCache<K, V> {
         map.entrySet().removeIf(it -> {
             K key = it.getKey();
             Entry<K, V> entry = it.getValue();
-            Value v = checkEntry(entry);
+            ValuePack v = checkEntry(entry, null);
             if (v == null) {
                 return true;
             }
@@ -156,15 +189,20 @@ final class GcCache<K, V> implements GekCache<K, V> {
     }
 
     @Override
-    public void removeEntry(BiPredicate<K, ValueInfo<V>> predicate) {
+    public void removeEntry(BiPredicate<K, Value<V>> predicate) {
         map.entrySet().removeIf(it -> {
             K key = it.getKey();
             Entry<K, V> entry = it.getValue();
-            Value v = checkEntry(entry);
+            ValuePack v = checkEntry(entry, null);
             if (v == null) {
                 return true;
             }
-            if (predicate.test(key, ValueInfo.of(v.value, v.expiration))) {
+            Value<V> wrapper = Value.of(
+                v.value,
+                v.customExpireAfterWrite < 0 ? expireAfterWrite : v.customExpireAfterWrite,
+                v.customExpireAfterAccess < 0 ? expireAfterAccess : v.customExpireAfterAccess
+            );
+            if (predicate.test(key, wrapper)) {
                 entry.clear();
                 return true;
             }
@@ -210,11 +248,11 @@ final class GcCache<K, V> implements GekCache<K, V> {
     }
 
     @Nullable
-    private Value checkEntry(@Nullable Entry<K, V> entry) {
+    private GcCache<K, V>.ValuePack checkEntry(@Nullable Entry<K, V> entry, Boolean isWrite) {
         if (entry == null) {
             return null;
         }
-        Value value = entry.value();
+        ValuePack value = entry.value();
         if (value == null) {
             return null;
         }
@@ -222,32 +260,40 @@ final class GcCache<K, V> implements GekCache<K, V> {
             entry.clear();
             return null;
         }
+        if (isWrite == null) {
+            return value;
+        }
+        if (isWrite) {
+            value.refreshWrite();
+        } else {
+            value.refreshAccess();
+        }
         return value;
     }
 
-    private Entry<K, V> newEntry(K key, @Nullable V value, long expiration) {
-        Value v = new Value(value, expiration);
+    private Entry<K, V> newEntry(K key, @Nullable V value, long expireAfterWrite, long expireAfterAccess) {
+        ValuePack v = new ValuePack(value, expireAfterWrite, expireAfterAccess);
         return newEntry(key, v);
     }
 
-    private Entry<K, V> newEntry(K key, Value value) {
-        return isSoft ? new SoftEntry(key, value) : new WeakEntry(key, value);
+    private Entry<K, V> newEntry(K key, ValuePack value) {
+        return useSoft ? new SoftEntry(key, value) : new WeakEntry(key, value);
     }
 
     private interface Entry<K, V> {
 
         K key();
 
-        GcCache<K, V>.Value value();
+        GcCache<K, V>.ValuePack value();
 
         void clear();
     }
 
-    private final class SoftEntry extends SoftReference<Value> implements Entry<K, V> {
+    private final class SoftEntry extends SoftReference<ValuePack> implements Entry<K, V> {
 
         private final K key;
 
-        public SoftEntry(K key, Value referent) {
+        public SoftEntry(K key, ValuePack referent) {
             super(referent, queue);
             this.key = key;
         }
@@ -258,7 +304,7 @@ final class GcCache<K, V> implements GekCache<K, V> {
         }
 
         @Override
-        public Value value() {
+        public ValuePack value() {
             return super.get();
         }
 
@@ -268,11 +314,11 @@ final class GcCache<K, V> implements GekCache<K, V> {
         }
     }
 
-    private final class WeakEntry extends WeakReference<Value> implements Entry<K, V> {
+    private final class WeakEntry extends WeakReference<ValuePack> implements Entry<K, V> {
 
         private final K key;
 
-        public WeakEntry(K key, Value referent) {
+        public WeakEntry(K key, ValuePack referent) {
             super(referent, queue);
             this.key = key;
         }
@@ -283,7 +329,7 @@ final class GcCache<K, V> implements GekCache<K, V> {
         }
 
         @Override
-        public Value value() {
+        public ValuePack value() {
             return super.get();
         }
 
@@ -293,32 +339,42 @@ final class GcCache<K, V> implements GekCache<K, V> {
         }
     }
 
-    private final class Value {
+    private final class ValuePack {
+
         private final V value;
-        private long startTime;
-        private long expiration;
+        private long customExpireAfterWrite;
+        private long customExpireAfterAccess;
+        private long expiredAt = -1;
 
-        private Value(V value, long expiration) {
+        private ValuePack(V value, long expireAfterWrite, long expireAfterAccess) {
             this.value = value;
-            this.expiration = expiration;
-            this.startTime = System.currentTimeMillis();
+            this.customExpireAfterWrite = expireAfterWrite;
+            this.customExpireAfterAccess = expireAfterAccess;
+            refreshWrite();
         }
 
         public boolean isExpired() {
-            if (expiration < 0) {
-                if (defaultExpirationMillis < 0) {
-                    return false;
-                }
-                long now = System.currentTimeMillis();
-                return now > startTime + defaultExpirationMillis;
+            if (expiredAt < 0) {
+                return false;
             }
             long now = System.currentTimeMillis();
-            return now > startTime + expiration;
+            return now > expiredAt;
         }
 
-        public void refreshExpiration(long expiration) {
-            this.expiration = expiration;
-            this.startTime = System.currentTimeMillis();
+        public void refreshWrite() {
+            long exp = customExpireAfterWrite < 0 ? expireAfterWrite : customExpireAfterWrite;
+            if (exp < 0) {
+                return;
+            }
+            this.expiredAt = System.currentTimeMillis() + exp;
+        }
+
+        public void refreshAccess() {
+            long exp = customExpireAfterAccess < 0 ? expireAfterAccess : customExpireAfterAccess;
+            if (exp < 0) {
+                return;
+            }
+            this.expiredAt = System.currentTimeMillis() + exp;
         }
     }
 }

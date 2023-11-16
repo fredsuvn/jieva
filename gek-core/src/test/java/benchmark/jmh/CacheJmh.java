@@ -78,102 +78,81 @@ public class CacheJmh {
     @Benchmark
     @Threads(32)
     public void fsSoft() {
-        for (String key : KEYS) {
-            fsSoftCache.put(key, key + key);
-        }
-        for (String key : KEYS) {
-            fsSoftCache.get(key);
-        }
-        for (String key : KEYS) {
-            fsSoftCache.get(key, k -> k);
-        }
-        for (String key : KEYS) {
-            fsSoftCache.get(key + key, k -> k);
-        }
+        fs(fsSoftCache);
     }
 
     @Benchmark
     @Threads(32)
     public void fsWeak() {
+        fs(fsWeakCache);
+    }
+
+    private void fs(GekCache<String, String> cache) {
         for (String key : KEYS) {
-            fsWeakCache.put(key, key + key);
+            cache.put(key, key + key);
         }
         for (String key : KEYS) {
-            fsWeakCache.get(key);
+            cache.get(key);
         }
         for (String key : KEYS) {
-            fsWeakCache.get(key, k -> k);
+            cache.get(key, k -> k);
         }
         for (String key : KEYS) {
-            fsWeakCache.get(key + key, k -> k);
+            cache.get(key + key, k -> k);
         }
     }
 
     @Benchmark
     @Threads(32)
     public void guava() throws ExecutionException {
-        for (String key : KEYS) {
-            guava.put(key, key + key);
-        }
-        for (String key : KEYS) {
-            guava.getIfPresent(key);
-        }
-        for (String key : KEYS) {
-            guava.get(key, () -> key);
-        }
-        for (String key : KEYS) {
-            guava.get(key + key, () -> key);
-        }
+        guava(guava);
     }
 
     @Benchmark
     @Threads(32)
     public void guavaSoft() throws ExecutionException {
+        guava(guavaSoft);
+    }
+
+    private void guava(Cache<String, String> cache) throws ExecutionException {
         for (String key : KEYS) {
-            guavaSoft.put(key, key + key);
+            cache.put(key, key + key);
         }
         for (String key : KEYS) {
-            guavaSoft.getIfPresent(key);
+            cache.getIfPresent(key);
         }
         for (String key : KEYS) {
-            guavaSoft.get(key, () -> key);
+            cache.get(key, () -> key);
         }
         for (String key : KEYS) {
-            guavaSoft.get(key + key, () -> key);
+            cache.get(key + key, () -> key);
         }
     }
 
     @Benchmark
     @Threads(32)
     public void caffeine() {
-        for (String key : KEYS) {
-            caffeine.put(key, key + key);
-        }
-        for (String key : KEYS) {
-            caffeine.getIfPresent(key);
-        }
-        for (String key : KEYS) {
-            caffeine.get(key, k -> k);
-        }
-        for (String key : KEYS) {
-            caffeine.get(key + key, k -> k);
-        }
+        caffeine(caffeine);
     }
 
     @Benchmark
     @Threads(32)
     public void caffeineSoft() {
+        caffeine(caffeineSoft);
+    }
+
+    private void caffeine(com.github.benmanes.caffeine.cache.Cache<String, String> cache) {
         for (String key : KEYS) {
-            caffeineSoft.put(key, key + key);
+            cache.put(key, key + key);
         }
         for (String key : KEYS) {
-            caffeineSoft.getIfPresent(key);
+            cache.getIfPresent(key);
         }
         for (String key : KEYS) {
-            caffeineSoft.get(key, k -> k);
+            cache.get(key, k -> k);
         }
         for (String key : KEYS) {
-            caffeineSoft.get(key + key, k -> k);
+            cache.get(key + key, k -> k);
         }
     }
 }

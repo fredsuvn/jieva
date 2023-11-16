@@ -47,8 +47,8 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li>Next&nbsp;Class</li>
+<li><a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="class in xyz.fsgek.common.cache"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?xyz/fsgek/common/cache/GekCache.RemoveListener.html" target="_top">Frames</a></li>
@@ -98,6 +98,11 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>K</code> - key type</dd>
+<dd><code>V</code> - value type</dd>
+</dl>
+<dl>
 <dt>Enclosing interface:</dt>
 <dd><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="type parameter in GekCache">V</a>&gt;</dd>
 </dl>
@@ -125,8 +130,9 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html#onRemove-xyz.fsgek.common.cache.GekCache-K-">onRemove</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">V</a>&gt;&nbsp;cache,
-        <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>&nbsp;key)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html#onRemove-K-V-xyz.fsgek.common.cache.GekCache-">onRemove</a></span>(<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>&nbsp;key,
+        <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">V</a>&nbsp;value,
+        <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">V</a>&gt;&nbsp;cache)</code>
 <div class="block">This method will be called after removing a key and its value.</div>
 </td>
 </tr>
@@ -145,21 +151,24 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="onRemove-xyz.fsgek.common.cache.GekCache-java.lang.Object-">
+<a name="onRemove-java.lang.Object-java.lang.Object-xyz.fsgek.common.cache.GekCache-">
 <!--   -->
-</a><a name="onRemove-xyz.fsgek.common.cache.GekCache-K-">
+</a><a name="onRemove-K-V-xyz.fsgek.common.cache.GekCache-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>onRemove</h4>
-<pre>void&nbsp;onRemove(<a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">V</a>&gt;&nbsp;cache,
-              <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>&nbsp;key)</pre>
+<pre>void&nbsp;onRemove(<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>&nbsp;key,
+              @Nullable
+              <a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">V</a>&nbsp;value,
+              <a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache">GekCache</a>&lt;<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">K</a>,<a href="../../../../xyz/fsgek/common/cache/GekCache.RemoveListener.html" title="type parameter in GekCache.RemoveListener">V</a>&gt;&nbsp;cache)</pre>
 <div class="block">This method will be called after removing a key and its value.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>cache</code> - current cache</dd>
 <dd><code>key</code> - key of removed value</dd>
+<dd><code>value</code> - removed value, may be null if the GC has already cleared the value</dd>
+<dd><code>cache</code> - current cache</dd>
 </dl>
 </li>
 </ul>
@@ -190,8 +199,8 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../xyz/fsgek/common/cache/GekCache.html" title="interface in xyz.fsgek.common.cache"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li>Next&nbsp;Class</li>
+<li><a href="../../../../xyz/fsgek/common/cache/GekCache.Builder.html" title="class in xyz.fsgek.common.cache"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../xyz/fsgek/common/cache/GekCache.Value.html" title="interface in xyz.fsgek.common.cache"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?xyz/fsgek/common/cache/GekCache.RemoveListener.html" target="_top">Frames</a></li>

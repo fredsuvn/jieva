@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9,"i24":9,"i25":9,"i26":9,"i27":9,"i28":9,"i29":9,"i30":9,"i31":9,"i32":9,"i33":9,"i34":9,"i35":9,"i36":9,"i37":9,"i38":9,"i39":9,"i40":9,"i41":9,"i42":9,"i43":9,"i44":9,"i45":9,"i46":9,"i47":9,"i48":9,"i49":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9,"i24":9,"i25":9,"i26":9,"i27":9,"i28":9,"i29":9,"i30":9,"i31":9,"i32":9,"i33":9,"i34":9,"i35":9,"i36":9,"i37":9,"i38":9,"i39":9,"i40":9,"i41":9,"i42":9,"i43":9,"i44":9,"i45":9,"i46":9,"i47":9,"i48":9,"i49":9,"i50":9,"i51":9,"i52":9,"i53":9,"i54":9,"i55":9,"i56":9,"i57":9,"i58":9,"i59":9,"i60":9,"i61":9,"i62":9,"i63":9,"i64":9,"i65":9,"i66":9,"i67":9,"i68":9,"i69":9,"i70":9,"i71":9,"i72":9,"i73":9,"i74":9,"i75":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -47,7 +47,7 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../xyz/fsgek/common/io/GekFileCache.FileWriteListener.html" title="interface in xyz.fsgek.common.io"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li>Prev&nbsp;Class</li>
 <li><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
@@ -168,67 +168,110 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static @Nullable byte[]</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#availableBytes-java.io.InputStream-">availableBytes</a></span>(java.io.InputStream&nbsp;inputStream)</code>
-<div class="block">Reads available bytes from given input stream.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#available-java.io.InputStream-">available</a></span>(java.io.InputStream&nbsp;source)</code>
+<div class="block">Reads available bytes from source stream into an array.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>static long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#availableBytesTo-java.io.InputStream-java.io.OutputStream-">availableBytesTo</a></span>(java.io.InputStream&nbsp;inputStream,
-                java.io.OutputStream&nbsp;dest)</code>
-<div class="block">Reads available bytes from given input stream to given dest stream,
- returns actual read number.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#availableTo-java.io.InputStream-java.io.OutputStream-">availableTo</a></span>(java.io.InputStream&nbsp;source,
+           java.io.OutputStream&nbsp;dest)</code>
+<div class="block">Reads available bytes from source stream into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of source stream.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>static @Nullable java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#avalaibleString-java.io.InputStream-">avalaibleString</a></span>(java.io.InputStream&nbsp;inputStream)</code>
-<div class="block">Reads available string encoded by all bytes from given input stream with
- <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>, returns null if reaches end of the stream.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#avalaibleString-java.io.InputStream-">avalaibleString</a></span>(java.io.InputStream&nbsp;source)</code>
+<div class="block">Reads available bytes from source stream into a string with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>static @Nullable java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#avalaibleString-java.io.InputStream-java.nio.charset.Charset-">avalaibleString</a></span>(java.io.InputStream&nbsp;inputStream,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#avalaibleString-java.io.InputStream-java.nio.charset.Charset-">avalaibleString</a></span>(java.io.InputStream&nbsp;source,
                java.nio.charset.Charset&nbsp;charset)</code>
-<div class="block">Reads available string encoded by all bytes from given input stream,
- Return null if no data read out and reach to the end of stream.</div>
+<div class="block">Reads available bytes from source stream into a string with specified charset.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>static java.io.InputStream</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#limited-java.io.InputStream-long-">limited</a></span>(java.io.InputStream&nbsp;source,
-       long&nbsp;limit)</code>
-<div class="block">Wraps given source stream to limit read length.</div>
+<td class="colFirst"><code>static java.nio.ByteBuffer</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#emptyBuffer--">emptyBuffer</a></span>()</code>
+<div class="block">Returns an empty byte buffer.</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>static java.io.OutputStream</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#limited-java.io.OutputStream-long-">limited</a></span>(java.io.OutputStream&nbsp;source,
-       long&nbsp;limit)</code>
-<div class="block">Wraps given source stream to limit written length.</div>
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#isSimpleWrapper-java.nio.ByteBuffer-">isSimpleWrapper</a></span>(java.nio.ByteBuffer&nbsp;buffer)</code>
+<div class="block">Returns whether given buffer is a simple wrapper of back array:</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code>static @Nullable byte[]</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readBytes-java.io.InputStream-">readBytes</a></span>(java.io.InputStream&nbsp;inputStream)</code>
-<div class="block">Reads all bytes from given input stream.</div>
+<td class="colFirst"><code>static java.io.InputStream</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#limit-java.io.InputStream-long-">limit</a></span>(java.io.InputStream&nbsp;stream,
+     long&nbsp;number)</code>
+<div class="block">Limits given stream to a specified number for readable bytes.</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code>static @Nullable byte[]</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readBytes-java.io.InputStream-int-">readBytes</a></span>(java.io.InputStream&nbsp;inputStream,
-         int&nbsp;limit)</code>
-<div class="block">Reads specified limit number of bytes from given input stream.</div>
+<td class="colFirst"><code>static java.io.OutputStream</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#limit-java.io.OutputStream-long-">limit</a></span>(java.io.OutputStream&nbsp;stream,
+     long&nbsp;number)</code>
+<div class="block">Limits given stream to a specified number for writeable bytes.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>static @Nullable byte[]</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.nio.ByteBuffer-">read</a></span>(java.nio.ByteBuffer&nbsp;source)</code>
+<div class="block">Reads all bytes from source buffer into an array.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>static @Nullable byte[]</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.nio.ByteBuffer-int-">read</a></span>(java.nio.ByteBuffer&nbsp;source,
+    int&nbsp;number)</code>
+<div class="block">Reads specified number of bytes from source buffer into an array.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>static @Nullable byte[]</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.io.InputStream-">read</a></span>(java.io.InputStream&nbsp;source)</code>
+<div class="block">Reads all bytes from source stream into an array.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>static @Nullable byte[]</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.io.InputStream-int-">read</a></span>(java.io.InputStream&nbsp;source,
+    int&nbsp;number)</code>
+<div class="block">Reads specified number of bytes from source stream into an array.</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.io.Reader-">read</a></span>(java.io.Reader&nbsp;source)</code>
+<div class="block">Reads all chars from source reader into a string.</div>
+</td>
+</tr>
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.io.Reader-int-">read</a></span>(java.io.Reader&nbsp;source,
+    int&nbsp;number)</code>
+<div class="block">Reads specified number of chars from source reader into a string.</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
+<td class="colFirst"><code>static byte[]</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readBack-java.nio.ByteBuffer-">readBack</a></span>(java.nio.ByteBuffer&nbsp;buffer)</code>
+<div class="block">Returns back array if <a href="../../../../xyz/fsgek/common/io/GekIO.html#isSimpleWrapper-java.nio.ByteBuffer-"><code>isSimpleWrapper(ByteBuffer)</code></a> returns true for given buffer,
+ and the position will be set to <code>buffer.limit()</code>.</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>static byte[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readBytes-java.nio.file.Path-">readBytes</a></span>(java.nio.file.Path&nbsp;path)</code>
 <div class="block">Using <code>RandomAccessFile</code> to read all bytes of given file of path.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>static byte[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readBytes-java.nio.file.Path-long-long-">readBytes</a></span>(java.nio.file.Path&nbsp;path,
          long&nbsp;offset,
@@ -237,81 +280,54 @@ extends java.lang.Object</pre>
  the given length may be set to -1 to read to end of file.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
-<td class="colFirst"><code>static long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readBytesTo-java.io.InputStream-java.io.OutputStream-">readBytesTo</a></span>(java.io.InputStream&nbsp;inputStream,
-           java.io.OutputStream&nbsp;dest)</code>
-<div class="block">Reads all bytes from given input stream to given dest stream, returns actual read number.</div>
-</td>
-</tr>
-<tr id="i11" class="rowColor">
-<td class="colFirst"><code>static long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readBytesTo-java.io.InputStream-java.io.OutputStream-int-">readBytesTo</a></span>(java.io.InputStream&nbsp;inputStream,
-           java.io.OutputStream&nbsp;dest,
-           int&nbsp;limit)</code>
-<div class="block">Reads specified limit number of bytes from given input stream to given dest stream, returns actual read number.</div>
-</td>
-</tr>
-<tr id="i12" class="altColor">
-<td class="colFirst"><code>static long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readBytesTo-java.io.InputStream-java.io.OutputStream-int-int-">readBytesTo</a></span>(java.io.InputStream&nbsp;inputStream,
-           java.io.OutputStream&nbsp;dest,
-           int&nbsp;limit,
-           int&nbsp;bufferSize)</code>
-<div class="block">Reads specified limit number of bytes from given input stream to given dest stream, returns actual read number.</div>
-</td>
-</tr>
-<tr id="i13" class="rowColor">
-<td class="colFirst"><code>static long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readCharsTo-java.io.Reader-java.lang.Appendable-">readCharsTo</a></span>(java.io.Reader&nbsp;reader,
-           java.lang.Appendable&nbsp;dest)</code>
-<div class="block">Reads all chars from given reader to given dest output, returns actual read number.</div>
-</td>
-</tr>
-<tr id="i14" class="altColor">
-<td class="colFirst"><code>static long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readCharsTo-java.io.Reader-java.lang.Appendable-int-">readCharsTo</a></span>(java.io.Reader&nbsp;reader,
-           java.lang.Appendable&nbsp;dest,
-           int&nbsp;limit)</code>
-<div class="block">Reads specified limit number of chars from given reader to given dest output, returns actual read number.</div>
-</td>
-</tr>
-<tr id="i15" class="rowColor">
-<td class="colFirst"><code>static long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readCharsTo-java.io.Reader-java.lang.Appendable-int-int-">readCharsTo</a></span>(java.io.Reader&nbsp;reader,
-           java.lang.Appendable&nbsp;dest,
-           int&nbsp;limit,
-           int&nbsp;bufferSize)</code>
-<div class="block">Reads specified limit number of chars from given reader to given dest output, returns actual read number.</div>
-</td>
-</tr>
-<tr id="i16" class="altColor">
-<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.io.InputStream-">readString</a></span>(java.io.InputStream&nbsp;inputStream)</code>
-<div class="block">Reads string encoded by all bytes from given input stream with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
-</td>
-</tr>
 <tr id="i17" class="rowColor">
-<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.io.InputStream-java.nio.charset.Charset-">readString</a></span>(java.io.InputStream&nbsp;inputStream,
-          java.nio.charset.Charset&nbsp;charset)</code>
-<div class="block">Reads string encoded by all bytes from given input stream.</div>
+<td class="colFirst"><code>static java.nio.ByteBuffer</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readSlice-java.nio.ByteBuffer-int-">readSlice</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+         int&nbsp;number)</code>
+<div class="block">Returns slice of given buffer by <code>ByteBuffer.slice()</code>, and sets the slice's limit to specified number
+ (or remaining if remaining is less than specified number).</div>
 </td>
 </tr>
 <tr id="i18" class="altColor">
+<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.nio.ByteBuffer-">readString</a></span>(java.nio.ByteBuffer&nbsp;source)</code>
+<div class="block">Reads all bytes from source buffer into a string with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
+</td>
+</tr>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.nio.ByteBuffer-java.nio.charset.Charset-">readString</a></span>(java.nio.ByteBuffer&nbsp;source,
+          java.nio.charset.Charset&nbsp;charset)</code>
+<div class="block">Reads all bytes from source buffer into a string with specified charset.</div>
+</td>
+</tr>
+<tr id="i20" class="altColor">
+<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.io.InputStream-">readString</a></span>(java.io.InputStream&nbsp;source)</code>
+<div class="block">Reads all bytes from source stream into a string with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
+</td>
+</tr>
+<tr id="i21" class="rowColor">
+<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.io.InputStream-java.nio.charset.Charset-">readString</a></span>(java.io.InputStream&nbsp;source,
+          java.nio.charset.Charset&nbsp;charset)</code>
+<div class="block">Reads all bytes from source stream into a string with specified charset.</div>
+</td>
+</tr>
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.nio.file.Path-">readString</a></span>(java.nio.file.Path&nbsp;path)</code>
 <div class="block">Using <code>RandomAccessFile</code> to read all bytes of given file of path.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.nio.file.Path-java.nio.charset.Charset-">readString</a></span>(java.nio.file.Path&nbsp;path,
           java.nio.charset.Charset&nbsp;charset)</code>
 <div class="block">Using <code>RandomAccessFile</code> to read all bytes of given file of path.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.nio.file.Path-long-long-">readString</a></span>(java.nio.file.Path&nbsp;path,
           long&nbsp;offset,
@@ -320,7 +336,7 @@ extends java.lang.Object</pre>
  the given length may be set to -1 to read to end of file.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.nio.file.Path-long-long-java.nio.charset.Charset-">readString</a></span>(java.nio.file.Path&nbsp;path,
           long&nbsp;offset,
@@ -330,46 +346,225 @@ extends java.lang.Object</pre>
  the given length may be set to -1 to read to end of file.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
-<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.io.Reader-">readString</a></span>(java.io.Reader&nbsp;reader)</code>
-<div class="block">Reads all chars as string from given reader.</div>
+<tr id="i26" class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.nio.ByteBuffer-byte:A-">readTo</a></span>(java.nio.ByteBuffer&nbsp;source,
+      byte[]&nbsp;dest)</code>
+<div class="block">Reads specified number of bytes from source buffer into dest array,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer or array.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
-<td class="colFirst"><code>static @Nullable java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readString-java.io.Reader-int-">readString</a></span>(java.io.Reader&nbsp;reader,
-          int&nbsp;limit)</code>
-<div class="block">Reads specified limit number of chars as string from given reader.</div>
+<tr id="i27" class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.nio.ByteBuffer-byte:A-int-">readTo</a></span>(java.nio.ByteBuffer&nbsp;source,
+      byte[]&nbsp;dest,
+      int&nbsp;offset)</code>
+<div class="block">Reads specified number of bytes from source buffer into dest array starting from given offset,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer or array.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i28" class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.nio.ByteBuffer-java.nio.ByteBuffer-">readTo</a></span>(java.nio.ByteBuffer&nbsp;source,
+      java.nio.ByteBuffer&nbsp;dest)</code>
+<div class="block">Reads bytes from source buffer into dest buffer,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer.</div>
+</td>
+</tr>
+<tr id="i29" class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.nio.ByteBuffer-java.nio.ByteBuffer-int-">readTo</a></span>(java.nio.ByteBuffer&nbsp;source,
+      java.nio.ByteBuffer&nbsp;dest,
+      int&nbsp;number)</code>
+<div class="block">Reads specified number of bytes from source buffer into dest buffer,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer.</div>
+</td>
+</tr>
+<tr id="i30" class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.nio.ByteBuffer-java.io.OutputStream-">readTo</a></span>(java.nio.ByteBuffer&nbsp;source,
+      java.io.OutputStream&nbsp;dest)</code>
+<div class="block">Reads bytes from source buffer into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer.</div>
+</td>
+</tr>
+<tr id="i31" class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.InputStream-byte:A-">readTo</a></span>(java.io.InputStream&nbsp;source,
+      byte[]&nbsp;dest)</code>
+<div class="block">Reads bytes from source stream into dest array,
+ returns actual read number, or -1 if no data read out and reaches to the end of stream.</div>
+</td>
+</tr>
+<tr id="i32" class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.InputStream-byte:A-int-int-">readTo</a></span>(java.io.InputStream&nbsp;source,
+      byte[]&nbsp;dest,
+      int&nbsp;offset,
+      int&nbsp;length)</code>
+<div class="block">Reads bytes of specified length from source stream into dest array starting from given offset,
+ returns actual read number, or -1 if no data read out and reaches to the end of stream.</div>
+</td>
+</tr>
+<tr id="i33" class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.InputStream-java.nio.ByteBuffer-">readTo</a></span>(java.io.InputStream&nbsp;source,
+      java.nio.ByteBuffer&nbsp;dest)</code>
+<div class="block">Reads bytes from source stream into dest buffer,
+ returns actual read number, or -1 if no data read out and reaches to the end of stream.</div>
+</td>
+</tr>
+<tr id="i34" class="altColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.InputStream-java.io.OutputStream-">readTo</a></span>(java.io.InputStream&nbsp;source,
+      java.io.OutputStream&nbsp;dest)</code>
+<div class="block">Reads all bytes from source stream into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of source stream.</div>
+</td>
+</tr>
+<tr id="i35" class="rowColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.InputStream-java.io.OutputStream-long-">readTo</a></span>(java.io.InputStream&nbsp;source,
+      java.io.OutputStream&nbsp;dest,
+      long&nbsp;number)</code>
+<div class="block">Reads specified number of bytes from source stream into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of source stream.</div>
+</td>
+</tr>
+<tr id="i36" class="altColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.InputStream-java.io.OutputStream-long-int-">readTo</a></span>(java.io.InputStream&nbsp;source,
+      java.io.OutputStream&nbsp;dest,
+      long&nbsp;number,
+      int&nbsp;bufferSize)</code>
+<div class="block">Reads specified number of bytes from source stream into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of source stream.</div>
+</td>
+</tr>
+<tr id="i37" class="rowColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.Reader-java.lang.Appendable-">readTo</a></span>(java.io.Reader&nbsp;source,
+      java.lang.Appendable&nbsp;dest)</code>
+<div class="block">Reads chars from source reader into dest appendable,
+ returns actual read number, or -1 if no data read out and reaches to the end of reader.</div>
+</td>
+</tr>
+<tr id="i38" class="altColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.Reader-java.lang.Appendable-int-">readTo</a></span>(java.io.Reader&nbsp;source,
+      java.lang.Appendable&nbsp;dest,
+      int&nbsp;number)</code>
+<div class="block">Reads specified number of chars from source reader into dest appendable,
+ returns actual read number, or -1 if no data read out and reaches to the end of source reader.</div>
+</td>
+</tr>
+<tr id="i39" class="rowColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.io.Reader-java.lang.Appendable-int-int-">readTo</a></span>(java.io.Reader&nbsp;source,
+      java.lang.Appendable&nbsp;dest,
+      int&nbsp;number,
+      int&nbsp;bufferSize)</code>
+<div class="block">Reads specified number of chars from source reader into dest appendable,
+ returns actual read number, or -1 if no data read out and reaches to the end of source reader.</div>
+</td>
+</tr>
+<tr id="i40" class="altColor">
+<td class="colFirst"><code>static java.nio.ByteBuffer</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#slice-java.nio.ByteBuffer-int-">slice</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+     int&nbsp;number)</code>
+<div class="block">Returns slice of given buffer by <code>ByteBuffer.slice()</code>, and sets the slice's limit to specified number
+ (or remaining if remaining is less than specified number).</div>
+</td>
+</tr>
+<tr id="i41" class="rowColor">
+<td class="colFirst"><code>static java.util.List&lt;java.nio.ByteBuffer&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#split-java.nio.ByteBuffer-byte-">split</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+     byte&nbsp;delimiter)</code>
+<div class="block">Splits given buffer in specified delimiter, returns split buffer list.</div>
+</td>
+</tr>
+<tr id="i42" class="altColor">
+<td class="colFirst"><code>static java.util.List&lt;java.nio.ByteBuffer&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#split-java.nio.ByteBuffer-byte-java.util.function.IntFunction-">split</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+     byte&nbsp;delimiter,
+     java.util.function.IntFunction&lt;java.nio.ByteBuffer&gt;&nbsp;generator)</code>
+<div class="block">Splits given buffer in specified delimiter, returns split buffer list.</div>
+</td>
+</tr>
+<tr id="i43" class="rowColor">
+<td class="colFirst"><code>static java.util.List&lt;java.nio.ByteBuffer&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#split-java.nio.ByteBuffer-int-">split</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+     int&nbsp;length)</code>
+<div class="block">Splits given buffer in specified length, returns split buffer list.</div>
+</td>
+</tr>
+<tr id="i44" class="altColor">
+<td class="colFirst"><code>static java.util.List&lt;java.nio.ByteBuffer&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#split-java.nio.ByteBuffer-int-int-">split</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+     int&nbsp;lengthOffset,
+     int&nbsp;lengthSize)</code>
+<div class="block">Splits given buffer in specified length, returns split buffer list.</div>
+</td>
+</tr>
+<tr id="i45" class="rowColor">
+<td class="colFirst"><code>static java.util.List&lt;java.nio.ByteBuffer&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#split-java.nio.ByteBuffer-int-java.util.function.IntFunction-">split</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+     int&nbsp;length,
+     java.util.function.IntFunction&lt;java.nio.ByteBuffer&gt;&nbsp;generator)</code>
+<div class="block">Splits given buffer in specified length, returns split buffer list.</div>
+</td>
+</tr>
+<tr id="i46" class="altColor">
+<td class="colFirst"><code>static java.util.List&lt;java.nio.ByteBuffer&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#split-java.nio.ByteBuffer-int-int-java.util.function.IntFunction-">split</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+     int&nbsp;lengthOffset,
+     int&nbsp;lengthSize,
+     java.util.function.IntFunction&lt;java.nio.ByteBuffer&gt;&nbsp;generator)</code>
+<div class="block">Splits given buffer in specified length, returns split buffer list.</div>
+</td>
+</tr>
+<tr id="i47" class="rowColor">
+<td class="colFirst"><code>static java.nio.ByteBuffer</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#subBuffer-java.nio.ByteBuffer-int-">subBuffer</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+         int&nbsp;offset)</code>
+<div class="block">Returns a sub-range view of given buffer, starting from given offset to buffer's limit.</div>
+</td>
+</tr>
+<tr id="i48" class="altColor">
+<td class="colFirst"><code>static java.nio.ByteBuffer</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#subBuffer-java.nio.ByteBuffer-int-int-">subBuffer</a></span>(java.nio.ByteBuffer&nbsp;buffer,
+         int&nbsp;offset,
+         int&nbsp;length)</code>
+<div class="block">Returns a sub-range view of given buffer, starting from given offset to specified length.</div>
+</td>
+</tr>
+<tr id="i49" class="rowColor">
 <td class="colFirst"><code>static java.io.ByteArrayInputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toInputStream-byte:A-">toInputStream</a></span>(byte[]&nbsp;array)</code>
-<div class="block">Wraps given array to <code>ByteArrayInputStream</code>.</div>
+<div class="block">Wraps given array as <code>ByteArrayInputStream</code>.</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i50" class="altColor">
 <td class="colFirst"><code>static java.io.ByteArrayInputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toInputStream-byte:A-int-int-">toInputStream</a></span>(byte[]&nbsp;array,
              int&nbsp;offset,
              int&nbsp;length)</code>
-<div class="block">Wraps given array to <code>ByteArrayInputStream</code>, the wrapped range of specified length start from given offset.</div>
+<div class="block">Wraps given array as <code>ByteArrayInputStream</code>, starting from given offset with specified length.</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i51" class="rowColor">
 <td class="colFirst"><code>static java.io.InputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toInputStream-java.nio.ByteBuffer-">toInputStream</a></span>(java.nio.ByteBuffer&nbsp;buffer)</code>
-<div class="block">Wraps given buffer as an input stream, supports mark/reset.</div>
+<div class="block">Wraps given buffer as <code>InputStream</code>.</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i52" class="altColor">
 <td class="colFirst"><code>static java.io.InputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toInputStream-java.io.RandomAccessFile-">toInputStream</a></span>(java.io.RandomAccessFile&nbsp;random)</code>
 <div class="block">Wraps given random access file as an input stream, supports mark/reset.</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i53" class="rowColor">
 <td class="colFirst"><code>static java.io.InputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toInputStream-java.io.RandomAccessFile-long-long-">toInputStream</a></span>(java.io.RandomAccessFile&nbsp;random,
              long&nbsp;offset,
@@ -379,59 +574,59 @@ extends java.lang.Object</pre>
  supports mark/reset.</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i54" class="altColor">
 <td class="colFirst"><code>static java.io.InputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toInputStream-java.io.Reader-">toInputStream</a></span>(java.io.Reader&nbsp;reader)</code>
-<div class="block">Wraps given reader as an input stream with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>, doesn't support mark/reset.</div>
+<div class="block">Wraps given reader as <code>InputStream</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i55" class="rowColor">
 <td class="colFirst"><code>static java.io.InputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toInputStream-java.io.Reader-java.nio.charset.Charset-">toInputStream</a></span>(java.io.Reader&nbsp;reader,
              java.nio.charset.Charset&nbsp;charset)</code>
-<div class="block">Wraps given reader as an input stream, doesn't support mark/reset.</div>
+<div class="block">Wraps given reader as <code>InputStream</code> with specified charset.</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i56" class="altColor">
 <td class="colFirst"><code>static java.io.OutputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toOutputStream-java.lang.Appendable-">toOutputStream</a></span>(java.lang.Appendable&nbsp;appendable)</code>
-<div class="block">Wraps given appendable as an output stream with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
+<div class="block">Wraps given appendable as <code>OutputStream</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i57" class="rowColor">
 <td class="colFirst"><code>static java.io.OutputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toOutputStream-java.lang.Appendable-java.nio.charset.Charset-">toOutputStream</a></span>(java.lang.Appendable&nbsp;appendable,
               java.nio.charset.Charset&nbsp;charset)</code>
-<div class="block">Wraps given appendable as an output stream.</div>
+<div class="block">Wraps given appendable as <code>OutputStream</code> with specified charset.</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
+<tr id="i58" class="altColor">
 <td class="colFirst"><code>static java.io.OutputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toOutputStream-byte:A-">toOutputStream</a></span>(byte[]&nbsp;array)</code>
-<div class="block">Wraps given array as an output stream.</div>
+<div class="block">Wraps given array as <code>OutputStream</code>.</div>
 </td>
 </tr>
-<tr id="i34" class="altColor">
+<tr id="i59" class="rowColor">
 <td class="colFirst"><code>static java.io.OutputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toOutputStream-byte:A-int-int-">toOutputStream</a></span>(byte[]&nbsp;array,
               int&nbsp;offset,
               int&nbsp;length)</code>
-<div class="block">Wraps given array as an output stream, the wrapped range of specified length start from given offset.</div>
+<div class="block">Wraps given array as <code>OutputStream</code>, starting from given offset with specified length.</div>
 </td>
 </tr>
-<tr id="i35" class="rowColor">
+<tr id="i60" class="altColor">
 <td class="colFirst"><code>static java.io.OutputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toOutputStream-java.nio.ByteBuffer-">toOutputStream</a></span>(java.nio.ByteBuffer&nbsp;buffer)</code>
-<div class="block">Wraps given buffer as an output stream.</div>
+<div class="block">Wraps given buffer as <code>OutputStream</code>.</div>
 </td>
 </tr>
-<tr id="i36" class="altColor">
+<tr id="i61" class="rowColor">
 <td class="colFirst"><code>static java.io.OutputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toOutputStream-java.io.RandomAccessFile-">toOutputStream</a></span>(java.io.RandomAccessFile&nbsp;random)</code>
 <div class="block">Wraps given random access file as an output stream.</div>
 </td>
 </tr>
-<tr id="i37" class="rowColor">
+<tr id="i62" class="altColor">
 <td class="colFirst"><code>static java.io.OutputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toOutputStream-java.io.RandomAccessFile-long-long-">toOutputStream</a></span>(java.io.RandomAccessFile&nbsp;random,
               long&nbsp;offset,
@@ -440,52 +635,60 @@ extends java.lang.Object</pre>
  written bytes from <code>offset</code> position to <code>(offset + length)</code>.</div>
 </td>
 </tr>
-<tr id="i38" class="altColor">
+<tr id="i63" class="rowColor">
 <td class="colFirst"><code>static java.io.Reader</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toReader-java.nio.CharBuffer-">toReader</a></span>(java.nio.CharBuffer&nbsp;buffer)</code>
-<div class="block">Wraps given buffer as a reader, supports mark/reset.</div>
+<div class="block">Wraps given buffer as <code>Reader</code>.</div>
 </td>
 </tr>
-<tr id="i39" class="rowColor">
+<tr id="i64" class="altColor">
 <td class="colFirst"><code>static java.io.Reader</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toReader-java.io.InputStream-">toReader</a></span>(java.io.InputStream&nbsp;inputStream)</code>
-<div class="block">Wraps given input stream as a reader with <code>InputStreamReader</code> and <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toReader-java.io.InputStream-">toReader</a></span>(java.io.InputStream&nbsp;stream)</code>
+<div class="block">Wraps given stream as <code>Reader</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
 </td>
 </tr>
-<tr id="i40" class="altColor">
+<tr id="i65" class="rowColor">
 <td class="colFirst"><code>static java.io.Reader</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toReader-java.io.InputStream-java.nio.charset.Charset-">toReader</a></span>(java.io.InputStream&nbsp;inputStream,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toReader-java.io.InputStream-java.nio.charset.Charset-">toReader</a></span>(java.io.InputStream&nbsp;stream,
         java.nio.charset.Charset&nbsp;charset)</code>
-<div class="block">Wraps given input stream as a reader with <code>InputStreamReader</code>.</div>
+<div class="block">Wraps given stream as <code>Reader</code> with specified charset.</div>
 </td>
 </tr>
-<tr id="i41" class="rowColor">
+<tr id="i66" class="altColor">
 <td class="colFirst"><code>static java.io.Writer</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toWriter-java.nio.CharBuffer-">toWriter</a></span>(java.nio.CharBuffer&nbsp;buffer)</code>
-<div class="block">Wraps given buffer as a writer.</div>
+<div class="block">Wraps given buffer as <code>Writer</code>.</div>
 </td>
 </tr>
-<tr id="i42" class="altColor">
+<tr id="i67" class="rowColor">
 <td class="colFirst"><code>static java.io.Writer</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toWriter-java.io.OutputStream-">toWriter</a></span>(java.io.OutputStream&nbsp;outputStream)</code>
-<div class="block">Wraps given output stream as a writer with <code>OutputStreamWriter</code> and <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toWriter-java.io.OutputStream-">toWriter</a></span>(java.io.OutputStream&nbsp;stream)</code>
+<div class="block">Wraps given stream as <code>Writer</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
 </td>
 </tr>
-<tr id="i43" class="rowColor">
+<tr id="i68" class="altColor">
 <td class="colFirst"><code>static java.io.Writer</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toWriter-java.io.OutputStream-java.nio.charset.Charset-">toWriter</a></span>(java.io.OutputStream&nbsp;outputStream,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#toWriter-java.io.OutputStream-java.nio.charset.Charset-">toWriter</a></span>(java.io.OutputStream&nbsp;stream,
         java.nio.charset.Charset&nbsp;charset)</code>
-<div class="block">Wraps given output stream as a writer with <code>OutputStreamWriter</code>.</div>
+<div class="block">Wraps given stream as <code>Writer</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
 </td>
 </tr>
-<tr id="i44" class="altColor">
+<tr id="i69" class="rowColor">
+<td class="colFirst"><code>static <a href="../../../../xyz/fsgek/common/io/TransformInputStream.html" title="class in xyz.fsgek.common.io">TransformInputStream</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#transform-java.io.InputStream-int-java.util.function.Function-">transform</a></span>(java.io.InputStream&nbsp;source,
+         int&nbsp;blockSize,
+         java.util.function.Function&lt;byte[],byte[]&gt;&nbsp;transformer)</code>
+<div class="block">Returns a <a href="../../../../xyz/fsgek/common/io/TransformInputStream.html" title="class in xyz.fsgek.common.io"><code>TransformInputStream</code></a> from source stream, block size and transformer.</div>
+</td>
+</tr>
+<tr id="i70" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#writeBytes-java.nio.file.Path-java.io.InputStream-">writeBytes</a></span>(java.nio.file.Path&nbsp;path,
           java.io.InputStream&nbsp;data)</code>
 <div class="block">Using <code>RandomAccessFile</code> to write  bytes into given file of path.</div>
 </td>
 </tr>
-<tr id="i45" class="rowColor">
+<tr id="i71" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#writeBytes-java.nio.file.Path-long-long-java.io.InputStream-">writeBytes</a></span>(java.nio.file.Path&nbsp;path,
           long&nbsp;offset,
@@ -495,14 +698,14 @@ extends java.lang.Object</pre>
  the given length may be set to -1 to write unlimitedly.</div>
 </td>
 </tr>
-<tr id="i46" class="altColor">
+<tr id="i72" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#writeString-java.nio.file.Path-java.lang.CharSequence-">writeString</a></span>(java.nio.file.Path&nbsp;path,
            java.lang.CharSequence&nbsp;data)</code>
 <div class="block">Using <code>RandomAccessFile</code> to write given data into given file.</div>
 </td>
 </tr>
-<tr id="i47" class="rowColor">
+<tr id="i73" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#writeString-java.nio.file.Path-java.lang.CharSequence-java.nio.charset.Charset-">writeString</a></span>(java.nio.file.Path&nbsp;path,
            java.lang.CharSequence&nbsp;data,
@@ -510,7 +713,7 @@ extends java.lang.Object</pre>
 <div class="block">Using <code>RandomAccessFile</code> to write given data into given file.</div>
 </td>
 </tr>
-<tr id="i48" class="altColor">
+<tr id="i74" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#writeString-java.nio.file.Path-long-long-java.lang.CharSequence-">writeString</a></span>(java.nio.file.Path&nbsp;path,
            long&nbsp;offset,
@@ -520,7 +723,7 @@ extends java.lang.Object</pre>
  the given length may be set to -1 to write unlimitedly.</div>
 </td>
 </tr>
-<tr id="i49" class="rowColor">
+<tr id="i75" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/io/GekIO.html#writeString-java.nio.file.Path-long-long-java.lang.CharSequence-java.nio.charset.Charset-">writeString</a></span>(java.nio.file.Path&nbsp;path,
            long&nbsp;offset,
@@ -592,271 +795,384 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="readBytes-java.io.InputStream-">
+<a name="read-java.io.InputStream-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readBytes</h4>
+<h4>read</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable byte[]&nbsp;readBytes(java.io.InputStream&nbsp;inputStream)</pre>
-<div class="block">Reads all bytes from given input stream.
- Return null if no data read out and reach to the end of stream.</div>
+public static&nbsp;@Nullable byte[]&nbsp;read(java.io.InputStream&nbsp;source)
+                                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads all bytes from source stream into an array.
+ Returns the array, or null if no data read out and reaches to the end of stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
+<dd><code>source</code> - source stream</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>all bytes from given input stream</dd>
+<dd>the array, or null if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readBytes-java.io.InputStream-int-">
+<a name="read-java.io.InputStream-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readBytes</h4>
+<h4>read</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable byte[]&nbsp;readBytes(java.io.InputStream&nbsp;inputStream,
-                                                    int&nbsp;limit)</pre>
-<div class="block">Reads specified limit number of bytes from given input stream.
- Return null if no data read out and reach to the end of stream.
+public static&nbsp;@Nullable byte[]&nbsp;read(java.io.InputStream&nbsp;source,
+                                               int&nbsp;number)
+                                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of bytes from source stream into an array.
+ Returns the array, or null if no data read out and reaches to the end of stream.
  <p>
- If the limit number &lt; 0, read all bytes;
- els if limit number is 0, no read and return;
- else this method will keep reading bytes until it reaches the limit or the end of the stream.</div>
+ If the number &lt; 0, read all as <a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.io.InputStream-"><code>read(InputStream)</code></a>;
+ els if the number is 0, no read and return an empty array;
+ else this method will keep reading until the read number reaches to the specified number,
+ or the reading reaches the end of the stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
-<dd><code>limit</code> - specified limit number</dd>
+<dd><code>source</code> - source stream</dd>
+<dd><code>number</code> - specified number</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>specified limit number of bytes from given input stream</dd>
+<dd>the array, or null if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readBytesTo-java.io.InputStream-java.io.OutputStream-">
+<a name="readTo-java.io.InputStream-byte:A-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readBytesTo</h4>
-<pre>public static&nbsp;long&nbsp;readBytesTo(java.io.InputStream&nbsp;inputStream,
-                               java.io.OutputStream&nbsp;dest)</pre>
-<div class="block">Reads all bytes from given input stream to given dest stream, returns actual read number.
- Return -1 if no data read out and reach to the end of stream.</div>
+<h4>readTo</h4>
+<pre>public static&nbsp;int&nbsp;readTo(java.io.InputStream&nbsp;source,
+                         byte[]&nbsp;dest)</pre>
+<div class="block">Reads bytes from source stream into dest array,
+ returns actual read number, or -1 if no data read out and reaches to the end of stream.
+ This method will keep reading until the dest array is filled up,
+ or the reading reaches the end of the stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
-<dd><code>dest</code> - given dest stream</dd>
+<dd><code>source</code> - source stream</dd>
+<dd><code>dest</code> - dest array</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>actual read number</dd>
+<dd>actual read number, or -1 if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readBytesTo-java.io.InputStream-java.io.OutputStream-int-">
+<a name="readTo-java.io.InputStream-byte:A-int-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readBytesTo</h4>
-<pre>public static&nbsp;long&nbsp;readBytesTo(java.io.InputStream&nbsp;inputStream,
-                               java.io.OutputStream&nbsp;dest,
-                               int&nbsp;limit)</pre>
-<div class="block">Reads specified limit number of bytes from given input stream to given dest stream, returns actual read number.
- Return -1 if no data read out and reach to the end of stream.
+<h4>readTo</h4>
+<pre>public static&nbsp;int&nbsp;readTo(java.io.InputStream&nbsp;source,
+                         byte[]&nbsp;dest,
+                         int&nbsp;offset,
+                         int&nbsp;length)
+                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads bytes of specified length from source stream into dest array starting from given offset,
+ returns actual read number, or -1 if no data read out and reaches to the end of stream.
+ This method will keep reading until the read number reaches to the specified length,
+ or the reading reaches the end of the stream.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source stream</dd>
+<dd><code>dest</code> - dest array</dd>
+<dd><code>offset</code> - given offset</dd>
+<dd><code>length</code> - specified length</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>actual read number, or -1 if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readTo-java.io.InputStream-java.nio.ByteBuffer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readTo</h4>
+<pre>public static&nbsp;int&nbsp;readTo(java.io.InputStream&nbsp;source,
+                         java.nio.ByteBuffer&nbsp;dest)</pre>
+<div class="block">Reads bytes from source stream into dest buffer,
+ returns actual read number, or -1 if no data read out and reaches to the end of stream.
+ This method will keep reading until the dest buffer is filled up,
+ or the reading reaches the end of the stream.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source stream</dd>
+<dd><code>dest</code> - dest buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>actual read number, or -1 if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readTo-java.io.InputStream-java.io.OutputStream-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readTo</h4>
+<pre>public static&nbsp;long&nbsp;readTo(java.io.InputStream&nbsp;source,
+                          java.io.OutputStream&nbsp;dest)
+                   throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads all bytes from source stream into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of source stream.
+ This method will keep reading until the reading reaches the end of source stream.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source stream</dd>
+<dd><code>dest</code> - dest stream</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>actual read number, or -1 if no data read out and reaches to the end of source stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readTo-java.io.InputStream-java.io.OutputStream-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readTo</h4>
+<pre>public static&nbsp;long&nbsp;readTo(java.io.InputStream&nbsp;source,
+                          java.io.OutputStream&nbsp;dest,
+                          long&nbsp;number)
+                   throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of bytes from source stream into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of source stream.
  <p>
- If the limit number &lt; 0, read all bytes;
- els if limit number is 0, no read and return;
- else this method will keep reading bytes until it reaches the limit or the end of the stream.</div>
+ If the number &lt; 0, read all;
+ els if the number is 0, no read and return 0;
+ else this method will keep reading until the read number reaches to the specified number,
+ or the reading reaches the end of the stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
-<dd><code>dest</code> - given dest stream</dd>
-<dd><code>limit</code> - specified limit number</dd>
+<dd><code>source</code> - source stream</dd>
+<dd><code>dest</code> - dest stream</dd>
+<dd><code>number</code> - specified number</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>actual read number</dd>
+<dd>actual read number, or -1 if no data read out and reaches to the end of source stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readBytesTo-java.io.InputStream-java.io.OutputStream-int-int-">
+<a name="readTo-java.io.InputStream-java.io.OutputStream-long-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readBytesTo</h4>
-<pre>public static&nbsp;long&nbsp;readBytesTo(java.io.InputStream&nbsp;inputStream,
-                               java.io.OutputStream&nbsp;dest,
-                               int&nbsp;limit,
-                               int&nbsp;bufferSize)</pre>
-<div class="block">Reads specified limit number of bytes from given input stream to given dest stream, returns actual read number.
- Return -1 if no data read out and reach to the end of stream.
+<h4>readTo</h4>
+<pre>public static&nbsp;long&nbsp;readTo(java.io.InputStream&nbsp;source,
+                          java.io.OutputStream&nbsp;dest,
+                          long&nbsp;number,
+                          int&nbsp;bufferSize)
+                   throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of bytes from source stream into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of source stream.
  <p>
- If the limit number &lt; 0, read all bytes;
- els if limit number is 0, no read and return;
- else this method will keep reading bytes until it reaches the limit or the end of the stream.</div>
+ If the number &lt; 0, read all;
+ els if the number is 0, no read and return 0;
+ else this method will keep reading until the read number reaches to the specified number,
+ or the reading reaches the end of the stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
-<dd><code>dest</code> - given dest stream</dd>
-<dd><code>limit</code> - specified limit number</dd>
-<dd><code>bufferSize</code> - buffer size for each reading and writing</dd>
+<dd><code>source</code> - source stream</dd>
+<dd><code>dest</code> - dest stream</dd>
+<dd><code>number</code> - specified number</dd>
+<dd><code>bufferSize</code> - buffer size for each IO operation</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>actual read number</dd>
+<dd>actual read number, or -1 if no data read out and reaches to the end of source stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="availableBytes-java.io.InputStream-">
+<a name="available-java.io.InputStream-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>availableBytes</h4>
+<h4>available</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable byte[]&nbsp;availableBytes(java.io.InputStream&nbsp;inputStream)</pre>
-<div class="block">Reads available bytes from given input stream.
- Return null if no data read out and reach to the end of stream.</div>
+public static&nbsp;@Nullable byte[]&nbsp;available(java.io.InputStream&nbsp;source)
+                                             throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads available bytes from source stream into an array.
+ Returns the array, or null if no data read out and reaches to the end of stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
+<dd><code>source</code> - source stream</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>available bytes from given input stream</dd>
+<dd>the array, or null if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="availableBytesTo-java.io.InputStream-java.io.OutputStream-">
+<a name="availableTo-java.io.InputStream-java.io.OutputStream-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>availableBytesTo</h4>
-<pre>public static&nbsp;long&nbsp;availableBytesTo(java.io.InputStream&nbsp;inputStream,
-                                    java.io.OutputStream&nbsp;dest)</pre>
-<div class="block">Reads available bytes from given input stream to given dest stream,
- returns actual read number.
- Return -1 if no data read out and reach to the end of stream.</div>
+<h4>availableTo</h4>
+<pre>public static&nbsp;long&nbsp;availableTo(java.io.InputStream&nbsp;source,
+                               java.io.OutputStream&nbsp;dest)
+                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads available bytes from source stream into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of source stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
-<dd><code>dest</code> - given dest stream</dd>
+<dd><code>source</code> - source stream</dd>
+<dd><code>dest</code> - dest stream</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>actual read number</dd>
+<dd>actual read number, or -1 if no data read out and reaches to the end of source stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readString-java.io.Reader-">
+<a name="read-java.io.Reader-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readString</h4>
+<h4>read</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.Reader&nbsp;reader)</pre>
-<div class="block">Reads all chars as string from given reader.
- Return null if no data read out and reach to the end of stream.</div>
+public static&nbsp;@Nullable java.lang.String&nbsp;read(java.io.Reader&nbsp;source)
+                                                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads all chars from source reader into a string.
+ Returns the string, or null if no data read out and reaches to the end of reader.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>reader</code> - given reader</dd>
+<dd><code>source</code> - source reader</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>all chars as string from given reader</dd>
+<dd>the string, or null if no data read out and reaches to the end of reader</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readString-java.io.Reader-int-">
+<a name="read-java.io.Reader-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readString</h4>
+<h4>read</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.Reader&nbsp;reader,
-                                                               int&nbsp;limit)</pre>
-<div class="block">Reads specified limit number of chars as string from given reader.
- Return null if no data read out and reach to the end of stream.
+public static&nbsp;@Nullable java.lang.String&nbsp;read(java.io.Reader&nbsp;source,
+                                                         int&nbsp;number)
+                                                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of chars from source reader into a string.
+ Returns the string, or null if no data read out and reaches to the end of reader.
  <p>
- If the limit number &lt; 0, read all bytes;
- els if limit number is 0, no read and return;
- else this method will keep reading chars until it reaches the limit or the end of the reader.</div>
+ If the number &lt; 0, read all as <a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.io.Reader-"><code>read(Reader)</code></a>;
+ els if the number is 0, no read and return an empty array;
+ else this method will keep reading until the read number reaches to the specified number,
+ or the reading reaches the end of the reader.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>reader</code> - given reader</dd>
-<dd><code>limit</code> - specified limit number</dd>
+<dd><code>source</code> - source reader</dd>
+<dd><code>number</code> - specified number</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>specified limit number of chars as string from given reader</dd>
+<dd>the string, or null if no data read out and reaches to the end of reader</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readCharsTo-java.io.Reader-java.lang.Appendable-">
+<a name="readTo-java.io.Reader-java.lang.Appendable-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readCharsTo</h4>
-<pre>public static&nbsp;long&nbsp;readCharsTo(java.io.Reader&nbsp;reader,
-                               java.lang.Appendable&nbsp;dest)</pre>
-<div class="block">Reads all chars from given reader to given dest output, returns actual read number.
- Return -1 if no data read out and reach to the end of stream.
- <p>
- If the limit number &lt; 0, read all chars;
- els if limit number is 0, no read and return;
- else this method will keep reading chars until it reaches the limit or the end of the reader.</div>
+<h4>readTo</h4>
+<pre>public static&nbsp;long&nbsp;readTo(java.io.Reader&nbsp;source,
+                          java.lang.Appendable&nbsp;dest)
+                   throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads chars from source reader into dest appendable,
+ returns actual read number, or -1 if no data read out and reaches to the end of reader.
+ This method will keep reading until the reading reaches the end of source reader.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>reader</code> - given reader</dd>
-<dd><code>dest</code> - given dest stream</dd>
+<dd><code>source</code> - source reader</dd>
+<dd><code>dest</code> - dest appendable</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>actual read number</dd>
+<dd>actual read number, or -1 if no data read out and reaches to the end of reader</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readCharsTo-java.io.Reader-java.lang.Appendable-int-">
+<a name="readTo-java.io.Reader-java.lang.Appendable-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readCharsTo</h4>
-<pre>public static&nbsp;long&nbsp;readCharsTo(java.io.Reader&nbsp;reader,
-                               java.lang.Appendable&nbsp;dest,
-                               int&nbsp;limit)</pre>
-<div class="block">Reads specified limit number of chars from given reader to given dest output, returns actual read number.
- Return -1 if no data read out and reach to the end of stream.
+<h4>readTo</h4>
+<pre>public static&nbsp;long&nbsp;readTo(java.io.Reader&nbsp;source,
+                          java.lang.Appendable&nbsp;dest,
+                          int&nbsp;number)
+                   throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of chars from source reader into dest appendable,
+ returns actual read number, or -1 if no data read out and reaches to the end of source reader.
  <p>
- If the limit number &lt; 0, read all chars;
- els if limit number is 0, no read and return;
- else this method will keep reading chars until it reaches the limit or the end of the reader.</div>
+ If the number &lt; 0, read all;
+ els if the number is 0, no read and return 0;
+ else this method will keep reading until the read number reaches to the specified number,
+ or the reading reaches the end of the reader.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>reader</code> - given reader</dd>
-<dd><code>dest</code> - given dest stream</dd>
-<dd><code>limit</code> - specified limit number</dd>
+<dd><code>source</code> - source reader</dd>
+<dd><code>dest</code> - dest appendable</dd>
+<dd><code>number</code> - specified number</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>actual read number</dd>
+<dd>actual read number, or -1 if no data read out and reaches to the end of source reader</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
-<a name="readCharsTo-java.io.Reader-java.lang.Appendable-int-int-">
+<a name="readTo-java.io.Reader-java.lang.Appendable-int-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>readCharsTo</h4>
-<pre>public static&nbsp;long&nbsp;readCharsTo(java.io.Reader&nbsp;reader,
-                               java.lang.Appendable&nbsp;dest,
-                               int&nbsp;limit,
-                               int&nbsp;bufferSize)</pre>
-<div class="block">Reads specified limit number of chars from given reader to given dest output, returns actual read number.
- Return -1 if no data read out and reach to the end of stream.
+<h4>readTo</h4>
+<pre>public static&nbsp;long&nbsp;readTo(java.io.Reader&nbsp;source,
+                          java.lang.Appendable&nbsp;dest,
+                          int&nbsp;number,
+                          int&nbsp;bufferSize)
+                   throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of chars from source reader into dest appendable,
+ returns actual read number, or -1 if no data read out and reaches to the end of source reader.
  <p>
- If the limit number &lt; 0, read all chars;
- els if limit number is 0, no read and return;
- else this method will keep reading chars until it reaches the limit or the end of the reader.</div>
+ If the number &lt; 0, read all;
+ els if the number is 0, no read and return 0;
+ else this method will keep reading until the read number reaches to the specified number,
+ or the reading reaches the end of the reader.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>reader</code> - given reader</dd>
-<dd><code>dest</code> - given dest stream</dd>
-<dd><code>limit</code> - specified limit number</dd>
-<dd><code>bufferSize</code> - buffer size for each reading and writing</dd>
+<dd><code>source</code> - source reader</dd>
+<dd><code>dest</code> - dest appendable</dd>
+<dd><code>number</code> - specified number</dd>
+<dd><code>bufferSize</code> - buffer size for each IO operation</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>actual read number</dd>
+<dd>actual read number, or -1 if no data read out and reaches to the end of source reader</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -867,14 +1183,17 @@ public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.Reader&nbs
 <li class="blockList">
 <h4>readString</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.InputStream&nbsp;inputStream)</pre>
-<div class="block">Reads string encoded by all bytes from given input stream with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.
- Return null if no data read out and reach to the end of stream.</div>
+public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.InputStream&nbsp;source)
+                                                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads all bytes from source stream into a string with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.
+ Returns the string, or null if no data read out and reaches to the end of stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
+<dd><code>source</code> - source stream</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>string encoded by all bytes from given input stream with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a></dd>
+<dd>the string, or null if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -885,16 +1204,19 @@ public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.InputStrea
 <li class="blockList">
 <h4>readString</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.InputStream&nbsp;inputStream,
-                                                               java.nio.charset.Charset&nbsp;charset)</pre>
-<div class="block">Reads string encoded by all bytes from given input stream.
- Return null if no data read out and reach to the end of stream.</div>
+public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.InputStream&nbsp;source,
+                                                               java.nio.charset.Charset&nbsp;charset)
+                                                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads all bytes from source stream into a string with specified charset.
+ Returns the string, or null if no data read out and reaches to the end of stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
-<dd><code>charset</code> - charset of the string</dd>
+<dd><code>source</code> - source stream</dd>
+<dd><code>charset</code> - specified charset</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>string encoded by all bytes from given input stream</dd>
+<dd>the string, or null if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -905,15 +1227,17 @@ public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.io.InputStrea
 <li class="blockList">
 <h4>avalaibleString</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.InputStream&nbsp;inputStream)</pre>
-<div class="block">Reads available string encoded by all bytes from given input stream with
- <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>, returns null if reaches end of the stream.
- Return null if no data read out and reach to the end of stream.</div>
+public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.InputStream&nbsp;source)
+                                                             throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads available bytes from source stream into a string with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.
+ Returns the string, or null if no data read out and reaches to the end of stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
+<dd><code>source</code> - source stream</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>available string</dd>
+<dd>the string, or null if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -924,16 +1248,19 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <li class="blockList">
 <h4>avalaibleString</h4>
 <pre>@Nullable
-public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.InputStream&nbsp;inputStream,
-                                                                    java.nio.charset.Charset&nbsp;charset)</pre>
-<div class="block">Reads available string encoded by all bytes from given input stream,
- Return null if no data read out and reach to the end of stream.</div>
+public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.InputStream&nbsp;source,
+                                                                    java.nio.charset.Charset&nbsp;charset)
+                                                             throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads available bytes from source stream into a string with specified charset.
+ Returns the string, or null if no data read out and reaches to the end of stream.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
-<dd><code>charset</code> - charset of the string</dd>
+<dd><code>source</code> - source stream</dd>
+<dd><code>charset</code> - specified charset</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>available string</dd>
+<dd>the string, or null if no data read out and reaches to the end of stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -943,13 +1270,16 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <ul class="blockList">
 <li class="blockList">
 <h4>toReader</h4>
-<pre>public static&nbsp;java.io.Reader&nbsp;toReader(java.io.InputStream&nbsp;inputStream)</pre>
-<div class="block">Wraps given input stream as a reader with <code>InputStreamReader</code> and <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
+<pre>public static&nbsp;java.io.Reader&nbsp;toReader(java.io.InputStream&nbsp;stream)
+                               throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given stream as <code>Reader</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
+<dd><code>stream</code> - given stream</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped reader</dd>
+<dd>given stream as <code>Reader</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -959,15 +1289,18 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <ul class="blockList">
 <li class="blockList">
 <h4>toReader</h4>
-<pre>public static&nbsp;java.io.Reader&nbsp;toReader(java.io.InputStream&nbsp;inputStream,
-                                      java.nio.charset.Charset&nbsp;charset)</pre>
-<div class="block">Wraps given input stream as a reader with <code>InputStreamReader</code>.</div>
+<pre>public static&nbsp;java.io.Reader&nbsp;toReader(java.io.InputStream&nbsp;stream,
+                                      java.nio.charset.Charset&nbsp;charset)
+                               throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given stream as <code>Reader</code> with specified charset.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>inputStream</code> - given input stream</dd>
-<dd><code>charset</code> - charset of return reader</dd>
+<dd><code>stream</code> - given stream</dd>
+<dd><code>charset</code> - specified charset</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped reader</dd>
+<dd>given stream as <code>Reader</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -977,13 +1310,16 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <ul class="blockList">
 <li class="blockList">
 <h4>toReader</h4>
-<pre>public static&nbsp;java.io.Reader&nbsp;toReader(java.nio.CharBuffer&nbsp;buffer)</pre>
-<div class="block">Wraps given buffer as a reader, supports mark/reset.</div>
+<pre>public static&nbsp;java.io.Reader&nbsp;toReader(java.nio.CharBuffer&nbsp;buffer)
+                               throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given buffer as <code>Reader</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>buffer</code> - given buffer</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped reader</dd>
+<dd>given buffer as <code>Reader</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -993,13 +1329,17 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <ul class="blockList">
 <li class="blockList">
 <h4>toInputStream</h4>
-<pre>public static&nbsp;java.io.InputStream&nbsp;toInputStream(java.io.Reader&nbsp;reader)</pre>
-<div class="block">Wraps given reader as an input stream with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>, doesn't support mark/reset.</div>
+<pre>public static&nbsp;java.io.InputStream&nbsp;toInputStream(java.io.Reader&nbsp;reader)
+                                         throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given reader as <code>InputStream</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.
+ The returned stream doesn't support mark/reset methods.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>reader</code> - given reader</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
+<dd>given reader as <code>InputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -1010,14 +1350,18 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <li class="blockList">
 <h4>toInputStream</h4>
 <pre>public static&nbsp;java.io.InputStream&nbsp;toInputStream(java.io.Reader&nbsp;reader,
-                                                java.nio.charset.Charset&nbsp;charset)</pre>
-<div class="block">Wraps given reader as an input stream, doesn't support mark/reset.</div>
+                                                java.nio.charset.Charset&nbsp;charset)
+                                         throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given reader as <code>InputStream</code> with specified charset.
+ The returned stream doesn't support mark/reset methods.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>reader</code> - given reader</dd>
-<dd><code>charset</code> - charset of given reader</dd>
+<dd><code>charset</code> - specified charset</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
+<dd>given reader as <code>InputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -1027,13 +1371,16 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <ul class="blockList">
 <li class="blockList">
 <h4>toInputStream</h4>
-<pre>public static&nbsp;java.io.ByteArrayInputStream&nbsp;toInputStream(byte[]&nbsp;array)</pre>
-<div class="block">Wraps given array to <code>ByteArrayInputStream</code>.</div>
+<pre>public static&nbsp;java.io.ByteArrayInputStream&nbsp;toInputStream(byte[]&nbsp;array)
+                                                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given array as <code>ByteArrayInputStream</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>array</code> - given array</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
+<dd>given array as <code>ByteArrayInputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -1045,15 +1392,18 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <h4>toInputStream</h4>
 <pre>public static&nbsp;java.io.ByteArrayInputStream&nbsp;toInputStream(byte[]&nbsp;array,
                                                          int&nbsp;offset,
-                                                         int&nbsp;length)</pre>
-<div class="block">Wraps given array to <code>ByteArrayInputStream</code>, the wrapped range of specified length start from given offset.</div>
+                                                         int&nbsp;length)
+                                                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given array as <code>ByteArrayInputStream</code>, starting from given offset with specified length.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>array</code> - given array</dd>
 <dd><code>offset</code> - given offset</dd>
 <dd><code>length</code> - specified length</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
+<dd>given array as <code>ByteArrayInputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -1063,13 +1413,832 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <ul class="blockList">
 <li class="blockList">
 <h4>toInputStream</h4>
-<pre>public static&nbsp;java.io.InputStream&nbsp;toInputStream(java.nio.ByteBuffer&nbsp;buffer)</pre>
-<div class="block">Wraps given buffer as an input stream, supports mark/reset.</div>
+<pre>public static&nbsp;java.io.InputStream&nbsp;toInputStream(java.nio.ByteBuffer&nbsp;buffer)
+                                         throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given buffer as <code>InputStream</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>buffer</code> - given buffer</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
+<dd>given buffer as <code>InputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="toWriter-java.io.OutputStream-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toWriter</h4>
+<pre>public static&nbsp;java.io.Writer&nbsp;toWriter(java.io.OutputStream&nbsp;stream)
+                               throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given stream as <code>Writer</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>stream</code> - given stream</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>given stream as <code>Writer</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="toWriter-java.io.OutputStream-java.nio.charset.Charset-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toWriter</h4>
+<pre>public static&nbsp;java.io.Writer&nbsp;toWriter(java.io.OutputStream&nbsp;stream,
+                                      java.nio.charset.Charset&nbsp;charset)
+                               throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given stream as <code>Writer</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>stream</code> - given stream</dd>
+<dd><code>charset</code> - specified charset</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>given stream as <code>Writer</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="toWriter-java.nio.CharBuffer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toWriter</h4>
+<pre>public static&nbsp;java.io.Writer&nbsp;toWriter(java.nio.CharBuffer&nbsp;buffer)
+                               throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given buffer as <code>Writer</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>given buffer as <code>Writer</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="toOutputStream-java.lang.Appendable-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toOutputStream</h4>
+<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.lang.Appendable&nbsp;appendable)
+                                           throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given appendable as <code>OutputStream</code> with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.
+ <p>
+ Note <code>OutputStream.flush()</code> and <code>OutputStream.close()</code> are valid
+ if given appendable is instance of <code>Writer</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>appendable</code> - given appendable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>given appendable as <code>OutputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="toOutputStream-java.lang.Appendable-java.nio.charset.Charset-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toOutputStream</h4>
+<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.lang.Appendable&nbsp;appendable,
+                                                  java.nio.charset.Charset&nbsp;charset)
+                                           throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given appendable as <code>OutputStream</code> with specified charset.
+ <p>
+ Note <code>OutputStream.flush()</code> and <code>OutputStream.close()</code> are valid
+ if given appendable is instance of <code>Writer</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>appendable</code> - given appendable</dd>
+<dd><code>charset</code> - specified charset</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>given appendable as <code>OutputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="toOutputStream-byte:A-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toOutputStream</h4>
+<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(byte[]&nbsp;array)
+                                           throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given array as <code>OutputStream</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>array</code> - given array</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>given array as <code>OutputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="toOutputStream-byte:A-int-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toOutputStream</h4>
+<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(byte[]&nbsp;array,
+                                                  int&nbsp;offset,
+                                                  int&nbsp;length)
+                                           throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given array as <code>OutputStream</code>, starting from given offset with specified length.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>array</code> - given array</dd>
+<dd><code>offset</code> - given offset</dd>
+<dd><code>length</code> - specified length</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>given array as <code>OutputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="toOutputStream-java.nio.ByteBuffer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toOutputStream</h4>
+<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.nio.ByteBuffer&nbsp;buffer)
+                                           throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Wraps given buffer as <code>OutputStream</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>given buffer as <code>OutputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="limit-java.io.InputStream-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>limit</h4>
+<pre>public static&nbsp;java.io.InputStream&nbsp;limit(java.io.InputStream&nbsp;stream,
+                                        long&nbsp;number)
+                                 throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Limits given stream to a specified number for readable bytes.
+ The returned stream doesn't support mark/reset methods.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>stream</code> - given stream</dd>
+<dd><code>number</code> - number of readable bytes, must &gt;= 0</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>limited <code>InputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="limit-java.io.OutputStream-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>limit</h4>
+<pre>public static&nbsp;java.io.OutputStream&nbsp;limit(java.io.OutputStream&nbsp;stream,
+                                         long&nbsp;number)
+                                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Limits given stream to a specified number for writeable bytes.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>stream</code> - given stream</dd>
+<dd><code>number</code> - number of writeable bytes, must &gt;= 0</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>limited <code>OutputStream</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="transform-java.io.InputStream-int-java.util.function.Function-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>transform</h4>
+<pre>public static&nbsp;<a href="../../../../xyz/fsgek/common/io/TransformInputStream.html" title="class in xyz.fsgek.common.io">TransformInputStream</a>&nbsp;transform(java.io.InputStream&nbsp;source,
+                                             int&nbsp;blockSize,
+                                             java.util.function.Function&lt;byte[],byte[]&gt;&nbsp;transformer)</pre>
+<div class="block">Returns a <a href="../../../../xyz/fsgek/common/io/TransformInputStream.html" title="class in xyz.fsgek.common.io"><code>TransformInputStream</code></a> from source stream, block size and transformer.
+ See <a href="../../../../xyz/fsgek/common/io/TransformInputStream.html" title="class in xyz.fsgek.common.io"><code>TransformInputStream</code></a> and
+ <a href="../../../../xyz/fsgek/common/io/TransformInputStream.html#TransformInputStream-java.io.InputStream-int-java.util.function.Function-"><code>TransformInputStream.TransformInputStream(InputStream, int, Function)</code></a>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source stream</dd>
+<dd><code>blockSize</code> - block size</dd>
+<dd><code>transformer</code> - given transformer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a <a href="../../../../xyz/fsgek/common/io/TransformInputStream.html" title="class in xyz.fsgek.common.io"><code>TransformInputStream</code></a></dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../xyz/fsgek/common/io/TransformInputStream.html" title="class in xyz.fsgek.common.io"><code>TransformInputStream</code></a>, 
+<a href="../../../../xyz/fsgek/common/io/TransformInputStream.html#TransformInputStream-java.io.InputStream-int-java.util.function.Function-"><code>TransformInputStream.TransformInputStream(InputStream, int, Function)</code></a></dd>
+</dl>
+</li>
+</ul>
+<a name="emptyBuffer--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>emptyBuffer</h4>
+<pre>public static&nbsp;java.nio.ByteBuffer&nbsp;emptyBuffer()</pre>
+<div class="block">Returns an empty byte buffer.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an empty byte buffer</dd>
+</dl>
+</li>
+</ul>
+<a name="read-java.nio.ByteBuffer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>read</h4>
+<pre>@Nullable
+public static&nbsp;@Nullable byte[]&nbsp;read(java.nio.ByteBuffer&nbsp;source)
+                                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads all bytes from source buffer into an array.
+ Returns the array, or null if no data read out and reaches to the end of buffer.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the array, or null if no data read out and reaches to the end of buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="read-java.nio.ByteBuffer-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>read</h4>
+<pre>@Nullable
+public static&nbsp;@Nullable byte[]&nbsp;read(java.nio.ByteBuffer&nbsp;source,
+                                               int&nbsp;number)
+                                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of bytes from source buffer into an array.
+ Returns the array, or null if no data read out and reaches to the end of buffer.
+ <p>
+ If the number &lt; 0, read all as <a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.nio.ByteBuffer-"><code>read(ByteBuffer)</code></a>;
+ els if the number is 0, no read and return an empty array;
+ else this method will keep reading until the read number reaches to the specified number,
+ or the reading reaches the end of the buffer.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dd><code>number</code> - specified number</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the array, or null if no data read out and reaches to the end of buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readTo-java.nio.ByteBuffer-java.nio.ByteBuffer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readTo</h4>
+<pre>public static&nbsp;int&nbsp;readTo(java.nio.ByteBuffer&nbsp;source,
+                         java.nio.ByteBuffer&nbsp;dest)
+                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads bytes from source buffer into dest buffer,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer.
+ This method will keep reading until the dest buffer is filled up,
+ or the reading reaches the end of the buffer.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dd><code>dest</code> - dest buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>actual read number, or -1 if no data read out and reaches to the end of buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readTo-java.nio.ByteBuffer-java.nio.ByteBuffer-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readTo</h4>
+<pre>public static&nbsp;int&nbsp;readTo(java.nio.ByteBuffer&nbsp;source,
+                         java.nio.ByteBuffer&nbsp;dest,
+                         int&nbsp;number)
+                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of bytes from source buffer into dest buffer,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer.
+ <p>
+ If the number &lt; 0, read as <a href="../../../../xyz/fsgek/common/io/GekIO.html#readTo-java.nio.ByteBuffer-java.nio.ByteBuffer-"><code>readTo(ByteBuffer, ByteBuffer)</code></a>;
+ els if the number is 0, no read and return 0;
+ else this method will keep reading until the read number reaches to the specified number,
+ or the reading reaches the end of the buffer (of source or dest).</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dd><code>dest</code> - dest buffer</dd>
+<dd><code>number</code> - specified number</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>actual read number, or -1 if no data read out and reaches to the end of buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readTo-java.nio.ByteBuffer-byte:A-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readTo</h4>
+<pre>public static&nbsp;int&nbsp;readTo(java.nio.ByteBuffer&nbsp;source,
+                         byte[]&nbsp;dest)
+                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of bytes from source buffer into dest array,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer or array.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dd><code>dest</code> - dest array</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>actual read number, or -1 if no data read out and reaches to the end of buffer or array</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readTo-java.nio.ByteBuffer-byte:A-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readTo</h4>
+<pre>public static&nbsp;int&nbsp;readTo(java.nio.ByteBuffer&nbsp;source,
+                         byte[]&nbsp;dest,
+                         int&nbsp;offset)
+                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads specified number of bytes from source buffer into dest array starting from given offset,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer or array.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dd><code>dest</code> - dest array</dd>
+<dd><code>offset</code> - given offset</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>actual read number, or -1 if no data read out and reaches to the end of buffer or array</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readTo-java.nio.ByteBuffer-java.io.OutputStream-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readTo</h4>
+<pre>public static&nbsp;int&nbsp;readTo(java.nio.ByteBuffer&nbsp;source,
+                         java.io.OutputStream&nbsp;dest)
+                  throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads bytes from source buffer into dest stream,
+ returns actual read number, or -1 if no data read out and reaches to the end of buffer.
+ This method will keep reading until the reading reaches the end of the buffer.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dd><code>dest</code> - dest stream</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>actual read number, or -1 if no data read out and reaches to the end of buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readString-java.nio.ByteBuffer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readString</h4>
+<pre>@Nullable
+public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.nio.ByteBuffer&nbsp;source)
+                                                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads all bytes from source buffer into a string with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.
+ Returns the string, or null if no data read out and reaches to the end of buffer.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the string, or null if no data read out and reaches to the end of buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readString-java.nio.ByteBuffer-java.nio.charset.Charset-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readString</h4>
+<pre>@Nullable
+public static&nbsp;@Nullable java.lang.String&nbsp;readString(java.nio.ByteBuffer&nbsp;source,
+                                                               java.nio.charset.Charset&nbsp;charset)
+                                                        throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Reads all bytes from source buffer into a string with specified charset.
+ Returns the string, or null if no data read out and reaches to the end of buffer.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>source</code> - source buffer</dd>
+<dd><code>charset</code> - specified charset</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the string, or null if no data read out and reaches to the end of buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="slice-java.nio.ByteBuffer-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>slice</h4>
+<pre>public static&nbsp;java.nio.ByteBuffer&nbsp;slice(java.nio.ByteBuffer&nbsp;buffer,
+                                        int&nbsp;number)
+                                 throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Returns slice of given buffer by <code>ByteBuffer.slice()</code>, and sets the slice's limit to specified number
+ (or remaining if remaining is less than specified number).
+ Position of given buffer will not be changed.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>number</code> - specified number</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the slice buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="readSlice-java.nio.ByteBuffer-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readSlice</h4>
+<pre>public static&nbsp;java.nio.ByteBuffer&nbsp;readSlice(java.nio.ByteBuffer&nbsp;buffer,
+                                            int&nbsp;number)
+                                     throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Returns slice of given buffer by <code>ByteBuffer.slice()</code>, and sets the slice's limit to specified number
+ (or remaining if remaining is less than specified number).
+ Position of given buffer will be set to <code>(buffer.position + slice.remaining())</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>number</code> - specified number</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the slice buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="subBuffer-java.nio.ByteBuffer-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>subBuffer</h4>
+<pre>public static&nbsp;java.nio.ByteBuffer&nbsp;subBuffer(java.nio.ByteBuffer&nbsp;buffer,
+                                            int&nbsp;offset)
+                                     throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Returns a sub-range view of given buffer, starting from given offset to buffer's limit.
+ The two buffers will share the same data so any operation will reflect each other.
+ <p>
+ Note the offset is counted from 0, not <code>buffer.position()</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>offset</code> - given offset</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the sub-buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="subBuffer-java.nio.ByteBuffer-int-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>subBuffer</h4>
+<pre>public static&nbsp;java.nio.ByteBuffer&nbsp;subBuffer(java.nio.ByteBuffer&nbsp;buffer,
+                                            int&nbsp;offset,
+                                            int&nbsp;length)
+                                     throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
+<div class="block">Returns a sub-range view of given buffer, starting from given offset to specified length.
+ The two buffers will share the same data so any operation will reflect each other.
+ <p>
+ Note the offset is counted from 0, not <code>buffer.position()</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>offset</code> - given offset</dd>
+<dd><code>length</code> - specified length</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the sub-buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
+</dl>
+</li>
+</ul>
+<a name="split-java.nio.ByteBuffer-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>split</h4>
+<pre>public static&nbsp;java.util.List&lt;java.nio.ByteBuffer&gt;&nbsp;split(java.nio.ByteBuffer&nbsp;buffer,
+                                                        int&nbsp;length)</pre>
+<div class="block">Splits given buffer in specified length, returns split buffer list.
+ This method starts the loop:
+ <ul>
+     <li>
+         If remaining length is &gt;= specified length, this method will use <code>ByteBuffer.slice()</code> to
+         generate a slice buffer of specified length. Then moves the position with specified length.
+     </li>
+     <li>
+         If remaining length is less than specified length, loop will be broken.
+     </li>
+ </ul></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>length</code> - specified length</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>split buffer list</dd>
+</dl>
+</li>
+</ul>
+<a name="split-java.nio.ByteBuffer-int-java.util.function.IntFunction-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>split</h4>
+<pre>public static&nbsp;java.util.List&lt;java.nio.ByteBuffer&gt;&nbsp;split(java.nio.ByteBuffer&nbsp;buffer,
+                                                        int&nbsp;length,
+                                                        java.util.function.IntFunction&lt;java.nio.ByteBuffer&gt;&nbsp;generator)</pre>
+<div class="block">Splits given buffer in specified length, returns split buffer list.
+ This method starts the loop:
+ <ul>
+     <li>
+         If remaining length is &gt;= specified length, this method will call <code>generator</code> with specified
+         length to generate new buffer. If <code>generator</code> return a new buffer, this method will fill data from
+         given buffer into new buffer. If <code>generator</code> return null, use <code>ByteBuffer.slice()</code> to
+         generate a slice buffer of specified buffer. Then moves the position with specified length.
+     </li>
+     <li>
+         If remaining length is less than specified length, loop will be broken.
+     </li>
+ </ul></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>length</code> - specified length</dd>
+<dd><code>generator</code> - given buffer generator, the argument is specified length</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>split buffer list</dd>
+</dl>
+</li>
+</ul>
+<a name="split-java.nio.ByteBuffer-int-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>split</h4>
+<pre>public static&nbsp;java.util.List&lt;java.nio.ByteBuffer&gt;&nbsp;split(java.nio.ByteBuffer&nbsp;buffer,
+                                                        int&nbsp;lengthOffset,
+                                                        int&nbsp;lengthSize)</pre>
+<div class="block">Splits given buffer in specified length, returns split buffer list.
+ This method assumes the length is specified at specified length offset, and starts the loop:
+ <ul>
+     <li>
+         Marks current position.
+         If remaining length is &gt;= <code>lengthOffset + lengthSize</code>, this method will skip and read number of
+         <code>lengthSize</code> bytes at <code>lengthOffset</code> as specified length.
+     </li>
+     <li>
+         Resets current position.
+         If remaining length is &gt;= specified length, this method will use <code>ByteBuffer.slice()</code> to
+         generate a slice buffer of specified length. Then moves the position with specified length.
+     </li>
+     <li>
+         If remaining length is less than <code>lengthOffset + lengthSize</code> or specified length,
+         loop will be broken.
+     </li>
+ </ul></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>lengthOffset</code> - offset of length</dd>
+<dd><code>lengthSize</code> - byte number of length, must in 1, 2, 4</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>split buffer list</dd>
+</dl>
+</li>
+</ul>
+<a name="split-java.nio.ByteBuffer-int-int-java.util.function.IntFunction-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>split</h4>
+<pre>public static&nbsp;java.util.List&lt;java.nio.ByteBuffer&gt;&nbsp;split(java.nio.ByteBuffer&nbsp;buffer,
+                                                        int&nbsp;lengthOffset,
+                                                        int&nbsp;lengthSize,
+                                                        java.util.function.IntFunction&lt;java.nio.ByteBuffer&gt;&nbsp;generator)</pre>
+<div class="block">Splits given buffer in specified length, returns split buffer list.
+ This method assumes the length is specified at specified length offset, and starts the loop:
+ <ul>
+     <li>
+         Marks current position.
+         If remaining length is &gt;= <code>lengthOffset + lengthSize</code>, this method will skip and read number of
+         <code>lengthSize</code> bytes at <code>lengthOffset</code> as specified length.
+     </li>
+     <li>
+         Resets current position.
+         If remaining length is &gt;= specified length, this method will call <code>generator</code> with specified
+         length to generate new buffer. If <code>generator</code> return a new buffer, this method will fill data from
+         given buffer into new buffer. If <code>generator</code> return null, use <code>ByteBuffer.slice()</code> to
+         generate a slice buffer of specified buffer. Then moves the position with specified length.
+     </li>
+     <li>
+         If remaining length is less than <code>lengthOffset + lengthSize</code> or specified length,
+         loop will be broken.
+     </li>
+ </ul></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>lengthOffset</code> - offset of length</dd>
+<dd><code>lengthSize</code> - byte number of length, must in 1, 2, 4</dd>
+<dd><code>generator</code> - given buffer generator, the argument is specified length</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>split buffer list</dd>
+</dl>
+</li>
+</ul>
+<a name="split-java.nio.ByteBuffer-byte-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>split</h4>
+<pre>public static&nbsp;java.util.List&lt;java.nio.ByteBuffer&gt;&nbsp;split(java.nio.ByteBuffer&nbsp;buffer,
+                                                        byte&nbsp;delimiter)</pre>
+<div class="block">Splits given buffer in specified delimiter, returns split buffer list.
+ This method starts the loop:
+ <ul>
+     <li>
+         Marks current position, reads until meets specified delimiter.
+     </li>
+     <li>
+         If specified delimiter is met, this method will use <code>ByteBuffer.slice()</code> to generate a slice
+         buffer of read data (delimiter exclusive). Then moves the position to next of delimiter.
+     </li>
+     <li>
+         If no specified delimiter is met, reset position and loop will be broken.
+     </li>
+ </ul>
+ For example:
+ <pre>
+     split("123|456|789|") = ["123", "456", "789"]
+     split("|123|456|789|") = ["", "123", "456", "789"]
+     split("|123|456|78") = ["", "123", "456"] and reset to position 9
+ </pre></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>delimiter</code> - specified delimiter</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>split buffer list</dd>
+</dl>
+</li>
+</ul>
+<a name="split-java.nio.ByteBuffer-byte-java.util.function.IntFunction-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>split</h4>
+<pre>public static&nbsp;java.util.List&lt;java.nio.ByteBuffer&gt;&nbsp;split(java.nio.ByteBuffer&nbsp;buffer,
+                                                        byte&nbsp;delimiter,
+                                                        java.util.function.IntFunction&lt;java.nio.ByteBuffer&gt;&nbsp;generator)</pre>
+<div class="block">Splits given buffer in specified delimiter, returns split buffer list.
+ This method starts the loop:
+ <ul>
+     <li>
+         Marks current position, reads until meets specified delimiter.
+     </li>
+     <li>
+         If specified delimiter is met, this method will call <code>generator</code> with length of read data to
+         generate new buffer. If <code>generator</code> return a new buffer, this method will fill data from given
+         buffer into new buffer. If <code>generator</code> return null, use <code>ByteBuffer.slice()</code> to generate a
+         slice buffer of read data (delimiter exclusive).
+         Then moves the position to next of delimiter.
+     </li>
+     <li>
+         If no specified delimiter is met, reset position and loop will be broken.
+     </li>
+ </ul>
+ For example:
+ <pre>
+     split("123|456|789|") = ["123", "456", "789"]
+     split("|123|456|789|") = ["", "123", "456", "789"]
+     split("|123|456|78") = ["", "123", "456"] and reset to position 9
+ </pre></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dd><code>delimiter</code> - specified delimiter</dd>
+<dd><code>generator</code> - given buffer generator, the argument is specified length</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>split buffer list</dd>
+</dl>
+</li>
+</ul>
+<a name="isSimpleWrapper-java.nio.ByteBuffer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isSimpleWrapper</h4>
+<pre>public static&nbsp;boolean&nbsp;isSimpleWrapper(java.nio.ByteBuffer&nbsp;buffer)</pre>
+<div class="block">Returns whether given buffer is a simple wrapper of back array:
+ <pre>
+     return buffer.hasArray()
+             && buffer.position() == 0
+             && buffer.arrayOffset() == 0
+             && buffer.limit() == buffer.array().length;
+ </pre></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>whether given buffer is a simple wrapper of back array</dd>
+</dl>
+</li>
+</ul>
+<a name="readBack-java.nio.ByteBuffer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>readBack</h4>
+<pre>public static&nbsp;byte[]&nbsp;readBack(java.nio.ByteBuffer&nbsp;buffer)</pre>
+<div class="block">Returns back array if <a href="../../../../xyz/fsgek/common/io/GekIO.html#isSimpleWrapper-java.nio.ByteBuffer-"><code>isSimpleWrapper(ByteBuffer)</code></a> returns true for given buffer,
+ and the position will be set to <code>buffer.limit()</code>.
+ Otherwise, return <a href="../../../../xyz/fsgek/common/io/GekIO.html#read-java.nio.ByteBuffer-"><code>read(ByteBuffer)</code></a>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>buffer</code> - given buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>back array if <a href="../../../../xyz/fsgek/common/io/GekIO.html#isSimpleWrapper-java.nio.ByteBuffer-"><code>isSimpleWrapper(ByteBuffer)</code></a> returns true for given buffer</dd>
 </dl>
 </li>
 </ul>
@@ -1079,7 +2248,8 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <ul class="blockList">
 <li class="blockList">
 <h4>toInputStream</h4>
-<pre>public static&nbsp;java.io.InputStream&nbsp;toInputStream(java.io.RandomAccessFile&nbsp;random)</pre>
+<pre>public static&nbsp;java.io.InputStream&nbsp;toInputStream(java.io.RandomAccessFile&nbsp;random)
+                                         throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
 <div class="block">Wraps given random access file as an input stream, supports mark/reset.
  <p>
  Note this method will seek position of random access file to given offset immediately.</div>
@@ -1088,6 +2258,8 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <dd><code>random</code> - given random access file</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>wrapped stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -1099,7 +2271,8 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <h4>toInputStream</h4>
 <pre>public static&nbsp;java.io.InputStream&nbsp;toInputStream(java.io.RandomAccessFile&nbsp;random,
                                                 long&nbsp;offset,
-                                                long&nbsp;length)</pre>
+                                                long&nbsp;length)
+                                         throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
 <div class="block">Wraps given random access file as an input stream,
  readable bytes from <code>offset</code> position to <code>(offset + length)</code>,
  supports mark/reset.
@@ -1113,148 +2286,8 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <dd><code>length</code> - length of readable bytes, or -1 to read to end of file</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>wrapped stream</dd>
-</dl>
-</li>
-</ul>
-<a name="toWriter-java.io.OutputStream-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toWriter</h4>
-<pre>public static&nbsp;java.io.Writer&nbsp;toWriter(java.io.OutputStream&nbsp;outputStream)</pre>
-<div class="block">Wraps given output stream as a writer with <code>OutputStreamWriter</code> and <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>outputStream</code> - given out stream</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped writer</dd>
-</dl>
-</li>
-</ul>
-<a name="toWriter-java.io.OutputStream-java.nio.charset.Charset-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toWriter</h4>
-<pre>public static&nbsp;java.io.Writer&nbsp;toWriter(java.io.OutputStream&nbsp;outputStream,
-                                      java.nio.charset.Charset&nbsp;charset)</pre>
-<div class="block">Wraps given output stream as a writer with <code>OutputStreamWriter</code>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>outputStream</code> - given out stream</dd>
-<dd><code>charset</code> - charset writer</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped writer</dd>
-</dl>
-</li>
-</ul>
-<a name="toWriter-java.nio.CharBuffer-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toWriter</h4>
-<pre>public static&nbsp;java.io.Writer&nbsp;toWriter(java.nio.CharBuffer&nbsp;buffer)</pre>
-<div class="block">Wraps given buffer as a writer.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>buffer</code> - given buffer</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped writer</dd>
-</dl>
-</li>
-</ul>
-<a name="toOutputStream-java.lang.Appendable-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toOutputStream</h4>
-<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.lang.Appendable&nbsp;appendable)</pre>
-<div class="block">Wraps given appendable as an output stream with <a href="../../../../xyz/fsgek/common/base/GekChars.html#defaultCharset--"><code>GekChars.defaultCharset()</code></a>.
- <p>
- Note <code>OutputStream.flush()</code> and <code>OutputStream.close()</code> are valid for given <code>appendable</code>
- if it is instance of <code>Writer</code>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>appendable</code> - given appendable</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
-</dl>
-</li>
-</ul>
-<a name="toOutputStream-java.lang.Appendable-java.nio.charset.Charset-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toOutputStream</h4>
-<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.lang.Appendable&nbsp;appendable,
-                                                  java.nio.charset.Charset&nbsp;charset)</pre>
-<div class="block">Wraps given appendable as an output stream.
- <p>
- Note <code>OutputStream.flush()</code> and <code>OutputStream.close()</code> are valid for given <code>appendable</code>
- if it is instance of <code>Writer</code>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>appendable</code> - given appendable</dd>
-<dd><code>charset</code> - charset of writer</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
-</dl>
-</li>
-</ul>
-<a name="toOutputStream-byte:A-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toOutputStream</h4>
-<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(byte[]&nbsp;array)</pre>
-<div class="block">Wraps given array as an output stream.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>array</code> - given array</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
-</dl>
-</li>
-</ul>
-<a name="toOutputStream-byte:A-int-int-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toOutputStream</h4>
-<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(byte[]&nbsp;array,
-                                                  int&nbsp;offset,
-                                                  int&nbsp;length)</pre>
-<div class="block">Wraps given array as an output stream, the wrapped range of specified length start from given offset.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>array</code> - given array</dd>
-<dd><code>offset</code> - given offset</dd>
-<dd><code>length</code> - specified length</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
-</dl>
-</li>
-</ul>
-<a name="toOutputStream-java.nio.ByteBuffer-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toOutputStream</h4>
-<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.nio.ByteBuffer&nbsp;buffer)</pre>
-<div class="block">Wraps given buffer as an output stream.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>buffer</code> - given writer</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -1264,7 +2297,8 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <ul class="blockList">
 <li class="blockList">
 <h4>toOutputStream</h4>
-<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.io.RandomAccessFile&nbsp;random)</pre>
+<pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.io.RandomAccessFile&nbsp;random)
+                                           throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
 <div class="block">Wraps given random access file as an output stream.
  The stream will lock the file with exclusive lock by <code>FileChannel.tryLock(long, long, boolean)</code>.
  <p>
@@ -1274,6 +2308,8 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <dd><code>random</code> - given random access file</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>wrapped stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -1285,7 +2321,8 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <h4>toOutputStream</h4>
 <pre>public static&nbsp;java.io.OutputStream&nbsp;toOutputStream(java.io.RandomAccessFile&nbsp;random,
                                                   long&nbsp;offset,
-                                                  long&nbsp;length)</pre>
+                                                  long&nbsp;length)
+                                           throws <a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></pre>
 <div class="block">Wraps given random access file as an output stream,
  written bytes from <code>offset</code> position to <code>(offset + length)</code>.
  <code>length</code> can be set to -1 if to write unlimitedly.
@@ -1299,43 +2336,8 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 <dd><code>length</code> - length of written bytes, or -1 to write unlimitedly</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>wrapped stream</dd>
-</dl>
-</li>
-</ul>
-<a name="limited-java.io.InputStream-long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>limited</h4>
-<pre>public static&nbsp;java.io.InputStream&nbsp;limited(java.io.InputStream&nbsp;source,
-                                          long&nbsp;limit)</pre>
-<div class="block">Wraps given source stream to limit read length.
- Note returned stream doesn't support mark/reset.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>source</code> - given source stream</dd>
-<dd><code>limit</code> - max read length, must &gt;= 0</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
-</dl>
-</li>
-</ul>
-<a name="limited-java.io.OutputStream-long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>limited</h4>
-<pre>public static&nbsp;java.io.OutputStream&nbsp;limited(java.io.OutputStream&nbsp;source,
-                                           long&nbsp;limit)</pre>
-<div class="block">Wraps given source stream to limit written length.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>source</code> - given source stream</dd>
-<dd><code>limit</code> - max written length, must &gt;= 0</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>wrapped stream</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io">GekIOException</a></code> - IO exception</dd>
 </dl>
 </li>
 </ul>
@@ -1604,7 +2606,7 @@ public static&nbsp;@Nullable java.lang.String&nbsp;avalaibleString(java.io.Input
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../xyz/fsgek/common/io/GekFileCache.FileWriteListener.html" title="interface in xyz.fsgek.common.io"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li>Prev&nbsp;Class</li>
 <li><a href="../../../../xyz/fsgek/common/io/GekIOException.html" title="class in xyz.fsgek.common.io"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
