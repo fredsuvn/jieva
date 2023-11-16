@@ -6,6 +6,9 @@ import com.google.common.cache.CacheBuilder;
 import org.openjdk.jmh.annotations.*;
 import xyz.fsgek.common.cache.GekCache;
 
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -17,152 +20,160 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class CacheJmh {
 
-    private static final Integer[] keys;
-    private static final Integer[] keys2;
+    private static final int LENGTH = 1000;
+    private static final String[] KEYS = new String[LENGTH];
 
     static {
-        keys = new Integer[500];
-        keys2 = new Integer[keys.length];
-        for (int i = 0; i < keys.length; i++) {
-            keys[i] = i;
-            keys2[i] = keys.length * 2 + i;
+        Random random = new Random();
+        for (int i = 0; i < KEYS.length; i++) {
+            KEYS[i] = String.valueOf(random.nextInt());
         }
     }
 
-    private GekCache<Integer, String> fsSoftCache;
-    private GekCache<Integer, String> fsWeakCache;
-    private Cache<Integer, String> guava;
-    private Cache<Integer, String> guavaSoft;
-    private Cache<Integer, String> guavaBig;
-    private com.github.benmanes.caffeine.cache.Cache<Integer, String> caffeine;
-    private com.github.benmanes.caffeine.cache.Cache<Integer, String> caffeineSoft;
-    private com.github.benmanes.caffeine.cache.Cache<Integer, String> caffeineBig;
+    private GekCache<String, String> fsSoftCache;
+    private GekCache<String, String> fsWeakCache;
+    private Cache<String, String> guava;
+    private Cache<String, String> guavaSoft;
+    private com.github.benmanes.caffeine.cache.Cache<String, String> caffeine;
+    private com.github.benmanes.caffeine.cache.Cache<String, String> caffeineSoft;
+    private Map<String, String> map;
 
     @Setup(Level.Iteration)
     public void init() {
         fsSoftCache = GekCache.softCache();
         fsWeakCache = GekCache.weakCache();
         guava = CacheBuilder.newBuilder()
-            .maximumSize(keys.length / 10)
+            .maximumSize(KEYS.length / 3)
             .build();
         guavaSoft = CacheBuilder.newBuilder()
             .softValues()
             .build();
-        guavaBig = CacheBuilder.newBuilder()
-            .maximumSize(keys.length)
-            .build();
         caffeine = Caffeine.newBuilder()
-            .maximumSize(keys.length / 10)
+            .maximumSize(KEYS.length / 3)
             .build();
         caffeineSoft = Caffeine.newBuilder()
             .softValues()
             .build();
-        caffeineBig = Caffeine.newBuilder()
-            .maximumSize(keys.length)
-            .build();
+        map = new ConcurrentHashMap<>(KEYS.length / 3);
     }
 
     @Benchmark
-    public void fsSoft() {
-        for (Integer key : keys) {
-            fsSoftCache.put(key, key.toString());
+    @Threads(32)
+    public void map() {
+        map.clear();
+        for (String key : KEYS) {
+            map.put(key, key + key);
         }
-        for (Integer key : keys) {
+        for (String key : KEYS) {
+            map.get(key);
+        }
+        for (String key : KEYS) {
+            map.computeIfAbsent(key, k -> k);
+        }
+        for (String key : KEYS) {
+            map.computeIfAbsent(key + key, k -> k);
+        }
+    }
+
+    @Benchmark
+    @Threads(32)
+    public void fsSoft() {
+        for (String key : KEYS) {
+            fsSoftCache.put(key, key + key);
+        }
+        for (String key : KEYS) {
             fsSoftCache.get(key);
         }
-        for (Integer key : keys2) {
-            fsSoftCache.get(key, String::valueOf);
+        for (String key : KEYS) {
+            fsSoftCache.get(key, k -> k);
+        }
+        for (String key : KEYS) {
+            fsSoftCache.get(key + key, k -> k);
         }
     }
 
     @Benchmark
+    @Threads(32)
     public void fsWeak() {
-        for (Integer key : keys) {
-            fsWeakCache.put(key, key.toString());
+        for (String key : KEYS) {
+            fsWeakCache.put(key, key + key);
         }
-        for (Integer key : keys) {
+        for (String key : KEYS) {
             fsWeakCache.get(key);
         }
-        for (Integer key : keys2) {
-            fsWeakCache.get(key, String::valueOf);
+        for (String key : KEYS) {
+            fsWeakCache.get(key, k -> k);
+        }
+        for (String key : KEYS) {
+            fsWeakCache.get(key + key, k -> k);
         }
     }
 
     @Benchmark
+    @Threads(32)
     public void guava() throws ExecutionException {
-        for (Integer key : keys) {
-            guava.put(key, key.toString());
+        for (String key : KEYS) {
+            guava.put(key, key + key);
         }
-        for (Integer key : keys) {
+        for (String key : KEYS) {
             guava.getIfPresent(key);
         }
-        for (Integer key : keys2) {
-            guava.get(key, () -> String.valueOf(key));
+        for (String key : KEYS) {
+            guava.get(key, () -> key);
+        }
+        for (String key : KEYS) {
+            guava.get(key + key, () -> key);
         }
     }
 
     @Benchmark
+    @Threads(32)
     public void guavaSoft() throws ExecutionException {
-        for (Integer key : keys) {
-            guavaSoft.put(key, key.toString());
+        for (String key : KEYS) {
+            guavaSoft.put(key, key + key);
         }
-        for (Integer key : keys) {
+        for (String key : KEYS) {
             guavaSoft.getIfPresent(key);
         }
-        for (Integer key : keys2) {
-            guavaSoft.get(key, () -> String.valueOf(key));
+        for (String key : KEYS) {
+            guavaSoft.get(key, () -> key);
+        }
+        for (String key : KEYS) {
+            guavaSoft.get(key + key, () -> key);
         }
     }
 
     @Benchmark
-    public void guavaBig() throws ExecutionException {
-        for (Integer key : keys) {
-            guavaBig.put(key, key.toString());
-        }
-        for (Integer key : keys) {
-            guavaBig.getIfPresent(key);
-        }
-        for (Integer key : keys2) {
-            guavaBig.get(key, () -> String.valueOf(key));
-        }
-    }
-
-    @Benchmark
+    @Threads(32)
     public void caffeine() {
-        for (Integer key : keys) {
-            caffeine.put(key, key.toString());
+        for (String key : KEYS) {
+            caffeine.put(key, key + key);
         }
-        for (Integer key : keys) {
+        for (String key : KEYS) {
             caffeine.getIfPresent(key);
         }
-        for (Integer key : keys2) {
-            caffeine.get(key, String::valueOf);
+        for (String key : KEYS) {
+            caffeine.get(key, k -> k);
+        }
+        for (String key : KEYS) {
+            caffeine.get(key + key, k -> k);
         }
     }
 
     @Benchmark
+    @Threads(32)
     public void caffeineSoft() {
-        for (Integer key : keys) {
-            caffeineSoft.put(key, key.toString());
+        for (String key : KEYS) {
+            caffeineSoft.put(key, key + key);
         }
-        for (Integer key : keys) {
+        for (String key : KEYS) {
             caffeineSoft.getIfPresent(key);
         }
-        for (Integer key : keys2) {
-            caffeineSoft.get(key, String::valueOf);
+        for (String key : KEYS) {
+            caffeineSoft.get(key, k -> k);
         }
-    }
-
-    @Benchmark
-    public void caffeineBig() {
-        for (Integer key : keys) {
-            caffeineBig.put(key, key.toString());
-        }
-        for (Integer key : keys) {
-            caffeineBig.getIfPresent(key);
-        }
-        for (Integer key : keys2) {
-            caffeineBig.get(key, String::valueOf);
+        for (String key : KEYS) {
+            caffeineSoft.get(key + key, k -> k);
         }
     }
 }

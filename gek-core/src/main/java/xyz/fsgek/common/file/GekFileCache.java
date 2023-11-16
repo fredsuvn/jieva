@@ -381,8 +381,8 @@ public interface GekFileCache {
             private final GekCache<ChunkIndex, Chunk> cache;
 
             private ChunkCacheImpl(ChunkCacheGenerator.RemoveListener removeListener) {
-                this.cache = GekCache.softCache((cache, key) ->
-                    removeListener.onCacheRemove(key, ChunkCacheImpl.this));
+                this.cache = GekCache.softCache((k, v, c) ->
+                    removeListener.onCacheRemove(k, ChunkCacheImpl.this));
             }
 
             @Override

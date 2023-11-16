@@ -2,18 +2,27 @@ package xyz.fsgek.common.cache;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
-import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekWrapper;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.time.Duration;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
- * Cache interface, thread-safe and supporting null value.
+ * Cache interface, provides get/compute/put/expire/remove/clear/clean methods which perform like
+ * {@link ConcurrentHashMap}. Implementations should be thread-safe, this is defined in this interface.
+ * <p>
+ * This cache supports set different expiration for each entry, and null value is permitted.
+ * However, default implementation is based on GC (Garbage Collection, {@link Reference}), invalidation of values is
+ * unclear, even if a value hasn't exceeded the expiration, it's still possible to not be retrieved.
+ * <p>
+ * {@link RemoveListener} is used to listen removing action of ths cache.
+ * As mentioned above, if a value is cleared by GC before {@link RemoveListener#onRemove(Object, Object, GekCache)} is
+ * called, the value parameter will be passed to null.
  *
  * @param <K> type of key
  * @param <V> type of value
@@ -23,29 +32,18 @@ import java.util.function.Function;
 public interface GekCache<K, V> {
 
     /**
-     * Returns new builder for {@link GekCache}.
-     *
-     * @param <K> type of key
-     * @param <V> type of value
-     * @return new builder for {@link GekCache}
-     */
-    static <K1 extends K, V1 extends V, K, V> Builder<K1, V1> newBuilder() {
-        return new Builder<>();
-    }
-
-    /**
-     * Creates a new {@link GekCache} based by {@link SoftReference}.
+     * Creates a new {@link GekCache} based on {@link SoftReference}.
      *
      * @param <K> key type
      * @param <V> value type
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache() {
-        return new SimpleCache<>(true);
+        return new GcCache<>(true, -1, null);
     }
 
     /**
-     * Creates a new {@link GekCache} based by {@link SoftReference} with remove listener,
+     * Creates a new {@link GekCache} based on {@link SoftReference} with remove listener,
      * the listener will be called <b>after</b> removing from the cache.
      *
      * @param removeListener remove listener called <b>after</b> removing from the cache,
@@ -55,11 +53,11 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache(RemoveListener<K, V> removeListener) {
-        return new SimpleCache<>(true, removeListener);
+        return new GcCache<>(true, -1, removeListener);
     }
 
     /**
-     * Creates a new {@link GekCache} based by {@link SoftReference} with initial capacity.
+     * Creates a new {@link GekCache} based on {@link SoftReference} with initial capacity.
      *
      * @param initialCapacity initial capacity
      * @param <K>             key type
@@ -67,11 +65,11 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache(int initialCapacity) {
-        return new SimpleCache<>(true, initialCapacity, null);
+        return new GcCache<>(true, initialCapacity, null);
     }
 
     /**
-     * Creates a new {@link GekCache} based by {@link SoftReference} with initial capacity and remove listener,
+     * Creates a new {@link GekCache} based on {@link SoftReference} with initial capacity and remove listener,
      * the listener will be called <b>after</b> removing from the cache.
      *
      * @param initialCapacity initial capacity
@@ -82,22 +80,22 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new SimpleCache<>(true, initialCapacity, removeListener);
+        return new GcCache<>(true, initialCapacity, removeListener);
     }
 
     /**
-     * Creates a new {@link GekCache} based by {@link WeakReference}.
+     * Creates a new {@link GekCache} based on {@link WeakReference}.
      *
      * @param <K> key type
      * @param <V> value type
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache() {
-        return new SimpleCache<>(false);
+        return new GcCache<>(false, -1, null);
     }
 
     /**
-     * Creates a new {@link GekCache} based by {@link WeakReference} with remove listener,
+     * Creates a new {@link GekCache} based on {@link WeakReference} with remove listener,
      * the listener will be called <b>after</b> removing from the cache.
      *
      * @param removeListener remove listener called <b>after</b> removing from the cache,
@@ -107,11 +105,11 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache(RemoveListener<K, V> removeListener) {
-        return new SimpleCache<>(false, removeListener);
+        return new GcCache<>(false, -1, removeListener);
     }
 
     /**
-     * Creates a new {@link GekCache} based by {@link WeakReference} with initial capacity.
+     * Creates a new {@link GekCache} based on {@link WeakReference} with initial capacity.
      *
      * @param initialCapacity initial capacity
      * @param <K>             key type
@@ -119,11 +117,11 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache(int initialCapacity) {
-        return new SimpleCache<>(false, initialCapacity, null);
+        return new GcCache<>(false, initialCapacity, null);
     }
 
     /**
-     * Creates a new {@link GekCache} based by {@link WeakReference} with initial capacity and remove listener,
+     * Creates a new {@link GekCache} based on {@link WeakReference} with initial capacity and remove listener,
      * the listener will be called <b>after</b> removing from the cache.
      *
      * @param initialCapacity initial capacity
@@ -134,116 +132,120 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache(int initialCapacity, RemoveListener<K, V> removeListener) {
-        return new SimpleCache<>(false, initialCapacity, removeListener);
+        return new GcCache<>(false, initialCapacity, removeListener);
     }
 
     /**
-     * Returns value associating with given key from this cache,
-     * return null if there is no entry for given key or the value is expired or the value itself is null.
+     * Returns value associating with specified key.
+     * The value will be null if there is no entry for specified key or is expired or itself is null.
      *
-     * @param key given key
-     * @return value associating with given key from this cache
+     * @param key specified key
+     * @return value associating with specified key
      */
     @Nullable
     V get(K key);
 
     /**
-     * Returns value associating with given key from this cache.
-     * If there is no entry for given key or the value is expired, a new value will be created by given loader.
-     * Duration of expiration for the created value will be set to the default expiration.
+     * Returns value associating with specified key, and it performs like
+     * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)}:
      * <p>
-     * This method will return null if and only if the existed value or created value itself is null.
+     * If the specified key is not already associated with a value, attempts to compute its value using the given
+     * loader and enters it into this cache. Null is permitted so the null value will also be entered.
+     * <p>
+     * This cache is thread-safe so the loader function is applied at most once per key, and blocks other thread.
      *
-     * @param key    given key
+     * @param key    specified key
      * @param loader given loader
-     * @return value associating with given key from this cache, or created one
+     * @return value associating with specified key, may be computed from given loader
      */
     @Nullable
     V get(K key, Function<? super K, @Nullable ? extends V> loader);
 
     /**
-     * Returns wrapped value associating with given key from this cache,
-     * or null if there is no entry for given key or the value is expired.
+     * Returns value wrapped by {@link Optional} associating with specified key.
+     * The returned {@link Optional} will be null if there is no entry for specified key.
      *
-     * @param key given key
-     * @return value associating with given key from this cache
+     * @param key specified key
+     * @return value wrapped by {@link Optional} associating with specified key, or null if not found
      */
     @Nullable
-    GekWrapper<V> getWrapper(K key);
+    Optional<V> getOptional(K key);
 
     /**
-     * Returns wrapped value associating with given key from this cache.
-     * If there is no entry for given key or the value is expired, a new value info will be created by given loader.
-     * If the loader returns null, no value will be put and this method will return null.
+     * Returns value wrapped by {@link Optional} associating with specified key, and it performs like
+     * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)}:
      * <p>
-     * This method will return null if and only if the loader returns null.
+     * If the specified key is not already associated with a value, attempts to compute its value as {@link ValueInfo}
+     * using the given loader and enters it into this cache. If the loader returns null, no mapping will be recorded and
+     * this method will return null.
+     * <p>
+     * This cache is thread-safe so the loader function is applied at most once per key, and blocks other thread.
      *
-     * @param key    given key
+     * @param key    specified key
      * @param loader given loader
-     * @return value associating with given key from this cache, or created one
+     * @return value associating with specified key, may be computed from given loader
      */
     @Nullable
-    GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable ValueInfo<? extends V>> loader);
+    Optional<V> getOptional(K key, Function<? super K, @Nullable ValueInfo<? extends V>> loader);
 
     /**
-     * Sets the value associated with given key,
+     * Sets the value associated with specified key,
      * return old value or null if there is no old value or old value is expired.
-     * Duration of expiration for the value will be set to the default expiration.
      *
-     * @param key   given key
+     * @param key   specified key
      * @param value the value
      * @return old value or null
      */
     V put(K key, V value);
 
     /**
-     * Sets the value info associated with given key and specified expiration in milliseconds,
+     * Sets the value info associated with specified key and specified expiration in milliseconds,
      * return old value or null if there is no old value or old value is expired.
-     * Duration of expiration for the value will be set to the specified expiration in milliseconds, may be -1 if set to
-     * use default expiration.
+     * The expiration can be set to -1, in this case the value uses default expiration rule.
      *
-     * @param key        given key
-     * @param value      the value
-     * @param expiration specified expiration in milliseconds, may be -1 if set to use default expiration
+     * @param key              specified key
+     * @param value            the value
+     * @param expirationMillis specified expiration in milliseconds
      * @return old value or null
      */
-    V put(K key, V value, long expiration);
+    V put(K key, V value, long expirationMillis);
 
     /**
-     * Sets the value info associated with given key and specified expiration,
+     * Sets the value info associated with specified key and specified expiration,
      * return old value or null if there is no old value or old value is expired.
-     * Duration of expiration for the value will be set to the specified expiration, may be null if set to use default
-     * expiration.
+     * The expiration can be set to null, in this case the value uses default expiration rule.
      *
-     * @param key        given key
+     * @param key        specified key
      * @param value      the value
-     * @param expiration specified expiration, may be null if set to use default expiration
+     * @param expiration specified expiration
      * @return old value or null
      */
     V put(K key, V value, @Nullable Duration expiration);
 
     /**
-     * Sets duration of expiration in milliseconds for value associated with given key.
+     * Sets expiration in milliseconds for value associated with specified key.
      * No effect if there is no old value or old value is expired.
+     * The expiration can be set to -1, in this case the value uses default expiration rule.
      *
-     * @param key        given key
-     * @param expiration duration of expiration in milliseconds
+     * @param key              specified key
+     * @param expirationMillis expiration in milliseconds
      */
-    void expire(K key, long expiration);
+    void expire(K key, long expirationMillis);
 
     /**
-     * Sets duration of expiration for value associated with given key.
+     * Sets expiration for value associated with specified key.
      * No effect if there is no old value or old value is expired.
+     * The expiration can be set to null, in this case the value uses default expiration rule.
      *
-     * @param key        given key
-     * @param expiration duration of expiration
+     * @param key        specified key
+     * @param expiration expiration
      */
     void expire(K key, @Nullable Duration expiration);
 
     /**
-     * Removes the value associated with given key.
+     * Removes the value associated with specified key.
      *
-     * @param key given key
+     * @param key specified key
      */
     void remove(K key);
 
@@ -275,50 +277,70 @@ public interface GekCache<K, V> {
     void clear();
 
     /**
-     * Removes all expired values.
+     * Removes all expired values in this cache.
      */
     void cleanUp();
 
     /**
      * Removing listener of {@link GekCache}.
+     *
+     * @param <K> key type
+     * @param <V> value type
      */
     interface RemoveListener<K, V> {
 
         /**
          * This method will be called after removing a key and its value.
          *
-         * @param cache current cache
          * @param key   key of removed value
+         * @param value removed value, may be null if the GC has already cleared the value
+         * @param cache current cache
          */
-        void onRemove(GekCache<K, V> cache, K key);
+        void onRemove(K key, @Nullable V value, GekCache<K, V> cache);
     }
 
     /**
-     * Cache value info with duration of expiration.
+     * Cache value info with expiration.
      *
-     * @param <V> type of value
+     * @param <V> value type
      */
     interface ValueInfo<V> {
 
         /**
-         * Returns a new instance of {@link ValueInfo} with given value and specified expiration in milliseconds.
+         * Returns a new instance with given value and specified expiration in milliseconds.
          *
          * @param value            given value
-         * @param expirationMillis specified expiration in milliseconds, may be -1 if set to use default expiration
-         * @param <V>              type of value
-         * @return a new instance of {@link ValueInfo} with given value and specified expiration in milliseconds
+         * @param expirationMillis specified expiration in milliseconds, may be -1 if set to use default expiration rule
+         * @param <V>              value type
+         * @return a new instance with given value and specified expiration in milliseconds
          */
         static <V> ValueInfo<V> of(@Nullable V value, long expirationMillis) {
-            return of(value, Duration.ofMillis(expirationMillis));
+            Duration duration = expirationMillis < 0 ? null : Duration.ofMillis(expirationMillis);
+            return new ValueInfo<V>() {
+                @Override
+                public @Nullable V get() {
+                    return value;
+                }
+
+                @Override
+                public @Nullable Duration expiration() {
+                    return duration;
+                }
+
+                @Override
+                public long expirationMillis() {
+                    return expirationMillis;
+                }
+            };
         }
 
         /**
-         * Returns a new instance of {@link ValueInfo} with given value and specified expiration.
+         * Returns a new instance with given value and specified expiration.
          *
          * @param value      given value
-         * @param expiration specified expiration, may be null if set to use default expiration
-         * @param <V>        type of value
-         * @return a new instance of {@link ValueInfo} with given value and specified expiration
+         * @param expiration specified expiration, may be null if set to use default expiration rule
+         * @param <V>        value type
+         * @return a new instance with given value and specified expiration
          */
         static <V> ValueInfo<V> of(@Nullable V value, @Nullable Duration expiration) {
             return new ValueInfo<V>() {
@@ -330,6 +352,11 @@ public interface GekCache<K, V> {
                 @Override
                 public @Nullable Duration expiration() {
                     return expiration;
+                }
+
+                @Override
+                public long expirationMillis() {
+                    return expiration == null ? -1 : expiration.toMillis();
                 }
             };
         }
@@ -343,114 +370,18 @@ public interface GekCache<K, V> {
         V get();
 
         /**
-         * Returns duration of expiration, may be null if set to use default expiration.
+         * Returns expiration, may be null if set to use default expiration rule.
          *
-         * @return duration of expiration, may be null if set to use default expiration
+         * @return expiration, may be null if set to use default expiration rule
          */
         @Nullable
         Duration expiration();
-    }
-
-    /**
-     * Builder for {@link GekCache}, based on {@link SoftReference} or {@link WeakReference}.
-     *
-     * @param <K> type of key
-     * @param <V> type of value
-     */
-    class Builder<K, V> {
-
-        private GekCache.RemoveListener<K, V> removeListener = null;
-        private boolean isSoft = true;
-        private long defaultExpiration = -1;
-        private int initialCapacity = 0;
 
         /**
-         * Sets default expiration in milliseconds,
-         * may be -1 if set to use gc ({@link Reference}) to mark expired values.
+         * Returns expiration in milliseconds, may be -1 if set to use default expiration rule.
          *
-         * @param expirationMillis default expiration in milliseconds
-         * @param <K1>             type of key
-         * @param <V1>             type of value
-         * @return this
+         * @return expiration in milliseconds, may be -1 if set to use default expiration rule
          */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> defaultExpiration(long expirationMillis) {
-            this.defaultExpiration = expirationMillis;
-            return Gek.as(this);
-        }
-
-        /**
-         * Sets default expiration,
-         * may be -1 if set to use gc ({@link Reference}) to mark expired values.
-         *
-         * @param expirationMillis default expiration
-         * @param <K1>             type of key
-         * @param <V1>             type of value
-         * @return this
-         */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> defaultExpiration(@Nullable Duration expirationMillis) {
-            this.defaultExpiration = expirationMillis == null ? -1 : expirationMillis.toMillis();
-            return Gek.as(this);
-        }
-
-        /**
-         * Sets listener on value removing.
-         *
-         * @param removeListener listener on value removing
-         * @param <K1>           type of key
-         * @param <V1>           type of value
-         * @return this
-         */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> removeListener(GekCache.RemoveListener<K, V> removeListener) {
-            this.removeListener = removeListener;
-            return Gek.as(this);
-        }
-
-        /**
-         * Sets the cache is based on {@link SoftReference}.
-         *
-         * @param <K1> type of key
-         * @param <V1> type of value
-         * @return this
-         */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> softReference() {
-            this.isSoft = true;
-            return Gek.as(this);
-        }
-
-        /**
-         * Sets the cache is based on {@link WeakReference}.
-         *
-         * @param <K1> type of key
-         * @param <V1> type of value
-         * @return this
-         */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> weakReference() {
-            this.isSoft = false;
-            return Gek.as(this);
-        }
-
-        /**
-         * Sets initial capacity.
-         *
-         * @param initialCapacity initial capacity
-         * @param <K1>            type of key
-         * @param <V1>            type of value
-         * @return this
-         */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> initialCapacity(int initialCapacity) {
-            this.initialCapacity = initialCapacity;
-            return Gek.as(this);
-        }
-
-        /**
-         * Builds the final cache.
-         *
-         * @param <K1> type of key
-         * @param <V1> type of value
-         * @return built final cache
-         */
-        public <K1 extends K, V1 extends V> GekCache<K1, V1> build() {
-            return Gek.as(new FullCache<>(isSoft, defaultExpiration, initialCapacity, removeListener));
-        }
+        long expirationMillis();
     }
 }

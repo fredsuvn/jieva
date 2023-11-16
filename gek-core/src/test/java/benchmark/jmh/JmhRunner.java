@@ -11,16 +11,16 @@ import java.nio.file.Paths;
 public class JmhRunner {
 
     public static void main(String[] args) throws Exception {
-        File resultDir = Paths.get("docs/benchmark").toFile();
-        File resultFile = Paths.get("docs/benchmark/jmhResult.txt").toFile();
-        if (!resultFile.exists()) {
-            resultDir.mkdirs();
-            resultFile.createNewFile();
-        }
+//        File resultDir = Paths.get("docs/benchmark").toFile();
+//        File resultFile = Paths.get("docs/benchmark/jmhResult.txt").toFile();
+//        if (!resultFile.exists()) {
+//            resultDir.mkdirs();
+//            resultFile.createNewFile();
+//        }
         Options options = new OptionsBuilder()
-            .include("benchmark.jmh.*Jmh")
-            .resultFormat(ResultFormatType.TEXT)
-            .result(resultFile.getAbsolutePath())
+            .include("benchmark.jmh.CacheJmh")
+            //.resultFormat(ResultFormatType.TEXT)
+            //.result(resultFile.getAbsolutePath())
             .build();
         new Runner(options).run();
     }

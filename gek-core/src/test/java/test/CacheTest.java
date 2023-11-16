@@ -3,12 +3,12 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekLogger;
-import xyz.fsgek.common.base.GekWrapper;
 import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
 import xyz.fsgek.common.cache.GekCache;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class CacheTest {
@@ -16,29 +16,21 @@ public class CacheTest {
     @Test
     public void testCache() {
         final int[] detected = {0};
-//        testCache(
-//            GekCache.newBuilder().removeListener((cache, key) -> {
-//                detected[0]++;
-//                cache.cleanUp();
-//            }).build(),
-//            detected,
-//            "Full-soft"
-//        );
-        testCache(
-            GekCache.newBuilder().removeListener((cache, key) -> {
-                detected[0]++;
-                cache.cleanUp();
-            }).weakReference().build(),
-            detected,
-            "Weak-soft"
-        );
+        testCache(GekCache.softCache((k, v, c) -> {
+            detected[0]++;
+            c.cleanUp();
+        }), detected, "soft-cache");
+        testCache(GekCache.weakCache((k, v, c) -> {
+            detected[0]++;
+            c.cleanUp();
+        }), detected, "soft-cache");
     }
 
     private void testCache(GekCache<Integer, String> cache, int[] detected, String name) {
         detected[0] = 0;
         //Map<Integer, String> map = new HashMap<>();
         int times = 1000 * 3;
-        String value = TestUtil.buildRandomString(1024 * 100, 0);
+        String value = TestUtil.buildRandomString(1024 * 100, 1024 * 100);
         for (int i = 0; i < times; i++) {
             cache.put(i, value + "i");
             //map.put(i, String.valueOf(i * 10086));
@@ -73,20 +65,20 @@ public class CacheTest {
         gekCache.remove(1);
         gekCache.get(1, k -> null);
         Assert.assertNull(gekCache.get(1));
-        Assert.assertEquals(gekCache.getWrapper(1), GekWrapper.empty());
+        Assert.assertEquals(gekCache.getOptional(1), Optional.empty());
         gekCache.remove(1);
-        gekCache.getWrapper(1, k -> null);
+        gekCache.getOptional(1, k -> null);
         Assert.assertNull(gekCache.get(1));
-        Assert.assertNull(gekCache.getWrapper(1));
+        Assert.assertNull(gekCache.getOptional(1));
         gekCache.put(2, "2");
         Assert.assertEquals(gekCache.get(2), "2");
         Assert.assertEquals(gekCache.get(2, k -> "4"), "2");
-        Assert.assertEquals(gekCache.getWrapper(2, k -> GekCache.ValueInfo.of("8", null)).get(), "2");
+        Assert.assertEquals(gekCache.getOptional(2, k -> GekCache.ValueInfo.of("8", null)).get(), "2");
     }
 
     @Test
     public void testCleanUp() {
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> c.cleanUp());
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> c.cleanUp());
         for (int i = 0; i < 10000; i++) {
             gekCache.put(i, i);
         }
@@ -96,7 +88,7 @@ public class CacheTest {
     @Test
     public void testRemove() {
         IntRef intRef = GekRef.ofInt(0);
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> intRef.incrementAndGet());
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intRef.incrementAndGet());
         gekCache.put(1, 1);
         gekCache.remove(1);
         Assert.assertEquals(intRef.get(), 1);
@@ -105,7 +97,7 @@ public class CacheTest {
     @Test
     public void testClear() {
         IntRef intRef = GekRef.ofInt(0);
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> intRef.incrementAndGet());
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intRef.incrementAndGet());
         for (int i = 0; i < 10000; i++) {
             gekCache.put(i, i);
         }
@@ -116,7 +108,7 @@ public class CacheTest {
     @Test
     public void testRemoveIf() {
         IntRef intRef = GekRef.ofInt(0);
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> intRef.incrementAndGet());
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intRef.incrementAndGet());
         for (int i = 0; i < 10; i++) {
             gekCache.put(i, i);
         }
@@ -129,7 +121,7 @@ public class CacheTest {
     public void testNull() {
         IntRef intRef = GekRef.ofInt(0);
         Set<Integer> set = new HashSet<>();
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((c, k) -> {
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> {
             intRef.incrementAndGet();
             set.remove(k);
         });
@@ -137,14 +129,34 @@ public class CacheTest {
             gekCache.put(i, null);
         }
         for (int i = 0; i < 10000; i++) {
-            GekWrapper<Integer> w = gekCache.getWrapper(i);
+            Optional<Integer> w = gekCache.getOptional(i);
             if (w != null) {
-                Assert.assertNull(w.get());
+                Assert.assertFalse(w.isPresent());
                 set.add(i);
             }
         }
         Assert.assertEquals(set.size() + intRef.get(), 10000);
         gekCache.clear();
         Assert.assertEquals(intRef.get(), 10000);
+    }
+
+    @Test
+    public void testExpiration() throws InterruptedException {
+        int[] l = {0};
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> l[0]++);
+        gekCache.put(1, 1, 1000);
+        Assert.assertEquals(gekCache.get(1), 1);
+        Assert.assertEquals(l[0], 0);
+        Thread.sleep(1001);
+        Assert.assertNull(gekCache.get(1));
+        Assert.assertEquals(l[0], 1);
+        gekCache.put(2, 2, 1000);
+        gekCache.expire(2, 1500);
+        Thread.sleep(1111);
+        Assert.assertEquals(gekCache.get(2), 2);
+        Assert.assertEquals(l[0], 1);
+        Thread.sleep(1000);
+        Assert.assertNull(gekCache.get(2));
+        Assert.assertEquals(l[0], 2);
     }
 }
