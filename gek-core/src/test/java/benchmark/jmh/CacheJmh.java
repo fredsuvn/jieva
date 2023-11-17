@@ -4,12 +4,13 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 import xyz.fsgek.common.cache.GekCache;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.Throughput)
@@ -20,139 +21,119 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class CacheJmh {
 
-    private static final int LENGTH = 1000;
-    private static final String[] KEYS = new String[LENGTH];
+    private static final int MAX = 1024 * 100;
 
-    static {
-        Random random = new Random();
-        for (int i = 0; i < KEYS.length; i++) {
-            KEYS[i] = String.valueOf(random.nextInt());
-        }
-    }
-
-    private GekCache<String, String> fsSoftCache;
-    private GekCache<String, String> fsWeakCache;
-    private Cache<String, String> guava;
-    private Cache<String, String> guavaSoft;
-    private com.github.benmanes.caffeine.cache.Cache<String, String> caffeine;
-    private com.github.benmanes.caffeine.cache.Cache<String, String> caffeineSoft;
-    private Map<String, String> map;
+    private GekCache<Integer, Integer> fsSoftCacheV1;
+    private GekCache<Integer, Integer> fsWeakCacheV1;
+    private GekCache<Integer, Integer> fsSoftCacheV2;
+    private GekCache<Integer, Integer> fsWeakCacheV2;
+    private Cache<Integer, Integer> guava;
+    private Cache<Integer, Integer> guavaSoft;
+    private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeine;
+    private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeineSoft;
+    private Map<Integer, Integer> map;
 
     @Setup(Level.Iteration)
     public void init() {
-        fsSoftCache = GekCache.softCache();
-        fsWeakCache = GekCache.weakCache();
+        System.out.println(">>>>>> init <<<<<<<<");
+        fsSoftCacheV1 = GekCache.newBuilder().useSoft(true).v1().build();
+        fsWeakCacheV1 = GekCache.newBuilder().useSoft(true).v1().build();
+        fsSoftCacheV2 = GekCache.newBuilder().useSoft(true).v2().build();
+        fsWeakCacheV2 = GekCache.newBuilder().useSoft(true).v2().build();
         guava = CacheBuilder.newBuilder()
-            .maximumSize(KEYS.length / 3)
+            .maximumSize(MAX / 3)
             .build();
         guavaSoft = CacheBuilder.newBuilder()
             .softValues()
             .build();
         caffeine = Caffeine.newBuilder()
-            .maximumSize(KEYS.length / 3)
+            .maximumSize(MAX / 3)
             .build();
         caffeineSoft = Caffeine.newBuilder()
             .softValues()
             .build();
-        map = new ConcurrentHashMap<>(KEYS.length / 3);
+        map = new ConcurrentHashMap<>(MAX / 3);
+        System.out.println("fsSoftCacheV1: " + fsSoftCacheV1.getClass());
+        System.out.println("fsWeakCacheV1: " + fsWeakCacheV1.getClass());
+        System.out.println("fsSoftCacheV2: " + fsSoftCacheV2.getClass());
+        System.out.println("fsWeakCacheV2: " + fsWeakCacheV2.getClass());
     }
 
     @Benchmark
-    @Threads(32)
-    public void map() {
-        map.clear();
-        for (String key : KEYS) {
-            map.put(key, key + key);
-        }
-        for (String key : KEYS) {
-            map.get(key);
-        }
-        for (String key : KEYS) {
-            map.computeIfAbsent(key, k -> k);
-        }
-        for (String key : KEYS) {
-            map.computeIfAbsent(key + key, k -> k);
-        }
+    @Threads(64)
+    public void map(Blackhole bh) {
+        bh.consume(map.put(next(), next() + next()));
+        bh.consume(map.get(next()));
+        bh.consume(map.computeIfAbsent(next(), k -> k));
     }
 
     @Benchmark
-    @Threads(32)
-    public void fsSoft() {
-        fs(fsSoftCache);
+    @Threads(64)
+    public void fsSoftV1(Blackhole bh) {
+        fsSoftCacheV1.put(next(), next() + next());
+        bh.consume(fsSoftCacheV1.get(next()));
+        bh.consume(fsSoftCacheV1.get(next(), k -> k));
     }
 
     @Benchmark
-    @Threads(32)
-    public void fsWeak() {
-        fs(fsWeakCache);
-    }
-
-    private void fs(GekCache<String, String> cache) {
-        for (String key : KEYS) {
-            cache.put(key, key + key);
-        }
-        for (String key : KEYS) {
-            cache.get(key);
-        }
-        for (String key : KEYS) {
-            cache.get(key, k -> k);
-        }
-        for (String key : KEYS) {
-            cache.get(key + key, k -> k);
-        }
+    @Threads(64)
+    public void fsWeakV1(Blackhole bh) {
+        fsWeakCacheV1.put(next(), next() + next());
+        bh.consume(fsWeakCacheV1.get(next()));
+        bh.consume(fsWeakCacheV1.get(next(), k -> k));
     }
 
     @Benchmark
-    @Threads(32)
-    public void guava() throws ExecutionException {
-        guava(guava);
+    @Threads(64)
+    public void fsSoftV2(Blackhole bh) {
+        fsSoftCacheV2.put(next(), next() + next());
+        bh.consume(fsSoftCacheV2.get(next()));
+        bh.consume(fsSoftCacheV2.get(next(), k -> k));
     }
 
     @Benchmark
-    @Threads(32)
-    public void guavaSoft() throws ExecutionException {
-        guava(guavaSoft);
-    }
-
-    private void guava(Cache<String, String> cache) throws ExecutionException {
-        for (String key : KEYS) {
-            cache.put(key, key + key);
-        }
-        for (String key : KEYS) {
-            cache.getIfPresent(key);
-        }
-        for (String key : KEYS) {
-            cache.get(key, () -> key);
-        }
-        for (String key : KEYS) {
-            cache.get(key + key, () -> key);
-        }
+    @Threads(64)
+    public void fsWeakV2(Blackhole bh) {
+        fsWeakCacheV1.put(next(), next() + next());
+        bh.consume(fsWeakCacheV2.get(next()));
+        bh.consume(fsWeakCacheV2.get(next(), k -> k));
     }
 
     @Benchmark
-    @Threads(32)
-    public void caffeine() {
-        caffeine(caffeine);
+    @Threads(64)
+    public void guava(Blackhole bh) throws ExecutionException {
+        guava.put(next(), next() + next());
+        bh.consume(guava.getIfPresent(next()));
+        int n = next();
+        bh.consume(guava.get(n, () -> n));
     }
 
     @Benchmark
-    @Threads(32)
-    public void caffeineSoft() {
-        caffeine(caffeineSoft);
+    @Threads(64)
+    public void guavaSoft(Blackhole bh) throws ExecutionException {
+        guavaSoft.put(next(), next() + next());
+        bh.consume(guavaSoft.getIfPresent(next()));
+        int n = next();
+        bh.consume(guavaSoft.get(n, () -> n));
     }
 
-    private void caffeine(com.github.benmanes.caffeine.cache.Cache<String, String> cache) {
-        for (String key : KEYS) {
-            cache.put(key, key + key);
-        }
-        for (String key : KEYS) {
-            cache.getIfPresent(key);
-        }
-        for (String key : KEYS) {
-            cache.get(key, k -> k);
-        }
-        for (String key : KEYS) {
-            cache.get(key + key, k -> k);
-        }
+    @Benchmark
+    @Threads(64)
+    public void caffeine(Blackhole bh) {
+        caffeine.put(next(), next() + next());
+        bh.consume(caffeine.getIfPresent(next()));
+        bh.consume(caffeine.get(next(), k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void caffeineSoft(Blackhole bh) {
+        caffeineSoft.put(next(), next() + next());
+        bh.consume(caffeineSoft.getIfPresent(next()));
+        bh.consume(caffeineSoft.get(next(), k -> k));
+    }
+
+    private int next() {
+        return ThreadLocalRandom.current().nextInt(MAX);
     }
 }

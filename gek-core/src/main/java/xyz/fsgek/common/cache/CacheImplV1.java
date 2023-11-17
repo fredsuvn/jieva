@@ -14,16 +14,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-final class GcCache<K, V> implements GekCache<K, V> {
+final class CacheImplV1<K, V> implements GekCache<K, V> {
 
     private final GekCache.RemoveListener<K, V> removeListener;
     private final boolean useSoft;
     private final Map<K, Entry<K, V>> map;
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
-    private long expireAfterWrite = -1;
-    private long expireAfterAccess = -1;
+    private final long expireAfterWrite;
+    private final long expireAfterAccess;
 
-    GcCache(Builder<K, V> builder) {
+    CacheImplV1(Builder<K, V> builder) {
         this.useSoft = builder.useSoft();
         this.expireAfterAccess = builder.expireAfterAccessMillis();
         this.expireAfterWrite = builder.expireAfterWriteMillis();
@@ -108,25 +108,20 @@ final class GcCache<K, V> implements GekCache<K, V> {
     }
 
     @Override
-    public V put(K key, V value) {
-        return put(key, value, expireAfterWrite);
+    public void put(K key, V value) {
+        put(key, value, expireAfterWrite);
     }
 
     @Override
-    public V put(K key, V value, long expireAfterWriteMillis) {
-        Entry<K, V> old = map.put(key, newEntry(key, value, expireAfterWriteMillis, expireAfterAccess));
-        ValuePack v = checkEntry(old, null);
+    public void put(K key, V value, long expireAfterWriteMillis) {
+        map.put(key, newEntry(key, value, expireAfterWriteMillis, expireAfterAccess));
         cleanUp();
-        return v == null ? null : v.value;
     }
 
     @Override
-    public V put(K key, Value<V> value) {
-        Entry<K, V> old = map.put(key,
-            newEntry(key, value.get(), value.expireAfterWriteMillis(), value.expireAfterAccessMillis()));
-        ValuePack v = checkEntry(old, null);
+    public void put(K key, Value<V> value) {
+        map.put(key, newEntry(key, value.get(), value.expireAfterWriteMillis(), value.expireAfterAccessMillis()));
         cleanUp();
-        return v == null ? null : v.value;
     }
 
     @Override
@@ -224,31 +219,27 @@ final class GcCache<K, V> implements GekCache<K, V> {
 
     @Override
     public void cleanUp() {
-        try {
-            while (true) {
-                Object x = queue.poll();
-                if (x == null) {
-                    break;
-                }
-                Entry<K, V> entry = Gek.as(x);
-                K key = entry.key();
-                map.compute(key, (k, v) -> {
-                    if (v == entry) {
-                        return null;
-                    }
-                    return v;
-                });
-                if (removeListener != null) {
-                    removeListener.onRemove(key, null, this);
-                }
+        while (true) {
+            Object x = queue.poll();
+            if (x == null) {
+                break;
             }
-        } finally {
-            //inCleanUp = false;
+            Entry<K, V> entry = Gek.as(x);
+            K key = entry.key();
+            map.compute(key, (k, v) -> {
+                if (v == entry) {
+                    return null;
+                }
+                return v;
+            });
+            if (removeListener != null) {
+                removeListener.onRemove(key, null, this);
+            }
         }
     }
 
     @Nullable
-    private GcCache<K, V>.ValuePack checkEntry(@Nullable Entry<K, V> entry, Boolean isWrite) {
+    private CacheImplV1<K, V>.ValuePack checkEntry(@Nullable Entry<K, V> entry, Boolean isWrite) {
         if (entry == null) {
             return null;
         }
@@ -284,7 +275,7 @@ final class GcCache<K, V> implements GekCache<K, V> {
 
         K key();
 
-        GcCache<K, V>.ValuePack value();
+        CacheImplV1<K, V>.ValuePack value();
 
         void clear();
     }

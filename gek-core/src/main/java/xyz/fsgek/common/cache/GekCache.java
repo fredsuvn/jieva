@@ -169,43 +169,36 @@ public interface GekCache<K, V> {
     boolean contains(K key);
 
     /**
-     * Puts the value associated with specified key,
-     * return old value or null if there is no old value or old value is expired.
+     * Puts or overrides the value associated with specified key.
      * <p>
      * This is a {@code put} operation.
      *
      * @param key   specified key
      * @param value the value
-     * @return old value or null
      */
-    V put(K key, V value);
+    void put(K key, V value);
 
     /**
-     * Puts the value associated with specified key and expiration in milliseconds of values which are written after
-     * once compute/put operation.
-     * return old value or null if there is no old value or old value is expired.
-     * The expiration can be -1 if set to default rule.
+     * Puts or overrides the value associated with specified key and expiration in milliseconds of values which are
+     * written after once compute/put operation. The expiration can be -1 if set to default rule.
      * <p>
      * This is a {@code put} operation.
      *
      * @param key                    specified key
      * @param value                  the value
      * @param expireAfterWriteMillis expiration in milliseconds after once writing
-     * @return old value or null
      */
-    V put(K key, V value, long expireAfterWriteMillis);
+    void put(K key, V value, long expireAfterWriteMillis);
 
     /**
-     * Puts the value wrapped by {@link Value} associated with specified key,
-     * return old value or null if there is no old value or old value is expired.
+     * Puts or overrides the value wrapped by {@link Value} associated with specified key.
      * <p>
      * This is a {@code put} operation.
      *
      * @param key   specified key
      * @param value the value wrapped by {@link Value}
-     * @return old value or null
      */
-    V put(K key, Value<V> value);
+    void put(K key, Value<V> value);
 
     /**
      * Sets expiration in milliseconds of values which are written after once compute/put operation for value
@@ -456,6 +449,9 @@ public interface GekCache<K, V> {
         private long expireAfterWrite = -1;
         private long expireAfterAccess = -1;
 
+        //Only for testing
+        private int version = 1;
+
         /**
          * Sets whether based on {@link SoftReference}, true for {@link SoftReference}, false for {@link WeakReference}.
          *
@@ -627,13 +623,23 @@ public interface GekCache<K, V> {
             return expireAfterAccess < 0 ? null : Duration.ofMillis(expireAfterAccess);
         }
 
+        public <K1 extends K, V1 extends V> Builder<K1, V1> v1() {
+            this.version = 1;
+            return Gek.as(this);
+        }
+
+        public <K1 extends K, V1 extends V> Builder<K1, V1> v2() {
+            this.version = 2;
+            return Gek.as(this);
+        }
+
         /**
          * Builds {@link GekCache}.
          *
          * @return built {@link GekCache}
          */
         public <K1 extends K, V1 extends V> GekCache<K1, V1> build() {
-            return Gek.as(new GcCache<>(this));
+            return Gek.as(version == 1 ? new CacheImplV1<>(this) : new CacheImplV2<>(this));
         }
     }
 }

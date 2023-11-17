@@ -7,6 +7,7 @@ import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
 import xyz.fsgek.common.cache.GekCache;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -55,7 +56,10 @@ public class CacheTest {
 
     @Test
     public void testCacheLoader() {
-        GekCache<Integer, String> gekCache = GekCache.softCache();
+        testCacheLoader(GekCache.softCache());
+    }
+
+    private void testCacheLoader(GekCache<Integer, String> gekCache) {
         Assert.assertNull(gekCache.get(1));
         Assert.assertEquals(gekCache.get(1, String::valueOf), "1");
         Assert.assertEquals(gekCache.get(1, String::valueOf), "1");
@@ -165,5 +169,18 @@ public class CacheTest {
         Assert.assertEquals(cache.get(3), 3);
         Thread.sleep(1001);
         Assert.assertNull(cache.get(3));
+
+        GekCache<Integer, Integer> cache2 = GekCache.newBuilder().expireAfterWrite(Duration.ofMillis(1000)).build();
+        cache2.put(1, 1);
+        Assert.assertEquals(cache2.get(1), 1);
+        Thread.sleep(1001);
+        Assert.assertNull(cache2.get(1));
+        cache2.put(2, 2);
+        cache2.expire(2, 1500);
+        Assert.assertEquals(cache2.get(2), 2);
+        Thread.sleep(1001);
+        Assert.assertEquals(cache2.get(2), 2);
+        Thread.sleep(501);
+        Assert.assertNull(cache2.get(2));
     }
 }
