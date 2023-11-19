@@ -24,7 +24,7 @@ public class CacheTest {
         testCache(GekCache.weakCache((k, v, c) -> {
             detected[0]++;
             c.cleanUp();
-        }), detected, "soft-cache");
+        }), detected, "weak-cache");
     }
 
     private void testCache(GekCache<Integer, String> cache, int[] detected, String name) {

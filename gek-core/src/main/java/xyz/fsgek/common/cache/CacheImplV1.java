@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -162,6 +163,7 @@ final class CacheImplV1<K, V> implements GekCache<K, V> {
         if (entry != null) {
             entry.clear();
         }
+        map.remove(key);
         cleanUp();
     }
 
@@ -225,16 +227,15 @@ final class CacheImplV1<K, V> implements GekCache<K, V> {
                 break;
             }
             Entry<K, V> entry = Gek.as(x);
+            entry.onRemove();
             K key = entry.key();
             map.compute(key, (k, v) -> {
                 if (v == entry) {
+                    v.onRemove();
                     return null;
                 }
                 return v;
             });
-            if (removeListener != null) {
-                removeListener.onRemove(key, null, this);
-            }
         }
     }
 
@@ -278,11 +279,14 @@ final class CacheImplV1<K, V> implements GekCache<K, V> {
         CacheImplV1<K, V>.ValuePack value();
 
         void clear();
+
+        void onRemove();
     }
 
     private final class SoftEntry extends SoftReference<ValuePack> implements Entry<K, V> {
 
         private final K key;
+        private final AtomicInteger counter = removeListener == null ? null : new AtomicInteger();
 
         public SoftEntry(K key, ValuePack referent) {
             super(referent, queue);
@@ -301,13 +305,27 @@ final class CacheImplV1<K, V> implements GekCache<K, V> {
 
         @Override
         public void clear() {
-            super.enqueue();
+            super.clear();
+            onRemove();
+        }
+
+        @Override
+        public void onRemove() {
+            if (counter == null) {
+                return;
+            }
+            int c = counter.getAndIncrement();
+            if (c > 0) {
+                return;
+            }
+            removeListener.onRemove(key, null, CacheImplV1.this);
         }
     }
 
     private final class WeakEntry extends WeakReference<ValuePack> implements Entry<K, V> {
 
         private final K key;
+        private final AtomicInteger counter = removeListener == null ? null : new AtomicInteger();
 
         public WeakEntry(K key, ValuePack referent) {
             super(referent, queue);
@@ -326,7 +344,20 @@ final class CacheImplV1<K, V> implements GekCache<K, V> {
 
         @Override
         public void clear() {
-            super.enqueue();
+            super.clear();
+            onRemove();
+        }
+
+        @Override
+        public void onRemove() {
+            if (counter == null) {
+                return;
+            }
+            int c = counter.getAndIncrement();
+            if (c > 0) {
+                return;
+            }
+            removeListener.onRemove(key, null, CacheImplV1.this);
         }
     }
 

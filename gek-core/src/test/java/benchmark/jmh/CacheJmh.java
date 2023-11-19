@@ -36,20 +36,32 @@ public class CacheJmh {
     @Setup(Level.Iteration)
     public void init() {
         System.out.println(">>>>>> init <<<<<<<<");
-        fsSoftCacheV1 = GekCache.newBuilder().useSoft(true).v1().build();
-        fsWeakCacheV1 = GekCache.newBuilder().useSoft(true).v1().build();
-        fsSoftCacheV2 = GekCache.newBuilder().useSoft(true).v2().build();
-        fsWeakCacheV2 = GekCache.newBuilder().useSoft(true).v2().build();
+        fsSoftCacheV1 = GekCache.newBuilder().useSoft(true).removeListener((k, v, c) -> {
+        }).v1().build();
+        fsWeakCacheV1 = GekCache.newBuilder().useSoft(true).removeListener((k, v, c) -> {
+        }).v1().build();
+        fsSoftCacheV2 = GekCache.newBuilder().useSoft(true).removeListener((k, v, c) -> {
+        }).v2().build();
+        fsWeakCacheV2 = GekCache.newBuilder().useSoft(true).removeListener((k, v, c) -> {
+        }).v2().build();
         guava = CacheBuilder.newBuilder()
+            .removalListener(n -> {
+            })
             .maximumSize(MAX / 3)
             .build();
         guavaSoft = CacheBuilder.newBuilder()
+            .removalListener(n -> {
+            })
             .softValues()
             .build();
         caffeine = Caffeine.newBuilder()
+            .removalListener((k, v, c) -> {
+            })
             .maximumSize(MAX / 3)
             .build();
         caffeineSoft = Caffeine.newBuilder()
+            .removalListener((k, v, c) -> {
+            })
             .softValues()
             .build();
         map = new ConcurrentHashMap<>(MAX / 3);
@@ -62,75 +74,190 @@ public class CacheJmh {
     @Benchmark
     @Threads(64)
     public void map(Blackhole bh) {
-        bh.consume(map.put(next(), next() + next()));
-        bh.consume(map.get(next()));
-        bh.consume(map.computeIfAbsent(next(), k -> k));
+        int value = next();
+        bh.consume(map.get(value));
+        map.put(value, value);
+        bh.consume(map.computeIfAbsent(value + 1, k -> k));
+        bh.consume(map.computeIfAbsent(value + 1, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void mapFull(Blackhole bh) {
+        int value = next();
+        bh.consume(map.get(value));
+        map.put(value, value);
+        map.remove(value);
+        bh.consume(map.computeIfAbsent(value, k -> k));
+        bh.consume(map.computeIfAbsent(value, k -> k));
     }
 
     @Benchmark
     @Threads(64)
     public void fsSoftV1(Blackhole bh) {
-        fsSoftCacheV1.put(next(), next() + next());
-        bh.consume(fsSoftCacheV1.get(next()));
-        bh.consume(fsSoftCacheV1.get(next(), k -> k));
+        int value = next();
+        bh.consume(fsSoftCacheV1.get(value));
+        fsSoftCacheV1.put(value, value);
+        bh.consume(fsSoftCacheV1.get(value + 1, k -> k));
+        bh.consume(fsSoftCacheV1.get(value + 1, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void fsSoftV1Full(Blackhole bh) {
+        int value = next();
+        bh.consume(fsSoftCacheV1.get(value));
+        fsSoftCacheV1.put(value, value);
+        fsSoftCacheV1.remove(value);
+        bh.consume(fsSoftCacheV1.get(value, k -> k));
+        bh.consume(fsSoftCacheV1.get(value, k -> k));
     }
 
     @Benchmark
     @Threads(64)
     public void fsWeakV1(Blackhole bh) {
-        fsWeakCacheV1.put(next(), next() + next());
-        bh.consume(fsWeakCacheV1.get(next()));
-        bh.consume(fsWeakCacheV1.get(next(), k -> k));
+        int value = next();
+        bh.consume(fsWeakCacheV1.get(value));
+        fsWeakCacheV1.put(value, value);
+        bh.consume(fsWeakCacheV1.get(value + 1, k -> k));
+        bh.consume(fsWeakCacheV1.get(value + 1, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void fsWeakV1Full(Blackhole bh) {
+        int value = next();
+        bh.consume(fsWeakCacheV1.get(value));
+        fsWeakCacheV1.put(value, value);
+        fsWeakCacheV1.remove(value);
+        bh.consume(fsWeakCacheV1.get(value, k -> k));
+        bh.consume(fsWeakCacheV1.get(value, k -> k));
     }
 
     @Benchmark
     @Threads(64)
     public void fsSoftV2(Blackhole bh) {
-        fsSoftCacheV2.put(next(), next() + next());
-        bh.consume(fsSoftCacheV2.get(next()));
-        bh.consume(fsSoftCacheV2.get(next(), k -> k));
+        int value = next();
+        bh.consume(fsSoftCacheV2.get(value));
+        fsSoftCacheV2.put(value, value);
+        bh.consume(fsSoftCacheV2.get(value + 1, k -> k));
+        bh.consume(fsSoftCacheV2.get(value + 1, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void fsSoftV2Full(Blackhole bh) {
+        int value = next();
+        bh.consume(fsSoftCacheV2.get(value));
+        fsSoftCacheV2.put(value, value);
+        fsSoftCacheV2.remove(value);
+        bh.consume(fsSoftCacheV2.get(value, k -> k));
+        bh.consume(fsSoftCacheV2.get(value, k -> k));
     }
 
     @Benchmark
     @Threads(64)
     public void fsWeakV2(Blackhole bh) {
-        fsWeakCacheV1.put(next(), next() + next());
-        bh.consume(fsWeakCacheV2.get(next()));
-        bh.consume(fsWeakCacheV2.get(next(), k -> k));
+        int value = next();
+        bh.consume(fsWeakCacheV2.get(value));
+        fsWeakCacheV2.put(value, value);
+        bh.consume(fsWeakCacheV2.get(value + 1, k -> k));
+        bh.consume(fsWeakCacheV2.get(value + 1, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void fsWeakV2Full(Blackhole bh) {
+        int value = next();
+        bh.consume(fsWeakCacheV2.get(value));
+        fsWeakCacheV2.put(value, value);
+        fsWeakCacheV2.remove(value);
+        bh.consume(fsWeakCacheV2.get(value, k -> k));
+        bh.consume(fsWeakCacheV2.get(value, k -> k));
     }
 
     @Benchmark
     @Threads(64)
     public void guava(Blackhole bh) throws ExecutionException {
-        guava.put(next(), next() + next());
-        bh.consume(guava.getIfPresent(next()));
-        int n = next();
-        bh.consume(guava.get(n, () -> n));
+        int value = next();
+        bh.consume(guava.getIfPresent(value));
+        guava.put(value, value);
+        bh.consume(guava.get(value + 1, () -> value));
+        bh.consume(guava.get(value + 1, () -> value));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void guavaFull(Blackhole bh) throws ExecutionException {
+        int value = next();
+        bh.consume(guava.getIfPresent(value));
+        guava.put(value, value);
+        guava.invalidate(value);
+        bh.consume(guava.get(value, () -> value));
+        bh.consume(guava.get(value, () -> value));
     }
 
     @Benchmark
     @Threads(64)
     public void guavaSoft(Blackhole bh) throws ExecutionException {
-        guavaSoft.put(next(), next() + next());
-        bh.consume(guavaSoft.getIfPresent(next()));
-        int n = next();
-        bh.consume(guavaSoft.get(n, () -> n));
+        int value = next();
+        bh.consume(guavaSoft.getIfPresent(value));
+        guavaSoft.put(value, value);
+        bh.consume(guavaSoft.get(value + 1, () -> value));
+        bh.consume(guavaSoft.get(value + 1, () -> value));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void guavaSoftFull(Blackhole bh) throws ExecutionException {
+        int value = next();
+        bh.consume(guavaSoft.getIfPresent(value));
+        guavaSoft.put(value, value);
+        guavaSoft.invalidate(value);
+        bh.consume(guavaSoft.get(value, () -> value));
+        bh.consume(guavaSoft.get(value, () -> value));
     }
 
     @Benchmark
     @Threads(64)
     public void caffeine(Blackhole bh) {
-        caffeine.put(next(), next() + next());
-        bh.consume(caffeine.getIfPresent(next()));
-        bh.consume(caffeine.get(next(), k -> k));
+        int value = next();
+        bh.consume(caffeine.getIfPresent(value));
+        caffeine.put(value, value);
+        bh.consume(caffeine.get(value + 1, k -> k));
+        bh.consume(caffeine.get(value + 1, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void caffeineFull(Blackhole bh) {
+        int value = next();
+        bh.consume(caffeine.getIfPresent(value));
+        caffeine.put(value, value);
+        caffeine.invalidate(value);
+        bh.consume(caffeine.get(value, k -> k));
+        bh.consume(caffeine.get(value, k -> k));
     }
 
     @Benchmark
     @Threads(64)
     public void caffeineSoft(Blackhole bh) {
-        caffeineSoft.put(next(), next() + next());
-        bh.consume(caffeineSoft.getIfPresent(next()));
-        bh.consume(caffeineSoft.get(next(), k -> k));
+        int value = next();
+        bh.consume(caffeineSoft.getIfPresent(value));
+        caffeineSoft.put(value, value);
+        bh.consume(caffeineSoft.get(value + 1, k -> k));
+        bh.consume(caffeineSoft.get(value + 1, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void caffeineSoftFull(Blackhole bh) {
+        int value = next();
+        bh.consume(caffeineSoft.getIfPresent(value));
+        caffeineSoft.put(value, value);
+        caffeineSoft.invalidate(value);
+        bh.consume(caffeineSoft.get(value, k -> k));
+        bh.consume(caffeineSoft.get(value, k -> k));
     }
 
     private int next() {

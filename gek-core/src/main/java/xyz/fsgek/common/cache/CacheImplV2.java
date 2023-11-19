@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -240,20 +241,15 @@ final class CacheImplV2<K, V> implements GekCache<K, V> {
             if (x == null) {
                 break;
             }
-            cleanUp0(Gek.as(x));
-        }
-    }
-
-    private void cleanUp0(Entry<K> entry) {
-        K key = entry.key();
-        map.compute(key, (k, v) -> {
-            if (v == entry) {
-                return null;
-            }
-            return v;
-        });
-        if (removeListener != null) {
-            removeListener.onRemove(key, null, this);
+            Entry<K> entry = Gek.as(x);
+            entry.onRemove();
+            K key = entry.key();
+            map.compute(key, (k, v) -> {
+                if (v == entry) {
+                    return null;
+                }
+                return v;
+            });
         }
     }
 
@@ -329,6 +325,8 @@ final class CacheImplV2<K, V> implements GekCache<K, V> {
         Object keepValue();
 
         void clearKeepValue();
+
+        void onRemove();
     }
 
     private final class SoftEntry extends SoftReference<Object> implements Entry<K> {
@@ -338,6 +336,7 @@ final class CacheImplV2<K, V> implements GekCache<K, V> {
         private long customExpireAfterAccess;
         private long expiredAt = -1;
         private Object keepValue;
+        private final AtomicInteger counter = removeListener == null ? null : new AtomicInteger();
 
         public SoftEntry(K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
             super(referent, queue);
@@ -359,7 +358,8 @@ final class CacheImplV2<K, V> implements GekCache<K, V> {
 
         @Override
         public void clear() {
-            super.enqueue();
+            super.clear();
+            onRemove();
         }
 
         public boolean isExpired() {
@@ -420,6 +420,18 @@ final class CacheImplV2<K, V> implements GekCache<K, V> {
         public void clearKeepValue() {
             keepValue = null;
         }
+
+        @Override
+        public void onRemove() {
+            if (counter == null) {
+                return;
+            }
+            int c = counter.getAndIncrement();
+            if (c > 0) {
+                return;
+            }
+            removeListener.onRemove(key, null, CacheImplV2.this);
+        }
     }
 
     private final class WeakEntry extends WeakReference<Object> implements Entry<K> {
@@ -429,6 +441,7 @@ final class CacheImplV2<K, V> implements GekCache<K, V> {
         private long customExpireAfterAccess;
         private long expiredAt = -1;
         private Object keepValue;
+        private final AtomicInteger counter = removeListener == null ? null : new AtomicInteger();
 
         public WeakEntry(K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
             super(referent, queue);
@@ -450,7 +463,8 @@ final class CacheImplV2<K, V> implements GekCache<K, V> {
 
         @Override
         public void clear() {
-            super.enqueue();
+            super.clear();
+            onRemove();
         }
 
         public boolean isExpired() {
@@ -510,6 +524,18 @@ final class CacheImplV2<K, V> implements GekCache<K, V> {
         @Override
         public void clearKeepValue() {
             keepValue = null;
+        }
+
+        @Override
+        public void onRemove() {
+            if (counter == null) {
+                return;
+            }
+            int c = counter.getAndIncrement();
+            if (c > 0) {
+                return;
+            }
+            removeListener.onRemove(key, null, CacheImplV2.this);
         }
     }
 
