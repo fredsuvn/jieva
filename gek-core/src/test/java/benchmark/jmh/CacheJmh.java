@@ -27,40 +27,52 @@ public class CacheJmh {
     private GekCache<Integer, Integer> fsWeak;
     private Cache<Integer, Integer> guava;
     private Cache<Integer, Integer> guavaSoft;
+    private Cache<Integer, Integer> guavaWeak;
     private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeine;
     private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeineSoft;
+    private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeineWeak;
     private Map<Integer, Integer> map;
 
     @Setup(Level.Iteration)
     public void init() {
         System.out.println(">>>>>> init <<<<<<<<");
         fsSoft = GekCache.newBuilder().useSoft(true)
-            //            .removeListener((k, v, c) -> {
-            //            })
+            .removeListener((k, v, c) -> {
+            })
             .build();
         fsWeak = GekCache.newBuilder().useSoft(false)
-            //            .removeListener((k, v, c) -> {
-            //            })
+            .removeListener((k, v, c) -> {
+            })
             .build();
         guava = CacheBuilder.newBuilder()
-            //            .removalListener(n -> {
-            //            })
+            .removalListener(n -> {
+            })
             .maximumSize(MAX / 3)
             .build();
         guavaSoft = CacheBuilder.newBuilder()
-            //            .removalListener(n -> {
-            //            })
+            .removalListener(n -> {
+            })
             .softValues()
             .build();
+        guavaWeak = CacheBuilder.newBuilder()
+            .removalListener(n -> {
+            })
+            .weakValues()
+            .build();
         caffeine = Caffeine.newBuilder()
-            //            .removalListener((k, v, c) -> {
-            //            })
+            .removalListener((k, v, c) -> {
+            })
             .maximumSize(MAX / 3)
             .build();
         caffeineSoft = Caffeine.newBuilder()
-            //            .removalListener((k, v, c) -> {
-            //            })
+            .removalListener((k, v, c) -> {
+            })
             .softValues()
+            .build();
+        caffeineWeak = Caffeine.newBuilder()
+            .removalListener((k, v, c) -> {
+            })
+            .weakValues()
             .build();
         map = new ConcurrentHashMap<>(MAX / 3);
     }
@@ -92,7 +104,7 @@ public class CacheJmh {
         int value = next();
         bh.consume(fsSoft.get(value));
         fsSoft.put(value, value);
-        bh.consume(fsSoft.get(value + 1, k -> null));
+        bh.consume(fsSoft.get(value + 1, k -> k));
         bh.consume(fsSoft.get(value + 1, k -> k));
     }
 
@@ -103,7 +115,7 @@ public class CacheJmh {
         bh.consume(fsSoft.get(value));
         fsSoft.put(value, value);
         fsSoft.remove(value);
-        bh.consume(fsSoft.get(value, k -> null));
+        bh.consume(fsSoft.get(value, k -> k));
         bh.consume(fsSoft.get(value, k -> k));
     }
 
@@ -113,7 +125,7 @@ public class CacheJmh {
         int value = next();
         bh.consume(fsWeak.get(value));
         fsWeak.put(value, value);
-        bh.consume(fsWeak.get(value + 1, k -> null));
+        bh.consume(fsWeak.get(value + 1, k -> k));
         bh.consume(fsWeak.get(value + 1, k -> k));
     }
 
@@ -124,7 +136,7 @@ public class CacheJmh {
         bh.consume(fsWeak.get(value));
         fsWeak.put(value, value);
         fsWeak.remove(value);
-        bh.consume(fsWeak.get(value, k -> null));
+        bh.consume(fsWeak.get(value, k -> k));
         bh.consume(fsWeak.get(value, k -> k));
     }
 
@@ -172,6 +184,27 @@ public class CacheJmh {
 
     @Benchmark
     @Threads(64)
+    public void guavaWeak(Blackhole bh) throws ExecutionException {
+        int value = next();
+        bh.consume(guavaWeak.getIfPresent(value));
+        guavaWeak.put(value, value);
+        bh.consume(guavaWeak.get(value + 1, () -> value));
+        bh.consume(guavaWeak.get(value + 1, () -> value));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void guavaWeakFull(Blackhole bh) throws ExecutionException {
+        int value = next();
+        bh.consume(guavaWeak.getIfPresent(value));
+        guavaWeak.put(value, value);
+        guavaWeak.invalidate(value);
+        bh.consume(guavaWeak.get(value, () -> value));
+        bh.consume(guavaWeak.get(value, () -> value));
+    }
+
+    @Benchmark
+    @Threads(64)
     public void caffeine(Blackhole bh) {
         int value = next();
         bh.consume(caffeine.getIfPresent(value));
@@ -210,6 +243,27 @@ public class CacheJmh {
         caffeineSoft.invalidate(value);
         bh.consume(caffeineSoft.get(value, k -> k));
         bh.consume(caffeineSoft.get(value, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void caffeineWeak(Blackhole bh) {
+        int value = next();
+        bh.consume(caffeineWeak.getIfPresent(value));
+        caffeineWeak.put(value, value);
+        bh.consume(caffeineWeak.get(value + 1, k -> k));
+        bh.consume(caffeineWeak.get(value + 1, k -> k));
+    }
+
+    @Benchmark
+    @Threads(64)
+    public void caffeineWeakFull(Blackhole bh) {
+        int value = next();
+        bh.consume(caffeineWeak.getIfPresent(value));
+        caffeineWeak.put(value, value);
+        caffeineWeak.invalidate(value);
+        bh.consume(caffeineWeak.get(value, k -> k));
+        bh.consume(caffeineWeak.get(value, k -> k));
     }
 
     private int next() {
