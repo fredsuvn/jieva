@@ -449,9 +449,6 @@ public interface GekCache<K, V> {
         private long expireAfterWrite = -1;
         private long expireAfterAccess = -1;
 
-        //Only for testing
-        private int version = 1;
-
         /**
          * Sets whether based on {@link SoftReference}, true for {@link SoftReference}, false for {@link WeakReference}.
          *
@@ -623,23 +620,15 @@ public interface GekCache<K, V> {
             return expireAfterAccess < 0 ? null : Duration.ofMillis(expireAfterAccess);
         }
 
-        public <K1 extends K, V1 extends V> Builder<K1, V1> v1() {
-            this.version = 1;
-            return Gek.as(this);
-        }
-
-        public <K1 extends K, V1 extends V> Builder<K1, V1> v2() {
-            this.version = 2;
-            return Gek.as(this);
-        }
-
         /**
          * Builds {@link GekCache}.
          *
          * @return built {@link GekCache}
          */
         public <K1 extends K, V1 extends V> GekCache<K1, V1> build() {
-            return Gek.as(version == 1 ? new CacheImplV1<>(this) : new CacheImplV2<>(this));
+            return Gek.as(
+                removeListener == null ?
+                    new CacheImpl.UnListenedCacheImpl<>(this) : new CacheImpl.ListenedCacheImpl<>(this));
         }
     }
 }

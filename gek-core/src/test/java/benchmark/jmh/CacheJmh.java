@@ -23,10 +23,8 @@ public class CacheJmh {
 
     private static final int MAX = 1024 * 100;
 
-    private GekCache<Integer, Integer> fsSoftCacheV1;
-    private GekCache<Integer, Integer> fsWeakCacheV1;
-    private GekCache<Integer, Integer> fsSoftCacheV2;
-    private GekCache<Integer, Integer> fsWeakCacheV2;
+    private GekCache<Integer, Integer> fsSoft;
+    private GekCache<Integer, Integer> fsWeak;
     private Cache<Integer, Integer> guava;
     private Cache<Integer, Integer> guavaSoft;
     private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeine;
@@ -36,39 +34,35 @@ public class CacheJmh {
     @Setup(Level.Iteration)
     public void init() {
         System.out.println(">>>>>> init <<<<<<<<");
-        fsSoftCacheV1 = GekCache.newBuilder().useSoft(true).removeListener((k, v, c) -> {
-        }).v1().build();
-        fsWeakCacheV1 = GekCache.newBuilder().useSoft(true).removeListener((k, v, c) -> {
-        }).v1().build();
-        fsSoftCacheV2 = GekCache.newBuilder().useSoft(true).removeListener((k, v, c) -> {
-        }).v2().build();
-        fsWeakCacheV2 = GekCache.newBuilder().useSoft(true).removeListener((k, v, c) -> {
-        }).v2().build();
+        fsSoft = GekCache.newBuilder().useSoft(true)
+            //            .removeListener((k, v, c) -> {
+            //            })
+            .build();
+        fsWeak = GekCache.newBuilder().useSoft(false)
+            //            .removeListener((k, v, c) -> {
+            //            })
+            .build();
         guava = CacheBuilder.newBuilder()
-            .removalListener(n -> {
-            })
+            //            .removalListener(n -> {
+            //            })
             .maximumSize(MAX / 3)
             .build();
         guavaSoft = CacheBuilder.newBuilder()
-            .removalListener(n -> {
-            })
+            //            .removalListener(n -> {
+            //            })
             .softValues()
             .build();
         caffeine = Caffeine.newBuilder()
-            .removalListener((k, v, c) -> {
-            })
+            //            .removalListener((k, v, c) -> {
+            //            })
             .maximumSize(MAX / 3)
             .build();
         caffeineSoft = Caffeine.newBuilder()
-            .removalListener((k, v, c) -> {
-            })
+            //            .removalListener((k, v, c) -> {
+            //            })
             .softValues()
             .build();
         map = new ConcurrentHashMap<>(MAX / 3);
-        System.out.println("fsSoftCacheV1: " + fsSoftCacheV1.getClass());
-        System.out.println("fsWeakCacheV1: " + fsWeakCacheV1.getClass());
-        System.out.println("fsSoftCacheV2: " + fsSoftCacheV2.getClass());
-        System.out.println("fsWeakCacheV2: " + fsWeakCacheV2.getClass());
     }
 
     @Benchmark
@@ -94,86 +88,44 @@ public class CacheJmh {
 
     @Benchmark
     @Threads(64)
-    public void fsSoftV1(Blackhole bh) {
+    public void fsSoft(Blackhole bh) {
         int value = next();
-        bh.consume(fsSoftCacheV1.get(value));
-        fsSoftCacheV1.put(value, value);
-        bh.consume(fsSoftCacheV1.get(value + 1, k -> k));
-        bh.consume(fsSoftCacheV1.get(value + 1, k -> k));
+        bh.consume(fsSoft.get(value));
+        fsSoft.put(value, value);
+        bh.consume(fsSoft.get(value + 1, k -> null));
+        bh.consume(fsSoft.get(value + 1, k -> k));
     }
 
     @Benchmark
     @Threads(64)
-    public void fsSoftV1Full(Blackhole bh) {
+    public void fsSoftFull(Blackhole bh) {
         int value = next();
-        bh.consume(fsSoftCacheV1.get(value));
-        fsSoftCacheV1.put(value, value);
-        fsSoftCacheV1.remove(value);
-        bh.consume(fsSoftCacheV1.get(value, k -> k));
-        bh.consume(fsSoftCacheV1.get(value, k -> k));
+        bh.consume(fsSoft.get(value));
+        fsSoft.put(value, value);
+        fsSoft.remove(value);
+        bh.consume(fsSoft.get(value, k -> null));
+        bh.consume(fsSoft.get(value, k -> k));
     }
 
     @Benchmark
     @Threads(64)
-    public void fsWeakV1(Blackhole bh) {
+    public void fsWeak(Blackhole bh) {
         int value = next();
-        bh.consume(fsWeakCacheV1.get(value));
-        fsWeakCacheV1.put(value, value);
-        bh.consume(fsWeakCacheV1.get(value + 1, k -> k));
-        bh.consume(fsWeakCacheV1.get(value + 1, k -> k));
+        bh.consume(fsWeak.get(value));
+        fsWeak.put(value, value);
+        bh.consume(fsWeak.get(value + 1, k -> null));
+        bh.consume(fsWeak.get(value + 1, k -> k));
     }
 
     @Benchmark
     @Threads(64)
-    public void fsWeakV1Full(Blackhole bh) {
+    public void fsWeakFull(Blackhole bh) {
         int value = next();
-        bh.consume(fsWeakCacheV1.get(value));
-        fsWeakCacheV1.put(value, value);
-        fsWeakCacheV1.remove(value);
-        bh.consume(fsWeakCacheV1.get(value, k -> k));
-        bh.consume(fsWeakCacheV1.get(value, k -> k));
-    }
-
-    @Benchmark
-    @Threads(64)
-    public void fsSoftV2(Blackhole bh) {
-        int value = next();
-        bh.consume(fsSoftCacheV2.get(value));
-        fsSoftCacheV2.put(value, value);
-        bh.consume(fsSoftCacheV2.get(value + 1, k -> k));
-        bh.consume(fsSoftCacheV2.get(value + 1, k -> k));
-    }
-
-    @Benchmark
-    @Threads(64)
-    public void fsSoftV2Full(Blackhole bh) {
-        int value = next();
-        bh.consume(fsSoftCacheV2.get(value));
-        fsSoftCacheV2.put(value, value);
-        fsSoftCacheV2.remove(value);
-        bh.consume(fsSoftCacheV2.get(value, k -> k));
-        bh.consume(fsSoftCacheV2.get(value, k -> k));
-    }
-
-    @Benchmark
-    @Threads(64)
-    public void fsWeakV2(Blackhole bh) {
-        int value = next();
-        bh.consume(fsWeakCacheV2.get(value));
-        fsWeakCacheV2.put(value, value);
-        bh.consume(fsWeakCacheV2.get(value + 1, k -> k));
-        bh.consume(fsWeakCacheV2.get(value + 1, k -> k));
-    }
-
-    @Benchmark
-    @Threads(64)
-    public void fsWeakV2Full(Blackhole bh) {
-        int value = next();
-        bh.consume(fsWeakCacheV2.get(value));
-        fsWeakCacheV2.put(value, value);
-        fsWeakCacheV2.remove(value);
-        bh.consume(fsWeakCacheV2.get(value, k -> k));
-        bh.consume(fsWeakCacheV2.get(value, k -> k));
+        bh.consume(fsWeak.get(value));
+        fsWeak.put(value, value);
+        fsWeak.remove(value);
+        bh.consume(fsWeak.get(value, k -> null));
+        bh.consume(fsWeak.get(value, k -> k));
     }
 
     @Benchmark
