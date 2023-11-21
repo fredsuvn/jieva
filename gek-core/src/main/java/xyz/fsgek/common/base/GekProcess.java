@@ -1,15 +1,17 @@
 package xyz.fsgek.common.base;
 
-import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.io.GekIOConfigurer;
 import xyz.fsgek.common.io.GekIOException;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * This class is used to start a {@link Process} in method chaining:
@@ -26,7 +28,7 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
     private Object output;
     private Object errorOutput;
     private File directory;
-    private Map<String, String> environment;
+    private ProcessBuilder builder;
 
     /**
      * Sets command.
@@ -99,6 +101,17 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
         return this;
     }
 
+    /**
+     * Sets input to given redirect.
+     *
+     * @param redirect given redirect
+     * @return this
+     */
+    public GekProcess input(ProcessBuilder.Redirect redirect) {
+        this.input = redirect;
+        return this;
+    }
+
     @Override
     public GekProcess output(byte[] array) {
         this.output = array;
@@ -136,6 +149,17 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
      */
     public GekProcess output(Path file) {
         this.output = file;
+        return this;
+    }
+
+    /**
+     * Sets output to given redirect.
+     *
+     * @param redirect given redirect
+     * @return this
+     */
+    public GekProcess output(ProcessBuilder.Redirect redirect) {
+        this.output = redirect;
         return this;
     }
 
@@ -212,6 +236,18 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
     }
 
     /**
+     * Sets error output to given redirect.
+     * The error output can be same with output, in this case both output will be written into same destination.
+     *
+     * @param redirect given redirect
+     * @return this
+     */
+    public GekProcess errorOutput(ProcessBuilder.Redirect redirect) {
+        this.errorOutput = redirect;
+        return this;
+    }
+
+    /**
      * Sets directory where the process works.
      *
      * @param directory directory where the process works
@@ -244,42 +280,49 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
 
     /**
      * Sets environment where the process works.
+     * This method provides default environment map into parameter of {@link Consumer}, the map is independent for each
+     * process and can be modified.
      *
-     * @param environment environment where the process works
+     * @param envConsumer environment where the process works
      * @return this
      */
-    public GekProcess environment(Map<String, String> environment) {
-        this.environment = environment;
+    public GekProcess environment(Consumer<Map<String, String>> envConsumer) {
+        envConsumer.accept(processBuilder().environment());
         return this;
     }
 
     /**
-     * Starts and returns configured process.
+     * Starts and returns configured process which is started.
+     * If the process's input, output or error output is redirected to an array, buffer or stream, current thread will
+     * be blocked to read/write stream from the process until the process ends.
+     * However, if redirected to files, this method will return immediately after starting process.
      *
      * @return the process which is started
      * @throws GekIOException IO exception
      */
-    public Process start() throws GekIOException{
+    public Process start() throws GekIOException {
         if (GekArray.isEmpty(command)) {
             throw new IllegalArgumentException("No command.");
         }
         try {
-            return GekColl.isEmpty(environment) ? startWithProcessBuilder() : startWithRuntime();
+            return startWithProcessBuilder();
         } catch (Exception e) {
             throw new GekIOException(e);
         }
     }
 
     private Process startWithProcessBuilder() throws IOException {
-        ProcessBuilder builder = new ProcessBuilder();
+        ProcessBuilder builder = processBuilder();
         builder.command(command);
         if (directory != null) {
             builder.directory(directory);
         }
         InputStream in = null;
         if (input != null) {
-            if (input instanceof File) {
-                builder.redirectInput((File)input);
+            if (input instanceof ProcessBuilder.Redirect) {
+                builder.redirectInput((ProcessBuilder.Redirect) input);
+            } else if (input instanceof File) {
+                builder.redirectInput((File) input);
             } else if (input instanceof Path) {
                 builder.redirectInput(((Path) input).toFile());
             } else {
@@ -289,41 +332,52 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
         }
         OutputStream out = null;
         if (output != null) {
-            if (output instanceof File) {
-                builder.redirectOutput((File)output);
+            if (output instanceof ProcessBuilder.Redirect) {
+                builder.redirectOutput((ProcessBuilder.Redirect) output);
+            } else if (output instanceof File) {
+                builder.redirectOutput((File) output);
             } else if (output instanceof Path) {
                 builder.redirectOutput(((Path) output).toFile());
             } else {
                 out = outputToStream(output);
-                builder.redirectOutput(ProcessBuilder.Redirect.);
+                builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
             }
         }
         OutputStream err = null;
         if (errorOutput != null) {
-            if (Objects.equals(errorOutput, output)){
+            if (Objects.equals(errorOutput, output)) {
                 builder.redirectErrorStream(true);
+            }
+            if (errorOutput instanceof ProcessBuilder.Redirect) {
+                builder.redirectError((ProcessBuilder.Redirect) errorOutput);
+            } else if (errorOutput instanceof File) {
+                builder.redirectError((File) errorOutput);
+            } else if (errorOutput instanceof Path) {
+                builder.redirectError(((Path) errorOutput).toFile());
             } else {
                 err = outputToStream(errorOutput);
-                builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+                builder.redirectError(ProcessBuilder.Redirect.PIPE);
             }
         }
         Process process = builder.start();
         if (in != null) {
             GekIO.readTo(in, process.getOutputStream());
         }
+        if (out != null) {
+            GekIO.readTo(process.getInputStream(), out);
+        }
+        if (err != null) {
+            GekIO.readTo(process.getErrorStream(), out);
+        }
         return process;
-    }
-
-    private Process startWithRuntime() {
-
     }
 
     private InputStream inputToStream() {
         if (input instanceof byte[]) {
-            return GekIO.toInputStream((byte[])input);
+            return GekIO.toInputStream((byte[]) input);
         }
         if (input instanceof ByteBuffer) {
-            return GekIO.toInputStream((ByteBuffer)input);
+            return GekIO.toInputStream((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return (InputStream) input;
@@ -333,14 +387,21 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
 
     private OutputStream outputToStream(Object out) {
         if (out instanceof byte[]) {
-            return GekIO.toOutputStream((byte[])out);
+            return GekIO.toOutputStream((byte[]) out);
         }
         if (out instanceof ByteBuffer) {
-            return GekIO.toOutputStream((ByteBuffer)out);
+            return GekIO.toOutputStream((ByteBuffer) out);
         }
         if (out instanceof OutputStream) {
             return (OutputStream) out;
         }
         throw new IllegalArgumentException("Error output type: " + out.getClass());
+    }
+
+    private ProcessBuilder processBuilder() {
+        if (builder == null) {
+            builder = new ProcessBuilder();
+        }
+        return builder;
     }
 }

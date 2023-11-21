@@ -633,4 +633,8 @@ public class Gek {
     public static long countBlock(long totalSize, long blockSize) {
         return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
     }
+
+    public static GekProcess start() {
+
+    }
 }
