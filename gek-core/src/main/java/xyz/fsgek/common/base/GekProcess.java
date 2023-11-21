@@ -1,128 +1,346 @@
 package xyz.fsgek.common.base;
 
 import xyz.fsgek.annotations.Nullable;
+import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.io.GekIOConfigurer;
+import xyz.fsgek.common.io.GekIOException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.util.*;
 
 /**
- * Utilities for process.
+ * This class is used to start a {@link Process} in method chaining:
+ * <pre>
+ *     process.input(in).output(out).start();
+ * </pre>
  *
  * @author fredsuvn
  */
-public class GekProcess {
+public class GekProcess implements GekIOConfigurer<GekProcess> {
+
+    private List<String> command;
+    private Object input;
+    private Object output;
+    private Object errorOutput;
+    private File directory;
+    private Map<String, String> environment;
 
     /**
-     * Starts a process with given command.
+     * Sets command.
      *
-     * @param cmd given command
-     * @return the process
+     * @param command command
+     * @return this
      */
-    public static Process start(String cmd) {
-        String[] splits = cmd.split(" ");
-        List<String> actualCmd = Arrays.stream(splits)
-            .filter(GekString::isNotBlank)
-            .map(String::trim)
-            .collect(Collectors.toList());
-        return start(false, actualCmd);
+    public GekProcess command(String command) {
+        return command(Collections.singletonList(command));
     }
 
     /**
-     * Starts a process with given command.
+     * Sets command.
      *
-     * @param cmd given command
-     * @return the process
+     * @param command command
+     * @return this
      */
-    public static Process start(String... cmd) {
-        return start(false, cmd);
+    public GekProcess command(String... command) {
+        return command(Arrays.asList(command));
     }
 
     /**
-     * Starts a process with given command and whether redirect error stream.
+     * Sets command.
      *
-     * @param redirectErrorStream whether redirect error stream
-     * @param cmd                 given command
-     * @return the process
+     * @param command command
+     * @return this
      */
-    public static Process start(boolean redirectErrorStream, String... cmd) {
-        return start(redirectErrorStream, Arrays.asList(cmd));
+    public GekProcess command(List<String> command) {
+        this.command = command;
+        return this;
+    }
+
+    @Override
+    public GekProcess input(byte[] array) {
+        this.input = array;
+        return this;
+    }
+
+    @Override
+    public GekProcess input(ByteBuffer buffer) {
+        this.input = buffer;
+        return this;
+    }
+
+    @Override
+    public GekProcess input(InputStream in) {
+        this.input = in;
+        return this;
     }
 
     /**
-     * Starts a process with given command and whether redirect error stream.
+     * Sets input to given file.
      *
-     * @param redirectErrorStream whether redirect error stream
-     * @param cmd                 given command
-     * @return the process
+     * @param file given file
+     * @return this
      */
-    public static Process start(boolean redirectErrorStream, List<String> cmd) {
-        return start(null, null, redirectErrorStream, cmd);
+    public GekProcess input(File file) {
+        this.input = file;
+        return this;
     }
 
     /**
-     * Starts a process with given command, given environment, given directory file, and whether redirect error stream.
+     * Sets input to given file.
      *
-     * @param env                 given environment
-     * @param dir                 given directory file
-     * @param redirectErrorStream whether redirect error stream
-     * @param cmd                 given command
-     * @return the process
+     * @param file given file
+     * @return this
      */
-    public static Process start(
-        @Nullable Map<String, String> env,
-        @Nullable File dir,
-        boolean redirectErrorStream,
-        List<String> cmd
-    ) {
-        ProcessBuilder builder = buildProcess(env, dir, redirectErrorStream);
-        builder.command(cmd);
+    public GekProcess input(Path file) {
+        this.input = file;
+        return this;
+    }
+
+    @Override
+    public GekProcess output(byte[] array) {
+        this.output = array;
+        return this;
+    }
+
+    @Override
+    public GekProcess output(ByteBuffer buffer) {
+        this.output = buffer;
+        return this;
+    }
+
+    @Override
+    public GekProcess output(OutputStream out) {
+        this.output = out;
+        return this;
+    }
+
+    /**
+     * Sets output to given file.
+     *
+     * @param file given file
+     * @return this
+     */
+    public GekProcess output(File file) {
+        this.output = file;
+        return this;
+    }
+
+    /**
+     * Sets output to given file.
+     *
+     * @param file given file
+     * @return this
+     */
+    public GekProcess output(Path file) {
+        this.output = file;
+        return this;
+    }
+
+    /**
+     * Sets error output to given array.
+     * The error output can be same with output, in this case both output will be written into same destination.
+     *
+     * @param array given array
+     * @return this
+     */
+    public GekProcess errorOutput(byte[] array) {
+        this.errorOutput = array;
+        return this;
+    }
+
+    /**
+     * Sets error output to given array, starting from given offset.
+     * The error output can be same with output, in this case both output will be written into same destination.
+     *
+     * @param array  given array
+     * @param offset given offset
+     * @return this
+     */
+    public GekProcess errorOutput(byte[] array, int offset) {
+        return errorOutput(ByteBuffer.wrap(array, offset, array.length - offset));
+    }
+
+    /**
+     * Sets error output to given buffer.
+     * The error output can be same with output, in this case both output will be written into same destination.
+     *
+     * @param buffer given buffer
+     * @return this
+     */
+    public GekProcess errorOutput(ByteBuffer buffer) {
+        this.errorOutput = buffer;
+        return this;
+    }
+
+    /**
+     * Sets error output to given output stream.
+     * The error output can be same with output, in this case both output will be written into same destination.
+     *
+     * @param out given output stream
+     * @return this
+     */
+    public GekProcess errorOutput(OutputStream out) {
+        this.errorOutput = out;
+        return this;
+    }
+
+    /**
+     * Sets error output to given file.
+     * The error output can be same with output, in this case both output will be written into same destination.
+     *
+     * @param file given file
+     * @return this
+     */
+    public GekProcess errorOutput(File file) {
+        this.errorOutput = file;
+        return this;
+    }
+
+    /**
+     * Sets error output to given file.
+     * The error output can be same with output, in this case both output will be written into same destination.
+     *
+     * @param file given file
+     * @return this
+     */
+    public GekProcess errorOutput(Path file) {
+        this.errorOutput = file;
+        return this;
+    }
+
+    /**
+     * Sets directory where the process works.
+     *
+     * @param directory directory where the process works
+     * @return this
+     */
+    public GekProcess directory(String directory) {
+        return directory(new File(directory));
+    }
+
+    /**
+     * Sets directory where the process works.
+     *
+     * @param directory directory where the process works
+     * @return this
+     */
+    public GekProcess directory(Path directory) {
+        return directory(directory.toFile());
+    }
+
+    /**
+     * Sets directory where the process works.
+     *
+     * @param directory directory where the process works
+     * @return this
+     */
+    public GekProcess directory(File directory) {
+        this.directory = directory;
+        return this;
+    }
+
+    /**
+     * Sets environment where the process works.
+     *
+     * @param environment environment where the process works
+     * @return this
+     */
+    public GekProcess environment(Map<String, String> environment) {
+        this.environment = environment;
+        return this;
+    }
+
+    /**
+     * Starts and returns configured process.
+     *
+     * @return the process which is started
+     * @throws GekIOException IO exception
+     */
+    public Process start() throws GekIOException{
+        if (GekArray.isEmpty(command)) {
+            throw new IllegalArgumentException("No command.");
+        }
         try {
-            return builder.start();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+            return GekColl.isEmpty(environment) ? startWithProcessBuilder() : startWithRuntime();
+        } catch (Exception e) {
+            throw new GekIOException(e);
         }
     }
 
-    /**
-     * Starts a process with given command, given environment, given directory file, and whether redirect error stream.
-     *
-     * @param env                 given environment
-     * @param dir                 given directory file
-     * @param redirectErrorStream whether redirect error stream
-     * @param cmd                 given command
-     * @return the process
-     */
-    public static Process start(
-        @Nullable Map<String, String> env,
-        @Nullable File dir,
-        boolean redirectErrorStream,
-        String... cmd
-    ) {
-        ProcessBuilder builder = buildProcess(env, dir, redirectErrorStream);
-        builder.command(cmd);
-        try {
-            return builder.start();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private static ProcessBuilder buildProcess(
-        @Nullable Map<String, String> env, @Nullable File dir, boolean redirectErrorStream) {
+    private Process startWithProcessBuilder() throws IOException {
         ProcessBuilder builder = new ProcessBuilder();
-        if (env != null) {
-            builder.environment().putAll(env);
+        builder.command(command);
+        if (directory != null) {
+            builder.directory(directory);
         }
-        if (dir != null) {
-            builder.directory(dir);
+        InputStream in = null;
+        if (input != null) {
+            if (input instanceof File) {
+                builder.redirectInput((File)input);
+            } else if (input instanceof Path) {
+                builder.redirectInput(((Path) input).toFile());
+            } else {
+                in = inputToStream();
+                builder.redirectInput(ProcessBuilder.Redirect.PIPE);
+            }
         }
-        if (redirectErrorStream) {
-            builder.redirectErrorStream(true);
+        OutputStream out = null;
+        if (output != null) {
+            if (output instanceof File) {
+                builder.redirectOutput((File)output);
+            } else if (output instanceof Path) {
+                builder.redirectOutput(((Path) output).toFile());
+            } else {
+                out = outputToStream(output);
+                builder.redirectOutput(ProcessBuilder.Redirect.);
+            }
         }
-        return builder;
+        OutputStream err = null;
+        if (errorOutput != null) {
+            if (Objects.equals(errorOutput, output)){
+                builder.redirectErrorStream(true);
+            } else {
+                err = outputToStream(errorOutput);
+                builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+            }
+        }
+        Process process = builder.start();
+        if (in != null) {
+            GekIO.readTo(in, process.getOutputStream());
+        }
+        return process;
+    }
+
+    private Process startWithRuntime() {
+
+    }
+
+    private InputStream inputToStream() {
+        if (input instanceof byte[]) {
+            return GekIO.toInputStream((byte[])input);
+        }
+        if (input instanceof ByteBuffer) {
+            return GekIO.toInputStream((ByteBuffer)input);
+        }
+        if (input instanceof InputStream) {
+            return (InputStream) input;
+        }
+        throw new IllegalArgumentException("Error input type: " + input.getClass());
+    }
+
+    private OutputStream outputToStream(Object out) {
+        if (out instanceof byte[]) {
+            return GekIO.toOutputStream((byte[])out);
+        }
+        if (out instanceof ByteBuffer) {
+            return GekIO.toOutputStream((ByteBuffer)out);
+        }
+        if (out instanceof OutputStream) {
+            return (OutputStream) out;
+        }
+        throw new IllegalArgumentException("Error output type: " + out.getClass());
     }
 }

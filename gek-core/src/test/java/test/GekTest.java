@@ -71,7 +71,7 @@ public class GekTest {
 
     @Test
     public void testPing() throws InterruptedException {
-        Process process = GekProcess.start("ping", "-n", "5", "127.0.0.1");
+        Process process = GekProcessExt.start("ping", "-n", "5", "127.0.0.1");
         Semaphore semaphore = new Semaphore(1);
         semaphore.acquire();
         GekThread.start(() -> {
@@ -95,7 +95,7 @@ public class GekTest {
     }
 
     private void testEcho(String command) throws InterruptedException {
-        Process process = GekProcess.start(command);
+        Process process = GekProcessExt.start(command);
         process.waitFor();
         String output = GekIO.avalaibleString(process.getInputStream(), GekChars.nativeCharset());
         GekLogger.defaultLogger().info(output);
