@@ -2,8 +2,8 @@ package xyz.fsgek.common.codec;
 
 import org.springframework.core.codec.CodecException;
 import xyz.fsgek.common.base.GekChars;
-import xyz.fsgek.common.data.GekDataProcess;
 import xyz.fsgek.common.io.GekIO;
+import xyz.fsgek.common.io.GekIOProcess;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,11 +12,11 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 /**
- * Hex implementation of {@link GekDataProcess} to encode/decode HEX.
+ * Hex implementation of {@link GekIOProcess} to encode/decode HEX.
  *
  * @author fredsuvn
  */
-public class HexCodec implements GekDataProcess<HexCodec> {
+public class HexCodec implements CodecProcess<HexCodec> {
 
     private static final int ENCODE_MODE = 0;
     private static final int DECODE_MODE = 1;

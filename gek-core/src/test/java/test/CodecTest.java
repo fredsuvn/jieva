@@ -6,8 +6,8 @@ import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.codec.CipherCodec;
+import xyz.fsgek.common.codec.CodecProcess;
 import xyz.fsgek.common.codec.GekCodec;
-import xyz.fsgek.common.data.GekDataProcess;
 import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.Cipher;
@@ -292,7 +292,7 @@ public class CodecTest {
     }
 
     private void testEncodeCodec(
-        GekDataProcess<?> codec, String source, String dest, boolean encode) {
+        CodecProcess<?> codec, String source, String dest, boolean encode) {
         byte[] srcBytes = encode ? GekString.encode(source) : GekString.encode(source, StandardCharsets.ISO_8859_1);
         byte[] destBytes = encode ? GekString.encode(dest, StandardCharsets.ISO_8859_1) : GekString.encode(dest);
         byte[] srcBytesPadding = padBytes(srcBytes, 10);
