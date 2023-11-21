@@ -634,7 +634,12 @@ public class Gek {
         return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
     }
 
-    public static GekProcess start() {
-
+    /**
+     * Returns a new {@link Process} configurer to start a sub-process.
+     *
+     * @return a new {@link Process} configurer to start a sub-process
+     */
+    public static GekProcess process() {
+        return new GekProcess();
     }
 }

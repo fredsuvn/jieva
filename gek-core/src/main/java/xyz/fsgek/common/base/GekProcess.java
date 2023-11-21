@@ -1,5 +1,6 @@
 package xyz.fsgek.common.base;
 
+import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.io.GekIOConfigurer;
 import xyz.fsgek.common.io.GekIOException;
@@ -10,11 +11,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * This class is used to start a {@link Process} in method chaining:
+ * This class is used to configure and start a {@link Process} in method chaining:
  * <pre>
  *     process.input(in).output(out).start();
  * </pre>
@@ -30,14 +34,21 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
     private File directory;
     private ProcessBuilder builder;
 
+    GekProcess() {
+    }
+
     /**
      * Sets command.
+     * This method will split given command with space chars:
+     * <pre>
+     *     command.split(" +")
+     * </pre>
      *
      * @param command command
      * @return this
      */
     public GekProcess command(String command) {
-        return command(Collections.singletonList(command));
+        return command(Arrays.asList(command.split(" +")));
     }
 
     /**
@@ -301,7 +312,7 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
      * @throws GekIOException IO exception
      */
     public Process start() throws GekIOException {
-        if (GekArray.isEmpty(command)) {
+        if (GekColl.isEmpty(command)) {
             throw new IllegalArgumentException("No command.");
         }
         try {

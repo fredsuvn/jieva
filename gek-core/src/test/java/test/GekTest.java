@@ -8,11 +8,8 @@ import xyz.fsgek.common.io.GekIO;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 
 public class GekTest {
-
-    private static final String ECHO_CONTENT = "hello world!";
 
     @Test
     public void testThrow() {
@@ -57,50 +54,6 @@ public class GekTest {
         for (URL url : set) {
             Assert.assertEquals(GekIO.readString(url.openStream(), GekChars.defaultCharset()), "f2.txt");
         }
-    }
-
-    @Test
-    public void testProcess() throws InterruptedException {
-        if (GekSystem.isLinux() || GekSystem.isMac() || GekSystem.isBsd()) {
-            testEcho("echo " + ECHO_CONTENT);
-        }
-        if (GekSystem.isWindows()) {
-            testEcho("cmd.exe /c echo " + ECHO_CONTENT);
-        }
-    }
-
-    @Test
-    public void testPing() throws InterruptedException {
-        Process process = GekProcessExt.start("ping", "-n", "5", "127.0.0.1");
-        Semaphore semaphore = new Semaphore(1);
-        semaphore.acquire();
-        GekThread.start(() -> {
-            while (true) {
-                String output = GekIO.avalaibleString(process.getInputStream(), GekChars.nativeCharset());
-                if (output == null) {
-                    semaphore.release();
-                    return;
-                }
-                if (GekString.isNotEmpty(output)) {
-                    GekLogger.defaultLogger().info(output);
-                }
-                GekThread.sleep(1);
-            }
-        });
-        process.waitFor();
-        while (semaphore.hasQueuedThreads()) {
-            GekThread.sleep(1000);
-        }
-        process.destroy();
-    }
-
-    private void testEcho(String command) throws InterruptedException {
-        Process process = GekProcessExt.start(command);
-        process.waitFor();
-        String output = GekIO.avalaibleString(process.getInputStream(), GekChars.nativeCharset());
-        GekLogger.defaultLogger().info(output);
-        Assert.assertEquals(output, ECHO_CONTENT + GekSystem.getLineSeparator());
-        process.destroy();
     }
 
     @Test

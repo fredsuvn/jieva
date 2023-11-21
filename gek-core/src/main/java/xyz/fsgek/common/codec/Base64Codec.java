@@ -5,7 +5,6 @@ import org.springframework.core.codec.CodecException;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.io.GekIO;
-import xyz.fsgek.common.io.GekIOProcess;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,7 +14,7 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 /**
- * Base64 implementation of {@link GekIOProcess} to encode/decode base64 with {@link Base64}.
+ * Base64 implementation of {@link CodecProcess} to encode/decode base64 with {@link Base64}.
  *
  * @author fredsuvn
  */

@@ -3,7 +3,6 @@ package xyz.fsgek.common.codec;
 import org.springframework.core.codec.CodecException;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.io.GekIO;
-import xyz.fsgek.common.io.GekIOProcess;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 /**
- * Hex implementation of {@link GekIOProcess} to encode/decode HEX.
+ * Hex implementation of {@link CodecProcess} to encode/decode HEX.
  *
  * @author fredsuvn
  */

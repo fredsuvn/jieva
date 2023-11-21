@@ -6,10 +6,15 @@ import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.io.GekIOProcess;
 
 /**
- * {@link GekIOProcess} for codec operation.
+ * This interface represents a {@link GekIOProcess} of codec process,
+ * supports configure and do final in method chaining.
+ * See {@link CipherCodec}, {@link Base64Codec} and {@link HexCodec}.
  *
  * @param <T> subtype
  * @author fredsuvn
+ * @see CipherCodec
+ * @see Base64Codec
+ * @see HexCodec
  */
 public interface CodecProcess<T extends CodecProcess<T>> extends GekIOProcess<T> {
 

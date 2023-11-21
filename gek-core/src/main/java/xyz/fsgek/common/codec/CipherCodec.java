@@ -3,7 +3,6 @@ package xyz.fsgek.common.codec;
 import org.springframework.core.codec.CodecException;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.io.GekIO;
-import xyz.fsgek.common.io.GekIOProcess;
 
 import javax.crypto.Cipher;
 import java.io.InputStream;
@@ -14,7 +13,7 @@ import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
- * Cipher codec implementation of {@link GekIOProcess} to encrypt/decrypt with {@link Cipher}.
+ * Cipher implementation of {@link CodecProcess} to encrypt/decrypt with {@link Cipher}.
  * When the process starts, the status of the {@link Cipher} instance cannot be changed.
  *
  * @author fredsuvn
