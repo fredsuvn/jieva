@@ -25,9 +25,9 @@ import java.util.function.Function;
  * This means that expired data may still occupy memory until the next invocation of {@link #cleanUp()}.
  * Scheduling task for {@link #cleanUp()} can effectively resolve this problem.
  * <p>
- * {@link RemoveListener} is used to listen removing action of ths cache.
- * As mentioned above, if a value is cleared by GC before {@link RemoveListener#onRemove(Object, Object, GekCache)} is
- * called, the value parameter will be passed to null.
+ * {@link RemovalListener} is used to listen removing event of ths cache. As mentioned above, if a value is cleared by
+ * GC, the value parameter will be passed to null on
+ * {@link RemovalListener#onRemoval(Object, Object, RemovalListener.Cause)}.
  *
  * @param <K> key type
  * @param <V> value type
@@ -59,17 +59,17 @@ public interface GekCache<K, V> {
     }
 
     /**
-     * Creates a new {@link GekCache} based on {@link SoftReference} with remove listener,
+     * Creates a new {@link GekCache} based on {@link SoftReference} with removal listener,
      * the listener will be called <b>after</b> removing from the cache.
      *
-     * @param removeListener remove listener called <b>after</b> removing from the cache,
-     *                       the first argument is current cache and second is the key.
-     * @param <K>            key type
-     * @param <V>            value type
+     * @param removalListener removal listener called <b>after</b> removing from the cache,
+     *                        the first argument is current cache and second is the key.
+     * @param <K>             key type
+     * @param <V>             value type
      * @return a new {@link GekCache}
      */
-    static <K, V> GekCache<K, V> softCache(RemoveListener<K, V> removeListener) {
-        return newBuilder().removeListener(removeListener).build();
+    static <K, V> GekCache<K, V> softCache(RemovalListener<K, V> removalListener) {
+        return newBuilder().removeListener(removalListener).build();
     }
 
     /**
@@ -84,17 +84,17 @@ public interface GekCache<K, V> {
     }
 
     /**
-     * Creates a new {@link GekCache} based on {@link WeakReference} with remove listener,
+     * Creates a new {@link GekCache} based on {@link WeakReference} with removal listener,
      * the listener will be called <b>after</b> removing from the cache.
      *
-     * @param removeListener remove listener called <b>after</b> removing from the cache,
-     *                       the first argument is current cache and second is the key.
-     * @param <K>            key type
-     * @param <V>            value type
+     * @param removalListener removal listener called <b>after</b> removing from the cache,
+     *                        the first argument is current cache and second is the key.
+     * @param <K>             key type
+     * @param <V>             value type
      * @return a new {@link GekCache}
      */
-    static <K, V> GekCache<K, V> weakCache(RemoveListener<K, V> removeListener) {
-        return newBuilder().useSoft(false).removeListener(removeListener).build();
+    static <K, V> GekCache<K, V> weakCache(RemovalListener<K, V> removalListener) {
+        return newBuilder().useSoft(false).removeListener(removalListener).build();
     }
 
     /**
@@ -284,21 +284,86 @@ public interface GekCache<K, V> {
     void cleanUp();
 
     /**
-     * Removing listener of {@link GekCache}.
+     * Listener interface that can receive a notification when an entry is removed from a cache, should be thread-safe.
      *
      * @param <K> key type
      * @param <V> value type
      */
-    interface RemoveListener<K, V> {
+    @ThreadSafe
+    interface RemovalListener<K, V> {
 
         /**
-         * This method will be called after removing a key and its value.
+         * This method will be called after a key and its value are removed.
          *
          * @param key   key of removed value
          * @param value removed value, may be null if the GC has already cleared the value
-         * @param cache current cache
+         * @param cause reason why a cached entry was removed
          */
-        void onRemove(K key, @Nullable V value, GekCache<K, V> cache);
+        void onRemoval(K key, @Nullable V value, Cause cause);
+
+        /**
+         * The reason why a cached entry was removed.
+         */
+        enum Cause {
+
+            /**
+             * The entry was manually removed by the user.
+             */
+            EXPLICIT {
+                @Override
+                public boolean wasEvicted() {
+                    return false;
+                }
+            },
+
+            /**
+             * The entry itself was not actually removed, but its value was replaced by the user.
+             */
+            REPLACED {
+                @Override
+                public boolean wasEvicted() {
+                    return false;
+                }
+            },
+
+            /**
+             * The entry was removed automatically because its key or value was garbage-collected.
+             */
+            COLLECTED {
+                @Override
+                public boolean wasEvicted() {
+                    return true;
+                }
+            },
+
+            /**
+             * The entry's expiration timestamp has passed.
+             */
+            EXPIRED {
+                @Override
+                public boolean wasEvicted() {
+                    return true;
+                }
+            },
+
+            /**
+             * The entry was evicted due to size constraints.
+             */
+            SIZE {
+                @Override
+                public boolean wasEvicted() {
+                    return true;
+                }
+            };
+
+            /**
+             * Returns {@code true} if there was an automatic removal due to eviction (the cause is neither
+             * {@link #EXPLICIT} nor {@link #REPLACED}).
+             *
+             * @return if the entry was automatically removed due to eviction
+             */
+            public abstract boolean wasEvicted();
+        }
     }
 
     /**
@@ -445,7 +510,7 @@ public interface GekCache<K, V> {
 
         private boolean useSoft = true;
         private int initialCapacity = -1;
-        private GekCache.RemoveListener<K, V> removeListener;
+        private RemovalListener<K, V> removalListener;
         private long expireAfterWrite = -1;
         private long expireAfterAccess = -1;
 
@@ -498,13 +563,13 @@ public interface GekCache<K, V> {
         /**
          * Sets removing event listener.
          *
-         * @param removeListener removing event listener
-         * @param <K1>           key type
-         * @param <V1>           value type
+         * @param removalListener removing event listener
+         * @param <K1>            key type
+         * @param <V1>            value type
          * @return this builder
          */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> removeListener(GekCache.RemoveListener<K1, V1> removeListener) {
-            this.removeListener = (RemoveListener<K, V>) removeListener;
+        public <K1 extends K, V1 extends V> Builder<K1, V1> removeListener(RemovalListener<K1, V1> removalListener) {
+            this.removalListener = (RemovalListener<K, V>) removalListener;
             return Gek.as(this);
         }
 
@@ -514,8 +579,8 @@ public interface GekCache<K, V> {
          * @return removing event listener
          */
         @Nullable
-        public GekCache.RemoveListener<K, V> removeListener() {
-            return removeListener;
+        public GekCache.RemovalListener<K, V> removeListener() {
+            return removalListener;
         }
 
         /**
@@ -627,7 +692,7 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> GekCache<K1, V1> build() {
             return Gek.as(
-                removeListener == null ?
+                removalListener == null ?
                     new CacheImpl.UnListenedCacheImpl<>(this) : new CacheImpl.ListenedCacheImpl<>(this));
         }
     }

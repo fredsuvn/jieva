@@ -9,6 +9,7 @@ import xyz.fsgek.common.cache.GekCache;
 
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -17,14 +18,20 @@ public class CacheTest {
     @Test
     public void testCache() {
         final int[] detected = {0};
+        final long[] collected = {0};
         testCache(GekCache.softCache((k, v, c) -> {
             detected[0]++;
-            c.cleanUp();
+            if (Objects.equals(c, GekCache.RemovalListener.Cause.COLLECTED)) {
+                collected[0]++;
+            }
         }), detected, "soft-cache");
         testCache(GekCache.weakCache((k, v, c) -> {
             detected[0]++;
-            c.cleanUp();
+            if (Objects.equals(c, GekCache.RemovalListener.Cause.COLLECTED)) {
+                collected[0]++;
+            }
         }), detected, "weak-cache");
+        GekLogger.defaultLogger().info("Collected: ", collected[0]);
     }
 
     private void testCache(GekCache<Integer, String> cache, int[] detected, String name) {
@@ -82,7 +89,8 @@ public class CacheTest {
 
     @Test
     public void testCleanUp() {
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> c.cleanUp());
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> {
+        });
         for (int i = 0; i < 10000; i++) {
             gekCache.put(i, i);
         }
@@ -147,13 +155,25 @@ public class CacheTest {
     @Test
     public void testExpiration() throws InterruptedException {
         int[] l = {0};
-        GekCache<Integer, Integer> cache = GekCache.softCache((k, v, c) -> l[0]++);
+        GekCache.RemovalListener.Cause[] cause = {null};
+        GekCache<Integer, Integer> cache = GekCache.softCache((k, v, c) -> {
+            l[0]++;
+            cause[0] = c;
+        });
         cache.put(1, 1, 1000);
         Assert.assertEquals(cache.get(1), 1);
         Assert.assertEquals(l[0], 0);
         Thread.sleep(1001);
         Assert.assertNull(cache.get(1));
         Assert.assertEquals(l[0], 1);
+        Assert.assertEquals(cause[0], GekCache.RemovalListener.Cause.EXPIRED);
+        cache.put(1, 1, 1000);
+        cache.put(1, 1, 1000);
+        Assert.assertEquals(cause[0], GekCache.RemovalListener.Cause.REPLACED);
+        cache.remove(1);
+        Assert.assertEquals(cause[0], GekCache.RemovalListener.Cause.EXPLICIT);
+
+        l[0] = 1;
         cache.put(2, 2, 1000);
         cache.expire(2, 1500);
         Thread.sleep(1111);

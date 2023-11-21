@@ -293,7 +293,7 @@ public interface GekFileCache {
         }
 
         /**
-         * Sets cache generator, default uses {@link GekCache#softCache(GekCache.RemoveListener)}.
+         * Sets cache generator, default uses {@link GekCache#softCache(GekCache.RemovalListener)}.
          *
          * @param chunkCacheGenerator cache generator
          * @return this builder
