@@ -269,7 +269,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
     }
 
     @Nullable
-    protected GekCache.RemovalListener<K, V> removeListener() {
+    protected GekCache.RemovalListener<K, V> removalListener() {
         return null;
     }
 
@@ -467,7 +467,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
                     return;
                 }
                 executed = true;
-                cache.removeListener().onRemoval(key(), valueToV(value()), cause);
+                cache.removalListener().onRemoval(key(), valueToV(value()), cause);
             }
         }
     }
@@ -598,7 +598,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
                     return;
                 }
                 executed = true;
-                cache.removeListener().onRemoval(key(), valueToV(value()), cause);
+                cache.removalListener().onRemoval(key(), valueToV(value()), cause);
             }
         }
     }
@@ -650,7 +650,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         @Override
-        protected @Nullable GekCache.RemovalListener<K, V> removeListener() {
+        protected @Nullable GekCache.RemovalListener<K, V> removalListener() {
             return removalListener;
         }
     }
