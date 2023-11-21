@@ -2,6 +2,7 @@ package xyz.fsgek.common.cache;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.base.GekWrapper;
 import xyz.fsgek.common.base.ref.GekRef;
 
 import java.lang.ref.ReferenceQueue;
@@ -9,7 +10,6 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -48,12 +48,12 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
 
     @Override
     public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
-        Entry<K> entry = data.get(key);
-        entry = getEntry(entry, false, true);
-        if (entry != null) {
-            cleanUp();
-            return clearKeepValue(entry);
-        }
+        // Entry<K> entry = data.get(key);
+        // entry = getEntry(entry, false, true);
+        // if (entry != null) {
+        //     cleanUp();
+        //     return clearKeepValue(entry);
+        // }
         GekRef<Entry<K>> result = GekRef.ofNull();
         data.compute(key, (k, old) -> {
             Entry<K> oldEntry = getEntry(old, false, true);
@@ -72,21 +72,21 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
     }
 
     @Override
-    public @Nullable Optional<V> getOptional(K key) {
+    public @Nullable GekWrapper<V> getWrapper(K key) {
         Entry<K> entry = data.get(key);
         entry = getEntry(entry, false, true);
         cleanUp();
-        return entry == null ? null : Optional.ofNullable(clearKeepValue(entry));
+        return entry == null ? null : GekWrapper.wrap(clearKeepValue(entry));
     }
 
     @Override
-    public @Nullable Optional<V> getOptional(K key, Function<? super K, @Nullable Value<? extends V>> loader) {
-        Entry<K> entry = data.get(key);
-        entry = getEntry(entry, false, true);
-        if (entry != null) {
-            cleanUp();
-            return Optional.ofNullable(clearKeepValue(entry));
-        }
+    public @Nullable GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable Value<? extends V>> loader) {
+        // Entry<K> entry = data.get(key);
+        // entry = getEntry(entry, false, true);
+        // if (entry != null) {
+        //     cleanUp();
+        //     return GekWrapper.wrap(clearKeepValue(entry));
+        // }
         GekRef<Entry<K>> result = GekRef.ofNull();
         data.compute(key, (k, old) -> {
             Entry<K> oldEntry = getEntry(old, false, true);
@@ -109,7 +109,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         if (resultEntry == null) {
             return null;
         }
-        return Optional.ofNullable(clearKeepValue(resultEntry));
+        return GekWrapper.wrap(clearKeepValue(resultEntry));
     }
 
     @Override

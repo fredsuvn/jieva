@@ -3,6 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.GekWrapper;
 import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
 import xyz.fsgek.common.cache.GekCache;
@@ -10,7 +11,6 @@ import xyz.fsgek.common.cache.GekCache;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 public class CacheTest {
@@ -76,15 +76,15 @@ public class CacheTest {
         gekCache.remove(1);
         gekCache.get(1, k -> null);
         Assert.assertNull(gekCache.get(1));
-        Assert.assertEquals(gekCache.getOptional(1), Optional.empty());
+        Assert.assertEquals(gekCache.getWrapper(1).get(), GekWrapper.empty().get());
         gekCache.remove(1);
-        gekCache.getOptional(1, k -> null);
+        gekCache.getWrapper(1, k -> null);
         Assert.assertNull(gekCache.get(1));
-        Assert.assertNull(gekCache.getOptional(1));
+        Assert.assertNull(gekCache.getWrapper(1));
         gekCache.put(2, "2");
         Assert.assertEquals(gekCache.get(2), "2");
         Assert.assertEquals(gekCache.get(2, k -> "4"), "2");
-        Assert.assertEquals(gekCache.getOptional(2, k -> GekCache.Value.of("8", null, null)).get(), "2");
+        Assert.assertEquals(gekCache.getWrapper(2, k -> GekCache.Value.of("8", null, null)).get(), "2");
     }
 
     @Test
@@ -141,9 +141,9 @@ public class CacheTest {
             gekCache.put(i, (Integer) null);
         }
         for (int i = 0; i < 10000; i++) {
-            Optional<Integer> w = gekCache.getOptional(i);
+            GekWrapper<Integer> w = gekCache.getWrapper(i);
             if (w != null) {
-                Assert.assertFalse(w.isPresent());
+                Assert.assertNull(w.get());
                 set.add(i);
             }
         }

@@ -36,42 +36,44 @@ public class CacheJmh {
     @Setup(Level.Iteration)
     public void init() {
         System.out.println(">>>>>> init <<<<<<<<");
-        fsSoft = GekCache.newBuilder().useSoft(true)
-            .removeListener((k, v, c) -> {
-            })
+        fsSoft = GekCache.newBuilder()
+            .useSoft(true)
+            // .removeListener((k, v, c) -> {
+            // })
             .build();
-        fsWeak = GekCache.newBuilder().useSoft(false)
-            .removeListener((k, v, c) -> {
-            })
+        fsWeak = GekCache.newBuilder()
+            .useSoft(false)
+            // .removeListener((k, v, c) -> {
+            // })
             .build();
         guava = CacheBuilder.newBuilder()
-            .removalListener(n -> {
-            })
+            // .removalListener(n -> {
+            // })
             .maximumSize(MAX / 3)
             .build();
         guavaSoft = CacheBuilder.newBuilder()
-            .removalListener(n -> {
-            })
+            // .removalListener(n -> {
+            // })
             .softValues()
             .build();
         guavaWeak = CacheBuilder.newBuilder()
-            .removalListener(n -> {
-            })
+            // .removalListener(n -> {
+            // })
             .weakValues()
             .build();
         caffeine = Caffeine.newBuilder()
-            .removalListener((k, v, c) -> {
-            })
+            // .removalListener((k, v, c) -> {
+            // })
             .maximumSize(MAX / 3)
             .build();
         caffeineSoft = Caffeine.newBuilder()
-            .removalListener((k, v, c) -> {
-            })
+            // .removalListener((k, v, c) -> {
+            // })
             .softValues()
             .build();
         caffeineWeak = Caffeine.newBuilder()
-            .removalListener((k, v, c) -> {
-            })
+            // .removalListener((k, v, c) -> {
+            // })
             .weakValues()
             .build();
         map = new ConcurrentHashMap<>(MAX / 3);
