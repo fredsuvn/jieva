@@ -8,7 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.GekLog;
 import xyz.fsgek.common.bean.*;
 import xyz.fsgek.common.bean.handlers.JavaBeanResolveHandler;
 import xyz.fsgek.common.bean.handlers.RecordBeanResolveHandler;
@@ -29,7 +29,7 @@ public class BeanTest {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
         GekBean ccBean = GekBean.resolve(ccType);
-        GekLogger.defaultLogger().info("ccBean: ", ccBean);
+        GekLog.getInstance().info("ccBean: ", ccBean);
         GekProperty cc = ccBean.getProperty("cc");
         GekProperty c1 = ccBean.getProperty("c1");
         GekProperty c2 = ccBean.getProperty("c2");
@@ -65,7 +65,7 @@ public class BeanTest {
     public void testClassBean() throws Exception {
         Type ccType = Cc.class;
         GekBean ccBean = GekBean.resolve(ccType);
-        GekLogger.defaultLogger().info("ccBean: ", ccBean);
+        GekLog.getInstance().info("ccBean: ", ccBean);
         GekProperty cc = ccBean.getProperty("cc");
         GekProperty c1 = ccBean.getProperty("c1");
         GekProperty c2 = ccBean.getProperty("c2");
@@ -110,7 +110,7 @@ public class BeanTest {
         map.put("2", 10010L);
         map.put("3", 10000L);
         GekBean mapBean = GekBean.wrap(map, mapType);
-        GekLogger.defaultLogger().info("mapBean: ", mapBean);
+        GekLog.getInstance().info("mapBean: ", mapBean);
         GekProperty p1 = mapBean.getProperty("1");
         GekProperty p2 = mapBean.getProperty("2");
         GekProperty p3 = mapBean.getProperty("3");
@@ -130,7 +130,7 @@ public class BeanTest {
         Assert.assertSame(p1, mapBean.getProperty("1"));
         map.remove("2");
         Assert.assertNull(mapBean.getProperty("2"));
-        GekLogger.defaultLogger().info("mapBean: ", mapBean);
+        GekLog.getInstance().info("mapBean: ", mapBean);
 
         GekBean mapObjBean = GekBean.wrap(map);
         GekProperty p1Obj = mapObjBean.getProperty("1");

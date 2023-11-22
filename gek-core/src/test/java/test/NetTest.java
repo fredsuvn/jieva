@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekChars;
-import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.GekLog;
 import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.data.GekData;
@@ -75,7 +75,7 @@ public class NetTest {
             .serverHandler(new GekTcpServerHandler() {
                 @Override
                 public void onException(GekNetServerException exception) {
-                    GekLogger.defaultLogger().info("server.onException: ", exception);
+                    GekLog.getInstance().info("server.onException: ", exception);
                 }
 
                 @Override
@@ -93,7 +93,7 @@ public class NetTest {
                 @Override
                 public void onException(GekTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
                     TestUtil.count("server-channel.onException", data);
-                    GekLogger.defaultLogger().info("server-channel.onException: ", throwable);
+                    GekLog.getInstance().info("server-channel.onException: ", throwable);
                 }
             })
             .addChannelHandler(new LengthBasedTcpChannelHandler(3))
@@ -142,7 +142,7 @@ public class NetTest {
                 @Override
                 public void onException(GekTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
                     TestUtil.count("client-channel.onException", data);
-                    GekLogger.defaultLogger().info("client-channel.onException: ", throwable);
+                    GekLog.getInstance().info("client-channel.onException: ", throwable);
                 }
             })
             .addChannelHandler(new LengthBasedTcpChannelHandler(1, 2))
@@ -262,7 +262,7 @@ public class NetTest {
             .serverHandler(new GekTcpServerHandler() {
                 @Override
                 public void onException(GekNetServerException exception) {
-                    GekLogger.defaultLogger().info("server.onException: ", exception);
+                    GekLog.getInstance().info("server.onException: ", exception);
                 }
 
                 @Override
@@ -280,7 +280,7 @@ public class NetTest {
                 @Override
                 public void onException(GekTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
                     TestUtil.count("server-channel.onException", data);
-                    GekLogger.defaultLogger().info("server-channel.onException: ", throwable);
+                    GekLog.getInstance().info("server-channel.onException: ", throwable);
                 }
             })
             .addChannelHandler(new DelimiterBasedTcpChannelHandler((byte) '|'))
@@ -329,7 +329,7 @@ public class NetTest {
                 @Override
                 public void onException(GekTcpChannel channel, Throwable throwable, ByteBuffer buffer) {
                     TestUtil.count("client-channel.onException", data);
-                    GekLogger.defaultLogger().info("client-channel.onException: ", throwable);
+                    GekLog.getInstance().info("client-channel.onException: ", throwable);
                 }
             })
             .addChannelHandler(new DelimiterBasedTcpChannelHandler((byte) '|'))
@@ -423,13 +423,13 @@ public class NetTest {
             .serverHandler(new GekUdpServerHandler() {
                 @Override
                 public void onException(GekNetServerException exception) {
-                    GekLogger.defaultLogger().info("server.onException: ", exception);
+                    GekLog.getInstance().info("server.onException: ", exception);
                 }
 
                 @Override
                 public void onException(GekUdpHeader header, GekUdpClient client, Throwable throwable, ByteBuffer buffer) {
                     TestUtil.count("server-header.onException", data);
-                    GekLogger.defaultLogger().info("server-header.onException: ", throwable);
+                    GekLog.getInstance().info("server-header.onException: ", throwable);
                 }
             })
             .addPacketHandler(new GekUdpPacketHandler<ByteBuffer>() {

@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.GekLog;
 import xyz.fsgek.common.base.GekWrapper;
 import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
@@ -31,7 +31,7 @@ public class CacheTest {
                 collected[0]++;
             }
         }), detected, "weak-cache");
-        GekLogger.defaultLogger().info("Collected: ", collected[0]);
+        GekLog.getInstance().info("Collected: ", collected[0]);
     }
 
     private void testCache(GekCache<Integer, String> cache, int[] detected, String name) {
@@ -52,7 +52,7 @@ public class CacheTest {
                 //Assert.assertEquals(map.get(i), fsValue);
             }
         }
-        GekLogger.defaultLogger().info(name + "---> total: " + times +
+        GekLog.getInstance().info(name + "---> total: " + times +
             ", removed: " + removed +
             ", detected: " + detected[0] +
             ", cached: " + (times - removed) +
@@ -70,7 +70,7 @@ public class CacheTest {
         Assert.assertNull(gekCache.get(1));
         Assert.assertEquals(gekCache.get(1, String::valueOf), "1");
         Assert.assertEquals(gekCache.get(1, String::valueOf), "1");
-        GekLogger.defaultLogger().info("cacheLoader: 1=", gekCache.get(1));
+        GekLog.getInstance().info("cacheLoader: 1=", gekCache.get(1));
         gekCache.get(1, k -> null);
         Assert.assertEquals(gekCache.get(1), "1");
         gekCache.remove(1);

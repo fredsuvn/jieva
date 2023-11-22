@@ -13,10 +13,10 @@ public class GekTest {
 
     @Test
     public void testThrow() {
-        GekLogger.defaultLogger().info(GekTrace.toString(
+        GekLog.getInstance().info(GekTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())))
         );
-        GekLogger.defaultLogger().info(GekTrace.toString(
+        GekLog.getInstance().info(GekTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())),
             " : ")
         );
@@ -58,15 +58,15 @@ public class GekTest {
 
     @Test
     public void testSystem() {
-        GekLogger.defaultLogger().info(GekSystem.getJavaVersion());
-        GekLogger.defaultLogger().info(GekSystem.javaMajorVersion());
-        GekLogger.defaultLogger().info(GekChars.nativeCharset());
-        GekLogger.defaultLogger().info(GekSystem.getOsName());
-        GekLogger.defaultLogger().info(GekSystem.isWindows());
-        GekLogger.defaultLogger().info(GekSystem.isLinux());
-        GekLogger.defaultLogger().info(GekSystem.isBsd());
-        GekLogger.defaultLogger().info(GekSystem.isMac());
-        GekLogger.defaultLogger().info(GekSystem.isJdk9OrHigher());
+        GekLog.getInstance().info(GekSystem.getJavaVersion());
+        GekLog.getInstance().info(GekSystem.javaMajorVersion());
+        GekLog.getInstance().info(GekChars.nativeCharset());
+        GekLog.getInstance().info(GekSystem.getOsName());
+        GekLog.getInstance().info(GekSystem.isWindows());
+        GekLog.getInstance().info(GekSystem.isLinux());
+        GekLog.getInstance().info(GekSystem.isBsd());
+        GekLog.getInstance().info(GekSystem.isMac());
+        GekLog.getInstance().info(GekSystem.isJdk9OrHigher());
     }
 
     @Test

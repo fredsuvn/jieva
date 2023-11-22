@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.GekLog;
 import xyz.fsgek.common.invoke.GekInvoker;
 
 import java.lang.reflect.Constructor;
@@ -24,7 +24,7 @@ public class InvokeTest {
         helloStatic.setAccessible(true);
         helloVirtual.setAccessible(true);
         TT tt = (TT) (reflect ? GekInvoker.reflectConstructor(constructor) : GekInvoker.unreflectConstructor(constructor)).invoke(null);
-        GekLogger.defaultLogger().info(tt);
+        GekLog.getInstance().info(tt);
         Assert.assertNotNull(tt);
         Assert.assertEquals(
             (reflect ? GekInvoker.reflectMethod(helloStatic) : GekInvoker.unreflectMethod(helloStatic))

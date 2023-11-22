@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekLogger;
+import xyz.fsgek.common.base.GekLog;
 import xyz.fsgek.common.base.GekRandom;
 
 public class RandomTest {
@@ -29,10 +29,10 @@ public class RandomTest {
         }
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
-        GekLogger.defaultLogger().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
+        GekLog.getInstance().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
 
         String randomStr = String.join("", gekRandom.nextList(100));
-        GekLogger.defaultLogger().info("randomStr: ", randomStr);
+        GekLog.getInstance().info("randomStr: ", randomStr);
         Assert.assertEquals(randomStr.length(), 100);
     }
 }
