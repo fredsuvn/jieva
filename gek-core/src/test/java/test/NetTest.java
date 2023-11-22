@@ -3,10 +3,10 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
+import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.base.GekLogger;
 import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.base.GekThread;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.data.GekData;
 import xyz.fsgek.common.io.GekIO;
@@ -156,21 +156,21 @@ public class NetTest {
                             case "hlo": {
                                 new Thread(() -> {
                                     channel.sendAndFlush(GekData.wrap("a"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("bc"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("abc"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("ab"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("ca"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("bca"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("bc"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("abcabcabcabcabc"));
-                                    GekThread.sleep(500);
+                                    Gek.sleep(500);
                                     channel.sendAndFlush(GekData.wrap("bye"));
                                 }).start();
                                 break;
@@ -343,21 +343,21 @@ public class NetTest {
                             case "hlo": {
                                 new Thread(() -> {
                                     channel.sendAndFlush(GekData.wrap("a"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("bc|"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("abc|"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("ab"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("c|a"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("bc|a"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("bc"));
-                                    GekThread.sleep(200);
+                                    Gek.sleep(200);
                                     channel.sendAndFlush(GekData.wrap("|abc|abc|abc|abc|abc"));
-                                    GekThread.sleep(500);
+                                    Gek.sleep(500);
                                     channel.sendAndFlush(GekData.wrap("|bye|"));
                                 }).start();
                                 break;
@@ -462,7 +462,7 @@ public class NetTest {
                             ByteBuffer.wrap("udp-client".getBytes(GekChars.defaultCharset())),
                             new InetSocketAddress("localhost", udpServer.getPort()))
                         );
-                        GekThread.sleep(50);
+                        Gek.sleep(50);
                     }
                 } catch (Exception e) {
                     System.out.println(e);

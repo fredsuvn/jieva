@@ -3,7 +3,6 @@ package xyz.fsgek.common.net.tcp;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekThread;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.data.GekData;
 import xyz.fsgek.common.io.GekIO;
@@ -476,7 +475,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                             latch.countDown();
                             break;
                         }
-                        GekThread.sleep(1);
+                        Gek.sleep(1);
                     }
                 });
             }

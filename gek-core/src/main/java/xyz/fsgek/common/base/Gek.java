@@ -8,8 +8,12 @@ import xyz.fsgek.common.reflect.TypeRef;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Utilities for object and common/base operations.
@@ -42,6 +46,21 @@ public class Gek {
      */
     public static <T> T notNull(@Nullable T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
+    }
+
+    /**
+     * Returns computed value if given object is null, or given object itself if it is not null:
+     * <pre>
+     *     return obj == null ? computedValue.get() : obj;
+     * </pre>
+     *
+     * @param obj           given object
+     * @param computedValue computed value
+     * @param <T>           type of value
+     * @return computed value if given object is null, or given object itself if it is not null
+     */
+    public static <T> T notNull(@Nullable T obj, Supplier<? extends T> computedValue) {
+        return obj == null ? computedValue.get() : obj;
     }
 
     /**
@@ -641,5 +660,58 @@ public class Gek {
      */
     public static GekProcess process() {
         return GekProcess.newInstance();
+    }
+
+    /**
+     * Sleeps current thread for specified milliseconds.
+     *
+     * @param millis specified milliseconds
+     */
+    public static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Sleeps current thread for specified duration.
+     *
+     * @param duration specified duration
+     */
+    public static void sleep(Duration duration) {
+        try {
+            Thread.sleep(duration.toMillis(), duration.getNano());
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Returns a new {@link Thread} configurer to build or start a thread.
+     *
+     * @return a new {@link Thread} configurer to build or start a thread
+     */
+    public static GekThread thread() {
+        return GekThread.newInstance();
+    }
+
+    /**
+     * Returns a new {@link ExecutorService} configurer to build a thread pool.
+     *
+     * @return a new {@link ExecutorService} configurer to build a thread pool
+     */
+    public static GekThreadPool threadPool() {
+        return GekThreadPool.newInstance();
+    }
+
+    /**
+     * Returns a new {@link ScheduledExecutorService} configurer to build a scheduled thread pool.
+     *
+     * @return a new {@link ScheduledExecutorService} configurer to build a scheduled thread pool
+     */
+    public static GekScheduledPool scheduledPool() {
+        return GekScheduledPool.newInstance();
     }
 }

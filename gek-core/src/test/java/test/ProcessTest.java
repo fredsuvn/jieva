@@ -34,7 +34,7 @@ public class ProcessTest {
         Process process = Gek.process().command("ping", "-n", "5", "127.0.0.1").start();
         Semaphore semaphore = new Semaphore(1);
         semaphore.acquire();
-        GekThread.start(() -> {
+        Gek.thread().task(() -> {
             while (true) {
                 String output = GekIO.avalaibleString(process.getInputStream(), GekChars.nativeCharset());
                 if (output == null) {
@@ -44,12 +44,12 @@ public class ProcessTest {
                 if (GekString.isNotEmpty(output)) {
                     GekLogger.defaultLogger().info(output);
                 }
-                GekThread.sleep(1);
+                Gek.sleep(1);
             }
-        });
+        }).start();
         process.waitFor();
         while (semaphore.hasQueuedThreads()) {
-            GekThread.sleep(1000);
+            Gek.sleep(1000);
         }
         process.destroy();
     }

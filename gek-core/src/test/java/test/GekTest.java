@@ -57,21 +57,6 @@ public class GekTest {
     }
 
     @Test
-    public void testThread() throws InterruptedException {
-        Thread thread = GekThread.start("hahaha", () -> {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        Assert.assertEquals(thread.getName(), "hahaha");
-        Assert.assertFalse(thread.isDaemon());
-        thread.join();
-        Assert.assertFalse(thread.isAlive());
-    }
-
-    @Test
     public void testSystem() {
         GekLogger.defaultLogger().info(GekSystem.getJavaVersion());
         GekLogger.defaultLogger().info(GekSystem.javaMajorVersion());

@@ -307,7 +307,7 @@ public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
     }
 
     /**
-     * Starts and returns configured process which is started.
+     * Starts and returns process which is configured by this.
      * If the process's input, output or error output is redirected to an array, buffer or stream, current thread will
      * be blocked to read/write stream from the process until the process ends.
      * However, if redirected to files, this method will return immediately after starting process.

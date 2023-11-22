@@ -1,87 +1,161 @@
 package xyz.fsgek.common.base;
 
-import xyz.fsgek.annotations.Nullable;
-
-import java.time.Duration;
+import xyz.fsgek.common.io.GekIOException;
 
 /**
- * Utilities for thread.
+ * This class is used to configure and start a {@link Thread} in method chaining:
+ * <pre>
+ *     thread.name(name).priority(5).start();
+ * </pre>
  *
  * @author fredsuvn
  */
-public class GekThread {
+public abstract class GekThread {
+
+    static GekThread newInstance() {
+        return new GekThread.OfJdk8();
+    }
+
+    private static int threadInitNumber;
+
+    private static synchronized int nextThreadNum() {
+        return threadInitNumber++;
+    }
 
     private String name;
-    private int priority;
-    private Runnable target;
+    private int priority = -1;
+    private boolean daemon = false;
+    private Runnable task;
     private ThreadGroup group;
     private ClassLoader contextClassLoader;
-    private long stackSize;
+    private long stackSize = -1;
 
-    /**
-     * Runs a new thread.
-     *
-     * @param runnable runnable body
-     * @return the thread
-     */
-    public static Thread start(Runnable runnable) {
-        return start(null, false, runnable);
+    GekThread() {
     }
 
     /**
-     * Runs a new thread with given thread name.
+     * Sets thread name.
      *
-     * @param threadName given thread name
-     * @param runnable   run content
-     * @return the thread
+     * @param name thread name
+     * @return this
      */
-    public static Thread start(@Nullable String threadName, Runnable runnable) {
-        return start(threadName, false, runnable);
+    public GekThread name(String name) {
+        this.name = name;
+        return this;
     }
 
     /**
-     * Runs a new thread with given thread name, whether the thread is daemon.
+     * Sets thread priority, in [{@link Thread#MIN_PRIORITY}, {@link Thread#MAX_PRIORITY}].
      *
-     * @param threadName given thread name
-     * @param daemon     whether the thread is daemon
-     * @param runnable   run content
-     * @return the thread
+     * @param priority thread priority
+     * @return this
      */
-    public static Thread start(@Nullable String threadName, boolean daemon, Runnable runnable) {
-        Thread thread = new Thread(runnable);
-        if (threadName != null) {
-            thread.setName(threadName);
-        }
-        if (daemon) {
+    public GekThread priority(int priority) {
+        this.priority = priority;
+        return this;
+    }
+
+    /**
+     * Sets whether the thread is daemon.
+     *
+     * @param daemon whether the thread is daemon
+     * @return this
+     */
+    public GekThread daemon(boolean daemon) {
+        this.daemon = daemon;
+        return this;
+    }
+
+    /**
+     * Sets runnable task which is invoked when this thread is started.
+     *
+     * @param task runnable task
+     * @return this
+     */
+    public GekThread task(Runnable task) {
+        this.task = task;
+        return this;
+    }
+
+    /**
+     * Sets context class loader.
+     *
+     * @param contextClassLoader context class loader
+     * @return this
+     */
+    public GekThread contextClassLoader(ClassLoader contextClassLoader) {
+        this.contextClassLoader = contextClassLoader;
+        return this;
+    }
+
+    /**
+     * Sets thread group.
+     *
+     * @param group thread group
+     * @return this
+     */
+    public GekThread group(ThreadGroup group) {
+        this.group = group;
+        return this;
+    }
+
+    /**
+     * Sets stack size.
+     *
+     * @param stackSize stack size
+     * @return this
+     */
+    public GekThread stackSize(long stackSize) {
+        this.stackSize = stackSize;
+        return this;
+    }
+
+    /**
+     * Returns thread which is configured by this, not started.
+     *
+     * @return thread which is configured by this, not started
+     * @throws GekIOException IO exception
+     */
+    public Thread build() throws GekIOException {
+        try {
+            String threadName = Gek.notNull(name, () -> "GekThread-" + nextThreadNum());
+            Thread thread;
+            if (stackSize != -1) {
+                thread = new Thread(group, task, threadName, stackSize);
+            } else {
+                thread = new Thread(group, task, threadName);
+            }
+            if (priority != -1) {
+                thread.setPriority(priority);
+            }
             thread.setDaemon(daemon);
-        }
-        thread.start();
-        return thread;
-    }
-
-    /**
-     * Sleeps current thread for specified milliseconds.
-     *
-     * @param millis specified milliseconds
-     */
-    public static void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
+            if (contextClassLoader != null) {
+                thread.setContextClassLoader(contextClassLoader);
+            }
+            return thread;
+        } catch (Exception e) {
+            throw new GekIOException(e);
         }
     }
 
     /**
-     * Sleeps current thread for specified duration.
+     * Starts and returns thread which is configured by this.
      *
-     * @param duration specified duration
+     * @return the thread which is started
+     * @throws GekIOException IO exception
      */
-    public static void sleep(Duration duration) {
+    public Thread start() throws GekIOException {
         try {
-            Thread.sleep(duration.toMillis(), duration.getNano());
-        } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
+            Thread thread = build();
+            thread.start();
+            return thread;
+        } catch (GekIOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GekIOException(e);
         }
+    }
+
+    private static final class OfJdk8 extends GekThread {
     }
 }

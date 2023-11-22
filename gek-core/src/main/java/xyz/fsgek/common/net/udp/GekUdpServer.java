@@ -3,7 +3,6 @@ package xyz.fsgek.common.net.udp;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekThread;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.net.GekNetException;
@@ -474,7 +473,7 @@ public interface GekUdpServer extends GekUdpClient {
                         }
                     }
                     while (packetCounter.get() > 0) {
-                        GekThread.sleep(1);
+                        Gek.sleep(1);
                     }
                     latch.countDown();
                 });
