@@ -1,6 +1,6 @@
 package xyz.fsgek.common.net.tcp;
 
-import xyz.fsgek.common.base.GekArray;
+import xyz.fsgek.common.collect.GekArray;
 import xyz.fsgek.common.io.GekIO;
 
 import java.nio.ByteBuffer;

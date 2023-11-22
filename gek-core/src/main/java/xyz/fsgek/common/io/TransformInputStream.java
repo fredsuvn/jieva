@@ -1,7 +1,7 @@
 package xyz.fsgek.common.io;
 
-import xyz.fsgek.common.base.GekArray;
 import xyz.fsgek.common.base.GekCheck;
+import xyz.fsgek.common.collect.GekArray;
 
 import java.io.IOException;
 import java.io.InputStream;

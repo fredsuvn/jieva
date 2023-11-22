@@ -1,8 +1,8 @@
 package xyz.fsgek.common.reflect;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.GekArray;
 import xyz.fsgek.common.base.GekString;
+import xyz.fsgek.common.collect.GekArray;
 import xyz.fsgek.common.collect.GekColl;
 
 import java.lang.reflect.GenericArrayType;

@@ -1,6 +1,7 @@
 package xyz.fsgek.common.base;
 
 import xyz.fsgek.annotations.Nullable;
+import xyz.fsgek.common.collect.GekArray;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
