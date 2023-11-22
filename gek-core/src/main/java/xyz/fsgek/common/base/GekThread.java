@@ -11,6 +11,13 @@ import java.time.Duration;
  */
 public class GekThread {
 
+    private String name;
+    private int priority;
+    private Runnable target;
+    private ThreadGroup group;
+    private ClassLoader contextClassLoader;
+    private long stackSize;
+
     /**
      * Runs a new thread.
      *

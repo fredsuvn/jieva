@@ -640,6 +640,6 @@ public class Gek {
      * @return a new {@link Process} configurer to start a sub-process
      */
     public static GekProcess process() {
-        return new GekProcess();
+        return GekProcess.newInstance();
     }
 }

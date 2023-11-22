@@ -25,7 +25,11 @@ import java.util.function.Consumer;
  *
  * @author fredsuvn
  */
-public class GekProcess implements GekIOConfigurer<GekProcess> {
+public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
+
+    static GekProcess newInstance() {
+        return new OfJdk8();
+    }
 
     private List<String> command;
     private Object input;
@@ -414,5 +418,8 @@ public class GekProcess implements GekIOConfigurer<GekProcess> {
             builder = new ProcessBuilder();
         }
         return builder;
+    }
+
+    private static final class OfJdk8 extends GekProcess {
     }
 }
