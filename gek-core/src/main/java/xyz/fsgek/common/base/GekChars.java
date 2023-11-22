@@ -1,8 +1,6 @@
 package xyz.fsgek.common.base;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.ref.BooleanRef;
-import xyz.fsgek.common.base.ref.GekRef;
 
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -26,7 +24,6 @@ public class GekChars {
     public static final Charset ISO_8859_1 = StandardCharsets.ISO_8859_1;
 
     private volatile static Charset NATIVE_CHARSET = null;
-    private final static BooleanRef nativeCharsetFlag = GekRef.ofBoolean(false);
 
     /**
      * Returns default charset: {@link #UTF_8}.
@@ -35,6 +32,15 @@ public class GekChars {
      */
     public static Charset defaultCharset() {
         return UTF_8;
+    }
+
+    /**
+     * Returns latin charset: {@link #ISO_8859_1}.
+     *
+     * @return latin charset: {@link #ISO_8859_1}
+     */
+    public static Charset latinCharset() {
+        return ISO_8859_1;
     }
 
     /**
@@ -55,17 +61,12 @@ public class GekChars {
      */
     @Nullable
     public static Charset nativeCharset() {
-        if (nativeCharsetFlag.get()) {
+        if (NATIVE_CHARSET != null) {
             return NATIVE_CHARSET;
         }
-        synchronized (nativeCharsetFlag) {
-            if (nativeCharsetFlag.get()) {
-                return NATIVE_CHARSET;
-            }
-            NATIVE_CHARSET = nativeCharset0();
-            nativeCharsetFlag.set(true);
-        }
-        return NATIVE_CHARSET;
+        Charset nativeChars = nativeCharset0();
+        NATIVE_CHARSET = nativeChars;
+        return nativeChars;
     }
 
     /**

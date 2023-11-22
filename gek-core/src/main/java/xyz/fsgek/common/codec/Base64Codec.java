@@ -387,7 +387,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
             case ENCODE_MODE:
                 return getEncoder().encodeToString(inputToBytes());
             case DECODE_MODE:
-                return GekString.of(getDecoder().decode(inputToBytes()), GekChars.ISO_8859_1);
+                return GekString.of(getDecoder().decode(inputToBytes()), GekChars.latinCharset());
         }
         throw new IllegalStateException("Unknown mode: " + mode);
     }
