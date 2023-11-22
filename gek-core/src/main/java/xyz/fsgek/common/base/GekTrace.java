@@ -14,7 +14,7 @@ public class GekTrace {
 
     /**
      * Returns caller stack trace of given class name and method name, or null if failed.
-     * This method is equivalent to {@link #findCallerStackTrace(String, String, int)}:
+     * This method is equivalent to {@link #findCallerTrace(String, String, int)}:
      * <pre>
      *     findCallerStackTrace(className, methodName, 0)
      * </pre>
@@ -30,8 +30,8 @@ public class GekTrace {
      * @return caller stack trace
      */
     @Nullable
-    public static StackTraceElement findCallerStackTrace(String className, String methodName) {
-        return findCallerStackTrace(className, methodName, 0);
+    public static StackTraceElement findCallerTrace(String className, String methodName) {
+        return findCallerTrace(className, methodName, 0);
     }
 
     /**
@@ -51,7 +51,7 @@ public class GekTrace {
      * @return caller stack trace
      */
     @Nullable
-    public static StackTraceElement findCallerStackTrace(String className, String methodName, int offset) {
+    public static StackTraceElement findCallerTrace(String className, String methodName, int offset) {
         StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
         if (GekArray.isEmpty(stackTraces)) {
             return null;
@@ -76,8 +76,8 @@ public class GekTrace {
      * @param throwable given throwable
      * @return stack trace info as string
      */
-    public static String stackTraceToString(Throwable throwable) {
-        return stackTraceToString(throwable, null);
+    public static String toString(Throwable throwable) {
+        return toString(throwable, null);
     }
 
     /**
@@ -88,7 +88,7 @@ public class GekTrace {
      * @param lineSeparator given separator
      * @return stack trace info as string
      */
-    public static String stackTraceToString(Throwable throwable, @Nullable String lineSeparator) {
+    public static String toString(Throwable throwable, @Nullable String lineSeparator) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);

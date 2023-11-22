@@ -140,7 +140,7 @@ public interface GekLogger {
      * @param msg              given message array
      * @param stackTraceOffset offset between the point where log operation occurs and this method
      * @return og info with given message array and trace offset between the log method and this method
-     * @see GekTrace#findCallerStackTrace(String, String, int)
+     * @see GekTrace#findCallerTrace(String, String, int)
      */
     default LogInfo buildLog(Object[] msg, int stackTraceOffset) {
         return new LogInfo() {
@@ -148,7 +148,7 @@ public interface GekLogger {
             private final Level level = GekLogger.this.getLevel();
             private final Instant time = Instant.now();
             private final @Nullable StackTraceElement stackTrace =
-                GekTrace.findCallerStackTrace(GekLogger.class.getName(), "buildLog", stackTraceOffset);
+                GekTrace.findCallerTrace(GekLogger.class.getName(), "buildLog", stackTraceOffset);
             private final Object[] messages = msg.clone();
 
             @Override

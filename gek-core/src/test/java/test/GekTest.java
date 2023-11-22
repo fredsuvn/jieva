@@ -13,10 +13,10 @@ public class GekTest {
 
     @Test
     public void testThrow() {
-        GekLogger.defaultLogger().info(GekTrace.stackTraceToString(
+        GekLogger.defaultLogger().info(GekTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())))
         );
-        GekLogger.defaultLogger().info(GekTrace.stackTraceToString(
+        GekLogger.defaultLogger().info(GekTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())),
             " : ")
         );
@@ -99,13 +99,13 @@ public class GekTest {
 
     private static final class T3 {
         public static void invoke3() {
-            StackTraceElement element1 = GekTrace.findCallerStackTrace(T1.class.getName(), "invoke1");
+            StackTraceElement element1 = GekTrace.findCallerTrace(T1.class.getName(), "invoke1");
             Assert.assertEquals(element1.getClassName(), GekTest.class.getName());
             Assert.assertEquals(element1.getMethodName(), "testFindCallerStackTrace");
-            StackTraceElement element2 = GekTrace.findCallerStackTrace(T2.class.getName(), "invoke2");
+            StackTraceElement element2 = GekTrace.findCallerTrace(T2.class.getName(), "invoke2");
             Assert.assertEquals(element2.getClassName(), T1.class.getName());
             Assert.assertEquals(element2.getMethodName(), "invoke1");
-            StackTraceElement element3 = GekTrace.findCallerStackTrace(T3.class.getName(), "invoke3");
+            StackTraceElement element3 = GekTrace.findCallerTrace(T3.class.getName(), "invoke3");
             Assert.assertEquals(element3.getClassName(), T2.class.getName());
             Assert.assertEquals(element3.getMethodName(), "invoke2");
         }
