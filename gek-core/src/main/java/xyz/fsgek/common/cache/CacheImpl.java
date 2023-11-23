@@ -41,34 +41,68 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
     @Override
     public @Nullable V get(K key) {
         Entry<K> entry = data.get(key);
-        entry = getEntry(entry, false, true);
+        if (entry == null) {
+            cleanUp();
+            return null;
+        }
+        if (entry.isExpired()) {
+            entry.clear(RemovalListener.Cause.EXPIRED);
+            cleanUp();
+            return null;
+        }
+        entry.refreshAccess();
         cleanUp();
-        return entry == null ? null : clearKeepValue(entry);
+        return valueToV(entry.value());
     }
 
     @Override
     public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
-        // Entry<K> entry = data.get(key);
-        // entry = getEntry(entry, false, true);
-        // if (entry != null) {
-        //     cleanUp();
-        //     return clearKeepValue(entry);
-        // }
-        GekRef<Entry<K>> result = GekRef.ofNull();
+        Entry<K> entry = data.get(key);
+        if (entry == null) {
+            return compute(key, loader);
+        }
+        if (entry.isExpired()) {
+            entry.clear(RemovalListener.Cause.EXPIRED);
+            return compute(key, loader);
+        }
+        Object value = entry.value();
+        if (value == null) {
+            return compute(key, loader);
+        }
+        entry.refreshAccess();
+        cleanUp();
+        return valueToV(entry.value());
+    }
+
+    private @Nullable V compute(K key, Function<? super K, ? extends V> loader) {
+        GekRef<V> result = GekRef.ofNull();
         data.compute(key, (k, old) -> {
-            Entry<K> oldEntry = getEntry(old, false, true);
-            if (oldEntry != null) {
-                result.set(oldEntry);
-                return old;
+            if (old == null) {
+                V nv = loader.apply(k);
+                Entry<K> newEntry = newEntry(k, nv, expireAfterWrite, expireAfterAccess);
+                result.set(nv);
+                return newEntry;
             }
-            V newValue = loader.apply(k);
-            Entry<K> newEntry = newEntry(k, newValue, expireAfterWrite, expireAfterAccess);
-            newEntry.keepValue(newValue);
-            result.set(newEntry);
-            return newEntry;
+            if (old.isExpired()) {
+                old.clear(RemovalListener.Cause.EXPIRED);
+                V nv = loader.apply(k);
+                Entry<K> newEntry = newEntry(k, nv, expireAfterWrite, expireAfterAccess);
+                result.set(nv);
+                return newEntry;
+            }
+            Object ov = old.value();
+            if (ov == null) {
+                V nv = loader.apply(k);
+                Entry<K> newEntry = newEntry(k, nv, expireAfterWrite, expireAfterAccess);
+                result.set(nv);
+                return newEntry;
+            }
+            result.set(valueToV(ov));
+            old.refreshAccess();
+            return old;
         });
         cleanUp();
-        return clearKeepValue(result.get());
+        return result.get();
     }
 
     @Override

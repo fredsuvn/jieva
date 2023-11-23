@@ -1,5 +1,7 @@
 package test;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekLog;
@@ -154,6 +156,14 @@ public class CacheTest {
 
     @Test
     public void testExpiration() throws InterruptedException {
+
+       // Cache<Integer,Integer> caffeineSoft = Caffeine.newBuilder()
+       //      // .removalListener((k, v, c) -> {
+       //      // })
+       //      .softValues()
+       //      .build();
+       //  caffeineSoft.get(1,k->k);
+
         int[] l = {0};
         GekCache.RemovalListener.Cause[] cause = {null};
         GekCache<Integer, Integer> cache = GekCache.softCache((k, v, c) -> {
