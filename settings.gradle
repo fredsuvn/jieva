@@ -12,3 +12,4 @@ rootProject.name = 'gek-root'
 file("${rootDir}/").eachDirMatch(~/gek-(?!(plugins|draft)).*/) { dir ->
   include ":${dir.name}"
 }
+include ":docs"

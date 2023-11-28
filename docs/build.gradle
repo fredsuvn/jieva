@@ -1,0 +1,34 @@
+plugins {
+  id 'gek'
+  id 'gek-config'
+  id 'gek-repo'
+  id 'java-library'
+  id 'gek-test'
+}
+
+description = 'Gek docs.'
+
+dependencies {
+  implementation platform(project(':gek-dependencies'))
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+  annotationProcessor platform(project(":gek-dependencies"))
+  annotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
+  api project(':gek-annotations')
+  api project(':gek-core')
+  api project(':gek-kotlin')
+  api project(":gek-test")
+}
+
+tasks.register('benchmark') {
+  //dependsOn compileTestJava
+  dependsOn compileJava
+  group = 'benchmark'
+  doLast {
+    javaexec {
+      main = 'benchmark.JmhRunner'
+      //classpath = sourceSets.test.runtimeClasspath
+      classpath = sourceSets.main.runtimeClasspath
+      args 'cache'
+    }
+  }
+}

@@ -110,17 +110,6 @@ clean {
   delete("$generatedPath/temp")
 }
 
-tasks.register('benchmark') {
-  dependsOn compileTestJava
-  group = 'benchmark'
-  doLast {
-    javaexec {
-      main = 'benchmark.jmh.JmhRunner'
-      classpath = sourceSets.test.runtimeClasspath
-    }
-  }
-}
-
 tasks.register('cleanWithJavadoc') {
   dependsOn clean
   group = 'build'

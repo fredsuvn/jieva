@@ -715,4 +715,13 @@ public class Gek {
     public static GekScheduledPool scheduledPool() {
         return GekScheduledPool.newInstance();
     }
+
+    /**
+     * Logs message in level of {@link GekLog.Level#INFO} with {@link GekLog#getInstance()}.
+     *
+     * @param message message
+     */
+    public static void log(Object... message) {
+        GekLog.getInstance().info(message);
+    }
 }

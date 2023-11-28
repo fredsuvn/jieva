@@ -1,0 +1,19 @@
+Benchmark                   Mode  Cnt      Score       Error   Units
+CacheJmh.caffeine          thrpt    3   7188.207 ± 14429.834  ops/ms
+CacheJmh.caffeineFull      thrpt    3   2492.426 ±  4415.100  ops/ms
+CacheJmh.caffeineSoft      thrpt    3  24893.158 ±  5950.333  ops/ms
+CacheJmh.caffeineSoftFull  thrpt    3   3239.111 ± 14406.698  ops/ms
+CacheJmh.caffeineSoftGs    thrpt    3  15756.324 ±  1624.754  ops/ms
+CacheJmh.caffeineWeak      thrpt    3    432.158 ±   782.240  ops/ms
+CacheJmh.caffeineWeakFull  thrpt    3    380.761 ±   196.475  ops/ms
+CacheJmh.fsSoft            thrpt    3  29893.985 ±  8642.241  ops/ms
+CacheJmh.fsSoftFull        thrpt    3  13420.404 ± 20617.319  ops/ms
+CacheJmh.fsSoftGs          thrpt    3  17636.753 ±  3592.073  ops/ms
+CacheJmh.fsWeak            thrpt    3  30460.745 ±  8303.961  ops/ms
+CacheJmh.fsWeakFull        thrpt    3  13877.809 ±  2331.832  ops/ms
+CacheJmh.guava             thrpt    3   2318.803 ±   902.011  ops/ms
+CacheJmh.guavaFull         thrpt    3    944.952 ±    82.511  ops/ms
+CacheJmh.guavaSoft         thrpt    3  17144.054 ±  8726.712  ops/ms
+CacheJmh.guavaSoftFull     thrpt    3   2242.943 ±  3338.676  ops/ms
+CacheJmh.guavaWeak         thrpt    3    520.590 ±   765.015  ops/ms
+CacheJmh.guavaWeakFull     thrpt    3    350.676 ±   215.346  ops/ms

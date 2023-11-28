@@ -1,4 +1,4 @@
-package benchmark.jmh;
+package benchmark;
 
 import org.openjdk.jmh.annotations.*;
 import xyz.fsgek.common.base.GekString;
