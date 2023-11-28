@@ -48,4 +48,4 @@ link:../src/test/java/samples/[Samples].
 
 == Benchmarks
 
-link:benchmark/[Benchmark Result].
+link:../../docs/benchmark/[Benchmark Result].
