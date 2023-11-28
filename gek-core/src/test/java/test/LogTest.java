@@ -2,11 +2,12 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekLog;
 import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
 
-public class LoggerTest {
+public class LogTest {
 
     @Test
     public void testLogger() {
@@ -25,6 +26,8 @@ public class LoggerTest {
         logger2.warn("test warn");
         logger2.error("test error");
         Assert.assertEquals(count.get(), 4);
+
+        Gek.log("Gek.log");
     }
 
     private static GekLog getGekLog2(IntRef count) {

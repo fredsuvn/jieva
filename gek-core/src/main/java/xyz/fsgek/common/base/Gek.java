@@ -717,11 +717,11 @@ public class Gek {
     }
 
     /**
-     * Logs message in level of {@link GekLog.Level#INFO} with {@link GekLog#getInstance()}.
+     * Logs message with level of {@link GekLog.Level#INFO} with {@link GekLog#getInstance()}.
      *
      * @param message message
      */
     public static void log(Object... message) {
-        GekLog.getInstance().info(message);
+        GekLog.getInstance().logOffset(GekLog.Level.INFO, 2, message);
     }
 }

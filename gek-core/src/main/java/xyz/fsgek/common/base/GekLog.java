@@ -48,7 +48,7 @@ public abstract class GekLog {
     }
 
     /**
-     * Logs message in level of {@link Level#TRACE}.
+     * Logs message with level of {@link Level#TRACE}.
      *
      * @param messages messages
      */
@@ -57,7 +57,7 @@ public abstract class GekLog {
     }
 
     /**
-     * Logs message in level of {@link Level#DEBUG}.
+     * Logs message with level of {@link Level#DEBUG}.
      *
      * @param messages messages
      */
@@ -66,7 +66,7 @@ public abstract class GekLog {
     }
 
     /**
-     * Logs message in level of {@link Level#INFO}.
+     * Logs message with level of {@link Level#INFO}.
      *
      * @param messages messages
      */
@@ -75,7 +75,7 @@ public abstract class GekLog {
     }
 
     /**
-     * Logs message in level of {@link Level#WARN}.
+     * Logs message with level of {@link Level#WARN}.
      *
      * @param messages messages
      */
@@ -84,7 +84,7 @@ public abstract class GekLog {
     }
 
     /**
-     * Logs message in level of {@link Level#ERROR}.
+     * Logs message with level of {@link Level#ERROR}.
      *
      * @param messages messages
      */
@@ -93,13 +93,28 @@ public abstract class GekLog {
     }
 
     private void log(Level level, Object... messages) {
+        logOffset(level, 2, messages);
+    }
+
+    /**
+     * Logs message with specified level and trace offset.
+     * The trace offset specifies the offset from where logging occurs to this method,
+     * see {@link #buildRecord(int, Level, Object...)} and {@link GekTrace#findCallerTrace(String, String, int)}.
+     *
+     * @param level    specified level
+     * @param offset   trace offset
+     * @param messages messages
+     * @see #buildRecord(int, Level, Object...)
+     * @see GekTrace#findCallerTrace(String, String, int)
+     */
+    public void logOffset(Level level, int offset, Object... messages) {
         if (level == null) {
             return;
         }
         if (!level.isGreaterOrEquals(getLevel())) {
             return;
         }
-        Record record = buildRecord(2, level, messages);
+        Record record = buildRecord(offset, level, messages);
         writeRecord(record);
     }
 
@@ -113,8 +128,8 @@ public abstract class GekLog {
     }
 
     /**
-     * Builds one log record of given message array and specified level.
-     * The parameter {@code traceOffset} specifies the offset from where logging occurs to this method,
+     * Builds one log record of given message array, specified level and trace offset.
+     * The trace offset specifies the offset from where logging occurs to this method,
      * see {@link GekTrace#findCallerTrace(String, String, int)}.
      *
      * @param traceOffset offset from where logging occurs to this method
