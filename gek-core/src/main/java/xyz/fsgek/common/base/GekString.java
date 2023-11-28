@@ -411,7 +411,7 @@ public class GekString {
     }
 
     /**
-     * Splits given chars by given separator, using given sub-sequence generator to generate sub CharSequence.
+     * Splits given chars by given separator, using given sub-sequence function to generate sub-CharSequence.
      * If chars or separator is empty, or separator's length is greater than chars' length,
      * or separator is never matched, return an empty list.
      * <p>
@@ -420,10 +420,11 @@ public class GekString {
      *
      * @param chars     given chars
      * @param separator given separator
-     * @param generator given sub-sequence generator
+     * @param subFunc   given sub-sequence generator
      * @return split list
      */
-    public static List<CharSequence> split(CharSequence chars, CharSequence separator, CharsGen generator) {
+    public static List<CharSequence> split(
+        CharSequence chars, CharSequence separator, SubFunction<CharSequence> subFunc) {
         if (isEmpty(chars) || isEmpty(separator) || separator.length() > chars.length()) {
             return Collections.emptyList();
         }
@@ -432,17 +433,17 @@ public class GekString {
         while (true) {
             int index = indexOf(chars, separator, wordStart);
             if (index >= 0) {
-                result.add(generator.apply(chars, wordStart, index));
+                result.add(subFunc.apply(chars, wordStart, index));
                 wordStart = index + separator.length();
                 if (wordStart >= chars.length()) {
-                    result.add(generator.apply(chars, wordStart, chars.length()));
+                    result.add(subFunc.apply(chars, wordStart, chars.length()));
                     return result;
                 }
             } else {
                 if (result.isEmpty()) {
                     return Collections.emptyList();
                 }
-                result.add(generator.apply(chars, wordStart, chars.length()));
+                result.add(subFunc.apply(chars, wordStart, chars.length()));
                 return result;
             }
         }
@@ -1070,24 +1071,6 @@ public class GekString {
     public static CharSequence subChars(CharSequence chars, int start, int end) {
         GekCheck.checkRangeInBounds(start, end, 0, chars.length());
         return new SubChars(chars, start, end);
-    }
-
-    /**
-     * Functional interface to generator sub-sequence.
-     *
-     * @author fredsuvn
-     */
-    @FunctionalInterface
-    public interface CharsGen {
-        /**
-         * Returns sub-sequence of given chars from given start index inclusive to given end index exclusive.
-         *
-         * @param chars given chars
-         * @param start given start index inclusive
-         * @param end   given end index exclusive
-         * @return sub-sequence of given chars
-         */
-        CharSequence apply(CharSequence chars, int start, int end);
     }
 
     private static final class Chars implements CharSequence {
