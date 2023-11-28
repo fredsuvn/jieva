@@ -14,28 +14,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-abstract class CacheImpl<K, V> implements GekCache<K, V> {
+final class CacheImpl<K, V> implements GekCache<K, V> {
 
-    @Nullable
-    static <V> V valueToV(@Nullable Object value) {
-        if (value == null || value instanceof Null) {
-            return null;
-        }
-        return Gek.as(value);
-    }
-
-    protected final boolean useSoft;
-    protected final Map<K, Entry<K>> data;
-    protected final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+    private final boolean useSoft;
+    private final Map<K, Entry<K>> data;
+    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
     private final long expireAfterWrite;
     private final long expireAfterAccess;
+    private final RemovalListener<? super K, ? super V> removalListener;
 
     CacheImpl(Builder<K, V> builder) {
-        this.useSoft = builder.useSoft();
+        this.useSoft = builder.isSoftValues();
         this.expireAfterAccess = builder.expireAfterAccessMillis();
         this.expireAfterWrite = builder.expireAfterWriteMillis();
         this.data = builder.initialCapacity() <= 0 ?
             new ConcurrentHashMap<>() : new ConcurrentHashMap<>(builder.initialCapacity());
+        this.removalListener = builder.removeListener();
+        ;
     }
 
     @Override
@@ -52,7 +47,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
         entry.refreshAccess();
         cleanUp();
-        return valueToV(entry.value());
+        return valueAs(entry.value());
     }
 
     @Override
@@ -71,7 +66,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
         entry.refreshAccess();
         cleanUp();
-        return valueToV(entry.value());
+        return valueAs(value);
     }
 
     private @Nullable V compute(K key, Function<? super K, ? extends V> loader) {
@@ -97,7 +92,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
                 result.set(nv);
                 return newEntry;
             }
-            result.set(valueToV(ov));
+            result.set(valueAs(ov));
             old.refreshAccess();
             return old;
         });
@@ -108,50 +103,104 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
     @Override
     public @Nullable GekWrapper<V> getWrapper(K key) {
         Entry<K> entry = data.get(key);
-        entry = getEntry(entry, false, true);
+        if (entry == null) {
+            cleanUp();
+            return null;
+        }
+        if (entry.isExpired()) {
+            entry.clear(RemovalListener.Cause.EXPIRED);
+            cleanUp();
+            return null;
+        }
+        Object value = entry.value();
+        if (value == null) {
+            return null;
+        }
+        entry.refreshAccess();
         cleanUp();
-        return entry == null ? null : GekWrapper.wrap(clearKeepValue(entry));
+        return GekWrapper.wrap(valueAs(value));
     }
 
     @Override
-    public @Nullable GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable Value<? extends V>> loader) {
-        // Entry<K> entry = data.get(key);
-        // entry = getEntry(entry, false, true);
-        // if (entry != null) {
-        //     cleanUp();
-        //     return GekWrapper.wrap(clearKeepValue(entry));
-        // }
-        GekRef<Entry<K>> result = GekRef.ofNull();
+    public @Nullable GekWrapper<V> getWrapper(
+        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
+        Entry<K> entry = data.get(key);
+        if (entry == null) {
+            return computeWrapper(key, loader);
+        }
+        if (entry.isExpired()) {
+            entry.clear(RemovalListener.Cause.EXPIRED);
+            return computeWrapper(key, loader);
+        }
+        Object value = entry.value();
+        if (value == null) {
+            return computeWrapper(key, loader);
+        }
+        entry.refreshAccess();
+        cleanUp();
+        return GekWrapper.wrap(valueAs(value));
+    }
+
+    private @Nullable GekWrapper<V> computeWrapper(
+        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
+        GekRef<GekWrapper<V>> result = GekRef.ofNull();
         data.compute(key, (k, old) -> {
-            Entry<K> oldEntry = getEntry(old, false, true);
-            if (oldEntry != null) {
-                result.set(oldEntry);
-                return old;
+            if (old == null) {
+                Value<? extends V> nv = loader.apply(k);
+                if (nv == null) {
+                    return null;
+                }
+                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
+                result.set(GekWrapper.wrap(nv.get()));
+                return newEntry;
             }
-            Value<? extends V> newValue = loader.apply(k);
-            if (newValue == null) {
-                return null;
+            if (old.isExpired()) {
+                old.clear(RemovalListener.Cause.EXPIRED);
+                Value<? extends V> nv = loader.apply(k);
+                if (nv == null) {
+                    return null;
+                }
+                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
+                result.set(GekWrapper.wrap(nv.get()));
+                return newEntry;
             }
-            Entry<K> newEntry = newEntry(
-                k, newValue.get(), newValue.expireAfterWriteMillis(), newValue.expireAfterAccessMillis());
-            newEntry.keepValue(newValue.get());
-            result.set(newEntry);
-            return newEntry;
+            Object ov = old.value();
+            if (ov == null) {
+                Value<? extends V> nv = loader.apply(k);
+                if (nv == null) {
+                    return null;
+                }
+                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
+                result.set(GekWrapper.wrap(nv.get()));
+                return newEntry;
+            }
+            result.set(GekWrapper.wrap(valueAs(ov)));
+            old.refreshAccess();
+            return old;
         });
         cleanUp();
-        Entry<K> resultEntry = result.get();
-        if (resultEntry == null) {
-            return null;
-        }
-        return GekWrapper.wrap(clearKeepValue(resultEntry));
+        return result.get();
     }
 
     @Override
     public boolean contains(K key) {
         Entry<K> entry = data.get(key);
-        entry = getEntry(entry, null, false);
+        if (entry == null) {
+            cleanUp();
+            return false;
+        }
+        if (entry.isExpired()) {
+            entry.clear(RemovalListener.Cause.EXPIRED);
+            cleanUp();
+            return false;
+        }
+        Object value = entry.value();
+        if (value == null) {
+            cleanUp();
+            return false;
+        }
         cleanUp();
-        return entry != null;
+        return true;
     }
 
     @Override
@@ -169,31 +218,37 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
     }
 
     @Override
-    public void put(K key, Value<V> value) {
-        data.put(key, newEntry(key, value.get(), value.expireAfterWriteMillis(), value.expireAfterAccessMillis()));
+    public void put(K key, Value<? extends V> value) {
+        Entry<K> old = data.put(
+            key, newEntry(key, value.get(), value.expireAfterWriteMillis(), value.expireAfterAccessMillis()));
+        if (old != null) {
+            old.clear(RemovalListener.Cause.REPLACED);
+        }
         cleanUp();
     }
 
     @Override
     public void expire(K key, long expireAfterWriteMillis) {
         Entry<K> entry = data.get(key);
-        entry = getEntry(entry, null, false);
-        if (entry != null) {
-            entry.refreshWrite(expireAfterWriteMillis);
-            entry.refreshWrite();
+        if (entry == null) {
+            cleanUp();
+            return;
         }
+        entry.setExpireAfterWrite(expireAfterWriteMillis);
+        entry.refreshWrite();
         cleanUp();
     }
 
     @Override
     public void expire(K key, long expireAfterWriteMillis, long expireAfterAccessMillis) {
         Entry<K> entry = data.get(key);
-        entry = getEntry(entry, null, false);
-        if (entry != null) {
-            entry.refreshWrite(expireAfterWriteMillis);
-            entry.refreshAccess(expireAfterAccessMillis);
-            entry.refreshWrite();
+        if (entry == null) {
+            cleanUp();
+            return;
         }
+        entry.setExpireAfterWrite(expireAfterWriteMillis);
+        entry.setExpireAfterAccess(expireAfterAccessMillis);
+        entry.refreshWrite();
         cleanUp();
     }
 
@@ -216,15 +271,22 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
     }
 
     @Override
-    public void removeIf(BiPredicate<K, V> predicate) {
+    public void removeIf(BiPredicate<? super K, ? super V> predicate) {
         data.entrySet().removeIf(it -> {
             K key = it.getKey();
             Entry<K> entry = it.getValue();
-            entry = getEntry(entry, null, true);
             if (entry == null) {
                 return true;
             }
-            if (predicate.test(key, clearKeepValue(entry))) {
+            if (entry.isExpired()) {
+                entry.clear(RemovalListener.Cause.EXPIRED);
+                return true;
+            }
+            Object value = entry.value();
+            if (value == null) {
+                return true;
+            }
+            if (predicate.test(key, valueAs(value))) {
                 entry.clear(RemovalListener.Cause.EXPLICIT);
                 return true;
             }
@@ -234,20 +296,23 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
     }
 
     @Override
-    public void removeEntry(BiPredicate<K, Value<V>> predicate) {
+    public void removeEntry(BiPredicate<? super K, ? super Value<? super V>> predicate) {
         data.entrySet().removeIf(it -> {
             K key = it.getKey();
             Entry<K> entry = it.getValue();
-            entry = getEntry(entry, null, true);
             if (entry == null) {
                 return true;
             }
-            Value<V> wrapper = Value.of(
-                clearKeepValue(entry),
-                entry.expireAfterWrite() < 0 ? expireAfterWrite : entry.expireAfterWrite(),
-                entry.expireAfterAccess() < 0 ? expireAfterAccess : entry.expireAfterAccess()
-            );
-            if (predicate.test(key, wrapper)) {
+            if (entry.isExpired()) {
+                entry.clear(RemovalListener.Cause.EXPIRED);
+                return true;
+            }
+            Object value = entry.value();
+            if (value == null) {
+                return true;
+            }
+            Value<V> v = Value.of(valueAs(value), entry.expireAfterWrite(), entry.expireAfterAccess());
+            if (predicate.test(key, v)) {
                 entry.clear(RemovalListener.Cause.EXPLICIT);
                 return true;
             }
@@ -266,8 +331,15 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
     public void clear() {
         data.entrySet().removeIf(it -> {
             Entry<K> entry = it.getValue();
-            entry = getEntry(entry, null, false);
             if (entry == null) {
+                return true;
+            }
+            if (entry.isExpired()) {
+                entry.clear(RemovalListener.Cause.EXPIRED);
+                return true;
+            }
+            Object value = entry.value();
+            if (value == null) {
                 return true;
             }
             entry.clear(RemovalListener.Cause.EXPLICIT);
@@ -284,8 +356,9 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
                 break;
             }
             Entry<K> entry = Gek.as(x);
+            entry.onRemoval(RemovalListener.Cause.COLLECTED);
             K key = entry.key();
-            data.compute(key, (k, v) -> {
+            data.computeIfPresent(key, (k, v) -> {
                 if (v == entry) {
                     return null;
                 }
@@ -294,52 +367,22 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
     }
 
-    protected Entry<K> newEntry(K key, @Nullable V value, long expireAfterWrite, long expireAfterAccess) {
+    private Entry<K> newEntry(K key, @Nullable V value, long expireAfterWrite, long expireAfterAccess) {
         Object v = value == null ? new Null() : value;
         return useSoft ?
-            new SoftEntry<>(this, key, v, expireAfterWrite, expireAfterAccess)
+            new SoftEntry(key, v, expireAfterWrite, expireAfterAccess)
             :
-            new WeakEntry<>(this, key, value, expireAfterWrite, expireAfterAccess);
+            new WeakEntry(key, value, expireAfterWrite, expireAfterAccess);
     }
 
     @Nullable
-    protected GekCache.RemovalListener<K, V> removalListener() {
-        return null;
+    private V valueAs(@Nullable Object value) {
+        if (value == null || value instanceof Null) {
+            return null;
+        }
+        return Gek.as(value);
     }
 
-    @Nullable
-    private Entry<K> getEntry(@Nullable Entry<K> entry, Boolean isWrite, boolean needKeep) {
-        if (entry == null) {
-            return null;
-        }
-        Object value = entry.value();
-        if (value == null) {
-            return null;
-        }
-        if (entry.isExpired()) {
-            entry.clear(RemovalListener.Cause.EXPIRED);
-            return null;
-        }
-        if (needKeep) {
-            entry.keepValue(value);
-        }
-        if (isWrite == null) {
-            return entry;
-        }
-        if (isWrite) {
-            entry.refreshWrite();
-        } else {
-            entry.refreshAccess();
-        }
-        return entry;
-    }
-
-    @Nullable
-    private V clearKeepValue(@Nullable Entry<K> entry) {
-        Object value = entry.keepValue();
-        entry.clearKeepValue();
-        return valueToV(value);
-    }
 
     protected interface Entry<K> {
 
@@ -347,47 +390,35 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
 
         Object value();
 
-        void clear(RemovalListener.Cause cause);
-
         boolean isExpired();
 
         void refreshWrite();
 
         void refreshAccess();
 
-        void refreshWrite(long expireAfterWrite);
+        void setExpireAfterWrite(long expireAfterWrite);
 
-        void refreshAccess(long expireAfterAccess);
+        void setExpireAfterAccess(long expireAfterAccess);
 
         long expireAfterWrite();
 
         long expireAfterAccess();
 
-        void keepValue(Object value);
-
-        Object keepValue();
-
-        void clearKeepValue();
-    }
-
-    private interface ListenedEntry<K> extends Entry<K> {
+        void clear(RemovalListener.Cause cause);
 
         void onRemoval(RemovalListener.Cause cause);
     }
 
-    private static abstract class BaseSoftEntry<K, V> extends SoftReference<Object> implements Entry<K> {
+    private final class SoftEntry extends SoftReference<Object> implements Entry<K> {
 
-        protected final CacheImpl<K, V> cache;
         private final K key;
         private long customExpireAfterWrite;
         private long customExpireAfterAccess;
         private long expiredAt = -1;
-        private Object keepValue;
+        private boolean removed = false;
 
-        public BaseSoftEntry(
-            CacheImpl<K, V> cache, K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
-            super(referent, cache.queue);
-            this.cache = cache;
+        public SoftEntry(K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
+            super(referent, CacheImpl.this.queue);
             this.key = key;
             this.customExpireAfterWrite = expireAfterWrite;
             this.customExpireAfterAccess = expireAfterAccess;
@@ -405,6 +436,9 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         public boolean isExpired() {
+            if (removed) {
+                return true;
+            }
             if (expiredAt < 0) {
                 return false;
             }
@@ -413,7 +447,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         public void refreshWrite() {
-            long exp = customExpireAfterWrite < 0 ? cache.expireAfterWrite : customExpireAfterWrite;
+            long exp = expireAfterWrite();
             if (exp < 0) {
                 return;
             }
@@ -421,7 +455,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         public void refreshAccess() {
-            long exp = customExpireAfterAccess < 0 ? cache.expireAfterAccess : customExpireAfterAccess;
+            long exp = expireAfterAccess();
             if (exp < 0) {
                 return;
             }
@@ -429,96 +463,63 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         @Override
-        public void refreshWrite(long expireAfterWrite) {
+        public void setExpireAfterWrite(long expireAfterWrite) {
             customExpireAfterWrite = expireAfterWrite;
         }
 
         @Override
-        public void refreshAccess(long expireAfterAccess) {
+        public void setExpireAfterAccess(long expireAfterAccess) {
             customExpireAfterAccess = expireAfterAccess;
         }
 
         @Override
         public long expireAfterWrite() {
-            return customExpireAfterWrite;
+            return customExpireAfterWrite < 0 ? CacheImpl.this.expireAfterWrite : customExpireAfterWrite;
         }
 
         @Override
         public long expireAfterAccess() {
-            return customExpireAfterAccess;
-        }
-
-        @Override
-        public void keepValue(Object value) {
-            keepValue = (value == null ? new Null() : value);
-        }
-
-        @Override
-        public Object keepValue() {
-            return keepValue;
-        }
-
-        @Override
-        public void clearKeepValue() {
-            keepValue = null;
-        }
-    }
-
-    private static final class SoftEntry<K, V> extends BaseSoftEntry<K, V> {
-
-        public SoftEntry(CacheImpl<K, V> cache, K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
-            super(cache, key, referent, expireAfterWrite, expireAfterAccess);
+            return customExpireAfterAccess < 0 ? CacheImpl.this.expireAfterAccess : customExpireAfterAccess;
         }
 
         @Override
         public void clear(RemovalListener.Cause cause) {
-            super.clear();
-        }
-    }
-
-    private static final class ListenedSoftEntry<K, V> extends BaseSoftEntry<K, V> implements ListenedEntry<K> {
-
-        private boolean executed = false;
-
-        public ListenedSoftEntry(
-            CacheImpl<K, V> cache, K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
-            super(cache, key, referent, expireAfterWrite, expireAfterAccess);
-        }
-
-        @Override
-        public void clear(RemovalListener.Cause cause) {
+            if (removed) {
+                return;
+            }
             super.clear();
             onRemoval(cause);
         }
 
         @Override
         public void onRemoval(RemovalListener.Cause cause) {
-            if (executed) {
+            if (removed) {
                 return;
             }
-            synchronized (ListenedSoftEntry.this) {
-                if (executed) {
+            if (CacheImpl.this.removalListener == null) {
+                removed = true;
+                return;
+            }
+            synchronized (SoftEntry.this) {
+                if (removed) {
                     return;
                 }
-                executed = true;
-                cache.removalListener().onRemoval(key(), valueToV(value()), cause);
+                removed = true;
+                CacheImpl.this.removalListener.onRemoval(key(), valueAs(value()), cause);
             }
         }
     }
 
-    private static abstract class BaseWeakEntry<K, V> extends WeakReference<Object> implements Entry<K> {
+    private final class WeakEntry extends WeakReference<Object> implements Entry<K> {
 
-        protected final CacheImpl<K, V> cache;
         private final K key;
         private long customExpireAfterWrite;
         private long customExpireAfterAccess;
         private long expiredAt = -1;
-        private Object keepValue;
+        private boolean removed = false;
 
-        public BaseWeakEntry(
-            CacheImpl<K, V> cache, K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
-            super(referent, cache.queue);
-            this.cache = cache;
+        public WeakEntry(K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
+            super(referent, CacheImpl.this.queue);
             this.key = key;
             this.customExpireAfterWrite = expireAfterWrite;
             this.customExpireAfterAccess = expireAfterAccess;
@@ -536,6 +537,9 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         public boolean isExpired() {
+            if (removed) {
+                return true;
+            }
             if (expiredAt < 0) {
                 return false;
             }
@@ -544,7 +548,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         public void refreshWrite() {
-            long exp = customExpireAfterWrite < 0 ? cache.expireAfterWrite : customExpireAfterWrite;
+            long exp = expireAfterWrite();
             if (exp < 0) {
                 return;
             }
@@ -552,7 +556,7 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         public void refreshAccess() {
-            long exp = customExpireAfterAccess < 0 ? cache.expireAfterAccess : customExpireAfterAccess;
+            long exp = expireAfterAccess();
             if (exp < 0) {
                 return;
             }
@@ -560,132 +564,53 @@ abstract class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         @Override
-        public void refreshWrite(long expireAfterWrite) {
+        public void setExpireAfterWrite(long expireAfterWrite) {
             customExpireAfterWrite = expireAfterWrite;
         }
 
         @Override
-        public void refreshAccess(long expireAfterAccess) {
+        public void setExpireAfterAccess(long expireAfterAccess) {
             customExpireAfterAccess = expireAfterAccess;
         }
 
         @Override
         public long expireAfterWrite() {
-            return customExpireAfterWrite;
+            return customExpireAfterWrite < 0 ? CacheImpl.this.expireAfterWrite : customExpireAfterWrite;
         }
 
         @Override
         public long expireAfterAccess() {
-            return customExpireAfterAccess;
-        }
-
-        @Override
-        public void keepValue(Object value) {
-            keepValue = (value == null ? new Null() : value);
-        }
-
-        @Override
-        public Object keepValue() {
-            return keepValue;
-        }
-
-        @Override
-        public void clearKeepValue() {
-            keepValue = null;
-        }
-    }
-
-    private static final class WeakEntry<K, V> extends BaseWeakEntry<K, V> {
-
-        public WeakEntry(CacheImpl<K, V> cache, K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
-            super(cache, key, referent, expireAfterWrite, expireAfterAccess);
+            return customExpireAfterAccess < 0 ? CacheImpl.this.expireAfterAccess : customExpireAfterAccess;
         }
 
         @Override
         public void clear(RemovalListener.Cause cause) {
-            super.clear();
-        }
-    }
-
-    private static final class ListenedWeakEntry<K, V> extends BaseWeakEntry<K, V> implements ListenedEntry<K> {
-
-        private boolean executed = false;
-
-        public ListenedWeakEntry(
-            CacheImpl<K, V> cache, K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
-            super(cache, key, referent, expireAfterWrite, expireAfterAccess);
-        }
-
-        @Override
-        public void clear(RemovalListener.Cause cause) {
+            if (removed) {
+                return;
+            }
             super.clear();
             onRemoval(cause);
         }
 
         @Override
         public void onRemoval(RemovalListener.Cause cause) {
-            if (executed) {
+            if (removed) {
                 return;
             }
-            synchronized (this) {
-                if (executed) {
+            if (CacheImpl.this.removalListener == null) {
+                removed = true;
+                return;
+            }
+            synchronized (WeakEntry.this) {
+                if (removed) {
                     return;
                 }
-                executed = true;
-                cache.removalListener().onRemoval(key(), valueToV(value()), cause);
+                removed = true;
+                CacheImpl.this.removalListener.onRemoval(key(), valueAs(value()), cause);
             }
         }
     }
 
     private static final class Null {
-    }
-
-    static final class UnListenedCacheImpl<K, V> extends CacheImpl<K, V> {
-
-        UnListenedCacheImpl(Builder<K, V> builder) {
-            super(builder);
-        }
-    }
-
-    static final class ListenedCacheImpl<K, V> extends CacheImpl<K, V> {
-
-        private final RemovalListener<K, V> removalListener;
-
-        ListenedCacheImpl(Builder<K, V> builder) {
-            super(builder);
-            this.removalListener = builder.removeListener();
-        }
-
-        @Override
-        public void cleanUp() {
-            while (true) {
-                Object x = queue.poll();
-                if (x == null) {
-                    break;
-                }
-                ListenedEntry<K> entry = Gek.as(x);
-                entry.onRemoval(RemovalListener.Cause.COLLECTED);
-                K key = entry.key();
-                data.compute(key, (k, v) -> {
-                    if (v == entry) {
-                        return null;
-                    }
-                    return v;
-                });
-            }
-        }
-
-        protected ListenedEntry<K> newEntry(K key, @Nullable V value, long expireAfterWrite, long expireAfterAccess) {
-            Object v = value == null ? new Null() : value;
-            return useSoft ?
-                new ListenedSoftEntry<>(this, key, v, expireAfterWrite, expireAfterAccess)
-                :
-                new ListenedWeakEntry<>(this, key, value, expireAfterWrite, expireAfterAccess);
-        }
-
-        @Override
-        protected @Nullable GekCache.RemovalListener<K, V> removalListener() {
-            return removalListener;
-        }
     }
 }

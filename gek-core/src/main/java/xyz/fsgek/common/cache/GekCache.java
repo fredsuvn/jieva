@@ -55,7 +55,7 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache() {
-        return newBuilder().build();
+        return newBuilder().softValues().build();
     }
 
     /**
@@ -68,8 +68,8 @@ public interface GekCache<K, V> {
      * @param <V>             value type
      * @return a new {@link GekCache}
      */
-    static <K, V> GekCache<K, V> softCache(RemovalListener<K, V> removalListener) {
-        return newBuilder().removeListener(removalListener).build();
+    static <K, V> GekCache<K, V> softCache(RemovalListener<? super K, ? super V> removalListener) {
+        return newBuilder().softValues().removeListener(removalListener).build();
     }
 
     /**
@@ -80,7 +80,7 @@ public interface GekCache<K, V> {
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache() {
-        return newBuilder().useSoft(false).build();
+        return newBuilder().weakValues().build();
     }
 
     /**
@@ -93,8 +93,8 @@ public interface GekCache<K, V> {
      * @param <V>             value type
      * @return a new {@link GekCache}
      */
-    static <K, V> GekCache<K, V> weakCache(RemovalListener<K, V> removalListener) {
-        return newBuilder().useSoft(false).removeListener(removalListener).build();
+    static <K, V> GekCache<K, V> weakCache(RemovalListener<? super K, ? super V> removalListener) {
+        return newBuilder().weakValues().removeListener(removalListener).build();
     }
 
     /**
@@ -156,7 +156,7 @@ public interface GekCache<K, V> {
      * @return value associating with specified key, may be computed from given loader
      */
     @Nullable
-    GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable Value<? extends V>> loader);
+    GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader);
 
     /**
      * Returns whether this cache contains the value associating with specified key and the value is valid.
@@ -198,7 +198,7 @@ public interface GekCache<K, V> {
      * @param key   specified key
      * @param value the value wrapped by {@link Value}
      */
-    void put(K key, Value<V> value);
+    void put(K key, Value<? extends V> value);
 
     /**
      * Sets expiration in milliseconds of values which are written after once compute/put operation for value
@@ -254,7 +254,7 @@ public interface GekCache<K, V> {
      *
      * @param predicate given predicate
      */
-    void removeIf(BiPredicate<K, V> predicate);
+    void removeIf(BiPredicate<? super K, ? super V> predicate);
 
     /**
      * Removes values of which key and value info (first and second param) pass given predicate.
@@ -264,7 +264,7 @@ public interface GekCache<K, V> {
      *
      * @param predicate given predicate
      */
-    void removeEntry(BiPredicate<K, Value<V>> predicate);
+    void removeEntry(BiPredicate<? super K, ? super Value<? super V>> predicate);
 
     /**
      * Returns current size.
@@ -510,32 +510,50 @@ public interface GekCache<K, V> {
 
         private boolean useSoft = true;
         private int initialCapacity = -1;
-        private RemovalListener<K, V> removalListener;
+        private RemovalListener<? super K, ? super V> removalListener;
         private long expireAfterWrite = -1;
         private long expireAfterAccess = -1;
 
         /**
-         * Sets whether based on {@link SoftReference}, true for {@link SoftReference}, false for {@link WeakReference}.
+         * Sets whether based on {@link SoftReference}.
          *
-         * @param useSoft whether based on {@link SoftReference}
-         * @param <K1>    key type
-         * @param <V1>    value type
+         * @param <K1> key type
+         * @param <V1> value type
          * @return this builder
          */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> useSoft(boolean useSoft) {
-            this.useSoft = useSoft;
+        public <K1 extends K, V1 extends V> Builder<K1, V1> softValues() {
+            this.useSoft = true;
             return Gek.as(this);
         }
 
         /**
-         * Returns whether based on {@link SoftReference},
-         * true for {@link SoftReference}, false for {@link WeakReference}.
+         * Returns whether based on {@link SoftReference}.
          *
-         * @return whether based on {@link SoftReference},
-         * true for {@link SoftReference}, false for {@link WeakReference}
+         * @return whether based on {@link SoftReference}
          */
-        public boolean useSoft() {
+        public boolean isSoftValues() {
             return useSoft;
+        }
+
+        /**
+         * Sets whether based on {@link WeakReference}.
+         *
+         * @param <K1> key type
+         * @param <V1> value type
+         * @return this builder
+         */
+        public <K1 extends K, V1 extends V> Builder<K1, V1> weakValues() {
+            this.useSoft = false;
+            return Gek.as(this);
+        }
+
+        /**
+         * Returns whether based on {@link WeakReference}.
+         *
+         * @return whether based on {@link WeakReference}
+         */
+        public boolean isWeakValues() {
+            return !useSoft;
         }
 
         /**
@@ -568,8 +586,9 @@ public interface GekCache<K, V> {
          * @param <V1>            value type
          * @return this builder
          */
-        public <K1 extends K, V1 extends V> Builder<K1, V1> removeListener(RemovalListener<K1, V1> removalListener) {
-            this.removalListener = (RemovalListener<K, V>) removalListener;
+        public <K1 extends K, V1 extends V> Builder<K1, V1> removeListener(
+            RemovalListener<? super K1, ? super V1> removalListener) {
+            this.removalListener = Gek.as(removalListener);
             return Gek.as(this);
         }
 
@@ -579,7 +598,7 @@ public interface GekCache<K, V> {
          * @return removing event listener
          */
         @Nullable
-        public GekCache.RemovalListener<K, V> removeListener() {
+        public <K1 extends K, V1 extends V> GekCache.RemovalListener<? super K, ? super V> removeListener() {
             return removalListener;
         }
 
@@ -691,9 +710,7 @@ public interface GekCache<K, V> {
          * @return built {@link GekCache}
          */
         public <K1 extends K, V1 extends V> GekCache<K1, V1> build() {
-            return Gek.as(
-                removalListener == null ?
-                    new CacheImpl.UnListenedCacheImpl<>(this) : new CacheImpl.ListenedCacheImpl<>(this));
+            return Gek.as(new CacheImpl<>(this));
         }
     }
 }
