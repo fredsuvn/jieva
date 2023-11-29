@@ -1,9 +1,9 @@
 package xyz.fsgek.common.bean.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.base.GekCase;
 import xyz.fsgek.common.base.GekString;
+import xyz.fsgek.common.collect.GekColl;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -38,10 +38,13 @@ public class JavaBeanResolveHandler extends AbstractBeanResolveHandler {
             && (Objects.equals(method.getReturnType(), boolean.class)
             || Objects.equals(method.getReturnType(), Boolean.class)))
         ) {
-            List<CharSequence> words = namingCase.split(method.getName());
-            if (GekColl.isNotEmpty(words) && words.size() > 1
-                && (GekString.charEquals(words.get(0), "get") || GekString.charEquals(words.get(0), "is"))) {
-                return namingCase.join(words.subList(1, words.size()));
+            List<GekCase.Token> tokens = namingCase.tokenize(method.getName());
+            if (GekColl.isNotEmpty(tokens) && tokens.size() > 1
+                && (
+                GekString.charEquals(tokens.get(0).toChars(), "get")
+                    || GekString.charEquals(tokens.get(0).toChars(), "is")
+            )) {
+                return namingCase.join(tokens.subList(1, tokens.size()));
             }
         }
         return null;
@@ -53,9 +56,10 @@ public class JavaBeanResolveHandler extends AbstractBeanResolveHandler {
             return null;
         }
         if ((method.getName().length() > 3 && method.getName().startsWith("set"))) {
-            List<CharSequence> words = namingCase.split(method.getName());
-            if (GekColl.isNotEmpty(words) && words.size() > 1 && GekString.charEquals(words.get(0), "set")) {
-                return namingCase.join(words.subList(1, words.size()));
+            List<GekCase.Token> tokens = namingCase.tokenize(method.getName());
+            if (GekColl.isNotEmpty(tokens) && tokens.size() > 1
+                && GekString.charEquals(tokens.get(0).toChars(), "set")) {
+                return namingCase.join(tokens.subList(1, tokens.size()));
             }
         }
         return null;

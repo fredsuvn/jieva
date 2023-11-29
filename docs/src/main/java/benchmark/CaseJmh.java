@@ -32,20 +32,20 @@ public class CaseJmh {
 
     @Benchmark
     public void fsCamel() {
-        fsUpperCamel.convert(TEST_CAMEL, fsLowerCamel);
-        fsLowerCamel.convert(TEST_CAMEL, fsUpperCamel);
+        fsUpperCamel.toCase(TEST_CAMEL, fsLowerCamel);
+        fsLowerCamel.toCase(TEST_CAMEL, fsUpperCamel);
     }
 
     @Benchmark
     public void fsUnderscore() {
-        fsUpperUnderscore.convert(TEST_SEPARATOR, fsLowerUnderscore);
-        fsLowerUnderscore.convert(TEST_SEPARATOR, fsUpperUnderscore);
+        fsUpperUnderscore.toCase(TEST_SEPARATOR, fsLowerUnderscore);
+        fsLowerUnderscore.toCase(TEST_SEPARATOR, fsUpperUnderscore);
     }
 
     @Benchmark
     public void fsMix() {
-        fsUpperCamel.convert(TEST_CAMEL, fsLowerUnderscore);
-        fsUpperUnderscore.convert(TEST_SEPARATOR, fsLowerCamel);
+        fsUpperCamel.toCase(TEST_CAMEL, fsLowerUnderscore);
+        fsUpperUnderscore.toCase(TEST_SEPARATOR, fsLowerCamel);
     }
 
     @Benchmark

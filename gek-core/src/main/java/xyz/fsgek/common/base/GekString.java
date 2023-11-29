@@ -348,7 +348,7 @@ public class GekString {
         if (isEmpty(chars)) {
             return chars.toString();
         }
-        if (Gek.equals(Character.isUpperCase(chars.charAt(0)), upper)) {
+        if (Character.isUpperCase(chars.charAt(0)) == upper) {
             return chars.toString();
         }
         char[] cs = new char[chars.length()];
@@ -423,12 +423,12 @@ public class GekString {
      * @param subFunc   given sub-sequence generator
      * @return split list
      */
-    public static List<CharSequence> split(
-        CharSequence chars, CharSequence separator, SubFunction<CharSequence> subFunc) {
+    public static <T> List<T> split(
+        CharSequence chars, CharSequence separator, SubFunction<CharSequence, T> subFunc) {
         if (isEmpty(chars) || isEmpty(separator) || separator.length() > chars.length()) {
             return Collections.emptyList();
         }
-        List<CharSequence> result = new LinkedList<>();
+        List<T> result = new LinkedList<>();
         int wordStart = 0;
         while (true) {
             int index = indexOf(chars, separator, wordStart);

@@ -1,185 +1,249 @@
 package xyz.fsgek.common.base;
 
+import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.collect.GekColl;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Naming case utilities.
+ * This class is used to convert name case in different case format such as camel-case, underscore-case.
  *
  * @author fredsuvn
  */
-public interface GekCase {
+public abstract class GekCase {
 
     /**
-     * Upper camel case.
+     * Upper camel case with {@link CamelCase#AS_LOWER}.
      */
-    GekCase UPPER_CAMEL = camelCase(true);
+    public static final GekCase UPPER_CAMEL = camelCase(true, CamelCase.AS_LOWER);
     /**
-     * Lower camel case.
+     * Lower camel case with {@link CamelCase#AS_LOWER}.
      */
-    GekCase LOWER_CAMEL = camelCase(false);
+    public static final GekCase LOWER_CAMEL = camelCase(false, CamelCase.AS_LOWER);
     /**
      * Upper underscore separator case.
      */
-    GekCase UPPER_UNDERSCORE = separatorCase("_", true);
+    public static final GekCase UPPER_UNDERSCORE = delimiterCase("_", t -> GekString.upperCase(t.toChars()));
     /**
      * Lower underscore separator case.
      */
-    GekCase LOWER_UNDERSCORE = separatorCase("_", false);
+    public static final GekCase LOWER_UNDERSCORE = delimiterCase("_", t -> GekString.lowerCase(t.toChars()));
     /**
      * Upper hyphen separator case.
      */
-    GekCase UPPER_HYPHEN = separatorCase("-", true);
+    public static final GekCase UPPER_HYPHEN = delimiterCase("-", t -> GekString.upperCase(t.toChars()));
     /**
      * Lower hyphen separator case.
      */
-    GekCase LOWER_HYPHEN = separatorCase("-", false);
+    public static final GekCase LOWER_HYPHEN = delimiterCase("-", t -> GekString.lowerCase(t.toChars()));
 
     /**
-     * Returns camel case (upper or lower) with given upper setting.
-     * This implementation uses
-     * {@link Character#isUpperCase(char)}, {@link Character#toUpperCase(char)} and {@link Character#toLowerCase(char)}
-     * to check and convert a char.
+     * Returns a new camel case with given character policy.
+     * The character policy specifies how to deal with non-lower and non-upper characters such as digit, supports
+     * {@link CamelCase#AS_LOWER}, {@link CamelCase#AS_UPPER} and {@link CamelCase#AS_INDEPENDENT}.
      *
-     * @param isUpper given upper setting
-     * @return camel case (upper or lower) with given upper setting
+     * @param isUpper    whether this case is upper camel case
+     * @param charPolicy given character policy
+     * @return a new camel case with given character policy
      */
-    static GekCase camelCase(boolean isUpper) {
-        return new CamelCase(isUpper);
+    public static GekCase camelCase(boolean isUpper, int charPolicy) {
+        return new CamelCase(isUpper, charPolicy);
     }
 
     /**
-     * Returns separator case with given separator and upper setting.
-     * If upper setting is not null, this case will process each split part from {@link #split(CharSequence)}
-     * by upper setting.
-     * If upper setting is null, there is no case process for each split part.
+     * Returns a new delimiter case with specified delimiter and token processor.
+     * Each token will be processed by token processor before joining.
      *
-     * @param separator given separator
-     * @param upper     upper setting
-     * @return separator case with given separator and upper setting
+     * @param delimiter      specified delimiter
+     * @param tokenProcessor token processor
+     * @return a new delimiter case with specified delimiter and token processor
      */
-    static GekCase separatorCase(CharSequence separator, Boolean upper) {
-        return new SeparatorCase(separator, upper);
+    public static GekCase delimiterCase(CharSequence delimiter, Function<Token, CharSequence> tokenProcessor) {
+        return new DelimiterCase(delimiter, tokenProcessor);
     }
 
     /**
-     * Splits given chars into a word list with rules of this implementation.
-     * Default implementations use {@link GekString#subChars(CharSequence, int, int)} to build sub-sequence.
+     * Tokenize operation, to split given chars into a token list with rules of this case.
      *
      * @param chars given chars
-     * @return split word list
+     * @return token list
      */
-    List<CharSequence> split(CharSequence chars);
+    public abstract List<Token> tokenize(CharSequence chars);
 
     /**
-     * Joins given split words to one String in rules of this case.
-     * It is assumed that the words is split by {@link #split(CharSequence)}.
+     * Join operation, to join given tokens to one String in rules of this case.
      *
-     * @param words given split words
+     * @param tokens given tokens
      * @return joined string
      */
-    String join(List<CharSequence> words);
+    public abstract String join(List<Token> tokens);
 
     /**
      * Converts given chars from this case to other case. The default implementation is:
      * <pre>
-     *     return otherCase.join(split(chars));
+     *     return otherCase.join(tokenize(chars));
      * </pre>
      *
      * @param chars     given chars
      * @param otherCase other case
      * @return converted string
-     * @see #split(CharSequence)
+     * @see #tokenize(CharSequence)
      * @see #join(List)
      */
-    default String convert(CharSequence chars, GekCase otherCase) {
-        return otherCase.join(split(chars));
+    public String toCase(CharSequence chars, GekCase otherCase) {
+        return otherCase.join(tokenize(chars));
     }
 
     /**
-     * Camel case implementation. This implementation uses
-     * {@link Character#isUpperCase(char)}, {@link Character#toUpperCase(char)} and {@link Character#toLowerCase(char)}
-     * to check and convert a char.
-     * And use {@link GekString#subChars(CharSequence, int, int)} to split string.
+     * Token split from a name in some case-rules.
      */
-    class CamelCase implements GekCase {
-
-        private final boolean isUpper;
+    public interface Token {
 
         /**
-         * Constructs with given upper setting.
+         * Returns this token as char sequence.
          *
-         * @param isUpper given upper setting
+         * @return this token as char sequence
          */
-        public CamelCase(boolean isUpper) {
+        CharSequence toChars();
+    }
+
+    /**
+     * Camel case of {@link GekCase}.
+     */
+    public static class CamelCase extends GekCase {
+
+        /**
+         * Let non-lower and non-upper character as lower character.
+         */
+        public static final int AS_LOWER = 0;
+        /**
+         * Let non-lower and non-upper character as upper character.
+         */
+        public static final int AS_UPPER = 1;
+        /**
+         * Let non-lower and non-upper character as independent character.
+         * The independent characters will be tokenized into independent token, not mixed with lower/upper characters.
+         */
+        public static final int AS_INDEPENDENT = 2;
+
+        private final boolean isUpper;
+        private final int charPolicy;
+
+        /**
+         * Constructs with given character policy.
+         * The character policy specifies how to deal with non-lower and non-upper characters such as digit, supports
+         * {@link #AS_LOWER}, {@link #AS_UPPER} and {@link #AS_INDEPENDENT}.
+         *
+         * @param isUpper    whether this case is upper camel case
+         * @param charPolicy given character policy
+         */
+        public CamelCase(boolean isUpper, int charPolicy) {
             this.isUpper = isUpper;
+            this.charPolicy = charPolicy;
         }
 
         @Override
-        public List<CharSequence> split(CharSequence chars) {
+        public List<Token> tokenize(CharSequence chars) {
             if (GekString.isBlank(chars)) {
                 return Collections.emptyList();
             }
             int len = chars.length();
             if (len == 1) {
-                return Collections.singletonList(chars);
+                return Collections.singletonList(CharsToken.of(chars, 0, chars.length()));
             }
-            List<CharSequence> result = new LinkedList<>();
-            int wordStart = 0;
-            boolean lastIsUpper = Character.isUpperCase(chars.charAt(0));
+            List<Token> result = new LinkedList<>();
+            int tokenStartIndex = 0;
+            int lastCharType = getCharType(chars.charAt(0));
             for (int i = 1; i < chars.length(); i++) {
                 char c = chars.charAt(i);
-                boolean currentIsUpper = Character.isUpperCase(c);
-                if (Gek.equals(lastIsUpper, currentIsUpper)) {
+                int currentCharType = getCharType(c);
+                // AA, aa, 00: just i++
+                if (lastCharType == currentCharType) {
                     continue;
                 }
-                // Aa: one word
-                if (lastIsUpper && !currentIsUpper) {
-                    int wordEnd = i - 1;
-                    if (wordEnd > wordStart) {
-                        result.add(GekString.subChars(chars, wordStart, wordEnd));
+                // Aa: one token
+                if (lastCharType == AS_UPPER && currentCharType == AS_LOWER) {
+                    int tokenEndIndex = i - 1;
+                    if (tokenEndIndex > tokenStartIndex) {
+                        result.add(CharsToken.of(chars, tokenStartIndex, tokenEndIndex));
                     }
-                    wordStart = wordEnd;
+                    tokenStartIndex = tokenEndIndex;
                 }
-                // aA: two words
+                // aA: two tokens
+                else if (lastCharType == AS_LOWER && currentCharType == AS_UPPER) {
+                    if (i > tokenStartIndex) {
+                        result.add(CharsToken.of(chars, tokenStartIndex, i));
+                    }
+                    tokenStartIndex = i;
+                }
+                // A0: three tokens
+                else if (lastCharType == AS_UPPER && currentCharType == AS_INDEPENDENT) {
+                    // first token
+                    int tokenEndIndex = i - 1;
+                    if (tokenEndIndex > tokenStartIndex) {
+                        result.add(CharsToken.of(chars, tokenStartIndex, tokenEndIndex));
+                    }
+                    // second token: A
+                    result.add(CharsToken.of(chars, tokenEndIndex, i));
+                    // third token
+                    tokenStartIndex = i;
+                }
+                // 0A, a0, 0a: two words
                 else {
-                    if (i > wordStart) {
-                        result.add(GekString.subChars(chars, wordStart, i));
+                    if (i > tokenStartIndex) {
+                        result.add(CharsToken.of(chars, tokenStartIndex, i));
                     }
-                    wordStart = i;
+                    tokenStartIndex = i;
                 }
-                lastIsUpper = currentIsUpper;
+                lastCharType = currentCharType;
             }
-            if (wordStart < len) {
-                result.add(GekString.subChars(chars, wordStart, len));
+            if (tokenStartIndex < len) {
+                result.add(CharsToken.of(chars, tokenStartIndex, len));
             }
             return result;
         }
 
+        private int getCharType(char c) {
+            if (Character.isLowerCase(c)) {
+                return AS_LOWER;
+            }
+            if (Character.isUpperCase(c)) {
+                return AS_UPPER;
+            }
+            if (charPolicy == AS_LOWER) {
+                return AS_LOWER;
+            }
+            if (charPolicy == AS_UPPER) {
+                return AS_UPPER;
+            }
+            return AS_INDEPENDENT;
+        }
+
         @Override
-        public String join(List<CharSequence> words) {
-            if (GekColl.isEmpty(words)) {
+        public String join(List<Token> tokens) {
+            if (GekColl.isEmpty(tokens)) {
                 return "";
             }
             StringBuilder sb = new StringBuilder();
-            Iterator<CharSequence> it = words.iterator();
+            Iterator<Token> it = tokens.iterator();
             if (!it.hasNext()) {
                 return "";
             }
-            CharSequence first = it.next();
-            sb.append(processCase(first, isUpper));
+            Token first = it.next();
+            sb.append(processToken(first, isUpper));
             while (it.hasNext()) {
-                sb.append(processCase(it.next(), true));
+                sb.append(processToken(it.next(), true));
             }
             return sb.toString();
         }
 
-        private CharSequence processCase(CharSequence chars, boolean upper) {
+        private CharSequence processToken(Token token, boolean upper) {
+            CharSequence chars = token.toChars();
             if (GekString.isEmpty(chars)) {
                 return "";
             }
@@ -191,46 +255,88 @@ public interface GekCase {
     }
 
     /**
-     * Separator case implementation.
+     * Delimiter case of {@link GekCase}.
+     * This implementation uses specified delimiter to split a name, and joins tokens with that delimiter.
      */
-    class SeparatorCase implements GekCase {
+    public static class DelimiterCase extends GekCase {
 
-        private final CharSequence separator;
-        private final Boolean upper;
+        private final CharSequence delimiter;
+        private final Function<Token, CharSequence> tokenProcessor;
 
         /**
-         * Constructs with given separator and upper setting.
-         * If upper setting is not null, this case will process each split part from {@link #split(CharSequence)}
-         * by upper setting.
-         * If upper setting is null, there is no case process for each split part.
+         * Constructs with specified delimiter.
          *
-         * @param separator given separator
-         * @param upper     upper setting
+         * @param delimiter specified delimiter
          */
-        public SeparatorCase(CharSequence separator, Boolean upper) {
-            this.separator = separator;
-            this.upper = upper;
+        public DelimiterCase(CharSequence delimiter) {
+            this(delimiter, null);
+        }
+
+        /**
+         * Constructs with specified delimiter and token processor.
+         * Each token will be processed by token processor before joining if it is not null.
+         *
+         * @param delimiter      specified delimiter
+         * @param tokenProcessor token processor, may be null
+         */
+        public DelimiterCase(CharSequence delimiter, @Nullable Function<Token, CharSequence> tokenProcessor) {
+            this.delimiter = delimiter;
+            this.tokenProcessor = tokenProcessor == null ? Token::toChars : tokenProcessor;
         }
 
         @Override
-        public List<CharSequence> split(CharSequence chars) {
-            return GekString.split(chars, separator);
+        public List<Token> tokenize(CharSequence chars) {
+            return GekString.split(chars, delimiter, CharsToken::of);
         }
 
         @Override
-        public String join(List<CharSequence> words) {
-            if (words.isEmpty()) {
+        public String join(List<Token> tokens) {
+            if (tokens.isEmpty()) {
                 return "";
             }
-            if (upper == null) {
-                return GekString.join(separator, words);
-            } else {
-                if (upper) {
-                    return GekString.join(separator, words.stream().map(GekString::upperCase).collect(Collectors.toList()));
-                } else {
-                    return GekString.join(separator, words.stream().map(GekString::lowerCase).collect(Collectors.toList()));
-                }
-            }
+            return tokens.stream().map(tokenProcessor).collect(Collectors.joining(delimiter));
+        }
+    }
+
+    private static final class CharsToken implements Token, CharSequence {
+
+        private static CharsToken of(CharSequence source, int startIndex, int endIndex) {
+            return new CharsToken(source, startIndex, endIndex);
+        }
+
+        private final CharSequence source;
+        private final int startIndex;
+        private final int endIndex;
+
+        private CharsToken(CharSequence source, int startIndex, int endIndex) {
+            this.source = source;
+            this.startIndex = startIndex;
+            this.endIndex = endIndex;
+        }
+
+        @Override
+        public CharSequence toChars() {
+            return this;
+        }
+
+        @Override
+        public int length() {
+            return endIndex - startIndex;
+        }
+
+        @Override
+        public char charAt(int index) {
+            return source.charAt(startIndex + index);
+        }
+
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            return new CharsToken(source, startIndex + start, startIndex + end);
+        }
+
+        @Override
+        public String toString() {
+            return source.subSequence(startIndex, endIndex).toString();
         }
     }
 }

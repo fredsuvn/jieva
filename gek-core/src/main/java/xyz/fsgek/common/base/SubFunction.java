@@ -4,10 +4,11 @@ package xyz.fsgek.common.base;
  * Functional interface used to generate sub-object such as sub-string, sub-list.
  *
  * @param <T> type of source object to be sub-ed.
+ * @param <R> type of result object after sub-ing.
  * @author fredsuvn
  */
 @FunctionalInterface
-public interface SubFunction<T> {
+public interface SubFunction<T, R> {
 
     /**
      * Returns sub-object of source object from start index inclusive to end index exclusive.
@@ -17,7 +18,7 @@ public interface SubFunction<T> {
      * @param end    end index exclusive
      * @return sub-object of source object from start index inclusive to end index exclusive
      */
-    T apply(T source, int start, int end);
+    R apply(T source, int start, int end);
 
     /**
      * Returns sub-object of source object from start index inclusive to end index exclusive.
@@ -28,7 +29,7 @@ public interface SubFunction<T> {
      * @param end    end index exclusive
      * @return sub-object of source object from start index inclusive to end index exclusive
      */
-    default T applyLong(T source, long start, long end) {
+    default R applyLong(T source, long start, long end) {
         return apply(source, (int) start, (int) end);
     }
 }
