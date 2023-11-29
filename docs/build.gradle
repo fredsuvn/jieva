@@ -28,7 +28,10 @@ tasks.register('benchmark') {
       main = 'benchmark.JmhRunner'
       //classpath = sourceSets.test.runtimeClasspath
       classpath = sourceSets.main.runtimeClasspath
-      args 'cache'
+      args Arrays.asList(
+        //'cache',
+        'case',
+      )
     }
   }
 }

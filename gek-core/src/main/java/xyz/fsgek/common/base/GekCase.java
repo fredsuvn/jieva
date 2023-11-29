@@ -11,12 +11,22 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * This class is used to convert name case in different case format such as camel-case, underscore-case.
+ * This class is used to convert case in different format such as camel-case, underscore-case.
  *
  * @author fredsuvn
  */
 public abstract class GekCase {
 
+    /**
+     * Token function to make given chars upper case.
+     * This function is used by {@link #UPPER_HYPHEN} and {@link #UPPER_UNDERSCORE}.
+     */
+    public static final Function<Token, CharSequence> TO_UPPER_CASE = t -> GekString.upperCase(t.toChars());
+    /**
+     * Token function to make given chars lower case.
+     * This function is used by {@link #LOWER_HYPHEN} and {@link #LOWER_UNDERSCORE}.
+     */
+    public static final Function<Token, CharSequence> TO_LOWER_CASE = t -> GekString.lowerCase(t.toChars());
     /**
      * Upper camel case with {@link CamelCase#AS_LOWER}.
      */
@@ -26,21 +36,29 @@ public abstract class GekCase {
      */
     public static final GekCase LOWER_CAMEL = camelCase(false, CamelCase.AS_LOWER);
     /**
-     * Upper underscore separator case.
+     * Underscore delimiter case.
      */
-    public static final GekCase UPPER_UNDERSCORE = delimiterCase("_", t -> GekString.upperCase(t.toChars()));
+    public static final GekCase UNDERSCORE = delimiterCase("_", null);
     /**
-     * Lower underscore separator case.
+     * Upper underscore delimiter case.
      */
-    public static final GekCase LOWER_UNDERSCORE = delimiterCase("_", t -> GekString.lowerCase(t.toChars()));
+    public static final GekCase UPPER_UNDERSCORE = delimiterCase("_", TO_UPPER_CASE);
     /**
-     * Upper hyphen separator case.
+     * Lower underscore delimiter case.
      */
-    public static final GekCase UPPER_HYPHEN = delimiterCase("-", t -> GekString.upperCase(t.toChars()));
+    public static final GekCase LOWER_UNDERSCORE = delimiterCase("_", TO_LOWER_CASE);
     /**
-     * Lower hyphen separator case.
+     * Hyphen delimiter case.
      */
-    public static final GekCase LOWER_HYPHEN = delimiterCase("-", t -> GekString.lowerCase(t.toChars()));
+    public static final GekCase HYPHEN = delimiterCase("-", null);
+    /**
+     * Upper hyphen delimiter case.
+     */
+    public static final GekCase UPPER_HYPHEN = delimiterCase("-", TO_UPPER_CASE);
+    /**
+     * Lower hyphen delimiter case.
+     */
+    public static final GekCase LOWER_HYPHEN = delimiterCase("-", TO_LOWER_CASE);
 
     /**
      * Returns a new camel case with given character policy.
@@ -84,7 +102,7 @@ public abstract class GekCase {
     public abstract String join(List<Token> tokens);
 
     /**
-     * Converts given chars from this case to other case. The default implementation is:
+     * Converts given chars from this case format to other case format. The default implementation is:
      * <pre>
      *     return otherCase.join(tokenize(chars));
      * </pre>
@@ -261,7 +279,7 @@ public abstract class GekCase {
     public static class DelimiterCase extends GekCase {
 
         private final CharSequence delimiter;
-        private final Function<Token, CharSequence> tokenProcessor;
+        private final @Nullable Function<Token, CharSequence> tokenProcessor;
 
         /**
          * Constructs with specified delimiter.
@@ -281,7 +299,7 @@ public abstract class GekCase {
          */
         public DelimiterCase(CharSequence delimiter, @Nullable Function<Token, CharSequence> tokenProcessor) {
             this.delimiter = delimiter;
-            this.tokenProcessor = tokenProcessor == null ? Token::toChars : tokenProcessor;
+            this.tokenProcessor = tokenProcessor;
         }
 
         @Override
@@ -294,7 +312,19 @@ public abstract class GekCase {
             if (tokens.isEmpty()) {
                 return "";
             }
+            if (tokenProcessor == null) {
+                return tokens.stream().map(Token::toChars).collect(Collectors.joining(delimiter));
+            }
             return tokens.stream().map(tokenProcessor).collect(Collectors.joining(delimiter));
+        }
+
+        @Override
+        public String toCase(CharSequence chars, GekCase otherCase) {
+            if (otherCase instanceof DelimiterCase
+                && ((DelimiterCase) otherCase).tokenProcessor == null) {
+                return GekString.replace(chars, this.delimiter, ((DelimiterCase) otherCase).delimiter);
+            }
+            return super.toCase(chars, otherCase);
         }
     }
 

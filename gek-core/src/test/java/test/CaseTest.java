@@ -54,6 +54,8 @@ public class CaseTest {
         // Assert.assertEquals(
         //     CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_UNDERSCORE, "AA_BB_CC"),
         //     "aa_bb_cc");
+        Assert.assertEquals(GekCase.UNDERSCORE.toCase("aa_bb_Cc", GekCase.HYPHEN), "aa-bb-Cc");
+        Assert.assertEquals(GekCase.HYPHEN.toCase("aa-Bb-cc", GekCase.UNDERSCORE), "aa_Bb_cc");
     }
 
     @Test
