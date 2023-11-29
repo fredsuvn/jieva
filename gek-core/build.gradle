@@ -41,8 +41,9 @@ dependencies {
 
   testImplementation platform(project(':gek-dependencies'))
   testAnnotationProcessor platform(project(":gek-dependencies"))
+
   testAnnotationProcessor 'org.projectlombok:lombok'
-  testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
+  //testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 
   testImplementation project(":gek-test")
   testImplementation "com.google.protobuf:protobuf-java"

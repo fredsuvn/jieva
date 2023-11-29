@@ -13,10 +13,10 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
   annotationProcessor platform(project(":gek-dependencies"))
   annotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
-  api project(':gek-annotations')
-  api project(':gek-core')
-  api project(':gek-kotlin')
-  api project(":gek-test")
+  implementation project(':gek-annotations')
+  implementation project(':gek-core')
+  implementation project(':gek-kotlin')
+  implementation project(":gek-test")
 }
 
 tasks.register('benchmark') {
@@ -27,7 +27,15 @@ tasks.register('benchmark') {
     javaexec {
       main = 'benchmark.JmhRunner'
       //classpath = sourceSets.test.runtimeClasspath
-      classpath = sourceSets.main.runtimeClasspath
+      classpath = files(
+        rootProject.subprojects.findAll {
+          it.plugins.hasPlugin('java-library') || it.plugins.hasPlugin('org.jetbrains.kotlin.jvm')
+        }.collect { println("$it.name"); it.sourceSets.main.runtimeClasspath }
+        //project(':gek-annotations').sourceSets.main.runtimeClasspath,
+        //project(':gek-core').sourceSets.main.runtimeClasspath,
+        //project(':gek-kotlin').sourceSets.main.runtimeClasspath,
+        //project(':gek-test').sourceSets.main.runtimeClasspath,
+      )
       args Arrays.asList(
         //'cache',
         'case',
