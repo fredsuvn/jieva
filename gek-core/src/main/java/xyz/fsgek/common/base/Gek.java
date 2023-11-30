@@ -4,7 +4,7 @@ import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.bean.GekBeanCopier;
 import xyz.fsgek.common.collect.GekArray;
 import xyz.fsgek.common.collect.GekColl;
-import xyz.fsgek.common.collect.GekCollect;
+import xyz.fsgek.common.collect.GekCollector;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.reflect.TypeRef;
 
@@ -813,7 +813,7 @@ public class Gek {
      * @return a new collection configurer to create a collection
      * @see GekColl#collect()
      */
-    public static GekCollect collect() {
+    public static GekCollector collect() {
         return GekColl.collect();
     }
 }

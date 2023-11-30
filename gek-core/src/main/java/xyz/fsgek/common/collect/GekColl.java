@@ -21,8 +21,8 @@ public class GekColl {
      *
      * @return a new collection configurer to create a collection
      */
-    public static GekCollect collect() {
-        return GekCollect.newInstance();
+    public static GekCollector collect() {
+        return GekCollector.newInstance();
     }
 
     /**
