@@ -3,6 +3,8 @@ package xyz.fsgek.common.base;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.bean.GekBeanCopier;
 import xyz.fsgek.common.collect.GekArray;
+import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.collect.GekCollect;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.reflect.TypeRef;
 
@@ -723,5 +725,95 @@ public class Gek {
      */
     public static void log(Object... message) {
         GekLog.getInstance().logOffset(GekLog.Level.INFO, 2, message);
+    }
+
+    /**
+     * Returns given elements as array.
+     *
+     * @param elements given elements
+     * @param <T>      type of elements
+     * @return given elements as array
+     */
+    @SafeVarargs
+    public static <T> T[] array(T... elements) {
+        return elements;
+    }
+
+    /**
+     * Returns given elements as list.
+     *
+     * @param elements given elements
+     * @param <T>      type of elements
+     * @return given elements as list
+     */
+    @SafeVarargs
+    public static <T> List<T> list(T... elements) {
+        if (elements == null || elements.length == 0) {
+            return Collections.emptyList();
+        }
+        if (elements.length == 1) {
+            return Collections.singletonList(elements[0]);
+        }
+        return Arrays.asList(elements);
+    }
+
+    /**
+     * Returns given elements as list.
+     *
+     * @param elements given elements
+     * @param <T>      type of elements
+     * @return given elements as list
+     */
+    @SafeVarargs
+    public static <T> Set<T> set(T... elements) {
+        if (elements == null || elements.length == 0) {
+            return Collections.emptySet();
+        }
+        if (elements.length == 1) {
+            return Collections.singleton(elements[0]);
+        }
+        return new LinkedHashSet<>(Arrays.asList(elements));
+    }
+
+    /**
+     * Returns given elements as map.
+     * The first element is key1, second is value1, third is key2, fourth is value2, and so on.
+     * If last key key{@code n} doesn't have a value{@code n}, the key{@code n} will be ignored.
+     *
+     * @param elements given elements
+     * @param <K>      type of key
+     * @param <V>      type of value
+     * @param <T>      type of elements
+     * @return given elements as map
+     */
+    @SafeVarargs
+    public static <K, V, T> Map<K, V> map(T... elements) {
+        if (elements == null || elements.length < 2) {
+            return Collections.emptyMap();
+        }
+        if (elements.length == 2) {
+            return Collections.singletonMap(as(elements[0]), as(elements[1]));
+        }
+        LinkedHashMap<K, V> map = new LinkedHashMap<>(elements.length / 2);
+        for (int i = 0; i < elements.length; i += 2) {
+            if (i + 1 >= elements.length) {
+                break;
+            }
+            K key = as(elements[i]);
+            V value = as(elements[i + 1]);
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    /**
+     * Returns a new collection configurer to create a collection.
+     * This method is same with {@link GekColl#collect()}.
+     *
+     * @return a new collection configurer to create a collection
+     * @see GekColl#collect()
+     */
+    public static GekCollect collect() {
+        return GekColl.collect();
     }
 }

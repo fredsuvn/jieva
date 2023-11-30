@@ -17,6 +17,15 @@ import java.util.stream.Collectors;
 public class GekColl {
 
     /**
+     * Returns a new collection configurer to create a collection.
+     *
+     * @return a new collection configurer to create a collection
+     */
+    public static GekCollect collect() {
+        return GekCollect.newInstance();
+    }
+
+    /**
      * Puts all given elements into dest collection, and returns the dest collection.
      *
      * @param dest     dest collection

@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
  * <pre>
  *     myOps.input(in).output(out).doFinal();
  * </pre>
+ * Generally, object of this process is reusable, re-set and re-doFinal are permitted.
  *
  * @param <T> subtype of this interface, and is subtype itself
  * @author fredsuvn
