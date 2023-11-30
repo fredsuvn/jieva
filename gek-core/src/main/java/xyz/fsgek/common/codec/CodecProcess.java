@@ -8,6 +8,7 @@ import xyz.fsgek.common.io.GekIOProcess;
 /**
  * This interface represents a {@link GekIOProcess} of codec process,
  * supports configure and do final in method chaining.
+ * Generally its instance is reusable, re-set and re-codec are permitted.
  * See {@link CipherCodec}, {@link Base64Codec} and {@link HexCodec}.
  *
  * @param <T> subtype

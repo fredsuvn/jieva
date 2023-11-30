@@ -14,7 +14,6 @@ import java.security.spec.AlgorithmParameterSpec;
 
 /**
  * Cipher implementation of {@link CodecProcess} to encrypt/decrypt with {@link Cipher}.
- * When the process starts, the status of the {@link Cipher} instance cannot be changed.
  *
  * @author fredsuvn
  */

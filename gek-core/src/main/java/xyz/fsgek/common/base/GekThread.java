@@ -7,6 +7,7 @@ import xyz.fsgek.common.io.GekIOException;
  * <pre>
  *     thread.name(name).priority(5).start();
  * </pre>
+ * Its instance is reusable, re-set and re-start are permitted.
  *
  * @author fredsuvn
  */
@@ -139,7 +140,7 @@ public abstract class GekThread {
     }
 
     /**
-     * Starts and returns thread which is configured by this.
+     * Starts and returns new thread which is configured by this.
      *
      * @return the thread which is started
      * @throws GekIOException IO exception

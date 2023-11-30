@@ -10,6 +10,7 @@ import java.util.concurrent.*;
  * <pre>
  *     pool.corePoolSize(10).maxPoolSize(20).build();
  * </pre>
+ * Its instance is reusable, re-set and re-build are permitted.
  *
  * @author fredsuvn
  */
@@ -109,7 +110,7 @@ public abstract class GekThreadPool {
     }
 
     /**
-     * Returns thread pool which is configured by this.
+     * Returns new thread pool which is configured by this.
      *
      * @return thread pool which is configured by this
      * @throws GekIOException IO exception
