@@ -779,10 +779,12 @@ public class Gek {
      * @param elements given elements
      * @param <K>      type of key
      * @param <V>      type of value
+     * @param <T>      type of element
      * @return an immutable map of given elements
      * @see GekColl#mapOf(Object...)
      */
-    public static <K, V> Map<K, V> mapOf(Object... elements) {
+    @SafeVarargs
+    public static <K, V, T> Map<K, V> mapOf(T... elements) {
         return GekColl.mapOf(elements);
     }
 

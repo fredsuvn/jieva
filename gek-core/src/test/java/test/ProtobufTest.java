@@ -7,10 +7,10 @@ import org.testng.annotations.Test;
 import test.protobuf.Data;
 import test.protobuf.Enum;
 import test.protobuf.Request;
+import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.bean.GekBean;
-import xyz.fsgek.common.bean.GekProperty;
 import xyz.fsgek.common.bean.GekBeanResolver;
-import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.bean.GekProperty;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.data.protobuf.GekProtobuf;
 import xyz.fsgek.common.reflect.TypeRef;
@@ -71,29 +71,29 @@ public class ProtobufTest {
             .setStr("888")
             .setNum(999)
             .addAllText(Arrays.asList("2", "4", "6"))
-            .putAllEntry(GekColl.hashMap("1", "1", "3", "3"));
+            .putAllEntry(Gek.mapOf("1", "1", "3", "3"));
         Data data = dataBuilder.build();
         Assert.assertEquals(propertyMap.get("em").get(data), Enum.E2);
         Assert.assertEquals(propertyMap.get("str").get(data), "888");
         Assert.assertEquals(propertyMap.get("num").get(data), 999L);
         Assert.assertEquals(propertyMap.get("textList").get(data), Arrays.asList("2", "4", "6"));
-        Assert.assertEquals(propertyMap.get("entryMap").get(data), GekColl.hashMap("1", "1", "3", "3"));
+        Assert.assertEquals(propertyMap.get("entryMap").get(data), Gek.mapOf("1", "1", "3", "3"));
         Assert.assertEquals(builderPropertyMap.get("em").get(dataBuilder), Enum.E2);
         Assert.assertEquals(builderPropertyMap.get("str").get(dataBuilder), "888");
         Assert.assertEquals(builderPropertyMap.get("num").get(dataBuilder), 999L);
         Assert.assertEquals(builderPropertyMap.get("textList").get(dataBuilder), Arrays.asList("2", "4", "6"));
-        Assert.assertEquals(builderPropertyMap.get("entryMap").get(dataBuilder), GekColl.hashMap("1", "1", "3", "3"));
+        Assert.assertEquals(builderPropertyMap.get("entryMap").get(dataBuilder), Gek.mapOf("1", "1", "3", "3"));
         builderPropertyMap.get("em").set(dataBuilder, Enum.E1);
         builderPropertyMap.get("str").set(dataBuilder, "777");
         builderPropertyMap.get("num").set(dataBuilder, 888L);
         builderPropertyMap.get("textList").set(dataBuilder, Arrays.asList("3", "5", "7"));
-        builderPropertyMap.get("entryMap").set(dataBuilder, GekColl.hashMap("8", "8", "9", "9"));
+        builderPropertyMap.get("entryMap").set(dataBuilder, Gek.mapOf("8", "8", "9", "9"));
         Data data2 = dataBuilder.build();
         Assert.assertEquals(propertyMap.get("em").get(data2), Enum.E1);
         Assert.assertEquals(propertyMap.get("str").get(data2), "777");
         Assert.assertEquals(propertyMap.get("num").get(data2), 888L);
         Assert.assertEquals(propertyMap.get("textList").get(data2), Arrays.asList("3", "5", "7"));
-        Assert.assertEquals(propertyMap.get("entryMap").get(data2), GekColl.hashMap("8", "8", "9", "9"));
+        Assert.assertEquals(propertyMap.get("entryMap").get(data2), Gek.mapOf("8", "8", "9", "9"));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ProtobufTest {
         dataDto.setTextList(Arrays.asList("11", "22", "33"));
         dataDto.setNum(777);
         dataDto.setBytes("123".getBytes());
-        dataDto.setEntryMap(GekColl.hashMap("88", "99"));
+        dataDto.setEntryMap(Gek.mapOf("88", "99"));
         dataDto.setFixed32(132);
         dataDto.setFixed64(164);
         dataDto.setSfixed32(232);

@@ -6,7 +6,6 @@ import xyz.fsgek.common.base.Gek;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -50,10 +49,133 @@ public class GekColl {
      * @param elements given elements
      * @param <K>      type of key
      * @param <V>      type of value
+     * @param <T>      type of element
      * @return an immutable map of given elements
      */
-    public static <K, V> Map<K, V> mapOf(Object... elements) {
+    @SafeVarargs
+    public static <K, V, T> Map<K, V> mapOf(T... elements) {
         return GekArray.isEmpty(elements) ? Collections.emptyMap() : new ImmutableMap<>(elements);
+    }
+
+    /**
+     * Collects given iterable to array.
+     *
+     * @param iterable given iterable
+     * @return array
+     */
+    public static Object[] toArray(@Nullable Iterable<?> iterable) {
+        if (iterable == null) {
+            return new Object[0];
+        }
+        if (iterable instanceof Collection) {
+            return ((Collection<?>) iterable).toArray();
+        }
+        return StreamSupport.stream(iterable.spliterator(), false).toArray();
+    }
+
+    /**
+     * Collects given iterable to array.
+     *
+     * @param iterable given iterable
+     * @param <T>      type of element
+     * @return array
+     */
+    public static <T> T[] toArray(@Nullable Iterable<? extends T> iterable, Class<T> type) {
+        if (iterable == null) {
+            return GekArray.newArray(type, 0);
+        }
+        if (iterable instanceof Collection) {
+            return ((Collection<?>) iterable).toArray(
+                GekArray.newArray(type, ((Collection<? extends T>) iterable).size()));
+        }
+        return StreamSupport.stream(iterable.spliterator(), false).toArray(size -> GekArray.newArray(type, size));
+    }
+
+    /**
+     * Collects given iterable to list.
+     *
+     * @param iterable given iterable
+     * @param <T>      type of element
+     * @return list
+     */
+    public static <T> List<T> toList(@Nullable Iterable<? extends T> iterable) {
+        if (iterable == null) {
+            return Collections.emptyList();
+        }
+        return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
+    }
+
+    /**
+     * Collects given iterable to set.
+     *
+     * @param iterable given iterable
+     * @param <T>      type of element
+     * @return set
+     */
+    public static <T> Set<T> toSet(@Nullable Iterable<? extends T> iterable) {
+        if (iterable == null) {
+            return Collections.emptySet();
+        }
+        return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toSet());
+    }
+
+    /**
+     * Converts given enumeration to iterable.
+     *
+     * @param enumeration given enumeration
+     * @param <T>         type of element
+     * @return iterable
+     */
+    public static <T> Iterable<T> toIterable(@Nullable Enumeration<? extends T> enumeration) {
+        if (enumeration == null) {
+            return Collections.emptyList();
+        }
+        return () -> new Iterator<T>() {
+            @Override
+            public boolean hasNext() {
+                return enumeration.hasMoreElements();
+            }
+
+            @Override
+            public T next() {
+                return enumeration.nextElement();
+            }
+        };
+    }
+
+    /**
+     * Converts given iterable to enumeration.
+     *
+     * @param iterable given enumeration
+     * @param <T>      type of element
+     * @return enumeration
+     */
+    public static <T> Enumeration<T> toEnumeration(@Nullable Iterable<? extends T> iterable) {
+        if (iterable == null) {
+            return Gek.as(EmptyEnumeration.INSTANCE);
+        }
+        Iterator<? extends T> iterator = iterable.iterator();
+        return new Enumeration<T>() {
+            @Override
+            public boolean hasMoreElements() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public T nextElement() {
+                return iterator.next();
+            }
+        };
+    }
+
+    /**
+     * Converts given iterable to string list for each element with conversion method {@link String#valueOf(Object)}.
+     *
+     * @param iterable given iterable
+     * @return converted string list
+     */
+    public static List<String> toStringList(Iterable<?> iterable) {
+        return mapList(iterable, String::valueOf);
     }
 
     /**
@@ -66,7 +188,7 @@ public class GekColl {
     }
 
     /**
-     * Puts all given elements into dest collection, and returns the dest collection.
+     * Collects given elements into dest collection, and returns the dest collection.
      *
      * @param dest     dest collection
      * @param elements given elements
@@ -75,16 +197,16 @@ public class GekColl {
      * @return the dest collection
      */
     @SafeVarargs
-    public static <T, C extends Collection<? super T>> C toCollection(C dest, T... elements) {
+    public static <T, C extends Collection<? super T>> C collect(C dest, T... elements) {
         if (GekArray.isEmpty(elements)) {
             return dest;
         }
-        dest.addAll(Arrays.asList(elements));
+        dest.addAll(listOf(elements));
         return dest;
     }
 
     /**
-     * Puts all given elements into dest collection, and returns the dest collection.
+     * Collects given elements into dest collection, and returns the dest collection.
      *
      * @param dest     dest collection
      * @param elements given elements
@@ -92,13 +214,39 @@ public class GekColl {
      * @param <C>      type of dest collection
      * @return the dest collection
      */
-    public static <T, C extends Collection<? super T>> C toCollection(C dest, Iterable<T> elements) {
+    public static <T, C extends Collection<? super T>> C collect(C dest, Iterable<T> elements) {
         if (elements instanceof Collection) {
             dest.addAll((Collection<T>) elements);
         } else {
             for (T t : elements) {
                 dest.add(t);
             }
+        }
+        return dest;
+    }
+
+    /**
+     * Collects given elements into dest map, and returns the dest map.
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
+     * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param <K>      key type
+     * @param <V>      value type
+     * @param <M>      type of dest map
+     * @param <T>      type of element
+     * @return dest map
+     */
+    @SafeVarargs
+    public static <K, V, M extends Map<K, V>, T> M collect(M dest, T... elements) {
+        for (int i = 0; i < elements.length; i += 2) {
+            if (i + 1 >= elements.length) {
+                break;
+            }
+            Object key = elements[i];
+            Object value = elements[i + 1];
+            dest.put(Gek.as(key), Gek.as(value));
         }
         return dest;
     }
@@ -118,7 +266,7 @@ public class GekColl {
         if (elements instanceof Collection) {
             return new ArrayList<>((Collection<T>) elements);
         }
-        return toCollection(new LinkedList<>(), elements);
+        return collect(new LinkedList<>(), elements);
     }
 
     /**
@@ -136,7 +284,7 @@ public class GekColl {
         if (elements instanceof Collection) {
             return new LinkedHashSet<>((Collection<T>) elements);
         }
-        return toCollection(new LinkedHashSet<>(), elements);
+        return collect(new LinkedHashSet<>(), elements);
     }
 
     /**
@@ -167,9 +315,9 @@ public class GekColl {
         }
         List<T> list;
         if (iterable instanceof Collection) {
-            list = toCollection(new ArrayList<>(((Collection<? extends T>) iterable).size()), iterable);
+            list = collect(new ArrayList<>(((Collection<? extends T>) iterable).size()), iterable);
         } else {
-            list = toCollection(new ArrayList<>(), iterable);
+            list = collect(new ArrayList<>(), iterable);
         }
         return Collections.unmodifiableList(list);
     }
@@ -185,7 +333,7 @@ public class GekColl {
         if (GekArray.isEmpty(array)) {
             return Collections.emptyList();
         }
-        List<T> list = toCollection(new ArrayList<>(array.length), array);
+        List<T> list = collect(new ArrayList<>(array.length), array);
         return Collections.unmodifiableList(list);
     }
 
@@ -202,9 +350,9 @@ public class GekColl {
         }
         LinkedHashSet<T> set;
         if (iterable instanceof Collection) {
-            set = toCollection(new LinkedHashSet<>(((Collection<? extends T>) iterable).size()), iterable);
+            set = collect(new LinkedHashSet<>(((Collection<? extends T>) iterable).size()), iterable);
         } else {
-            set = toCollection(new LinkedHashSet<>(), iterable);
+            set = collect(new LinkedHashSet<>(), iterable);
         }
         return Collections.unmodifiableSet(set);
     }
@@ -220,7 +368,7 @@ public class GekColl {
         if (GekArray.isEmpty(array)) {
             return Collections.emptySet();
         }
-        LinkedHashSet<T> set = toCollection(new LinkedHashSet<>(array.length), array);
+        LinkedHashSet<T> set = collect(new LinkedHashSet<>(array.length), array);
         return Collections.unmodifiableSet(set);
     }
 
@@ -237,170 +385,6 @@ public class GekColl {
             return Collections.emptyMap();
         }
         return Collections.unmodifiableMap(new LinkedHashMap<>(map));
-    }
-
-    /**
-     * Puts all given key-values into dest map, and returns the dest map.
-     * <p>
-     * The key-values is an array of which elements are in order of key followed by value,
-     * means the first element (index 0) is key, second (index 1) is value, third is key, fourth is value and so on.
-     * If the array miss the last value, the last value will be considered as null.
-     *
-     * @param dest      dest collection
-     * @param keyValues given key-values
-     * @param <K>       key type
-     * @param <V>       value type
-     * @param <M>       type of dest map
-     * @param <T>       type of element
-     * @return dest map
-     */
-    @SafeVarargs
-    public static <K, V, M extends Map<? super K, ? super V>, T> M toMap(M dest, T... keyValues) {
-        boolean isKey = true;
-        K key = null;
-        for (Object keyValue : keyValues) {
-            if (isKey) {
-                key = Gek.as(keyValue);
-                isKey = false;
-            } else {
-                V value = Gek.as(keyValue);
-                dest.put(key, value);
-                isKey = true;
-            }
-        }
-        if (!isKey) {
-            dest.put(key, null);
-        }
-        return dest;
-    }
-
-    /**
-     * Returns an array contains all elements from given iterable in its order.
-     *
-     * @param iterable given iterable
-     * @return an array contains all elements from given iterable in its order
-     */
-    public static Object[] toArray(@Nullable Iterable<?> iterable) {
-        if (iterable == null) {
-            return new Object[0];
-        }
-        if (iterable instanceof Collection) {
-            return ((Collection<?>) iterable).toArray();
-        }
-        Iterator<?> it = iterable.iterator();
-        if (!it.hasNext()) {
-            return new Object[0];
-        }
-        List<Object> list = new LinkedList<>();
-        while (it.hasNext()) {
-            list.add(it.next());
-        }
-        return list.toArray();
-    }
-
-    /**
-     * Returns an array contains all elements from given iterable in its order.
-     *
-     * @param iterable given iterable
-     * @param type     array's component type
-     * @param <T>      type of element
-     * @return an array contains all elements from given iterable in its order
-     */
-    public static <T> T[] toArray(@Nullable Iterable<? extends T> iterable, Class<T> type) {
-        if (iterable == null) {
-            return GekArray.newArray(type, 0);
-        }
-        if (iterable instanceof Collection) {
-            return ((Collection<?>) iterable).toArray(
-                GekArray.newArray(type, ((Collection<? extends T>) iterable).size()));
-        }
-        Iterator<? extends T> it = iterable.iterator();
-        if (!it.hasNext()) {
-            return GekArray.newArray(type, 0);
-        }
-        List<T> list = new LinkedList<>();
-        while (it.hasNext()) {
-            list.add(it.next());
-        }
-        return list.toArray(GekArray.newArray(type, list.size()));
-    }
-
-    /**
-     * Creates an {@link ArrayList} and put all given elements into it.
-     *
-     * @param elements given elements
-     * @param <T>      type of element
-     * @return an {@link ArrayList} and put all given elements into it
-     */
-    @SafeVarargs
-    public static <T> ArrayList<T> arrayList(T... elements) {
-        return toCollection(new ArrayList<>(elements.length), elements);
-    }
-
-    /**
-     * Creates an {@link LinkedList} and put all given elements into it.
-     *
-     * @param elements given elements
-     * @param <T>      type of element
-     * @return an {@link LinkedList} and put all given elements into it
-     */
-    @SafeVarargs
-    public static <T> LinkedList<T> linkedList(T... elements) {
-        return new LinkedList<>(Arrays.asList(elements));
-    }
-
-    /**
-     * Creates an {@link HashMap} and put all given key-values into it.
-     * <p>
-     * The key-values is an array of which elements are in order of key followed by value,
-     * means the first element (index 0) is key, second (index 1) is value, third is key, fourth is value and so on.
-     * If the array miss the last value, the last value will be considered as null.
-     *
-     * @param keyValues given key-values
-     * @param <K>       key type
-     * @param <V>       value type
-     * @param <T>       type of element
-     * @return an {@link HashMap} and put all given key-values into it
-     */
-    @SafeVarargs
-    public static <K, V, T> HashMap<K, V> hashMap(T... keyValues) {
-        return toMap(new HashMap<>(keyValues.length / 2 + 1), keyValues);
-    }
-
-    /**
-     * Creates an {@link LinkedHashMap} and put all given key-values into it.
-     * <p>
-     * The key-values is an array of which elements are in order of key followed by value,
-     * means the first element (index 0) is key, second (index 1) is value, third is key, fourth is value and so on.
-     * If the array miss the last value, the last value will be considered as null.
-     *
-     * @param keyValues given key-values
-     * @param <K>       key type
-     * @param <V>       value type
-     * @param <T>       type of element
-     * @return an {@link LinkedHashMap} and put all given key-values into it
-     */
-    @SafeVarargs
-    public static <K, V, T> LinkedHashMap<K, V> linkedHashMap(T... keyValues) {
-        return toMap(new LinkedHashMap<>(keyValues.length / 2 + 1), keyValues);
-    }
-
-    /**
-     * Creates an {@link ConcurrentHashMap} and put all given key-values into it.
-     * <p>
-     * The key-values is an array of which elements are in order of key followed by value,
-     * means the first element (index 0) is key, second (index 1) is value, third is key, fourth is value and so on.
-     * If the array miss the last value, the last value will be considered as null.
-     *
-     * @param keyValues given key-values
-     * @param <K>       key type
-     * @param <V>       value type
-     * @param <T>       type of element
-     * @return an {@link ConcurrentHashMap} and put all given key-values into it
-     */
-    @SafeVarargs
-    public static <K, V, T> ConcurrentHashMap<K, V> concurrentHashMap(T... keyValues) {
-        return toMap(new ConcurrentHashMap<>(keyValues.length / 2 + 1), keyValues);
     }
 
     /**
@@ -530,48 +514,6 @@ public class GekColl {
         }
         V v = map.get(key);
         return v == null ? defaultValue : v;
-    }
-
-    /**
-     * Collects given iterable to list.
-     *
-     * @param iterable given iterable
-     * @param <T>      type of element
-     * @return the list
-     */
-    public static <T> List<T> toList(Iterable<? extends T> iterable) {
-        return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
-    }
-
-    /**
-     * Converts given enumeration to iterable.
-     *
-     * @param enumeration given enumeration
-     * @param <T>         type of element
-     * @return converted iterable
-     */
-    public static <T> Iterable<T> toIterable(Enumeration<T> enumeration) {
-        return () -> new Iterator<T>() {
-            @Override
-            public boolean hasNext() {
-                return enumeration.hasMoreElements();
-            }
-
-            @Override
-            public T next() {
-                return enumeration.nextElement();
-            }
-        };
-    }
-
-    /**
-     * Converts given iterable to string list for each element with conversion method {@link String#valueOf(Object)}.
-     *
-     * @param iterable given iterable
-     * @return converted string list
-     */
-    public static List<String> toStringList(Iterable<?> iterable) {
-        return mapList(iterable, String::valueOf);
     }
 
     /**
@@ -830,6 +772,21 @@ public class GekColl {
             public V setValue(V value) {
                 throw new UnsupportedOperationException();
             }
+        }
+    }
+
+    private static final class EmptyEnumeration implements Enumeration<Object> {
+
+        private static final EmptyEnumeration INSTANCE = new EmptyEnumeration();
+
+        @Override
+        public boolean hasMoreElements() {
+            return false;
+        }
+
+        @Override
+        public Object nextElement() {
+            throw new NoSuchElementException();
         }
     }
 }

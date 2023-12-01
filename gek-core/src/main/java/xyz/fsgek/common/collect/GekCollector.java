@@ -6,7 +6,6 @@ import xyz.fsgek.common.base.GekConfigurer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntFunction;
-import java.util.stream.StreamSupport;
 
 /**
  * This class is used to configure and build collection in method chaining:
@@ -95,7 +94,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      * @return this
      */
     public GekCollector initialElements(Iterable<?> initialElements) {
-        this.initialElements = GekColl.toArray(initialElements);
+        this.initialElements = initialElements;
         return this;
     }
 
@@ -305,14 +304,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
                 Object[] array = (Object[]) initialElements;
-                for (int i = 0; i < array.length; i += 2) {
-                    if (i + 1 >= array.length) {
-                        break;
-                    }
-                    Object key = array[i];
-                    Object value = array[i + 1];
-                    map.put(Gek.as(key), Gek.as(value));
-                }
+                GekColl.collect(map, array);
                 return;
             }
             if (initialElements instanceof Iterable) {
@@ -416,7 +408,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
             return (Object[]) initialElements;
         }
         if (initialElements instanceof Iterable) {
-            return StreamSupport.stream(((Iterable<?>) initialElements).spliterator(), false).toArray();
+            return GekColl.toArray((Iterable<?>) initialElements);
         }
         throw new IllegalArgumentException("Initial elements must be iterable or array.");
     }

@@ -157,7 +157,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
         if (sourceInfo.getObject() instanceof Collection) {
             srcList = (Collection<?>) sourceInfo.getObject();
         } else {
-            srcList = GekColl.toCollection(new LinkedList<>(), sourceInfo.getObject());
+            srcList = GekColl.collect(new LinkedList<>(), sourceInfo.getObject());
         }
         Class<?> targetArrayClass = GekReflect.arrayClass(targetComponentType);
         Object targetArray = GekArray.newArray(targetArrayClass.getComponentType(), srcList.size());

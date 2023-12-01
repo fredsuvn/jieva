@@ -30,7 +30,7 @@ public class CollTest {
             Arrays.asList(1, 2, 3)
         );
         Assert.assertEquals(
-            collector.reset().initialElements(1, 2, 3).toSet(),
+            collector.reset().initialElements(Arrays.asList(1, 2, 3)).toSet(),
             new HashSet<>(Arrays.asList(1, 2, 3))
         );
         Map<Integer, Integer> map = new LinkedHashMap<>();
@@ -44,6 +44,11 @@ public class CollTest {
             collector.reset().initialElements(1, 2, 3, 4).toMap(),
             map
         );
+        map.remove(3);
+        Assert.assertEquals(collector.reset().initialElements(1, 2, 3).toMap(), map);
+        map.put(3, 4);
+        Assert.assertEquals(collector.reset().initialElements(1, 2, 3, 4).toMap(), map);
+
         Assert.assertTrue(collector.reset().initialElements(1, 2, 3).toList().add(4));
         Assert.expectThrows(UnsupportedOperationException.class, () ->
             collector.reset().initialElements(1, 2, 3).immutable(true).toList().add(4));

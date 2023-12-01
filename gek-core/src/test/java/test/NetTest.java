@@ -525,7 +525,7 @@ public class NetTest {
         System.out.println("----------------------------------");
         GekHttpResponse response2 = GekHttp.get(
             "http://localhost:" + server.getPort(),
-            GekColl.hashMap("hello", "hello world")
+            GekColl.mapOf("hello", "hello world")
         );
         System.out.println("response2 Server received:");
         System.out.println(new String(received.toByteArray(), GekChars.defaultCharset()));
