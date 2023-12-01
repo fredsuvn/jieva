@@ -54,5 +54,9 @@ public class CollTest {
         Assert.assertEquals(collector.clear().toArrayList().getClass(), ArrayList.class);
         Assert.assertEquals(collector.clear().initialSize(3).initialFunction(i -> i).toList(), Arrays.asList(0, 1, 2));
         Assert.assertEquals(collector.clear().initialSize(3).initialFunction(i -> i).toSet(), new HashSet<>(Arrays.asList(0, 1, 2)));
+        Assert.assertEquals(
+            collector.clear().initialElements(1, 2, 3).initialSize(3).initialFunction(i -> i).toList(),
+            Arrays.asList(1, 2, 3)
+        );
     }
 }
