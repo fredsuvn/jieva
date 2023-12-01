@@ -417,7 +417,7 @@ public abstract class GekCollector {
     }
 
     /**
-     * Clears all configurations.
+     * Clears current configurations.
      *
      * @return this
      */
