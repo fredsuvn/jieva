@@ -112,6 +112,22 @@ public abstract class GekThread {
     }
 
     /**
+     * Clears current configurations.
+     *
+     * @return this
+     */
+    public GekThread clear() {
+        this.name = null;
+        this.priority = -1;
+        this.daemon = false;
+        this.task = null;
+        this.group = null;
+        this.contextClassLoader = null;
+        this.stackSize = -1;
+        return this;
+    }
+
+    /**
      * Returns thread which is configured by this, not started.
      *
      * @return thread which is configured by this, not started

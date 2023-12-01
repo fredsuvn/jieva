@@ -61,6 +61,15 @@ public class HexCodec implements CodecProcess<HexCodec> {
         return this;
     }
 
+    @Override
+    public HexCodec clear() {
+        this.input = null;
+        this.output = null;
+        this.blockSize = GekIO.IO_BUFFER_SIZE;
+        this.mode = ENCODE_MODE;
+        return this;
+    }
+
     /**
      * Sets block size for encoding/decoding operations.
      *

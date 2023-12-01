@@ -306,6 +306,17 @@ public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
         return this;
     }
 
+    @Override
+    public GekProcess clear() {
+        this.input = null;
+        this.output = null;
+        this.errorOutput = null;
+        this.command = null;
+        this.directory = null;
+        this.builder = null;
+        return this;
+    }
+
     /**
      * Starts and returns process which is configured by this.
      * If the process's input, output or error output is redirected to an array, buffer or stream, current thread will

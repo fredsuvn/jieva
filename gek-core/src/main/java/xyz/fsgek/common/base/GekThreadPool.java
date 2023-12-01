@@ -110,6 +110,22 @@ public abstract class GekThreadPool {
     }
 
     /**
+     * Clears current configurations.
+     *
+     * @return this
+     */
+    public GekThreadPool clear() {
+        this.corePoolSize = 0;
+        this.maxPoolSize = 0;
+        this.keepAliveTime = null;
+        this.workQueue = null;
+        this.threadFactory = null;
+        this.rejectHandler = null;
+        this.allowCoreThreadTimeOut = false;
+        return this;
+    }
+
+    /**
      * Returns new thread pool which is configured by this.
      *
      * @return thread pool which is configured by this

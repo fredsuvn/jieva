@@ -64,6 +64,21 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
         return this;
     }
 
+    @Override
+    public CipherCodec clear() {
+        this.cipher = null;
+        this.input = null;
+        this.output = null;
+        this.blockSize = 0;
+        this.secureRandom = null;
+        this.certificate = null;
+        this.algorithmParameters = null;
+        this.algorithmParameterSpec = null;
+        this.mode = 0;
+        this.key = null;
+        return this;
+    }
+
     /**
      * Sets cipher algorithm.
      *

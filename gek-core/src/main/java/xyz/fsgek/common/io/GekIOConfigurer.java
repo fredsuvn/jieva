@@ -132,4 +132,11 @@ public interface GekIOConfigurer<T extends GekIOConfigurer<T>> {
      * @return this
      */
     T output(OutputStream out);
+
+    /**
+     * Clears current configurations.
+     *
+     * @return this
+     */
+    T clear();
 }

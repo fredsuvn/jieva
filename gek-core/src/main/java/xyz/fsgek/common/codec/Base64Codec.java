@@ -70,6 +70,18 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
         return this;
     }
 
+    @Override
+    public Base64Codec clear() {
+        this.input = null;
+        this.output = null;
+        this.blockSize = GekIO.IO_BUFFER_SIZE;
+        this.mode = ENCODE_MODE;
+        this.type = BASIC_TYPE;
+        this.withoutPadding = false;
+        this.mimeParams = null;
+        return this;
+    }
+
     /**
      * Sets block size for encoding/decoding operations.
      *
