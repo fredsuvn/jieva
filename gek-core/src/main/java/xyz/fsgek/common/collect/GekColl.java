@@ -4,10 +4,12 @@ import xyz.fsgek.annotations.Immutable;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Collection utilities.
@@ -17,11 +19,49 @@ import java.util.stream.Collectors;
 public class GekColl {
 
     /**
+     * Returns an immutable list of given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return an immutable list of given elements
+     */
+    @SafeVarargs
+    public static <T> List<T> listOf(T... elements) {
+        return GekArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements);
+    }
+
+    /**
+     * Returns an immutable set of given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return an immutable set of given elements
+     */
+    @SafeVarargs
+    public static <T> Set<T> setOf(T... elements) {
+        return GekArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements);
+    }
+
+    /**
+     * Returns an immutable map of given elements.
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
+     * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param elements given elements
+     * @param <K>      type of key
+     * @param <V>      type of value
+     * @return an immutable map of given elements
+     */
+    public static <K, V> Map<K, V> mapOf(Object... elements) {
+        return GekArray.isEmpty(elements) ? Collections.emptyMap() : new ImmutableMap<>(elements);
+    }
+
+    /**
      * Returns a new collection configurer to create a collection.
      *
      * @return a new collection configurer to create a collection
      */
-    public static GekCollector collect() {
+    public static GekCollector collector() {
         return GekCollector.newInstance();
     }
 
@@ -238,18 +278,51 @@ public class GekColl {
      * Returns an array contains all elements from given iterable in its order.
      *
      * @param iterable given iterable
+     * @return an array contains all elements from given iterable in its order
+     */
+    public static Object[] toArray(@Nullable Iterable<?> iterable) {
+        if (iterable == null) {
+            return new Object[0];
+        }
+        if (iterable instanceof Collection) {
+            return ((Collection<?>) iterable).toArray();
+        }
+        Iterator<?> it = iterable.iterator();
+        if (!it.hasNext()) {
+            return new Object[0];
+        }
+        List<Object> list = new LinkedList<>();
+        while (it.hasNext()) {
+            list.add(it.next());
+        }
+        return list.toArray();
+    }
+
+    /**
+     * Returns an array contains all elements from given iterable in its order.
+     *
+     * @param iterable given iterable
      * @param type     array's component type
      * @param <T>      type of element
      * @return an array contains all elements from given iterable in its order
      */
-    public static <T> T[] toArray(Iterable<? extends T> iterable, Class<T> type) {
-        Collection<? extends T> collection = asOrToCollection(iterable);
-        T[] array = GekArray.newArray(type, collection.size());
-        int i = 0;
-        for (T t : collection) {
-            array[i++] = t;
+    public static <T> T[] toArray(@Nullable Iterable<? extends T> iterable, Class<T> type) {
+        if (iterable == null) {
+            return GekArray.newArray(type, 0);
         }
-        return array;
+        if (iterable instanceof Collection) {
+            return ((Collection<?>) iterable).toArray(
+                GekArray.newArray(type, ((Collection<? extends T>) iterable).size()));
+        }
+        Iterator<? extends T> it = iterable.iterator();
+        if (!it.hasNext()) {
+            return GekArray.newArray(type, 0);
+        }
+        List<T> list = new LinkedList<>();
+        while (it.hasNext()) {
+            list.add(it.next());
+        }
+        return list.toArray(GekArray.newArray(type, list.size()));
     }
 
     /**
@@ -460,6 +533,17 @@ public class GekColl {
     }
 
     /**
+     * Collects given iterable to list.
+     *
+     * @param iterable given iterable
+     * @param <T>      type of element
+     * @return the list
+     */
+    public static <T> List<T> toList(Iterable<? extends T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
+    }
+
+    /**
      * Converts given enumeration to iterable.
      *
      * @param enumeration given enumeration
@@ -635,5 +719,117 @@ public class GekColl {
             return null;
         }
         return cur;
+    }
+
+    static final class ImmutableList<T> extends AbstractList<T> implements RandomAccess, Serializable {
+
+        private final Object[] array;
+
+        ImmutableList(Object[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public T get(int index) {
+            return Gek.as(array[index]);
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+    }
+
+    static final class ImmutableSet<T> extends AbstractSet<T> implements Serializable {
+
+        private final Object[] array;
+
+        ImmutableSet(Object[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public Iterator<T> iterator() {
+            return new ImmutableIterator();
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+
+        private final class ImmutableIterator implements Iterator<T> {
+
+            private int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < array.length;
+            }
+
+            @Override
+            public T next() {
+                return Gek.as(array[i++]);
+            }
+        }
+    }
+
+    static final class ImmutableMap<K, V> extends AbstractMap<K, V> implements Serializable {
+
+        private final Set<Entry<K, V>> entries;
+
+        ImmutableMap(Object[] array) {
+            Entry<K, V>[] entryArray = new Entry[array.length / 2];
+            for (int i = 0, j = 0; i < array.length; i += 2, j++) {
+                if (i + 1 >= array.length) {
+                    break;
+                }
+                K key = Gek.as(array[i]);
+                V value = Gek.as(array[i + 1]);
+                entryArray[j] = new ImmutableEntry(key, value);
+            }
+            entries = new ImmutableSet<>(entryArray);
+        }
+
+        ImmutableMap(GekCollector.Pair<K, V>[] array) {
+            Entry<K, V>[] entryArray = new Entry[array.length];
+            for (int i = 0; i < array.length; i++) {
+                K key = array[i].key();
+                V value = array[i].value();
+                entryArray[i] = new ImmutableEntry(key, value);
+            }
+            entries = new ImmutableSet<>(entryArray);
+        }
+
+        @Override
+        public Set<Entry<K, V>> entrySet() {
+            return entries;
+        }
+
+        private final class ImmutableEntry implements Entry<K, V> {
+
+            private final K key;
+            private final V value;
+
+            private ImmutableEntry(K key, V value) {
+                this.key = key;
+                this.value = value;
+            }
+
+            @Override
+            public K getKey() {
+                return key;
+            }
+
+            @Override
+            public V getValue() {
+                return value;
+            }
+
+            @Override
+            public V setValue(V value) {
+                throw new UnsupportedOperationException();
+            }
+        }
     }
 }
