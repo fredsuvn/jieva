@@ -14,7 +14,7 @@ import java.util.concurrent.*;
  *
  * @author fredsuvn
  */
-public abstract class GekThreadPool {
+public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
 
     static GekThreadPool newInstance() {
         return new GekThreadPool.OfJdk8();
@@ -26,9 +26,10 @@ public abstract class GekThreadPool {
     private BlockingQueue<Runnable> workQueue;
     private ThreadFactory threadFactory;
     private RejectedExecutionHandler rejectHandler;
-    private boolean allowCoreThreadTimeOut = false;
+    private boolean allowCoreThreadTimeOut;
 
     GekThreadPool() {
+        reset();
     }
 
     /**
@@ -109,12 +110,8 @@ public abstract class GekThreadPool {
         return this;
     }
 
-    /**
-     * Clears current configurations.
-     *
-     * @return this
-     */
-    public GekThreadPool clear() {
+    @Override
+    public GekThreadPool reset() {
         this.corePoolSize = 0;
         this.maxPoolSize = 0;
         this.keepAliveTime = null;

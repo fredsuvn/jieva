@@ -22,13 +22,17 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
     private Cipher cipher;
     private Object input;
     private Object output;
-    private int blockSize = 0;
+    private int blockSize;
     private SecureRandom secureRandom;
     private Certificate certificate;
     private AlgorithmParameters algorithmParameters;
     private AlgorithmParameterSpec algorithmParameterSpec;
     private int mode;
     private Key key;
+
+    CipherCodec() {
+        reset();
+    }
 
     @Override
     public CipherCodec input(byte[] array) {
@@ -65,7 +69,7 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
     }
 
     @Override
-    public CipherCodec clear() {
+    public CipherCodec reset() {
         this.cipher = null;
         this.input = null;
         this.output = null;

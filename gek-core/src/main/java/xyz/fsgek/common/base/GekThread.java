@@ -11,7 +11,7 @@ import xyz.fsgek.common.io.GekIOException;
  *
  * @author fredsuvn
  */
-public abstract class GekThread {
+public abstract class GekThread implements GekConfigurer<GekThread> {
 
     static GekThread newInstance() {
         return new GekThread.OfJdk8();
@@ -24,14 +24,15 @@ public abstract class GekThread {
     }
 
     private String name;
-    private int priority = -1;
-    private boolean daemon = false;
+    private int priority;
+    private boolean daemon;
     private Runnable task;
     private ThreadGroup group;
     private ClassLoader contextClassLoader;
-    private long stackSize = -1;
+    private long stackSize;
 
     GekThread() {
+        reset();
     }
 
     /**
@@ -111,12 +112,8 @@ public abstract class GekThread {
         return this;
     }
 
-    /**
-     * Clears current configurations.
-     *
-     * @return this
-     */
-    public GekThread clear() {
+    @Override
+    public GekThread reset() {
         this.name = null;
         this.priority = -1;
         this.daemon = false;

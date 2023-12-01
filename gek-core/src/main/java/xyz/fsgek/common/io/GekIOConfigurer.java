@@ -1,6 +1,7 @@
 package xyz.fsgek.common.io;
 
 import xyz.fsgek.common.base.GekChars;
+import xyz.fsgek.common.base.GekConfigurer;
 import xyz.fsgek.common.base.GekString;
 
 import java.io.InputStream;
@@ -9,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * This is base interface for configuring IO process, supports method chaining to configure input/output:
+ * This is base interface for IO version of {@link GekConfigurer}, provides input/output methods configurations:
  * <pre>
  *     configurer.input(in).output(out);
  * </pre>
@@ -28,7 +29,7 @@ import java.nio.charset.Charset;
  * @param <T> subtype of this interface, and is subtype itself
  * @author fredsuvn
  */
-public interface GekIOConfigurer<T extends GekIOConfigurer<T>> {
+public interface GekIOConfigurer<T extends GekIOConfigurer<T>> extends GekConfigurer<T> {
 
     /**
      * Sets input to given array.
@@ -132,11 +133,4 @@ public interface GekIOConfigurer<T extends GekIOConfigurer<T>> {
      * @return this
      */
     T output(OutputStream out);
-
-    /**
-     * Clears current configurations.
-     *
-     * @return this
-     */
-    T clear();
 }

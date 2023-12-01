@@ -28,11 +28,15 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
 
     private Object input;
     private Object output;
-    private int blockSize = GekIO.IO_BUFFER_SIZE;
-    private int mode = ENCODE_MODE;
-    private int type = BASIC_TYPE;
-    private boolean withoutPadding = false;
+    private int blockSize;
+    private int mode;
+    private int type;
+    private boolean withoutPadding;
     private MimeParams mimeParams;
+
+    Base64Codec() {
+        reset();
+    }
 
     @Override
     public Base64Codec input(byte[] array) {
@@ -71,7 +75,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
     }
 
     @Override
-    public Base64Codec clear() {
+    public Base64Codec reset() {
         this.input = null;
         this.output = null;
         this.blockSize = GekIO.IO_BUFFER_SIZE;

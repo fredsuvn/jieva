@@ -22,8 +22,12 @@ public class HexCodec implements CodecProcess<HexCodec> {
 
     private Object input;
     private Object output;
-    private int blockSize = GekIO.IO_BUFFER_SIZE;
-    private int mode = ENCODE_MODE;
+    private int blockSize;
+    private int mode;
+
+    HexCodec() {
+        reset();
+    }
 
     @Override
     public HexCodec input(byte[] array) {
@@ -62,7 +66,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
     }
 
     @Override
-    public HexCodec clear() {
+    public HexCodec reset() {
         this.input = null;
         this.output = null;
         this.blockSize = GekIO.IO_BUFFER_SIZE;

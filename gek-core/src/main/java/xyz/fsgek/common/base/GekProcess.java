@@ -39,6 +39,7 @@ public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
     private ProcessBuilder builder;
 
     GekProcess() {
+        reset();
     }
 
     /**
@@ -307,7 +308,7 @@ public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
     }
 
     @Override
-    public GekProcess clear() {
+    public GekProcess reset() {
         this.input = null;
         this.output = null;
         this.errorOutput = null;

@@ -26,36 +26,36 @@ public class CollTest {
     public void testCollector() {
         GekCollector collector = Gek.collector();
         Assert.assertEquals(
-            collector.clear().initialElements(1, 2, 3).toList(),
+            collector.reset().initialElements(1, 2, 3).toList(),
             Arrays.asList(1, 2, 3)
         );
         Assert.assertEquals(
-            collector.clear().initialElements(1, 2, 3).toSet(),
+            collector.reset().initialElements(1, 2, 3).toSet(),
             new HashSet<>(Arrays.asList(1, 2, 3))
         );
         Map<Integer, Integer> map = new LinkedHashMap<>();
         map.put(1, 2);
         Assert.assertEquals(
-            collector.clear().initialElements(1, 2, 3).toMap(),
+            collector.reset().initialElements(1, 2, 3).toMap(),
             map
         );
         map.put(3, 4);
         Assert.assertEquals(
-            collector.clear().initialElements(1, 2, 3, 4).toMap(),
+            collector.reset().initialElements(1, 2, 3, 4).toMap(),
             map
         );
-        Assert.assertTrue(collector.clear().initialElements(1, 2, 3).toList().add(4));
+        Assert.assertTrue(collector.reset().initialElements(1, 2, 3).toList().add(4));
         Assert.expectThrows(UnsupportedOperationException.class, () ->
-            collector.clear().initialElements(1, 2, 3).immutable(true).toList().add(4));
-        List<Integer> list = collector.clear().initialCapacity(100).toList();
+            collector.reset().initialElements(1, 2, 3).immutable(true).toList().add(4));
+        List<Integer> list = collector.reset().initialCapacity(100).toList();
         list.add(2);
         list.add(3);
         Assert.assertEquals(list, Arrays.asList(2, 3));
-        Assert.assertEquals(collector.clear().toArrayList().getClass(), ArrayList.class);
-        Assert.assertEquals(collector.clear().initialSize(3).initialFunction(i -> i).toList(), Arrays.asList(0, 1, 2));
-        Assert.assertEquals(collector.clear().initialSize(3).initialFunction(i -> i).toSet(), new HashSet<>(Arrays.asList(0, 1, 2)));
+        Assert.assertEquals(collector.reset().toArrayList().getClass(), ArrayList.class);
+        Assert.assertEquals(collector.reset().initialSize(3).initialFunction(i -> i).toList(), Arrays.asList(0, 1, 2));
+        Assert.assertEquals(collector.reset().initialSize(3).initialFunction(i -> i).toSet(), new HashSet<>(Arrays.asList(0, 1, 2)));
         Assert.assertEquals(
-            collector.clear().initialElements(1, 2, 3).initialSize(3).initialFunction(i -> i).toList(),
+            collector.reset().initialElements(1, 2, 3).initialSize(3).initialFunction(i -> i).toList(),
             Arrays.asList(1, 2, 3)
         );
     }

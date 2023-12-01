@@ -1,6 +1,7 @@
 package xyz.fsgek.common.collect;
 
 import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.base.GekConfigurer;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ import java.util.stream.StreamSupport;
  *
  * @author fredsuvn
  */
-public abstract class GekCollector {
+public abstract class GekCollector implements GekConfigurer<GekCollector> {
 
     /**
      * Returns a new pair of specified key and value.
@@ -45,11 +46,15 @@ public abstract class GekCollector {
         return new OfJdk8();
     }
 
-    private int initialCapacity = 0;
-    private int initialSize = 0;
-    private Object initialElements = null;
-    private IntFunction<?> initialFunction = null;
-    private boolean immutable = false;
+    private int initialCapacity;
+    private int initialSize;
+    private Object initialElements;
+    private IntFunction<?> initialFunction;
+    private boolean immutable;
+
+    GekCollector() {
+        reset();
+    }
 
     /**
      * Sets initial capacity.
@@ -416,12 +421,8 @@ public abstract class GekCollector {
         throw new IllegalArgumentException("Initial elements must be iterable or array.");
     }
 
-    /**
-     * Clears current configurations.
-     *
-     * @return this
-     */
-    public GekCollector clear() {
+    @Override
+    public GekCollector reset() {
         this.initialSize = 0;
         this.initialCapacity = 0;
         this.initialElements = null;
