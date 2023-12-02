@@ -38,10 +38,7 @@ public class GekColl {
      */
     @SafeVarargs
     public static <T> Set<T> setOf(T... elements) {
-        return GekArray.isEmpty(elements) ?
-            Collections.emptySet()
-            :
-            new ImmutableSet<>(Arrays.stream(elements).distinct().toArray());
+        return GekArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements, true);
     }
 
     /**
@@ -163,7 +160,8 @@ public class GekColl {
         if (elements == null) {
             return Collections.emptySet();
         }
-        return new ImmutableSet<>(StreamSupport.stream(elements.spliterator(), false).distinct().toArray());
+        return new ImmutableSet<>(
+            StreamSupport.stream(elements.spliterator(), false).distinct().toArray(), false);
     }
 
     /**
@@ -181,7 +179,8 @@ public class GekColl {
             return Collections.emptySet();
         }
         return new ImmutableSet<>(
-            StreamSupport.stream(elements.spliterator(), false).map(function).distinct().toArray()
+            StreamSupport.stream(elements.spliterator(), false).map(function).distinct().toArray(),
+            false
         );
     }
 
@@ -753,11 +752,11 @@ public class GekColl {
         return cur;
     }
 
-    static final class ImmutableList<T> extends AbstractList<T> implements RandomAccess, Serializable {
+    private static final class ImmutableList<T> extends AbstractList<T> implements RandomAccess, Serializable {
 
         private final Object[] array;
 
-        ImmutableList(Object[] array) {
+        private ImmutableList(Object[] array) {
             this.array = array;
         }
 
@@ -772,12 +771,16 @@ public class GekColl {
         }
     }
 
-    static final class ImmutableSet<T> extends AbstractSet<T> implements Serializable {
+    private static final class ImmutableSet<T> extends AbstractSet<T> implements Serializable {
 
         private final Object[] array;
 
-        ImmutableSet(Object[] array) {
-            this.array = array;
+        private ImmutableSet(Object[] array, boolean distinct) {
+            if (distinct) {
+                this.array = Arrays.stream(array).distinct().toArray();
+            } else {
+                this.array = array;
+            }
         }
 
         @Override
@@ -806,31 +809,35 @@ public class GekColl {
         }
     }
 
-    static final class ImmutableMap<K, V> extends AbstractMap<K, V> implements Serializable {
+    private static final class ImmutableMap<K, V> extends AbstractMap<K, V> implements Serializable {
 
         private final Set<Entry<K, V>> entries;
 
-        ImmutableMap(Object[] array) {
-            Entry<K, V>[] entryArray = new Entry[array.length / 2];
+        private ImmutableMap(Object[] array) {
+            if (array.length < 2) {
+                entries = Collections.emptySet();
+                return;
+            }
+            entries = new ImmutableSet<>(
+                Arrays.stream(pairs(array))
+                    .distinct()
+                    .map(it -> new SimpleImmutableEntry<>(it.key, it.value))
+                    .toArray(),
+                false
+            );
+        }
+
+        private Node<K, V>[] pairs(Object[] array) {
+            Node<K, V>[] pairs = new Node[array.length / 2];
             for (int i = 0, j = 0; i < array.length; i += 2, j++) {
                 if (i + 1 >= array.length) {
                     break;
                 }
                 K key = Gek.as(array[i]);
                 V value = Gek.as(array[i + 1]);
-                entryArray[j] = new ImmutableEntry(key, value);
+                pairs[j] = new Node<>(key, value);
             }
-            entries = new ImmutableSet<>(entryArray);
-        }
-
-        ImmutableMap(GekCollector.Pair<K, V>[] array) {
-            Entry<K, V>[] entryArray = new Entry[array.length];
-            for (int i = 0; i < array.length; i++) {
-                K key = array[i].key();
-                V value = array[i].value();
-                entryArray[i] = new ImmutableEntry(key, value);
-            }
-            entries = new ImmutableSet<>(entryArray);
+            return pairs;
         }
 
         @Override
@@ -838,29 +845,25 @@ public class GekColl {
             return entries;
         }
 
-        private final class ImmutableEntry implements Entry<K, V> {
+        private static final class Node<K, V> {
 
             private final K key;
             private final V value;
 
-            private ImmutableEntry(K key, V value) {
+            private Node(K key, V value) {
                 this.key = key;
                 this.value = value;
             }
 
             @Override
-            public K getKey() {
-                return key;
+            public boolean equals(Object o) {
+                Node<?, ?> node = (Node<?, ?>) o;
+                return Objects.equals(key, node.key);
             }
 
             @Override
-            public V getValue() {
-                return value;
-            }
-
-            @Override
-            public V setValue(V value) {
-                throw new UnsupportedOperationException();
+            public int hashCode() {
+                return Objects.hash(key);
             }
         }
     }

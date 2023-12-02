@@ -6,7 +6,6 @@ import xyz.fsgek.common.base.GekConfigurer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntFunction;
-import java.util.stream.StreamSupport;
 
 /**
  * This class is used to configure and build collection in method chaining:
@@ -153,6 +152,15 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     }
 
     /**
+     * Sets built collection is immutable.
+     *
+     * @return this
+     */
+    public GekCollector immutable() {
+        return immutable(true);
+    }
+
+    /**
      * Builds and returns {@link ArrayList}.
      *
      * @param <T> type of element
@@ -279,45 +287,46 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     }
 
     private void fillCollection(Collection<?> collection) {
+        Collection<Object> dest = Gek.as(collection);
         if (initialElements != null) {
             if (initialElements instanceof Collection) {
-                collection.addAll(Gek.as(initialElements));
+                dest.addAll((Collection<?>) initialElements);
                 return;
             }
             if (initialElements instanceof Object[]) {
-                collection.addAll(new GekColl.ImmutableList<>((Object[]) initialElements));
+                GekColl.collect(dest, (Object[]) initialElements);
                 return;
             }
             if (initialElements instanceof Iterable) {
-                ((Iterable<?>) initialElements).forEach(it -> collection.add(Gek.as(it)));
+                ((Iterable<?>) initialElements).forEach(dest::add);
                 return;
             }
             throw new IllegalArgumentException("Initial elements must be iterable or array.");
         } else if (initialSize > 0 && initialFunction != null) {
             for (int i = 0; i < initialSize; i++) {
                 Object v = initialFunction.apply(i);
-                collection.add(Gek.as(v));
+                dest.add(v);
             }
         }
     }
 
     private void fillMap(Map<?, ?> map) {
+        Map<Object, Object> dest = Gek.as(map);
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
-                Object[] array = (Object[]) initialElements;
-                GekColl.collect(map, array);
+                GekColl.collect(dest, (Object[]) initialElements);
                 return;
             }
             if (initialElements instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) initialElements;
-                GekColl.collect(map, iterable);
+                GekColl.collect(dest, iterable);
                 return;
             }
             throw new IllegalArgumentException("Initial elements must be iterable or array.");
         } else if (initialSize > 0 && initialFunction != null) {
             for (int i = 0; i < initialSize; i++) {
                 Pair<?, ?> p = Gek.as(initialFunction.apply(i));
-                map.put(Gek.as(p.key()), Gek.as(p.value()));
+                dest.put(Gek.as(p.key()), Gek.as(p.value()));
             }
         }
     }
@@ -333,14 +342,19 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
             return toArrayList();
         }
         if (initialElements != null) {
-            Object[] array = toArray(initialElements, false);
-            return new GekColl.ImmutableList<>(array);
+            if (initialElements instanceof Object[]) {
+                return Gek.as(GekColl.listOf((Object[]) initialElements));
+            }
+            if (initialElements instanceof Iterable) {
+                return Gek.as(GekColl.toList((Iterable<?>) initialElements));
+            }
+            throw new IllegalArgumentException("Initial elements must be iterable or array.");
         } else if (initialSize > 0 && initialFunction != null) {
             Object[] array = new Object[initialSize];
             for (int i = 0; i < array.length; i++) {
                 array[i] = initialFunction.apply(i);
             }
-            return new GekColl.ImmutableList<>(array);
+            return Gek.as(GekColl.listOf(array));
         }
         return Collections.emptyList();
     }
@@ -356,14 +370,19 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
             return toLinkedHashSet();
         }
         if (initialElements != null) {
-            Object[] array = toArray(initialElements, true);
-            return new GekColl.ImmutableSet<>(array);
+            if (initialElements instanceof Object[]) {
+                return Gek.as(GekColl.setOf((Object[]) initialElements));
+            }
+            if (initialElements instanceof Iterable) {
+                return Gek.as(GekColl.toSet((Iterable<?>) initialElements));
+            }
+            throw new IllegalArgumentException("Initial elements must be iterable or array.");
         } else if (initialSize > 0 && initialFunction != null) {
             Object[] array = new Object[initialSize];
             for (int i = 0; i < array.length; i++) {
                 array[i] = initialFunction.apply(i);
             }
-            return new GekColl.ImmutableSet<>(array);
+            return Gek.as(GekColl.setOf(array));
         }
         return Collections.emptySet();
     }
@@ -380,38 +399,23 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
             return toLinkedHashMap();
         }
         if (initialElements != null) {
-            Object[] array = toArray(initialElements, false);
-            return new GekColl.ImmutableMap<>(array);
-        } else if (initialSize > 0 && initialFunction != null) {
-            Pair<K, V>[] array = new Pair[initialSize];
-            for (int i = 0; i < initialSize; i++) {
-                array[i] = Gek.as(initialFunction.apply(i));
+            if (initialElements instanceof Object[]) {
+                return Gek.as(GekColl.mapOf((Object[]) initialElements));
             }
-            return new GekColl.ImmutableMap<>(array);
+            if (initialElements instanceof Iterable) {
+                return Gek.as(GekColl.toMap((Iterable<?>) initialElements));
+            }
+            throw new IllegalArgumentException("Initial elements must be iterable or array.");
+        } else if (initialSize > 0 && initialFunction != null) {
+            Object[] array = new Object[initialSize * 2];
+            for (int i = 0; i < initialSize; i++) {
+                Pair<?, ?> p = Gek.as(initialFunction.apply(i));
+                array[i * 2] = p.key();
+                array[i * 2 + 1] = p.value();
+            }
+            return GekColl.mapOf(array);
         }
         return Collections.emptyMap();
-    }
-
-    private static Object[] toArray(Object elements, boolean distinct) {
-        if (elements instanceof Collection) {
-            if (distinct) {
-                return ((Collection<?>) elements).stream().distinct().toArray();
-            }
-            return ((Collection<?>) elements).toArray();
-        }
-        if (elements instanceof Object[]) {
-            if (distinct) {
-                return Arrays.stream((Object[]) elements).distinct().toArray();
-            }
-            return (Object[]) elements;
-        }
-        if (elements instanceof Iterable) {
-            if (distinct) {
-                return StreamSupport.stream(((Iterable<?>) elements).spliterator(), false).distinct().toArray();
-            }
-            return GekColl.toArray((Iterable<?>) elements);
-        }
-        throw new IllegalArgumentException("Initial elements must be iterable or array.");
     }
 
     @Override
