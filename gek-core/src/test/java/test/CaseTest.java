@@ -77,11 +77,11 @@ public class CaseTest {
 
     @Test
     public void testNumberCase() {
-        GekCase case1 = GekCase.camelCase(true, GekCase.CamelCase.AS_INDEPENDENT);
+        GekCase case1 = GekCase.camelCase(true, GekCase.AS_INDEPENDENT);
         Assert.assertEquals(case1.toCase("aaBbCc00cC0", GekCase.LOWER_HYPHEN), "aa-bb-cc-00-c-c-0");
-        GekCase case2 = GekCase.camelCase(true, GekCase.CamelCase.AS_INDEPENDENT);
+        GekCase case2 = GekCase.camelCase(true, GekCase.AS_INDEPENDENT);
         Assert.assertEquals(case2.toCase("aaBbCc00cC0", GekCase.LOWER_CAMEL), "aaBbCc00CC0");
-        GekCase case3 = GekCase.camelCase(true, GekCase.CamelCase.AS_UPPER);
+        GekCase case3 = GekCase.camelCase(true, GekCase.AS_UPPER);
         Assert.assertEquals(case3.toCase("aaBbCc00cC0", GekCase.LOWER_CAMEL), "aaBbCc00cC0");
     }
 }

@@ -18,6 +18,19 @@ import java.util.stream.Collectors;
 public abstract class GekCase {
 
     /**
+     * Policy let non-lower and non-upper character as lower character.
+     */
+    public static final int AS_LOWER = 0;
+    /**
+     * Policy let non-lower and non-upper character as upper character.
+     */
+    public static final int AS_UPPER = 1;
+    /**
+     * Policy let non-lower and non-upper character as independent character.
+     * The independent characters will be tokenized into independent token, not mixed with lower/upper characters.
+     */
+    public static final int AS_INDEPENDENT = 2;
+    /**
      * Token function to make given chars upper case.
      * This function is used by {@link #UPPER_HYPHEN} and {@link #UPPER_UNDERSCORE}.
      */
@@ -28,13 +41,13 @@ public abstract class GekCase {
      */
     public static final Function<Token, CharSequence> TO_LOWER_CASE = t -> GekString.lowerCase(t.toChars());
     /**
-     * Upper camel case with {@link CamelCase#AS_LOWER}.
+     * Upper camel case with {@link #AS_LOWER} policy.
      */
-    public static final GekCase UPPER_CAMEL = camelCase(true, CamelCase.AS_LOWER);
+    public static final GekCase UPPER_CAMEL = camelCase(true, AS_LOWER);
     /**
-     * Lower camel case with {@link CamelCase#AS_LOWER}.
+     * Lower camel case with {@link #AS_LOWER} policy.
      */
-    public static final GekCase LOWER_CAMEL = camelCase(false, CamelCase.AS_LOWER);
+    public static final GekCase LOWER_CAMEL = camelCase(false, AS_LOWER);
     /**
      * Underscore delimiter case.
      */
@@ -63,7 +76,7 @@ public abstract class GekCase {
     /**
      * Returns a new camel case with given character policy.
      * The character policy specifies how to deal with non-lower and non-upper characters such as digit, supports
-     * {@link CamelCase#AS_LOWER}, {@link CamelCase#AS_UPPER} and {@link CamelCase#AS_INDEPENDENT}.
+     * {@link #AS_LOWER}, {@link #AS_UPPER} and {@link #AS_INDEPENDENT}.
      *
      * @param isUpper    whether this case is upper camel case
      * @param charPolicy given character policy
@@ -75,14 +88,15 @@ public abstract class GekCase {
 
     /**
      * Returns a new delimiter case with specified delimiter and token processor.
-     * Each token will be processed by token processor before joining.
+     * Each token will be processed by token processor before joining if the processor is not null.
      *
-     * @param delimiter      specified delimiter
-     * @param tokenProcessor token processor
+     * @param delimiter specified delimiter
+     * @param processor token processor
      * @return a new delimiter case with specified delimiter and token processor
      */
-    public static GekCase delimiterCase(CharSequence delimiter, Function<Token, CharSequence> tokenProcessor) {
-        return new DelimiterCase(delimiter, tokenProcessor);
+    public static GekCase delimiterCase(
+        CharSequence delimiter, @Nullable Function<Token, CharSequence> processor) {
+        return new DelimiterCase(delimiter, processor);
     }
 
     /**
@@ -133,34 +147,12 @@ public abstract class GekCase {
     /**
      * Camel case of {@link GekCase}.
      */
-    public static class CamelCase extends GekCase {
-
-        /**
-         * Let non-lower and non-upper character as lower character.
-         */
-        public static final int AS_LOWER = 0;
-        /**
-         * Let non-lower and non-upper character as upper character.
-         */
-        public static final int AS_UPPER = 1;
-        /**
-         * Let non-lower and non-upper character as independent character.
-         * The independent characters will be tokenized into independent token, not mixed with lower/upper characters.
-         */
-        public static final int AS_INDEPENDENT = 2;
+    private static class CamelCase extends GekCase {
 
         private final boolean isUpper;
         private final int charPolicy;
 
-        /**
-         * Constructs with given character policy.
-         * The character policy specifies how to deal with non-lower and non-upper characters such as digit, supports
-         * {@link #AS_LOWER}, {@link #AS_UPPER} and {@link #AS_INDEPENDENT}.
-         *
-         * @param isUpper    whether this case is upper camel case
-         * @param charPolicy given character policy
-         */
-        public CamelCase(boolean isUpper, int charPolicy) {
+        private CamelCase(boolean isUpper, int charPolicy) {
             this.isUpper = isUpper;
             this.charPolicy = charPolicy;
         }
@@ -276,28 +268,12 @@ public abstract class GekCase {
      * Delimiter case of {@link GekCase}.
      * This implementation uses specified delimiter to split a name, and joins tokens with that delimiter.
      */
-    public static class DelimiterCase extends GekCase {
+    private static class DelimiterCase extends GekCase {
 
         private final CharSequence delimiter;
         private final @Nullable Function<Token, CharSequence> tokenProcessor;
 
-        /**
-         * Constructs with specified delimiter.
-         *
-         * @param delimiter specified delimiter
-         */
-        public DelimiterCase(CharSequence delimiter) {
-            this(delimiter, null);
-        }
-
-        /**
-         * Constructs with specified delimiter and token processor.
-         * Each token will be processed by token processor before joining if it is not null.
-         *
-         * @param delimiter      specified delimiter
-         * @param tokenProcessor token processor, may be null
-         */
-        public DelimiterCase(CharSequence delimiter, @Nullable Function<Token, CharSequence> tokenProcessor) {
+        private DelimiterCase(CharSequence delimiter, @Nullable Function<Token, CharSequence> tokenProcessor) {
             this.delimiter = delimiter;
             this.tokenProcessor = tokenProcessor;
         }
