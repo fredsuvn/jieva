@@ -256,7 +256,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                 this.maxConnection = builder.maxConnection;
                 this.address = builder.address;
                 this.serverHandler = Gek.notNull(builder.serverHandler, EMPTY_SERVER_HANDLER);
-                this.channelHandlers = GekColl.immutableList(builder.channelHandlers);
+                this.channelHandlers = GekColl.toList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
                     throw new GekNetException("Channel handlers are empty.");
                 }

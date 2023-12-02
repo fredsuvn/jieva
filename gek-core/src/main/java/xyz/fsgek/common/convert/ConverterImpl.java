@@ -42,7 +42,7 @@ final class ConverterImpl implements GekConverter, GekConverter.Handler {
     ) {
         this.prefixHandler = prefixHandler;
         this.suffixHandler = suffixHandler;
-        this.middleHandlers = GekColl.immutableList(middleHandlers);
+        this.middleHandlers = GekColl.toList(middleHandlers);
         this.options = options;
         int total = 0;
         if (this.prefixHandler != null) {

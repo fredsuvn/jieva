@@ -1,12 +1,12 @@
 package xyz.fsgek.common.collect;
 
-import xyz.fsgek.annotations.Immutable;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -38,7 +38,10 @@ public class GekColl {
      */
     @SafeVarargs
     public static <T> Set<T> setOf(T... elements) {
-        return GekArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements);
+        return GekArray.isEmpty(elements) ?
+            Collections.emptySet()
+            :
+            new ImmutableSet<>(Arrays.stream(elements).distinct().toArray());
     }
 
     /**
@@ -58,124 +61,244 @@ public class GekColl {
     }
 
     /**
-     * Collects given iterable to array.
+     * Collects given elements to array.
      *
-     * @param iterable given iterable
+     * @param elements given elements
      * @return array
      */
-    public static Object[] toArray(@Nullable Iterable<?> iterable) {
-        if (iterable == null) {
+    public static Object[] toArray(@Nullable Iterable<?> elements) {
+        if (elements == null) {
             return new Object[0];
         }
-        if (iterable instanceof Collection) {
-            return ((Collection<?>) iterable).toArray();
+        if (elements instanceof Collection) {
+            return ((Collection<?>) elements).toArray();
         }
-        return StreamSupport.stream(iterable.spliterator(), false).toArray();
+        return StreamSupport.stream(elements.spliterator(), false).toArray();
     }
 
     /**
-     * Collects given iterable to array.
+     * Collects given elements to array.
      *
-     * @param iterable given iterable
+     * @param elements given elements
      * @param <T>      type of element
      * @return array
      */
-    public static <T> T[] toArray(@Nullable Iterable<? extends T> iterable, Class<T> type) {
-        if (iterable == null) {
+    public static <T> T[] toArray(@Nullable Iterable<? extends T> elements, Class<T> type) {
+        if (elements == null) {
             return GekArray.newArray(type, 0);
         }
-        if (iterable instanceof Collection) {
-            return ((Collection<?>) iterable).toArray(
-                GekArray.newArray(type, ((Collection<? extends T>) iterable).size()));
-        }
-        return StreamSupport.stream(iterable.spliterator(), false).toArray(size -> GekArray.newArray(type, size));
+        return StreamSupport.stream(elements.spliterator(), false)
+            .toArray(size -> GekArray.newArray(type, size));
     }
 
     /**
-     * Collects given iterable to list.
+     * Collects given elements to array, converts each element from type {@code T} to type {@code R}.
+     *
+     * @param elements given elements
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @return array
+     */
+    public static <T, R> R[] toArray(
+        @Nullable Iterable<? extends T> elements, Class<R> type, Function<? super T, ? extends R> function) {
+        if (elements == null) {
+            return GekArray.newArray(type, 0);
+        }
+        return StreamSupport.stream(elements.spliterator(), false)
+            .map(function)
+            .toArray(size -> GekArray.newArray(type, size));
+    }
+
+    /**
+     * Collects given elements to immutable list.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return immutable list
+     */
+    public static <T> List<T> toList(@Nullable Iterable<? extends T> elements) {
+        if (elements == null) {
+            return Collections.emptyList();
+        }
+        return new ImmutableList<>(toArray(elements));
+    }
+
+    /**
+     * Collects given elements to immutable list, converts each element from type {@code T} to type {@code R}.
+     *
+     * @param elements source elements
+     * @param function conversion function
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @return immutable list
+     */
+    public static <T, R> List<R> toList(
+        @Nullable Iterable<? extends T> elements, Function<? super T, ? extends R> function) {
+        if (elements == null) {
+            return Collections.emptyList();
+        }
+        return new ImmutableList<>(
+            StreamSupport.stream(elements.spliterator(), false).map(function).toArray()
+        );
+    }
+
+    /**
+     * Collects given elements to immutable string list, converts each element to string.
+     *
+     * @param iterable given elements
+     * @return immutable string list
+     */
+    public static List<String> toStringList(@Nullable Iterable<?> iterable) {
+        return toList(iterable, String::valueOf);
+    }
+
+    /**
+     * Collects given elements to immutable set.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return immutable set
+     */
+    public static <T> Set<T> toSet(@Nullable Iterable<? extends T> elements) {
+        if (elements == null) {
+            return Collections.emptySet();
+        }
+        return new ImmutableSet<>(StreamSupport.stream(elements.spliterator(), false).distinct().toArray());
+    }
+
+    /**
+     * Collects given elements to immutable set, converts each element from type {@code T} to type {@code R}.
+     *
+     * @param elements source elements
+     * @param function conversion function
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @return immutable set
+     */
+    public static <T, R> Set<R> toSet(
+        @Nullable Iterable<? extends T> elements, Function<? super T, ? extends R> function) {
+        if (elements == null) {
+            return Collections.emptySet();
+        }
+        return new ImmutableSet<>(
+            StreamSupport.stream(elements.spliterator(), false).map(function).distinct().toArray()
+        );
+    }
+
+    /**
+     * Collects given elements to immutable string set, converts each element to string.
+     *
+     * @param elements given elements
+     * @return immutable string set
+     */
+    public static Set<String> toStringSet(@Nullable Iterable<?> elements) {
+        return toSet(elements, String::valueOf);
+    }
+
+    /**
+     * Collects given elements into immutable map.
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
+     * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param elements given elements
+     * @param <K>      type of key
+     * @param <V>      type of value
+     * @param <T>      type of element
+     * @return immutable map
+     */
+    public static <K, V, T> Map<K, V> toMap(@Nullable Iterable<T> elements) {
+        if (elements == null) {
+            return Collections.emptyMap();
+        }
+        return new ImmutableMap<>(toArray(elements));
+    }
+
+    /**
+     * Converts given elements to immutable map, each element of source map will be converted to a map's entry.
+     *
+     * @param elements      given elements
+     * @param keyFunction   key conversion function
+     * @param valueFunction value conversion function
+     * @param <T>           type of source element
+     * @param <K>           key type of target map
+     * @param <V>           value type of target map
+     * @return immutable map
+     */
+    public static <T, K, V> Map<K, V> toMap(
+        @Nullable Iterable<? extends T> elements,
+        Function<? super T, ? extends K> keyFunction,
+        Function<? super T, ? extends V> valueFunction
+    ) {
+        if (elements == null) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(
+            StreamSupport.stream(elements.spliterator(), false).collect(Collectors.toMap(
+                keyFunction,
+                valueFunction,
+                (v1, v2) -> v2,
+                LinkedHashMap::new
+            ))
+        );
+    }
+
+    /**
+     * Converts source map to immutable map, each entry of source map will be converted to entry of type
+     * {@code K2} and {@code V2}.
+     *
+     * @param source        source map
+     * @param keyFunction   key conversion function
+     * @param valueFunction value conversion function
+     * @param <K1>          type of source key
+     * @param <V1>          type of source value
+     * @param <K2>          type of target key
+     * @param <V2>          type of target value
+     * @return immutable map
+     */
+    public static <K1, V1, K2, V2> Map<K2, V2> toMap(
+        @Nullable Map<K1, V1> source,
+        Function<? super K1, ? extends K2> keyFunction,
+        Function<? super V1, ? extends V2> valueFunction
+    ) {
+        if (source == null) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(
+            source.entrySet().stream().collect(Collectors.toMap(
+                e -> keyFunction.apply(e.getKey()),
+                e -> valueFunction.apply(e.getValue()),
+                (v1, v2) -> v2,
+                LinkedHashMap::new
+            ))
+        );
+    }
+
+    /**
+     * If given iterable is a list, return itself, otherwise collects it into an immutable list and return.
      *
      * @param iterable given iterable
      * @param <T>      type of element
      * @return list
      */
-    public static <T> List<T> toList(@Nullable Iterable<? extends T> iterable) {
-        if (iterable == null) {
-            return Collections.emptyList();
+    public static <T> List<T> orList(@Nullable Iterable<T> iterable) {
+        if (iterable instanceof List) {
+            return (List<T>) iterable;
         }
-        return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
+        return toList(iterable);
     }
 
     /**
-     * Collects given iterable to set.
+     * If given iterable is a set, return itself, otherwise collects it into an immutable set and return.
      *
-     * @param iterable given iterable
+     * @param iterable given elements
      * @param <T>      type of element
      * @return set
      */
-    public static <T> Set<T> toSet(@Nullable Iterable<? extends T> iterable) {
-        if (iterable == null) {
-            return Collections.emptySet();
+    public static <T> Set<T> orSet(@Nullable Iterable<T> iterable) {
+        if (iterable instanceof Set) {
+            return (Set<T>) iterable;
         }
-        return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toSet());
-    }
-
-    /**
-     * Converts given enumeration to iterable.
-     *
-     * @param enumeration given enumeration
-     * @param <T>         type of element
-     * @return iterable
-     */
-    public static <T> Iterable<T> toIterable(@Nullable Enumeration<? extends T> enumeration) {
-        if (enumeration == null) {
-            return Collections.emptyList();
-        }
-        return () -> new Iterator<T>() {
-            @Override
-            public boolean hasNext() {
-                return enumeration.hasMoreElements();
-            }
-
-            @Override
-            public T next() {
-                return enumeration.nextElement();
-            }
-        };
-    }
-
-    /**
-     * Converts given iterable to enumeration.
-     *
-     * @param iterable given enumeration
-     * @param <T>      type of element
-     * @return enumeration
-     */
-    public static <T> Enumeration<T> toEnumeration(@Nullable Iterable<? extends T> iterable) {
-        if (iterable == null) {
-            return Gek.as(EmptyEnumeration.INSTANCE);
-        }
-        Iterator<? extends T> iterator = iterable.iterator();
-        return new Enumeration<T>() {
-            @Override
-            public boolean hasMoreElements() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public T nextElement() {
-                return iterator.next();
-            }
-        };
-    }
-
-    /**
-     * Converts given iterable to string list for each element with conversion method {@link String#valueOf(Object)}.
-     *
-     * @param iterable given iterable
-     * @return converted string list
-     */
-    public static List<String> toStringList(Iterable<?> iterable) {
-        return mapList(iterable, String::valueOf);
+        return toSet(iterable);
     }
 
     /**
@@ -194,7 +317,7 @@ public class GekColl {
      * @param elements given elements
      * @param <T>      type of element
      * @param <C>      type of dest collection
-     * @return the dest collection
+     * @return dest collection
      */
     @SafeVarargs
     public static <T, C extends Collection<? super T>> C collect(C dest, T... elements) {
@@ -212,16 +335,26 @@ public class GekColl {
      * @param elements given elements
      * @param <T>      type of element
      * @param <C>      type of dest collection
-     * @return the dest collection
+     * @return dest collection
      */
     public static <T, C extends Collection<? super T>> C collect(C dest, Iterable<T> elements) {
-        if (elements instanceof Collection) {
-            dest.addAll((Collection<T>) elements);
-        } else {
-            for (T t : elements) {
-                dest.add(t);
-            }
-        }
+        return collect(dest, elements, it -> it);
+    }
+
+    /**
+     * Collects given elements into dest collection, converts each element from type {@code T} to type {@code R},
+     * and returns the dest collection.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @param <C>      type of dest collection
+     * @return dest collection
+     */
+    public static <T, R, C extends Collection<? super R>> C collect(
+        C dest, Iterable<T> elements, Function<? super T, ? extends R> function) {
+        StreamSupport.stream(elements.spliterator(), false).map(function).forEach(dest::add);
         return dest;
     }
 
@@ -252,139 +385,134 @@ public class GekColl {
     }
 
     /**
-     * If given element is list, return itself as list type, else puts all given elements into a new
-     * list and returns.
+     * Collects given elements into dest map, and returns the dest map.
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
+     * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      *
+     * @param dest     dest collection
      * @param elements given elements
+     * @param <K>      key type
+     * @param <V>      value type
+     * @param <M>      type of dest map
      * @param <T>      type of element
-     * @return the list
+     * @return dest map
      */
-    public static <T> List<T> asOrToList(Iterable<T> elements) {
-        if (elements instanceof List) {
-            return (List<T>) elements;
-        }
-        if (elements instanceof Collection) {
-            return new ArrayList<>((Collection<T>) elements);
-        }
-        return collect(new LinkedList<>(), elements);
+    public static <K, V, M extends Map<K, V>, T> M collect(M dest, Iterable<T> elements) {
+        return collect(dest, elements, it -> it);
     }
 
     /**
-     * If given element is set, return itself as set type, else puts all given elements into a new
-     * set and returns.
+     * Collects given elements into dest map, converts each element from type {@code T} to type {@code R},
+     * and returns the dest map.
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
+     * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      *
+     * @param dest     dest collection
      * @param elements given elements
-     * @param <T>      type of element
-     * @return the set
+     * @param <K>      key type
+     * @param <V>      value type
+     * @param <M>      type of dest map
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @return dest map
      */
-    public static <T> Set<T> asOrToSet(Iterable<T> elements) {
-        if (elements instanceof Set) {
-            return (Set<T>) elements;
+    public static <K, V, M extends Map<K, V>, T, R> M collect(
+        M dest, Iterable<? extends T> elements, Function<? super T, ? extends R> function) {
+        Iterator<? extends T> iterator = elements.iterator();
+        while (iterator.hasNext()) {
+            R key = function.apply(iterator.next());
+            if (iterator.hasNext()) {
+                Object value = function.apply(iterator.next());
+                dest.put(Gek.as(key), Gek.as(value));
+            } else {
+                break;
+            }
         }
-        if (elements instanceof Collection) {
-            return new LinkedHashSet<>((Collection<T>) elements);
-        }
-        return collect(new LinkedHashSet<>(), elements);
+        return dest;
     }
 
     /**
-     * If given element is collection, return itself as collection type, else puts all given elements into a new
-     * collection and returns.
+     * Collects given elements into dest map, each entry of source map will be converted to entry of type
+     * {@code K2} and {@code V2}, and returns the dest map.
      *
-     * @param elements given elements
-     * @param <T>      type of element
-     * @return the collection
+     * @param dest          dest map
+     * @param source        source map
+     * @param keyFunction   key conversion function
+     * @param valueFunction value conversion function
+     * @param <K1>          type of source key
+     * @param <V1>          type of source value
+     * @param <K2>          type of target key
+     * @param <V2>          type of target value
+     * @return converted map
      */
-    public static <T> Collection<T> asOrToCollection(Iterable<T> elements) {
-        if (elements instanceof Collection) {
-            return (Collection<T>) elements;
-        }
-        return asOrToSet(elements);
+    public static <K1, V1, K2, V2, M extends Map<K2, V2>> M collect(
+        M dest,
+        Map<K1, V1> source,
+        Function<? super K1, ? extends K2> keyFunction,
+        Function<? super V1, ? extends V2> valueFunction
+    ) {
+        source.forEach((k, v) -> {
+            dest.put(keyFunction.apply(k), valueFunction.apply(v));
+        });
+        return dest;
     }
 
     /**
-     * Returns immutable list of which elements were put from given iterable.
+     * Converts given enumeration to iterable.
      *
-     * @param iterable given iterable
-     * @param <T>      type of element
-     * @return immutable list
+     * @param enumeration given enumeration
+     * @param <T>         type of element
+     * @return iterable
      */
-    public static <T> @Immutable List<T> immutableList(@Nullable Iterable<? extends T> iterable) {
-        if (iterable == null) {
+    public static <T> Iterable<T> asIterable(@Nullable Enumeration<? extends T> enumeration) {
+        if (enumeration == null) {
             return Collections.emptyList();
         }
-        List<T> list;
-        if (iterable instanceof Collection) {
-            list = collect(new ArrayList<>(((Collection<? extends T>) iterable).size()), iterable);
-        } else {
-            list = collect(new ArrayList<>(), iterable);
-        }
-        return Collections.unmodifiableList(list);
+        return () -> new Iterator<T>() {
+            @Override
+            public boolean hasNext() {
+                return enumeration.hasMoreElements();
+            }
+
+            @Override
+            public T next() {
+                return enumeration.nextElement();
+            }
+        };
     }
 
     /**
-     * Returns immutable list of which elements were put from given array.
+     * Converts given iterable to enumeration.
      *
-     * @param array given array
-     * @param <T>   type of element
-     * @return immutable list
-     */
-    public static <T> @Immutable List<T> immutableList(@Nullable T[] array) {
-        if (GekArray.isEmpty(array)) {
-            return Collections.emptyList();
-        }
-        List<T> list = collect(new ArrayList<>(array.length), array);
-        return Collections.unmodifiableList(list);
-    }
-
-    /**
-     * Returns immutable set of which elements were put from given iterable.
-     *
-     * @param iterable given iterable
+     * @param iterable given enumeration
      * @param <T>      type of element
-     * @return immutable set
+     * @return enumeration
      */
-    public static <T> @Immutable Set<T> immutableSet(@Nullable Iterable<? extends T> iterable) {
+    public static <T> Enumeration<T> asEnumeration(@Nullable Iterable<? extends T> iterable) {
         if (iterable == null) {
-            return Collections.emptySet();
+            return Gek.as(EmptyEnumeration.INSTANCE);
         }
-        LinkedHashSet<T> set;
-        if (iterable instanceof Collection) {
-            set = collect(new LinkedHashSet<>(((Collection<? extends T>) iterable).size()), iterable);
-        } else {
-            set = collect(new LinkedHashSet<>(), iterable);
-        }
-        return Collections.unmodifiableSet(set);
-    }
+        return new Enumeration<T>() {
 
-    /**
-     * Returns immutable set of which elements were put from given array.
-     *
-     * @param array given array
-     * @param <T>   type of element
-     * @return immutable set
-     */
-    public static <T> @Immutable Set<T> immutableSet(@Nullable T[] array) {
-        if (GekArray.isEmpty(array)) {
-            return Collections.emptySet();
-        }
-        LinkedHashSet<T> set = collect(new LinkedHashSet<>(array.length), array);
-        return Collections.unmodifiableSet(set);
-    }
+            private Iterator<? extends T> iterator = null;
 
-    /**
-     * Returns immutable map of which elements were put from given map.
-     *
-     * @param map given map
-     * @param <K> key type
-     * @param <V> value type
-     * @return immutable map
-     */
-    public static <K, V> @Immutable Map<K, V> immutableMap(@Nullable Map<? extends K, ? extends V> map) {
-        if (isEmpty(map)) {
-            return Collections.emptyMap();
-        }
-        return Collections.unmodifiableMap(new LinkedHashMap<>(map));
+            @Override
+            public boolean hasMoreElements() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public T nextElement() {
+                return iterator.next();
+            }
+
+            private Iterator<? extends T> iterator() {
+                if (iterator == null) {
+                    iterator = iterable.iterator();
+                }
+                return iterator;
+            }
+        };
     }
 
     /**
@@ -442,10 +570,11 @@ public class GekColl {
      * @param iterable given iterable
      * @param index    specified index
      * @param <T>      type of element
-     * @return value from given iterable at specified index
+     * @return value or null
      */
-    public static <T> T get(@Nullable Iterable<T> iterable, int index) {
-        return get(iterable, index, null);
+    @Nullable
+    public static <T> T get(@Nullable Iterable<? extends T> iterable, int index) {
+        return get(iterable, index, (T) null);
     }
 
     /**
@@ -456,15 +585,15 @@ public class GekColl {
      * @param index        specified index
      * @param defaultValue default value
      * @param <T>          type of element
-     * @return value from given iterable at specified index
+     * @return value or default value
      */
-    public static <T> T get(@Nullable Iterable<T> iterable, int index, @Nullable T defaultValue) {
+    public static <T> T get(@Nullable Iterable<? extends T> iterable, int index, T defaultValue) {
         if (iterable == null || index < 0) {
             return defaultValue;
         }
         if (iterable instanceof List) {
-            List<T> list = (List<T>) iterable;
-            if (list.size() > index) {
+            List<T> list = Gek.as(iterable);
+            if (index < list.size()) {
                 T result = list.get(index);
                 if (result != null) {
                     return result;
@@ -477,12 +606,51 @@ public class GekColl {
             if (index == i) {
                 if (t != null) {
                     return t;
+                } else {
+                    return defaultValue;
                 }
-                break;
             }
             i++;
         }
         return defaultValue;
+    }
+
+    /**
+     * Returns value from given iterable at specified index,
+     * if the value is null or failed to obtain, compute new value by specified function and return.
+     *
+     * @param iterable given iterable
+     * @param index    specified index
+     * @param function specified function
+     * @param <T>      type of element
+     * @return value or computed value
+     */
+    public static <T> T compute(@Nullable Iterable<? extends T> iterable, int index, IntFunction<? extends T> function) {
+        if (iterable == null || index < 0) {
+            return function.apply(index);
+        }
+        if (iterable instanceof List) {
+            List<T> list = Gek.as(iterable);
+            if (index < list.size()) {
+                T result = list.get(index);
+                if (result != null) {
+                    return result;
+                }
+            }
+            return function.apply(index);
+        }
+        int i = 0;
+        for (T t : iterable) {
+            if (index == i) {
+                if (t != null) {
+                    return t;
+                } else {
+                    return function.apply(index);
+                }
+            }
+            i++;
+        }
+        return function.apply(index);
     }
 
     /**
@@ -492,23 +660,25 @@ public class GekColl {
      * @param key specified key
      * @param <K> key type
      * @param <V> value type
-     * @return value from given map at specified key
+     * @return value or null
      */
+    @Nullable
     public static <K, V> V get(@Nullable Map<K, V> map, K key) {
-        return get(map, key, null);
+        return get(map, key, (V) null);
     }
 
     /**
-     * Returns value from given map at specified key, if the value is null or failed to obtain, return default value.
+     * Returns value from given map at specified key,
+     * if the value is null or failed to obtain, return default value.
      *
      * @param map          given map
      * @param key          specified key
      * @param defaultValue default value
      * @param <K>          key type
      * @param <V>          value type
-     * @return value from given map at specified key
+     * @return value or default value
      */
-    public static <K, V> V get(@Nullable Map<K, V> map, K key, @Nullable V defaultValue) {
+    public static <K, V> V get(@Nullable Map<K, V> map, K key, V defaultValue) {
         if (map == null) {
             return defaultValue;
         }
@@ -517,102 +687,22 @@ public class GekColl {
     }
 
     /**
-     * Converts given iterable of type {@link T} to list of type {@link R}
-     * for each element with given conversion function.
+     * Returns value from given map at specified key,
+     * if the value is null or failed to obtain, compute new value by specified function and return.
      *
-     * @param iterable given iterable of type {@link T}
-     * @param function given conversion function
-     * @param <T>      type of source element
-     * @param <R>      type of target element
-     * @return converted list
+     * @param map      given map
+     * @param key      specified key
+     * @param function specified function
+     * @param <K>      key type
+     * @param <V>      value type
+     * @return value or computed value
      */
-    public static <T, R> List<R> mapList(Iterable<T> iterable, Function<? super T, ? extends R> function) {
-        if (iterable instanceof Collection) {
-            return ((Collection<T>) iterable).stream().map(function).collect(Collectors.toList());
+    public static <K, V> V compute(@Nullable Map<K, V> map, K key, Function<? super K, ? extends V> function) {
+        if (map == null) {
+            return function.apply(key);
         }
-        List<R> result = new LinkedList<>();
-        for (T o : iterable) {
-            result.add(function.apply(o));
-        }
-        return result;
-    }
-
-    /**
-     * Converts given iterable of type {@link T} to set of type {@link R}
-     * for each element with given conversion function.
-     *
-     * @param iterable given iterable of type {@link T}
-     * @param function given conversion function
-     * @param <T>      type of source element
-     * @param <R>      type of target element
-     * @return converted set
-     */
-    public static <T, R> Set<R> mapSet(Iterable<T> iterable, Function<? super T, ? extends R> function) {
-        if (iterable instanceof Collection) {
-            return ((Collection<T>) iterable).stream().map(function).collect(Collectors.toSet());
-        }
-        Set<R> result = new LinkedHashSet<>();
-        for (T o : iterable) {
-            result.add(function.apply(o));
-        }
-        return result;
-    }
-
-    /**
-     * Converts source iterable to map, each element of source map will be converted to a map entry
-     * with given conversion function and finally collected into a map.
-     *
-     * @param source        source iterable
-     * @param keyFunction   key conversion function
-     * @param valueFunction value conversion function
-     * @param <T>           type of source element
-     * @param <K>           key type of target map
-     * @param <V>           value type of target map
-     * @return converted map
-     */
-    public static <T, K, V> Map<K, V> mapMap(
-        Iterable<T> source,
-        Function<? super T, ? extends K> keyFunction,
-        Function<? super T, ? extends V> valueFunction
-    ) {
-        if (source instanceof Collection) {
-            return ((Collection<T>) source).stream().collect(Collectors.toMap(
-                keyFunction,
-                valueFunction,
-                (v1, v2) -> v2
-            ));
-        }
-        Map<K, V> result = new LinkedHashMap<>();
-        for (T o : source) {
-            result.put(keyFunction.apply(o), valueFunction.apply(o));
-        }
-        return result;
-    }
-
-    /**
-     * Converts source map into dest map, each element of source map will be converted into dest map
-     * with given conversion function.
-     *
-     * @param source        source map
-     * @param dest          dest map
-     * @param keyFunction   key conversion function
-     * @param valueFunction value conversion function
-     * @param <KS>          key type of source map
-     * @param <VS>          value type of source map
-     * @param <KR>          key type of target map
-     * @param <VR>          value type of target map
-     * @return converted map
-     */
-    public static <KS, VS, KR, VR> Map<KR, VR> mapMap(
-        Map<KS, VS> source,
-        Map<KR, VR> dest,
-        Function<? super KS, ? extends KR> keyFunction,
-        Function<? super VS, ? extends VR> valueFunction
-    ) {
-        source.forEach((k, v) -> {
-            dest.put(keyFunction.apply(k), valueFunction.apply(v));
-        });
-        return dest;
+        V v = map.get(key);
+        return v == null ? function.apply(key) : v;
     }
 
     /**

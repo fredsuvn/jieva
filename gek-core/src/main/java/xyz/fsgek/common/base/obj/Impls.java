@@ -3,7 +3,6 @@ package xyz.fsgek.common.base.obj;
 import lombok.EqualsAndHashCode;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.*;
@@ -72,7 +71,7 @@ final class Impls {
 
         public List<Type> getActualTypeArguments() {
             if (actualTypeArguments == null) {
-                actualTypeArguments = GekColl.immutableList(getType().getActualTypeArguments());
+                actualTypeArguments = Gek.listOf(getType().getActualTypeArguments());
             }
             return actualTypeArguments;
         }
@@ -94,14 +93,14 @@ final class Impls {
 
         public List<Type> getBounds() {
             if (bounds == null) {
-                bounds = GekColl.immutableList(getType().getBounds());
+                bounds = Gek.listOf(getType().getBounds());
             }
             return bounds;
         }
 
         public List<AnnotatedType> getAnnotatedBounds() {
             if (annotatedBounds == null) {
-                annotatedBounds = GekColl.immutableList(getType().getAnnotatedBounds());
+                annotatedBounds = Gek.listOf(getType().getAnnotatedBounds());
             }
             return annotatedBounds;
         }

@@ -5,12 +5,12 @@ import lombok.Data;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.bean.handlers.AbstractBeanResolveHandler;
+import xyz.fsgek.common.bean.handlers.JavaBeanResolveHandler;
 import xyz.fsgek.common.bean.handlers.RecordBeanResolveHandler;
 import xyz.fsgek.common.cache.GekCache;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.reflect.GekReflect;
 import xyz.fsgek.common.reflect.TypeRef;
-import xyz.fsgek.common.bean.handlers.JavaBeanResolveHandler;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -163,9 +163,7 @@ public interface GekBeanResolver {
                         GekProperty property = new MapPropertyImpl(k);
                         propertyNodes.put(k, new Node(propertyVersion, property));
                     });
-                    properties = Collections.unmodifiableMap(
-                        GekColl.mapMap(propertyNodes, new LinkedHashMap<>(), name -> name, Node::getProperty)
-                    );
+                    properties = GekColl.toMap(propertyNodes, name -> name, Node::getProperty);
                     return properties;
                 }
 
@@ -194,9 +192,7 @@ public interface GekBeanResolver {
                         }
                     }
                 }
-                properties = Collections.unmodifiableMap(
-                    GekColl.mapMap(propertyNodes, new LinkedHashMap<>(), name -> name, Node::getProperty)
-                );
+                properties = GekColl.toMap(propertyNodes, name -> name, Node::getProperty);
                 return properties;
             }
 

@@ -2,9 +2,9 @@ package xyz.fsgek.common.bean;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.bean.handlers.JavaBeanResolveHandler;
 import xyz.fsgek.common.cache.GekCache;
 import xyz.fsgek.common.collect.GekColl;
-import xyz.fsgek.common.bean.handlers.JavaBeanResolveHandler;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -21,7 +21,7 @@ final class BeanResolverImpl implements GekBeanResolver, GekBeanResolver.Handler
     private final @Nullable GekCache<Type, GekBean> cache;
 
     BeanResolverImpl(Iterable<GekBeanResolver.Handler> handlers, @Nullable GekCache<Type, GekBean> cache) {
-        this.handlers = GekColl.immutableList(handlers);
+        this.handlers = GekColl.toList(handlers);
         this.cache = cache;
     }
 

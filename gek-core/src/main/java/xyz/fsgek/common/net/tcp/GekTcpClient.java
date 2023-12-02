@@ -249,7 +249,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
                 this.port = builder.port;
                 this.address = builder.address;
                 this.clientHandler = Gek.notNull(builder.clientHandler, EMPTY_CLIENT_HANDLER);
-                this.channelHandlers = GekColl.immutableList(builder.channelHandlers);
+                this.channelHandlers = GekColl.toList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
                     throw new GekNetException("Channel handlers are empty.");
                 }

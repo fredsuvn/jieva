@@ -280,7 +280,7 @@ public interface GekUdpServer extends GekUdpClient {
                 this.port = builder.port;
                 this.address = builder.address;
                 this.serverHandler = Gek.notNull(builder.serverHandler, EMPTY_SERVER_HANDLER);
-                this.packetHandlers = GekColl.immutableList(builder.packetHandlers);
+                this.packetHandlers = GekColl.toList(builder.packetHandlers);
                 if (packetHandlers.isEmpty()) {
                     throw new GekNetException("Packet handlers are empty.");
                 }

@@ -115,23 +115,26 @@ public interface GekRandom<T> {
          * @return built instance of {@link GekRandom}
          */
         public <R extends T> GekRandom<R> build() {
+            if (GekColl.isEmpty(parts)) {
+                throw new IllegalStateException("There is no score build.");
+            }
             return Gek.as(new Impl<>(Gek.notNull(random, new Random()), parts));
         }
 
         private static final class Impl<T> implements GekRandom<T> {
 
             private final Random random;
-            private final List<Part> parts;
+            private final Part[] parts;
 
             private Impl(Random random, List<Part> parts) {
                 this.random = random;
-                this.parts = GekColl.immutableList(parts);
+                this.parts = GekColl.toArray(parts, Part.class);
             }
 
             @Override
             public T next() {
-                int min = parts.get(0).from;
-                int max = parts.get(parts.size() - 1).to;
+                int min = parts[0].from;
+                int max = parts[parts.length - 1].to;
                 int next = random.nextInt(max - min) + min;
                 for (Part part : parts) {
                     if (next >= part.from && next < part.to) {

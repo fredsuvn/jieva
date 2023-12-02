@@ -110,7 +110,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
             return null;
         }
         if (generator.needSize()) {
-            Collection<?> srcList = GekColl.asOrToList(sourceInfo.getObject());
+            Collection<?> srcList = GekColl.orList(sourceInfo.getObject());
             return convertCollection(
                 srcList,
                 generator.generate(srcList.size()),

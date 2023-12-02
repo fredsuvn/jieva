@@ -482,7 +482,7 @@ public class ReflectTest {
         // A(844996153)=A(726237730)
         // B(1498084403)=A(844996153)
         // V(23805079)=class java.lang.Long(746023354)
-        GekLog.getInstance().info(GekColl.mapMap(
+        GekLog.getInstance().info(GekColl.toMap(
             map.entrySet(),
             it -> it.getKey() + "(" + Gek.systemHash(it.getKey()) + ")",
             it -> it.getValue() + "(" + Gek.systemHash(it.getValue()) + ")"
@@ -496,7 +496,7 @@ public class ReflectTest {
         // A(844996153)=A(726237730)
         // B(1498084403)=A(844996153)
         // V(23805079)=class java.lang.Long(746023354)
-        GekLog.getInstance().info(GekColl.mapMap(
+        GekLog.getInstance().info(GekColl.toMap(
             map2.entrySet(),
             it -> it.getKey() + "(" + Gek.systemHash(it.getKey()) + ")",
             it -> it.getValue() + "(" + Gek.systemHash(it.getValue()) + ")"
