@@ -112,20 +112,28 @@ public class CollTest {
             map
         );
         Assert.assertEquals(
-            collector.reset().initialFunction(i -> GekCollector.pair(i, i)).toMap(),
+            collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(i, i)).toMap(),
             Collections.emptyMap()
         );
         Assert.assertEquals(
-            collector.reset().initialFunction(i -> GekCollector.pair(i, i)).immutable().toMap(),
+            collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(i, i)).immutable().toMap(),
             Collections.emptyMap()
         );
         Assert.assertEquals(
-            collector.reset().initialFunction(i -> GekCollector.pair(i, i)).initialSize(4).toMap(),
+            collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(i, i)).initialSize(4).toMap(),
             Gek.mapOf(0, 0, 1, 1, 2, 2, 3, 3)
         );
         Assert.assertEquals(
-            collector.reset().initialFunction(i -> GekCollector.pair(i, i)).initialSize(4).immutable().toMap(),
+            collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(i, i)).initialSize(4).immutable().toMap(),
             Gek.mapOf(0, 0, 1, 1, 2, 2, 3, 3)
+        );
+        Assert.assertEquals(
+            collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(1, i)).initialSize(4).toMap(),
+            Gek.mapOf(1, 3)
+        );
+        Assert.assertEquals(
+            collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(1, i)).initialSize(4).immutable().toMap(),
+            Gek.mapOf(1, 3)
         );
         map.remove(3);
         Assert.assertEquals(collector.reset().initialElements(1, 2, 3).toMap(), map);

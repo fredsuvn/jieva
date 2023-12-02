@@ -58,6 +58,27 @@ public class GekColl {
     }
 
     /**
+     * Returns an immutable map of given entries.
+     *
+     * @param entries given elements
+     * @param <K>     type of key
+     * @param <V>     type of value
+     * @return an immutable map of given entries
+     */
+    @SafeVarargs
+    public static <K, V> Map<K, V> mapOfEntries(Map.Entry<? extends K, ? extends V>... entries) {
+        if (GekArray.isEmpty(entries)) {
+            return Collections.emptyMap();
+        }
+        Object[] array = new Object[entries.length * 2];
+        for (int i = 0; i < entries.length; i++) {
+            array[i * 2] = entries[i].getKey();
+            array[i * 2 + 1] = entries[i].getValue();
+        }
+        return new ImmutableMap<>(array);
+    }
+
+    /**
      * Collects given elements to array.
      *
      * @param elements given elements
@@ -818,26 +839,11 @@ public class GekColl {
                 entries = Collections.emptySet();
                 return;
             }
+            Map<K, V> map = collect(new LinkedHashMap<>(), array);
             entries = new ImmutableSet<>(
-                Arrays.stream(pairs(array))
-                    .distinct()
-                    .map(it -> new SimpleImmutableEntry<>(it.key, it.value))
-                    .toArray(),
+                map.entrySet().stream().map(it -> new SimpleImmutableEntry<>(it.getKey(), it.getValue())).toArray(),
                 false
             );
-        }
-
-        private Node<K, V>[] pairs(Object[] array) {
-            Node<K, V>[] pairs = new Node[array.length / 2];
-            for (int i = 0, j = 0; i < array.length; i += 2, j++) {
-                if (i + 1 >= array.length) {
-                    break;
-                }
-                K key = Gek.as(array[i]);
-                V value = Gek.as(array[i + 1]);
-                pairs[j] = new Node<>(key, value);
-            }
-            return pairs;
         }
 
         @Override

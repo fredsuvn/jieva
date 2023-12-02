@@ -18,29 +18,6 @@ import java.util.function.IntFunction;
  */
 public abstract class GekCollector implements GekConfigurer<GekCollector> {
 
-    /**
-     * Returns a new pair of specified key and value.
-     *
-     * @param key   specified key
-     * @param value specified value
-     * @param <K>   key type
-     * @param <V>   value type
-     * @return a new pair of specified key and value
-     */
-    public static <K, V> Pair<K, V> pair(K key, V value) {
-        return new Pair<K, V>() {
-            @Override
-            public K key() {
-                return key;
-            }
-
-            @Override
-            public V value() {
-                return value;
-            }
-        };
-    }
-
     static GekCollector newInstance() {
         return new OfJdk8();
     }
@@ -127,7 +104,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      *     </li>
      *     <li>
      *         To build a map, the function will be passed to the index and return
-     *         an array of {@link Pair} at the index;
+     *         an array of {@link Map.Entry} (such as {@link AbstractMap.SimpleImmutableEntry}) at the index;
      *     </li>
      * </ul>
      * If the {@link #initialElements} is set, this configuration will be ignored.
@@ -325,8 +302,8 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
             throw new IllegalArgumentException("Initial elements must be iterable or array.");
         } else if (initialSize > 0 && initialFunction != null) {
             for (int i = 0; i < initialSize; i++) {
-                Pair<?, ?> p = Gek.as(initialFunction.apply(i));
-                dest.put(Gek.as(p.key()), Gek.as(p.value()));
+                Map.Entry<?, ?> p = Gek.as(initialFunction.apply(i));
+                dest.put(Gek.as(p.getKey()), Gek.as(p.getValue()));
             }
         }
     }
@@ -407,13 +384,11 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
             }
             throw new IllegalArgumentException("Initial elements must be iterable or array.");
         } else if (initialSize > 0 && initialFunction != null) {
-            Object[] array = new Object[initialSize * 2];
+            Map.Entry<?, ?>[] entries = new Map.Entry<?, ?>[initialSize];
             for (int i = 0; i < initialSize; i++) {
-                Pair<?, ?> p = Gek.as(initialFunction.apply(i));
-                array[i * 2] = p.key();
-                array[i * 2 + 1] = p.value();
+                entries[i] = Gek.as(initialFunction.apply(i));
             }
-            return GekColl.mapOf(array);
+            return Gek.as(GekColl.mapOfEntries(entries));
         }
         return Collections.emptyMap();
     }
@@ -429,28 +404,5 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     }
 
     private static final class OfJdk8 extends GekCollector {
-    }
-
-    /**
-     * Structure contains a key and a value.
-     *
-     * @param <K> key type
-     * @param <V> value type
-     */
-    public interface Pair<K, V> {
-
-        /**
-         * Returns key.
-         *
-         * @return key
-         */
-        K key();
-
-        /**
-         * Returns value.
-         *
-         * @return value
-         */
-        V value();
     }
 }
