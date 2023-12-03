@@ -3,13 +3,14 @@ package xyz.fsgek.common.data.protobuf;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.invoke.GekInvoker;
-import xyz.fsgek.common.reflect.GekReflect;
+import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.bean.GekBeanException;
 import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.bean.GekPropertyBase;
 import xyz.fsgek.common.convert.GekConvertException;
+import xyz.fsgek.common.invoke.GekInvoker;
+import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -34,11 +35,11 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
     public static final ProtobufResolveHandler INSTANCE = new ProtobufResolveHandler();
 
     @Override
-    public @Nullable void resolve(GekBeanResolver.ResolveContext context) {
+    public @Nullable GekFlag resolve(GekBeanResolver.ResolveContext context) {
         try {
             Class<?> rawType = GekReflect.getRawType(context.beanType());
             if (rawType == null) {
-                return;
+                return null;
             }
             //Check whether it is a protobuf object
             boolean isProtobuf = false;
@@ -51,7 +52,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
                 isBuilder = true;
             }
             if (!isProtobuf) {
-                return;
+                return null;
             }
             Method getDescriptorMethod = rawType.getMethod("getDescriptor");
             Descriptors.Descriptor descriptor = (Descriptors.Descriptor) getDescriptorMethod.invoke(null);
@@ -59,7 +60,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
                 GekPropertyBase propBase = buildProperty(context, field, rawType, isBuilder);
                 context.beanProperties().put(propBase.getName(), propBase);
             }
-            context.breakResolving();
+            return GekFlag.BREAK;
         } catch (GekConvertException e) {
             throw e;
         } catch (Exception e) {

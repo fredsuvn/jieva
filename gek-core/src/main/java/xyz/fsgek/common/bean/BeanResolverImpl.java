@@ -1,7 +1,7 @@
 package xyz.fsgek.common.bean;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.bean.handlers.JavaBeanResolveHandler;
 import xyz.fsgek.common.cache.GekCache;
 import xyz.fsgek.common.collect.GekColl;
@@ -52,33 +52,33 @@ final class BeanResolverImpl implements GekBeanResolver, GekBeanResolver.Handler
     }
 
     @Override
-    public @Nullable void resolve(ResolveContext builder) {
+    public @Nullable GekFlag resolve(ResolveContext builder) {
         for (GekBeanResolver.Handler handler : handlers) {
-            handler.resolve(builder);
-            if (builder.isBreakResolving()) {
-                break;
+            GekFlag flag = handler.resolve(builder);
+            if (Objects.equals(flag, GekFlag.BREAK)) {
+                return GekFlag.BREAK;
             }
         }
+        return null;
     }
 
     private GekBean resolve0(Type type) {
-        ContextImpl builder = new ContextImpl(type);
+        Context builder = new Context(type);
         for (Handler handler : handlers) {
-            handler.resolve(builder);
-            if (builder.isBreakResolving()) {
+            GekFlag flag = handler.resolve(builder);
+            if (Objects.equals(flag, GekFlag.BREAK)) {
                 break;
             }
         }
         return builder.build();
     }
 
-    static final class ContextImpl implements ResolveContext {
+    static final class Context implements ResolveContext {
 
         private final Type type;
         private final Map<String, GekPropertyBase> properties = new LinkedHashMap<>();
-        private boolean breakResolving = false;
 
-        ContextImpl(Type type) {
+        Context(Type type) {
             this.type = type;
         }
 
@@ -92,192 +92,148 @@ final class BeanResolverImpl implements GekBeanResolver, GekBeanResolver.Handler
             return properties;
         }
 
-        @Override
-        public void breakResolving() {
-            breakResolving = true;
-        }
-
-        @Override
-        public boolean isBreakResolving() {
-            return breakResolving;
-        }
-
         private GekBean build() {
             return new BeanImpl(type, properties);
         }
+    }
 
-        private static final class BeanImpl implements GekBean {
+    private static final class BeanImpl implements GekBean {
 
-            private final Type type;
-            private final Map<String, GekProperty> properties;
-            private String toString = null;
+        private final Type type;
+        private final Map<String, GekProperty> properties;
 
-            private BeanImpl(Type type, Map<String, GekPropertyBase> properties) {
-                this.type = type;
-                Map<String, GekProperty> props = new LinkedHashMap<>();
-                properties.forEach((name, propBase) -> props.put(name, new PropertyImpl(propBase)));
-                this.properties = Collections.unmodifiableMap(props);
+        private BeanImpl(Type type, Map<String, GekPropertyBase> properties) {
+            this.type = type;
+            this.properties = GekColl.toMap(properties, name -> name, PropertyImpl::new);
+        }
+
+        @Override
+        public Type getType() {
+            return type;
+        }
+
+        @Override
+        public Map<String, GekProperty> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return GekBean.equals(this, o);
+        }
+
+        @Override
+        public int hashCode() {
+            return GekBean.hashCode(this);
+        }
+
+        @Override
+        public String toString() {
+            return GekBean.toString(this);
+        }
+
+        private final class PropertyImpl implements GekProperty {
+
+            private final GekPropertyBase base;
+
+            private PropertyImpl(GekPropertyBase propBase) {
+                this.base = propBase;
+            }
+
+            @Override
+            public GekBean getOwner() {
+                return BeanImpl.this;
+            }
+
+            @Override
+            public String getName() {
+                return base.getName();
+            }
+
+            @Override
+            @Nullable
+            public Object get(Object bean) {
+                return base.get(bean);
+            }
+
+            @Override
+            public void set(Object bean, @Nullable Object value) {
+                base.set(bean, value);
             }
 
             @Override
             public Type getType() {
-                return type;
+                return base.getType();
             }
 
             @Override
-            public Map<String, GekProperty> getProperties() {
-                return properties;
+            public Class<?> getRawType() {
+                return base.getRawType();
+            }
+
+            @Override
+            public @Nullable Method getGetter() {
+                return base.getGetter();
+            }
+
+            @Override
+            public @Nullable Method getSetter() {
+                return base.getSetter();
+            }
+
+            @Override
+            public @Nullable Field getField() {
+                return base.getField();
+            }
+
+            @Override
+            public List<Annotation> getGetterAnnotations() {
+                return base.getGetterAnnotations();
+            }
+
+            @Override
+            public List<Annotation> getSetterAnnotations() {
+                return base.getSetterAnnotations();
+            }
+
+            @Override
+            public List<Annotation> getFieldAnnotations() {
+                return base.getFieldAnnotations();
+            }
+
+            @Override
+            public List<Annotation> getAnnotations() {
+                return base.getAnnotations();
+            }
+
+            @Override
+            public @Nullable Annotation getAnnotation(Class<?> annotationType) {
+                return base.getAnnotation(annotationType);
+            }
+
+            @Override
+            public boolean isReadable() {
+                return base.isReadable();
+            }
+
+            @Override
+            public boolean isWriteable() {
+                return base.isWriteable();
             }
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (o == null) {
-                    return false;
-                }
-                if (!Objects.equals(getClass(), o.getClass())) {
-                    return false;
-                }
-                BeanImpl ob = Gek.as(o);
-                return Objects.equals(getType(), ob.getType());
+                return GekProperty.equals(this, o);
             }
 
             @Override
             public int hashCode() {
-                return getType().hashCode();
+                return GekProperty.hashCode(this);
             }
 
             @Override
             public String toString() {
-                if (toString == null) {
-                    String finalToString = GekBean.toString(this);
-                    toString = finalToString;
-                    return finalToString;
-                }
-                return toString;
-            }
-
-            private final class PropertyImpl implements GekProperty {
-
-                private final GekPropertyBase propBase;
-                private String toString = null;
-
-                private PropertyImpl(GekPropertyBase propBase) {
-                    this.propBase = propBase;
-                }
-
-                @Override
-                public GekBean getOwner() {
-                    return BeanImpl.this;
-                }
-
-                @Override
-                public String getName() {
-                    return propBase.getName();
-                }
-
-                @Override
-                @Nullable
-                public Object get(Object bean) {
-                    return propBase.get(bean);
-                }
-
-                @Override
-                public void set(Object bean, @Nullable Object value) {
-                    propBase.set(bean, value);
-                }
-
-                @Override
-                public Type getType() {
-                    return propBase.getType();
-                }
-
-                @Override
-                public Class<?> getRawType() {
-                    return propBase.getRawType();
-                }
-
-                @Override
-                public @Nullable Method getGetter() {
-                    return propBase.getGetter();
-                }
-
-                @Override
-                public @Nullable Method getSetter() {
-                    return propBase.getSetter();
-                }
-
-                @Override
-                public @Nullable Field getField() {
-                    return propBase.getField();
-                }
-
-                @Override
-                public List<Annotation> getGetterAnnotations() {
-                    return propBase.getGetterAnnotations();
-                }
-
-                @Override
-                public List<Annotation> getSetterAnnotations() {
-                    return propBase.getSetterAnnotations();
-                }
-
-                @Override
-                public List<Annotation> getFieldAnnotations() {
-                    return propBase.getFieldAnnotations();
-                }
-
-                @Override
-                public List<Annotation> getAnnotations() {
-                    return propBase.getAnnotations();
-                }
-
-                @Override
-                public @Nullable Annotation getAnnotation(Class<?> annotationType) {
-                    return propBase.getAnnotation(annotationType);
-                }
-
-                @Override
-                public boolean isReadable() {
-                    return propBase.isReadable();
-                }
-
-                @Override
-                public boolean isWriteable() {
-                    return propBase.isWriteable();
-                }
-
-                @Override
-                public boolean equals(Object o) {
-                    if (this == o) {
-                        return true;
-                    }
-                    if (o == null) {
-                        return false;
-                    }
-                    if (!Objects.equals(getClass(), o.getClass())) {
-                        return false;
-                    }
-                    PropertyImpl op = Gek.as(o);
-                    return Objects.equals(getOwner(), op.getOwner()) && Objects.equals(getName(), op.getName());
-                }
-
-                @Override
-                public int hashCode() {
-                    return Objects.hash(getOwner().hashCode(), getName().hashCode());
-                }
-
-                @Override
-                public String toString() {
-                    if (toString == null) {
-                        String finalToString = GekProperty.toString(this);
-                        toString = finalToString;
-                        return finalToString;
-                    }
-                    return toString;
-                }
+                return GekProperty.toString(this);
             }
         }
     }

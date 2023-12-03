@@ -1,12 +1,13 @@
 package xyz.fsgek.common.bean.handlers;
 
 import xyz.fsgek.annotations.Nullable;
+import xyz.fsgek.common.base.GekFlag;
+import xyz.fsgek.common.bean.GekBeanException;
+import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.bean.GekPropertyBase;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.invoke.GekInvoker;
 import xyz.fsgek.common.reflect.GekReflect;
-import xyz.fsgek.common.bean.GekBeanException;
-import xyz.fsgek.common.bean.GekBeanResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -31,7 +32,7 @@ import java.util.*;
 public abstract class AbstractBeanResolveHandler implements GekBeanResolver.Handler {
 
     @Override
-    public @Nullable void resolve(GekBeanResolver.ResolveContext context) {
+    public @Nullable GekFlag resolve(GekBeanResolver.ResolveContext context) {
         Type type = context.beanType();
         Class<?> rawType = GekReflect.getRawType(type);
         if (rawType == null) {
@@ -80,6 +81,7 @@ public abstract class AbstractBeanResolveHandler implements GekBeanResolver.Hand
             setType = getActualType(setType, typeParameterMapping, stack);
             context.beanProperties().put(name, new PropertyBaseImpl(name, null, setter, field, setType));
         });
+        return null;
     }
 
     /**

@@ -14,6 +14,7 @@ import java.util.Objects;
 
 /**
  * Base info of property of a bean ({@link GekBean}).
+ * It must be immutable and thread-safe.
  *
  * @author fredsuvn
  */

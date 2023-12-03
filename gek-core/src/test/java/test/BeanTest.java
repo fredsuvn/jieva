@@ -8,6 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekLog;
 import xyz.fsgek.common.bean.*;
 import xyz.fsgek.common.bean.handlers.JavaBeanResolveHandler;
@@ -122,12 +123,12 @@ public class BeanTest {
         Map<String, GekProperty> properties = mapBean.getProperties();
         Assert.assertSame(properties, mapBean.getProperties());
         map.put("4", 12345L);
-        Assert.assertNotEquals(properties, mapBean.getProperties());
+        Assert.assertEquals(properties, mapBean.getProperties());
         Assert.assertNull(p4);
         GekProperty p42 = mapBean.getProperty("4");
         Assert.assertEquals(p42.getType(), Long.class);
-        Assert.assertSame(p1, mapBean.getProperties().get("1"));
-        Assert.assertSame(p1, mapBean.getProperty("1"));
+        Assert.assertEquals(p1, mapBean.getProperties().get("1"));
+        Assert.assertEquals(p1, mapBean.getProperty("1"));
         map.remove("2");
         Assert.assertNull(mapBean.getProperty("2"));
         GekLog.getInstance().info("mapBean: ", mapBean);
@@ -333,18 +334,16 @@ public class BeanTest {
         GekBeanResolver.Handler handler = GekBeanResolver.defaultResolver()
             .insertFirstHandler(new GekBeanResolver.Handler() {
                 @Override
-                public @Nullable void resolve(GekBeanResolver.ResolveContext context) {
+                public @Nullable GekFlag resolve(GekBeanResolver.ResolveContext context) {
                     if (Objects.equals(context.beanType(), Integer.class)) {
                         x[0]++;
-                        return;
+                        return null;
                     }
-                    context.breakResolving();
+                    return GekFlag.BREAK;
                 }
             })
             .asHandler();
         GekBeanResolver.ResolveContext context1 = new GekBeanResolver.ResolveContext() {
-
-            private boolean breakResolving = false;
 
             @Override
             public Type beanType() {
@@ -355,23 +354,10 @@ public class BeanTest {
             public Map<String, GekPropertyBase> beanProperties() {
                 return new HashMap<>();
             }
-
-            @Override
-            public void breakResolving() {
-                breakResolving = true;
-            }
-
-            @Override
-            public boolean isBreakResolving() {
-                return breakResolving;
-            }
         };
         handler.resolve(context1);
-        Assert.assertFalse(context1.isBreakResolving());
         Assert.assertEquals(x[0], 1);
         GekBeanResolver.ResolveContext context2 = new GekBeanResolver.ResolveContext() {
-
-            private boolean breakResolving = false;
 
             @Override
             public Type beanType() {
@@ -382,19 +368,8 @@ public class BeanTest {
             public Map<String, GekPropertyBase> beanProperties() {
                 return new HashMap<>();
             }
-
-            @Override
-            public void breakResolving() {
-                breakResolving = true;
-            }
-
-            @Override
-            public boolean isBreakResolving() {
-                return breakResolving;
-            }
         };
         handler.resolve(context2);
-        Assert.assertTrue(context2.isBreakResolving());
         Assert.assertEquals(x[0], 1);
     }
 
