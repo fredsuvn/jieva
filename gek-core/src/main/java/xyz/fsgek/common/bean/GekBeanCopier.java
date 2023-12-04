@@ -1,7 +1,10 @@
 package xyz.fsgek.common.bean;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.base.GekOption;
 import xyz.fsgek.common.convert.GekConvertException;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.reflect.GekReflect;
@@ -52,6 +55,19 @@ public interface GekBeanCopier {
     }
 
     /**
+     * Copies properties from source object to dest object.
+     *
+     * @param source  source object
+     * @param dest    dest object
+     * @param options copy options
+     * @param <T>     type of dest object
+     * @return dest object
+     */
+    default <T> T copyProperties(Object source, T dest, Option... options) {
+        return copyProperties(source, source.getClass(), dest, dest.getClass(), options);
+    }
+
+    /**
      * Copies properties from source object to dest object with specified types.
      *
      * @param source     source object
@@ -61,7 +77,22 @@ public interface GekBeanCopier {
      * @param <T>        type of dest object
      * @return dest object
      */
-    <T> T copyProperties(Object source, Type sourceType, T dest, Type destType);
+    default <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
+        return copyProperties(source, sourceType, dest, destType, new Option[0]);
+    }
+
+    /**
+     * Copies properties from source object to dest object with specified types.
+     *
+     * @param source     source object
+     * @param sourceType specified type of source object
+     * @param dest       dest object
+     * @param destType   specified type of dest type
+     * @param options    copy options
+     * @param <T>        type of dest object
+     * @return dest object
+     */
+    <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, Option... options);
 
     /**
      * Returns a bean copier of which options come from this copier,
@@ -477,6 +508,38 @@ public interface GekBeanCopier {
                     .destPropertyFilter(destPropertyFilter)
                     .putIfNotContained(putIfNotContained);
             }
+        }
+    }
+
+    /**
+     * Copy options. This option implementation use key to differentiate different functional options.
+     * Default option in {@link CopyOptions}, and default key range in [0, 1024].
+     */
+    interface Option extends GekOption<Integer, Object> {
+
+        /**
+         * Returns an option instance of given key and value.
+         *
+         * @param key   given key
+         * @param value given value
+         * @return an option instance of given key and value
+         */
+        static Option of(int key, Object value) {
+            @EqualsAndHashCode
+            @ToString
+            final class OptionImpl implements Option {
+
+                @Override
+                public Integer key() {
+                    return key;
+                }
+
+                @Override
+                public Object value() {
+                    return value;
+                }
+            }
+            return new OptionImpl();
         }
     }
 }

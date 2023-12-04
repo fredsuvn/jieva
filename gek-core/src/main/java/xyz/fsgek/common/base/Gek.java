@@ -1,6 +1,7 @@
 package xyz.fsgek.common.base;
 
 import xyz.fsgek.annotations.Nullable;
+import xyz.fsgek.common.bean.GekBean;
 import xyz.fsgek.common.bean.GekBeanCopier;
 import xyz.fsgek.common.collect.GekArray;
 import xyz.fsgek.common.collect.GekColl;
@@ -456,6 +457,21 @@ public class Gek {
     @Nullable
     public static Object convertType(@Nullable Object source, Type sourceType, Type targetType) {
         return GekConverter.defaultConverter().convertType(source, sourceType, targetType);
+    }
+
+    /**
+     * Resolves given object to {@link GekBean}.
+     * If the object is an instance of {@link Map}, call {@link GekBean#wrap(Map)},
+     * otherwise call {@link GekBean#resolve(Type)}.
+     *
+     * @param obj given object
+     * @return {@link GekBean} of given object
+     */
+    public static GekBean toBean(Object obj) {
+        if (obj instanceof Map) {
+            return GekBean.wrap(Gek.as(obj));
+        }
+        return GekBean.resolve(obj.getClass());
     }
 
     /**
