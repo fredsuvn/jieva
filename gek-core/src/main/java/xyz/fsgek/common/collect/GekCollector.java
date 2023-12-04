@@ -10,7 +10,7 @@ import java.util.function.IntFunction;
 /**
  * This class is used to configure and build collection in method chaining:
  * <pre>
- *     collector.initialSize(100).initialFunction(i->random()).toList();
+ *     collector.initialSize(100).initialFunction(i-&gt;random()).toList();
  * </pre>
  * Its instance is reusable, re-set and re-build are permitted.
  *
