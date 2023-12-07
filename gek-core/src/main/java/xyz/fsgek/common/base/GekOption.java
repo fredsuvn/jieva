@@ -4,16 +4,32 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * This class represents an option for some service, for example:
+ * This interface represents optional parameter. For example:
  * <pre>
- *     public void doService(Object arg, GekOption&lt;?, ? &gt;... options)
+ *     public void doSomething(Object arg, GekOption&lt;?, ? &gt;... options)
  * </pre>
- * The options should be implemented by service provider.
+ * The key specifies which option to be set, and the value is argument of the option.
  *
  * @param <K> type of key
  * @param <V> type of value
  */
 public interface GekOption<K, V> {
+
+    /**
+     * Empty option array.
+     */
+    GekOption<?, ?>[] EMPTY_OPTIONS = new GekOption<?, ?>[0];
+
+    /**
+     * Returns empty option array;
+     *
+     * @param <K> type of key
+     * @param <V> type of value
+     * @return empty option array
+     */
+    static <K, V> GekOption<K, V>[] emptyOptions() {
+        return Gek.as(EMPTY_OPTIONS);
+    }
 
     /**
      * Returns an option instance of given key and value.

@@ -2,9 +2,13 @@ package xyz.fsgek.common.bean;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
+import xyz.fsgek.common.base.GekOption;
 import xyz.fsgek.common.collect.GekArray;
+import xyz.fsgek.common.convert.GekConvertException;
 import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.reflect.GekReflect;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,7 +17,7 @@ import java.util.Objects;
 final class BeanCopierImpl implements GekBeanCopier {
 
     @Override
-    public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, Option... options) {
+    public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, GekOption<?,?>... options) {
         GekBeanResolver resolver = null;
         GekConverter converter = null;
         boolean throwIfConversionFailed = true;
@@ -21,7 +25,7 @@ final class BeanCopierImpl implements GekBeanCopier {
         Object ignoreProperties = null;
         boolean ignoreNull = false;
         if (GekArray.isNotEmpty(options)) {
-            for (Option option : options) {
+            for (GekOption<?,?> option : options) {
                 if (Objects.equals(option.key(), CopyOptions.KEY_OF_BEAN_RESOLVER)) {
                     resolver = Gek.as(option.value());
                 } else if (Objects.equals(option.key(), CopyOptions.KEY_OF_CONVERTER)) {
@@ -37,6 +41,41 @@ final class BeanCopierImpl implements GekBeanCopier {
                 }
             }
         }
+        if (source instanceof Map) {
+            ParameterizedType sourceMapType = GekReflect.getGenericSuperType(sourceType, Map.class);
+            if (sourceMapType == null) {
+                throw new IllegalArgumentException("Not a map type: " + sourceType + ".");
+            }
+            Type[] sourceActualTypes = sourceMapType.getActualTypeArguments();
+            Type sourceKeyType = sourceActualTypes[0];
+            Type sourceValueType = sourceActualTypes[1];
+            if (dest instanceof Map) {
+                ParameterizedType destMapType = GekReflect.getGenericSuperType(destType, Map.class);
+                if (destMapType == null) {
+                    throw new IllegalArgumentException("Not a map type: " + destType + ".");
+                }
+                Type[] destActualTypes = destMapType.getActualTypeArguments();
+                Type destKeyType = destActualTypes[0];
+                Type destValueType = destActualTypes[1];
+                copyProperties0(source, sourceType, sourceKeyType, sourceValueType, dest, destType, destKeyType, destValueType);
+            } else {
+                copyProperties0(source, sourceType, sourceKeyType, sourceValueType, dest, destType, null, null);
+            }
+        } else {
+            if (dest instanceof Map) {
+                ParameterizedType destMapType = GekReflect.getGenericSuperType(destType, Map.class);
+                if (destMapType == null) {
+                    throw new IllegalArgumentException("Not a map type: " + destType + ".");
+                }
+                Type[] destActualTypes = destMapType.getActualTypeArguments();
+                Type destKeyType = destActualTypes[0];
+                Type destValueType = destActualTypes[1];
+                copyProperties0(source, sourceType, null, null, dest, destType, destKeyType, destValueType);
+            } else {
+                copyProperties0(source, sourceType, null, null, dest, destType, null, null);
+            }
+        }
+        return dest;
         return copyProperties0(
             source, sourceType, dest, destType,
             Gek.notNull(resolver, GekBeanResolver.defaultResolver()),
@@ -57,6 +96,8 @@ final class BeanCopierImpl implements GekBeanCopier {
         @Nullable Object ignoreProperties,
         boolean ignoreNull
     ) {
+
+
         if (source instanceof Map) {
             if (dest instanceof Map) {
                 Map<Object, Object> sourceMap = Gek.as(source);
@@ -218,6 +259,21 @@ final class BeanCopierImpl implements GekBeanCopier {
             return false;
         }
         return false;
+    }
+
+    @Nullable
+    private Object tryConvert(
+        Object value, Type fromType, Type destType, GekConverter converter,
+        boolean throwIfConversionFailed) {
+        Object newValue = converter.convertType(value, fromType, destType);
+        if (newValue == null) {
+            if (throwIfConversionFailed) {
+                throw new GekConvertException(fromType, destType);
+            } else {
+                return null;
+            }
+        }
+        return newValue;
     }
 
     @Override

@@ -5,13 +5,18 @@ import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.reflect.GekReflect;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Bean struct info of a type, usually resolved by {@link GekBeanResolver}.
+ * This interface represents a simple type of java bean struct, which has a set of property structs,
+ * each of the property consists of a name-value pair, the name is unique in same bean.
+ * <p>
+ * A bean corresponds to a {@link Type}, commonly resolved by {@link GekBeanResolver}.
+ * The most common type of bean is a Java class that is filled with getters and setters which specify their properties.
  *
  * @author fredsuvn
  * @see GekBeanResolver
@@ -32,10 +37,11 @@ public interface GekBean {
 
     /**
      * Wraps given map as a {@link GekBean} by {@link GekBeanResolver#defaultResolver()},
-     * of which type will be seen as Map&lt;String, Object&gt;.
-     * This method is equivalent to:
+     * of which type will be seen as Map&lt;String, ?&gt;.
+     * types of properties will be calculated dynamically by its value's {@link Class#getClass()} (or Object if null).
+     * This method is same with:
      * <pre>
-     *     wrap(map, null);
+     *     wrapMap(map, null);
      * </pre>
      *
      * @param map given map
@@ -48,10 +54,12 @@ public interface GekBean {
 
     /**
      * Wraps given map as a {@link GekBean} by {@link GekBeanResolver#defaultResolver()},
-     * the key type of map type must be {@link String}.
-     * If the given map type is null, the map type will be seen as Map&lt;String, Object&gt;.
+     * the key type of map type must be {@link String},
+     * property type is specified by map type. If the given map type is null,
+     * the map type will be seen as Map&lt;String, ?&gt;. If map type is Map&lt;String, ?&gt;,
+     * types of properties will be calculated dynamically by its value's {@link Class#getClass()} (or Object if null).
      * <p>
-     * Result of {@link GekBean#getProperties()} is immutable, but its content will be affected by given map.
+     * Result of {@link GekBean#getProperties()} is immutable, but its content will be affected by given map dynamically.
      *
      * @param map     given map
      * @param mapType given map type
@@ -112,9 +120,9 @@ public interface GekBean {
     }
 
     /**
-     * Returns type of this bean.
+     * Returns type of this bean, should be {@link Class} or {@link ParameterizedType}.
      *
-     * @return type of this bean
+     * @return type of this bean, should be {@link Class} or {@link ParameterizedType}
      */
     Type getType();
 

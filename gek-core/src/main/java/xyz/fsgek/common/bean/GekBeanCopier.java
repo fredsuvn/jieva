@@ -51,7 +51,7 @@ public interface GekBeanCopier {
      * @return dest object
      */
     default <T> T copyProperties(Object source, T dest) {
-        return copyProperties(source, source.getClass(), dest, dest.getClass());
+        return copyProperties(source, dest, GekOption.emptyOptions());
     }
 
     /**
@@ -63,7 +63,7 @@ public interface GekBeanCopier {
      * @param <T>     type of dest object
      * @return dest object
      */
-    default <T> T copyProperties(Object source, T dest, Option... options) {
+    default <T> T copyProperties(Object source, T dest, GekOption<?, ?>... options) {
         return copyProperties(source, source.getClass(), dest, dest.getClass(), options);
     }
 
@@ -78,7 +78,7 @@ public interface GekBeanCopier {
      * @return dest object
      */
     default <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
-        return copyProperties(source, sourceType, dest, destType, new Option[0]);
+        return copyProperties(source, sourceType, dest, destType, GekOption.emptyOptions());
     }
 
     /**
@@ -92,7 +92,7 @@ public interface GekBeanCopier {
      * @param <T>        type of dest object
      * @return dest object
      */
-    <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, Option... options);
+    <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, GekOption<?, ?>... options);
 
     /**
      * Returns a bean copier of which options come from this copier,
@@ -508,38 +508,6 @@ public interface GekBeanCopier {
                     .destPropertyFilter(destPropertyFilter)
                     .putIfNotContained(putIfNotContained);
             }
-        }
-    }
-
-    /**
-     * Copy options. This option implementation use key to differentiate different functional options.
-     * Default option in {@link CopyOptions}, and default key range in [0, 1024].
-     */
-    interface Option extends GekOption<Integer, Object> {
-
-        /**
-         * Returns an option instance of given key and value.
-         *
-         * @param key   given key
-         * @param value given value
-         * @return an option instance of given key and value
-         */
-        static Option of(int key, Object value) {
-            @EqualsAndHashCode
-            @ToString
-            final class OptionImpl implements Option {
-
-                @Override
-                public Integer key() {
-                    return key;
-                }
-
-                @Override
-                public Object value() {
-                    return value;
-                }
-            }
-            return new OptionImpl();
         }
     }
 }

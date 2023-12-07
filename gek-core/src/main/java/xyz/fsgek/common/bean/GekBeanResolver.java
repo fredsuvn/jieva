@@ -86,7 +86,8 @@ public interface GekBeanResolver {
     GekBean resolve(Type type);
 
     /**
-     * Wraps given map as a {@link GekBean}, of which type will be seen as Map&lt;String, Object&gt;.
+     * Wraps given map as a {@link GekBean}, of which type will be seen as Map&lt;String, ?&gt;,
+     * types of properties will be calculated dynamically by its value's {@link Class#getClass()} (or Object if null).
      * This method is same with:
      * <pre>
      *     wrapMap(map, null);
@@ -101,13 +102,15 @@ public interface GekBeanResolver {
     }
 
     /**
-     * Wraps given map as a {@link GekBean}, the key type of map type must be {@link String}.
-     * If the given map type is null, the map type will be seen as Map&lt;String, Object&gt;.
+     * Wraps given map as a {@link GekBean}, the key type of map type must be {@link String},
+     * property type is specified by map type. If the given map type is null,
+     * the map type will be seen as Map&lt;String, ?&gt;. If map type is Map&lt;String, ?&gt;,
+     * types of properties will be calculated dynamically by its value's {@link Class#getClass()} (or Object if null).
      * <p>
-     * Result of {@link GekBean#getProperties()} is immutable, but its content will be affected by given map.
+     * Result of {@link GekBean#getProperties()} is immutable, but its content will be affected by given map dynamically.
      *
      * @param map     given map
-     * @param mapType given map type
+     * @param mapType map type
      * @return wrapped {@link GekBean}
      */
     default GekBean wrap(Map<String, ?> map, @Nullable Type mapType) {

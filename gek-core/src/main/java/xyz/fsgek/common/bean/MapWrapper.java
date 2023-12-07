@@ -15,18 +15,18 @@ import java.util.stream.Collectors;
 
 final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBean {
 
-    private static final Type DEFAULT_MAP_BEAN_TYPE = new TypeRef<Map<String, Object>>() {
+    private static final Type DEFAULT_MAP_BEAN_TYPE = new TypeRef<Map<String, ?>>() {
     }.getType();
 
     private final Map<String, ?> source;
     private final Type mapType;
-    private final Type valueType;
+    private final @Nullable Type valueType;
 
     MapWrapper(Map<String, ?> source, @Nullable Type mapType) {
         this.source = source;
-        this.mapType = mapType == null ? DEFAULT_MAP_BEAN_TYPE : mapType;
-        if (this.mapType == DEFAULT_MAP_BEAN_TYPE) {
-            this.valueType = Object.class;
+        this.mapType = Gek.notNull(mapType, DEFAULT_MAP_BEAN_TYPE);
+        if (Objects.equals(this.mapType, DEFAULT_MAP_BEAN_TYPE)) {
+            this.valueType = null;
         } else {
             ParameterizedType parameterizedType = GekReflect.getGenericSuperType(mapType, Map.class);
             if (parameterizedType == null) {
@@ -111,7 +111,13 @@ final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBe
 
         @Override
         public Type getType() {
-            return valueType;
+            return Gek.notNull(valueType, () -> {
+                Object value = source.get(key);
+                if (value != null) {
+                    return value.getClass();
+                }
+                return Object.class;
+            });
         }
 
         @Override

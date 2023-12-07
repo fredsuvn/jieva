@@ -1,5 +1,6 @@
 package xyz.fsgek.common.bean;
 
+import xyz.fsgek.common.base.GekOption;
 import xyz.fsgek.common.convert.GekConvertException;
 import xyz.fsgek.common.convert.GekConverter;
 
@@ -55,8 +56,8 @@ public class CopyOptions {
      * @param resolver bean resolver
      * @return option to set bean resolver
      */
-    public static GekBeanCopier.Option beanResolver(GekBeanResolver resolver) {
-        return GekBeanCopier.Option.of(KEY_OF_BEAN_RESOLVER, resolver);
+    public static GekOption<Integer, GekBeanResolver> beanResolver(GekBeanResolver resolver) {
+        return GekOption.of(KEY_OF_BEAN_RESOLVER, resolver);
     }
 
     /**
@@ -65,8 +66,8 @@ public class CopyOptions {
      * @param converter converter
      * @return option to set converter
      */
-    public static GekBeanCopier.Option converter(GekConverter converter) {
-        return GekBeanCopier.Option.of(KEY_OF_CONVERTER, converter);
+    public static GekOption<Integer, GekConverter> converter(GekConverter converter) {
+        return GekOption.of(KEY_OF_CONVERTER, converter);
     }
 
     /**
@@ -76,8 +77,8 @@ public class CopyOptions {
      *                                true throw {@link GekConvertException}, false to ignore
      * @return option to whether throw exception if property converting failed
      */
-    public static GekBeanCopier.Option throwIfConversionFailed(boolean throwIfConversionFailed) {
-        return GekBeanCopier.Option.of(KEY_OF_THROW_IF_CONVERT_FAILED, throwIfConversionFailed);
+    public static GekOption<Integer, Boolean> throwIfConversionFailed(boolean throwIfConversionFailed) {
+        return GekOption.of(KEY_OF_THROW_IF_CONVERT_FAILED, throwIfConversionFailed);
     }
 
     /**
@@ -86,8 +87,8 @@ public class CopyOptions {
      * @param putIfNotContained whether put value if destination is a map and doesn't contain that property
      * @return option to whether put value if destination is a map and doesn't contain that property
      */
-    public static GekBeanCopier.Option putIfNotContained(boolean putIfNotContained) {
-        return GekBeanCopier.Option.of(KEY_OF_PUT_IF_NOT_CONTAINED, putIfNotContained);
+    public static GekOption<Integer, Boolean> putIfNotContained(boolean putIfNotContained) {
+        return GekOption.of(KEY_OF_PUT_IF_NOT_CONTAINED, putIfNotContained);
     }
 
     /**
@@ -96,8 +97,8 @@ public class CopyOptions {
      * @param ignoreProperties ignored properties which don't need copy
      * @return option to set ignored properties which don't need copy
      */
-    public static GekBeanCopier.Option ignoreProperties(String... ignoreProperties) {
-        return GekBeanCopier.Option.of(KEY_OF_IGNORE_PROPERTIES, ignoreProperties);
+    public static GekOption<Integer, String[]> ignoreProperties(String... ignoreProperties) {
+        return GekOption.of(KEY_OF_IGNORE_PROPERTIES, ignoreProperties);
     }
 
     /**
@@ -106,8 +107,8 @@ public class CopyOptions {
      * @param ignoreProperties ignored properties which don't need copy
      * @return option to set ignored properties which don't need copy
      */
-    public static GekBeanCopier.Option ignoreProperties(Iterable<String> ignoreProperties) {
-        return GekBeanCopier.Option.of(KEY_OF_IGNORE_PROPERTIES, ignoreProperties);
+    public static GekOption<Integer, Iterable<String>> ignoreProperties(Iterable<String> ignoreProperties) {
+        return GekOption.of(KEY_OF_IGNORE_PROPERTIES, ignoreProperties);
     }
 
     /**
@@ -116,7 +117,7 @@ public class CopyOptions {
      * @param ignoreNull whether ignore null value of source
      * @return option set whether ignore null value of source
      */
-    public static GekBeanCopier.Option ignoreNull(boolean ignoreNull) {
-        return GekBeanCopier.Option.of(KEY_OF_IGNORE_NULL, ignoreNull);
+    public static GekOption<Integer, Boolean> ignoreNull(boolean ignoreNull) {
+        return GekOption.of(KEY_OF_IGNORE_NULL, ignoreNull);
     }
 }

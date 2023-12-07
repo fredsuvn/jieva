@@ -1,5 +1,6 @@
 package test;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.*;
@@ -13,6 +14,7 @@ public class GekTest {
 
     @Test
     public void testThrow() {
+        BeanUtils.copyProperties(null, null);
         GekLog.getInstance().info(GekTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())))
         );
