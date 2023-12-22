@@ -2,7 +2,7 @@ package xyz.fsgek.common.cache;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekWrapper;
+import xyz.fsgek.common.base.Geko;
 import xyz.fsgek.common.base.ref.GekRef;
 
 import java.lang.ref.ReferenceQueue;
@@ -101,7 +101,7 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
     }
 
     @Override
-    public @Nullable GekWrapper<V> getWrapper(K key) {
+    public @Nullable Geko<V> getWrapper(K key) {
         Entry<K> entry = data.get(key);
         if (entry == null) {
             cleanUp();
@@ -118,11 +118,11 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
         }
         entry.refreshAccess();
         cleanUp();
-        return GekWrapper.wrap(valueAs(value));
+        return Geko.of(valueAs(value));
     }
 
     @Override
-    public @Nullable GekWrapper<V> getWrapper(
+    public @Nullable Geko<V> getWrapper(
         K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
         Entry<K> entry = data.get(key);
         if (entry == null) {
@@ -138,12 +138,12 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
         }
         entry.refreshAccess();
         cleanUp();
-        return GekWrapper.wrap(valueAs(value));
+        return Geko.of(valueAs(value));
     }
 
-    private @Nullable GekWrapper<V> computeWrapper(
+    private @Nullable Geko<V> computeWrapper(
         K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
-        GekRef<GekWrapper<V>> result = GekRef.ofNull();
+        GekRef<Geko<V>> result = GekRef.ofNull();
         data.compute(key, (k, old) -> {
             if (old == null) {
                 Value<? extends V> nv = loader.apply(k);
@@ -151,7 +151,7 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
                     return null;
                 }
                 Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-                result.set(GekWrapper.wrap(nv.get()));
+                result.set(Geko.of(nv.get()));
                 return newEntry;
             }
             if (old.isExpired()) {
@@ -161,7 +161,7 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
                     return null;
                 }
                 Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-                result.set(GekWrapper.wrap(nv.get()));
+                result.set(Geko.of(nv.get()));
                 return newEntry;
             }
             Object ov = old.value();
@@ -171,10 +171,10 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
                     return null;
                 }
                 Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-                result.set(GekWrapper.wrap(nv.get()));
+                result.set(Geko.of(nv.get()));
                 return newEntry;
             }
-            result.set(GekWrapper.wrap(valueAs(ov)));
+            result.set(Geko.of(valueAs(ov)));
             old.refreshAccess();
             return old;
         });

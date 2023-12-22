@@ -1,11 +1,11 @@
 package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.reflect.GekReflect;
-import xyz.fsgek.common.base.GekWrapper;
+import xyz.fsgek.common.base.Geko;
 import xyz.fsgek.common.bean.GekBeanCopier;
 import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.Type;
 import java.time.*;
@@ -34,7 +34,7 @@ import java.util.function.Supplier;
  * </ul>
  * For other types, it creates with their empty constructor.
  * <p>
- * Note if the {@code obj} is null, return {@link GekWrapper#empty()}.
+ * Note if the {@code obj} is null, return {@link Geko#empty()}.
  *
  * @author fredsuvn
  */
@@ -99,7 +99,7 @@ public class BeanConvertHandler implements GekConverter.Handler {
     @Override
     public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
         if (source == null) {
-            return GekWrapper.empty();
+            return Geko.empty();
         }
         Class<?> targetRawType = GekReflect.getRawType(targetType);
         if (targetRawType == null || targetRawType.isArray() || UNSUPPORTED_TYPES.contains(targetRawType)) {

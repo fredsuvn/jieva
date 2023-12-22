@@ -6,7 +6,7 @@ import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekFlag;
-import xyz.fsgek.common.base.GekWrapper;
+import xyz.fsgek.common.base.Geko;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.convert.handlers.*;
 import xyz.fsgek.common.reflect.TypeRef;
@@ -113,8 +113,8 @@ public interface GekConverter {
         if (result == null) {
             return null;
         }
-        if (result instanceof GekWrapper) {
-            return Gek.as(((GekWrapper<?>) result).get());
+        if (result instanceof Geko) {
+            return Gek.as(((Geko<?>) result).get());
         }
         return Gek.as(result);
     }
@@ -205,14 +205,14 @@ public interface GekConverter {
 
     /**
      * Converts source object from source type to target type.
-     * The result of this method in 3 types: {@code null}, {@link GekWrapper} and others:
+     * The result of this method in 3 types: {@code null}, {@link Geko} and others:
      * <ul>
      *     <li>
      *         {@code null}: means this converter can not do this conversion;
      *     </li>
      *     <li>
-     *         {@link GekWrapper}: wrapped object (from {@link GekWrapper#get()}) is actual result of conversion,
-     *         including {@code null} and {@link GekWrapper} itself;
+     *         {@link Geko}: wrapped object (from {@link Geko#get()}) is actual result of conversion,
+     *         including {@code null} and {@link Geko} itself;
      *     </li>
      *     <li>
      *         Others: any other type of returned object is the actual result of conversion.
@@ -236,7 +236,7 @@ public interface GekConverter {
                 return null;
             }
             if (value == GekFlag.NULL) {
-                return GekWrapper.empty();
+                return Geko.empty();
             }
             return value;
         }
@@ -332,7 +332,7 @@ public interface GekConverter {
          * Converts object from source type to target type.
          * <p>
          * In general, all handlers in the converter ({@link #getHandlers()}) will be invoked this method sequentially.
-         * The result of this method in 4 types: {@code null}, {@link GekFlag}, {@link GekWrapper} and others.
+         * The result of this method in 4 types: {@code null}, {@link GekFlag}, {@link Geko} and others.
          * <p>
          * If this method returns {@code null}, means this handler can not do this conversion, and it will hand off to
          * next handler; If this method returns an instance of {@link GekFlag}, means:
@@ -347,15 +347,15 @@ public interface GekConverter {
          *         This will cause the conversion failure in this converter;
          *     </li>
          *     <li>
-         *         {@link GekFlag#NULL} or {@link GekWrapper#empty()}:
+         *         {@link GekFlag#NULL} or {@link Geko#empty()}:
          *         means the result of this conversion is clearly {@code null};
          *     </li>
          *     <li>
          *         Other instance of {@link GekFlag} is a wrong result, will throw a {@link GekConvertException}.
          *     </li>
          * </ul>
-         * If this method returns a {@link GekWrapper}, wrapped object (from {@link GekWrapper#get()}) is actual result
-         * of conversion, including {@link GekFlag}, {@code null} and {@link GekWrapper} itself.
+         * If this method returns a {@link Geko}, wrapped object (from {@link Geko#get()}) is actual result
+         * of conversion, including {@link GekFlag}, {@code null} and {@link Geko} itself.
          * Any other type of returned object is the actual result of conversion.
          *
          * @param source     source object

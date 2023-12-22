@@ -433,14 +433,14 @@ public class Gek {
 
     /**
      * Converts source object from source type to target type.
-     * The result of this method in 3 types: {@code null}, {@link GekWrapper} and others:
+     * The result of this method in 3 types: {@code null}, {@link Geko} and others:
      * <ul>
      *     <li>
      *         {@code null}: means this converter can not do this conversion;
      *     </li>
      *     <li>
-     *         {@link GekWrapper}: wrapped object (from {@link GekWrapper#get()}) is actual result of conversion,
-     *         including {@code null} and {@link GekWrapper} itself;
+     *         {@link Geko}: wrapped object (from {@link Geko#get()}) is actual result of conversion,
+     *         including {@code null} and {@link Geko} itself;
      *     </li>
      *     <li>
      *         Others: any other type of returned object is the actual result of conversion.

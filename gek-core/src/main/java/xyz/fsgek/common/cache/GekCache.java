@@ -3,7 +3,7 @@ package xyz.fsgek.common.cache;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekWrapper;
+import xyz.fsgek.common.base.Geko;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -128,19 +128,19 @@ public interface GekCache<K, V> {
     V get(K key, Function<? super K, @Nullable ? extends V> loader);
 
     /**
-     * Returns value wrapped by {@link GekWrapper} associating with specified key.
-     * The returned {@link GekWrapper} will be null if there is no entry for specified key.
+     * Returns value wrapped by {@link Geko} associating with specified key.
+     * The returned {@link Geko} will be null if there is no entry for specified key.
      * <p>
      * This is a {@code get} operation.
      *
      * @param key specified key
-     * @return value wrapped by {@link GekWrapper} associating with specified key, or null if not found
+     * @return value wrapped by {@link Geko} associating with specified key, or null if not found
      */
     @Nullable
-    GekWrapper<V> getWrapper(K key);
+    Geko<V> getWrapper(K key);
 
     /**
-     * Returns value wrapped by {@link GekWrapper} associating with specified key, and it performs like
+     * Returns value wrapped by {@link Geko} associating with specified key, and it performs like
      * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)}:
      * <p>
      * If the specified key is not already associated with a value, attempts to compute its value as {@link Value}
@@ -156,7 +156,7 @@ public interface GekCache<K, V> {
      * @return value associating with specified key, may be computed from given loader
      */
     @Nullable
-    GekWrapper<V> getWrapper(K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader);
+    Geko<V> getWrapper(K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader);
 
     /**
      * Returns whether this cache contains the value associating with specified key and the value is valid.

@@ -3,7 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekLog;
-import xyz.fsgek.common.base.GekWrapper;
+import xyz.fsgek.common.base.Geko;
 import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
 import xyz.fsgek.common.cache.GekCache;
@@ -76,7 +76,7 @@ public class CacheTest {
         gekCache.remove(1);
         gekCache.get(1, k -> null);
         Assert.assertNull(gekCache.get(1));
-        Assert.assertEquals(gekCache.getWrapper(1).get(), GekWrapper.empty().get());
+        Assert.assertEquals(gekCache.getWrapper(1).get(), Geko.empty().get());
         gekCache.remove(1);
         gekCache.getWrapper(1, k -> null);
         Assert.assertNull(gekCache.get(1));
@@ -141,7 +141,7 @@ public class CacheTest {
             gekCache.put(i, (Integer) null);
         }
         for (int i = 0; i < 10000; i++) {
-            GekWrapper<Integer> w = gekCache.getWrapper(i);
+            Geko<Integer> w = gekCache.getWrapper(i);
             if (w != null) {
                 Assert.assertNull(w.get());
                 set.add(i);
