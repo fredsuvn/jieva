@@ -197,7 +197,7 @@ public abstract class AbstractBeanResolveHandler implements GekBeanResolver.Hand
         }
 
         @Override
-        public @Nullable Object get(Object bean) {
+        public @Nullable Object getValue(Object bean) {
             if (getterInvoker == null) {
                 throw new GekBeanException("Property is not readable: " + name + ".");
             }
@@ -205,7 +205,7 @@ public abstract class AbstractBeanResolveHandler implements GekBeanResolver.Hand
         }
 
         @Override
-        public void set(Object bean, @Nullable Object value) {
+        public void setValue(Object bean, @Nullable Object value) {
             if (setterInvoker == null) {
                 throw new GekBeanException("Property is not writeable: " + name + ".");
             }

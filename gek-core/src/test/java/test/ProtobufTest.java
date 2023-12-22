@@ -73,27 +73,27 @@ public class ProtobufTest {
             .addAllText(Arrays.asList("2", "4", "6"))
             .putAllEntry(Gek.mapOf("1", "1", "3", "3"));
         Data data = dataBuilder.build();
-        Assert.assertEquals(propertyMap.get("em").get(data), Enum.E2);
-        Assert.assertEquals(propertyMap.get("str").get(data), "888");
-        Assert.assertEquals(propertyMap.get("num").get(data), 999L);
-        Assert.assertEquals(propertyMap.get("textList").get(data), Arrays.asList("2", "4", "6"));
-        Assert.assertEquals(propertyMap.get("entryMap").get(data), Gek.mapOf("1", "1", "3", "3"));
-        Assert.assertEquals(builderPropertyMap.get("em").get(dataBuilder), Enum.E2);
-        Assert.assertEquals(builderPropertyMap.get("str").get(dataBuilder), "888");
-        Assert.assertEquals(builderPropertyMap.get("num").get(dataBuilder), 999L);
-        Assert.assertEquals(builderPropertyMap.get("textList").get(dataBuilder), Arrays.asList("2", "4", "6"));
-        Assert.assertEquals(builderPropertyMap.get("entryMap").get(dataBuilder), Gek.mapOf("1", "1", "3", "3"));
-        builderPropertyMap.get("em").set(dataBuilder, Enum.E1);
-        builderPropertyMap.get("str").set(dataBuilder, "777");
-        builderPropertyMap.get("num").set(dataBuilder, 888L);
-        builderPropertyMap.get("textList").set(dataBuilder, Arrays.asList("3", "5", "7"));
-        builderPropertyMap.get("entryMap").set(dataBuilder, Gek.mapOf("8", "8", "9", "9"));
+        Assert.assertEquals(propertyMap.get("em").getValue(data), Enum.E2);
+        Assert.assertEquals(propertyMap.get("str").getValue(data), "888");
+        Assert.assertEquals(propertyMap.get("num").getValue(data), 999L);
+        Assert.assertEquals(propertyMap.get("textList").getValue(data), Arrays.asList("2", "4", "6"));
+        Assert.assertEquals(propertyMap.get("entryMap").getValue(data), Gek.mapOf("1", "1", "3", "3"));
+        Assert.assertEquals(builderPropertyMap.get("em").getValue(dataBuilder), Enum.E2);
+        Assert.assertEquals(builderPropertyMap.get("str").getValue(dataBuilder), "888");
+        Assert.assertEquals(builderPropertyMap.get("num").getValue(dataBuilder), 999L);
+        Assert.assertEquals(builderPropertyMap.get("textList").getValue(dataBuilder), Arrays.asList("2", "4", "6"));
+        Assert.assertEquals(builderPropertyMap.get("entryMap").getValue(dataBuilder), Gek.mapOf("1", "1", "3", "3"));
+        builderPropertyMap.get("em").setValue(dataBuilder, Enum.E1);
+        builderPropertyMap.get("str").setValue(dataBuilder, "777");
+        builderPropertyMap.get("num").setValue(dataBuilder, 888L);
+        builderPropertyMap.get("textList").setValue(dataBuilder, Arrays.asList("3", "5", "7"));
+        builderPropertyMap.get("entryMap").setValue(dataBuilder, Gek.mapOf("8", "8", "9", "9"));
         Data data2 = dataBuilder.build();
-        Assert.assertEquals(propertyMap.get("em").get(data2), Enum.E1);
-        Assert.assertEquals(propertyMap.get("str").get(data2), "777");
-        Assert.assertEquals(propertyMap.get("num").get(data2), 888L);
-        Assert.assertEquals(propertyMap.get("textList").get(data2), Arrays.asList("3", "5", "7"));
-        Assert.assertEquals(propertyMap.get("entryMap").get(data2), Gek.mapOf("8", "8", "9", "9"));
+        Assert.assertEquals(propertyMap.get("em").getValue(data2), Enum.E1);
+        Assert.assertEquals(propertyMap.get("str").getValue(data2), "777");
+        Assert.assertEquals(propertyMap.get("num").getValue(data2), 888L);
+        Assert.assertEquals(propertyMap.get("textList").getValue(data2), Arrays.asList("3", "5", "7"));
+        Assert.assertEquals(propertyMap.get("entryMap").getValue(data2), Gek.mapOf("8", "8", "9", "9"));
     }
 
     @Test

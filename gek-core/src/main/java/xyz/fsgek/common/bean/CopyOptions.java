@@ -4,9 +4,11 @@ import xyz.fsgek.common.base.GekOption;
 import xyz.fsgek.common.convert.GekConvertException;
 import xyz.fsgek.common.convert.GekConverter;
 
+import java.lang.reflect.Type;
+
 /**
  * Copy options for {@link GekBeanCopier#defaultCopier()}.
- * Including keys:
+ * Including option keys:
  * <ul>
  *     <li>{@link #KEY_OF_BEAN_RESOLVER};</li>
  *     <li>{@link #KEY_OF_CONVERTER};</li>
@@ -14,6 +16,8 @@ import xyz.fsgek.common.convert.GekConverter;
  *     <li>{@link #KEY_OF_PUT_IF_NOT_CONTAINED};</li>
  *     <li>{@link #KEY_OF_IGNORE_PROPERTIES};</li>
  *     <li>{@link #KEY_OF_IGNORE_NULL};</li>
+ *     <li>{@link #KEY_OF_SOURCE_TYPE};</li>
+ *     <li>{@link #KEY_OF_DEST_TYPE};</li>
  * </ul>
  *
  * @author fredsuvn
@@ -49,6 +53,16 @@ public class CopyOptions {
      * Key of {@link #ignoreNull(boolean)}. Default is false.
      */
     public static final int KEY_OF_IGNORE_NULL = 6;
+
+    /**
+     * Key of {@link #sourceType(Type)}.
+     */
+    public static final int KEY_OF_SOURCE_TYPE = 7;
+
+    /**
+     * Key of {@link #destType(Type)}.
+     */
+    public static final int KEY_OF_DEST_TYPE = 7;
 
     /**
      * Option to set bean resolver.
@@ -119,5 +133,25 @@ public class CopyOptions {
      */
     public static GekOption<Integer, Boolean> ignoreNull(boolean ignoreNull) {
         return GekOption.of(KEY_OF_IGNORE_NULL, ignoreNull);
+    }
+
+    /**
+     * Option to set type of source object.
+     *
+     * @param sourceType type of source object
+     * @return option set type of source object
+     */
+    public static GekOption<Integer, Type> sourceType(Type sourceType) {
+        return GekOption.of(KEY_OF_SOURCE_TYPE, sourceType);
+    }
+
+    /**
+     * Option to set type of dest object.
+     *
+     * @param destType type of dest object
+     * @return option set type of dest object
+     */
+    public static GekOption<Integer, Type> destType(Type destType) {
+        return GekOption.of(KEY_OF_DEST_TYPE, destType);
     }
 }

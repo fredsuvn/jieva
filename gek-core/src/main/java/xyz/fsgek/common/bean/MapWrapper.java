@@ -100,12 +100,12 @@ final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBe
         }
 
         @Override
-        public @Nullable Object get(Object bean) {
+        public @Nullable Object getValue(Object bean) {
             return source.get(key);
         }
 
         @Override
-        public void set(Object bean, @Nullable Object value) {
+        public void setValue(Object bean, @Nullable Object value) {
             source.put(key, Gek.as(value));
         }
 

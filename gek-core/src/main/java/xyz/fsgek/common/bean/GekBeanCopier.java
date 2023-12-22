@@ -16,7 +16,6 @@ import java.util.function.Function;
 
 /**
  * Bean properties copier for {@link GekBean}, to copy properties from source object to dest object.
- * The copier supports both common object and {@link Map}.
  *
  * @author fredsuvn
  */
@@ -61,36 +60,7 @@ public interface GekBeanCopier {
      * @param <T>     type of dest object
      * @return dest object
      */
-    default <T> T copyProperties(Object source, T dest, GekOption<?, ?>... options) {
-        return copyProperties(source, source.getClass(), dest, dest.getClass(), options);
-    }
-
-    /**
-     * Copies properties from source object to dest object with specified types.
-     *
-     * @param source     source object
-     * @param sourceType specified type of source object
-     * @param dest       dest object
-     * @param destType   specified type of dest type
-     * @param <T>        type of dest object
-     * @return dest object
-     */
-    default <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
-        return copyProperties(source, sourceType, dest, destType, GekOption.emptyOptions());
-    }
-
-    /**
-     * Copies properties from source object to dest object with specified types.
-     *
-     * @param source     source object
-     * @param sourceType specified type of source object
-     * @param dest       dest object
-     * @param destType   specified type of dest type
-     * @param options    copy options
-     * @param <T>        type of dest object
-     * @return dest object
-     */
-    <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, GekOption<?, ?>... options);
+    <T> T copyProperties(Object source, T dest, GekOption<?, ?>... options);
 
     /**
      * Returns a bean copier of which options come from this copier,
@@ -385,7 +355,7 @@ public interface GekBeanCopier {
                             if (!destFilter.test(newDestName, newDestValue)) {
                                 return;
                             }
-                            destProperty.set(dest, newDestValue);
+                            destProperty.setValue(dest, newDestValue);
                         });
                     }
                 } else {
@@ -398,7 +368,7 @@ public interface GekBeanCopier {
                             if (!sourceProperty.isReadable()) {
                                 return;
                             }
-                            Object sourceValue = sourceProperty.get(source);
+                            Object sourceValue = sourceProperty.getValue(source);
                             if (!sourceFilter.test(sourceName, sourceValue)) {
                                 return;
                             }
@@ -432,7 +402,7 @@ public interface GekBeanCopier {
                             if (!sourceProperty.isReadable()) {
                                 return;
                             }
-                            Object sourceValue = sourceProperty.get(source);
+                            Object sourceValue = sourceProperty.getValue(source);
                             if (!sourceFilter.test(sourceName, sourceValue)) {
                                 return;
                             }
@@ -460,7 +430,7 @@ public interface GekBeanCopier {
                             if (!destFilter.test(newDestName, newDestValue)) {
                                 return;
                             }
-                            destProperty.set(dest, newDestValue);
+                            destProperty.setValue(dest, newDestValue);
                         });
                     }
                 }

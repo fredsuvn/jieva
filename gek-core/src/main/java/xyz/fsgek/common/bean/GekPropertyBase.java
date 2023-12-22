@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Base info of property of a bean ({@link GekBean}).
- * It must be immutable and thread-safe.
+ * Base info of {@link GekProperty}.
+ * It should be immutable and thread-safe.
  *
  * @author fredsuvn
  */
@@ -36,7 +36,7 @@ public interface GekPropertyBase {
      * @return property value of given bean instance
      */
     @Nullable
-    Object get(Object bean);
+    Object getValue(Object bean);
 
     /**
      * Sets property value of given bean instance.
@@ -44,7 +44,7 @@ public interface GekPropertyBase {
      * @param bean  given bean instance
      * @param value property value
      */
-    void set(Object bean, @Nullable Object value);
+    void setValue(Object bean, @Nullable Object value);
 
     /**
      * Returns type of this property.
@@ -54,10 +54,14 @@ public interface GekPropertyBase {
     Type getType();
 
     /**
-     * Returns raw type of this property.
+     * Returns raw type of this property:
+     * <pre>
+     *     return GekReflect.getRawType(getType());
+     * </pre>
      *
      * @return raw type of this property
      */
+    @Nullable
     default Class<?> getRawType() {
         return GekReflect.getRawType(getType());
     }
@@ -115,11 +119,10 @@ public interface GekPropertyBase {
     List<Annotation> getAnnotations();
 
     /**
-     * Returns first annotation of {@link #getAnnotations()} of which type is specified annotation type,
-     * or null if not found.
+     * Returns first annotation of specified type on {@link #getAnnotations()}, or null if not found.
      *
-     * @param annotationType specified annotation type
-     * @return first annotation of {@link #getAnnotations()} of which type is specified annotation type, or null
+     * @param annotationType specified type
+     * @return first annotation of specified type on {@link #getAnnotations()}, or null if not found
      */
     @Nullable
     default Annotation getAnnotation(Class<?> annotationType) {

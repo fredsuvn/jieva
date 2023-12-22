@@ -10,20 +10,21 @@ import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
 final class BeanCopierImpl implements GekBeanCopier {
 
     @Override
-    public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, GekOption<?,?>... options) {
+    public <T> T copyProperties(Object source, T dest, GekOption<?,?>... options) {
         GekBeanResolver resolver = null;
         GekConverter converter = null;
-        boolean throwIfConversionFailed = true;
-        boolean putIfNotContained = true;
+        Boolean throwIfConversionFailed = true;
+        Boolean putIfNotContained = true;
         Object ignoreProperties = null;
-        boolean ignoreNull = false;
+        Boolean ignoreNull = false;
+        Type sourceType = source.getClass();
+        Type destType = dest.getClass();
         if (GekArray.isNotEmpty(options)) {
             for (GekOption<?,?> option : options) {
                 if (Objects.equals(option.key(), CopyOptions.KEY_OF_BEAN_RESOLVER)) {
@@ -38,6 +39,10 @@ final class BeanCopierImpl implements GekBeanCopier {
                     ignoreProperties = option.value();
                 } else if (Objects.equals(option.key(), CopyOptions.KEY_OF_IGNORE_NULL)) {
                     ignoreNull = Gek.as(option.value());
+                }else if (Objects.equals(option.key(), CopyOptions.KEY_OF_SOURCE_TYPE)) {
+                    sourceType = Gek.as(option.value());
+                }else if (Objects.equals(option.key(), CopyOptions.KEY_OF_DEST_TYPE)) {
+                    destType = Gek.as(option.value());
                 }
             }
         }
@@ -75,7 +80,7 @@ final class BeanCopierImpl implements GekBeanCopier {
                 copyProperties0(source, sourceType, null, null, dest, destType, null, null);
             }
         }
-        return dest;
+        //return dest;
         return copyProperties0(
             source, sourceType, dest, destType,
             Gek.notNull(resolver, GekBeanResolver.defaultResolver()),
@@ -96,8 +101,6 @@ final class BeanCopierImpl implements GekBeanCopier {
         @Nullable Object ignoreProperties,
         boolean ignoreNull
     ) {
-
-
         if (source instanceof Map) {
             if (dest instanceof Map) {
                 Map<Object, Object> sourceMap = Gek.as(source);
@@ -157,7 +160,7 @@ final class BeanCopierImpl implements GekBeanCopier {
                     if (!destFilter.test(newDestName, newDestValue)) {
                         return;
                     }
-                    destProperty.set(dest, newDestValue);
+                    destProperty.setValue(dest, newDestValue);
                 });
             }
         } else {
@@ -170,7 +173,7 @@ final class BeanCopierImpl implements GekBeanCopier {
                     if (!sourceProperty.isReadable()) {
                         return;
                     }
-                    Object sourceValue = sourceProperty.get(source);
+                    Object sourceValue = sourceProperty.getValue(source);
                     if (!sourceFilter.test(sourceName, sourceValue)) {
                         return;
                     }
@@ -204,7 +207,7 @@ final class BeanCopierImpl implements GekBeanCopier {
                     if (!sourceProperty.isReadable()) {
                         return;
                     }
-                    Object sourceValue = sourceProperty.get(source);
+                    Object sourceValue = sourceProperty.getValue(source);
                     if (!sourceFilter.test(sourceName, sourceValue)) {
                         return;
                     }
@@ -232,7 +235,7 @@ final class BeanCopierImpl implements GekBeanCopier {
                     if (!destFilter.test(newDestName, newDestValue)) {
                         return;
                     }
-                    destProperty.set(dest, newDestValue);
+                    destProperty.setValue(dest, newDestValue);
                 });
             }
         }

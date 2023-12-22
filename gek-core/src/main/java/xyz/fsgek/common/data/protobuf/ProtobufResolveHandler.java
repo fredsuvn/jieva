@@ -177,12 +177,12 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
         }
 
         @Override
-        public @Nullable Object get(Object bean) {
+        public @Nullable Object getValue(Object bean) {
             return getter.invoke(bean);
         }
 
         @Override
-        public void set(Object bean, @Nullable Object value) {
+        public void setValue(Object bean, @Nullable Object value) {
             if (setter == null) {
                 throw new GekBeanException("Not writeable.");
             }

@@ -152,13 +152,13 @@ final class BeanResolverImpl implements GekBeanResolver, GekBeanResolver.Handler
 
             @Override
             @Nullable
-            public Object get(Object bean) {
-                return base.get(bean);
+            public Object getValue(Object bean) {
+                return base.getValue(bean);
             }
 
             @Override
-            public void set(Object bean, @Nullable Object value) {
-                base.set(bean, value);
+            public void setValue(Object bean, @Nullable Object value) {
+                base.setValue(bean, value);
             }
 
             @Override

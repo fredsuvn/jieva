@@ -137,8 +137,8 @@ public class BeanTest {
         GekProperty p1Obj = mapObjBean.getProperty("1");
         Assert.assertEquals(p1Obj.getType(), Object.class);
         Assert.assertEquals(
-            p1.get(map),
-            p1Obj.get(map)
+            p1.getValue(map),
+            p1Obj.getValue(map)
         );
 
         Assert.assertThrows(IllegalArgumentException.class, () -> {

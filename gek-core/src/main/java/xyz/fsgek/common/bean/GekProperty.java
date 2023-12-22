@@ -7,7 +7,8 @@ import xyz.fsgek.annotations.ThreadSafe;
 import java.util.Objects;
 
 /**
- * Represents property of ({@link GekBean}).
+ * This interface represents property of {@link GekBean}.
+ * It should be immutable and thread-safe.
  *
  * @author fredsuvn
  */
