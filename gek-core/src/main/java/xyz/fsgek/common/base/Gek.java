@@ -45,7 +45,7 @@ public class Gek {
      *
      * @param obj          given object
      * @param defaultValue default value
-     * @param <T>          value type
+     * @param <T>          type of values
      * @return default value if given object is null, or given object itself if it is not null
      */
     public static <T> T notNull(@Nullable T obj, T defaultValue) {
@@ -60,7 +60,7 @@ public class Gek {
      *
      * @param obj           given object
      * @param computedValue computed value
-     * @param <T>           value type
+     * @param <T>           type of values
      * @return computed value if given object is null, or given object itself if it is not null
      */
     public static <T> T notNull(@Nullable T obj, Supplier<? extends T> computedValue) {
@@ -793,8 +793,8 @@ public class Gek {
      * This method directly invoke {@link GekColl#mapOf(Object...)}.
      *
      * @param elements given elements
-     * @param <K>      key type
-     * @param <V>      value type
+     * @param <K>      type of keys
+     * @param <V>      type of values
      * @param <T>      type of element
      * @return an immutable map of given elements
      * @see GekColl#mapOf(Object...)

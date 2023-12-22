@@ -10,8 +10,8 @@ import lombok.EqualsAndHashCode;
  * </pre>
  * The key specifies which option to be set, and the value is actual argument of the option.
  *
- * @param <K> key type
- * @param <V> value type
+ * @param <K> type of keys
+ * @param <V> type of values
  */
 public interface GekOption<K, V> {
 
@@ -23,8 +23,8 @@ public interface GekOption<K, V> {
     /**
      * Returns empty option array;
      *
-     * @param <K> key type
-     * @param <V> value type
+     * @param <K> type of keys
+     * @param <V> type of values
      * @return empty option array
      */
     static <K, V> GekOption<K, V>[] emptyOptions() {
@@ -36,8 +36,8 @@ public interface GekOption<K, V> {
      *
      * @param key   given key
      * @param value given value
-     * @param <K>   key type
-     * @param <V>   value type
+     * @param <K>   type of keys
+     * @param <V>   type of values
      * @return an option instance of given key and value
      */
     static <K, V> GekOption<K, V> of(K key, V value) {

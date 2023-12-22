@@ -102,7 +102,7 @@ public interface GekBeanResolver {
     }
 
     /**
-     * Wraps given map as a {@link GekBean}, the key type of map type must be {@link String},
+     * Wraps given map as a {@link GekBean}, the type of keys of map type must be {@link String},
      * property type is specified by map type. If the given map type is null,
      * the map type will be seen as Map&lt;String, ?&gt;. If map type is Map&lt;String, ?&gt;,
      * types of properties will be calculated dynamically by its value's {@link Class#getClass()} (or Object if null).

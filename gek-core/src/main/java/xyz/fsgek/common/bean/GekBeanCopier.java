@@ -177,7 +177,7 @@ public interface GekBeanCopier {
          * The property will be ignored if new name is null or not found in dest bean.
          * <p>
          * For common bean object, type of property names is always {@link String};
-         * for map object, key types is any type.
+         * for map object, type of keyss is any type.
          * <p>
          * Note:
          * <ul>

@@ -29,8 +29,8 @@ import java.util.function.Function;
  * GC, the value parameter will be passed to null on
  * {@link RemovalListener#onRemoval(Object, Object, RemovalListener.Cause)}.
  *
- * @param <K> key type
- * @param <V> value type
+ * @param <K> type of keys
+ * @param <V> type of values
  * @author fresduvn
  */
 @ThreadSafe
@@ -39,8 +39,8 @@ public interface GekCache<K, V> {
     /**
      * Returns new builder of {@link GekCache}.
      *
-     * @param <K> key type
-     * @param <V> value type
+     * @param <K> type of keys
+     * @param <V> type of values
      * @return new builder of {@link GekCache}
      */
     static <K, V> Builder<K, V> newBuilder() {
@@ -50,8 +50,8 @@ public interface GekCache<K, V> {
     /**
      * Creates a new {@link GekCache} based on {@link SoftReference}.
      *
-     * @param <K> key type
-     * @param <V> value type
+     * @param <K> type of keys
+     * @param <V> type of values
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache() {
@@ -64,8 +64,8 @@ public interface GekCache<K, V> {
      *
      * @param removalListener removal listener called <b>after</b> removing from the cache,
      *                        the first argument is current cache and second is the key.
-     * @param <K>             key type
-     * @param <V>             value type
+     * @param <K>             type of keys
+     * @param <V>             type of values
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> softCache(RemovalListener<? super K, ? super V> removalListener) {
@@ -75,8 +75,8 @@ public interface GekCache<K, V> {
     /**
      * Creates a new {@link GekCache} based on {@link WeakReference}.
      *
-     * @param <K> key type
-     * @param <V> value type
+     * @param <K> type of keys
+     * @param <V> type of values
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache() {
@@ -89,8 +89,8 @@ public interface GekCache<K, V> {
      *
      * @param removalListener removal listener called <b>after</b> removing from the cache,
      *                        the first argument is current cache and second is the key.
-     * @param <K>             key type
-     * @param <V>             value type
+     * @param <K>             type of keys
+     * @param <V>             type of values
      * @return a new {@link GekCache}
      */
     static <K, V> GekCache<K, V> weakCache(RemovalListener<? super K, ? super V> removalListener) {
@@ -286,8 +286,8 @@ public interface GekCache<K, V> {
     /**
      * Listener interface that can receive a notification when an entry is removed from a cache, should be thread-safe.
      *
-     * @param <K> key type
-     * @param <V> value type
+     * @param <K> type of keys
+     * @param <V> type of values
      */
     @ThreadSafe
     interface RemovalListener<K, V> {
@@ -369,7 +369,7 @@ public interface GekCache<K, V> {
     /**
      * Cache value info with expiration.
      *
-     * @param <V> value type
+     * @param <V> type of values
      */
     interface Value<V> {
 
@@ -380,7 +380,7 @@ public interface GekCache<K, V> {
          * @param value                   given value
          * @param expireAfterWriteMillis  expiration in milliseconds after once writing, may be -1
          * @param expireAfterAccessMillis expiration in milliseconds after once access, may be -1
-         * @param <V>                     value type
+         * @param <V>                     type of values
          * @return a new instance with given value and specified expiration in milliseconds
          */
         static <V> Value<V> of(@Nullable V value, long expireAfterWriteMillis, long expireAfterAccessMillis) {
@@ -422,7 +422,7 @@ public interface GekCache<K, V> {
          * @param value             given value
          * @param expireAfterWrite  expiration after once writing, may be null
          * @param expireAfterAccess expiration after once access, may be null
-         * @param <V>               value type
+         * @param <V>               type of values
          * @return a new instance with given value and specified expiration
          */
         static <V> Value<V> of(@Nullable V value, @Nullable Duration expireAfterWrite, @Nullable Duration expireAfterAccess) {
@@ -503,8 +503,8 @@ public interface GekCache<K, V> {
     /**
      * Builder for {@link GekCache}.
      *
-     * @param <K> key type
-     * @param <V> value type
+     * @param <K> type of keys
+     * @param <V> type of values
      */
     class Builder<K, V> {
 
@@ -517,8 +517,8 @@ public interface GekCache<K, V> {
         /**
          * Sets whether based on {@link SoftReference}.
          *
-         * @param <K1> key type
-         * @param <V1> value type
+         * @param <K1> type of keys
+         * @param <V1> type of values
          * @return this builder
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> softValues() {
@@ -538,8 +538,8 @@ public interface GekCache<K, V> {
         /**
          * Sets whether based on {@link WeakReference}.
          *
-         * @param <K1> key type
-         * @param <V1> value type
+         * @param <K1> type of keys
+         * @param <V1> type of values
          * @return this builder
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> weakValues() {
@@ -560,8 +560,8 @@ public interface GekCache<K, V> {
          * Sets initial capacity.
          *
          * @param initialCapacity initial capacity
-         * @param <K1>            key type
-         * @param <V1>            value type
+         * @param <K1>            type of keys
+         * @param <V1>            type of values
          * @return this builder
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> initialCapacity(int initialCapacity) {
@@ -582,8 +582,8 @@ public interface GekCache<K, V> {
          * Sets removing event listener.
          *
          * @param removalListener removing event listener
-         * @param <K1>            key type
-         * @param <V1>            value type
+         * @param <K1>            type of keys
+         * @param <V1>            type of values
          * @return this builder
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> removeListener(
@@ -607,8 +607,8 @@ public interface GekCache<K, V> {
          * It can be -1 if set to expired by GC.
          *
          * @param expireAfterWriteMillis expiration in milliseconds after once writing
-         * @param <K1>                   key type
-         * @param <V1>                   value type
+         * @param <K1>                   type of keys
+         * @param <V1>                   type of values
          * @return this builder
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterWrite(long expireAfterWriteMillis) {
@@ -631,8 +631,8 @@ public interface GekCache<K, V> {
          * It can be null if set to expired by GC.
          *
          * @param expireAfterWrite expiration after once writing
-         * @param <K1>             key type
-         * @param <V1>             value type
+         * @param <K1>             type of keys
+         * @param <V1>             type of values
          * @return this builder
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterWrite(@Nullable Duration expireAfterWrite) {
@@ -657,8 +657,8 @@ public interface GekCache<K, V> {
          * It can be -1 if set to expired by GC.
          *
          * @param expireAfterAccessMillis expiration in milliseconds after once access
-         * @param <K1>                    key type
-         * @param <V1>                    value type
+         * @param <K1>                    type of keys
+         * @param <V1>                    type of values
          * @return this builder
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterAccess(long expireAfterAccessMillis) {
@@ -683,8 +683,8 @@ public interface GekCache<K, V> {
          * It can be null if set to expired by GC.
          *
          * @param expireAfterAccess expiration after once access
-         * @param <K1>              key type
-         * @param <V1>              value type
+         * @param <K1>              type of keys
+         * @param <V1>              type of values
          * @return this builder
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterAccess(@Nullable Duration expireAfterAccess) {

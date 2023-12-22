@@ -47,8 +47,8 @@ public class GekColl {
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      *
      * @param elements given elements
-     * @param <K>      key type
-     * @param <V>      value type
+     * @param <K>      type of keys
+     * @param <V>      type of values
      * @param <T>      type of element
      * @return an immutable map of given elements
      */
@@ -61,8 +61,8 @@ public class GekColl {
      * Returns an immutable map of given entries.
      *
      * @param entries given elements
-     * @param <K>     key type
-     * @param <V>     value type
+     * @param <K>     type of keys
+     * @param <V>     type of values
      * @return an immutable map of given entries
      */
     @SafeVarargs
@@ -221,8 +221,8 @@ public class GekColl {
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      *
      * @param elements given elements
-     * @param <K>      key type
-     * @param <V>      value type
+     * @param <K>      type of keys
+     * @param <V>      type of values
      * @param <T>      type of element
      * @return immutable map
      */
@@ -240,8 +240,8 @@ public class GekColl {
      * @param keyFunction   key conversion function
      * @param valueFunction value conversion function
      * @param <T>           type of source element
-     * @param <K>           key type of target map
-     * @param <V>           value type of target map
+     * @param <K>           type of keys of target map
+     * @param <V>           type of values of target map
      * @return immutable map
      */
     public static <T, K, V> Map<K, V> toMap(
@@ -385,8 +385,8 @@ public class GekColl {
      *
      * @param dest     dest collection
      * @param elements given elements
-     * @param <K>      key type
-     * @param <V>      value type
+     * @param <K>      type of keys
+     * @param <V>      type of values
      * @param <M>      type of dest map
      * @param <T>      type of element
      * @return dest map
@@ -411,8 +411,8 @@ public class GekColl {
      *
      * @param dest     dest collection
      * @param elements given elements
-     * @param <K>      key type
-     * @param <V>      value type
+     * @param <K>      type of keys
+     * @param <V>      type of values
      * @param <M>      type of dest map
      * @param <T>      type of element
      * @return dest map
@@ -429,8 +429,8 @@ public class GekColl {
      *
      * @param dest     dest collection
      * @param elements given elements
-     * @param <K>      key type
-     * @param <V>      value type
+     * @param <K>      type of keys
+     * @param <V>      type of values
      * @param <M>      type of dest map
      * @param <T>      type of source element
      * @param <R>      type of target element
@@ -678,8 +678,8 @@ public class GekColl {
      *
      * @param map given map
      * @param key specified key
-     * @param <K> key type
-     * @param <V> value type
+     * @param <K> type of keys
+     * @param <V> type of values
      * @return value or null
      */
     @Nullable
@@ -694,8 +694,8 @@ public class GekColl {
      * @param map          given map
      * @param key          specified key
      * @param defaultValue default value
-     * @param <K>          key type
-     * @param <V>          value type
+     * @param <K>          type of keys
+     * @param <V>          type of values
      * @return value or default value
      */
     public static <K, V> V get(@Nullable Map<K, V> map, K key, V defaultValue) {
@@ -713,8 +713,8 @@ public class GekColl {
      * @param map      given map
      * @param key      specified key
      * @param function specified function
-     * @param <K>      key type
-     * @param <V>      value type
+     * @param <K>      type of keys
+     * @param <V>      type of values
      * @return value or computed value
      */
     public static <K, V> V compute(@Nullable Map<K, V> map, K key, Function<? super K, ? extends V> function) {
