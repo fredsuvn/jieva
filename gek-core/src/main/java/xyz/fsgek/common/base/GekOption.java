@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 /**
  * This interface represents optional parameter. For example:
  * <pre>
- *     public void doSomething(Object arg, GekOption&lt;?, ? &gt;... options)
+ *     public void doSomething(Object arg, GekOption&lt;?, ?&gt;... options)
  * </pre>
- * The key specifies which option to be set, and the value is argument of the option.
+ * The key specifies which option to be set, and the value is actual argument of the option.
  *
- * @param <K> type of key
- * @param <V> type of value
+ * @param <K> key type
+ * @param <V> value type
  */
 public interface GekOption<K, V> {
 
@@ -23,8 +23,8 @@ public interface GekOption<K, V> {
     /**
      * Returns empty option array;
      *
-     * @param <K> type of key
-     * @param <V> type of value
+     * @param <K> key type
+     * @param <V> value type
      * @return empty option array
      */
     static <K, V> GekOption<K, V>[] emptyOptions() {
@@ -36,8 +36,8 @@ public interface GekOption<K, V> {
      *
      * @param key   given key
      * @param value given value
-     * @param <K>   type of key
-     * @param <V>   type of value
+     * @param <K>   key type
+     * @param <V>   value type
      * @return an option instance of given key and value
      */
     static <K, V> GekOption<K, V> of(K key, V value) {

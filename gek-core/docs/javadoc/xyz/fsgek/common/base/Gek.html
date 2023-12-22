@@ -280,7 +280,7 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/base/Gek.html#equals-java.lang.Object-java.lang.Object-">equals</a></span>(@Nullable java.lang.Object&nbsp;a,
       @Nullable java.lang.Object&nbsp;b)</code>
 <div class="block">Returns result of equaling follows:
- 
+
  returns Objects.equals for given objects if they are not arrays;
  if given objects are arrays of which types are same primitive type, returns Arrays.equals for them;
  if given objects are object array, returns Arrays.deepEquals for them;
@@ -295,7 +295,7 @@ extends java.lang.Object</pre>
           boolean&nbsp;arrayCheck,
           boolean&nbsp;deepEquals)</code>
 <div class="block">Returns result of equaling follows:
- 
+
  if given objects are arrays of which types are same primitive type and array-check is true,
  returns Arrays.equals for them;
  if given objects are object array and both array-check and deep-equals are true,
@@ -350,7 +350,7 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../xyz/fsgek/common/base/Gek.html#hash-java.lang.Object-">hash</a></span>(@Nullable java.lang.Object&nbsp;obj)</code>
 <div class="block">Returns hash code follows:
- 
+
  returns Objects.hashCode for given object if it is not an array;
  if given object is primitive array, returns Arrays.hashCode for it;
  if given object is Object[], returns Arrays.deepHashCode for it;
@@ -364,7 +364,7 @@ extends java.lang.Object</pre>
         boolean&nbsp;arrayCheck,
         boolean&nbsp;deepHash)</code>
 <div class="block">Returns hash code follows:
- 
+
  if given object is primitive array and array-check is true, returns Arrays.hashCode for it;
  if given object is Object[] and both array-check and deep-to-string are true,
  returns Arrays.deepHashCode for it;
@@ -477,7 +477,7 @@ extends java.lang.Object</pre>
  </pre></div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
-<dd><code>T</code> - type of value</dd>
+<dd><code>T</code> - value type</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>obj</code> - given object</dd>
 <dd><code>defaultValue</code> - default value</dd>

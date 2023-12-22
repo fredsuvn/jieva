@@ -1,7 +1,5 @@
 package xyz.fsgek.common.bean;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekOption;
@@ -179,7 +177,7 @@ public interface GekBeanCopier {
          * The property will be ignored if new name is null or not found in dest bean.
          * <p>
          * For common bean object, type of property names is always {@link String};
-         * for map object, type of keys is any type.
+         * for map object, key types is any type.
          * <p>
          * Note:
          * <ul>

@@ -213,7 +213,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     /**
      * Builds and returns {@link ConcurrentHashMap.KeySetView}.
      *
-     * @param <T> type of key
+     * @param <T> key type
      * @return {@link ConcurrentHashMap.KeySetView}
      */
     public <T> ConcurrentHashMap.KeySetView<T, Boolean> toConcurrentSet() {
@@ -226,8 +226,8 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     /**
      * Builds and returns {@link HashMap}.
      *
-     * @param <K> type of key
-     * @param <V> type of value
+     * @param <K> key type
+     * @param <V> value type
      * @return {@link HashMap}
      */
     public <K, V> HashMap<K, V> toHashMap() {
@@ -239,8 +239,8 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     /**
      * Builds and returns {@link LinkedHashMap}.
      *
-     * @param <K> type of key
-     * @param <V> type of value
+     * @param <K> key type
+     * @param <V> value type
      * @return {@link LinkedHashMap}
      */
     public <K, V> LinkedHashMap<K, V> toLinkedHashMap() {
@@ -252,8 +252,8 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     /**
      * Builds and returns {@link ConcurrentHashMap}.
      *
-     * @param <K> type of key
-     * @param <V> type of value
+     * @param <K> key type
+     * @param <V> value type
      * @return {@link ConcurrentHashMap}
      */
     public <K, V> ConcurrentHashMap<K, V> toConcurrentHashMap() {
@@ -367,8 +367,8 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     /**
      * Builds and returns map.
      *
-     * @param <K> type of key
-     * @param <V> type of value
+     * @param <K> key type
+     * @param <V> value type
      * @return map
      */
     public <K, V> Map<K, V> toMap() {

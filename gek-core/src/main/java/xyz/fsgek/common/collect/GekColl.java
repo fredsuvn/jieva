@@ -47,8 +47,8 @@ public class GekColl {
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      *
      * @param elements given elements
-     * @param <K>      type of key
-     * @param <V>      type of value
+     * @param <K>      key type
+     * @param <V>      value type
      * @param <T>      type of element
      * @return an immutable map of given elements
      */
@@ -61,8 +61,8 @@ public class GekColl {
      * Returns an immutable map of given entries.
      *
      * @param entries given elements
-     * @param <K>     type of key
-     * @param <V>     type of value
+     * @param <K>     key type
+     * @param <V>     value type
      * @return an immutable map of given entries
      */
     @SafeVarargs
@@ -221,8 +221,8 @@ public class GekColl {
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      *
      * @param elements given elements
-     * @param <K>      type of key
-     * @param <V>      type of value
+     * @param <K>      key type
+     * @param <V>      value type
      * @param <T>      type of element
      * @return immutable map
      */
