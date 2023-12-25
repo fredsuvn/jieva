@@ -40,6 +40,16 @@ public class GekArray {
     }
 
     /**
+     * Returns whether given array is not null and empty.
+     *
+     * @param array given array
+     * @return whether given array is not null and empty
+     */
+    public static <T> boolean isNotEmpty(@Nullable T[] array) {
+        return !isEmpty(array);
+    }
+
+    /**
      * Returns whether given array is null or empty.
      *
      * @param array given array

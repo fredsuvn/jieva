@@ -2,6 +2,10 @@ package xyz.fsgek.common.base;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import xyz.fsgek.annotations.Nullable;
+import xyz.fsgek.common.collect.GekArray;
+
+import java.util.Objects;
 
 /**
  * This interface represents optional parameter. For example:
@@ -29,6 +33,28 @@ public interface GekOption<K, V> {
      */
     static <K, V> GekOption<K, V>[] emptyOptions() {
         return Gek.as(EMPTY_OPTIONS);
+    }
+
+    /**
+     * Returns option of specified key in given options, or null if not found.
+     *
+     * @param key     specified key
+     * @param options given options
+     * @param <K>     type of keys
+     * @param <V>     type of values
+     * @return option of specified key in given options, or null if not found
+     */
+    @Nullable
+    static <K, V> V get(K key, GekOption<?, ?>... options) {
+        if (GekArray.isEmpty(options)) {
+            return null;
+        }
+        for (GekOption<?, ?> option : options) {
+            if (option != null && Objects.equals(option.key(), key)) {
+                return Gek.as(option.value());
+            }
+        }
+        return null;
     }
 
     /**
