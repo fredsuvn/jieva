@@ -142,7 +142,7 @@ public class GekType {
             this.rawType = rawType;
             this.ownerType = ownerType == null ?
                 ((rawType instanceof Class) ? ((Class<?>) rawType).getDeclaringClass() : null) : ownerType;
-            this.actualTypeArguments = actualTypeArguments;
+            this.actualTypeArguments = actualTypeArguments.clone();
         }
 
         @Override
@@ -248,8 +248,8 @@ public class GekType {
         private List<Type> lowerBoundList;
 
         private GekWildcardImpl(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
-            this.upperBounds = GekArray.isEmpty(upperBounds) ? new Type[]{Object.class} : upperBounds;
-            this.lowerBounds = GekArray.isEmpty(lowerBounds) ? new Type[0] : lowerBounds;
+            this.upperBounds = GekArray.isEmpty(upperBounds) ? new Type[]{Object.class} : upperBounds.clone();
+            this.lowerBounds = GekArray.isEmpty(lowerBounds) ? new Type[0] : lowerBounds.clone();
         }
 
         @Override

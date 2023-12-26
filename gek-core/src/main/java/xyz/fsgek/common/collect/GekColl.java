@@ -874,28 +874,6 @@ public class GekColl {
         public Set<Entry<K, V>> entrySet() {
             return entries;
         }
-
-        private static final class Node<K, V> {
-
-            private final K key;
-            private final V value;
-
-            private Node(K key, V value) {
-                this.key = key;
-                this.value = value;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                Node<?, ?> node = (Node<?, ?>) o;
-                return Objects.equals(key, node.key);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(key);
-            }
-        }
     }
 
     private static final class EmptyEnumeration implements Enumeration<Object> {
