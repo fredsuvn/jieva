@@ -6,7 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * Type reference usually to obtain type instance for java, for examples:
+ * This class represents type reference, usually used to obtain type instance for java, for examples:
  * <p>
  * String.class:
  * <pre>
@@ -27,7 +27,7 @@ public abstract class TypeRef<T> {
     /**
      * Actual runtime type.
      */
-    private Type type;
+    private volatile Type type;
 
     /**
      * Empty constructor, used to get a generic type.
@@ -57,7 +57,11 @@ public abstract class TypeRef<T> {
      */
     public Type getType() {
         if (type == null) {
-            type = reflectToActualType();
+            synchronized (this) {
+                if (type == null) {
+                    type = reflectToActualType();
+                }
+            }
         }
         return type;
     }

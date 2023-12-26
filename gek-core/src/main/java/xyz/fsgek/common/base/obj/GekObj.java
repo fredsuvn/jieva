@@ -108,7 +108,7 @@ public interface GekObj<T> {
         }
         if (this instanceof ClassObj) {
             return new Impls.ParameterizedImpl<>(getObject(),
-                GekType.parameterizedType(getType(), Collections.singletonList(Object.class)));
+                GekType.parameterized(getType(), Collections.singletonList(Object.class)));
         }
         return new Impls.ParameterizedImpl<>(getObject(), (ParameterizedType) getType());
     }

@@ -71,7 +71,7 @@ final class Impls {
 
         public List<Type> getActualTypeArguments() {
             if (actualTypeArguments == null) {
-                actualTypeArguments = Gek.listOf(getType().getActualTypeArguments());
+                actualTypeArguments = Gek.asList(getType().getActualTypeArguments());
             }
             return actualTypeArguments;
         }
@@ -93,14 +93,14 @@ final class Impls {
 
         public List<Type> getBounds() {
             if (bounds == null) {
-                bounds = Gek.listOf(getType().getBounds());
+                bounds = Gek.asList(getType().getBounds());
             }
             return bounds;
         }
 
         public List<AnnotatedType> getAnnotatedBounds() {
             if (annotatedBounds == null) {
-                annotatedBounds = Gek.listOf(getType().getAnnotatedBounds());
+                annotatedBounds = Gek.asList(getType().getAnnotatedBounds());
             }
             return annotatedBounds;
         }

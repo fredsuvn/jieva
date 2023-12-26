@@ -22,26 +22,6 @@ public class GekReflect {
     private static final GekCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = GekCache.softCache();
 
     /**
-     * Returns new instance for given class name.
-     * This method first uses {@link Class#forName(String)} to load given class,
-     * then call the none-arguments constructor to create instance.
-     * If loading failed, return null.
-     *
-     * @param className given clas name
-     * @param <T>       type of result
-     * @return new instance for given class name or null
-     */
-    @Nullable
-    public static <T> T load(String className) {
-        try {
-            Class<?> cls = Class.forName(className);
-            return GekReflect.newInstance(cls);
-        } catch (ClassNotFoundException e) {
-            return null;
-        }
-    }
-
-    /**
      * Returns last name of given class. The last name is sub-string after last dot, for example:
      * <p>
      * {@code String} is last name of {@code java.lang.String}.
@@ -52,7 +32,7 @@ public class GekReflect {
     public static String getLastName(Class<?> cls) {
         String name = cls.getName();
         int index = GekString.lastIndexOf(name, ".");
-        if (index < 0 || index >= name.length() - 1) {
+        if (index < 0) {
             return name;
         }
         return name.substring(index + 1);
@@ -172,6 +152,26 @@ public class GekReflect {
             } catch (NoSuchMethodException ex) {
                 return null;
             }
+        }
+    }
+
+    /**
+     * Returns new instance for given class name.
+     * This method first uses {@link Class#forName(String)} to load given class,
+     * then call {@link #newInstance(Class)} to create instance.
+     * Return null if failed.
+     *
+     * @param className given class name
+     * @param <T>       type of result
+     * @return a new instance of given class name with empty constructor or null
+     */
+    @Nullable
+    public static <T> T newInstance(String className) {
+        try {
+            Class<?> cls = Class.forName(className);
+            return newInstance(cls);
+        } catch (ClassNotFoundException e) {
+            return null;
         }
     }
 
@@ -573,7 +573,7 @@ public class GekReflect {
                 stack.clear();
                 return nestedValue == null ? it : nestedValue;
             }).collect(Collectors.toList());
-        return GekType.parameterizedType(target, target.getDeclaringClass(), actualTypeArguments);
+        return GekType.parameterized(target, target.getDeclaringClass(), actualTypeArguments);
     }
 
     /**
@@ -730,7 +730,7 @@ public class GekReflect {
                 }
             }
             if (matched) {
-                return GekType.parameterizedType(rawType, ownerType, actualTypeArguments);
+                return GekType.parameterized(rawType, ownerType, actualTypeArguments);
             } else {
                 return type;
             }
@@ -766,7 +766,7 @@ public class GekReflect {
                 }
             }
             if (matched) {
-                return GekType.wildcardType(upperBounds, lowerBounds);
+                return GekType.wildcard(upperBounds, lowerBounds);
             } else {
                 return type;
             }
@@ -785,7 +785,7 @@ public class GekReflect {
                 }
             }
             if (matched) {
-                return GekType.genericArrayType(componentType);
+                return GekType.arrayType(componentType);
             } else {
                 return type;
             }
