@@ -131,7 +131,7 @@ public class ReflectTest {
             t2.toString(),
             "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
         );
-        ParameterizedType p1 = GekType.parameterized(T.class, Arrays.asList(Integer.class));
+        ParameterizedType p1 = GekType.paramType(T.class, Arrays.asList(Integer.class));
         Assert.assertEquals(
             p1.toString(),
             "test.ReflectTest$T<java.lang.Integer>"
@@ -140,7 +140,7 @@ public class ReflectTest {
             t1,
             p1
         );
-        ParameterizedType p2 = GekType.parameterized(T.V.class, p1, Arrays.asList(String.class));
+        ParameterizedType p2 = GekType.paramType(T.V.class, p1, Arrays.asList(String.class));
         Assert.assertEquals(
             p2.toString(),
             "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
@@ -190,7 +190,7 @@ public class ReflectTest {
             "java.util.List<? extends java.lang.Integer>[]"
         );
         Type g1 = GekType.arrayType(
-            GekType.parameterized(List.class, Arrays.asList(
+            GekType.paramType(List.class, Arrays.asList(
                 GekType.wildcard(Arrays.asList(Integer.class), null))));
         Assert.assertEquals(
             g1.toString(),
@@ -526,7 +526,7 @@ public class ReflectTest {
 
         Assert.assertEquals(
             GekReflect.getGenericSuperType(Iterable.class, Iterable.class),
-            GekType.parameterized(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
+            GekType.paramType(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
         );
     }
 

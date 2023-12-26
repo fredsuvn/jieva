@@ -21,72 +21,69 @@ import java.util.Objects;
 public class GekType {
 
     /**
-     * Returns a parameterized type with given raw type, owner type and actual type arguments.
+     * Returns parameterized type with given raw type, owner type and actual type arguments.
      *
      * @param rawType             given raw type
      * @param ownerType           given owner type
      * @param actualTypeArguments actual type arguments
      * @return parameterized type
      */
-    public static GekParamType parameterized(
-        Type rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
-        return new GekParamTypeImpl(rawType, ownerType, GekColl.toArray(actualTypeArguments, Type.class));
+    public static GekParamType paramType(Type rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
+        return paramType(rawType, ownerType, GekColl.toArray(actualTypeArguments, Type.class));
     }
 
     /**
-     * Returns a parameterized type with given raw type and actual type arguments.
+     * Returns parameterized type with given raw type and actual type arguments.
      *
      * @param rawType             given raw type
      * @param actualTypeArguments actual type arguments
      * @return parameterized type
      */
-    public static GekParamType parameterized(Type rawType, Iterable<Type> actualTypeArguments) {
-        return parameterized(rawType, null, actualTypeArguments);
+    public static GekParamType paramType(Type rawType, Iterable<Type> actualTypeArguments) {
+        return paramType(rawType, null, actualTypeArguments);
     }
 
     /**
-     * Returns a parameterized type with given raw type, owner type and actual type arguments.
+     * Returns parameterized type with given raw type, owner type and actual type arguments.
      *
      * @param rawType             given raw type
      * @param ownerType           given owner type
      * @param actualTypeArguments actual type arguments
      * @return parameterized type
      */
-    public static GekParamType parameterized(
-        Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
+    public static GekParamType paramType(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
         return new GekParamTypeImpl(rawType, ownerType, actualTypeArguments);
     }
 
     /**
-     * Returns a parameterized type with given raw type and actual type arguments.
+     * Returns parameterized type with given raw type and actual type arguments.
      *
      * @param rawType             given raw type
      * @param actualTypeArguments actual type arguments
      * @return parameterized type
      */
-    public static GekParamType parameterized(Type rawType, Type[] actualTypeArguments) {
-        return parameterized(rawType, null, actualTypeArguments);
+    public static GekParamType paramType(Type rawType, Type[] actualTypeArguments) {
+        return paramType(rawType, null, actualTypeArguments);
     }
 
     /**
-     * Wraps given parameterized type as {@link GekParamType}.
+     * Returns given parameterized type as {@link GekParamType}.
      *
      * @param type given parameterized type
-     * @return {@link GekParamType}
+     * @return parameterized type
      */
-    public static GekParamType wrap(ParameterizedType type) {
-        return new GekParamTypeImpl(type.getRawType(), type.getOwnerType(), type.getActualTypeArguments());
+    public static GekParamType paramType(ParameterizedType type) {
+        return paramType(type.getRawType(), type.getOwnerType(), type.getActualTypeArguments());
     }
 
     /**
-     * Returns a wildcard type with given upper bounds and lower bounds.
+     * Returns wildcard type with given upper bounds and lower bounds.
      *
      * @param upperBounds given upper bounds
      * @param lowerBounds given lower bounds
-     * @return WildcardType
+     * @return wildcard type
      */
-    public static GekWildcard wildcard(
-        @Nullable Iterable<Type> upperBounds, @Nullable Iterable<Type> lowerBounds) {
+    public static GekWildcard wildcard(@Nullable Iterable<Type> upperBounds, @Nullable Iterable<Type> lowerBounds) {
         return new GekWildcardImpl(
             upperBounds == null ? null : GekColl.toArray(upperBounds, Type.class),
             lowerBounds == null ? null : GekColl.toArray(lowerBounds, Type.class)
@@ -94,44 +91,43 @@ public class GekType {
     }
 
     /**
-     * Returns a wildcard type with given upper bounds and lower bounds.
+     * Returns wildcard type with given upper bounds and lower bounds.
      *
      * @param upperBounds given upper bounds
      * @param lowerBounds given lower bounds
-     * @return WildcardType
+     * @return wildcard type
      */
-    public static GekWildcard wildcard(
-        @Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
+    public static GekWildcard wildcard(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
         return new GekWildcardImpl(upperBounds, lowerBounds);
     }
 
     /**
-     * Wraps given wildcard type as {@link GekWildcard}.
+     * Returns given wildcard type as {@link GekWildcard}.
      *
      * @param type given wildcard type
-     * @return {@link GekWildcard}
+     * @return wildcard type
      */
-    public static GekWildcard wrap(WildcardType type) {
+    public static GekWildcard wildcard(WildcardType type) {
         return new GekWildcardImpl(type.getUpperBounds(), type.getLowerBounds());
     }
 
     /**
-     * Returns a generic array type with given component type.
+     * Returns generic array type with given component type.
      *
      * @param componentType given component type
-     * @return GenericArrayType
+     * @return generic array type
      */
     public static GekArrayType arrayType(Type componentType) {
         return new GekArrayTypeImpl(componentType);
     }
 
     /**
-     * Wraps given generic array type as {@link GekArrayType}.
+     * Returns given generic array type as {@link GekArrayType}.
      *
      * @param type given generic array type
-     * @return {@link GekArrayType}
+     * @return generic array type
      */
-    public static GekArrayType wrap(GenericArrayType type) {
+    public static GekArrayType arrayType(GenericArrayType type) {
         return new GekArrayTypeImpl(type.getGenericComponentType());
     }
 

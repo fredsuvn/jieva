@@ -184,7 +184,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
             return Gek.as(
                 GekObj.wrap(
                     it,
-                    GekType.parameterized(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+                    GekType.paramType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
                 ).toParameterizedObj()
             );
         }
@@ -196,7 +196,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
             return Gek.as(
                 GekObj.wrap(
                     it,
-                    GekType.parameterized(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+                    GekType.paramType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
                 ).toParameterizedObj()
             );
         }

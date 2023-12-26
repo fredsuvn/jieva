@@ -212,30 +212,7 @@ public class GekReflect {
      */
     public static Class<?> arrayClass(Type componentType, ClassLoader classLoader) {
         if (componentType instanceof Class) {
-            String name;
-            if (((Class<?>) componentType).isArray()) {
-                name = "[" + ((Class<?>) componentType).getName();
-            } else if (Objects.equals(boolean.class, componentType)) {
-                name = "[Z";
-            } else if (Objects.equals(byte.class, componentType)) {
-                name = "[B";
-            } else if (Objects.equals(short.class, componentType)) {
-                name = "[S";
-            } else if (Objects.equals(char.class, componentType)) {
-                name = "[C";
-            } else if (Objects.equals(int.class, componentType)) {
-                name = "[I";
-            } else if (Objects.equals(long.class, componentType)) {
-                name = "[J";
-            } else if (Objects.equals(float.class, componentType)) {
-                name = "[F";
-            } else if (Objects.equals(double.class, componentType)) {
-                name = "[D";
-            } else if (Objects.equals(void.class, componentType)) {
-                name = "[V";
-            } else {
-                name = "[L" + ((Class<?>) componentType).getName() + ";";
-            }
+            String name = arrayClassName((Class<?>) componentType);
             try {
                 return Class.forName(name, true, classLoader);
             } catch (ClassNotFoundException e) {
@@ -246,29 +223,57 @@ public class GekReflect {
             return arrayClass(((ParameterizedType) componentType).getRawType(), classLoader);
         }
         if (componentType instanceof GenericArrayType) {
-            String name = "";
+            StringBuilder name = new StringBuilder();
             Type cur = componentType;
             do {
-                name += "[";
+                name.append("[");
                 if (cur instanceof GenericArrayType) {
                     cur = ((GenericArrayType) cur).getGenericComponentType();
                 } else if (cur instanceof Class) {
-                    name += "L" + ((Class<?>) cur).getName() + ";";
+                    name.append("L").append(((Class<?>) cur).getName()).append(";");
                     break;
                 } else if (cur instanceof ParameterizedType) {
-                    name += "L" + ((Class<?>) ((ParameterizedType) cur).getRawType()).getName() + ";";
+                    name.append("L").append(((Class<?>) ((ParameterizedType) cur).getRawType()).getName()).append(";");
                     break;
                 } else {
                     throw new IllegalArgumentException("Unsupported component type: " + componentType);
                 }
             } while (true);
             try {
-                return Class.forName(name, true, classLoader);
+                return Class.forName(name.toString(), true, classLoader);
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(e);
             }
         }
         throw new IllegalArgumentException("Unsupported component type: " + componentType);
+    }
+
+    private static String arrayClassName(Class<?> componentType) {
+        String name;
+        if (componentType.isArray()) {
+            name = "[" + componentType.getName();
+        } else if (Objects.equals(boolean.class, componentType)) {
+            name = "[Z";
+        } else if (Objects.equals(byte.class, componentType)) {
+            name = "[B";
+        } else if (Objects.equals(short.class, componentType)) {
+            name = "[S";
+        } else if (Objects.equals(char.class, componentType)) {
+            name = "[C";
+        } else if (Objects.equals(int.class, componentType)) {
+            name = "[I";
+        } else if (Objects.equals(long.class, componentType)) {
+            name = "[J";
+        } else if (Objects.equals(float.class, componentType)) {
+            name = "[F";
+        } else if (Objects.equals(double.class, componentType)) {
+            name = "[D";
+        } else if (Objects.equals(void.class, componentType)) {
+            name = "[V";
+        } else {
+            name = "[L" + componentType.getName() + ";";
+        }
+        return name;
     }
 
     /**
@@ -541,7 +546,7 @@ public class GekReflect {
      * @return generic super type with actual arguments
      */
     @Nullable
-    public static ParameterizedType getGenericSuperType(Type type, Class<?> target) {
+    public static GekParamType getGenericSuperType(Type type, Class<?> target) {
         boolean supportedType = false;
         if (type instanceof Class<?>) {
             supportedType = true;
@@ -573,7 +578,7 @@ public class GekReflect {
                 stack.clear();
                 return nestedValue == null ? it : nestedValue;
             }).collect(Collectors.toList());
-        return GekType.parameterized(target, target.getDeclaringClass(), actualTypeArguments);
+        return GekType.paramType(target, target.getDeclaringClass(), actualTypeArguments);
     }
 
     /**
@@ -730,7 +735,7 @@ public class GekReflect {
                 }
             }
             if (matched) {
-                return GekType.parameterized(rawType, ownerType, actualTypeArguments);
+                return GekType.paramType(rawType, ownerType, actualTypeArguments);
             } else {
                 return type;
             }
