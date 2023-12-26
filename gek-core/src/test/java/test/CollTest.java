@@ -12,17 +12,17 @@ public class CollTest {
 
     @Test
     public void testImmutable() {
-        Assert.assertEquals(Gek.arrayOf(1, 2, 3), Arrays.asList(1, 2, 3).toArray(new Integer[0]));
-        Assert.assertEquals(Gek.listOf(1, 2, 3), Arrays.asList(1, 2, 3));
-        Assert.assertEquals(Gek.setOf(1, 2, 3), new HashSet<>(Arrays.asList(1, 2, 3)));
-        Assert.assertEquals(Gek.setOf(1, 2, 2), new HashSet<>(Arrays.asList(1, 2)));
-        Assert.assertEquals(Gek.setOf(1, 2, 2).size(), new HashSet<>(Arrays.asList(1, 2)).size());
+        Assert.assertEquals(Gek.asArray(1, 2, 3), Arrays.asList(1, 2, 3).toArray(new Integer[0]));
+        Assert.assertEquals(Gek.asList(1, 2, 3), Arrays.asList(1, 2, 3));
+        Assert.assertEquals(Gek.asSet(1, 2, 3), new HashSet<>(Arrays.asList(1, 2, 3)));
+        Assert.assertEquals(Gek.asSet(1, 2, 2), new HashSet<>(Arrays.asList(1, 2)));
+        Assert.assertEquals(Gek.asSet(1, 2, 2).size(), new HashSet<>(Arrays.asList(1, 2)).size());
         Map<Integer, Integer> map = new LinkedHashMap<>();
         map.put(1, 2);
         Assert.assertEquals(Gek.mapOf(1, 2, 3), map);
         map.put(3, 4);
         Assert.assertEquals(Gek.mapOf(1, 2, 3, 4), map);
-        Assert.expectThrows(UnsupportedOperationException.class, () -> Gek.listOf(1, 2, 3).set(0, 5));
+        Assert.expectThrows(UnsupportedOperationException.class, () -> Gek.asList(1, 2, 3).set(0, 5));
     }
 
     @Test
@@ -154,13 +154,13 @@ public class CollTest {
 
     @Test
     public void testGetCompute() {
-        List<Integer> list = Gek.listOf(0, 1, 2);
+        List<Integer> list = Gek.asList(0, 1, 2);
         Assert.assertEquals(GekColl.get(list, 1), 1);
         Assert.assertEquals(GekColl.get(list, 1, 9), 1);
         Assert.assertEquals(GekColl.get(list, 8, 9), 9);
         Assert.assertEquals(GekColl.compute(list, 1, i -> i * 2), 1);
         Assert.assertEquals(GekColl.compute(list, 8, i -> i * 2), 16);
-        Set<Integer> set = Gek.setOf(0, 1, 2);
+        Set<Integer> set = Gek.asSet(0, 1, 2);
         Assert.assertEquals(GekColl.get(set, 1), 1);
         Assert.assertEquals(GekColl.get(set, 1, 9), 1);
         Assert.assertEquals(GekColl.get(set, 8, 9), 9);
@@ -177,11 +177,11 @@ public class CollTest {
     @Test
     public void testCollect() {
         Assert.assertEquals(
-            GekColl.toMap(Gek.listOf(1, 2, 3, 4)),
+            GekColl.toMap(Gek.asList(1, 2, 3, 4)),
             Gek.mapOf(1, 2, 3, 4)
         );
         Assert.assertEquals(
-            GekColl.toMap(Gek.listOf(1, 2, 3, 4), String::valueOf, String::valueOf),
+            GekColl.toMap(Gek.asList(1, 2, 3, 4), String::valueOf, String::valueOf),
             Gek.mapOf("1", "1", "2", "2", "3", "3", "4", "4")
         );
         Assert.assertEquals(
@@ -197,15 +197,15 @@ public class CollTest {
             Gek.mapOf(1, 2, 3, 4)
         );
         Assert.assertEquals(
-            GekColl.collect(new LinkedHashMap<>(), Gek.listOf(1, 2, 3)),
+            GekColl.collect(new LinkedHashMap<>(), Gek.asList(1, 2, 3)),
             Gek.mapOf(1, 2, 3)
         );
         Assert.assertEquals(
-            GekColl.collect(new LinkedHashMap<>(), Gek.listOf(1, 2, 3, 4)),
+            GekColl.collect(new LinkedHashMap<>(), Gek.asList(1, 2, 3, 4)),
             Gek.mapOf(1, 2, 3, 4)
         );
         Assert.assertEquals(
-            GekColl.collect(new LinkedHashMap<>(), Gek.listOf(1, 2, 3, 4), String::valueOf),
+            GekColl.collect(new LinkedHashMap<>(), Gek.asList(1, 2, 3, 4), String::valueOf),
             Gek.mapOf("1", "2", "3", "4")
         );
         Assert.assertEquals(
@@ -213,16 +213,16 @@ public class CollTest {
             Gek.mapOf("1", "2", "3", "4")
         );
         Assert.assertEquals(
-            GekColl.toList(Gek.listOf(1, 2, 3, 4)),
-            Gek.listOf(1, 2, 3, 4)
+            GekColl.toList(Gek.asList(1, 2, 3, 4)),
+            Gek.asList(1, 2, 3, 4)
         );
         Assert.assertEquals(
-            GekColl.toSet(Gek.listOf(1, 1, 3, 3)),
-            Gek.setOf(1, 1, 3, 3)
+            GekColl.toSet(Gek.asList(1, 1, 3, 3)),
+            Gek.asSet(1, 1, 3, 3)
         );
         Assert.assertEquals(
-            GekColl.toSet(Gek.listOf(1, 1, 3, 3)),
-            new HashSet<>(Gek.listOf(1, 1, 3, 3))
+            GekColl.toSet(Gek.asList(1, 1, 3, 3)),
+            new HashSet<>(Gek.asList(1, 1, 3, 3))
         );
     }
 }

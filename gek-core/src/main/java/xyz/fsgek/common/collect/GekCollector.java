@@ -320,7 +320,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
         }
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
-                return Gek.as(GekColl.listOf((Object[]) initialElements));
+                return Gek.as(GekColl.asList((Object[]) initialElements));
             }
             if (initialElements instanceof Iterable) {
                 return Gek.as(GekColl.toList((Iterable<?>) initialElements));
@@ -331,7 +331,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
             for (int i = 0; i < array.length; i++) {
                 array[i] = initialFunction.apply(i);
             }
-            return Gek.as(GekColl.listOf(array));
+            return Gek.as(GekColl.asList(array));
         }
         return Collections.emptyList();
     }
@@ -348,7 +348,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
         }
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
-                return Gek.as(GekColl.setOf((Object[]) initialElements));
+                return Gek.as(GekColl.asSet((Object[]) initialElements));
             }
             if (initialElements instanceof Iterable) {
                 return Gek.as(GekColl.toSet((Iterable<?>) initialElements));
@@ -359,7 +359,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
             for (int i = 0; i < array.length; i++) {
                 array[i] = initialFunction.apply(i);
             }
-            return Gek.as(GekColl.setOf(array));
+            return Gek.as(GekColl.asSet(array));
         }
         return Collections.emptySet();
     }

@@ -18,31 +18,55 @@ import java.util.stream.StreamSupport;
 public class GekColl {
 
     /**
-     * Returns an immutable list of given elements.
+     * Returns given elements as immutable list, any change for the elements will reflect to the list.
      *
      * @param elements given elements
      * @param <T>      type of element
-     * @return an immutable list of given elements
+     * @return given elements as immutable list
      */
     @SafeVarargs
-    public static <T> List<T> listOf(T... elements) {
+    public static <T> List<T> asList(T... elements) {
         return GekArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements);
     }
 
     /**
-     * Returns an immutable set of given elements.
+     * Returns given elements as immutable set, any change for the elements will reflect to the set.
      *
      * @param elements given elements
      * @param <T>      type of element
-     * @return an immutable set of given elements
+     * @return given elements as immutable set
      */
     @SafeVarargs
-    public static <T> Set<T> setOf(T... elements) {
+    public static <T> Set<T> asSet(T... elements) {
         return GekArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements, true);
     }
 
     /**
-     * Returns an immutable map of given elements.
+     * Returns an immutable list contains given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return an immutable list contains given elements
+     */
+    @SafeVarargs
+    public static <T> List<T> listOf(T... elements) {
+        return GekArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements.clone());
+    }
+
+    /**
+     * Returns an immutable set contains given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return an immutable set contains given elements
+     */
+    @SafeVarargs
+    public static <T> Set<T> setOf(T... elements) {
+        return GekArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements.clone(), true);
+    }
+
+    /**
+     * Returns an immutable map contains given elements.
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      *
@@ -50,7 +74,7 @@ public class GekColl {
      * @param <K>      type of keys
      * @param <V>      type of values
      * @param <T>      type of element
-     * @return an immutable map of given elements
+     * @return an immutable map contains given elements
      */
     @SafeVarargs
     public static <K, V, T> Map<K, V> mapOf(T... elements) {
@@ -344,7 +368,7 @@ public class GekColl {
         if (GekArray.isEmpty(elements)) {
             return dest;
         }
-        dest.addAll(listOf(elements));
+        dest.addAll(asList(elements));
         return dest;
     }
 

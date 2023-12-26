@@ -744,25 +744,57 @@ public class Gek {
     }
 
     /**
-     * Returns given elements as array.
+     * Returns given elements itself as array.
+     * <p>
+     * This method directly invoke {@link GekArray#asArray(Object[])}.
      *
      * @param elements given elements
-     * @param <T>      type of element
-     * @return given elements as array
+     * @param <T>      component type
+     * @return given elements itself as array
      */
     @SafeVarargs
-    public static <T> T[] arrayOf(T... elements) {
-        return elements;
+    public static <T> T[] asArray(T... elements) {
+        return GekArray.asArray(elements);
     }
 
     /**
-     * Returns an immutable list of given elements.
+     * Returns given elements as immutable list, any change for the elements will reflect to the list.
+     * <p>
+     * This method directly invoke {@link GekColl#asList(Object[])}.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return given elements as immutable list
+     * @see GekColl#asList(Object[])
+     */
+    @SafeVarargs
+    public static <T> List<T> asList(T... elements) {
+        return GekColl.asList(elements);
+    }
+
+    /**
+     * Returns given elements as immutable set, any change for the elements will reflect to the set.
+     * <p>
+     * This method directly invoke {@link GekColl#asSet(Object[])}.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return given elements as immutable set
+     * @see GekColl#asSet(Object[])
+     */
+    @SafeVarargs
+    public static <T> Set<T> asSet(T... elements) {
+        return GekColl.asSet(elements);
+    }
+
+    /**
+     * Returns an immutable list contains given elements.
      * <p>
      * This method directly invoke {@link GekColl#listOf(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
-     * @return an immutable list of given elements
+     * @return an immutable list contains given elements
      * @see GekColl#listOf(Object[])
      */
     @SafeVarargs
@@ -771,13 +803,13 @@ public class Gek {
     }
 
     /**
-     * Returns an immutable set of given elements.
+     * Returns an immutable set contains given elements.
      * <p>
      * This method directly invoke {@link GekColl#setOf(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
-     * @return an immutable set of given elements
+     * @return an immutable set contains given elements
      * @see GekColl#setOf(Object[])
      */
     @SafeVarargs
@@ -786,7 +818,7 @@ public class Gek {
     }
 
     /**
-     * Returns an immutable map of given elements.
+     * Returns an immutable map contains given elements.
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      * <p>
@@ -796,7 +828,7 @@ public class Gek {
      * @param <K>      type of keys
      * @param <V>      type of values
      * @param <T>      type of element
-     * @return an immutable map of given elements
+     * @return an immutable map contains given elements
      * @see GekColl#mapOf(Object...)
      */
     @SafeVarargs

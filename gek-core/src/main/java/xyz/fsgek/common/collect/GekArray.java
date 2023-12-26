@@ -18,15 +18,15 @@ import java.util.function.Function;
 public class GekArray {
 
     /**
-     * Returns given arguments as an array.
+     * Returns given elements itself as array.
      *
-     * @param args given arguments
-     * @param <T>  component type
-     * @return given arguments as an array
+     * @param elements given arguments
+     * @param <T>      component type
+     * @return given elements itself as array
      */
     @SafeVarargs
-    public static <T> T[] array(T... args) {
-        return args;
+    public static <T> T[] asArray(T... elements) {
+        return elements;
     }
 
     /**
