@@ -3,6 +3,7 @@ package xyz.fsgek.common.bean;
 import xyz.fsgek.annotations.Immutable;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.ParameterizedType;
@@ -12,8 +13,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * This interface represents a simple type of java bean struct, which has a set of property structs,
- * each of the property consists of a name-value pair, the name is unique in same bean.
+ * This interface represents the structure of <b>Gek Bean</b>.
+ * <p>
+ * Gek bean is similar to Java Bean, but not exactly the same.
  * <p>
  * A bean corresponds to a {@link Type}, commonly resolved by {@link GekBeanResolver}.
  * The most common type of bean is a Java class that is filled with getters and setters which specify their properties.
@@ -71,12 +73,15 @@ public interface GekBean {
 
     /**
      * Utility method which is a simple implementing of {@link Object#equals(Object)} for this interface.
-     * This method uses result of {@link GekBean#getType()} to compare,
-     * and work in conjunction with {@link #hashCode(GekBean)}.
+     * This method uses result of {@link GekBean#getType()} to compare:
+     * <pre>
+     *     return Objects.equals(bean.getType(), other.getType());
+     * </pre>
+     * And it works in conjunction with {@link #hashCode(GekBean)}.
      *
      * @param bean comparing bean
      * @param o    object to be compared
-     * @return true if equal false otherwise
+     * @return true if equals false otherwise
      */
     static boolean equals(GekBean bean, @Nullable Object o) {
         if (bean == o) {
@@ -94,11 +99,14 @@ public interface GekBean {
 
     /**
      * Utility method which is a simple implementing of {@link Object#hashCode()} for this interface.
-     * This method uses hash of {@link GekBean#getType()} to compute,
-     * and work in conjunction with {@link #equals(GekBean, Object)}.
+     * This method uses {@link Object#hashCode()} of {@link GekBean#getType()} to compute:
+     * <pre>
+     *     return bean.getType().hashCode();
+     * </pre>
+     * And it works in conjunction with {@link #equals(GekBean, Object)}.
      *
      * @param bean property to be hashed
-     * @return hash code of given property
+     * @return hash code of given bean
      */
     static int hashCode(GekBean bean) {
         return bean.getType().hashCode();
@@ -111,7 +119,9 @@ public interface GekBean {
      * @return a string describes given property
      */
     static String toString(GekBean bean) {
-        return "bean{"
+        return "{@objId: " + Gek.systemHash(bean) + ", "
+            + "@objType: bean, "
+            + "@objClass: " + bean.getClass().getName() + ", "
             + "type: " + bean.getType().getTypeName() + ", "
             + "properties: ["
             + bean.getProperties().entrySet().stream().map(Object::toString).collect(Collectors.joining(", "))
