@@ -114,7 +114,7 @@ public interface GekConverter {
             return null;
         }
         if (result instanceof GekObject) {
-            return Gek.as(((GekObject) result).get());
+            return Gek.as(((GekObject) result).getValue());
         }
         return Gek.as(result);
     }
@@ -211,7 +211,7 @@ public interface GekConverter {
      *         {@code null}: means this converter can not do this conversion;
      *     </li>
      *     <li>
-     *         {@link GekObject}: wrapped object (from {@link GekObject#get()}) is actual result of conversion,
+     *         {@link GekObject}: wrapped object (from {@link GekObject#getValue()}) is actual result of conversion,
      *         including {@code null} and {@link GekObject} itself;
      *     </li>
      *     <li>
@@ -354,7 +354,7 @@ public interface GekConverter {
          *         Other instance of {@link GekFlag} is a wrong result, will throw a {@link GekConvertException}.
          *     </li>
          * </ul>
-         * If this method returns a {@link GekObject}, wrapped object (from {@link GekObject#get()}) is actual result
+         * If this method returns a {@link GekObject}, wrapped object (from {@link GekObject#getValue()}) is actual result
          * of conversion, including {@link GekFlag}, {@code null} and {@link GekObject} itself.
          * Any other type of returned object is the actual result of conversion.
          *

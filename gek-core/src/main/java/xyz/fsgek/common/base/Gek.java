@@ -439,7 +439,7 @@ public class Gek {
      *         {@code null}: means this converter can not do this conversion;
      *     </li>
      *     <li>
-     *         {@link GekObject}: wrapped object (from {@link GekObject#get()}) is actual result of conversion,
+     *         {@link GekObject}: wrapped object (from {@link GekObject#getValue()}) is actual result of conversion,
      *         including {@code null} and {@link GekObject} itself;
      *     </li>
      *     <li>
