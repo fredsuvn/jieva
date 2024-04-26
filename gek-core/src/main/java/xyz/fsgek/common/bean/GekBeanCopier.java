@@ -48,7 +48,7 @@ public interface GekBeanCopier {
      * @return dest object
      */
     default <T> T copyProperties(Object source, T dest) {
-        return copyProperties(source, dest, GekOption.emptyOptions());
+        return copyProperties(source, source.getClass(), dest, dest.getClass(), GekOption.emptyOptions());
     }
 
     /**
@@ -60,7 +60,7 @@ public interface GekBeanCopier {
      * @param <T>     type of dest object
      * @return dest object
      */
-    <T> T copyProperties(Object source, T dest, GekOption<?, ?>... options);
+    <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, GekOption<?, ?>... options);
 
     /**
      * Returns a bean copier of which options come from this copier,
@@ -240,7 +240,7 @@ public interface GekBeanCopier {
             }
 
             @Override
-            public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
+            public <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, GekOption<?, ?>... options) {
                 if (source instanceof Map) {
                     ParameterizedType sourceMapType = GekReflect.getGenericSuperType(sourceType, Map.class);
                     if (sourceMapType == null) {

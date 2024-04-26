@@ -2,7 +2,7 @@ package xyz.fsgek.common.cache;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.Geko;
+import xyz.fsgek.common.base.GekObject;
 import xyz.fsgek.common.base.ref.GekRef;
 
 import java.lang.ref.ReferenceQueue;
@@ -100,87 +100,87 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
         return result.get();
     }
 
-    @Override
-    public @Nullable Geko<V> getWrapper(K key) {
-        Entry<K> entry = data.get(key);
-        if (entry == null) {
-            cleanUp();
-            return null;
-        }
-        if (entry.isExpired()) {
-            entry.clear(RemovalListener.Cause.EXPIRED);
-            cleanUp();
-            return null;
-        }
-        Object value = entry.value();
-        if (value == null) {
-            return null;
-        }
-        entry.refreshAccess();
-        cleanUp();
-        return Geko.of(valueAs(value));
-    }
+//    @Override
+//    public @Nullable GekObject<V> getWrapper(K key) {
+//        Entry<K> entry = data.get(key);
+//        if (entry == null) {
+//            cleanUp();
+//            return null;
+//        }
+//        if (entry.isExpired()) {
+//            entry.clear(RemovalListener.Cause.EXPIRED);
+//            cleanUp();
+//            return null;
+//        }
+//        Object value = entry.value();
+//        if (value == null) {
+//            return null;
+//        }
+//        entry.refreshAccess();
+//        cleanUp();
+//        return GekObject.of(valueAs(value));
+//    }
 
-    @Override
-    public @Nullable Geko<V> getWrapper(
-        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
-        Entry<K> entry = data.get(key);
-        if (entry == null) {
-            return computeWrapper(key, loader);
-        }
-        if (entry.isExpired()) {
-            entry.clear(RemovalListener.Cause.EXPIRED);
-            return computeWrapper(key, loader);
-        }
-        Object value = entry.value();
-        if (value == null) {
-            return computeWrapper(key, loader);
-        }
-        entry.refreshAccess();
-        cleanUp();
-        return Geko.of(valueAs(value));
-    }
+//    @Override
+//    public @Nullable GekObject<V> getWrapper(
+//        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
+//        Entry<K> entry = data.get(key);
+//        if (entry == null) {
+//            return computeWrapper(key, loader);
+//        }
+//        if (entry.isExpired()) {
+//            entry.clear(RemovalListener.Cause.EXPIRED);
+//            return computeWrapper(key, loader);
+//        }
+//        Object value = entry.value();
+//        if (value == null) {
+//            return computeWrapper(key, loader);
+//        }
+//        entry.refreshAccess();
+//        cleanUp();
+//        return GekObject.of(valueAs(value));
+//    }
 
-    private @Nullable Geko<V> computeWrapper(
-        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
-        GekRef<Geko<V>> result = GekRef.ofNull();
-        data.compute(key, (k, old) -> {
-            if (old == null) {
-                Value<? extends V> nv = loader.apply(k);
-                if (nv == null) {
-                    return null;
-                }
-                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-                result.set(Geko.of(nv.get()));
-                return newEntry;
-            }
-            if (old.isExpired()) {
-                old.clear(RemovalListener.Cause.EXPIRED);
-                Value<? extends V> nv = loader.apply(k);
-                if (nv == null) {
-                    return null;
-                }
-                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-                result.set(Geko.of(nv.get()));
-                return newEntry;
-            }
-            Object ov = old.value();
-            if (ov == null) {
-                Value<? extends V> nv = loader.apply(k);
-                if (nv == null) {
-                    return null;
-                }
-                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-                result.set(Geko.of(nv.get()));
-                return newEntry;
-            }
-            result.set(Geko.of(valueAs(ov)));
-            old.refreshAccess();
-            return old;
-        });
-        cleanUp();
-        return result.get();
-    }
+//    private @Nullable GekObject<V> computeWrapper(
+//        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
+//        GekRef<GekObject<V>> result = GekRef.ofNull();
+//        data.compute(key, (k, old) -> {
+//            if (old == null) {
+//                Value<? extends V> nv = loader.apply(k);
+//                if (nv == null) {
+//                    return null;
+//                }
+//                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
+//                result.set(GekObject.of(nv.get()));
+//                return newEntry;
+//            }
+//            if (old.isExpired()) {
+//                old.clear(RemovalListener.Cause.EXPIRED);
+//                Value<? extends V> nv = loader.apply(k);
+//                if (nv == null) {
+//                    return null;
+//                }
+//                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
+//                result.set(GekObject.of(nv.get()));
+//                return newEntry;
+//            }
+//            Object ov = old.value();
+//            if (ov == null) {
+//                Value<? extends V> nv = loader.apply(k);
+//                if (nv == null) {
+//                    return null;
+//                }
+//                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
+//                result.set(GekObject.of(nv.get()));
+//                return newEntry;
+//            }
+//            result.set(GekObject.of(valueAs(ov)));
+//            old.refreshAccess();
+//            return old;
+//        });
+//        cleanUp();
+//        return result.get();
+//    }
 
     @Override
     public boolean contains(K key) {

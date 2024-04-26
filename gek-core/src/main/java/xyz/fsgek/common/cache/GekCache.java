@@ -3,7 +3,7 @@ package xyz.fsgek.common.cache;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.Geko;
+import xyz.fsgek.common.base.GekObject;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -127,36 +127,36 @@ public interface GekCache<K, V> {
     @Nullable
     V get(K key, Function<? super K, @Nullable ? extends V> loader);
 
-    /**
-     * Returns value wrapped by {@link Geko} associating with specified key.
-     * The returned {@link Geko} will be null if there is no entry for specified key.
-     * <p>
-     * This is a {@code get} operation.
-     *
-     * @param key specified key
-     * @return value wrapped by {@link Geko} associating with specified key, or null if not found
-     */
-    @Nullable
-    Geko<V> getWrapper(K key);
+//    /**
+//     * Returns value wrapped by {@link GekObject} associating with specified key.
+//     * The returned {@link GekObject} will be null if there is no entry for specified key.
+//     * <p>
+//     * This is a {@code get} operation.
+//     *
+//     * @param key specified key
+//     * @return value wrapped by {@link GekObject} associating with specified key, or null if not found
+//     */
+//    @Nullable
+//    GekObject<V> getWrapper(K key);
 
-    /**
-     * Returns value wrapped by {@link Geko} associating with specified key, and it performs like
-     * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)}:
-     * <p>
-     * If the specified key is not already associated with a value, attempts to compute its value as {@link Value}
-     * using the given loader and enters it into this cache. If the loader returns null, no mapping will be recorded and
-     * this method will return null.
-     * <p>
-     * This cache is thread-safe so the loader function is applied at most once per key, and blocks other thread.
-     * <p>
-     * This is a {@code compute} operation if the computation is occurred, otherwise this is a {@code get} operation.
-     *
-     * @param key    specified key
-     * @param loader given loader
-     * @return value associating with specified key, may be computed from given loader
-     */
-    @Nullable
-    Geko<V> getWrapper(K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader);
+//    /**
+//     * Returns value wrapped by {@link GekObject} associating with specified key, and it performs like
+//     * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)}:
+//     * <p>
+//     * If the specified key is not already associated with a value, attempts to compute its value as {@link Value}
+//     * using the given loader and enters it into this cache. If the loader returns null, no mapping will be recorded and
+//     * this method will return null.
+//     * <p>
+//     * This cache is thread-safe so the loader function is applied at most once per key, and blocks other thread.
+//     * <p>
+//     * This is a {@code compute} operation if the computation is occurred, otherwise this is a {@code get} operation.
+//     *
+//     * @param key    specified key
+//     * @param loader given loader
+//     * @return value associating with specified key, may be computed from given loader
+//     */
+//    @Nullable
+//    GekObject<V> getWrapper(K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader);
 
     /**
      * Returns whether this cache contains the value associating with specified key and the value is valid.

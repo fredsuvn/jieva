@@ -3,7 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fsgek.common.base.GekLog;
-import xyz.fsgek.common.base.Geko;
+import xyz.fsgek.common.base.GekObject;
 import xyz.fsgek.common.base.ref.GekRef;
 import xyz.fsgek.common.base.ref.IntRef;
 import xyz.fsgek.common.cache.GekCache;
@@ -76,15 +76,15 @@ public class CacheTest {
         gekCache.remove(1);
         gekCache.get(1, k -> null);
         Assert.assertNull(gekCache.get(1));
-        Assert.assertEquals(gekCache.getWrapper(1).get(), Geko.empty().get());
+//        Assert.assertEquals(gekCache.getWrapper(1).get(), GekObject.empty().get());
         gekCache.remove(1);
-        gekCache.getWrapper(1, k -> null);
+//        gekCache.getWrapper(1, k -> null);
         Assert.assertNull(gekCache.get(1));
-        Assert.assertNull(gekCache.getWrapper(1));
+//        Assert.assertNull(gekCache.getWrapper(1));
         gekCache.put(2, "2");
         Assert.assertEquals(gekCache.get(2), "2");
         Assert.assertEquals(gekCache.get(2, k -> "4"), "2");
-        Assert.assertEquals(gekCache.getWrapper(2, k -> GekCache.Value.of("8", null, null)).get(), "2");
+//        Assert.assertEquals(gekCache.getWrapper(2, k -> GekCache.Value.of("8", null, null)).get(), "2");
     }
 
     @Test
@@ -141,11 +141,11 @@ public class CacheTest {
             gekCache.put(i, (Integer) null);
         }
         for (int i = 0; i < 10000; i++) {
-            Geko<Integer> w = gekCache.getWrapper(i);
-            if (w != null) {
-                Assert.assertNull(w.get());
-                set.add(i);
-            }
+//            GekObject<Integer> w = gekCache.getWrapper(i);
+//            if (w != null) {
+//                Assert.assertNull(w.get());
+//                set.add(i);
+//            }
         }
         Assert.assertEquals(set.size() + intRef.get(), 10000);
         gekCache.clear();
