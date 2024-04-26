@@ -3,9 +3,8 @@ package xyz.fsgek.common.base.ref;
 import xyz.fsgek.annotations.Nullable;
 
 /**
- * Denote a variable reference for an object, usually be used where the variable cannot be re-assigned.
+ * Gek Ref is an object which contains a value. It is usually be used where a variable cannot be re-assigned.
  * For example:
- *
  * <pre>
  *     String str = "a";
  *     GekRef&lt;String&gt; ref = GekRef.of("a");
@@ -15,6 +14,9 @@ import xyz.fsgek.annotations.Nullable;
  *         //...
  *     });
  * </pre>
+ * In simple terms, it is just a container to hold an object. It also has version for primitive types:
+ * {@link BooleanRef}, {@link ByteRef}, {@link CharRef}, {@link ShortRef}, {@link IntRef}, {@link LongRef},
+ * {@link DoubleRef} and {@link FloatRef}.
  *
  * @param <T> type of referenced instance
  * @author fredsuvn
