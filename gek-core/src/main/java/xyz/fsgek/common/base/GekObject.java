@@ -1,8 +1,5 @@
 package xyz.fsgek.common.base;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import xyz.fsgek.annotations.Immutable;
 import xyz.fsgek.annotations.Nullable;
 
@@ -38,14 +35,7 @@ public interface GekObject {
      * @return an instance of {@link GekObject} of specified value and type
      */
     static GekObject of(@Nullable Object value, Type type) {
-        @Data
-        @EqualsAndHashCode
-        @AllArgsConstructor
-        final class Impl implements GekObject {
-            private final Object value;
-            private final Type type;
-        }
-        return new Impl(value, type);
+        return BaseImpls.newGekObject(value, type);
     }
 
     /**
@@ -54,7 +44,7 @@ public interface GekObject {
      * @return an instance of {@link GekObject} of null value and type of {@code Object.class}
      */
     static GekObject empty() {
-        return Companion.NULL;
+        return BaseImpls.nullGekObject();
     }
 
     /**
@@ -71,11 +61,4 @@ public interface GekObject {
      * @return type of object
      */
     Type getType();
-
-    /**
-     * Companion object of {@link GekObject}.
-     */
-    class Companion {
-        private static final GekObject NULL = GekObject.of(null);
-    }
 }
