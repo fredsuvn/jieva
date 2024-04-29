@@ -5,89 +5,46 @@ package xyz.fsgek.common.base.ref;
  *
  * @author fredsuvn
  */
-public class FloatRef {
+public interface FloatRef {
 
-    private float value;
-
-    FloatRef(float value) {
-        this.value = value;
+    /**
+     * Returns an instance of {@link FloatRef} of 0 initialized value.
+     *
+     * @return an instance of {@link FloatRef} of 0 initialized value
+     */
+    static FloatRef ofZero() {
+        return of(0);
     }
 
     /**
-     * Returns value of this ref.
+     * Returns an instance of {@link FloatRef} of initialized value.
      *
-     * @return value of this ref
+     * @param value initialized value
+     * @return an instance of {@link FloatRef} of initialized value
      */
-    public float get() {
-        return value;
+    static FloatRef of(float value) {
+        return RefImpls.newFloatRef(value);
     }
 
     /**
-     * Sets value of this ref.
+     * Returns referenced value.
      *
-     * @param value value of this ref
+     * @return referenced value
      */
-    public void set(float value) {
-        this.value = value;
-    }
+    float get();
 
     /**
-     * Adds 1 for current value then return:
+     * Sets referenced value.
      *
-     * <pre>
-     *     return ++value;
-     * </pre>
-     *
-     * @return ++value
+     * @param value referenced value
      */
-    public float incrementAndGet() {
-        return ++value;
-    }
+    void set(float value);
 
     /**
-     * Adds specified number for current value then return:
+     * Adds current value by specified value, and returns the result.
      *
-     * <pre>
-     *     value += addon;
-     *     return value;
-     * </pre>
-     *
-     * @param addon specified number
-     * @return value += addon
+     * @param v specified value
+     * @return the result
      */
-    public float incrementAndGet(float addon) {
-        value += addon;
-        return value;
-    }
-
-    /**
-     * Returns current value then adds 1 for the value:
-     *
-     * <pre>
-     *     return value++;
-     * </pre>
-     *
-     * @return value++
-     */
-    public float getAndIncrement() {
-        return value++;
-    }
-
-    /**
-     * Returns current value then adds specified number for the value:
-     *
-     * <pre>
-     *     float temp = value;
-     *     value += addon;
-     *     return temp;
-     * </pre>
-     *
-     * @param addon specified number
-     * @return current value
-     */
-    public float getAndIncrement(float addon) {
-        float temp = value;
-        value += addon;
-        return temp;
-    }
+    float add(float v);
 }

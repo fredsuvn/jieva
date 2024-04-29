@@ -5,29 +5,52 @@ package xyz.fsgek.common.base.ref;
  *
  * @author fredsuvn
  */
-public class BooleanRef {
+public interface BooleanRef {
 
-    private boolean value;
-
-    BooleanRef(boolean value) {
-        this.value = value;
+    /**
+     * Returns an instance of {@link BooleanRef} of false initialized value.
+     *
+     * @return an instance of {@link BooleanRef} of false initialized value
+     */
+    static BooleanRef ofFalse() {
+        return of(false);
     }
 
     /**
-     * Returns value of this ref.
+     * Returns an instance of {@link BooleanRef} of initialized value.
      *
-     * @return value of this ref
+     * @param value initialized value
+     * @return an instance of {@link BooleanRef} of initialized value
      */
-    public boolean get() {
-        return value;
+    static BooleanRef of(boolean value) {
+        return RefImpls.newBooleanRef(value);
     }
 
     /**
-     * Sets value of this ref.
+     * Returns referenced value.
      *
-     * @param value value of this ref
+     * @return referenced value
      */
-    public void set(boolean value) {
-        this.value = value;
-    }
+    boolean get();
+
+    /**
+     * Sets referenced value.
+     *
+     * @param value referenced value
+     */
+    void set(boolean value);
+
+    /**
+     * Toggles current value, and returns the result.
+     *
+     * @return toggle result
+     */
+    boolean toggleAndGet();
+
+    /**
+     * Toggles current value, and returns the old value before toggling.
+     *
+     * @return old value before toggling
+     */
+    boolean getAndToggle();
 }

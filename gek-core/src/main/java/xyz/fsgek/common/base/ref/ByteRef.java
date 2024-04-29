@@ -5,89 +5,60 @@ package xyz.fsgek.common.base.ref;
  *
  * @author fredsuvn
  */
-public class ByteRef {
+public interface ByteRef {
 
-    private byte value;
-
-    ByteRef(byte value) {
-        this.value = value;
+    /**
+     * Returns an instance of {@link ByteRef} of 0 initialized value.
+     *
+     * @return an instance of {@link ByteRef} of 0 initialized value
+     */
+    static ByteRef ofZero() {
+        return of((byte) 0);
     }
 
     /**
-     * Returns value of this ref.
+     * Returns an instance of {@link ByteRef} of initialized value.
      *
-     * @return value of this ref
+     * @param value initialized value
+     * @return an instance of {@link ByteRef} of initialized value
      */
-    public byte get() {
-        return value;
+    static ByteRef of(byte value) {
+        return RefImpls.newByteRef(value);
     }
 
     /**
-     * Sets value of this ref.
+     * Returns referenced value.
      *
-     * @param value value of this ref
+     * @return referenced value
      */
-    public void set(byte value) {
-        this.value = value;
-    }
+    byte get();
 
     /**
-     * Adds 1 for current value then return:
+     * Sets referenced value.
      *
-     * <pre>
-     *     return ++value;
-     * </pre>
-     *
-     * @return ++value
+     * @param value referenced value
      */
-    public byte incrementAndGet() {
-        return ++value;
-    }
+    void set(byte value);
 
     /**
-     * Adds specified number for current value then return:
+     * Increments current value by one, and returns the result.
      *
-     * <pre>
-     *     value += addon;
-     *     return value;
-     * </pre>
-     *
-     * @param addon specified number
-     * @return value += addon
+     * @return toggle result
      */
-    public byte incrementAndGet(byte addon) {
-        value += addon;
-        return value;
-    }
+    byte incrementAndGet();
 
     /**
-     * Returns current value then adds 1 for the value:
+     * Increments current value by one, and returns the old value before increment.
      *
-     * <pre>
-     *     return value++;
-     * </pre>
-     *
-     * @return value++
+     * @return old value before increment
      */
-    public byte getAndIncrement() {
-        return value++;
-    }
+    byte getAndIncrement();
 
     /**
-     * Returns current value then adds specified number for the value:
+     * Adds current value by specified value, and returns the result.
      *
-     * <pre>
-     *     byte temp = value;
-     *     value += addon;
-     *     return temp;
-     * </pre>
-     *
-     * @param addon specified number
-     * @return current value
+     * @param v specified value
+     * @return the result
      */
-    public byte getAndIncrement(byte addon) {
-        byte temp = value;
-        value += addon;
-        return temp;
-    }
+    byte add(byte v);
 }

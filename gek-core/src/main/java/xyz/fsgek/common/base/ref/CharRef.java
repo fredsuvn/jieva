@@ -5,89 +5,38 @@ package xyz.fsgek.common.base.ref;
  *
  * @author fredsuvn
  */
-public class CharRef {
+public interface CharRef {
 
-    private char value;
-
-    CharRef(char value) {
-        this.value = value;
+    /**
+     * Returns an instance of {@link CharRef} of 0 initialized value.
+     *
+     * @return an instance of {@link CharRef} of 0 initialized value
+     */
+    static CharRef ofZero() {
+        return of((char) 0);
     }
 
     /**
-     * Returns value of this ref.
+     * Returns an instance of {@link CharRef} of initialized value.
      *
-     * @return value of this ref
+     * @param value initialized value
+     * @return an instance of {@link CharRef} of initialized value
      */
-    public char get() {
-        return value;
+    static CharRef of(char value) {
+        return RefImpls.newCharRef(value);
     }
 
     /**
-     * Sets value of this ref.
+     * Returns referenced value.
      *
-     * @param value value of this ref
+     * @return referenced value
      */
-    public void set(char value) {
-        this.value = value;
-    }
+    char get();
 
     /**
-     * Adds 1 for current value then return:
+     * Sets referenced value.
      *
-     * <pre>
-     *     return ++value;
-     * </pre>
-     *
-     * @return ++value
+     * @param value referenced value
      */
-    public char incrementAndGet() {
-        return ++value;
-    }
-
-    /**
-     * Adds specified number for current value then return:
-     *
-     * <pre>
-     *     value += addon;
-     *     return value;
-     * </pre>
-     *
-     * @param addon specified number
-     * @return value += addon
-     */
-    public char incrementAndGet(char addon) {
-        value += addon;
-        return value;
-    }
-
-    /**
-     * Returns current value then adds 1 for the value:
-     *
-     * <pre>
-     *     return value++;
-     * </pre>
-     *
-     * @return value++
-     */
-    public char getAndIncrement() {
-        return value++;
-    }
-
-    /**
-     * Returns current value then adds specified number for the value:
-     *
-     * <pre>
-     *     char temp = value;
-     *     value += addon;
-     *     return temp;
-     * </pre>
-     *
-     * @param addon specified number
-     * @return current value
-     */
-    public char getAndIncrement(char addon) {
-        char temp = value;
-        value += addon;
-        return temp;
-    }
+    void set(char value);
 }

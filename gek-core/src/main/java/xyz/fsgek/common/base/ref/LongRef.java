@@ -5,89 +5,60 @@ package xyz.fsgek.common.base.ref;
  *
  * @author fredsuvn
  */
-public class LongRef {
+public interface LongRef {
 
-    private long value;
-
-    LongRef(long value) {
-        this.value = value;
+    /**
+     * Returns an instance of {@link LongRef} of 0 initialized value.
+     *
+     * @return an instance of {@link LongRef} of 0 initialized value
+     */
+    static LongRef ofZero() {
+        return of(0);
     }
 
     /**
-     * Returns value of this ref.
+     * Returns an instance of {@link LongRef} of initialized value.
      *
-     * @return value of this ref
+     * @param value initialized value
+     * @return an instance of {@link LongRef} of initialized value
      */
-    public long get() {
-        return value;
+    static LongRef of(long value) {
+        return RefImpls.newLongRef(value);
     }
 
     /**
-     * Sets value of this ref.
+     * Returns referenced value.
      *
-     * @param value value of this ref
+     * @return referenced value
      */
-    public void set(long value) {
-        this.value = value;
-    }
+    long get();
 
     /**
-     * Adds 1 for current value then return:
+     * Sets referenced value.
      *
-     * <pre>
-     *     return ++value;
-     * </pre>
-     *
-     * @return ++value
+     * @param value referenced value
      */
-    public long incrementAndGet() {
-        return ++value;
-    }
+    void set(long value);
 
     /**
-     * Adds specified number for current value then return:
+     * Increments current value by one, and returns the result.
      *
-     * <pre>
-     *     value += addon;
-     *     return value;
-     * </pre>
-     *
-     * @param addon specified number
-     * @return value += addon
+     * @return toggle result
      */
-    public long incrementAndGet(long addon) {
-        value += addon;
-        return value;
-    }
+    long incrementAndGet();
 
     /**
-     * Returns current value then adds 1 for the value:
+     * Increments current value by one, and returns the old value before increment.
      *
-     * <pre>
-     *     return value++;
-     * </pre>
-     *
-     * @return value++
+     * @return old value before increment
      */
-    public long getAndIncrement() {
-        return value++;
-    }
+    long getAndIncrement();
 
     /**
-     * Returns current value then adds specified number for the value:
+     * Adds current value by specified value, and returns the result.
      *
-     * <pre>
-     *     long temp = value;
-     *     value += addon;
-     *     return temp;
-     * </pre>
-     *
-     * @param addon specified number
-     * @return current value
+     * @param v specified value
+     * @return the result
      */
-    public long getAndIncrement(long addon) {
-        long temp = value;
-        value += addon;
-        return temp;
-    }
+    long add(long v);
 }
