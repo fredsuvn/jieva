@@ -4,6 +4,7 @@ import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekOption;
 import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.bean.GekProperty;
+import xyz.fsgek.common.convert.GekConverter;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -43,7 +44,15 @@ public interface GekDataCopier {
      *         For {@link Map} object, type of properties' names and values are come from {@code destType};
      *     </li>
      *     <li>
-     *         Options are specified by {@link GekDataOption.Key};
+     *         Options are specified by {@link GekDataOption}, including:
+     *         <ul>
+     *             <li>{@link GekDataOption#resolver(GekBeanResolver)}</li>
+     *             <li>{@link GekDataOption#converter(GekConverter)}</li>
+     *             <li>{@link GekDataOption#ignoredProperties(Object...)}, {@link GekDataOption#ignoredProperties(Iterable)}</li>
+     *             <li>{@link GekDataOption#ignoreNull(boolean)}</li>
+     *             <li>{@link GekDataOption#thrownIfConversionFails(boolean)}</li>
+     *             <li>{@link GekDataOption#putIfNotContained(boolean)}</li>
+     *         </ul>
      *     </li>
      * </ul>
      *
