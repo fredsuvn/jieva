@@ -23,7 +23,7 @@ public interface BooleanRef {
      * @return an instance of {@link BooleanRef} of initialized value
      */
     static BooleanRef of(boolean value) {
-        return RefImpls.newBooleanRef(value);
+        return Impls.newBooleanRef(value);
     }
 
     /**

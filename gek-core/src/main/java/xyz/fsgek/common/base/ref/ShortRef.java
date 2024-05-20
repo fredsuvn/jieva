@@ -23,7 +23,7 @@ public interface ShortRef {
      * @return an instance of {@link ShortRef} of initialized value
      */
     static ShortRef of(short value) {
-        return RefImpls.newShortRef(value);
+        return Impls.newShortRef(value);
     }
 
     /**

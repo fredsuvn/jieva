@@ -23,7 +23,7 @@ public interface LongRef {
      * @return an instance of {@link LongRef} of initialized value
      */
     static LongRef of(long value) {
-        return RefImpls.newLongRef(value);
+        return Impls.newLongRef(value);
     }
 
     /**

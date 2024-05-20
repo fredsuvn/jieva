@@ -23,7 +23,7 @@ public interface ByteRef {
      * @return an instance of {@link ByteRef} of initialized value
      */
     static ByteRef of(byte value) {
-        return RefImpls.newByteRef(value);
+        return Impls.newByteRef(value);
     }
 
     /**

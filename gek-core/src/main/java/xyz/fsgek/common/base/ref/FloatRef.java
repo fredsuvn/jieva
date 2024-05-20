@@ -23,7 +23,7 @@ public interface FloatRef {
      * @return an instance of {@link FloatRef} of initialized value
      */
     static FloatRef of(float value) {
-        return RefImpls.newFloatRef(value);
+        return Impls.newFloatRef(value);
     }
 
     /**

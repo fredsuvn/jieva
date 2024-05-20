@@ -3,7 +3,7 @@ package xyz.fsgek.common.base.ref;
 import lombok.AllArgsConstructor;
 import xyz.fsgek.annotations.Nullable;
 
-final class RefImpls {
+final class Impls {
 
     static <T> GekRef<T> newGekRef(@Nullable T value) {
         return new GekRefImpl<>(value);

@@ -23,7 +23,7 @@ public interface CharRef {
      * @return an instance of {@link CharRef} of initialized value
      */
     static CharRef of(char value) {
-        return RefImpls.newCharRef(value);
+        return Impls.newCharRef(value);
     }
 
     /**

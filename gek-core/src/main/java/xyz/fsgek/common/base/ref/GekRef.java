@@ -41,7 +41,7 @@ public interface GekRef<T> {
      * @return an instance of {@link GekRef} of initialized value
      */
     static <T> GekRef<T> of(@Nullable T value) {
-        return RefImpls.newGekRef(value);
+        return Impls.newGekRef(value);
     }
 
     /**

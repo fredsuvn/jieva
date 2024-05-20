@@ -23,7 +23,7 @@ public interface IntRef {
      * @return an instance of {@link IntRef} of initialized value
      */
     static IntRef of(int value) {
-        return RefImpls.newIntRef(value);
+        return Impls.newIntRef(value);
     }
 
     /**

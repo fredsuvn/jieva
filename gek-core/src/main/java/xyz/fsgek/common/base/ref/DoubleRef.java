@@ -23,7 +23,7 @@ public interface DoubleRef {
      * @return an instance of {@link DoubleRef} of initialized value
      */
     static DoubleRef of(double value) {
-        return RefImpls.newDoubleRef(value);
+        return Impls.newDoubleRef(value);
     }
 
     /**
