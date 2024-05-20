@@ -4,6 +4,7 @@ import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.collect.GekArray;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * This interface represents optional parameter. For example:
@@ -42,13 +43,13 @@ public interface GekOption<K, V> {
     }
 
     /**
-     * Returns option of specified key in given options, or null if not found.
+     * Returns option value of specified key in given options, or null if not found.
      *
      * @param key     specified key
      * @param options given options
      * @param <K>     type of keys
      * @param <V>     type of values
-     * @return option of specified key in given options, or null if not found
+     * @return option value of specified key in given options, or null if not found
      */
     @Nullable
     static <K, V> V get(K key, GekOption<?, ?>... options) {
@@ -61,6 +62,72 @@ public interface GekOption<K, V> {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns option value of specified key in given options, or default value if not found.
+     *
+     * @param key          specified key
+     * @param defaultValue default value
+     * @param options      given options
+     * @param <K>          type of keys
+     * @param <V>          type of values
+     * @return option value of specified key in given options, or default value if not found
+     */
+    static <K, V> V get(K key, V defaultValue, GekOption<?, ?>... options) {
+        if (GekArray.isEmpty(options)) {
+            return defaultValue;
+        }
+        for (GekOption<?, ?> option : options) {
+            if (option != null && Objects.equals(option.getKey(), key)) {
+                return Gek.as(option.getValue());
+            }
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Returns option value of specified key in given options, or result of default value if not found.
+     *
+     * @param key          specified key
+     * @param options      given options
+     * @param defaultValue function of default value
+     * @param <K>          type of keys
+     * @param <V>          type of values
+     * @return option value of specified key in given options, or result of default value if not found
+     */
+    static <K, V> V get(K key, GekOption<?, ?>[] options, Function<K, V> defaultValue) {
+        if (GekArray.isEmpty(options)) {
+            return defaultValue.apply(key);
+        }
+        for (GekOption<?, ?> option : options) {
+            if (option != null && Objects.equals(option.getKey(), key)) {
+                return Gek.as(option.getValue());
+            }
+        }
+        return defaultValue.apply(key);
+    }
+
+    /**
+     * Returns option value of specified key in given options, or result of default value if not found.
+     *
+     * @param key          specified key
+     * @param options      given options
+     * @param defaultValue function of default value
+     * @param <K>          type of keys
+     * @param <V>          type of values
+     * @return option value of specified key in given options, or result of default value if not found
+     */
+    static <K, V> V get(K key, Iterable<? extends GekOption<?, ?>> options, Function<K, V> defaultValue) {
+        if (GekArray.isEmpty(options)) {
+            return defaultValue.apply(key);
+        }
+        for (GekOption<?, ?> option : options) {
+            if (option != null && Objects.equals(option.getKey(), key)) {
+                return Gek.as(option.getValue());
+            }
+        }
+        return defaultValue.apply(key);
     }
 
     /**

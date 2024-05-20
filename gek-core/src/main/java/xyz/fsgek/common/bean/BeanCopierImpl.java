@@ -27,22 +27,22 @@ final class BeanCopierImpl implements GekBeanCopier {
         Type destType = dest.getClass();
         if (GekArray.isNotEmpty(options)) {
             for (GekOption<?,?> option : options) {
-                if (Objects.equals(option.key(), CopyOptions.KEY_OF_BEAN_RESOLVER)) {
-                    resolver = Gek.as(option.value());
-                } else if (Objects.equals(option.key(), CopyOptions.KEY_OF_CONVERTER)) {
-                    converter = Gek.as(option.value());
-                } else if (Objects.equals(option.key(), CopyOptions.KEY_OF_THROW_IF_CONVERT_FAILED)) {
-                    throwIfConversionFailed = Gek.as(option.value());
-                } else if (Objects.equals(option.key(), CopyOptions.KEY_OF_PUT_IF_NOT_CONTAINED)) {
-                    putIfNotContained = Gek.as(option.value());
-                } else if (Objects.equals(option.key(), CopyOptions.KEY_OF_IGNORE_PROPERTIES)) {
-                    ignoreProperties = option.value();
-                } else if (Objects.equals(option.key(), CopyOptions.KEY_OF_IGNORE_NULL)) {
-                    ignoreNull = Gek.as(option.value());
-                }else if (Objects.equals(option.key(), CopyOptions.KEY_OF_SOURCE_TYPE)) {
-                    sourceType = Gek.as(option.value());
-                }else if (Objects.equals(option.key(), CopyOptions.KEY_OF_DEST_TYPE)) {
-                    destType = Gek.as(option.value());
+                if (Objects.equals(option.getKey(), CopyOptions.KEY_OF_BEAN_RESOLVER)) {
+                    resolver = Gek.as(option.getValue());
+                } else if (Objects.equals(option.getKey(), CopyOptions.KEY_OF_CONVERTER)) {
+                    converter = Gek.as(option.getValue());
+                } else if (Objects.equals(option.getKey(), CopyOptions.KEY_OF_THROW_IF_CONVERT_FAILED)) {
+                    throwIfConversionFailed = Gek.as(option.getValue());
+                } else if (Objects.equals(option.getKey(), CopyOptions.KEY_OF_PUT_IF_NOT_CONTAINED)) {
+                    putIfNotContained = Gek.as(option.getValue());
+                } else if (Objects.equals(option.getKey(), CopyOptions.KEY_OF_IGNORE_PROPERTIES)) {
+                    ignoreProperties = option.getValue();
+                } else if (Objects.equals(option.getKey(), CopyOptions.KEY_OF_IGNORE_NULL)) {
+                    ignoreNull = Gek.as(option.getValue());
+                }else if (Objects.equals(option.getKey(), CopyOptions.KEY_OF_SOURCE_TYPE)) {
+                    sourceType = Gek.as(option.getValue());
+                }else if (Objects.equals(option.getKey(), CopyOptions.KEY_OF_DEST_TYPE)) {
+                    destType = Gek.as(option.getValue());
                 }
             }
         }

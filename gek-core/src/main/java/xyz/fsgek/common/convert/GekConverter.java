@@ -7,6 +7,7 @@ import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekObject;
+import xyz.fsgek.common.base.GekOption;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.convert.handlers.*;
 import xyz.fsgek.common.reflect.TypeRef;
@@ -109,6 +110,7 @@ public interface GekConverter {
      * @param <T>    target type
      * @return actual result of conversion
      */
+    @Nullable
     static <T> T getResult(Object result) {
         if (result == null) {
             return null;
@@ -226,7 +228,7 @@ public interface GekConverter {
      * @return converted object or null
      */
     @Nullable
-    default Object convertType(@Nullable Object source, Type sourceType, Type targetType) {
+    default Object convertType(@Nullable Object source, Type sourceType, Type targetType, GekOption<?, ?>... options) {
         for (Handler handler : getHandlers()) {
             Object value = handler.convert(source, sourceType, targetType, this);
             if (value == null || value == GekFlag.CONTINUE) {
