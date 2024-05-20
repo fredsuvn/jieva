@@ -1,19 +1,20 @@
-package xyz.fsgek.common.bean.handlers;
+package xyz.fsgek.common.data.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekCase;
 import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.data.GekDataResolver;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Resolve handler for the classical java bean, of which getters' name are start with:
+ * {@link GekDataResolver.Handler} for the classical java bean, of which getters' name are start with:
  * <ul>
- *     <li>"get" -- for non-boolean return type;</li>
- *     <li>"set" -- for boolean return type;</li>
+ *     <li>"get" -- for non-boolean returned type;</li>
+ *     <li>"is" -- for boolean returned type;</li>
  * </ul>
  * and setters' name are start with "set".
  *

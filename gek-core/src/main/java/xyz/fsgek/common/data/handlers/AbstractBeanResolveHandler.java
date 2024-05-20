@@ -1,11 +1,11 @@
-package xyz.fsgek.common.bean.handlers;
+package xyz.fsgek.common.data.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekFlag;
-import xyz.fsgek.common.bean.GekBeanException;
-import xyz.fsgek.common.bean.GekBeanResolver;
-import xyz.fsgek.common.bean.GekPropertyBase;
 import xyz.fsgek.common.collect.GekColl;
+import xyz.fsgek.common.data.GekBeanException;
+import xyz.fsgek.common.data.GekDataResolver;
+import xyz.fsgek.common.data.GekPropertyBase;
 import xyz.fsgek.common.invoke.GekInvoker;
 import xyz.fsgek.common.reflect.GekReflect;
 
@@ -17,7 +17,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 /**
- * Base abstract bean resolve handler, provides a skeletal implementation of the {@link GekBeanResolver.Handler}
+ * Base abstract data object resolve handler, provides a skeletal implementation of the {@link GekDataResolver.Handler}
  * to minimize the effort required to implement the interface backed by "method-based" getters/setters.
  * <p>
  * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
@@ -29,14 +29,14 @@ import java.util.*;
  *
  * @author fredsuvn
  */
-public abstract class AbstractBeanResolveHandler implements GekBeanResolver.Handler {
+public abstract class AbstractBeanResolveHandler implements GekDataResolver.Handler {
 
     @Override
-    public @Nullable GekFlag resolve(GekBeanResolver.ResolveContext context) {
-        Type type = context.beanType();
+    public @Nullable GekFlag resolve(GekDataResolver.Context context) {
+        Type type = context.getType();
         Class<?> rawType = GekReflect.getRawType(type);
         if (rawType == null) {
-            throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType.");
+            throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType: " + type + ".");
         }
         Method[] methods = rawType.getMethods();
         Map<TypeVariable<?>, Type> typeParameterMapping = GekReflect.getTypeParameterMapping(type);
@@ -72,14 +72,14 @@ public abstract class AbstractBeanResolveHandler implements GekBeanResolver.Hand
                 }
             }
             Field field = findField(name, rawType);
-            context.beanProperties().put(name, new PropertyBaseImpl(name, getter, setter, field, returnType));
+            context.getProperties().put(name, new PropertyBaseImpl(name, getter, setter, field, returnType));
             setters.remove(name);
         });
         setters.forEach((name, setter) -> {
             Field field = findField(name, rawType);
             Type setType = setter.getGenericParameterTypes()[0];
             setType = getActualType(setType, typeParameterMapping, stack);
-            context.beanProperties().put(name, new PropertyBaseImpl(name, null, setter, field, setType));
+            context.getProperties().put(name, new PropertyBaseImpl(name, null, setter, field, setType));
         });
         return null;
     }
@@ -197,19 +197,19 @@ public abstract class AbstractBeanResolveHandler implements GekBeanResolver.Hand
         }
 
         @Override
-        public @Nullable Object getValue(Object bean) {
+        public @Nullable Object getValue(Object data) {
             if (getterInvoker == null) {
                 throw new GekBeanException("Property is not readable: " + name + ".");
             }
-            return getterInvoker.invoke(bean);
+            return getterInvoker.invoke(data);
         }
 
         @Override
-        public void setValue(Object bean, @Nullable Object value) {
+        public void setValue(Object data, @Nullable Object value) {
             if (setterInvoker == null) {
                 throw new GekBeanException("Property is not writeable: " + name + ".");
             }
-            setterInvoker.invoke(bean, value);
+            setterInvoker.invoke(data, value);
         }
 
         @Override

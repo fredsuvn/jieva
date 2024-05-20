@@ -1,4 +1,4 @@
-package xyz.fsgek.common.bean;
+package xyz.fsgek.common.data;
 
 import xyz.fsgek.annotations.Immutable;
 import xyz.fsgek.annotations.Nullable;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Base info of {@link GekProperty}.
+ * Base info of {@link GekPropertyDescriptor}.
  * It should be immutable and thread-safe.
  *
  * @author fredsuvn
@@ -30,21 +30,21 @@ public interface GekPropertyBase {
     String getName();
 
     /**
-     * Returns property value of given bean instance.
+     * Returns property value of given data object.
      *
-     * @param bean given bean instance
-     * @return property value of given bean instance
+     * @param data given data object
+     * @return property value of given data object
      */
     @Nullable
-    Object getValue(Object bean);
+    Object getValue(Object data);
 
     /**
-     * Sets property value of given bean instance.
+     * Sets property value of given data object.
      *
-     * @param bean  given bean instance
+     * @param data  given data object
      * @param value property value
      */
-    void setValue(Object bean, @Nullable Object value);
+    void setValue(Object data, @Nullable Object value);
 
     /**
      * Returns type of this property.

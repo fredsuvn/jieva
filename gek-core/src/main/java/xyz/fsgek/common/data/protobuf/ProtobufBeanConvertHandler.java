@@ -2,7 +2,7 @@ package xyz.fsgek.common.data.protobuf;
 
 import com.google.protobuf.Message;
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.bean.GekBeanResolver;
+import xyz.fsgek.common.data.GekDataResolver;
 import xyz.fsgek.common.convert.GekConvertException;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.convert.handlers.BeanConvertHandler;
@@ -27,7 +27,7 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
     /**
      * Constructs with {@link GekProtobuf#protobufBeanCopier()}.
      *
-     * @see #ProtobufBeanConvertHandler(GekBeanResolver)
+     * @see #ProtobufBeanConvertHandler(GekDataResolver)
      */
     public ProtobufBeanConvertHandler() {
         this(GekProtobuf.protobufBeanResolver());
@@ -38,7 +38,7 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
      *
      * @param resolver given object converter
      */
-    public ProtobufBeanConvertHandler(GekBeanResolver resolver) {
+    public ProtobufBeanConvertHandler(GekDataResolver resolver) {
         super(resolver);
     }
 

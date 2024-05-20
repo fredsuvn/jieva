@@ -3,9 +3,6 @@ package xyz.fsgek.common.data;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekOption;
-import xyz.fsgek.common.bean.GekBean;
-import xyz.fsgek.common.bean.GekBeanResolver;
-import xyz.fsgek.common.bean.GekProperty;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.reflect.GekParamType;
@@ -107,9 +104,9 @@ final class CopierImpl implements GekDataCopier {
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
         Map<Object, Object> sourceMap = Gek.as(source);
-        GekBeanResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekBeanResolver.defaultResolver(), options);
-        GekBean destData = resolver.resolve(destType);
-        Map<String, GekProperty> destProperties = destData.getProperties();
+        GekDataResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekDataResolver.defaultResolver(), options);
+        GekDataDescriptor destData = resolver.resolve(destType);
+        Map<String, GekPropertyDescriptor> destProperties = destData.getProperties();
         GekConverter converter = GekOption.get(GekDataOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
         Object ignoredProperties = GekOption.get(GekDataOption.Key.IGNORED_PROPERTIES, options);
         Object ignoreNull = GekOption.get(GekDataOption.Key.IGNORE_NULL, options);
@@ -130,7 +127,7 @@ final class CopierImpl implements GekDataCopier {
                 }
             }
             String destName = destKey.toString();
-            GekProperty destProperty = destProperties.get(destName);
+            GekPropertyDescriptor destProperty = destProperties.get(destName);
             if (destProperty == null) {
                 return;
             }
@@ -152,9 +149,9 @@ final class CopierImpl implements GekDataCopier {
         @Nullable Object dest, Type destType,
         GekOption<?, ?>... options
     ) {
-        GekBeanResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekBeanResolver.defaultResolver(), options);
-        GekBean sourceData = resolver.resolve(sourceType);
-        Map<String, GekProperty> sourceProperties = sourceData.getProperties();
+        GekDataResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekDataResolver.defaultResolver(), options);
+        GekDataDescriptor sourceData = resolver.resolve(sourceType);
+        Map<String, GekPropertyDescriptor> sourceProperties = sourceData.getProperties();
         GekParamType destParamType = GekReflect.getGenericSuperType(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
@@ -203,11 +200,11 @@ final class CopierImpl implements GekDataCopier {
         @Nullable Object dest, Type destType,
         GekOption<?, ?>... options
     ) {
-        GekBeanResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekBeanResolver.defaultResolver(), options);
-        GekBean sourceData = resolver.resolve(sourceType);
-        Map<String, GekProperty> sourceProperties = sourceData.getProperties();
-        GekBean destData = resolver.resolve(destType);
-        Map<String, GekProperty> destProperties = destData.getProperties();
+        GekDataResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekDataResolver.defaultResolver(), options);
+        GekDataDescriptor sourceData = resolver.resolve(sourceType);
+        Map<String, GekPropertyDescriptor> sourceProperties = sourceData.getProperties();
+        GekDataDescriptor destData = resolver.resolve(destType);
+        Map<String, GekPropertyDescriptor> destProperties = destData.getProperties();
         GekConverter converter = GekOption.get(GekDataOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
         Object ignoredProperties = GekOption.get(GekDataOption.Key.IGNORED_PROPERTIES, options);
         Object ignoreNull = GekOption.get(GekDataOption.Key.IGNORE_NULL, options);
@@ -220,7 +217,7 @@ final class CopierImpl implements GekDataCopier {
             if (value == null && ignoreNull != null && Objects.equals(true, ignoreNull)) {
                 return;
             }
-            GekProperty destProperty = destProperties.get(name);
+            GekPropertyDescriptor destProperty = destProperties.get(name);
             if (destProperty == null) {
                 return;
             }

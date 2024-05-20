@@ -2,8 +2,6 @@ package xyz.fsgek.common.data;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekOption;
-import xyz.fsgek.common.bean.GekBeanResolver;
-import xyz.fsgek.common.bean.GekProperty;
 import xyz.fsgek.common.convert.GekConverter;
 
 import java.lang.reflect.Type;
@@ -37,8 +35,8 @@ public interface GekDataCopier {
      *         The types specified by params {@code sourceType} and {@code destType};
      *     </li>
      *     <li>
-     *         For common data object, it will be resolved by {@link GekBeanResolver} first, type of properties' names
-     *         is {@link String} and types of properties' values are come from {@link GekProperty#getType()};
+     *         For common data object, it will be resolved by {@link GekDataResolver} first, type of properties' names
+     *         is {@link String} and types of properties' values are come from {@link GekPropertyDescriptor#getType()};
      *     </li>
      *     <li>
      *         For {@link Map} object, type of properties' names and values are come from {@code destType};
@@ -46,7 +44,7 @@ public interface GekDataCopier {
      *     <li>
      *         Options are specified by {@link GekDataOption}, including:
      *         <ul>
-     *             <li>{@link GekDataOption#resolver(GekBeanResolver)}</li>
+     *             <li>{@link GekDataOption#resolver(GekDataResolver)}</li>
      *             <li>{@link GekDataOption#converter(GekConverter)}</li>
      *             <li>{@link GekDataOption#ignoredProperties(Object...)}, {@link GekDataOption#ignoredProperties(Iterable)}</li>
      *             <li>{@link GekDataOption#ignoreNull(boolean)}</li>

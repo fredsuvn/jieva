@@ -1,7 +1,6 @@
 package xyz.fsgek.common.data;
 
 import xyz.fsgek.common.base.GekOption;
-import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.convert.GekConvertException;
 import xyz.fsgek.common.convert.GekConverter;
 
@@ -18,8 +17,8 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
     enum Key {
 
         /**
-         * To specify the {@link GekBeanResolver}.
-         * Default is {@link GekBeanResolver#defaultResolver()}.
+         * To specify the {@link GekDataResolver}.
+         * Default is {@link GekDataResolver#defaultResolver()}.
          */
         RESOLVER,
 
@@ -54,13 +53,13 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
     }
 
     /**
-     * Option to specify the {@link GekBeanResolver}.
-     * Default is {@link GekBeanResolver#defaultResolver()}.
+     * Option to specify the {@link GekDataResolver}.
+     * Default is {@link GekDataResolver#defaultResolver()}.
      *
      * @param resolver data resolver
-     * @return option to specify the {@link GekBeanResolver}
+     * @return option to specify the {@link GekDataResolver}
      */
-    static GekDataOption resolver(GekBeanResolver resolver) {
+    static GekDataOption resolver(GekDataResolver resolver) {
         return Impls.newGekDataOption(Key.RESOLVER, resolver);
     }
 

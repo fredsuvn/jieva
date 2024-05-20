@@ -5,9 +5,9 @@ import com.google.protobuf.Message;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.bean.GekBeanException;
-import xyz.fsgek.common.bean.GekBeanResolver;
-import xyz.fsgek.common.bean.GekPropertyBase;
+import xyz.fsgek.common.data.GekBeanException;
+import xyz.fsgek.common.data.GekDataResolver;
+import xyz.fsgek.common.data.GekPropertyBase;
 import xyz.fsgek.common.convert.GekConvertException;
 import xyz.fsgek.common.invoke.GekInvoker;
 import xyz.fsgek.common.reflect.GekReflect;
@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
-public class ProtobufResolveHandler implements GekBeanResolver.Handler {
+public class ProtobufResolveHandler implements GekDataResolver.Handler {
 
     /**
      * An instance.
@@ -35,9 +35,9 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
     public static final ProtobufResolveHandler INSTANCE = new ProtobufResolveHandler();
 
     @Override
-    public @Nullable GekFlag resolve(GekBeanResolver.ResolveContext context) {
+    public @Nullable GekFlag resolve(GekDataResolver.Context context) {
         try {
-            Class<?> rawType = GekReflect.getRawType(context.beanType());
+            Class<?> rawType = GekReflect.getRawType(context.getType());
             if (rawType == null) {
                 return null;
             }
@@ -58,7 +58,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
             Descriptors.Descriptor descriptor = (Descriptors.Descriptor) getDescriptorMethod.invoke(null);
             for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
                 GekPropertyBase propBase = buildProperty(context, field, rawType, isBuilder);
-                context.beanProperties().put(propBase.getName(), propBase);
+                context.getProperties().put(propBase.getName(), propBase);
             }
             return GekFlag.BREAK;
         } catch (GekConvertException e) {
@@ -69,7 +69,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
     }
 
     private GekPropertyBase buildProperty(
-        GekBeanResolver.ResolveContext builder,
+        GekDataResolver.Context builder,
         Descriptors.FieldDescriptor field,
         Class<?> rawClass,
         boolean isBuilder
@@ -177,16 +177,16 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
         }
 
         @Override
-        public @Nullable Object getValue(Object bean) {
-            return getter.invoke(bean);
+        public @Nullable Object getValue(Object data) {
+            return getter.invoke(data);
         }
 
         @Override
-        public void setValue(Object bean, @Nullable Object value) {
+        public void setValue(Object data, @Nullable Object value) {
             if (setter == null) {
                 throw new GekBeanException("Not writeable.");
             }
-            setter.invoke(bean, value);
+            setter.invoke(data, value);
         }
 
         @Override

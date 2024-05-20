@@ -1,4 +1,4 @@
-package xyz.fsgek.common.bean.handlers;
+package xyz.fsgek.common.data.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekCase;

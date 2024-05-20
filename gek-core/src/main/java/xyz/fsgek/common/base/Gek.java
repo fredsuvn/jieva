@@ -1,8 +1,7 @@
 package xyz.fsgek.common.base;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.bean.GekBean;
-import xyz.fsgek.common.bean.GekBeanCopier;
+import xyz.fsgek.common.data.GekDataDescriptor;
 import xyz.fsgek.common.collect.GekArray;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.collect.GekCollector;
@@ -460,18 +459,18 @@ public class Gek {
     }
 
     /**
-     * Resolves given object to {@link GekBean}.
-     * If the object is an instance of {@link Map}, call {@link GekBean#wrap(Map)},
-     * otherwise call {@link GekBean#resolve(Type)}.
+     * Resolves given object to {@link GekDataDescriptor}.
+     * If the object is an instance of {@link Map}, call {@link GekDataDescriptor#wrap(Map)},
+     * otherwise call {@link GekDataDescriptor#resolve(Type)}.
      *
      * @param obj given object
-     * @return {@link GekBean} of given object
+     * @return {@link GekDataDescriptor} of given object
      */
-    public static GekBean toBean(Object obj) {
+    public static GekDataDescriptor toBean(Object obj) {
         if (obj instanceof Map) {
-            return GekBean.wrap(Gek.as(obj));
+            return GekDataDescriptor.wrap(Gek.as(obj));
         }
-        return GekBean.resolve(obj.getClass());
+        return GekDataDescriptor.resolve(obj.getClass());
     }
 
     /**

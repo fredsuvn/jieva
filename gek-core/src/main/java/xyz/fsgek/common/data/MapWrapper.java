@@ -1,4 +1,4 @@
-package xyz.fsgek.common.bean;
+package xyz.fsgek.common.data;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
@@ -13,7 +13,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBean {
+final class MapWrapper extends AbstractMap<String, GekPropertyDescriptor> implements GekDataDescriptor {
 
     private static final Type DEFAULT_MAP_BEAN_TYPE = new TypeRef<Map<String, ?>>() {
     }.getType();
@@ -46,7 +46,7 @@ final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBe
     }
 
     @Override
-    public Map<String, GekProperty> getProperties() {
+    public Map<String, GekPropertyDescriptor> getProperties() {
         return this;
     }
 
@@ -66,31 +66,31 @@ final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBe
     }
 
     @Override
-    public GekProperty get(Object key) {
+    public GekPropertyDescriptor get(Object key) {
         if (!source.containsKey(key)) {
             return null;
         }
-        return new PropertyWrapper(key.toString());
+        return new PropertyDescriptorWrapper(key.toString());
     }
 
     @Override
-    public Set<Entry<String, GekProperty>> entrySet() {
+    public Set<Entry<String, GekPropertyDescriptor>> entrySet() {
         return Gek.as(source.entrySet().stream().map(
-                it -> new SimpleImmutableEntry<>(it.getKey(), new PropertyWrapper(it.toString())))
+                it -> new SimpleImmutableEntry<>(it.getKey(), new PropertyDescriptorWrapper(it.toString())))
             .collect(Collectors.toSet())
         );
     }
 
     @Override
     public String toString() {
-        return GekBean.toString(this);
+        return GekDataDescriptor.toString(this);
     }
 
-    final class PropertyWrapper implements GekProperty {
+    final class PropertyDescriptorWrapper implements GekPropertyDescriptor {
 
         private final String key;
 
-        private PropertyWrapper(String key) {
+        private PropertyDescriptorWrapper(String key) {
             this.key = key;
         }
 
@@ -100,12 +100,12 @@ final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBe
         }
 
         @Override
-        public @Nullable Object getValue(Object bean) {
+        public @Nullable Object getValue(Object data) {
             return source.get(key);
         }
 
         @Override
-        public void setValue(Object bean, @Nullable Object value) {
+        public void setValue(Object data, @Nullable Object value) {
             source.put(key, Gek.as(value));
         }
 
@@ -156,7 +156,7 @@ final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBe
         }
 
         @Override
-        public GekBean getOwner() {
+        public GekDataDescriptor getOwner() {
             return MapWrapper.this;
         }
 
@@ -172,17 +172,17 @@ final class MapWrapper extends AbstractMap<String, GekProperty> implements GekBe
 
         @Override
         public boolean equals(Object o) {
-            return GekProperty.equals(this, o);
+            return GekPropertyDescriptor.equals(this, o);
         }
 
         @Override
         public int hashCode() {
-            return GekProperty.hashCode(this);
+            return GekPropertyDescriptor.hashCode(this);
         }
 
         @Override
         public String toString() {
-            return GekProperty.toString(this);
+            return GekPropertyDescriptor.toString(this);
         }
     }
 }

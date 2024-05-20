@@ -1,7 +1,6 @@
 package xyz.fsgek.common.data.protobuf;
 
-import xyz.fsgek.common.bean.GekBeanCopier;
-import xyz.fsgek.common.bean.GekBeanResolver;
+import xyz.fsgek.common.data.GekDataResolver;
 import xyz.fsgek.common.convert.GekConverter;
 
 /**
@@ -10,19 +9,19 @@ import xyz.fsgek.common.convert.GekConverter;
  */
 public class GekProtobuf {
 
-    private static final GekBeanResolver RESOLVER = GekBeanResolver.defaultResolver()
-        .insertFirstHandler(ProtobufResolveHandler.INSTANCE);
+    private static final GekDataResolver RESOLVER = GekDataResolver.defaultResolver()
+        .withFirstHandler(ProtobufResolveHandler.INSTANCE);
     private static final GekConverter CONVERTER = GekConverter.defaultConverter()
         .insertFirstMiddleHandler(ByteStringConvertHandler.INSTANCE)
         .withSuffixHandler(ProtobufBeanConvertHandler.INSTANCE);
     private static final GekBeanCopier COPIER = ProtobufBeanConvertHandler.INSTANCE.getCopier();
 
     /**
-     * Returns bean resolver supports protobuf based on {@link GekBeanResolver#defaultResolver()}.
+     * Returns bean resolver supports protobuf based on {@link GekDataResolver#defaultResolver()}.
      *
-     * @return bean resolver supports protobuf based on {@link GekBeanResolver#defaultResolver()}
+     * @return bean resolver supports protobuf based on {@link GekDataResolver#defaultResolver()}
      */
-    public static GekBeanResolver protobufBeanResolver() {
+    public static GekDataResolver protobufBeanResolver() {
         return RESOLVER;
     }
 
