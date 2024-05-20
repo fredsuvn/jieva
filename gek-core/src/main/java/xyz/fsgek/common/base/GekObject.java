@@ -35,7 +35,7 @@ public interface GekObject {
      * @return an instance of {@link GekObject} of specified value and type
      */
     static GekObject of(@Nullable Object value, Type type) {
-        return BaseImpls.newGekObject(value, type);
+        return Impls.newGekObject(value, type);
     }
 
     /**
@@ -44,7 +44,7 @@ public interface GekObject {
      * @return an instance of {@link GekObject} of null value and type of {@code Object.class}
      */
     static GekObject empty() {
-        return BaseImpls.nullGekObject();
+        return Impls.nullGekObject();
     }
 
     /**

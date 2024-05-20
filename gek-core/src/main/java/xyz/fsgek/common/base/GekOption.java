@@ -1,7 +1,5 @@
 package xyz.fsgek.common.base;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.collect.GekArray;
 
@@ -20,9 +18,17 @@ import java.util.Objects;
 public interface GekOption<K, V> {
 
     /**
-     * Empty option array.
+     * Returns an option instance of given key and value.
+     *
+     * @param key   given key
+     * @param value given value
+     * @param <K>   type of keys
+     * @param <V>   type of values
+     * @return an option instance of given key and value
      */
-    GekOption<?, ?>[] EMPTY_OPTIONS = new GekOption<?, ?>[0];
+    static <K, V> GekOption<K, V> of(K key, V value) {
+        return Impls.newGekOption(key, value);
+    }
 
     /**
      * Returns empty option array;
@@ -32,7 +38,7 @@ public interface GekOption<K, V> {
      * @return empty option array
      */
     static <K, V> GekOption<K, V>[] emptyOptions() {
-        return Gek.as(EMPTY_OPTIONS);
+        return Gek.as(Impls.EMPTY_OPTIONS);
     }
 
     /**
@@ -50,38 +56,11 @@ public interface GekOption<K, V> {
             return null;
         }
         for (GekOption<?, ?> option : options) {
-            if (option != null && Objects.equals(option.key(), key)) {
-                return Gek.as(option.value());
+            if (option != null && Objects.equals(option.getKey(), key)) {
+                return Gek.as(option.getValue());
             }
         }
         return null;
-    }
-
-    /**
-     * Returns an option instance of given key and value.
-     *
-     * @param key   given key
-     * @param value given value
-     * @param <K>   type of keys
-     * @param <V>   type of values
-     * @return an option instance of given key and value
-     */
-    static <K, V> GekOption<K, V> of(K key, V value) {
-        @Data
-        @EqualsAndHashCode
-        final class Impl implements GekOption<K, V> {
-
-            @Override
-            public K key() {
-                return key;
-            }
-
-            @Override
-            public V value() {
-                return value;
-            }
-        }
-        return new Impl();
     }
 
     /**
@@ -89,12 +68,12 @@ public interface GekOption<K, V> {
      *
      * @return key
      */
-    K key();
+    K getKey();
 
     /**
      * Returns value.
      *
      * @return value
      */
-    V value();
+    V getValue();
 }
