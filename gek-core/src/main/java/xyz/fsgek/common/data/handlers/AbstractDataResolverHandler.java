@@ -2,6 +2,7 @@ package xyz.fsgek.common.data.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekFlag;
+import xyz.fsgek.common.base.GekRuntimeException;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.data.GekBeanException;
 import xyz.fsgek.common.data.GekDataResolver;
@@ -21,15 +22,13 @@ import java.util.*;
  * to minimize the effort required to implement the interface backed by "method-based" getters/setters.
  * <p>
  * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
- * {@link #isGetter(Method)} and {@link #isSetter(Method)} method to determine whether it is a getter/setting.
- * If it is, it will be wrapped to a property.
- * <p>
- * {@link #buildMethodInvoker(Method)} can be overridden to build custom method invoker.
- * Default is {@link GekInvoker#reflectMethod(Method)}.
+ * {@link #resolveGetter(Method)} and {@link #resolveSetter(Method)} method to determine whether it is a getter/setter.
+ * If it is, it will be resolved to a property descriptor. Subtypes can use {@link #buildGetter(String, Method)} and
+ * {@link #buildSetter(String, Method)} to create getter/setter.
  *
  * @author fredsuvn
  */
-public abstract class AbstractBeanResolveHandler implements GekDataResolver.Handler {
+public abstract class AbstractDataResolverHandler implements GekDataResolver.Handler {
 
     @Override
     public @Nullable GekFlag resolve(GekDataResolver.Context context) {
@@ -39,23 +38,31 @@ public abstract class AbstractBeanResolveHandler implements GekDataResolver.Hand
             throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType: " + type + ".");
         }
         Method[] methods = rawType.getMethods();
-        Map<TypeVariable<?>, Type> typeParameterMapping = GekReflect.getTypeParameterMapping(type);
         Map<String, Method> getters = new LinkedHashMap<>();
         Map<String, Method> setters = new LinkedHashMap<>();
         for (Method method : methods) {
             if (method.isBridge()) {
                 continue;
             }
-            String propertyName = isGetter(method);
-            if (propertyName != null) {
-                getters.put(propertyName, method);
+            Getter getter = resolveGetter(method);
+            if (getter != null) {
+                getters.put(getter.getName(), method);
                 continue;
             }
-            propertyName = isSetter(method);
-            if (propertyName != null) {
-                setters.put(propertyName, method);
+            Setter setter = resolveSetter(method);
+            if (setter != null) {
+                setters.put(setter.getName(), method);
             }
         }
+        if (GekColl.isNotEmpty(getters) || GekColl.isNotEmpty(setters)) {
+            mergeAccessors(context, getters, setters, rawType);
+        }
+        return null;
+    }
+
+    private void mergeAccessors(
+        GekDataResolver.Context context, Map<String, Method> getters, Map<String, Method> setters, Class<?> rawType) {
+        Map<TypeVariable<?>, Type> typeParameterMapping = GekReflect.getTypeParameterMapping(context.getType());
         Set<Type> stack = new HashSet<>();
         getters.forEach((name, getter) -> {
             Method setter = setters.get(name);
@@ -68,50 +75,58 @@ public abstract class AbstractBeanResolveHandler implements GekDataResolver.Hand
                 Type setType = setter.getGenericParameterTypes()[0];
                 setType = getActualType(setType, typeParameterMapping, stack);
                 if (!Objects.equals(returnType, setType)) {
+                    // Different returned type and set type.
                     return;
                 }
             }
-            Field field = findField(name, rawType);
-            context.getProperties().put(name, new PropertyBaseImpl(name, getter, setter, field, returnType));
+            context.getProperties().put(name, new PropertyBaseImpl(name, getter, setter, returnType, rawType));
             setters.remove(name);
         });
         setters.forEach((name, setter) -> {
-            Field field = findField(name, rawType);
             Type setType = setter.getGenericParameterTypes()[0];
             setType = getActualType(setType, typeParameterMapping, stack);
-            context.getProperties().put(name, new PropertyBaseImpl(name, null, setter, field, setType));
+            context.getProperties().put(name, new PropertyBaseImpl(name, null, setter, setType, rawType));
         });
-        return null;
     }
 
     /**
-     * Whether given method is a getter.
-     * If it is, return name of this property, or null if it is not
+     * Resolves and returns given method as a getter, or null if given method is not a getter.
      *
      * @param method given method
-     * @return whether given method is a getter
+     * @return given method as a getter
      */
     @Nullable
-    protected abstract String isGetter(Method method);
+    protected abstract Getter resolveGetter(Method method);
 
     /**
-     * Whether given method is a setter.
-     * If it is, return name of this property, or null if it is not
+     * Resolves and returns given method as a setter, or null if given method is not a setter.
      *
      * @param method given method
-     * @return whether given method is a setter
+     * @return given method as a setter
      */
     @Nullable
-    protected abstract String isSetter(Method method);
+    protected abstract Setter resolveSetter(Method method);
 
     /**
-     * Builds invoker of given getter/setter.
+     * Builds a getter.
      *
-     * @param method given getter/setter
-     * @return built invoker
+     * @param name   name of getter
+     * @param method source method
+     * @return a getter
      */
-    protected GekInvoker buildMethodInvoker(Method method) {
-        return GekInvoker.reflectMethod(method);
+    protected Getter buildGetter(String name, Method method) {
+        return () -> name;
+    }
+
+    /**
+     * Builds a setter.
+     *
+     * @param name   name of setter
+     * @param method source method
+     * @return a setter
+     */
+    protected Setter buildSetter(String name, Method method) {
+        return () -> name;
     }
 
     private Type getActualType(Type type, Map<TypeVariable<?>, Type> typeParameterMapping, Set<Type> stack) {
@@ -126,47 +141,62 @@ public abstract class AbstractBeanResolveHandler implements GekDataResolver.Hand
         return result;
     }
 
-    @Nullable
-    private Field findField(String name, Class<?> type) {
-        try {
-            return type.getField(name);
-        } catch (NoSuchFieldException e) {
-            Class<?> cur = type;
-            while (cur != null) {
-                try {
-                    return cur.getDeclaredField(name);
-                } catch (NoSuchFieldException ex) {
-                    cur = cur.getSuperclass();
-                }
-            }
-        }
-        return null;
+    /**
+     * Getter info.
+     */
+    public interface Getter {
+        /**
+         * Returns name of this getter.
+         *
+         * @return name of this getter
+         */
+        String getName();
     }
 
-    private final class PropertyBaseImpl implements GekPropertyBase {
+    /**
+     * Setter info.
+     */
+    public interface Setter {
+        /**
+         * Returns name of this setter.
+         *
+         * @return name of this setter
+         */
+        String getName();
+    }
+
+    private static final class PropertyBaseImpl implements GekPropertyBase {
+
+        private static final Field EMPTY;
+
+        static {
+            try {
+                EMPTY = PropertyBaseImpl.class.getDeclaredField("EMPTY");
+            } catch (NoSuchFieldException e) {
+                throw new GekRuntimeException(e);
+            }
+        }
 
         private final String name;
         private final Method getter;
         private final Method setter;
-        private final Field field;
         private final Type type;
+        private final Class<?> rawType;
         private final GekInvoker getterInvoker;
         private final GekInvoker setterInvoker;
-        private final List<Annotation> getterAnnotations;
-        private final List<Annotation> setterAnnotations;
-        private final List<Annotation> fieldAnnotations;
-        private final List<Annotation> allAnnotations;
+        private Field field;
+        private List<Annotation> getterAnnotations;
+        private List<Annotation> setterAnnotations;
+        private List<Annotation> fieldAnnotations;
+        private List<Annotation> allAnnotations;
 
         private PropertyBaseImpl(
-            String name,
-            @Nullable Method getter, @Nullable Method setter,
-            @Nullable Field field, Type type
-        ) {
+            String name, @Nullable Method getter, @Nullable Method setter, Type type, Class<?> rawType) {
             this.name = name;
             this.getter = getter;
             this.setter = setter;
-            this.field = field;
             this.type = type;
+            this.rawType = rawType;
             if (getter != null) {
                 getterInvoker = buildMethodInvoker(getter);
             } else {
@@ -177,18 +207,6 @@ public abstract class AbstractBeanResolveHandler implements GekDataResolver.Hand
             } else {
                 setterInvoker = null;
             }
-            getterAnnotations = getter == null ? Collections.emptyList() :
-                Collections.unmodifiableList(Arrays.asList(getter.getAnnotations()));
-            setterAnnotations = setter == null ? Collections.emptyList() :
-                Collections.unmodifiableList(Arrays.asList(setter.getAnnotations()));
-            fieldAnnotations = field == null ? Collections.emptyList() :
-                Collections.unmodifiableList(Arrays.asList(field.getAnnotations()));
-            List<Annotation> annotations = new ArrayList<>(
-                getterAnnotations.size() + setterAnnotations.size() + fieldAnnotations.size());
-            annotations.addAll(getterAnnotations);
-            annotations.addAll(setterAnnotations);
-            annotations.addAll(fieldAnnotations);
-            allAnnotations = Collections.unmodifiableList(annotations);
         }
 
         @Override
@@ -229,26 +247,50 @@ public abstract class AbstractBeanResolveHandler implements GekDataResolver.Hand
 
         @Override
         public @Nullable Field getField() {
-            return field;
+            if (field == null) {
+                field = findField(name, rawType);
+            }
+            return field == EMPTY ? null : field;
         }
 
         @Override
         public List<Annotation> getGetterAnnotations() {
+            if (getterAnnotations == null) {
+                getterAnnotations = getter == null ? Collections.emptyList() :
+                    Collections.unmodifiableList(Arrays.asList(getter.getAnnotations()));
+            }
             return getterAnnotations;
         }
 
         @Override
         public List<Annotation> getSetterAnnotations() {
+            if (setterAnnotations == null) {
+                setterAnnotations = setter == null ? Collections.emptyList() :
+                    Collections.unmodifiableList(Arrays.asList(setter.getAnnotations()));
+            }
             return setterAnnotations;
         }
 
         @Override
         public List<Annotation> getFieldAnnotations() {
+            if (fieldAnnotations == null) {
+                Field field = getField();
+                fieldAnnotations = field == null ? Collections.emptyList() :
+                    Collections.unmodifiableList(Arrays.asList(field.getAnnotations()));
+            }
             return fieldAnnotations;
         }
 
         @Override
         public List<Annotation> getAnnotations() {
+            if (allAnnotations == null) {
+                List<Annotation> annotations = new ArrayList<>(
+                    getGetterAnnotations().size() + getSetterAnnotations().size() + getFieldAnnotations().size());
+                annotations.addAll(getGetterAnnotations());
+                annotations.addAll(getSetterAnnotations());
+                annotations.addAll(getFieldAnnotations());
+                allAnnotations = Collections.unmodifiableList(annotations);
+            }
             return allAnnotations;
         }
 
@@ -260,6 +302,26 @@ public abstract class AbstractBeanResolveHandler implements GekDataResolver.Hand
         @Override
         public boolean isWriteable() {
             return setterInvoker != null;
+        }
+
+        private GekInvoker buildMethodInvoker(Method method) {
+            return GekInvoker.reflectMethod(method);
+        }
+
+        private Field findField(String name, Class<?> type) {
+            try {
+                return type.getField(name);
+            } catch (NoSuchFieldException e) {
+                Class<?> cur = type;
+                while (cur != null) {
+                    try {
+                        return cur.getDeclaredField(name);
+                    } catch (NoSuchFieldException ex) {
+                        cur = cur.getSuperclass();
+                    }
+                }
+            }
+            return EMPTY;
         }
     }
 }

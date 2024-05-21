@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.cache.GekCache;
-import xyz.fsgek.common.data.handlers.JavaBeanResolveHandler;
+import xyz.fsgek.common.data.handlers.JavaBeanResolverHandler;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -13,7 +13,7 @@ import java.util.Collections;
 final class Impls {
 
     static ResolverImpl DEFAULT_RESOLVER = new ResolverImpl(
-        Collections.singletonList(JavaBeanResolveHandler.INSTANCE), GekCache.softCache()
+        Collections.singletonList(JavaBeanResolverHandler.INSTANCE), GekCache.softCache()
     );
 
     static CopierImpl DEFAULT_COPIER = new CopierImpl();

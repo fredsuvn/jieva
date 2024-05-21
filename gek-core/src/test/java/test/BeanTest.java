@@ -10,8 +10,8 @@ import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekLog;
-import xyz.fsgek.common.data.handlers.JavaBeanResolveHandler;
-import xyz.fsgek.common.data.handlers.RecordBeanResolveHandler;
+import xyz.fsgek.common.data.handlers.JavaBeanResolverHandler;
+import xyz.fsgek.common.data.handlers.NonGetterPrefixResolverHandler;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.data.GekDataDescriptor;
 import xyz.fsgek.common.data.GekDataResolver;
@@ -158,7 +158,7 @@ public class BeanTest {
         GekDataDescriptor ccBean2 = GekDataDescriptor.resolve(ccType);
         Assert.assertSame(ccBean1, ccBean2);
         GekDataResolver resolver = GekDataResolver.newResolver(
-            Collections.singletonList(new JavaBeanResolveHandler()),
+            Collections.singletonList(new JavaBeanResolverHandler()),
             null
         );
         GekDataDescriptor ccBean3 = resolver.resolve(ccType);
@@ -179,7 +179,7 @@ public class BeanTest {
         Assert.assertTrue(aaa.getProperty("aaa").isWriteable());
         Assert.assertFalse(aaa.getProperty("bbb").isReadable());
         Assert.assertTrue(aaa.getProperty("bbb").isWriteable());
-        GekDataDescriptor bbb = GekDataResolver.newResolver(RecordBeanResolveHandler.INSTANCE).resolve(TestHandler.class);
+        GekDataDescriptor bbb = GekDataResolver.newResolver(NonGetterPrefixResolverHandler.INSTANCE).resolve(TestHandler.class);
         Assert.assertEquals(bbb.getProperties().size(), 3);
         Assert.assertNotNull(bbb.getProperty("aaa"));
         Assert.assertNotNull(bbb.getProperty("bbb"));

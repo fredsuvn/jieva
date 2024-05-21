@@ -5,9 +5,10 @@ import xyz.fsgek.annotations.ThreadSafe;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.cache.GekCache;
 import xyz.fsgek.common.collect.GekArray;
-import xyz.fsgek.common.data.handlers.AbstractBeanResolveHandler;
-import xyz.fsgek.common.data.handlers.JavaBeanResolveHandler;
-import xyz.fsgek.common.data.handlers.RecordBeanResolveHandler;
+import xyz.fsgek.common.data.handlers.AbstractDataResolverHandler;
+import xyz.fsgek.common.data.handlers.JavaBeanResolverHandler;
+import xyz.fsgek.common.data.handlers.NonGetterPrefixResolverHandler;
+import xyz.fsgek.common.data.handlers.NonPrefixResolverHandler;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -17,10 +18,11 @@ import java.util.Map;
  * Data object resolver for {@link GekDataDescriptor}, usually consists of a {@link Handler} list.
  * There are 2 built-in resolvers:
  * <ul>
- *     <li>{@link JavaBeanResolveHandler} (default handler);</li>
- *     <li>{@link RecordBeanResolveHandler};</li>
+ *     <li>{@link JavaBeanResolverHandler} (default handler);</li>
+ *     <li>{@link NonGetterPrefixResolverHandler};</li>
+ *     <li>{@link NonPrefixResolverHandler};</li>
  * </ul>
- * And a skeletal implementation: {@link AbstractBeanResolveHandler}.
+ * And a skeletal implementation: {@link AbstractDataResolverHandler}.
  *
  * @author fredsuvn
  */
@@ -28,7 +30,7 @@ import java.util.Map;
 public interface GekDataResolver {
 
     /**
-     * Returns default data object resolver of which handler is {@link JavaBeanResolveHandler}.
+     * Returns default data object resolver of which handler is {@link JavaBeanResolverHandler}.
      *
      * @return default data object resolver
      */
