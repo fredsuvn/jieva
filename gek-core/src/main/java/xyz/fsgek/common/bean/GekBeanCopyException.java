@@ -1,18 +1,18 @@
-package xyz.fsgek.common.data;
+package xyz.fsgek.common.bean;
 
 import java.lang.reflect.Type;
 
 /**
- * Exception for data object copy.
+ * Exception for bean object copy.
  *
  * @author fredsuvn
  */
-public class GekDataCopyException extends RuntimeException {
+public class GekBeanCopyException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekDataCopyException() {
+    public GekBeanCopyException() {
     }
 
     /**
@@ -20,7 +20,7 @@ public class GekDataCopyException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekDataCopyException(String message) {
+    public GekBeanCopyException(String message) {
         super(message);
     }
 
@@ -30,7 +30,7 @@ public class GekDataCopyException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekDataCopyException(String message, Throwable cause) {
+    public GekBeanCopyException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -39,7 +39,7 @@ public class GekDataCopyException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekDataCopyException(Throwable cause) {
+    public GekBeanCopyException(Throwable cause) {
         super(cause);
     }
 
@@ -49,7 +49,7 @@ public class GekDataCopyException extends RuntimeException {
      * @param sourceType source type
      * @param destType   destination type
      */
-    public GekDataCopyException(Type sourceType, Type destType) {
+    public GekBeanCopyException(Type sourceType, Type destType) {
         this("Failed to copy properties from " + sourceType.getTypeName() + " to " + destType.getTypeName() + ".");
     }
 
@@ -60,7 +60,7 @@ public class GekDataCopyException extends RuntimeException {
      * @param destType   destination type
      * @param cause      exception cause
      */
-    public GekDataCopyException(Type sourceType, Type destType, Throwable cause) {
+    public GekBeanCopyException(Type sourceType, Type destType, Throwable cause) {
         this("Failed to copy properties from " + sourceType.getTypeName() + " to " + destType.getTypeName() + ".", cause);
     }
 }

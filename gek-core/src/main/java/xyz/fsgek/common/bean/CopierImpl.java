@@ -1,4 +1,4 @@
-package xyz.fsgek.common.data;
+package xyz.fsgek.common.bean;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
@@ -13,14 +13,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-final class CopierImpl implements GekDataCopier {
+final class CopierImpl implements GekBeanCopier {
+
+    static CopierImpl DEFAULT_COPIER = new CopierImpl();
 
     @Override
     public void copyProperties(
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
         GekOption<?, ?>... options
-    ) throws GekDataCopyException {
+    ) throws GekBeanCopyException {
         try {
             if (source instanceof Map) {
                 if (dest instanceof Map) {
@@ -35,10 +37,10 @@ final class CopierImpl implements GekDataCopier {
                     dataToData(source, sourceType, dest, destType, options);
                 }
             }
-        } catch (GekDataCopyException e) {
+        } catch (GekBeanCopyException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekDataCopyException(sourceType, destType, e);
+            throw new GekBeanCopyException(sourceType, destType, e);
         }
     }
 
@@ -57,11 +59,11 @@ final class CopierImpl implements GekDataCopier {
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
         Map<Object, Object> destMap = Gek.as(dest);
-        GekConverter converter = GekOption.get(GekDataOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
-        Object ignoredProperties = GekOption.get(GekDataOption.Key.IGNORED_PROPERTIES, options);
-        Object ignoreNull = GekOption.get(GekDataOption.Key.IGNORE_NULL, options);
-        Object thrownIfConversionFails = GekOption.get(GekDataOption.Key.THROWN_IF_ANY_FAILS, options);
-        Object putIfNotContained = GekOption.get(GekDataOption.Key.PUT_IF_NOT_CONTAINED, options);
+        GekConverter converter = GekOption.get(GekBeanOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
+        Object ignoredProperties = GekOption.get(GekBeanOption.Key.IGNORED_PROPERTIES, options);
+        Object ignoreNull = GekOption.get(GekBeanOption.Key.IGNORE_NULL, options);
+        Object thrownIfConversionFails = GekOption.get(GekBeanOption.Key.THROWN_IF_ANY_FAILS, options);
+        Object putIfNotContained = GekOption.get(GekBeanOption.Key.PUT_IF_NOT_CONTAINED, options);
         sourceMap.forEach((key, value) -> {
             if (isIgnored(key, ignoredProperties)) {
                 return;
@@ -72,7 +74,7 @@ final class CopierImpl implements GekDataCopier {
             Object destKey = converter.convertType(key, sourceKeyType, destKeyType, options);
             if (destKey == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekDataCopyException(sourceKeyType, destKeyType);
+                    throw new GekBeanCopyException(sourceKeyType, destKeyType);
                 } else {
                     return;
                 }
@@ -84,7 +86,7 @@ final class CopierImpl implements GekDataCopier {
             Object destValue = converter.convertType(value, sourceValueType, destValueType, options);
             if (destValue == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekDataCopyException(sourceValueType, destValueType);
+                    throw new GekBeanCopyException(sourceValueType, destValueType);
                 } else {
                     return;
                 }
@@ -104,13 +106,13 @@ final class CopierImpl implements GekDataCopier {
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
         Map<Object, Object> sourceMap = Gek.as(source);
-        GekDataResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekDataResolver.defaultResolver(), options);
-        GekDataDescriptor destData = resolver.resolve(destType);
-        Map<String, GekPropertyDescriptor> destProperties = destData.getProperties();
-        GekConverter converter = GekOption.get(GekDataOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
-        Object ignoredProperties = GekOption.get(GekDataOption.Key.IGNORED_PROPERTIES, options);
-        Object ignoreNull = GekOption.get(GekDataOption.Key.IGNORE_NULL, options);
-        Object thrownIfConversionFails = GekOption.get(GekDataOption.Key.THROWN_IF_ANY_FAILS, options);
+        GekBeanResolver resolver = GekOption.get(GekBeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
+        GekBeanInfo destData = resolver.resolve(destType);
+        Map<String, GekPropertyInfo> destProperties = destData.getProperties();
+        GekConverter converter = GekOption.get(GekBeanOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
+        Object ignoredProperties = GekOption.get(GekBeanOption.Key.IGNORED_PROPERTIES, options);
+        Object ignoreNull = GekOption.get(GekBeanOption.Key.IGNORE_NULL, options);
+        Object thrownIfConversionFails = GekOption.get(GekBeanOption.Key.THROWN_IF_ANY_FAILS, options);
         sourceMap.forEach((key, value) -> {
             if (isIgnored(key, ignoredProperties)) {
                 return;
@@ -121,20 +123,20 @@ final class CopierImpl implements GekDataCopier {
             Object destKey = converter.convertType(key, sourceKeyType, String.class, options);
             if (destKey == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekDataCopyException(sourceKeyType, String.class);
+                    throw new GekBeanCopyException(sourceKeyType, String.class);
                 } else {
                     return;
                 }
             }
             String destName = destKey.toString();
-            GekPropertyDescriptor destProperty = destProperties.get(destName);
+            GekPropertyInfo destProperty = destProperties.get(destName);
             if (destProperty == null) {
                 return;
             }
             Object destValue = converter.convertType(value, sourceValueType, destProperty.getType(), options);
             if (destValue == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekDataCopyException(sourceValueType, destProperty.getType());
+                    throw new GekBeanCopyException(sourceValueType, destProperty.getType());
                 } else {
                     return;
                 }
@@ -149,19 +151,19 @@ final class CopierImpl implements GekDataCopier {
         @Nullable Object dest, Type destType,
         GekOption<?, ?>... options
     ) {
-        GekDataResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekDataResolver.defaultResolver(), options);
-        GekDataDescriptor sourceData = resolver.resolve(sourceType);
-        Map<String, GekPropertyDescriptor> sourceProperties = sourceData.getProperties();
+        GekBeanResolver resolver = GekOption.get(GekBeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
+        GekBeanInfo sourceData = resolver.resolve(sourceType);
+        Map<String, GekPropertyInfo> sourceProperties = sourceData.getProperties();
         GekParamType destParamType = GekReflect.getGenericSuperType(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
         Map<Object, Object> destMap = Gek.as(dest);
-        GekConverter converter = GekOption.get(GekDataOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
-        Object ignoredProperties = GekOption.get(GekDataOption.Key.IGNORED_PROPERTIES, options);
-        Object ignoreNull = GekOption.get(GekDataOption.Key.IGNORE_NULL, options);
-        Object thrownIfConversionFails = GekOption.get(GekDataOption.Key.THROWN_IF_ANY_FAILS, options);
-        Object putIfNotContained = GekOption.get(GekDataOption.Key.PUT_IF_NOT_CONTAINED, options);
+        GekConverter converter = GekOption.get(GekBeanOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
+        Object ignoredProperties = GekOption.get(GekBeanOption.Key.IGNORED_PROPERTIES, options);
+        Object ignoreNull = GekOption.get(GekBeanOption.Key.IGNORE_NULL, options);
+        Object thrownIfConversionFails = GekOption.get(GekBeanOption.Key.THROWN_IF_ANY_FAILS, options);
+        Object putIfNotContained = GekOption.get(GekBeanOption.Key.PUT_IF_NOT_CONTAINED, options);
         sourceProperties.forEach((name, property) -> {
             if (isIgnored(name, ignoredProperties)) {
                 return;
@@ -173,7 +175,7 @@ final class CopierImpl implements GekDataCopier {
             Object destKey = converter.convertType(name, String.class, destKeyType, options);
             if (destKey == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekDataCopyException(String.class, destKeyType);
+                    throw new GekBeanCopyException(String.class, destKeyType);
                 } else {
                     return;
                 }
@@ -185,7 +187,7 @@ final class CopierImpl implements GekDataCopier {
             Object destValue = converter.convertType(value, property.getType(), destValueType, options);
             if (destValue == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekDataCopyException(property.getType(), destValueType);
+                    throw new GekBeanCopyException(property.getType(), destValueType);
                 } else {
                     return;
                 }
@@ -200,15 +202,15 @@ final class CopierImpl implements GekDataCopier {
         @Nullable Object dest, Type destType,
         GekOption<?, ?>... options
     ) {
-        GekDataResolver resolver = GekOption.get(GekDataOption.Key.RESOLVER, GekDataResolver.defaultResolver(), options);
-        GekDataDescriptor sourceData = resolver.resolve(sourceType);
-        Map<String, GekPropertyDescriptor> sourceProperties = sourceData.getProperties();
-        GekDataDescriptor destData = resolver.resolve(destType);
-        Map<String, GekPropertyDescriptor> destProperties = destData.getProperties();
-        GekConverter converter = GekOption.get(GekDataOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
-        Object ignoredProperties = GekOption.get(GekDataOption.Key.IGNORED_PROPERTIES, options);
-        Object ignoreNull = GekOption.get(GekDataOption.Key.IGNORE_NULL, options);
-        Object thrownIfConversionFails = GekOption.get(GekDataOption.Key.THROWN_IF_ANY_FAILS, options);
+        GekBeanResolver resolver = GekOption.get(GekBeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
+        GekBeanInfo sourceData = resolver.resolve(sourceType);
+        Map<String, GekPropertyInfo> sourceProperties = sourceData.getProperties();
+        GekBeanInfo destData = resolver.resolve(destType);
+        Map<String, GekPropertyInfo> destProperties = destData.getProperties();
+        GekConverter converter = GekOption.get(GekBeanOption.Key.CONVERTER, GekConverter.defaultConverter(), options);
+        Object ignoredProperties = GekOption.get(GekBeanOption.Key.IGNORED_PROPERTIES, options);
+        Object ignoreNull = GekOption.get(GekBeanOption.Key.IGNORE_NULL, options);
+        Object thrownIfConversionFails = GekOption.get(GekBeanOption.Key.THROWN_IF_ANY_FAILS, options);
         sourceProperties.forEach((name, property) -> {
             if (isIgnored(name, ignoredProperties)) {
                 return;
@@ -217,14 +219,14 @@ final class CopierImpl implements GekDataCopier {
             if (value == null && ignoreNull != null && Objects.equals(true, ignoreNull)) {
                 return;
             }
-            GekPropertyDescriptor destProperty = destProperties.get(name);
+            GekPropertyInfo destProperty = destProperties.get(name);
             if (destProperty == null) {
                 return;
             }
             Object destValue = converter.convertType(value, property.getType(), destProperty.getType(), options);
             if (destValue == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekDataCopyException(property.getType(), destProperty.getType());
+                    throw new GekBeanCopyException(property.getType(), destProperty.getType());
                 } else {
                     return;
                 }
@@ -259,11 +261,11 @@ final class CopierImpl implements GekDataCopier {
 
     private void checkMapType(@Nullable GekParamType paramType) {
         if (paramType == null) {
-            throw new GekDataCopyException("Not a Map type: null.");
+            throw new GekBeanCopyException("Not a Map type: null.");
         }
         List<Type> types = paramType.getActualTypeArgumentList();
         if (GekColl.isEmpty(types) || types.size() != 2) {
-            throw new GekDataCopyException("Not a Map type: " + paramType + ".");
+            throw new GekBeanCopyException("Not a Map type: " + paramType + ".");
         }
     }
 }

@@ -1,26 +1,26 @@
-package xyz.fsgek.common.data;
+package xyz.fsgek.common.bean;
 
 import xyz.fsgek.common.base.GekOption;
 import xyz.fsgek.common.convert.GekConvertException;
 import xyz.fsgek.common.convert.GekConverter;
 
 /**
- * Options for gek data.
+ * Options for gek bean operations.
  *
  * @author sunqian
  */
-public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
+public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
 
     /**
-     * Key of {@link GekDataOption}.
+     * Key of {@link GekBeanOption}.
      */
     enum Key {
 
         /**
-         * To specify the {@link GekDataResolver}.
-         * Default is {@link GekDataResolver#defaultResolver()}.
+         * To specify the {@link GekBeanProvider}.
+         * Default is {@link GekBeanProvider#defaultProvider()}.
          */
-        RESOLVER,
+        PROVIDER,
 
         /**
          * To specify the {@link GekConverter}.
@@ -40,7 +40,7 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
         IGNORE_NULL,
 
         /**
-         * To specify whether a {@link GekDataCopyException} should be thrown when any part of conversion fails.
+         * To specify whether a {@link GekBeanCopyException} should be thrown when any part of conversion fails.
          * Default is true, if it is set to false, failed property copy will be ignored.
          */
         THROWN_IF_ANY_FAILS,
@@ -53,14 +53,14 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
     }
 
     /**
-     * Option to specify the {@link GekDataResolver}.
-     * Default is {@link GekDataResolver#defaultResolver()}.
+     * Option to specify the {@link GekBeanProvider}.
+     * Default is {@link GekBeanProvider#defaultProvider()}.
      *
-     * @param resolver data resolver
-     * @return option to specify the {@link GekDataResolver}
+     * @param provider bean info provider
+     * @return option to specify the {@link GekBeanProvider}
      */
-    static GekDataOption resolver(GekDataResolver resolver) {
-        return Impls.newGekDataOption(Key.RESOLVER, resolver);
+    static GekBeanOption provider(GekBeanProvider provider) {
+        return new OptionImpl(Key.PROVIDER, provider);
     }
 
     /**
@@ -70,8 +70,8 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
      * @param converter data converter
      * @return option to specify the {@link GekConverter}
      */
-    static GekDataOption converter(GekConverter converter) {
-        return Impls.newGekDataOption(Key.CONVERTER, converter);
+    static GekBeanOption converter(GekConverter converter) {
+        return new OptionImpl(Key.CONVERTER, converter);
     }
 
     /**
@@ -80,8 +80,8 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
      * @param ignoreProperties ignored properties which don't need copy
      * @return option to specify ignored properties to copy
      */
-    static GekDataOption ignoredProperties(Object... ignoreProperties) {
-        return Impls.newGekDataOption(Key.IGNORED_PROPERTIES, ignoreProperties);
+    static GekBeanOption ignoredProperties(Object... ignoreProperties) {
+        return new OptionImpl(Key.IGNORED_PROPERTIES, ignoreProperties);
     }
 
     /**
@@ -90,8 +90,8 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
      * @param ignoreProperties ignored properties which don't need copy
      * @return option to specify ignored properties
      */
-    static GekDataOption ignoredProperties(Iterable<?> ignoreProperties) {
-        return Impls.newGekDataOption(Key.IGNORED_PROPERTIES, ignoreProperties);
+    static GekBeanOption ignoredProperties(Iterable<?> ignoreProperties) {
+        return new OptionImpl(Key.IGNORED_PROPERTIES, ignoreProperties);
     }
 
     /**
@@ -101,8 +101,8 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
      * @param ignoreNull whether the null value should be ignored to copy
      * @return option to specify whether the null value should be ignored to copy
      */
-    static GekDataOption ignoreNull(boolean ignoreNull) {
-        return Impls.newGekDataOption(Key.IGNORE_NULL, ignoreNull);
+    static GekBeanOption ignoreNull(boolean ignoreNull) {
+        return new OptionImpl(Key.IGNORE_NULL, ignoreNull);
     }
 
     /**
@@ -114,8 +114,8 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
      * @return option to specify whether a {@link GekConvertException} should be thrown when any part of conversion
      * fails
      */
-    static GekDataOption thrownIfConversionFails(boolean thrownIfAnyFails) {
-        return Impls.newGekDataOption(Key.THROWN_IF_ANY_FAILS, thrownIfAnyFails);
+    static GekBeanOption thrownIfConversionFails(boolean thrownIfAnyFails) {
+        return new OptionImpl(Key.THROWN_IF_ANY_FAILS, thrownIfAnyFails);
     }
 
     /**
@@ -127,7 +127,7 @@ public interface GekDataOption extends GekOption<GekDataOption.Key, Object> {
      * @return option to specify whether the value should be copied into the dest map if the dest doesn't contain the
      * key mapped by the value
      */
-    static GekDataOption putIfNotContained(boolean putIfNotContained) {
-        return Impls.newGekDataOption(Key.PUT_IF_NOT_CONTAINED, putIfNotContained);
+    static GekBeanOption putIfNotContained(boolean putIfNotContained) {
+        return new OptionImpl(Key.PUT_IF_NOT_CONTAINED, putIfNotContained);
     }
 }

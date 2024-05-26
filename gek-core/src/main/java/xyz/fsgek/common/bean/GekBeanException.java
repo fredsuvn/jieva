@@ -1,4 +1,4 @@
-package xyz.fsgek.common.data;
+package xyz.fsgek.common.bean;
 
 /**
  * Exception for bean.

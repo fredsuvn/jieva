@@ -1,4 +1,4 @@
-package xyz.fsgek.common.data;
+package xyz.fsgek.common.bean;
 
 import xyz.fsgek.annotations.Immutable;
 import xyz.fsgek.annotations.Nullable;
@@ -10,11 +10,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * Base info of {@link GekPropertyDescriptor}.
- * It should be immutable and thread-safe.
+ * Base info of {@link GekPropertyInfo}.
  *
  * @author fredsuvn
  */
@@ -30,21 +28,21 @@ public interface GekPropertyBase {
     String getName();
 
     /**
-     * Returns property value of given data object.
+     * Returns property value of given bean.
      *
-     * @param data given data object
-     * @return property value of given data object
+     * @param bean given bean
+     * @return property value of given bean
      */
     @Nullable
-    Object getValue(Object data);
+    Object getValue(Object bean);
 
     /**
-     * Sets property value of given data object.
+     * Sets property value of given bean.
      *
-     * @param data  given data object
+     * @param bean  given bean
      * @param value property value
      */
-    void setValue(Object data, @Nullable Object value);
+    void setValue(Object bean, @Nullable Object value);
 
     /**
      * Returns type of this property.
@@ -117,22 +115,6 @@ public interface GekPropertyBase {
      * @return annotations on getter, setter and backed field
      */
     List<Annotation> getAnnotations();
-
-    /**
-     * Returns first annotation of specified type on {@link #getAnnotations()}, or null if not found.
-     *
-     * @param annotationType specified type
-     * @return first annotation of specified type on {@link #getAnnotations()}, or null if not found
-     */
-    @Nullable
-    default Annotation getAnnotation(Class<?> annotationType) {
-        for (Annotation annotation : getAnnotations()) {
-            if (Objects.equals(annotationType, annotation.getClass())) {
-                return annotation;
-            }
-        }
-        return null;
-    }
 
     /**
      * Returns whether this property is readable.

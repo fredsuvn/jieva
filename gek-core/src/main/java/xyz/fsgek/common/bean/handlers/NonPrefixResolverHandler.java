@@ -1,13 +1,13 @@
-package xyz.fsgek.common.data.handlers;
+package xyz.fsgek.common.bean.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.data.GekDataResolver;
+import xyz.fsgek.common.bean.GekBeanResolver;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * {@link GekDataResolver.Handler} for non-prefix style, of which getters' and setters' names are themselves.
+ * {@link GekBeanResolver.Handler} for non-prefix style, of which getters' and setters' names are themselves.
  * For example:
  * <pre>
  *     // Getter of "foo"
@@ -19,7 +19,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class NonPrefixResolverHandler extends AbstractDataResolverHandler {
+public class NonPrefixResolverHandler extends AbstractBeanResolverHandler {
 
     private static final Method[] BELONG_OBJECT = Object.class.getMethods();
 

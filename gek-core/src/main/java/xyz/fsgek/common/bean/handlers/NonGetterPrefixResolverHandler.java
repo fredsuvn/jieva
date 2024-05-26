@@ -1,15 +1,15 @@
-package xyz.fsgek.common.data.handlers;
+package xyz.fsgek.common.bean.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekCase;
 import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.data.GekDataResolver;
+import xyz.fsgek.common.bean.GekBeanResolver;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * {@link GekDataResolver.Handler} for non-getter-prefix style (but setters have),
+ * {@link GekBeanResolver.Handler} for non-getter-prefix style (but setters have),
  * of which getters' names are themselves, and setters' names are start with "set".
  * For example:
  * <pre>

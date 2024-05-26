@@ -1,12 +1,10 @@
-package xyz.fsgek.common.data.handlers;
+package xyz.fsgek.common.bean.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekRuntimeException;
+import xyz.fsgek.common.bean.*;
 import xyz.fsgek.common.collect.GekColl;
-import xyz.fsgek.common.data.GekBeanException;
-import xyz.fsgek.common.data.GekDataResolver;
-import xyz.fsgek.common.data.GekPropertyBase;
 import xyz.fsgek.common.invoke.GekInvoker;
 import xyz.fsgek.common.reflect.GekReflect;
 
@@ -18,20 +16,22 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 /**
- * Base abstract data object resolve handler, provides a skeletal implementation of the {@link GekDataResolver.Handler}
+ * Base abstract gek bean resolving handler, provides a skeletal implementation of the {@link GekBeanResolver.Handler}
  * to minimize the effort required to implement the interface backed by "method-based" getters/setters.
  * <p>
  * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
  * {@link #resolveGetter(Method)} and {@link #resolveSetter(Method)} method to determine whether it is a getter/setter.
- * If it is, it will be resolved to a property descriptor. Subtypes can use {@link #buildGetter(String, Method)} and
- * {@link #buildSetter(String, Method)} to create getter/setter.
+ * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link GekMethodInfo}.
+ * Subtypes can use {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create
+ * getter/setter.
  *
  * @author fredsuvn
  */
-public abstract class AbstractDataResolverHandler implements GekDataResolver.Handler {
+public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Handler {
 
     @Override
-    public @Nullable GekFlag resolve(GekDataResolver.Context context) {
+    public @Nullable GekFlag resolve(GekBeanResolver.Context context) {
+
         Type type = context.getType();
         Class<?> rawType = GekReflect.getRawType(type);
         if (rawType == null) {
@@ -52,7 +52,9 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
             Setter setter = resolveSetter(method);
             if (setter != null) {
                 setters.put(setter.getName(), method);
+                continue;
             }
+            context.getMethods().add(new MethodBaseImpl(method));
         }
         if (GekColl.isNotEmpty(getters) || GekColl.isNotEmpty(setters)) {
             mergeAccessors(context, getters, setters, rawType);
@@ -61,7 +63,7 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
     }
 
     private void mergeAccessors(
-        GekDataResolver.Context context, Map<String, Method> getters, Map<String, Method> setters, Class<?> rawType) {
+        GekBeanResolver.Context context, Map<String, Method> getters, Map<String, Method> setters, Class<?> rawType) {
         Map<TypeVariable<?>, Type> typeParameterMapping = GekReflect.getTypeParameterMapping(context.getType());
         Set<Type> stack = new HashSet<>();
         getters.forEach((name, getter) -> {
@@ -167,23 +169,30 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
 
     private static final class PropertyBaseImpl implements GekPropertyBase {
 
-        private static final Field EMPTY;
+        private static final Field EMPTY_FIELD;
+        private static final GekInvoker EMPTY_INVOKER;
 
         static {
             try {
-                EMPTY = PropertyBaseImpl.class.getDeclaredField("EMPTY");
+                EMPTY_FIELD = PropertyBaseImpl.class.getDeclaredField("EMPTY_FIELD");
+                EMPTY_INVOKER = new GekInvoker() {
+                    @Override
+                    public @Nullable Object invoke(@Nullable Object inst, Object... args) {
+                        return null;
+                    }
+                };
             } catch (NoSuchFieldException e) {
                 throw new GekRuntimeException(e);
             }
         }
 
         private final String name;
-        private final Method getter;
-        private final Method setter;
+        private final @Nullable Method getter;
+        private final @Nullable Method setter;
         private final Type type;
         private final Class<?> rawType;
-        private final GekInvoker getterInvoker;
-        private final GekInvoker setterInvoker;
+        private GekInvoker getterInvoker;
+        private GekInvoker setterInvoker;
         private Field field;
         private List<Annotation> getterAnnotations;
         private List<Annotation> setterAnnotations;
@@ -194,19 +203,11 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
             String name, @Nullable Method getter, @Nullable Method setter, Type type, Class<?> rawType) {
             this.name = name;
             this.getter = getter;
+            this.getterInvoker = getter == null ? EMPTY_INVOKER : null;
             this.setter = setter;
+            this.setterInvoker = setter == null ? EMPTY_INVOKER : null;
             this.type = type;
             this.rawType = rawType;
-            if (getter != null) {
-                getterInvoker = buildMethodInvoker(getter);
-            } else {
-                getterInvoker = null;
-            }
-            if (setter != null) {
-                setterInvoker = buildMethodInvoker(setter);
-            } else {
-                setterInvoker = null;
-            }
         }
 
         @Override
@@ -215,19 +216,25 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
         }
 
         @Override
-        public @Nullable Object getValue(Object data) {
-            if (getterInvoker == null) {
+        public @Nullable Object getValue(Object bean) {
+            if (getterInvoker == EMPTY_INVOKER) {
                 throw new GekBeanException("Property is not readable: " + name + ".");
             }
-            return getterInvoker.invoke(data);
+            if (getterInvoker == null) {
+                getterInvoker = buildMethodInvoker(getter);
+            }
+            return getterInvoker.invoke(bean);
         }
 
         @Override
-        public void setValue(Object data, @Nullable Object value) {
-            if (setterInvoker == null) {
+        public void setValue(Object bean, @Nullable Object value) {
+            if (setterInvoker == EMPTY_INVOKER) {
                 throw new GekBeanException("Property is not writeable: " + name + ".");
             }
-            setterInvoker.invoke(data, value);
+            if (setterInvoker == null) {
+                setterInvoker = buildMethodInvoker(getter);
+            }
+            setterInvoker.invoke(bean, value);
         }
 
         @Override
@@ -250,14 +257,13 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
             if (field == null) {
                 field = findField(name, rawType);
             }
-            return field == EMPTY ? null : field;
+            return field == EMPTY_FIELD ? null : field;
         }
 
         @Override
         public List<Annotation> getGetterAnnotations() {
             if (getterAnnotations == null) {
-                getterAnnotations = getter == null ? Collections.emptyList() :
-                    Collections.unmodifiableList(Arrays.asList(getter.getAnnotations()));
+                getterAnnotations = getter == null ? Collections.emptyList() : GekColl.listOf(getter.getAnnotations());
             }
             return getterAnnotations;
         }
@@ -265,8 +271,7 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
         @Override
         public List<Annotation> getSetterAnnotations() {
             if (setterAnnotations == null) {
-                setterAnnotations = setter == null ? Collections.emptyList() :
-                    Collections.unmodifiableList(Arrays.asList(setter.getAnnotations()));
+                setterAnnotations = setter == null ? Collections.emptyList() : GekColl.listOf(setter.getAnnotations());
             }
             return setterAnnotations;
         }
@@ -275,8 +280,7 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
         public List<Annotation> getFieldAnnotations() {
             if (fieldAnnotations == null) {
                 Field field = getField();
-                fieldAnnotations = field == null ? Collections.emptyList() :
-                    Collections.unmodifiableList(Arrays.asList(field.getAnnotations()));
+                fieldAnnotations = field == null ? Collections.emptyList() : GekColl.listOf(field.getAnnotations());
             }
             return fieldAnnotations;
         }
@@ -304,10 +308,6 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
             return setterInvoker != null;
         }
 
-        private GekInvoker buildMethodInvoker(Method method) {
-            return GekInvoker.reflectMethod(method);
-        }
-
         private Field findField(String name, Class<?> type) {
             try {
                 return type.getField(name);
@@ -321,7 +321,48 @@ public abstract class AbstractDataResolverHandler implements GekDataResolver.Han
                     }
                 }
             }
-            return EMPTY;
+            return EMPTY_FIELD;
         }
+    }
+
+    private static final class MethodBaseImpl implements GekMethodBase {
+
+        private final Method method;
+        private List<Annotation> annotations;
+        private GekInvoker invoker;
+
+        private MethodBaseImpl(Method method) {
+            this.method = method;
+        }
+
+        @Override
+        public String getName() {
+            return method.getName();
+        }
+
+        @Override
+        public Object invoke(Object bean, Object... args) {
+            if (invoker == null) {
+                invoker = buildMethodInvoker(method);
+            }
+            return invoker.invoke(bean, args);
+        }
+
+        @Override
+        public Method getMethod() {
+            return method;
+        }
+
+        @Override
+        public List<Annotation> getAnnotations() {
+            if (annotations == null) {
+                annotations = GekColl.listOf(method.getAnnotations());
+            }
+            return annotations;
+        }
+    }
+
+    private static GekInvoker buildMethodInvoker(Method method) {
+        return GekInvoker.reflectMethod(method);
     }
 }

@@ -8,9 +8,9 @@ import test.protobuf.Data;
 import test.protobuf.Enum;
 import test.protobuf.Request;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.data.GekDataDescriptor;
-import xyz.fsgek.common.data.GekDataResolver;
-import xyz.fsgek.common.data.GekPropertyDescriptor;
+import xyz.fsgek.common.bean.GekBeanInfo;
+import xyz.fsgek.common.bean.GekBeanResolver;
+import xyz.fsgek.common.bean.GekPropertyInfo;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.data.protobuf.GekProtobuf;
 import xyz.fsgek.common.reflect.TypeRef;
@@ -33,9 +33,9 @@ public class ProtobufTest {
             map<string, string> entry = 5;
         }
          */
-        GekDataResolver resolver = GekProtobuf.protobufBeanResolver();
-        GekDataDescriptor dataBean = resolver.resolve(Data.class);
-        Map<String, GekPropertyDescriptor> propertyMap = dataBean.getProperties();
+        GekBeanResolver resolver = GekProtobuf.protobufBeanResolver();
+        GekBeanInfo dataBean = resolver.resolve(Data.class);
+        Map<String, GekPropertyInfo> propertyMap = dataBean.getProperties();
         Assert.assertEquals(propertyMap.size(), 14);
         Assert.assertEquals(propertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(propertyMap.get("str").getType(), String.class);
@@ -50,8 +50,8 @@ public class ProtobufTest {
         Assert.assertFalse(propertyMap.get("textList").isWriteable());
         Assert.assertFalse(propertyMap.get("entryMap").isWriteable());
 
-        GekDataDescriptor dataBuilderBean = resolver.resolve(Data.newBuilder().getClass());
-        Map<String, GekPropertyDescriptor> builderPropertyMap = dataBuilderBean.getProperties();
+        GekBeanInfo dataBuilderBean = resolver.resolve(Data.newBuilder().getClass());
+        Map<String, GekPropertyInfo> builderPropertyMap = dataBuilderBean.getProperties();
         Assert.assertEquals(builderPropertyMap.size(), 14);
         Assert.assertEquals(builderPropertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(builderPropertyMap.get("str").getType(), String.class);

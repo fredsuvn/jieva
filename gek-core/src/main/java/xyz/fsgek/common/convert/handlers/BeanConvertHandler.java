@@ -2,7 +2,7 @@ package xyz.fsgek.common.convert.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekObject;
-import xyz.fsgek.common.data.GekDataResolver;
+import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.convert.GekConverter;
 import xyz.fsgek.common.reflect.GekReflect;
 
@@ -71,16 +71,16 @@ public class BeanConvertHandler implements GekConverter.Handler {
         GENERATOR_MAP.put(ConcurrentSkipListMap.class, ConcurrentSkipListMap::new);
     }
 
-    private final GekDataResolver beanResolver;
+    private final GekBeanResolver beanResolver;
     private final GekBeanCopier copier;
 
     /**
-     * Constructs with {@link GekDataResolver#defaultResolver()}.
+     * Constructs with {@link GekBeanResolver#defaultResolver()}.
      *
-     * @see #BeanConvertHandler(GekDataResolver)
+     * @see #BeanConvertHandler(GekBeanResolver)
      */
     public BeanConvertHandler() {
-        this(GekDataResolver.defaultResolver());
+        this(GekBeanResolver.defaultResolver());
     }
 
     /**
@@ -88,7 +88,7 @@ public class BeanConvertHandler implements GekConverter.Handler {
      *
      * @param beanResolver bean resolver
      */
-    public BeanConvertHandler(GekDataResolver beanResolver) {
+    public BeanConvertHandler(GekBeanResolver beanResolver) {
         this.beanResolver = beanResolver;
         this.copier = GekBeanCopier.defaultCopier().toBuilder()
             .beanResolver(beanResolver)
@@ -122,7 +122,7 @@ public class BeanConvertHandler implements GekConverter.Handler {
      *
      * @return bean resolver of this handler
      */
-    public GekDataResolver getBeanResolver() {
+    public GekBeanResolver getBeanResolver() {
         return beanResolver;
     }
 
