@@ -1,7 +1,7 @@
-package xyz.fsgek.common.convert.handlers;
+package xyz.fsgek.common.mapper.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.reflect.GekReflect;
 
@@ -20,7 +20,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class BytesConvertHandler implements GekConverter.Handler {
+public class BytesConvertHandler implements JieMapper.Handler {
 
     /**
      * An instance.
@@ -28,14 +28,14 @@ public class BytesConvertHandler implements GekConverter.Handler {
     public static final BytesConvertHandler INSTANCE = new BytesConvertHandler();
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         if (source == null) {
             return null;
         }
         if (Objects.equals(targetType, byte[].class)) {
             if (Objects.equals(sourceType, byte[].class)) {
                 byte[] src = (byte[]) source;
-                if (converter.getOptions().reusePolicy() == GekConverter.Options.NO_REUSE) {
+                if (mapper.getOptions().reusePolicy() == JieMapper.Options.NO_REUSE) {
                     return src.clone();
                 }
                 return source;
@@ -48,7 +48,7 @@ public class BytesConvertHandler implements GekConverter.Handler {
         } else if (Objects.equals(targetType, ByteBuffer.class)) {
             if (Objects.equals(sourceType, byte[].class)) {
                 byte[] src = (byte[]) source;
-                if (converter.getOptions().reusePolicy() == GekConverter.Options.NO_REUSE) {
+                if (mapper.getOptions().reusePolicy() == JieMapper.Options.NO_REUSE) {
                     return ByteBuffer.wrap(src.clone());
                 }
                 return ByteBuffer.wrap(src);

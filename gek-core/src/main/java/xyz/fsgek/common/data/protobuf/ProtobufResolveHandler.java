@@ -8,7 +8,7 @@ import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.bean.GekBeanException;
 import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.bean.GekPropertyBase;
-import xyz.fsgek.common.convert.GekConvertException;
+import xyz.fsgek.common.mapper.GekConvertException;
 import xyz.fsgek.common.invoke.GekInvoker;
 import xyz.fsgek.common.reflect.GekReflect;
 

@@ -3,7 +3,7 @@ package xyz.fsgek.common.data.protobuf;
 import com.google.protobuf.ByteString;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekChars;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
@@ -25,7 +25,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class ByteStringConvertHandler implements GekConverter.Handler {
+public class ByteStringConvertHandler implements JieMapper.Handler {
 
     /**
      * An instance with {@link #ByteStringConvertHandler()}.
@@ -51,7 +51,7 @@ public class ByteStringConvertHandler implements GekConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         if (source == null) {
             return null;
         }

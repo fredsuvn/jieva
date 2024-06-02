@@ -12,7 +12,7 @@ import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekLog;
 import xyz.fsgek.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fsgek.common.bean.handlers.NonGetterPrefixResolverHandler;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 import xyz.fsgek.common.bean.GekBeanInfo;
 import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.bean.GekPropertyInfo;
@@ -248,10 +248,10 @@ public class BeanTest {
             }.getType());
         Assert.assertEquals(ccs.getCc(), cc1.getCc().toString());
 
-        GekConverter kConverter = GekConverter.defaultConverter().insertFirstMiddleHandler(new GekConverter.Handler() {
+        JieMapper kConverter = JieMapper.defaultMapper().insertFirstMiddleHandler(new JieMapper.Handler() {
             @Override
-            public @Nullable Object convert(
-                @Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+            public @Nullable Object map(
+                @Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
                 if (Objects.equals(targetType, Kk.class)) {
                     return new Kk(String.valueOf(source));
                 }

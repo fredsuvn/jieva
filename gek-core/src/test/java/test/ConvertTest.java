@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekFlag;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 import xyz.fsgek.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
@@ -184,39 +184,39 @@ public class ConvertTest {
     public void testConvertBytes() {
         byte[] low = {1, 2, 3};
         ByteBuffer buffer = ByteBuffer.wrap(new byte[]{1, 2, 3});
-        GekConverter converter = GekConverter.defaultConverter();
-        GekConverter newConverter = converter.withOptions(
-            converter.getOptions().replaceReusePolicy(GekConverter.Options.NO_REUSE));
+        JieMapper converter = JieMapper.defaultMapper();
+        JieMapper newConverter = converter.withOptions(
+            converter.getOptions().replaceReusePolicy(JieMapper.Options.NO_REUSE));
         Assert.assertEquals(
-            converter.convert(low, byte[].class),
+            converter.map(low, byte[].class),
             low
         );
         Assert.assertEquals(
-            converter.convert(low, ByteBuffer.class),
+            converter.map(low, ByteBuffer.class),
             buffer.slice()
         );
         Assert.assertEquals(
-            converter.convert(buffer, byte[].class),
+            converter.map(buffer, byte[].class),
             low
         );
         Assert.assertEquals(
-            converter.convert(buffer, ByteBuffer.class),
+            converter.map(buffer, ByteBuffer.class),
             buffer.slice()
         );
         Assert.assertSame(
-            converter.convert(low, byte[].class),
+            converter.map(low, byte[].class),
             low
         );
         Assert.assertEquals(
-            newConverter.convert(low, byte[].class),
+            newConverter.map(low, byte[].class),
             low
         );
         Assert.assertNotSame(
-            newConverter.convert(low, byte[].class),
+            newConverter.map(low, byte[].class),
             low
         );
         Assert.assertNotSame(
-            converter.convert(buffer, ByteBuffer.class),
+            converter.map(buffer, ByteBuffer.class),
             buffer.slice()
         );
     }
@@ -224,23 +224,23 @@ public class ConvertTest {
     @Test
     public void testConvertHandler() {
         Object x = new Object();
-        GekConverter.Handler handler = new GekConverter.Handler() {
+        JieMapper.Handler handler = new JieMapper.Handler() {
             @Override
-            public @Nullable Object convert(
-                @Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+            public @Nullable Object map(
+                @Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
                 return x;
             }
         };
-        GekConverter converter = GekConverter.defaultConverter().insertFirstMiddleHandler(handler);
+        JieMapper converter = JieMapper.defaultMapper().insertFirstMiddleHandler(handler);
         Assert.assertSame(
             x,
-            converter.convert(
+            converter.map(
                 "123",
                 new TypeRef<List<? super Integer>>() {
                 }.getType()
             )
         );
-        GekConverter converter2 = converter.withOptions(converter.getOptions());
+        JieMapper converter2 = converter.withOptions(converter.getOptions());
         Assert.assertSame(converter, converter2);
         converter2 = converter.withOptions(converter.getOptions()
             .replaceReusePolicy(converter.getOptions().reusePolicy()));
@@ -256,10 +256,10 @@ public class ConvertTest {
 
     @Test
     public void testConvertAsHandler() {
-        GekConverter.Handler handler = GekConverter.defaultConverter()
-            .insertFirstMiddleHandler(new GekConverter.Handler() {
+        JieMapper.Handler handler = JieMapper.defaultMapper()
+            .insertFirstMiddleHandler(new JieMapper.Handler() {
                 @Override
-                public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+                public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
                     if (Objects.equals(source, "1")) {
                         return "2";
                     }
@@ -274,13 +274,13 @@ public class ConvertTest {
             })
             .asHandler();
         Assert.assertEquals(
-            handler.convert("1", String.class, Integer.class, GekConverter.defaultConverter()), "2");
+            handler.map("1", String.class, Integer.class, JieMapper.defaultMapper()), "2");
         Assert.assertEquals(
-            handler.convert("2", String.class, Integer.class, GekConverter.defaultConverter()), "1");
+            handler.map("2", String.class, Integer.class, JieMapper.defaultMapper()), "1");
         Assert.assertEquals(
-            handler.convert("3", String.class, Integer.class, GekConverter.defaultConverter()), 3);
+            handler.map("3", String.class, Integer.class, JieMapper.defaultMapper()), 3);
         Assert.assertEquals(
-            handler.convert("4", String.class, Integer.class, GekConverter.defaultConverter()), GekFlag.BREAK);
+            handler.map("4", String.class, Integer.class, JieMapper.defaultMapper()), GekFlag.BREAK);
     }
 
     public enum E1 {

@@ -1,9 +1,9 @@
-package xyz.fsgek.common.convert.handlers;
+package xyz.fsgek.common.mapper.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.reflect.GekReflect;
 import xyz.fsgek.common.base.GekFlag;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -20,7 +20,7 @@ import java.util.Objects;
  *         If target type and source type are equal:
  *         <ul>
  *             <li>
- *                 If {@link GekConverter.Options#reusePolicy()} is not {@link GekConverter.Options#NO_REUSE},
+ *                 If {@link JieMapper.Options#reusePolicy()} is not {@link JieMapper.Options#NO_REUSE},
  *                 return source object, else return {@code null};
  *             </li>
  *         </ul>
@@ -29,7 +29,7 @@ import java.util.Objects;
  *         If target type is assignable from source type by {@link GekReflect#isAssignableFrom(Type, Type)}:
  *         <ul>
  *             <li>
- *                 If {@link GekConverter.Options#reusePolicy()} is {@link GekConverter.Options#REUSE_ASSIGNABLE},
+ *                 If {@link JieMapper.Options#reusePolicy()} is {@link JieMapper.Options#REUSE_ASSIGNABLE},
  *                 return source object, else return {@code null};
  *             </li>
  *         </ul>
@@ -82,7 +82,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class ReuseConvertHandler implements GekConverter.Handler {
+public class ReuseConvertHandler implements JieMapper.Handler {
 
     /**
      * An instance.
@@ -90,19 +90,19 @@ public class ReuseConvertHandler implements GekConverter.Handler {
     public static final ReuseConvertHandler INSTANCE = new ReuseConvertHandler();
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         if (source == null) {
             return null;
         }
-        int reusePolicy = converter.getOptions().reusePolicy();
+        int reusePolicy = mapper.getOptions().reusePolicy();
         if (Objects.equals(targetType, sourceType)) {
-            if (reusePolicy != GekConverter.Options.NO_REUSE) {
+            if (reusePolicy != JieMapper.Options.NO_REUSE) {
                 return source;
             }
             return null;
         }
         if (GekReflect.isAssignableFrom(targetType, sourceType)) {
-            if (reusePolicy == GekConverter.Options.REUSE_ASSIGNABLE) {
+            if (reusePolicy == JieMapper.Options.REUSE_ASSIGNABLE) {
                 return source;
             }
             return null;
@@ -114,11 +114,11 @@ public class ReuseConvertHandler implements GekConverter.Handler {
             WildcardType wildcardType = (WildcardType) sourceType;
             Type sourceUpper = GekReflect.getUpperBound(wildcardType);
             if (sourceUpper != null) {
-                return converter.asHandler().convert(source, sourceUpper, targetType, null);
+                return mapper.asHandler().map(source, sourceUpper, targetType, null);
             } else {
                 Type sourceLower = GekReflect.getLowerBound(wildcardType);
                 if (sourceLower != null) {
-                    return converter.asHandler().convert(source, Object.class, targetType, null);
+                    return mapper.asHandler().map(source, Object.class, targetType, null);
                 }
             }
         }
@@ -126,14 +126,14 @@ public class ReuseConvertHandler implements GekConverter.Handler {
             WildcardType wildcardType = (WildcardType) targetType;
             Type targetUpper = GekReflect.getUpperBound(wildcardType);
             if (targetUpper != null) {
-                return converter.asHandler().convert(source, sourceType, targetUpper, null);
+                return mapper.asHandler().map(source, sourceType, targetUpper, null);
             } else {
                 Type targetLower = GekReflect.getLowerBound(wildcardType);
                 if (targetLower != null) {
-                    return converter
-                        .withOptions(converter.getOptions().replaceReusePolicy(GekConverter.Options.REUSE_EQUAL))
+                    return mapper
+                        .withOptions(mapper.getOptions().replaceReusePolicy(JieMapper.Options.REUSE_EQUAL))
                         .asHandler()
-                        .convert(source, sourceType, targetLower, null);
+                        .map(source, sourceType, targetLower, null);
                 }
             }
         }

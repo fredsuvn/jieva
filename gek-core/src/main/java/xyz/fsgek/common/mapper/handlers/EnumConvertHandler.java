@@ -1,8 +1,8 @@
-package xyz.fsgek.common.convert.handlers;
+package xyz.fsgek.common.mapper.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
 
@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
  *
  * @author fredsuvn
  */
-public class EnumConvertHandler implements GekConverter.Handler {
+public class EnumConvertHandler implements JieMapper.Handler {
 
     /**
      * An instance.
@@ -20,7 +20,7 @@ public class EnumConvertHandler implements GekConverter.Handler {
     public static final EnumConvertHandler INSTANCE = new EnumConvertHandler();
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         if (source == null) {
             return null;
         }

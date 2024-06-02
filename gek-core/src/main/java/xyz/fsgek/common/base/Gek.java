@@ -5,7 +5,7 @@ import xyz.fsgek.common.bean.GekBeanInfo;
 import xyz.fsgek.common.collect.GekArray;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.collect.GekCollector;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 import xyz.fsgek.common.reflect.TypeRef;
 
 import java.io.IOException;
@@ -393,11 +393,11 @@ public class Gek {
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see GekConverter#convert(Object, Class)
+     * @see JieMapper#convert(Object, Class)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, Class<T> targetType) {
-        return GekConverter.defaultConverter().convert(source, targetType);
+        return JieMapper.defaultMapper().map(source, targetType);
     }
 
     /**
@@ -408,11 +408,11 @@ public class Gek {
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see GekConverter#convert(Object, TypeRef)
+     * @see JieMapper#convert(Object, TypeRef)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, TypeRef<T> targetType) {
-        return GekConverter.defaultConverter().convert(source, targetType);
+        return JieMapper.defaultMapper().map(source, targetType);
     }
 
     /**
@@ -423,11 +423,11 @@ public class Gek {
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see GekConverter#convert(Object, Type)
+     * @see JieMapper#convert(Object, Type)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, Type targetType) {
-        return GekConverter.defaultConverter().convert(source, targetType);
+        return JieMapper.defaultMapper().map(source, targetType);
     }
 
     /**
@@ -445,17 +445,17 @@ public class Gek {
      *         Others: any other type of returned object is the actual result of conversion.
      *     </li>
      * </ul>
-     * Using {@link GekConverter#getResult(Object)} can get actual result object from wrapper.
+     * Using {@link JieMapper#resolveResult(Object)} can get actual result object from wrapper.
      *
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
      * @return converted object or null
-     * @see GekConverter#convertType(Object, Type, Type)
+     * @see JieMapper#convertType(Object, Type, Type)
      */
     @Nullable
     public static Object convertType(@Nullable Object source, Type sourceType, Type targetType) {
-        return GekConverter.defaultConverter().convertType(source, sourceType, targetType);
+        return JieMapper.defaultMapper().convertType(source, sourceType, targetType);
     }
 
     /**

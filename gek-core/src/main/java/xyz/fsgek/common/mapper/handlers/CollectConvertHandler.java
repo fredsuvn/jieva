@@ -1,4 +1,4 @@
-package xyz.fsgek.common.convert.handlers;
+package xyz.fsgek.common.mapper.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
@@ -7,7 +7,7 @@ import xyz.fsgek.common.base.obj.GekObj;
 import xyz.fsgek.common.base.obj.ParameterizedObj;
 import xyz.fsgek.common.collect.GekArray;
 import xyz.fsgek.common.collect.GekColl;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 import xyz.fsgek.common.reflect.GekReflect;
 import xyz.fsgek.common.reflect.GekType;
 
@@ -43,7 +43,7 @@ import java.util.function.IntFunction;
  *
  * @author fredsuvn
  */
-public class CollectConvertHandler implements GekConverter.Handler {
+public class CollectConvertHandler implements JieMapper.Handler {
 
     /**
      * An instance.
@@ -68,7 +68,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         if (source == null) {
             return null;
         }
@@ -78,22 +78,22 @@ public class CollectConvertHandler implements GekConverter.Handler {
                 if (sourceInfo == null) {
                     return null;
                 }
-                return convertArray(sourceInfo, ((Class<?>) targetType).getComponentType(), converter);
+                return convertArray(sourceInfo, ((Class<?>) targetType).getComponentType(), mapper);
             }
-            return convertIterableType(source, sourceType, targetType, converter);
+            return convertIterableType(source, sourceType, targetType, mapper);
         } else if (targetType instanceof GenericArrayType) {
             ParameterizedObj<Iterable<?>> sourceInfo = toGenericInfo(source, sourceType);
             if (sourceInfo == null) {
                 return null;
             }
-            return convertArray(sourceInfo, ((GenericArrayType) targetType).getGenericComponentType(), converter);
+            return convertArray(sourceInfo, ((GenericArrayType) targetType).getGenericComponentType(), mapper);
         }
-        return convertIterableType(source, sourceType, targetType, converter);
+        return convertIterableType(source, sourceType, targetType, mapper);
     }
 
     @Nullable
     private Object convertIterableType(
-        @Nullable Object obj, Type sourceType, Type targetType, GekConverter converter) {
+        @Nullable Object obj, Type sourceType, Type targetType, JieMapper converter) {
         ParameterizedType targetItType = GekReflect.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
             return null;
@@ -135,14 +135,14 @@ public class CollectConvertHandler implements GekConverter.Handler {
         Collection<Object> dest,
         Type sourceComponentType,
         Type destComponentType,
-        GekConverter converter
+        JieMapper converter
     ) {
         for (Object srcValue : source) {
             Object targetValue = converter.convertType(srcValue, sourceComponentType, destComponentType);
             if (targetValue == null) {
                 return GekFlag.BREAK;
             }
-            dest.add(GekConverter.getResult(targetValue));
+            dest.add(JieMapper.resolveResult(targetValue));
         }
         return dest;
     }
@@ -151,7 +151,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
     private Object convertArray(
         ParameterizedObj<Iterable<?>> sourceInfo,
         Type targetComponentType,
-        GekConverter converter
+        JieMapper converter
     ) {
         Collection<?> srcList;
         if (sourceInfo.getObject() instanceof Collection) {
@@ -168,7 +168,7 @@ public class CollectConvertHandler implements GekConverter.Handler {
             if (targetValue == null) {
                 return GekFlag.BREAK;
             }
-            Array.set(targetArray, i, GekConverter.getResult(targetValue));
+            Array.set(targetArray, i, JieMapper.resolveResult(targetValue));
             i++;
         }
         return targetArray;

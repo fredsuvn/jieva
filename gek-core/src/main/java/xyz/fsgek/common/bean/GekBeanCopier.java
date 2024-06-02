@@ -2,7 +2,7 @@ package xyz.fsgek.common.bean;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekOption;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -45,7 +45,7 @@ public interface GekBeanCopier {
      *         Options are specified by {@link GekBeanOption}, including:
      *         <ul>
      *             <li>{@link GekBeanOption#provider(GekBeanProvider)}</li>
-     *             <li>{@link GekBeanOption#converter(GekConverter)}</li>
+     *             <li>{@link GekBeanOption#converter(JieMapper)}</li>
      *             <li>{@link GekBeanOption#ignoredProperties(Object...)}, {@link GekBeanOption#ignoredProperties(Iterable)}</li>
      *             <li>{@link GekBeanOption#ignoreNull(boolean)}</li>
      *             <li>{@link GekBeanOption#thrownIfConversionFails(boolean)}</li>

@@ -1,7 +1,7 @@
-package xyz.fsgek.common.convert.handlers;
+package xyz.fsgek.common.mapper.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -23,7 +23,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class BooleanConvertHandler implements GekConverter.Handler {
+public class BooleanConvertHandler implements JieMapper.Handler {
 
     /**
      * An instance.
@@ -31,7 +31,7 @@ public class BooleanConvertHandler implements GekConverter.Handler {
     public static final BooleanConvertHandler INSTANCE = new BooleanConvertHandler();
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         if (source == null) {
             return null;
         }

@@ -11,7 +11,7 @@ import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.bean.GekBeanInfo;
 import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.bean.GekPropertyInfo;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 import xyz.fsgek.common.data.protobuf.GekProtobuf;
 import xyz.fsgek.common.reflect.TypeRef;
 
@@ -119,7 +119,7 @@ public class ProtobufTest {
         requestDto.setData(dataDto);
 
         //dto -> protobuf
-        ResponseDto responseDto = GekProtobuf.protobufConverter().convert(requestDto, ResponseDto.class);
+        ResponseDto responseDto = GekProtobuf.protobufConverter().map(requestDto, ResponseDto.class);
         Assert.assertEquals(responseDto.getCode(), "111");
         Assert.assertEquals(responseDto.getMessage(), 111L);
         Data data = responseDto.getData();
@@ -138,7 +138,7 @@ public class ProtobufTest {
         Assert.assertEquals(data.getSint64(), dataDto.getSint64());
 
         //dto -> protobuf builder
-        Data.Builder dataBuilder = GekProtobuf.protobufConverter().convert(requestDto.getData(), Data.Builder.class);
+        Data.Builder dataBuilder = GekProtobuf.protobufConverter().map(requestDto.getData(), Data.Builder.class);
         Assert.assertEquals(dataBuilder.getEm(), Enum.E2);
         Assert.assertEquals(dataBuilder.getStr(), dataDto.getStr());
         Assert.assertEquals(dataBuilder.getTextList(), dataDto.getTextList());
@@ -205,18 +205,18 @@ public class ProtobufTest {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         ByteString bs = ByteString.copyFrom(bytes);
         String str = bs.toStringUtf8();
-        GekConverter converter = GekProtobuf.protobufConverter();
-        Assert.assertEquals(converter.convert(bytes, ByteBuffer.class), buffer.slice());
-        Assert.assertEquals(converter.convert(bs, ByteBuffer.class), buffer.slice());
-        Assert.assertEquals(converter.convert(buffer, ByteBuffer.class), buffer.slice());
-        Assert.assertEquals(converter.convert(bytes, byte[].class), bytes);
-        Assert.assertEquals(converter.convert(bs, byte[].class), bytes);
-        Assert.assertEquals(converter.convert(buffer, byte[].class), bytes);
-        Assert.assertEquals(converter.convert(bytes, ByteString.class), bs);
-        Assert.assertEquals(converter.convert(bs, ByteString.class), bs);
-        Assert.assertEquals(converter.convert(buffer, ByteString.class), bs);
-        Assert.assertEquals(converter.convert(bs, String.class), str);
-        Assert.assertEquals(converter.convert(str, ByteString.class), bs);
+        JieMapper converter = GekProtobuf.protobufConverter();
+        Assert.assertEquals(converter.map(bytes, ByteBuffer.class), buffer.slice());
+        Assert.assertEquals(converter.map(bs, ByteBuffer.class), buffer.slice());
+        Assert.assertEquals(converter.map(buffer, ByteBuffer.class), buffer.slice());
+        Assert.assertEquals(converter.map(bytes, byte[].class), bytes);
+        Assert.assertEquals(converter.map(bs, byte[].class), bytes);
+        Assert.assertEquals(converter.map(buffer, byte[].class), bytes);
+        Assert.assertEquals(converter.map(bytes, ByteString.class), bs);
+        Assert.assertEquals(converter.map(bs, ByteString.class), bs);
+        Assert.assertEquals(converter.map(buffer, ByteString.class), bs);
+        Assert.assertEquals(converter.map(bs, String.class), str);
+        Assert.assertEquals(converter.map(str, ByteString.class), bs);
     }
 
     public enum EnumDto {

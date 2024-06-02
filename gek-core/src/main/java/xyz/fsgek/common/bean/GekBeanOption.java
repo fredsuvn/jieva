@@ -1,8 +1,8 @@
 package xyz.fsgek.common.bean;
 
 import xyz.fsgek.common.base.GekOption;
-import xyz.fsgek.common.convert.GekConvertException;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.GekConvertException;
+import xyz.fsgek.common.mapper.JieMapper;
 
 /**
  * Options for gek bean operations.
@@ -23,8 +23,8 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
         PROVIDER,
 
         /**
-         * To specify the {@link GekConverter}.
-         * Default is {@link GekConverter#defaultConverter()}.
+         * To specify the {@link JieMapper}.
+         * Default is {@link JieMapper#defaultMapper()}.
          */
         CONVERTER,
 
@@ -64,13 +64,13 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
     }
 
     /**
-     * Option to specify the {@link GekConverter}.
-     * Default is {@link GekConverter#defaultConverter()}.
+     * Option to specify the {@link JieMapper}.
+     * Default is {@link JieMapper#defaultMapper()}.
      *
      * @param converter data converter
-     * @return option to specify the {@link GekConverter}
+     * @return option to specify the {@link JieMapper}
      */
-    static GekBeanOption converter(GekConverter converter) {
+    static GekBeanOption converter(JieMapper converter) {
         return new OptionImpl(Key.CONVERTER, converter);
     }
 

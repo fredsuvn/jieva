@@ -1,4 +1,4 @@
-package xyz.fsgek.common.convert;
+package xyz.fsgek.common.mapper;
 
 import java.lang.reflect.Type;
 

@@ -1,9 +1,9 @@
-package xyz.fsgek.common.convert.handlers;
+package xyz.fsgek.common.mapper.handlers;
 
 import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 import xyz.fsgek.common.base.GekDate;
-import xyz.fsgek.common.convert.GekConvertException;
+import xyz.fsgek.common.mapper.GekConvertException;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -57,7 +57,7 @@ import java.util.TimeZone;
  *
  * @author fredsuvn
  */
-public class DateConvertHandler implements GekConverter.Handler {
+public class DateConvertHandler implements JieMapper.Handler {
 
     /**
      * An instance with {@link #DateConvertHandler()}.
@@ -147,7 +147,7 @@ public class DateConvertHandler implements GekConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         try {
             return convert0(source, sourceType, targetType);
         } catch (ParseException e) {

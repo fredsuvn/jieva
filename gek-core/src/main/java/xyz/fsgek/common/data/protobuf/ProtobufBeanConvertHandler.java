@@ -3,9 +3,9 @@ package xyz.fsgek.common.data.protobuf;
 import com.google.protobuf.Message;
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.bean.GekBeanResolver;
-import xyz.fsgek.common.convert.GekConvertException;
-import xyz.fsgek.common.convert.GekConverter;
-import xyz.fsgek.common.convert.handlers.BeanConvertHandler;
+import xyz.fsgek.common.mapper.GekConvertException;
+import xyz.fsgek.common.mapper.JieMapper;
+import xyz.fsgek.common.mapper.handlers.BeanConvertHandler;
 import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.Method;
@@ -43,12 +43,12 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         if (source == null) {
             return null;
         }
         if (!(targetType instanceof Class<?>)) {
-            return super.convert(source, sourceType, targetType, converter);
+            return super.map(source, sourceType, targetType, mapper);
         }
         Class<?> rawType = GekReflect.getRawType(targetType);
         //Check whether it is a protobuf object
@@ -62,11 +62,11 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
             isBuilder = true;
         }
         if (!isProtobuf) {
-            return super.convert(source, sourceType, targetType, converter);
+            return super.map(source, sourceType, targetType, mapper);
         }
         try {
             Object builder = getProtobufBuilder(rawType, isBuilder);
-            getCopier().withConverter(converter)
+            getCopier().withConverter(mapper)
 
                 .copyProperties(source, sourceType, builder, builder.getClass());
             return build(builder, isBuilder);

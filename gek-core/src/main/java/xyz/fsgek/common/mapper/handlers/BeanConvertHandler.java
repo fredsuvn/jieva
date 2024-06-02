@@ -1,9 +1,9 @@
-package xyz.fsgek.common.convert.handlers;
+package xyz.fsgek.common.mapper.handlers;
 
 import xyz.fsgek.annotations.Nullable;
 import xyz.fsgek.common.base.GekObject;
 import xyz.fsgek.common.bean.GekBeanResolver;
-import xyz.fsgek.common.convert.GekConverter;
+import xyz.fsgek.common.mapper.JieMapper;
 import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.Type;
@@ -37,7 +37,7 @@ import java.util.function.Supplier;
  *
  * @author fredsuvn
  */
-public class BeanConvertHandler implements GekConverter.Handler {
+public class BeanConvertHandler implements JieMapper.Handler {
 
     /**
      * An instance with {@link #BeanConvertHandler()}.
@@ -96,7 +96,7 @@ public class BeanConvertHandler implements GekConverter.Handler {
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, Type sourceType, Type targetType, GekConverter converter) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
         if (source == null) {
             return GekObject.empty();
         }
@@ -114,7 +114,7 @@ public class BeanConvertHandler implements GekConverter.Handler {
         if (dest == null) {
             return null;
         }
-        return getCopier().withConverter(converter).copyProperties(source, sourceType, dest, targetType);
+        return getCopier().withConverter(mapper).copyProperties(source, sourceType, dest, targetType);
     }
 
     /**
