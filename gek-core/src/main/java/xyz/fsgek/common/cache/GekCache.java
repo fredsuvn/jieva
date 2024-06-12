@@ -1,9 +1,8 @@
 package xyz.fsgek.common.cache;
 
-import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekObject;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;

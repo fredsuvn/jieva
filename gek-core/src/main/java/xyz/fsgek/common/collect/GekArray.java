@@ -1,6 +1,6 @@
 package xyz.fsgek.common.collect;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 
 import java.lang.reflect.Array;

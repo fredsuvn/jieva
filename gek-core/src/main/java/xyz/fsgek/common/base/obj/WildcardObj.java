@@ -1,6 +1,6 @@
 package xyz.fsgek.common.base.obj;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.reflect.Type;

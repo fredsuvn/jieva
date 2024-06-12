@@ -1,7 +1,7 @@
 package xyz.fsgek.common.codec;
 
 import org.springframework.core.codec.CodecException;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.Cipher;

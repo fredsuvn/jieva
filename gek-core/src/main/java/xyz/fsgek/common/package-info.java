@@ -1,4 +1,4 @@
 @DefaultNonNull
 package xyz.fsgek.common;
 
-import xyz.fsgek.annotations.DefaultNonNull;
+import xyz.fslabo.annotations.DefaultNonNull;

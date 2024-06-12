@@ -1,8 +1,8 @@
 package xyz.fsgek.common.net.http;
 
 import lombok.Getter;
-import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fsgek.common.io.GekIO;
 
 import java.net.Proxy;

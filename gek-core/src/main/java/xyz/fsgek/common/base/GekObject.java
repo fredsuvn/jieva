@@ -1,7 +1,7 @@
 package xyz.fsgek.common.base;
 
-import xyz.fsgek.annotations.Immutable;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Immutable;
+import xyz.fslabo.annotations.Nullable;
 
 import java.lang.reflect.Type;
 

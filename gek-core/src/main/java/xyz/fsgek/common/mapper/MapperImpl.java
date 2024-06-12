@@ -1,6 +1,6 @@
 package xyz.fsgek.common.mapper;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.collect.GekColl;
 import xyz.fsgek.common.mapper.handlers.*;

@@ -1,8 +1,8 @@
 package xyz.fsgek.common.bean;
 
-import xyz.fsgek.annotations.Immutable;
-import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.Immutable;
+import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fsgek.common.reflect.GekReflect;
 
 import java.lang.annotation.Annotation;

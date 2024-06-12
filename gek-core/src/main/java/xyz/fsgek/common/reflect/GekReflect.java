@@ -1,7 +1,7 @@
 package xyz.fsgek.common.reflect;
 
-import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.annotations.OutParam;
+import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.annotations.OutParam;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.cache.GekCache;

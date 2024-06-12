@@ -1,6 +1,6 @@
 package xyz.fsgek.common.mapper.handlers;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.GekObject;
 import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.mapper.JieMapper;

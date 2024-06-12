@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.base.GekLog;

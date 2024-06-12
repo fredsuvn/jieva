@@ -2,7 +2,7 @@ package xyz.fsgek.common.data.protobuf;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.bean.GekBeanException;

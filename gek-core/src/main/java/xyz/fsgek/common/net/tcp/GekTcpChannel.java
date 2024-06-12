@@ -1,7 +1,7 @@
 package xyz.fsgek.common.net.tcp;
 
-import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fsgek.common.data.GekData;
 
 import java.io.InputStream;

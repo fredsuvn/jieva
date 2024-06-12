@@ -1,6 +1,6 @@
 package xyz.fsgek.common.codec;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.io.GekIO;
 
 import javax.crypto.Cipher;

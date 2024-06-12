@@ -1,9 +1,9 @@
-package xyz.fsgek.annotations;
+package xyz.fslabo.annotations;
 
 import java.lang.annotation.*;
 
 /**
- * Declares the annotated element is an output parameter that can be modified.
+ * Declares the annotated element is an output parameter which can be modified.
  *
  * @author fredsuvn
  */

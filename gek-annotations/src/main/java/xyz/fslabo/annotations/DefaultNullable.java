@@ -1,4 +1,4 @@
-package xyz.fsgek.annotations;
+package xyz.fslabo.annotations;
 
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
@@ -7,15 +7,24 @@ import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
 /**
- * Declares the annotated element and all methods, fields parameters, local variables and type uses
- * in its scope may be null.
- * It is equivalent to use {@link Nullable} on those spaces.
+ * Declares the annotated element and all methods, fields, parameters, local variables and type uses under its scope
+ * is nullable.
+ * It is equivalent to use {@link Nullable} on all those points.
  *
  * @author fredsuvn
  */
 @Documented
+@Nonnull(
+    when = When.UNKNOWN
+)
 @Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.MAYBE)
+@TypeQualifierNickname
+@Target({
+    ElementType.TYPE,
+    ElementType.METHOD,
+    ElementType.CONSTRUCTOR,
+    ElementType.PACKAGE,
+})
 @TypeQualifierDefault({
     ElementType.METHOD,
     ElementType.FIELD,
@@ -23,13 +32,6 @@ import java.lang.annotation.*;
     ElementType.LOCAL_VARIABLE,
     ElementType.TYPE_PARAMETER,
     ElementType.TYPE_USE,
-})
-@TypeQualifierNickname
-@Target({
-    ElementType.TYPE,
-    ElementType.METHOD,
-    ElementType.CONSTRUCTOR,
-    ElementType.PACKAGE,
 })
 public @interface DefaultNullable {
 }

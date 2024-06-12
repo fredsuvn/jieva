@@ -3,7 +3,7 @@ package xyz.fsgek.common.base;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 
 import java.lang.reflect.Type;
 

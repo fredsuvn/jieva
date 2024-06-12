@@ -1,7 +1,7 @@
 package xyz.fsgek.common.data.protobuf;
 
 import com.google.protobuf.ByteString;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.mapper.JieMapper;
 

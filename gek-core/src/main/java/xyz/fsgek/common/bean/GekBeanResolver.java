@@ -1,7 +1,7 @@
 package xyz.fsgek.common.bean;
 
-import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.bean.handlers.AbstractBeanResolverHandler;
 import xyz.fsgek.common.bean.handlers.JavaBeanResolverHandler;

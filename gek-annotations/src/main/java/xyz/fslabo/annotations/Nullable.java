@@ -1,16 +1,21 @@
-package xyz.fsgek.annotations;
+package xyz.fslabo.annotations;
 
+import javax.annotation.Nonnull;
+import javax.annotation.meta.TypeQualifierNickname;
+import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
 /**
- * Declares type of the annotated element is not allowed to be the specified types.
- * It is container of {@link RejectedType}.
+ * Declares the annotated element is nullable.
  *
  * @author fredsuvn
- * @see RejectedType
  */
 @Documented
+@Nonnull(
+    when = When.UNKNOWN
+)
 @Retention(RetentionPolicy.RUNTIME)
+@TypeQualifierNickname
 @Target({
     ElementType.METHOD,
     ElementType.FIELD,
@@ -19,7 +24,5 @@ import java.lang.annotation.*;
     ElementType.TYPE_PARAMETER,
     ElementType.TYPE_USE,
 })
-public @interface RejectedTypes {
-
-    RejectedType[] value();
+public @interface Nullable {
 }

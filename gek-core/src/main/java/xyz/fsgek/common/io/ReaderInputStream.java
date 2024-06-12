@@ -1,6 +1,6 @@
 package xyz.fsgek.common.io;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.GekCheck;
 
 import java.io.IOException;

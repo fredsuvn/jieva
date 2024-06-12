@@ -1,6 +1,6 @@
 package xyz.fsgek.common.data;
 
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fsgek.common.base.GekChars;
 import xyz.fsgek.common.base.GekCheck;
 import xyz.fsgek.common.base.GekString;

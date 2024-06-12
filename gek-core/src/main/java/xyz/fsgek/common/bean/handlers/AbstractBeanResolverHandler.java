@@ -1,6 +1,6 @@
 package xyz.fsgek.common.bean.handlers;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekRuntimeException;
 import xyz.fsgek.common.bean.*;

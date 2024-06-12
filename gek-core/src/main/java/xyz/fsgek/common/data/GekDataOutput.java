@@ -1,6 +1,6 @@
 package xyz.fsgek.common.data;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 
 import java.io.InputStream;
 import java.io.OutputStream;

@@ -3,7 +3,7 @@ package test;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.GekString;
 import xyz.fsgek.common.codec.CipherCodec;
 import xyz.fsgek.common.codec.CodecProcess;

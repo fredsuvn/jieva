@@ -1,9 +1,9 @@
 package xyz.fsgek.common.mapper;
 
 import lombok.EqualsAndHashCode;
-import xyz.fsgek.annotations.Immutable;
-import xyz.fsgek.annotations.Nullable;
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.Immutable;
+import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.base.GekObject;

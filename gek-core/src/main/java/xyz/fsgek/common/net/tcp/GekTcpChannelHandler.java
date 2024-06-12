@@ -1,6 +1,6 @@
 package xyz.fsgek.common.net.tcp;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.net.tcp.handlers.DelimiterBasedTcpChannelHandler;
 import xyz.fsgek.common.net.tcp.handlers.LengthBasedTcpChannelHandler;
 

@@ -1,6 +1,6 @@
 package xyz.fsgek.common.file;
 
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.ThreadSafe;
 
 import java.io.*;
 import java.nio.channels.FileChannel;

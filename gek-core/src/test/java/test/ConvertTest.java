@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.base.GekFlag;
 import xyz.fsgek.common.mapper.JieMapper;

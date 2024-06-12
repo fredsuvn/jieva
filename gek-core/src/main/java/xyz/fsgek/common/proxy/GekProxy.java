@@ -1,6 +1,6 @@
 package xyz.fsgek.common.proxy;
 
-import xyz.fsgek.annotations.ThreadSafe;
+import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.reflect.GekReflect;
 

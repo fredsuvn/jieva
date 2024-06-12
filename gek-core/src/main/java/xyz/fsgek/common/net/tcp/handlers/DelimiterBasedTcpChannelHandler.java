@@ -1,6 +1,6 @@
 package xyz.fsgek.common.net.tcp.handlers;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.io.GekIO;
 import xyz.fsgek.common.net.tcp.GekTcpChannel;
 import xyz.fsgek.common.net.tcp.GekTcpChannelHandler;

@@ -2,7 +2,7 @@ package xyz.fsgek.common.proxy;
 
 import org.springframework.cglib.core.SpringNamingPolicy;
 import org.springframework.cglib.proxy.*;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.collect.GekColl;
 
 import java.lang.reflect.Method;

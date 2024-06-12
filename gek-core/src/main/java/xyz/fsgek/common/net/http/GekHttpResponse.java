@@ -1,6 +1,6 @@
 package xyz.fsgek.common.net.http;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 
 import java.io.InputStream;
 

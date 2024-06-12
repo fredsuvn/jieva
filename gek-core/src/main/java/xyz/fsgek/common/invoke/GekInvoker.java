@@ -1,6 +1,6 @@
 package xyz.fsgek.common.invoke;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;

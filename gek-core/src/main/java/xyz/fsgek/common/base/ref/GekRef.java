@@ -1,6 +1,6 @@
 package xyz.fsgek.common.base.ref;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 
 /**
  * Gek Ref is an object which references a value. It is usually be used where a variable cannot be re-assigned.

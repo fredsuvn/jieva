@@ -1,6 +1,6 @@
 package xyz.fsgek.common.mapper.handlers;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;

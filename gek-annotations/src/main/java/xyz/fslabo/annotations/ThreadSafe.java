@@ -1,26 +1,24 @@
-package xyz.fsgek.annotations;
+package xyz.fslabo.annotations;
 
-import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierNickname;
-import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
 /**
- * Declares the annotated element may be null.
- *
- * @author fredsuvn
+ * Declares the annotated element is thread-safe.
  */
 @Documented
-@TypeQualifierNickname
-@Nonnull(when = When.UNKNOWN)
+@javax.annotation.concurrent.ThreadSafe
 @Retention(RetentionPolicy.RUNTIME)
+@TypeQualifierNickname
 @Target({
+    ElementType.TYPE,
     ElementType.METHOD,
+    ElementType.CONSTRUCTOR,
     ElementType.FIELD,
     ElementType.PARAMETER,
     ElementType.LOCAL_VARIABLE,
     ElementType.TYPE_PARAMETER,
     ElementType.TYPE_USE,
 })
-public @interface Nullable {
+public @interface ThreadSafe {
 }

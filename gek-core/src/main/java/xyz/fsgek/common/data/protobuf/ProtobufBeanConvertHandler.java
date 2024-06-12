@@ -1,7 +1,7 @@
 package xyz.fsgek.common.data.protobuf;
 
 import com.google.protobuf.Message;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.bean.GekBeanResolver;
 import xyz.fsgek.common.mapper.GekConvertException;
 import xyz.fsgek.common.mapper.JieMapper;

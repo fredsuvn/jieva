@@ -1,6 +1,6 @@
 package xyz.fsgek.common.base;
 
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;

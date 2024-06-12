@@ -1,7 +1,7 @@
 package xyz.fsgek.common.base.obj;
 
 import lombok.EqualsAndHashCode;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 import xyz.fsgek.common.base.Gek;
 import xyz.fsgek.common.reflect.GekReflect;
 

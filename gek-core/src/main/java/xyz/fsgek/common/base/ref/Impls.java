@@ -1,7 +1,7 @@
 package xyz.fsgek.common.base.ref;
 
 import lombok.AllArgsConstructor;
-import xyz.fsgek.annotations.Nullable;
+import xyz.fslabo.annotations.Nullable;
 
 final class Impls {
 
