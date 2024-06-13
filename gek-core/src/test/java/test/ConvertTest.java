@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekFlag;
-import xyz.fsgek.common.mapper.JieMapper;
-import xyz.fsgek.common.reflect.TypeRef;
+import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;

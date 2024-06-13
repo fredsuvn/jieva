@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekDate;
+import xyz.fslabo.common.base.GekDate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

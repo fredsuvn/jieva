@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.proxy.GekProxy;
+import xyz.fslabo.common.proxy.GekProxy;
 
 public class ProxyTest {
 

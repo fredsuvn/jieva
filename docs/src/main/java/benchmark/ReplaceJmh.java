@@ -1,7 +1,7 @@
 package benchmark;
 
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgek.common.base.GekString;
+import xyz.fslabo.common.base.GekString;
 
 import java.util.concurrent.TimeUnit;
 

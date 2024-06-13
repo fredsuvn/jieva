@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.collect.GekColl;
-import xyz.fsgek.common.collect.GekCollector;
+import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.GekCollector;
 
 import java.util.*;
 

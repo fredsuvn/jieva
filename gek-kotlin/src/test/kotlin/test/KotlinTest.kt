@@ -1,7 +1,7 @@
 package test
 
 import org.testng.annotations.Test
-import xyz.fsgek.common.base.helloGekKotlin
+import xyz.fslabo.common.base.helloGekKotlin
 
 class KotlinTest {
 

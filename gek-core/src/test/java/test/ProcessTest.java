@@ -1,8 +1,8 @@
 package test;
 
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.*;
-import xyz.fsgek.common.io.GekIO;
+import xyz.fslabo.common.base.*;
+import xyz.fslabo.common.io.GekIO;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.Semaphore;

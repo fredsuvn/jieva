@@ -2,8 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekChars;
-import xyz.fsgek.common.io.GekIO;
+import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.io.GekIO;
 
 import java.io.*;
 import java.nio.ByteBuffer;

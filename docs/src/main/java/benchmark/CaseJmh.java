@@ -3,7 +3,7 @@ package benchmark;
 import com.google.common.base.CaseFormat;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-import xyz.fsgek.common.base.GekCase;
+import xyz.fslabo.common.base.GekCase;
 
 import java.util.concurrent.TimeUnit;
 

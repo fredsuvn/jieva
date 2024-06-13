@@ -3,9 +3,9 @@ package test;
 import com.google.common.base.CaseFormat;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekCase;
-import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.collect.GekColl;
+import xyz.fslabo.common.base.GekCase;
+import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.collect.GekColl;
 
 import java.util.Arrays;
 

@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
 import org.openjdk.jmh.annotations.*;
-import xyz.fsgek.common.base.Gek;
+import xyz.fslabo.common.base.Gek;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;

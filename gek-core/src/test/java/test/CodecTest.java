@@ -4,11 +4,11 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.codec.CipherCodec;
-import xyz.fsgek.common.codec.CodecProcess;
-import xyz.fsgek.common.codec.GekCodec;
-import xyz.fsgek.common.io.GekIO;
+import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.codec.CipherCodec;
+import xyz.fslabo.common.codec.CodecProcess;
+import xyz.fslabo.common.codec.GekCodec;
+import xyz.fslabo.common.io.GekIO;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

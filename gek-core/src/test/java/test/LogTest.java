@@ -2,10 +2,10 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekLog;
-import xyz.fsgek.common.base.ref.GekRef;
-import xyz.fsgek.common.base.ref.IntRef;
+import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.GekLog;
+import xyz.fslabo.common.base.ref.GekRef;
+import xyz.fslabo.common.base.ref.IntRef;
 
 public class LogTest {
 

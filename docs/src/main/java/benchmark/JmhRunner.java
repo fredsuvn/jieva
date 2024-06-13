@@ -4,9 +4,9 @@ import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.collect.GekArray;
+import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.collect.GekArray;
 
 import java.io.File;
 import java.io.IOException;

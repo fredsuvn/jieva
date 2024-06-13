@@ -2,8 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekLog;
-import xyz.fsgek.common.base.GekRandom;
+import xyz.fslabo.common.base.GekLog;
+import xyz.fslabo.common.base.GekRandom;
 
 public class RandomTest {
 

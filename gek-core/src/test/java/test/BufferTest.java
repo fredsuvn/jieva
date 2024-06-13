@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekBytesBuilder;
-import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.io.GekIO;
+import xyz.fslabo.common.base.GekBytesBuilder;
+import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.io.GekIO;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

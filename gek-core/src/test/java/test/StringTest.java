@@ -3,8 +3,8 @@ package test;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.GekString;
-import xyz.fsgek.common.collect.GekColl;
+import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.collect.GekColl;
 
 import java.util.Arrays;
 import java.util.Collections;

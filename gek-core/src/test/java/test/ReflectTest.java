@@ -2,13 +2,13 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekLog;
-import xyz.fsgek.common.base.obj.GekObj;
-import xyz.fsgek.common.collect.GekColl;
-import xyz.fsgek.common.reflect.GekReflect;
-import xyz.fsgek.common.reflect.GekType;
-import xyz.fsgek.common.reflect.TypeRef;
+import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.GekLog;
+import xyz.fslabo.common.base.obj.GekObj;
+import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.GekType;
+import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

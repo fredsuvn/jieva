@@ -6,7 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.Blackhole;
-import xyz.fsgek.common.cache.GekCache;
+import xyz.fslabo.common.cache.GekCache;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;

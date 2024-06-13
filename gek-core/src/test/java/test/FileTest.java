@@ -2,14 +2,14 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fsgek.common.base.Gek;
-import xyz.fsgek.common.base.GekChars;
-import xyz.fsgek.common.base.ref.GekRef;
-import xyz.fsgek.common.base.ref.LongRef;
-import xyz.fsgek.common.file.GekFile;
-import xyz.fsgek.common.file.GekFileCache;
-import xyz.fsgek.common.io.GekIO;
-import xyz.fsgek.common.io.GekIOException;
+import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.base.ref.GekRef;
+import xyz.fslabo.common.base.ref.LongRef;
+import xyz.fslabo.common.file.GekFile;
+import xyz.fslabo.common.file.GekFileCache;
+import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.GekIOException;
 
 import java.io.File;
 import java.io.FileOutputStream;
