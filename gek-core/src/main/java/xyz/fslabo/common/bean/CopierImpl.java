@@ -2,7 +2,7 @@ package xyz.fslabo.common.bean;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Gek;
-import xyz.fslabo.common.base.GekOption;
+import xyz.fslabo.common.base.JieOption;
 import xyz.fslabo.common.collect.GekColl;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.reflect.GekParamType;
@@ -21,7 +21,7 @@ final class CopierImpl implements GekBeanCopier {
     public void copyProperties(
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
-        GekOption<?, ?>... options
+        JieOption<?, ?>... options
     ) throws GekBeanCopyException {
         try {
             if (source instanceof Map) {
@@ -47,7 +47,7 @@ final class CopierImpl implements GekBeanCopier {
     public void mapToMap(
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
-        GekOption<?, ?>... options
+        JieOption<?, ?>... options
     ) {
         GekParamType sourceParamType = GekReflect.getGenericSuperType(sourceType, Map.class);
         checkMapType(sourceParamType);
@@ -59,11 +59,11 @@ final class CopierImpl implements GekBeanCopier {
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
         Map<Object, Object> destMap = Gek.as(dest);
-        JieMapper converter = GekOption.get(GekBeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
-        Object ignoredProperties = GekOption.get(GekBeanOption.Key.IGNORED_PROPERTIES, options);
-        Object ignoreNull = GekOption.get(GekBeanOption.Key.IGNORE_NULL, options);
-        Object thrownIfConversionFails = GekOption.get(GekBeanOption.Key.THROWN_IF_ANY_FAILS, options);
-        Object putIfNotContained = GekOption.get(GekBeanOption.Key.PUT_IF_NOT_CONTAINED, options);
+        JieMapper converter = JieOption.get(BeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
+        Object ignoredProperties = JieOption.get(BeanOption.Key.IGNORED_PROPERTIES, options);
+        Object ignoreNull = JieOption.get(BeanOption.Key.IGNORE_NULL, options);
+        Object thrownIfConversionFails = JieOption.get(BeanOption.Key.THROWN_IF_ANY_FAILS, options);
+        Object putIfNotContained = JieOption.get(BeanOption.Key.PUT_IF_NOT_CONTAINED, options);
         sourceMap.forEach((key, value) -> {
             if (isIgnored(key, ignoredProperties)) {
                 return;
@@ -99,20 +99,20 @@ final class CopierImpl implements GekBeanCopier {
     public void mapToData(
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
-        GekOption<?, ?>... options
+        JieOption<?, ?>... options
     ) {
         GekParamType sourceParamType = GekReflect.getGenericSuperType(sourceType, Map.class);
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
         Map<Object, Object> sourceMap = Gek.as(source);
-        GekBeanResolver resolver = GekOption.get(GekBeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
+        GekBeanResolver resolver = JieOption.get(BeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
         GekBeanInfo destData = resolver.resolve(destType);
         Map<String, GekPropertyInfo> destProperties = destData.getProperties();
-        JieMapper converter = GekOption.get(GekBeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
-        Object ignoredProperties = GekOption.get(GekBeanOption.Key.IGNORED_PROPERTIES, options);
-        Object ignoreNull = GekOption.get(GekBeanOption.Key.IGNORE_NULL, options);
-        Object thrownIfConversionFails = GekOption.get(GekBeanOption.Key.THROWN_IF_ANY_FAILS, options);
+        JieMapper converter = JieOption.get(BeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
+        Object ignoredProperties = JieOption.get(BeanOption.Key.IGNORED_PROPERTIES, options);
+        Object ignoreNull = JieOption.get(BeanOption.Key.IGNORE_NULL, options);
+        Object thrownIfConversionFails = JieOption.get(BeanOption.Key.THROWN_IF_ANY_FAILS, options);
         sourceMap.forEach((key, value) -> {
             if (isIgnored(key, ignoredProperties)) {
                 return;
@@ -149,9 +149,9 @@ final class CopierImpl implements GekBeanCopier {
     public void dataToMap(
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
-        GekOption<?, ?>... options
+        JieOption<?, ?>... options
     ) {
-        GekBeanResolver resolver = GekOption.get(GekBeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
+        GekBeanResolver resolver = JieOption.get(BeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
         GekBeanInfo sourceData = resolver.resolve(sourceType);
         Map<String, GekPropertyInfo> sourceProperties = sourceData.getProperties();
         GekParamType destParamType = GekReflect.getGenericSuperType(destType, Map.class);
@@ -159,11 +159,11 @@ final class CopierImpl implements GekBeanCopier {
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
         Map<Object, Object> destMap = Gek.as(dest);
-        JieMapper converter = GekOption.get(GekBeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
-        Object ignoredProperties = GekOption.get(GekBeanOption.Key.IGNORED_PROPERTIES, options);
-        Object ignoreNull = GekOption.get(GekBeanOption.Key.IGNORE_NULL, options);
-        Object thrownIfConversionFails = GekOption.get(GekBeanOption.Key.THROWN_IF_ANY_FAILS, options);
-        Object putIfNotContained = GekOption.get(GekBeanOption.Key.PUT_IF_NOT_CONTAINED, options);
+        JieMapper converter = JieOption.get(BeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
+        Object ignoredProperties = JieOption.get(BeanOption.Key.IGNORED_PROPERTIES, options);
+        Object ignoreNull = JieOption.get(BeanOption.Key.IGNORE_NULL, options);
+        Object thrownIfConversionFails = JieOption.get(BeanOption.Key.THROWN_IF_ANY_FAILS, options);
+        Object putIfNotContained = JieOption.get(BeanOption.Key.PUT_IF_NOT_CONTAINED, options);
         sourceProperties.forEach((name, property) -> {
             if (isIgnored(name, ignoredProperties)) {
                 return;
@@ -200,17 +200,17 @@ final class CopierImpl implements GekBeanCopier {
     public void dataToData(
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
-        GekOption<?, ?>... options
+        JieOption<?, ?>... options
     ) {
-        GekBeanResolver resolver = GekOption.get(GekBeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
+        GekBeanResolver resolver = JieOption.get(BeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
         GekBeanInfo sourceData = resolver.resolve(sourceType);
         Map<String, GekPropertyInfo> sourceProperties = sourceData.getProperties();
         GekBeanInfo destData = resolver.resolve(destType);
         Map<String, GekPropertyInfo> destProperties = destData.getProperties();
-        JieMapper converter = GekOption.get(GekBeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
-        Object ignoredProperties = GekOption.get(GekBeanOption.Key.IGNORED_PROPERTIES, options);
-        Object ignoreNull = GekOption.get(GekBeanOption.Key.IGNORE_NULL, options);
-        Object thrownIfConversionFails = GekOption.get(GekBeanOption.Key.THROWN_IF_ANY_FAILS, options);
+        JieMapper converter = JieOption.get(BeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
+        Object ignoredProperties = JieOption.get(BeanOption.Key.IGNORED_PROPERTIES, options);
+        Object ignoreNull = JieOption.get(BeanOption.Key.IGNORE_NULL, options);
+        Object thrownIfConversionFails = JieOption.get(BeanOption.Key.THROWN_IF_ANY_FAILS, options);
         sourceProperties.forEach((name, property) -> {
             if (isIgnored(name, ignoredProperties)) {
                 return;

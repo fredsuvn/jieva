@@ -5,7 +5,7 @@ package xyz.fslabo.common.ref;
  *
  * @author fredsuvn
  */
-public interface LongVar {
+public interface LongVar extends LongVal {
 
     /**
      * Returns an instance of {@link LongVar} of 0 initialized value.
@@ -23,22 +23,24 @@ public interface LongVar {
      * @return an instance of {@link LongVar} of initialized value
      */
     static LongVar of(long value) {
-        return VarImpls.newLongVar(value);
+        return VarImpls.ofLong(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    long get();
+    long set(long value);
 
     /**
-     * Sets referenced value.
+     * Adds current value by specified value, and returns the result.
      *
-     * @param value referenced value
+     * @param value specified value
+     * @return the result
      */
-    void set(long value);
+    long add(long value);
 
     /**
      * Increments current value by one, and returns the result.
@@ -55,19 +57,11 @@ public interface LongVar {
     long getAndIncrement();
 
     /**
-     * Adds current value by specified value, and returns the result.
-     *
-     * @param v specified value
-     * @return the result
-     */
-    long add(long v);
-
-    /**
      * Returns {@link Var} version with current value.
      *
      * @return {@link Var} version with current value
      */
-    default Var<Long> toVar() {
+    default Var<Long> toWrapper() {
         return Var.of(get());
     }
 }

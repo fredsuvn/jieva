@@ -1,6 +1,6 @@
 package xyz.fslabo.common.bean;
 
-import xyz.fslabo.common.base.GekOption;
+import xyz.fslabo.common.base.JieOption;
 import xyz.fslabo.common.mapper.GekConvertException;
 import xyz.fslabo.common.mapper.JieMapper;
 
@@ -9,10 +9,10 @@ import xyz.fslabo.common.mapper.JieMapper;
  *
  * @author sunqian
  */
-public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
+public interface BeanOption extends JieOption<BeanOption.Key, Object> {
 
     /**
-     * Key of {@link GekBeanOption}.
+     * Key of {@link BeanOption}.
      */
     enum Key {
 
@@ -59,7 +59,7 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
      * @param provider bean info provider
      * @return option to specify the {@link GekBeanProvider}
      */
-    static GekBeanOption provider(GekBeanProvider provider) {
+    static BeanOption provider(GekBeanProvider provider) {
         return new OptionImpl(Key.PROVIDER, provider);
     }
 
@@ -70,7 +70,7 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
      * @param converter data converter
      * @return option to specify the {@link JieMapper}
      */
-    static GekBeanOption converter(JieMapper converter) {
+    static BeanOption converter(JieMapper converter) {
         return new OptionImpl(Key.CONVERTER, converter);
     }
 
@@ -80,7 +80,7 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
      * @param ignoreProperties ignored properties which don't need copy
      * @return option to specify ignored properties to copy
      */
-    static GekBeanOption ignoredProperties(Object... ignoreProperties) {
+    static BeanOption ignoredProperties(Object... ignoreProperties) {
         return new OptionImpl(Key.IGNORED_PROPERTIES, ignoreProperties);
     }
 
@@ -90,7 +90,7 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
      * @param ignoreProperties ignored properties which don't need copy
      * @return option to specify ignored properties
      */
-    static GekBeanOption ignoredProperties(Iterable<?> ignoreProperties) {
+    static BeanOption ignoredProperties(Iterable<?> ignoreProperties) {
         return new OptionImpl(Key.IGNORED_PROPERTIES, ignoreProperties);
     }
 
@@ -101,7 +101,7 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
      * @param ignoreNull whether the null value should be ignored to copy
      * @return option to specify whether the null value should be ignored to copy
      */
-    static GekBeanOption ignoreNull(boolean ignoreNull) {
+    static BeanOption ignoreNull(boolean ignoreNull) {
         return new OptionImpl(Key.IGNORE_NULL, ignoreNull);
     }
 
@@ -114,7 +114,7 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
      * @return option to specify whether a {@link GekConvertException} should be thrown when any part of conversion
      * fails
      */
-    static GekBeanOption thrownIfConversionFails(boolean thrownIfAnyFails) {
+    static BeanOption thrownIfConversionFails(boolean thrownIfAnyFails) {
         return new OptionImpl(Key.THROWN_IF_ANY_FAILS, thrownIfAnyFails);
     }
 
@@ -127,7 +127,7 @@ public interface GekBeanOption extends GekOption<GekBeanOption.Key, Object> {
      * @return option to specify whether the value should be copied into the dest map if the dest doesn't contain the
      * key mapped by the value
      */
-    static GekBeanOption putIfNotContained(boolean putIfNotContained) {
+    static BeanOption putIfNotContained(boolean putIfNotContained) {
         return new OptionImpl(Key.PUT_IF_NOT_CONTAINED, putIfNotContained);
     }
 }

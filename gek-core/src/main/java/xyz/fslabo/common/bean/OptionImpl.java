@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode
 @AllArgsConstructor
-final class OptionImpl implements GekBeanOption {
+final class OptionImpl implements BeanOption {
 
     private final Key key;
     private final Object value;

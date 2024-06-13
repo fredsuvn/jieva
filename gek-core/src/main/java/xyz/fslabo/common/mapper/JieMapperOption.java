@@ -1,13 +1,13 @@
 package xyz.fslabo.common.mapper;
 
-import xyz.fslabo.common.base.GekOption;
+import xyz.fslabo.common.base.JieOption;
 
 /**
  * Options for gek bean operations.
  *
  * @author sunqian
  */
-public interface JieMapperOption extends GekOption<JieMapperOption.Key, Object> {
+public interface JieMapperOption extends JieOption<JieMapperOption.Key, Object> {
 
     /**
      * Key of {@link JieMapperOption}.

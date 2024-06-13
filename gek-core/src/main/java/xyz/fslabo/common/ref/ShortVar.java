@@ -5,7 +5,7 @@ package xyz.fslabo.common.ref;
  *
  * @author fredsuvn
  */
-public interface ShortVar {
+public interface ShortVar extends ShortVal {
 
     /**
      * Returns an instance of {@link ShortVar} of 0 initialized value.
@@ -23,22 +23,24 @@ public interface ShortVar {
      * @return an instance of {@link ShortVar} of initialized value
      */
     static ShortVar of(short value) {
-        return VarImpls.newShortVar(value);
+        return VarImpls.ofShort(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    short get();
+    short set(short value);
 
     /**
-     * Sets referenced value.
+     * Adds current value by specified value, and returns the result.
      *
-     * @param value referenced value
+     * @param value specified value
+     * @return the result
      */
-    void set(short value);
+    short add(short value);
 
     /**
      * Increments current value by one, and returns the result.
@@ -55,19 +57,11 @@ public interface ShortVar {
     short getAndIncrement();
 
     /**
-     * Adds current value by specified value, and returns the result.
-     *
-     * @param v specified value
-     * @return the result
-     */
-    short add(short v);
-
-    /**
      * Returns {@link Var} version with current value.
      *
      * @return {@link Var} version with current value
      */
-    default Var<Short> toVar() {
+    default Var<Short> toWrapper() {
         return Var.of(get());
     }
 }

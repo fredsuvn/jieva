@@ -5,7 +5,7 @@ package xyz.fslabo.common.ref;
  *
  * @author fredsuvn
  */
-public interface BooleanVar {
+public interface BooleanVar extends BooleanVal {
 
     /**
      * Returns an instance of {@link BooleanVar} of false initialized value.
@@ -23,22 +23,16 @@ public interface BooleanVar {
      * @return an instance of {@link BooleanVar} of initialized value
      */
     static BooleanVar of(boolean value) {
-        return VarImpls.newBooleanVar(value);
+        return VarImpls.ofBoolean(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    boolean get();
-
-    /**
-     * Sets referenced value.
-     *
-     * @param value referenced value
-     */
-    void set(boolean value);
+    boolean set(boolean value);
 
     /**
      * Toggles current value, and returns the result.
@@ -59,7 +53,7 @@ public interface BooleanVar {
      *
      * @return {@link Var} version with current value
      */
-    default Var<Boolean> toVar() {
+    default Var<Boolean> toWrapper() {
         return Var.of(get());
     }
 }

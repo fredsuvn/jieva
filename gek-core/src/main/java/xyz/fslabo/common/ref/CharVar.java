@@ -5,7 +5,7 @@ package xyz.fslabo.common.ref;
  *
  * @author fredsuvn
  */
-public interface CharVar {
+public interface CharVar extends CharVal {
 
     /**
      * Returns an instance of {@link CharVar} of 0 initialized value.
@@ -23,29 +23,23 @@ public interface CharVar {
      * @return an instance of {@link CharVar} of initialized value
      */
     static CharVar of(char value) {
-        return VarImpls.newCharVar(value);
+        return VarImpls.ofChar(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    char get();
-
-    /**
-     * Sets referenced value.
-     *
-     * @param value referenced value
-     */
-    void set(char value);
+    char set(char value);
 
     /**
      * Returns {@link Var} version with current value.
      *
      * @return {@link Var} version with current value
      */
-    default Var<Character> toVar() {
+    default Var<Character> toWrapper() {
         return Var.of(get());
     }
 }

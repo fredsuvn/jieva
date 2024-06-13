@@ -5,7 +5,7 @@ package xyz.fslabo.common.ref;
  *
  * @author fredsuvn
  */
-public interface DoubleVar {
+public interface DoubleVar extends DoubleVal {
 
     /**
      * Returns an instance of {@link DoubleVar} of 0 initialized value.
@@ -23,37 +23,31 @@ public interface DoubleVar {
      * @return an instance of {@link DoubleVar} of initialized value
      */
     static DoubleVar of(double value) {
-        return VarImpls.newDoubleVar(value);
+        return VarImpls.ofDouble(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    double get();
-
-    /**
-     * Sets referenced value.
-     *
-     * @param value referenced value
-     */
-    void set(double value);
+    double set(double value);
 
     /**
      * Adds current value by specified value, and returns the result.
      *
-     * @param v specified value
+     * @param value specified value
      * @return the result
      */
-    double add(double v);
+    double add(double value);
 
     /**
      * Returns {@link Var} version with current value.
      *
      * @return {@link Var} version with current value
      */
-    default Var<Double> toVar() {
+    default Var<Double> toWrapper() {
         return Var.of(get());
     }
 }

@@ -5,7 +5,7 @@ package xyz.fslabo.common.ref;
  *
  * @author fredsuvn
  */
-public interface FloatVar {
+public interface FloatVar extends FloatVal {
 
     /**
      * Returns an instance of {@link FloatVar} of 0 initialized value.
@@ -23,37 +23,31 @@ public interface FloatVar {
      * @return an instance of {@link FloatVar} of initialized value
      */
     static FloatVar of(float value) {
-        return VarImpls.newFloatVar(value);
+        return VarImpls.ofFloat(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    float get();
-
-    /**
-     * Sets referenced value.
-     *
-     * @param value referenced value
-     */
-    void set(float value);
+    float set(float value);
 
     /**
      * Adds current value by specified value, and returns the result.
      *
-     * @param v specified value
+     * @param value specified value
      * @return the result
      */
-    float add(float v);
+    float add(float value);
 
     /**
      * Returns {@link Var} version with current value.
      *
      * @return {@link Var} version with current value
      */
-    default Var<Float> toVar() {
+    default Var<Float> toWrapper() {
         return Var.of(get());
     }
 }

@@ -5,7 +5,7 @@ package xyz.fslabo.common.ref;
  *
  * @author fredsuvn
  */
-public interface IntVar {
+public interface IntVar extends IntVal {
 
     /**
      * Returns an instance of {@link IntVar} of 0 initialized value.
@@ -23,22 +23,24 @@ public interface IntVar {
      * @return an instance of {@link IntVar} of initialized value
      */
     static IntVar of(int value) {
-        return VarImpls.newIntVar(value);
+        return VarImpls.ofInt(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    int get();
+    int set(int value);
 
     /**
-     * Sets referenced value.
+     * Adds current value by specified value, and returns the result.
      *
-     * @param value referenced value
+     * @param value specified value
+     * @return the result
      */
-    void set(int value);
+    int add(int value);
 
     /**
      * Increments current value by one, and returns the result.
@@ -55,19 +57,11 @@ public interface IntVar {
     int getAndIncrement();
 
     /**
-     * Adds current value by specified value, and returns the result.
-     *
-     * @param v specified value
-     * @return the result
-     */
-    int add(int v);
-
-    /**
      * Returns {@link Var} version with current value.
      *
      * @return {@link Var} version with current value
      */
-    default Var<Integer> toVar() {
+    default Var<Integer> toWrapper() {
         return Var.of(get());
     }
 }

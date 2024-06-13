@@ -1,7 +1,7 @@
 package xyz.fslabo.common.bean;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekOption;
+import xyz.fslabo.common.base.JieOption;
 import xyz.fslabo.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
@@ -42,14 +42,14 @@ public interface GekBeanCopier {
      *         For {@link Map} object, type of properties' names and values are come from {@code destType};
      *     </li>
      *     <li>
-     *         Options are specified by {@link GekBeanOption}, including:
+     *         Options are specified by {@link BeanOption}, including:
      *         <ul>
-     *             <li>{@link GekBeanOption#provider(GekBeanProvider)}</li>
-     *             <li>{@link GekBeanOption#converter(JieMapper)}</li>
-     *             <li>{@link GekBeanOption#ignoredProperties(Object...)}, {@link GekBeanOption#ignoredProperties(Iterable)}</li>
-     *             <li>{@link GekBeanOption#ignoreNull(boolean)}</li>
-     *             <li>{@link GekBeanOption#thrownIfConversionFails(boolean)}</li>
-     *             <li>{@link GekBeanOption#putIfNotContained(boolean)}</li>
+     *             <li>{@link BeanOption#provider(GekBeanProvider)}</li>
+     *             <li>{@link BeanOption#converter(JieMapper)}</li>
+     *             <li>{@link BeanOption#ignoredProperties(Object...)}, {@link BeanOption#ignoredProperties(Iterable)}</li>
+     *             <li>{@link BeanOption#ignoreNull(boolean)}</li>
+     *             <li>{@link BeanOption#thrownIfConversionFails(boolean)}</li>
+     *             <li>{@link BeanOption#putIfNotContained(boolean)}</li>
      *         </ul>
      *     </li>
      * </ul>
@@ -64,6 +64,6 @@ public interface GekBeanCopier {
     void copyProperties(
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
-        GekOption<?, ?>... options
+        JieOption<?, ?>... options
     ) throws GekBeanCopyException;
 }

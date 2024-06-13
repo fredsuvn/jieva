@@ -5,7 +5,7 @@ package xyz.fslabo.common.ref;
  *
  * @author fredsuvn
  */
-public interface ByteVar {
+public interface ByteVar extends ByteVal {
 
     /**
      * Returns an instance of {@link ByteVar} of 0 initialized value.
@@ -23,22 +23,24 @@ public interface ByteVar {
      * @return an instance of {@link ByteVar} of initialized value
      */
     static ByteVar of(byte value) {
-        return VarImpls.newByteVar(value);
+        return VarImpls.ofByte(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    byte get();
+    byte set(byte value);
 
     /**
-     * Sets referenced value.
+     * Adds current value by specified value, and returns the result.
      *
-     * @param value referenced value
+     * @param value specified value
+     * @return the result
      */
-    void set(byte value);
+    byte add(byte value);
 
     /**
      * Increments current value by one, and returns the result.
@@ -55,19 +57,11 @@ public interface ByteVar {
     byte getAndIncrement();
 
     /**
-     * Adds current value by specified value, and returns the result.
-     *
-     * @param v specified value
-     * @return the result
-     */
-    byte add(byte v);
-
-    /**
      * Returns {@link Var} version with current value.
      *
      * @return {@link Var} version with current value
      */
-    default Var<Byte> toVar() {
+    default Var<Byte> toWrapper() {
         return Var.of(get());
     }
 }

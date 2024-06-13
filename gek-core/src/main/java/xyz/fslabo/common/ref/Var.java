@@ -3,7 +3,7 @@ package xyz.fslabo.common.ref;
 import xyz.fslabo.annotations.Nullable;
 
 /**
- * This interface represents a mutable variable reference which references an object.
+ * This interface represents a mutable variable reference which references a value.
  * It is typically used in places where variables cannot be reassigned, for example:
  * <pre>
  *     String str = "a";
@@ -21,7 +21,7 @@ import xyz.fslabo.annotations.Nullable;
  * @param <T> type of referenced value
  * @author fredsuvn
  */
-public interface Var<T> {
+public interface Var<T> extends Val<T> {
 
     /**
      * Return an instance of {@link Var} of null initialized value.
@@ -41,21 +41,14 @@ public interface Var<T> {
      * @return an instance of {@link Var} of initialized value
      */
     static <T> Var<T> of(@Nullable T value) {
-        return VarImpls.newVar(value);
+        return VarImpls.of(value);
     }
 
     /**
-     * Returns referenced value.
+     * Sets and returns specified value.
      *
-     * @return referenced value
+     * @param value specified value
+     * @return specified value
      */
-    @Nullable
-    T get();
-
-    /**
-     * Sets referenced value.
-     *
-     * @param value referenced value
-     */
-    void set(@Nullable T value);
+    T set(@Nullable T value);
 }

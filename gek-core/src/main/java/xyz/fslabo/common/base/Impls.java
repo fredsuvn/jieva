@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 
 final class Impls {
 
-    static GekOption<?, ?>[] EMPTY_OPTIONS = new GekOption<?, ?>[0];
+    static JieOption<?, ?>[] EMPTY_OPTIONS = new JieOption<?, ?>[0];
 
     static GekObject nullGekObject() {
         return GekObjectImpl.NULL;
@@ -19,8 +19,8 @@ final class Impls {
         return new GekObjectImpl(value, type);
     }
 
-    static <K, V> GekOption<K, V> newGekOption(K key, V value) {
-        return new GekOptionImpl<>(key, value);
+    static <K, V> JieOption<K, V> newGekOption(K key, V value) {
+        return new JieOptionImpl<>(key, value);
     }
 
     @Data
@@ -37,7 +37,7 @@ final class Impls {
     @Data
     @EqualsAndHashCode
     @AllArgsConstructor
-    private static final class GekOptionImpl<K, V> implements GekOption<K, V> {
+    private static final class JieOptionImpl<K, V> implements JieOption<K, V> {
 
         private final K key;
         private final V value;

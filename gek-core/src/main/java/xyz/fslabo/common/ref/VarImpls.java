@@ -5,39 +5,39 @@ import xyz.fslabo.annotations.Nullable;
 
 final class VarImpls {
 
-    static <T> Var<T> newVar(@Nullable T value) {
+    static <T> Var<T> of(@Nullable T value) {
         return new VarImpl<>(value);
     }
 
-    static BooleanVar newBooleanVar(boolean value) {
+    static BooleanVar ofBoolean(boolean value) {
         return new BooleanVarImpl(value);
     }
 
-    static IntVar newIntVar(int value) {
+    static IntVar ofInt(int value) {
         return new IntVarImpl(value);
     }
 
-    static LongVar newLongVar(long value) {
+    static LongVar ofLong(long value) {
         return new LongVarImpl(value);
     }
 
-    static ShortVar newShortVar(short value) {
+    static ShortVar ofShort(short value) {
         return new ShortVarImpl(value);
     }
 
-    static FloatVar newFloatVar(float value) {
+    static FloatVar ofFloat(float value) {
         return new FloatVarImpl(value);
     }
 
-    static DoubleVar newDoubleVar(double value) {
+    static DoubleVar ofDouble(double value) {
         return new DoubleVarImpl(value);
     }
 
-    static ByteVar newByteVar(byte value) {
+    static ByteVar ofByte(byte value) {
         return new ByteVarImpl(value);
     }
 
-    static CharVar newCharVar(char value) {
+    static CharVar ofChar(char value) {
         return new CharVarImpl(value);
     }
 
@@ -52,8 +52,9 @@ final class VarImpls {
         }
 
         @Override
-        public void set(@Nullable T value) {
+        public T set(@Nullable T value) {
             this.value = value;
+            return value;
         }
     }
 
@@ -68,8 +69,9 @@ final class VarImpls {
         }
 
         @Override
-        public void set(boolean value) {
+        public boolean set(boolean value) {
             this.value = value;
+            return value;
         }
 
         @Override
@@ -96,8 +98,9 @@ final class VarImpls {
         }
 
         @Override
-        public void set(int value) {
+        public int set(int value) {
             this.value = value;
+            return value;
         }
 
         @Override
@@ -111,9 +114,9 @@ final class VarImpls {
         }
 
         @Override
-        public int add(int v) {
-            value += v;
-            return value;
+        public int add(int value) {
+            this.value += value;
+            return this.value;
         }
     }
 
@@ -128,8 +131,9 @@ final class VarImpls {
         }
 
         @Override
-        public void set(long value) {
+        public long set(long value) {
             this.value = value;
+            return value;
         }
 
         @Override
@@ -143,9 +147,9 @@ final class VarImpls {
         }
 
         @Override
-        public long add(long v) {
-            value += v;
-            return value;
+        public long add(long value) {
+            this.value += value;
+            return this.value;
         }
     }
 
@@ -160,8 +164,9 @@ final class VarImpls {
         }
 
         @Override
-        public void set(short value) {
+        public short set(short value) {
             this.value = value;
+            return value;
         }
 
         @Override
@@ -175,9 +180,9 @@ final class VarImpls {
         }
 
         @Override
-        public short add(short v) {
-            value += v;
-            return value;
+        public short add(short value) {
+            this.value += value;
+            return this.value;
         }
     }
 
@@ -192,14 +197,15 @@ final class VarImpls {
         }
 
         @Override
-        public void set(float value) {
+        public float set(float value) {
             this.value = value;
+            return value;
         }
 
         @Override
-        public float add(float v) {
-            value += v;
-            return value;
+        public float add(float value) {
+            this.value += value;
+            return this.value;
         }
     }
 
@@ -214,14 +220,15 @@ final class VarImpls {
         }
 
         @Override
-        public void set(double value) {
+        public double set(double value) {
             this.value = value;
+            return value;
         }
 
         @Override
-        public double add(double v) {
-            value += v;
-            return value;
+        public double add(double value) {
+            this.value += value;
+            return this.value;
         }
     }
 
@@ -236,8 +243,9 @@ final class VarImpls {
         }
 
         @Override
-        public void set(byte value) {
+        public byte set(byte value) {
             this.value = value;
+            return value;
         }
 
         @Override
@@ -251,9 +259,9 @@ final class VarImpls {
         }
 
         @Override
-        public byte add(byte v) {
-            value += v;
-            return value;
+        public byte add(byte value) {
+            this.value += value;
+            return this.value;
         }
     }
 
@@ -268,8 +276,9 @@ final class VarImpls {
         }
 
         @Override
-        public void set(char value) {
+        public char set(char value) {
             this.value = value;
+            return value;
         }
     }
 }
