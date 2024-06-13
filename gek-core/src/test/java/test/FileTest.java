@@ -4,8 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Gek;
 import xyz.fslabo.common.base.GekChars;
-import xyz.fslabo.common.base.ref.GekRef;
-import xyz.fslabo.common.base.ref.LongRef;
+import xyz.fslabo.common.ref.Var;
+import xyz.fslabo.common.ref.LongVar;
 import xyz.fslabo.common.file.GekFile;
 import xyz.fslabo.common.file.GekFileCache;
 import xyz.fslabo.common.io.GekIO;
@@ -68,7 +68,7 @@ public class FileTest {
             GekIO.readBytes(file.toPath(), offset + 4, length));
         long fileLength = gekFile.length();
         gekFile.position(fileLength);
-        LongRef newLength = GekRef.ofLong(fileLength);
+        LongVar newLength = Var.ofLong(fileLength);
         IOTest.testOutStream(-1, gekFile.bindOutputStream(), (offset, length) -> {
             newLength.incrementAndGet(length);
             return GekIO.readBytes(file.toPath(), offset + fileLength, length);
@@ -103,7 +103,7 @@ public class FileTest {
         IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), 4), (offset, length) ->
             GekIO.readBytes(file.toPath(), offset + 4, length));
         long fileLength = file.length();
-        LongRef newLength = GekRef.ofLong(fileLength);
+        LongVar newLength = Var.ofLong(fileLength);
         IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), fileLength), (offset, length) -> {
             newLength.incrementAndGet(length);
             return GekIO.readBytes(file.toPath(), offset + fileLength, length);
@@ -123,10 +123,10 @@ public class FileTest {
         byte[] bytes2 = (data + data + data).getBytes(GekChars.defaultCharset());
         File file1 = createFile("FileTest-testFileCache1.txt", data);
         File file2 = createFile("FileTest-testFileCache2.txt", data + data + data);
-        LongRef cacheRead = GekRef.ofLong(0);
-        LongRef fileRead = GekRef.ofLong(0);
-        LongRef cacheWrite = GekRef.ofLong(0);
-        LongRef fileWrite = GekRef.ofLong(0);
+        LongVar cacheRead = Var.ofLong(0);
+        LongVar fileRead = Var.ofLong(0);
+        LongVar cacheWrite = Var.ofLong(0);
+        LongVar fileWrite = Var.ofLong(0);
         GekFileCache fileCache = GekFileCache.newBuilder()
             .chunkSize(3)
             .bufferSize(4)

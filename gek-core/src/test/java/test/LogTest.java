@@ -4,8 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Gek;
 import xyz.fslabo.common.base.GekLog;
-import xyz.fslabo.common.base.ref.GekRef;
-import xyz.fslabo.common.base.ref.IntRef;
+import xyz.fslabo.common.ref.Var;
+import xyz.fslabo.common.ref.IntVar;
 
 public class LogTest {
 
@@ -18,7 +18,7 @@ public class LogTest {
         logger.info("test info");
         logger.warn("test warn");
         logger.error("test error");
-        IntRef count = GekRef.ofInt(0);
+        IntVar count = Var.ofInt(0);
         GekLog logger2 = getGekLog2(count);
         logger2.trace("test trace");
         logger2.debug("test debug");
@@ -30,7 +30,7 @@ public class LogTest {
         Gek.log("Gek.log");
     }
 
-    private static GekLog getGekLog2(IntRef count) {
+    private static GekLog getGekLog2(IntVar count) {
         return new GekLog() {
             @Override
             protected Record buildRecord(int traceOffset, Level level, Object... messages) {

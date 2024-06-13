@@ -1,29 +1,29 @@
-package xyz.fslabo.common.base.ref;
+package xyz.fslabo.common.ref;
 
 /**
- * {@link GekRef} for byte type.
+ * Byte version of {@link Var}.
  *
  * @author fredsuvn
  */
-public interface ByteRef {
+public interface ByteVar {
 
     /**
-     * Returns an instance of {@link ByteRef} of 0 initialized value.
+     * Returns an instance of {@link ByteVar} of 0 initialized value.
      *
-     * @return an instance of {@link ByteRef} of 0 initialized value
+     * @return an instance of {@link ByteVar} of 0 initialized value
      */
-    static ByteRef ofZero() {
+    static ByteVar ofZero() {
         return of((byte) 0);
     }
 
     /**
-     * Returns an instance of {@link ByteRef} of initialized value.
+     * Returns an instance of {@link ByteVar} of initialized value.
      *
      * @param value initialized value
-     * @return an instance of {@link ByteRef} of initialized value
+     * @return an instance of {@link ByteVar} of initialized value
      */
-    static ByteRef of(byte value) {
-        return Impls.newByteRef(value);
+    static ByteVar of(byte value) {
+        return VarImpls.newByteVar(value);
     }
 
     /**
@@ -61,4 +61,13 @@ public interface ByteRef {
      * @return the result
      */
     byte add(byte v);
+
+    /**
+     * Returns {@link Var} version with current value.
+     *
+     * @return {@link Var} version with current value
+     */
+    default Var<Byte> toVar() {
+        return Var.of(get());
+    }
 }

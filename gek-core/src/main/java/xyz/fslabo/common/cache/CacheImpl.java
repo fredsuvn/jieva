@@ -2,7 +2,7 @@ package xyz.fslabo.common.cache;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Gek;
-import xyz.fslabo.common.base.ref.GekRef;
+import xyz.fslabo.common.ref.Var;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -69,7 +69,7 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
     }
 
     private @Nullable V compute(K key, Function<? super K, ? extends V> loader) {
-        GekRef<V> result = GekRef.ofNull();
+        Var<V> result = Var.ofNull();
         data.compute(key, (k, old) -> {
             if (old == null) {
                 V nv = loader.apply(k);
@@ -142,7 +142,7 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
 
 //    private @Nullable GekObject<V> computeWrapper(
 //        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
-//        GekRef<GekObject<V>> result = GekRef.ofNull();
+//        Var<GekObject<V>> result = Var.ofNull();
 //        data.compute(key, (k, old) -> {
 //            if (old == null) {
 //                Value<? extends V> nv = loader.apply(k);

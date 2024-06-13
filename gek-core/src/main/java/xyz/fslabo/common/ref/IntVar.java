@@ -1,29 +1,29 @@
-package xyz.fslabo.common.base.ref;
+package xyz.fslabo.common.ref;
 
 /**
- * {@link GekRef} for int type.
+ * Int version of {@link Var}.
  *
  * @author fredsuvn
  */
-public interface IntRef {
+public interface IntVar {
 
     /**
-     * Returns an instance of {@link IntRef} of 0 initialized value.
+     * Returns an instance of {@link IntVar} of 0 initialized value.
      *
-     * @return an instance of {@link IntRef} of 0 initialized value
+     * @return an instance of {@link IntVar} of 0 initialized value
      */
-    static IntRef ofZero() {
+    static IntVar ofZero() {
         return of(0);
     }
 
     /**
-     * Returns an instance of {@link IntRef} of initialized value.
+     * Returns an instance of {@link IntVar} of initialized value.
      *
      * @param value initialized value
-     * @return an instance of {@link IntRef} of initialized value
+     * @return an instance of {@link IntVar} of initialized value
      */
-    static IntRef of(int value) {
-        return Impls.newIntRef(value);
+    static IntVar of(int value) {
+        return VarImpls.newIntVar(value);
     }
 
     /**
@@ -61,4 +61,13 @@ public interface IntRef {
      * @return the result
      */
     int add(int v);
+
+    /**
+     * Returns {@link Var} version with current value.
+     *
+     * @return {@link Var} version with current value
+     */
+    default Var<Integer> toVar() {
+        return Var.of(get());
+    }
 }

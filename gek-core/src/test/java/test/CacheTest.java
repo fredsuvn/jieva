@@ -3,8 +3,8 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.GekLog;
-import xyz.fslabo.common.base.ref.GekRef;
-import xyz.fslabo.common.base.ref.IntRef;
+import xyz.fslabo.common.ref.Var;
+import xyz.fslabo.common.ref.IntVar;
 import xyz.fslabo.common.cache.GekCache;
 
 import java.time.Duration;
@@ -98,42 +98,42 @@ public class CacheTest {
 
     @Test
     public void testRemove() {
-        IntRef intRef = GekRef.ofInt(0);
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intRef.incrementAndGet());
+        IntVar intVar = Var.ofInt(0);
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intVar.incrementAndGet());
         gekCache.put(1, 1);
         gekCache.remove(1);
-        Assert.assertEquals(intRef.get(), 1);
+        Assert.assertEquals(intVar.get(), 1);
     }
 
     @Test
     public void testClear() {
-        IntRef intRef = GekRef.ofInt(0);
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intRef.incrementAndGet());
+        IntVar intVar = Var.ofInt(0);
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intVar.incrementAndGet());
         for (int i = 0; i < 10000; i++) {
             gekCache.put(i, i);
         }
         gekCache.clear();
-        Assert.assertEquals(intRef.get(), 10000);
+        Assert.assertEquals(intVar.get(), 10000);
     }
 
     @Test
     public void testRemoveIf() {
-        IntRef intRef = GekRef.ofInt(0);
-        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intRef.incrementAndGet());
+        IntVar intVar = Var.ofInt(0);
+        GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> intVar.incrementAndGet());
         for (int i = 0; i < 10; i++) {
             gekCache.put(i, i);
         }
         gekCache.removeIf((k, v) -> k > 5);
-        Assert.assertEquals(intRef.get(), 4);
+        Assert.assertEquals(intVar.get(), 4);
         Assert.assertEquals(gekCache.size(), 6);
     }
 
     @Test
     public void testNull() {
-        IntRef intRef = GekRef.ofInt(0);
+        IntVar intVar = Var.ofInt(0);
         Set<Integer> set = new HashSet<>();
         GekCache<Integer, Integer> gekCache = GekCache.softCache((k, v, c) -> {
-            intRef.incrementAndGet();
+            intVar.incrementAndGet();
             set.remove(k);
         });
         for (int i = 0; i < 10000; i++) {
@@ -146,9 +146,9 @@ public class CacheTest {
 //                set.add(i);
 //            }
         }
-        Assert.assertEquals(set.size() + intRef.get(), 10000);
+        Assert.assertEquals(set.size() + intVar.get(), 10000);
         gekCache.clear();
-        Assert.assertEquals(intRef.get(), 10000);
+        Assert.assertEquals(intVar.get(), 10000);
     }
 
     @Test

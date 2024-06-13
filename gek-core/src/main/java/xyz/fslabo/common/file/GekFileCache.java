@@ -6,9 +6,9 @@ import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.GekCheck;
-import xyz.fslabo.common.base.ref.BooleanRef;
-import xyz.fslabo.common.base.ref.GekRef;
-import xyz.fslabo.common.base.ref.LongRef;
+import xyz.fslabo.common.ref.BooleanVar;
+import xyz.fslabo.common.ref.Var;
+import xyz.fslabo.common.ref.LongVar;
 import xyz.fslabo.common.cache.GekCache;
 import xyz.fslabo.common.io.GekIO;
 
@@ -526,11 +526,11 @@ public interface GekFileCache {
                 private int read0(byte[] b, int off, int len) throws IOException {
                     int offset = off;
                     int remaining = len;
-                    final LongRef chunkIndex = GekRef.ofLong(pos / chunkSize);
+                    final LongVar chunkIndex = Var.ofLong(pos / chunkSize);
                     long chunkOffset = pos % chunkSize;
                     String pathString = path.toString();
                     ChunkIndex chunkIndexKey;
-                    final BooleanRef cacheFlag = GekRef.ofBoolean(true);
+                    final BooleanVar cacheFlag = Var.ofBoolean(true);
                     while (true) {
                         chunkIndexKey = new ChunkIndex(pathString, chunkIndex.get());
                         long chunkPos = chunkIndex.get() * chunkSize;

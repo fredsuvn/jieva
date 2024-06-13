@@ -1,48 +1,48 @@
-package xyz.fslabo.common.base.ref;
+package xyz.fslabo.common.ref;
 
 import lombok.AllArgsConstructor;
 import xyz.fslabo.annotations.Nullable;
 
-final class Impls {
+final class VarImpls {
 
-    static <T> GekRef<T> newGekRef(@Nullable T value) {
-        return new GekRefImpl<>(value);
+    static <T> Var<T> newVar(@Nullable T value) {
+        return new VarImpl<>(value);
     }
 
-    static BooleanRef newBooleanRef(boolean value) {
-        return new BooleanGekImpl(value);
+    static BooleanVar newBooleanVar(boolean value) {
+        return new BooleanVarImpl(value);
     }
 
-    static IntRef newIntRef(int value) {
-        return new IntRefImpl(value);
+    static IntVar newIntVar(int value) {
+        return new IntVarImpl(value);
     }
 
-    static LongRef newLongRef(long value) {
-        return new LongRefImpl(value);
+    static LongVar newLongVar(long value) {
+        return new LongVarImpl(value);
     }
 
-    static ShortRef newShortRef(short value) {
-        return new ShortRefImpl(value);
+    static ShortVar newShortVar(short value) {
+        return new ShortVarImpl(value);
     }
 
-    static FloatRef newFloatRef(float value) {
-        return new FloatRefImpl(value);
+    static FloatVar newFloatVar(float value) {
+        return new FloatVarImpl(value);
     }
 
-    static DoubleRef newDoubleRef(double value) {
-        return new DoubleRefImpl(value);
+    static DoubleVar newDoubleVar(double value) {
+        return new DoubleVarImpl(value);
     }
 
-    static ByteRef newByteRef(byte value) {
-        return new ByteRefImpl(value);
+    static ByteVar newByteVar(byte value) {
+        return new ByteVarImpl(value);
     }
 
-    static CharRef newCharRef(char value) {
-        return new CharRefImpl(value);
+    static CharVar newCharVar(char value) {
+        return new CharVarImpl(value);
     }
 
     @AllArgsConstructor
-    private static final class GekRefImpl<T> implements GekRef<T> {
+    private static final class VarImpl<T> implements Var<T> {
 
         private T value;
 
@@ -58,7 +58,7 @@ final class Impls {
     }
 
     @AllArgsConstructor
-    private static final class BooleanGekImpl implements BooleanRef {
+    private static final class BooleanVarImpl implements BooleanVar {
 
         private boolean value;
 
@@ -86,7 +86,7 @@ final class Impls {
     }
 
     @AllArgsConstructor
-    private static final class IntRefImpl implements IntRef {
+    private static final class IntVarImpl implements IntVar {
 
         private int value;
 
@@ -118,7 +118,7 @@ final class Impls {
     }
 
     @AllArgsConstructor
-    private static final class LongRefImpl implements LongRef {
+    private static final class LongVarImpl implements LongVar {
 
         private long value;
 
@@ -150,7 +150,7 @@ final class Impls {
     }
 
     @AllArgsConstructor
-    private static final class ShortRefImpl implements ShortRef {
+    private static final class ShortVarImpl implements ShortVar {
 
         private short value;
 
@@ -182,7 +182,7 @@ final class Impls {
     }
 
     @AllArgsConstructor
-    private static final class FloatRefImpl implements FloatRef {
+    private static final class FloatVarImpl implements FloatVar {
 
         private float value;
 
@@ -204,7 +204,7 @@ final class Impls {
     }
 
     @AllArgsConstructor
-    private static final class DoubleRefImpl implements DoubleRef {
+    private static final class DoubleVarImpl implements DoubleVar {
 
         private double value;
 
@@ -226,7 +226,7 @@ final class Impls {
     }
 
     @AllArgsConstructor
-    private static final class ByteRefImpl implements ByteRef {
+    private static final class ByteVarImpl implements ByteVar {
 
         private byte value;
 
@@ -258,7 +258,7 @@ final class Impls {
     }
 
     @AllArgsConstructor
-    private static final class CharRefImpl implements CharRef {
+    private static final class CharVarImpl implements CharVar {
 
         private char value;
 

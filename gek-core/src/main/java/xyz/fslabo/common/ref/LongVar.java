@@ -1,29 +1,29 @@
-package xyz.fslabo.common.base.ref;
+package xyz.fslabo.common.ref;
 
 /**
- * {@link GekRef} for long type.
+ * Long version of {@link Var}.
  *
  * @author fredsuvn
  */
-public interface LongRef {
+public interface LongVar {
 
     /**
-     * Returns an instance of {@link LongRef} of 0 initialized value.
+     * Returns an instance of {@link LongVar} of 0 initialized value.
      *
-     * @return an instance of {@link LongRef} of 0 initialized value
+     * @return an instance of {@link LongVar} of 0 initialized value
      */
-    static LongRef ofZero() {
+    static LongVar ofZero() {
         return of(0);
     }
 
     /**
-     * Returns an instance of {@link LongRef} of initialized value.
+     * Returns an instance of {@link LongVar} of initialized value.
      *
      * @param value initialized value
-     * @return an instance of {@link LongRef} of initialized value
+     * @return an instance of {@link LongVar} of initialized value
      */
-    static LongRef of(long value) {
-        return Impls.newLongRef(value);
+    static LongVar of(long value) {
+        return VarImpls.newLongVar(value);
     }
 
     /**
@@ -61,4 +61,13 @@ public interface LongRef {
      * @return the result
      */
     long add(long v);
+
+    /**
+     * Returns {@link Var} version with current value.
+     *
+     * @return {@link Var} version with current value
+     */
+    default Var<Long> toVar() {
+        return Var.of(get());
+    }
 }

@@ -1,29 +1,29 @@
-package xyz.fslabo.common.base.ref;
+package xyz.fslabo.common.ref;
 
 /**
- * {@link GekRef} for short type.
+ * Short version of {@link Var}.
  *
  * @author fredsuvn
  */
-public interface ShortRef {
+public interface ShortVar {
 
     /**
-     * Returns an instance of {@link ShortRef} of 0 initialized value.
+     * Returns an instance of {@link ShortVar} of 0 initialized value.
      *
-     * @return an instance of {@link ShortRef} of 0 initialized value
+     * @return an instance of {@link ShortVar} of 0 initialized value
      */
-    static ShortRef ofZero() {
+    static ShortVar ofZero() {
         return of((short) 0);
     }
 
     /**
-     * Returns an instance of {@link ShortRef} of initialized value.
+     * Returns an instance of {@link ShortVar} of initialized value.
      *
      * @param value initialized value
-     * @return an instance of {@link ShortRef} of initialized value
+     * @return an instance of {@link ShortVar} of initialized value
      */
-    static ShortRef of(short value) {
-        return Impls.newShortRef(value);
+    static ShortVar of(short value) {
+        return VarImpls.newShortVar(value);
     }
 
     /**
@@ -61,4 +61,13 @@ public interface ShortRef {
      * @return the result
      */
     short add(short v);
+
+    /**
+     * Returns {@link Var} version with current value.
+     *
+     * @return {@link Var} version with current value
+     */
+    default Var<Short> toVar() {
+        return Var.of(get());
+    }
 }
