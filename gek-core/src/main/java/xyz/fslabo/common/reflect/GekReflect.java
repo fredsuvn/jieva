@@ -2,7 +2,7 @@ package xyz.fslabo.common.reflect;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.OutParam;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.cache.GekCache;
 import xyz.fslabo.common.collect.GekArray;
@@ -187,7 +187,7 @@ public class GekReflect {
     public static <T> T newInstance(Class<?> type) {
         try {
             Constructor<?> constructor = type.getConstructor();
-            return Gek.as(constructor.newInstance());
+            return Jie.as(constructor.newInstance());
         } catch (Exception e) {
             return null;
         }

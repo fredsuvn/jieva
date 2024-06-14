@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 /**
- * Base exception for Gek.
+ * Base exception for Jie.
  *
  * @author fredsuvn
  */

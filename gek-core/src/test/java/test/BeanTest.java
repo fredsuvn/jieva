@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
@@ -202,32 +202,32 @@ public class BeanTest {
         cc1.setCc(33L);
         cc1.setE1(E1.E2);
         cc1.setE2(E2.E3);
-        Cc<Long> cc2 = Gek.copyProperties(cc1, new Cc<>());
+        Cc<Long> cc2 = Jie.copyProperties(cc1, new Cc<>());
         Assert.assertEquals(cc2, cc1);
         cc1.setI1(null);
         cc2.setI1("888");
-        Gek.copyProperties(cc1, cc2);
+        Jie.copyProperties(cc1, cc2);
         Assert.assertEquals(cc2, cc1);
         Assert.assertEquals(cc2.getI1(), cc1.getI1());
         Assert.assertNull(cc2.getI1());
         Assert.assertSame(cc2.getE1(), E1.E2);
         Assert.assertSame(cc2.getE2(), E2.E3);
         cc2.setI1("888");
-        Gek.copyProperties(cc1, cc2, false);
+        Jie.copyProperties(cc1, cc2, false);
         Assert.assertEquals("888", cc2.getI1());
         cc1.setI1("aaaa");
-        cc2 = Gek.copyProperties(cc1, new Cc<>());
+        cc2 = Jie.copyProperties(cc1, new Cc<>());
         Assert.assertNotNull(cc2.getC2());
-        cc2 = Gek.copyProperties(cc1, new Cc<>(), "c2");
+        cc2 = Jie.copyProperties(cc1, new Cc<>(), "c2");
         Assert.assertEquals(cc1.getI1(), cc2.getI1());
         Assert.assertEquals(cc1.getI2(), cc2.getI2());
         Assert.assertEquals(cc1.getCc(), cc2.getCc());
         Assert.assertNull(cc2.getC2());
         Assert.assertEquals(cc1.getC2().longValue(), 22);
         cc1.setI1(null);
-        cc2 = Gek.copyProperties(cc1, new Cc<>(), false, "c2");
+        cc2 = Jie.copyProperties(cc1, new Cc<>(), false, "c2");
         cc2.setI1("qqqq");
-        Gek.copyProperties(cc1, new Cc<>(), false, "c2");
+        Jie.copyProperties(cc1, new Cc<>(), false, "c2");
         Assert.assertEquals("qqqq", cc2.getI1());
         Assert.assertEquals(cc1.getI2(), cc2.getI2());
         Assert.assertEquals(cc1.getCc(), cc2.getCc());
@@ -235,14 +235,14 @@ public class BeanTest {
         Assert.assertEquals(cc1.getC2().longValue(), 22);
         Assert.expectThrows(ClassCastException.class, () -> {
             Cc<Long> ccl = new Cc<>();
-            Gek.copyProperties(cc1, new TypeRef<Cc<Double>>() {
+            Jie.copyProperties(cc1, new TypeRef<Cc<Double>>() {
                 }.getType(),
                 ccl, new TypeRef<Cc<String>>() {
                 }.getType());
             Long l = ccl.getCc();
             System.out.println(l);
         });
-        Cc<String> ccs = Gek.copyProperties(cc1, new TypeRef<Cc<Double>>() {
+        Cc<String> ccs = Jie.copyProperties(cc1, new TypeRef<Cc<Double>>() {
             }.getType(),
             new Cc<>(), new TypeRef<Cc<String>>() {
             }.getType());
@@ -271,10 +271,10 @@ public class BeanTest {
                 new TypeRef<Map<Kk, String>>() {
                 }.getType()
             );
-        Assert.assertEquals(map1.get(new Kk("i1")), Gek.orNull(cc1.getI1(), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("i2")), Gek.orNull(cc1.getI2(), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("cc")), Gek.orNull(cc1.getCc(), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("c2")), Gek.orNull(cc1.getC2(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i1")), Jie.orNull(cc1.getI1(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i2")), Jie.orNull(cc1.getI2(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("cc")), Jie.orNull(cc1.getCc(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("c2")), Jie.orNull(cc1.getC2(), String::valueOf));
 
         // map -> bean
         map1.put(new Kk("i1"), "88888");
@@ -288,10 +288,10 @@ public class BeanTest {
                 new TypeRef<Cc<String>>() {
                 }.getType()
             );
-        Assert.assertEquals(map1.get(new Kk("i1")), Gek.orNull(cs2.getI1(), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("i2")), Gek.orNull(cs2.getI2(), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("cc")), Gek.orNull(cs2.getCc(), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("c2")), Gek.orNull(cs2.getC2(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i1")), Jie.orNull(cs2.getI1(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i2")), Jie.orNull(cs2.getI2(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("cc")), Jie.orNull(cs2.getCc(), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("c2")), Jie.orNull(cs2.getC2(), String::valueOf));
 
         // map -> map
         Map<String, Kk> map2 = copier.toBuilder()
@@ -304,21 +304,21 @@ public class BeanTest {
                 new TypeRef<Map<String, Kk>>() {
                 }.getType()
             );
-        Assert.assertEquals(map1.get(new Kk("i1")), Gek.orNull(map2.get("i1"), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("i2")), Gek.orNull(map2.get("i2"), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("cc")), Gek.orNull(map2.get("cc"), String::valueOf));
-        Assert.assertEquals(map1.get(new Kk("c2")), Gek.orNull(map2.get("c2"), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i1")), Jie.orNull(map2.get("i1"), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("i2")), Jie.orNull(map2.get("i2"), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("cc")), Jie.orNull(map2.get("cc"), String::valueOf));
+        Assert.assertEquals(map1.get(new Kk("c2")), Jie.orNull(map2.get("c2"), String::valueOf));
     }
 
     @Test
     public void testCopyPropertiesComplex() {
         Map<? extends Number, ? extends String> pm = new HashMap<>();
-        pm.put(Gek.as(1), Gek.as("11"));
+        pm.put(Jie.as(1), Jie.as("11"));
         CopyP1 p1 = new CopyP1("22", new List[]{Arrays.asList(pm)}, E1.E1);
         Map<String, ? extends CopyP1> cm = new HashMap<>();
-        cm.put("33", Gek.as(p1));
+        cm.put("33", Jie.as(p1));
         CopyA ca = new CopyA("44", new List[]{Arrays.asList(55)}, cm, p1);
-        CopyB cb = Gek.copyProperties(ca, new CopyB());
+        CopyB cb = Jie.copyProperties(ca, new CopyB());
         Assert.assertEquals(cb.getS(), new Long(44L));
         Assert.assertEquals(cb.getList().get(0), new int[]{55});
         Assert.assertSame(cb.getP().getE(), E2.E1);

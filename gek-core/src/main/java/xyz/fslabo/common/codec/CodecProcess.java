@@ -1,6 +1,6 @@
 package xyz.fslabo.common.codec;
 
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekChars;
 import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.io.GekIOProcess;
@@ -26,7 +26,7 @@ public interface CodecProcess<T extends CodecProcess<T>> extends GekIOProcess<T>
      * @return this
      */
     default T inputLatin(String str) {
-        return Gek.as(input(GekString.encode(str, GekChars.latinCharset())));
+        return Jie.as(input(GekString.encode(str, GekChars.latinCharset())));
     }
 
     /**

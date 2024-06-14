@@ -2,7 +2,7 @@ package xyz.fslabo.common.net.tcp;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.collect.GekColl;
 import xyz.fslabo.common.data.GekData;
 import xyz.fslabo.common.io.GekIO;
@@ -255,7 +255,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                 this.port = builder.port;
                 this.maxConnection = builder.maxConnection;
                 this.address = builder.address;
-                this.serverHandler = Gek.orDefault(builder.serverHandler, EMPTY_SERVER_HANDLER);
+                this.serverHandler = Jie.orDefault(builder.serverHandler, EMPTY_SERVER_HANDLER);
                 this.channelHandlers = GekColl.toList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
                     throw new GekNetException("Channel handlers are empty.");
@@ -265,7 +265,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                     throw new GekNetException("Executor is null.");
                 }
                 this.socketConfig = builder.socketConfig;
-                this.bufferGenerator = Gek.orDefault(builder.bufferGenerator, ByteBuffer::allocate);
+                this.bufferGenerator = Jie.orDefault(builder.bufferGenerator, ByteBuffer::allocate);
                 this.channelBufferSize = builder.channelBufferSize;
                 if (channelBufferSize <= 0) {
                     throw new GekNetException("Channel buffer size must > 0.");
@@ -475,7 +475,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                             latch.countDown();
                             break;
                         }
-                        Gek.sleep(1);
+                        Jie.sleep(1);
                     }
                 });
             }
@@ -507,7 +507,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                 compactBuffer(channel, newBytes);
                 Object message = channel.buffer;
                 for (GekTcpChannelHandler<?> channelHandler : channelHandlers) {
-                    GekTcpChannelHandler<Object> handler = Gek.as(channelHandler);
+                    GekTcpChannelHandler<Object> handler = Jie.as(channelHandler);
                     Object result = handler.onMessage(channel, message);
                     if (result == null) {
                         break;

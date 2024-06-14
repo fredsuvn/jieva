@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.Date;
 
 /**
- * Simple log system of Gek.
+ * Simple log system of Jie.
  * Overrides {@link #buildRecord(int, Level, Object...)} and {@link #writeRecord(Record)} can custom log actions.
  *
  * @author fredsuvn

@@ -1,7 +1,7 @@
 package xyz.fslabo.common.collect;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;
@@ -133,7 +133,7 @@ public class GekArray {
      * @return created array
      */
     public static <A> A newArray(Class<?> componentType, int length) {
-        return Gek.as(Array.newInstance(componentType, length));
+        return Jie.as(Array.newInstance(componentType, length));
     }
 
     /**

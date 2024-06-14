@@ -1,7 +1,7 @@
 package xyz.fslabo.common.cache;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.ref.Var;
 
 import java.lang.ref.ReferenceQueue;
@@ -354,7 +354,7 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
             if (x == null) {
                 break;
             }
-            Entry<K> entry = Gek.as(x);
+            Entry<K> entry = Jie.as(x);
             entry.onRemoval(RemovalListener.Cause.COLLECTED);
             K key = entry.key();
             data.computeIfPresent(key, (k, v) -> {
@@ -379,7 +379,7 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
         if (value == null || value instanceof Null) {
             return null;
         }
-        return Gek.as(value);
+        return Jie.as(value);
     }
 
 

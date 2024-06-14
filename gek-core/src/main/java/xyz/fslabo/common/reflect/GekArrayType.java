@@ -1,6 +1,6 @@
 package xyz.fslabo.common.reflect;
 
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
@@ -21,7 +21,7 @@ public interface GekArrayType extends GenericArrayType {
      */
     default Class<?> getComponentType() {
         Type componentType = getGenericComponentType();
-        return Gek.orDefault(GekReflect.getRawType(componentType), Object.class);
+        return Jie.orDefault(GekReflect.getRawType(componentType), Object.class);
     }
 
     /**

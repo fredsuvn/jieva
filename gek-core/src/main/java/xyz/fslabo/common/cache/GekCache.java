@@ -2,7 +2,7 @@ package xyz.fslabo.common.cache;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -522,7 +522,7 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> softValues() {
             this.useSoft = true;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -543,7 +543,7 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> weakValues() {
             this.useSoft = false;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -565,7 +565,7 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> initialCapacity(int initialCapacity) {
             this.initialCapacity = initialCapacity;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -587,8 +587,8 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> removeListener(
             RemovalListener<? super K1, ? super V1> removalListener) {
-            this.removalListener = Gek.as(removalListener);
-            return Gek.as(this);
+            this.removalListener = Jie.as(removalListener);
+            return Jie.as(this);
         }
 
         /**
@@ -612,7 +612,7 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterWrite(long expireAfterWriteMillis) {
             this.expireAfterWrite = expireAfterWriteMillis;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -636,7 +636,7 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterWrite(@Nullable Duration expireAfterWrite) {
             this.expireAfterWrite = expireAfterWrite == null ? -1 : expireAfterWrite.toMillis();
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -662,7 +662,7 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterAccess(long expireAfterAccessMillis) {
             this.expireAfterAccess = expireAfterAccessMillis;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -688,7 +688,7 @@ public interface GekCache<K, V> {
          */
         public <K1 extends K, V1 extends V> Builder<K1, V1> expireAfterAccess(@Nullable Duration expireAfterAccess) {
             this.expireAfterAccess = expireAfterAccess == null ? -1 : expireAfterAccess.toMillis();
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -709,7 +709,7 @@ public interface GekCache<K, V> {
          * @return built {@link GekCache}
          */
         public <K1 extends K, V1 extends V> GekCache<K1, V1> build() {
-            return Gek.as(new CacheImpl<>(this));
+            return Jie.as(new CacheImpl<>(this));
         }
     }
 }

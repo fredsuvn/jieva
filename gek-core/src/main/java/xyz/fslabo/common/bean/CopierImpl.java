@@ -1,7 +1,7 @@
 package xyz.fslabo.common.bean;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.Option;
 import xyz.fslabo.common.collect.GekColl;
 import xyz.fslabo.common.mapper.JieMapper;
@@ -53,12 +53,12 @@ final class CopierImpl implements GekBeanCopier {
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
-        Map<Object, Object> sourceMap = Gek.as(source);
+        Map<Object, Object> sourceMap = Jie.as(source);
         GekParamType destParamType = GekReflect.getGenericSuperType(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
-        Map<Object, Object> destMap = Gek.as(dest);
+        Map<Object, Object> destMap = Jie.as(dest);
         JieMapper converter = Option.find(BeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
         Object ignoredProperties = Option.find(BeanOption.Key.IGNORED_PROPERTIES, options);
         Object ignoreNull = Option.find(BeanOption.Key.IGNORE_NULL, options);
@@ -105,7 +105,7 @@ final class CopierImpl implements GekBeanCopier {
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
-        Map<Object, Object> sourceMap = Gek.as(source);
+        Map<Object, Object> sourceMap = Jie.as(source);
         GekBeanResolver resolver = Option.find(BeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
         GekBeanInfo destData = resolver.resolve(destType);
         Map<String, GekPropertyInfo> destProperties = destData.getProperties();
@@ -158,7 +158,7 @@ final class CopierImpl implements GekBeanCopier {
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
-        Map<Object, Object> destMap = Gek.as(dest);
+        Map<Object, Object> destMap = Jie.as(dest);
         JieMapper converter = Option.find(BeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
         Object ignoredProperties = Option.find(BeanOption.Key.IGNORED_PROPERTIES, options);
         Object ignoreNull = Option.find(BeanOption.Key.IGNORE_NULL, options);

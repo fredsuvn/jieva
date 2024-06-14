@@ -1,7 +1,7 @@
 package xyz.fslabo.common.proxy;
 
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.reflect.GekReflect;
 
 import java.lang.reflect.Method;
@@ -74,7 +74,7 @@ public interface GekProxy<T> {
          */
         public <T1 extends T> Builder<T1> superClass(Class<?> superClass) {
             this.superClass = superClass;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -97,7 +97,7 @@ public interface GekProxy<T> {
          */
         public <T1 extends T> Builder<T1> superInterfaces(Iterable<Class<?>> superInterfaces) {
             this.superInterfaces = superInterfaces;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -110,7 +110,7 @@ public interface GekProxy<T> {
          */
         public <T1 extends T> Builder<T1> proxyMethod(Predicate<Method> predicate, GekProxyMethod proxyMethod) {
             proxyMap.put(predicate, proxyMethod);
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -162,7 +162,7 @@ public interface GekProxy<T> {
          */
         public <T1 extends T> Builder<T1> proxyGenerator(int proxyGenerator) {
             this.proxyGenerator = proxyGenerator;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**

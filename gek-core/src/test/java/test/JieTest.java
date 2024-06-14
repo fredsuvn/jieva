@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
 
-public class GekTest {
+public class JieTest {
 
     @Test
     public void testThrow() {
@@ -31,18 +31,18 @@ public class GekTest {
 
     @Test
     public void testEqual() {
-        Assert.assertTrue(Gek.equals(new int[]{1, 2, 3}, new int[]{1, 2, 3}));
-        Assert.assertFalse(Gek.equals(new int[]{1, 2}, new int[]{1, 2, 3}));
-        Assert.assertFalse(Gek.equalsWith(new int[]{1, 2, 3}, new int[]{1, 2, 3}, false, false));
-        Assert.assertTrue(Gek.equals(
+        Assert.assertTrue(Jie.equals(new int[]{1, 2, 3}, new int[]{1, 2, 3}));
+        Assert.assertFalse(Jie.equals(new int[]{1, 2}, new int[]{1, 2, 3}));
+        Assert.assertFalse(Jie.equalsWith(new int[]{1, 2, 3}, new int[]{1, 2, 3}, false, false));
+        Assert.assertTrue(Jie.equals(
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}},
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}
         ));
-        Assert.assertFalse(Gek.equals(
+        Assert.assertFalse(Jie.equals(
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2}},
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}
         ));
-        Assert.assertFalse(Gek.equalsWith(
+        Assert.assertFalse(Jie.equalsWith(
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}},
             new Object[]{new int[]{1, 2, 3}, new int[]{1, 2, 3}}, false, true
         ));
@@ -50,9 +50,9 @@ public class GekTest {
 
     @Test
     public void testRes() throws IOException {
-        URL f1 = Gek.findRes("/t2/f1.txt");
+        URL f1 = Jie.findRes("/t2/f1.txt");
         Assert.assertEquals(GekIO.readString(f1.openStream(), GekChars.defaultCharset()), "f1.txt");
-        Set<URL> set = Gek.findAllRes("/t2/f2.txt");
+        Set<URL> set = Jie.findAllRes("/t2/f2.txt");
         for (URL url : set) {
             Assert.assertEquals(GekIO.readString(url.openStream(), GekChars.defaultCharset()), "f2.txt");
         }
@@ -73,14 +73,14 @@ public class GekTest {
 
     @Test
     public void testEnum() {
-        Assert.assertEquals(Te.A, Gek.findEnum(Te.class, 0));
-        Assert.assertEquals(Te.B, Gek.findEnum(Te.class, "B", false));
-        Assert.assertEquals(Te.C, Gek.findEnum(Te.class, "c", true));
-        Assert.assertNull(Gek.findEnum(Te.class, 10));
-        Assert.assertNull(Gek.findEnum(Te.class, "d", false));
-        Assert.expectThrows(IllegalArgumentException.class, () -> Gek.findEnum(Te.class, -1));
-        Assert.expectThrows(IllegalArgumentException.class, () -> Gek.findEnum(Gek.class, -1));
-        Assert.expectThrows(IllegalArgumentException.class, () -> Gek.findEnum(Gek.class, "a", true));
+        Assert.assertEquals(Te.A, Jie.findEnum(Te.class, 0));
+        Assert.assertEquals(Te.B, Jie.findEnum(Te.class, "B", false));
+        Assert.assertEquals(Te.C, Jie.findEnum(Te.class, "c", true));
+        Assert.assertNull(Jie.findEnum(Te.class, 10));
+        Assert.assertNull(Jie.findEnum(Te.class, "d", false));
+        Assert.expectThrows(IllegalArgumentException.class, () -> Jie.findEnum(Te.class, -1));
+        Assert.expectThrows(IllegalArgumentException.class, () -> Jie.findEnum(Jie.class, -1));
+        Assert.expectThrows(IllegalArgumentException.class, () -> Jie.findEnum(Jie.class, "a", true));
     }
 
     public enum Te {
@@ -102,7 +102,7 @@ public class GekTest {
     private static final class T3 {
         public static void invoke3() {
             StackTraceElement element1 = GekTrace.findCallerTrace(T1.class.getName(), "invoke1");
-            Assert.assertEquals(element1.getClassName(), GekTest.class.getName());
+            Assert.assertEquals(element1.getClassName(), JieTest.class.getName());
             Assert.assertEquals(element1.getMethodName(), "testFindCallerStackTrace");
             StackTraceElement element2 = GekTrace.findCallerTrace(T2.class.getName(), "invoke2");
             Assert.assertEquals(element2.getClassName(), T1.class.getName());

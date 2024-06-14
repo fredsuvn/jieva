@@ -2,7 +2,7 @@ package xyz.fslabo.common.net.tcp;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.collect.GekColl;
 import xyz.fslabo.common.data.GekData;
 import xyz.fslabo.common.io.GekIO;
@@ -248,13 +248,13 @@ public interface GekTcpClient extends GekTcpEndpoint {
             private SocketTcpClient(Builder builder) {
                 this.port = builder.port;
                 this.address = builder.address;
-                this.clientHandler = Gek.orDefault(builder.clientHandler, EMPTY_CLIENT_HANDLER);
+                this.clientHandler = Jie.orDefault(builder.clientHandler, EMPTY_CLIENT_HANDLER);
                 this.channelHandlers = GekColl.toList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
                     throw new GekNetException("Channel handlers are empty.");
                 }
                 this.socketConfig = builder.socketConfig;
-                this.bufferGenerator = Gek.orDefault(builder.bufferGenerator, ByteBuffer::allocate);
+                this.bufferGenerator = Jie.orDefault(builder.bufferGenerator, ByteBuffer::allocate);
                 this.channelBufferSize = builder.channelBufferSize;
                 if (channelBufferSize <= 0) {
                     throw new GekNetException("Channel buffer size must > 0.");
@@ -432,7 +432,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
                 compactBuffer(channel, newBytes);
                 Object message = channel.buffer;
                 for (GekTcpChannelHandler<?> channelHandler : channelHandlers) {
-                    GekTcpChannelHandler<Object> handler = Gek.as(channelHandler);
+                    GekTcpChannelHandler<Object> handler = Jie.as(channelHandler);
                     Object result = handler.onMessage(channel, message);
                     if (result == null) {
                         break;

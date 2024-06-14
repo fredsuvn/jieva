@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
 import org.openjdk.jmh.annotations.*;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -43,7 +43,7 @@ public class CopyPropertiesJmh {
 
     @Benchmark
     public void fsCopy() {
-        Gek.copyProperties(bean, new Bean());
+        Jie.copyProperties(bean, new Bean());
     }
 
     @Benchmark
@@ -58,7 +58,7 @@ public class CopyPropertiesJmh {
 
     @Benchmark
     public void fsCopyIgnore() {
-        Gek.copyProperties(bean, new Bean(), "s1", "i1", "l1");
+        Jie.copyProperties(bean, new Bean(), "s1", "i1", "l1");
     }
 
     @Data

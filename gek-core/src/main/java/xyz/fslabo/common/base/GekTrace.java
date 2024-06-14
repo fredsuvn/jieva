@@ -59,8 +59,8 @@ public class GekTrace {
         }
         for (int i = 0; i < stackTraces.length; i++) {
             StackTraceElement stackTraceElement = stackTraces[i];
-            if (Gek.equals(stackTraceElement.getClassName(), className)
-                && Gek.equals(stackTraceElement.getMethodName(), methodName)) {
+            if (Jie.equals(stackTraceElement.getClassName(), className)
+                && Jie.equals(stackTraceElement.getMethodName(), methodName)) {
                 int targetIndex = i + 1 + offset;
                 if (GekCheck.isInBounds(targetIndex, 0, stackTraces.length)) {
                     return stackTraces[targetIndex];

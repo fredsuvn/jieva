@@ -22,7 +22,7 @@ public class ProcessTest {
     }
 
     private void testEcho(String command) throws InterruptedException {
-        Process process = Gek.process().command(command).start();
+        Process process = Jie.process().command(command).start();
         process.waitFor();
         String output = GekIO.readString(process.getInputStream(), GekChars.nativeCharset());
         process.destroy();
@@ -31,10 +31,10 @@ public class ProcessTest {
 
     @Test
     public void testPing() throws InterruptedException {
-        Process process = Gek.process().command("ping", "-n", "5", "127.0.0.1").start();
+        Process process = Jie.process().command("ping", "-n", "5", "127.0.0.1").start();
         Semaphore semaphore = new Semaphore(1);
         semaphore.acquire();
-        Gek.thread().task(() -> {
+        Jie.thread().task(() -> {
             while (true) {
                 String output = GekIO.avalaibleString(process.getInputStream(), GekChars.nativeCharset());
                 if (output == null) {
@@ -44,12 +44,12 @@ public class ProcessTest {
                 if (GekString.isNotEmpty(output)) {
                     GekLog.getInstance().info(output);
                 }
-                Gek.sleep(1);
+                Jie.sleep(1);
             }
         }).start();
         process.waitFor();
         while (semaphore.hasQueuedThreads()) {
-            Gek.sleep(1000);
+            Jie.sleep(1000);
         }
         process.destroy();
     }
@@ -57,7 +57,7 @@ public class ProcessTest {
     @Test
     public void testPingToOutput() throws InterruptedException {
         ByteArrayOutputStream dest = new ByteArrayOutputStream();
-        Process process = Gek.process().command("ping", "-n", "5", "127.0.0.1").output(dest).start();
+        Process process = Jie.process().command("ping", "-n", "5", "127.0.0.1").output(dest).start();
         process.waitFor();
         process.destroy();
         System.out.println(GekString.of(dest.toByteArray(), GekChars.nativeCharset()));

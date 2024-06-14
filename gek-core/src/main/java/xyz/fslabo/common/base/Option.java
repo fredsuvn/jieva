@@ -4,7 +4,6 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.collect.GekArray;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * This interface represents optional parameter. For example:
@@ -39,7 +38,7 @@ public interface Option<K, V> {
      * @return an empty {@link Option} array
      */
     static <K, V> Option<K, V>[] empty() {
-        return Gek.as(OptionImpls.EMPTY_OPTIONS);
+        return Jie.as(OptionImpls.EMPTY_OPTIONS);
     }
 
     /**
@@ -58,7 +57,29 @@ public interface Option<K, V> {
         }
         for (Option<?, ?> option : options) {
             if (option != null && Objects.equals(option.getKey(), key)) {
-                return Gek.as(option.getValue());
+                return Jie.as(option.getValue());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds and returns option value of specified key in given options, or null if not found.
+     *
+     * @param key     specified key
+     * @param options given options
+     * @param <K>     type of keys
+     * @param <V>     type of values
+     * @return option value of specified key in given options, or null if not found
+     */
+    @Nullable
+    static <K, V> V find(K key, Iterable<Option<?, ?>> options) {
+        if (GekArray.isEmpty(options)) {
+            return null;
+        }
+        for (Option<?, ?> option : options) {
+            if (option != null && Objects.equals(option.getKey(), key)) {
+                return Jie.as(option.getValue());
             }
         }
         return null;
@@ -75,29 +96,21 @@ public interface Option<K, V> {
      * @return option value of specified key in given options, or default value if not found
      */
     static <K, V> V find(K key, V defaultValue, Option<?, ?>... options) {
-        return Gek.orDefault(find(key, options), defaultValue);
+        return Jie.orDefault(find(key, options), defaultValue);
     }
 
     /**
-     * Returns option value of specified key in given options, or result of default value if not found.
+     * Finds and returns option value of specified key in given options, or default value if not found.
      *
      * @param key          specified key
+     * @param defaultValue default value
      * @param options      given options
-     * @param defaultValue function of default value
      * @param <K>          type of keys
      * @param <V>          type of values
-     * @return option value of specified key in given options, or result of default value if not found
+     * @return option value of specified key in given options, or default value if not found
      */
-    static <K, V> V find(K key, Iterable<? extends Option<?, ?>> options, Function<K, V> defaultValue) {
-        if (GekArray.isEmpty(options)) {
-            return defaultValue.apply(key);
-        }
-        for (Option<?, ?> option : options) {
-            if (option != null && Objects.equals(option.getKey(), key)) {
-                return Gek.as(option.getValue());
-            }
-        }
-        return defaultValue.apply(key);
+    static <K, V> V find(K key, V defaultValue, Iterable<Option<?, ?>> options) {
+        return Jie.orDefault(find(key, options), defaultValue);
     }
 
     /**

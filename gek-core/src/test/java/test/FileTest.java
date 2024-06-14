@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekChars;
 import xyz.fslabo.common.ref.Var;
 import xyz.fslabo.common.ref.LongVar;
@@ -137,9 +137,9 @@ public class FileTest {
             .build();
         byte[] dest = new byte[bytes1.length * 4];
         fileCache.getInputStream(file1.toPath(), 0).read(dest);
-        Assert.assertEquals(fileCache.cachedChunkCount(), Gek.countBlock(bytes1.length, 3));
+        Assert.assertEquals(fileCache.cachedChunkCount(), Jie.countBlock(bytes1.length, 3));
         fileCache.getInputStream(file2.toPath(), 0).read(dest);
-        Assert.assertEquals(fileCache.cachedChunkCount(), Gek.countBlock(bytes1.length + bytes2.length, 3) + 1);
+        Assert.assertEquals(fileCache.cachedChunkCount(), Jie.countBlock(bytes1.length + bytes2.length, 3) + 1);
         Assert.assertEquals(cacheRead.get(), 0);
         Assert.assertEquals(fileRead.get(), bytes1.length + bytes2.length);
         Assert.assertEquals(cacheWrite.get(), bytes1.length + bytes2.length);

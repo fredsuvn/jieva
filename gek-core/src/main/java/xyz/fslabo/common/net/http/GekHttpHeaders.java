@@ -2,7 +2,7 @@ package xyz.fslabo.common.net.http;
 
 import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.collect.GekColl;
 
 import java.util.*;
@@ -48,7 +48,7 @@ public class GekHttpHeaders {
      */
     public static GekHttpHeaders of(String... keyValues) {
         GekHttpHeaders headers = new GekHttpHeaders();
-        headers.addHeaders(Gek.mapOf(keyValues));
+        headers.addHeaders(Jie.mapOf(keyValues));
         return headers;
     }
 
@@ -127,7 +127,7 @@ public class GekHttpHeaders {
     public GekHttpHeaders addHeader(String key, Object value) {
         List<String> values = headerMap.computeIfAbsent(key, k -> new LinkedList<>());
         if (value instanceof Collection) {
-            Collection<Object> c = Gek.as(value);
+            Collection<Object> c = Jie.as(value);
             values.addAll(c.stream().map(String::valueOf).collect(Collectors.toList()));
         } else {
             values.add(String.valueOf(value));

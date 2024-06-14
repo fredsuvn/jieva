@@ -1,7 +1,7 @@
 package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
@@ -32,6 +32,6 @@ public class EnumConvertHandler implements JieMapper.Handler {
             return null;
         }
         String name = source.toString();
-        return Gek.findEnum(enumType, name);
+        return Jie.findEnum(enumType, name);
     }
 }

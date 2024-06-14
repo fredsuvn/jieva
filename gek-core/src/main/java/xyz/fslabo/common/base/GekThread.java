@@ -132,7 +132,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      */
     public Thread build() throws GekIOException {
         try {
-            String threadName = Gek.orDefault(name, () -> "GekThread-" + nextThreadNum());
+            String threadName = Jie.orDefault(name, () -> "GekThread-" + nextThreadNum());
             Thread thread;
             if (stackSize != -1) {
                 thread = new Thread(group, task, threadName, stackSize);

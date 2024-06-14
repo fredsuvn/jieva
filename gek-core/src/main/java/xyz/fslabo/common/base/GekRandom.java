@@ -75,7 +75,7 @@ public interface GekRandom<T> {
         public <R extends T> Builder<R> score(int score, T value) {
             parts.add(new ValuePart<>(currentScore, currentScore + score, value));
             currentScore += score;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -93,7 +93,7 @@ public interface GekRandom<T> {
         public <R extends T> Builder<R> score(int score, Supplier<T> supplier) {
             parts.add(new SupplierPart<>(currentScore, currentScore + score, supplier));
             currentScore += score;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -105,7 +105,7 @@ public interface GekRandom<T> {
          */
         public <R extends T> Builder<R> random(Random random) {
             this.random = random;
-            return Gek.as(this);
+            return Jie.as(this);
         }
 
         /**
@@ -118,7 +118,7 @@ public interface GekRandom<T> {
             if (GekColl.isEmpty(parts)) {
                 throw new IllegalStateException("There is no score build.");
             }
-            return Gek.as(new Impl<>(Gek.orDefault(random, new Random()), parts));
+            return Jie.as(new Impl<>(Jie.orDefault(random, new Random()), parts));
         }
 
         private static final class Impl<T> implements GekRandom<T> {

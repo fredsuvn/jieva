@@ -2,7 +2,7 @@ package xyz.fslabo.common.base.obj;
 
 import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.reflect.GekReflect;
 
 import java.lang.reflect.*;
@@ -40,7 +40,7 @@ final class Impls {
 
         @Override
         public Class<T> getType() {
-            return Gek.as(type);
+            return Jie.as(type);
         }
     }
 
@@ -52,7 +52,7 @@ final class Impls {
 
         @Override
         public GenericArrayType getType() {
-            return Gek.as(type);
+            return Jie.as(type);
         }
     }
 
@@ -66,12 +66,12 @@ final class Impls {
 
         @Override
         public ParameterizedType getType() {
-            return Gek.as(type);
+            return Jie.as(type);
         }
 
         public List<Type> getActualTypeArguments() {
             if (actualTypeArguments == null) {
-                actualTypeArguments = Gek.asList(getType().getActualTypeArguments());
+                actualTypeArguments = Jie.asList(getType().getActualTypeArguments());
             }
             return actualTypeArguments;
         }
@@ -88,19 +88,19 @@ final class Impls {
 
         @Override
         public TypeVariable<?> getType() {
-            return Gek.as(type);
+            return Jie.as(type);
         }
 
         public List<Type> getBounds() {
             if (bounds == null) {
-                bounds = Gek.asList(getType().getBounds());
+                bounds = Jie.asList(getType().getBounds());
             }
             return bounds;
         }
 
         public List<AnnotatedType> getAnnotatedBounds() {
             if (annotatedBounds == null) {
-                annotatedBounds = Gek.asList(getType().getAnnotatedBounds());
+                annotatedBounds = Jie.asList(getType().getAnnotatedBounds());
             }
             return annotatedBounds;
         }
@@ -117,7 +117,7 @@ final class Impls {
 
         @Override
         public WildcardType getType() {
-            return Gek.as(type);
+            return Jie.as(type);
         }
 
         @Nullable

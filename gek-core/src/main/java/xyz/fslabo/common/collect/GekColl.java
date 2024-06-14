@@ -1,7 +1,7 @@
 package xyz.fslabo.common.collect;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 
 import java.io.Serializable;
 import java.util.*;
@@ -423,7 +423,7 @@ public class GekColl {
             }
             Object key = elements[i];
             Object value = elements[i + 1];
-            dest.put(Gek.as(key), Gek.as(value));
+            dest.put(Jie.as(key), Jie.as(value));
         }
         return dest;
     }
@@ -467,7 +467,7 @@ public class GekColl {
             R key = function.apply(iterator.next());
             if (iterator.hasNext()) {
                 Object value = function.apply(iterator.next());
-                dest.put(Gek.as(key), Gek.as(value));
+                dest.put(Jie.as(key), Jie.as(value));
             } else {
                 break;
             }
@@ -534,7 +534,7 @@ public class GekColl {
      */
     public static <T> Enumeration<T> asEnumeration(@Nullable Iterable<? extends T> iterable) {
         if (iterable == null) {
-            return Gek.as(EmptyEnumeration.INSTANCE);
+            return Jie.as(EmptyEnumeration.INSTANCE);
         }
         return new Enumeration<T>() {
 
@@ -636,7 +636,7 @@ public class GekColl {
             return defaultValue;
         }
         if (iterable instanceof List) {
-            List<T> list = Gek.as(iterable);
+            List<T> list = Jie.as(iterable);
             if (index < list.size()) {
                 T result = list.get(index);
                 if (result != null) {
@@ -674,7 +674,7 @@ public class GekColl {
             return function.apply(index);
         }
         if (iterable instanceof List) {
-            List<T> list = Gek.as(iterable);
+            List<T> list = Jie.as(iterable);
             if (index < list.size()) {
                 T result = list.get(index);
                 if (result != null) {
@@ -807,7 +807,7 @@ public class GekColl {
 
         @Override
         public T get(int index) {
-            return Gek.as(array[index]);
+            return Jie.as(array[index]);
         }
 
         @Override
@@ -849,7 +849,7 @@ public class GekColl {
 
             @Override
             public T next() {
-                return Gek.as(array[i++]);
+                return Jie.as(array[i++]);
             }
         }
     }

@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  *
  * @author fredsuvn
  */
-public class Gek {
+public class Jie {
 
     /**
      * Casts given object as specified type T.
@@ -468,7 +468,7 @@ public class Gek {
      */
     public static GekBeanInfo toBean(Object obj) {
         if (obj instanceof Map) {
-            return GekBeanInfo.wrap(Gek.as(obj));
+            return GekBeanInfo.wrap(Jie.as(obj));
         }
         return GekBeanInfo.get(obj.getClass());
     }

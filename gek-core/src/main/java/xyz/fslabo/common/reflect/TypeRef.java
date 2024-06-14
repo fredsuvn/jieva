@@ -1,6 +1,6 @@
 package xyz.fslabo.common.reflect;
 
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -39,7 +39,7 @@ public abstract class TypeRef<T> {
         Type generic = getClass().getGenericSuperclass();
         if (generic instanceof ParameterizedType) {
             ParameterizedType p = (ParameterizedType) generic;
-            if (Gek.equals(p.getRawType(), TypeRef.class)) {
+            if (Jie.equals(p.getRawType(), TypeRef.class)) {
                 return p.getActualTypeArguments()[0];
             }
         }

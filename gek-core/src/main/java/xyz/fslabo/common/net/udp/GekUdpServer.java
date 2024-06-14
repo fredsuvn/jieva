@@ -2,7 +2,7 @@ package xyz.fslabo.common.net.udp;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.collect.GekColl;
 import xyz.fslabo.common.io.GekIO;
 import xyz.fslabo.common.net.GekNetException;
@@ -279,7 +279,7 @@ public interface GekUdpServer extends GekUdpClient {
             private SocketUdpServer(GekUdpServer.Builder builder) {
                 this.port = builder.port;
                 this.address = builder.address;
-                this.serverHandler = Gek.orDefault(builder.serverHandler, EMPTY_SERVER_HANDLER);
+                this.serverHandler = Jie.orDefault(builder.serverHandler, EMPTY_SERVER_HANDLER);
                 this.packetHandlers = GekColl.toList(builder.packetHandlers);
                 if (packetHandlers.isEmpty()) {
                     throw new GekNetException("Packet handlers are empty.");
@@ -473,7 +473,7 @@ public interface GekUdpServer extends GekUdpClient {
                         }
                     }
                     while (packetCounter.get() > 0) {
-                        Gek.sleep(1);
+                        Jie.sleep(1);
                     }
                     latch.countDown();
                 });
@@ -482,7 +482,7 @@ public interface GekUdpServer extends GekUdpClient {
             private void doPacket(GekUdpHeader header, ByteBuffer buffer) {
                 Object packet = buffer;
                 for (GekUdpPacketHandler<?> packetHandler : packetHandlers) {
-                    GekUdpPacketHandler<Object> handler = Gek.as(packetHandler);
+                    GekUdpPacketHandler<Object> handler = Jie.as(packetHandler);
                     Object result = handler.onPacket(header, this, packet);
                     if (result == null) {
                         break;

@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
@@ -13,7 +13,7 @@ public class ThreadTest {
 
     @Test
     public void testThread() throws InterruptedException {
-        Thread thread = Gek.thread().name("hahaha").task(() -> {
+        Thread thread = Jie.thread().name("hahaha").task(() -> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -29,10 +29,10 @@ public class ThreadTest {
     @Test
     public void testThreadPool() {
         AtomicInteger ai = new AtomicInteger();
-        ExecutorService executorService = Gek.threadPool().corePoolSize(10)
+        ExecutorService executorService = Jie.threadPool().corePoolSize(10)
             .threadFactory(r -> {
                 ai.incrementAndGet();
-                return Gek.thread().task(r).build();
+                return Jie.thread().task(r).build();
             })
             .keepAliveTime(Duration.ofMillis(10000)).allowCoreThreadTimeOut(false).build();
         for (int i = 0; i < 10; i++) {
@@ -44,10 +44,10 @@ public class ThreadTest {
     @Test
     public void testScheduledPool() {
         AtomicInteger ai = new AtomicInteger();
-        ScheduledExecutorService executorService = Gek.scheduledPool().corePoolSize(10)
+        ScheduledExecutorService executorService = Jie.scheduledPool().corePoolSize(10)
             .threadFactory(r -> {
                 ai.incrementAndGet();
-                return Gek.thread().task(r).build();
+                return Jie.thread().task(r).build();
             })
             .keepAliveTime(Duration.ofMillis(10000)).allowCoreThreadTimeOut(true).build();
         for (int i = 0; i < 10; i++) {

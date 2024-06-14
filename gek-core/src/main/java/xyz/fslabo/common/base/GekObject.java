@@ -6,7 +6,7 @@ import xyz.fslabo.annotations.Nullable;
 import java.lang.reflect.Type;
 
 /**
- * Gek Object contains a value and its type to describe an object.
+ * Jie Object contains a value and its type to describe an object.
  * The value is typically the object itself.
  * <p>
  * it is immutable.

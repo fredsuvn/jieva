@@ -12,14 +12,14 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Information about the properties and methods of <b>Gek Bean</b>, commonly using {@link GekBeanProvider} to get
+ * Information about the properties and methods of <b>Jie Bean</b>, commonly using {@link GekBeanProvider} to get
  * the instance.
  * <p>
- * Gek bean is similar to Java Bean, but not exactly the same. A gek bean consist of a set of properties and methods,
+ * Jie bean is similar to Java Bean, but not exactly the same. A gek bean consist of a set of properties and methods,
  * but unlike java bean, gek bean do not have indexed properties, listeners, events and any other specific methods and
  * rules.
  * <p>
- * Gek bean is just the set of properties and methods, the properties of a bean are defined by property accessors, while
+ * Jie bean is just the set of properties and methods, the properties of a bean are defined by property accessors, while
  * methods that are not property accessors belong to the bean's methods.
  *
  * @author fredsuvn

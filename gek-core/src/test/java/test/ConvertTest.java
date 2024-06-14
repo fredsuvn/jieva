@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.reflect.TypeRef;
@@ -27,16 +27,16 @@ public class ConvertTest {
         long now = System.currentTimeMillis();
         Assert.assertEquals(
             Instant.ofEpochMilli(now),
-            Gek.convert(new Date(now), Instant.class)
+            Jie.convert(new Date(now), Instant.class)
         );
         Instant instant = Instant.ofEpochMilli(now);
         Assert.assertSame(
             instant,
-            Gek.convert(instant, Instant.class)
+            Jie.convert(instant, Instant.class)
         );
         Assert.assertEquals(
             Arrays.asList("1", "2", "3"),
-            Gek.convertType(
+            Jie.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<String>>() {
                 }.getType(),
                 new TypeRef<List<String>>() {
@@ -45,7 +45,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Gek.convertType(
+            Jie.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -54,7 +54,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Gek.convertType(
+            Jie.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -63,7 +63,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Gek.convertType(
+            Jie.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? extends String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
@@ -72,7 +72,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Gek.convertType(
+            Jie.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super Integer>>() {
@@ -81,7 +81,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Gek.convertType(
+            Jie.convertType(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? extends Integer>>() {
@@ -91,7 +91,7 @@ public class ConvertTest {
         List<String> strList = Arrays.asList("1", "2", "3");
         Assert.assertSame(
             strList,
-            Gek.convertType(
+            Jie.convertType(
                 strList, new TypeRef<List<? super CharSequence>>() {
                 }.getType(),
                 new TypeRef<List<? super String>>() {
@@ -100,7 +100,7 @@ public class ConvertTest {
         );
         Assert.assertNotSame(
             strList,
-            Gek.convertType(
+            Jie.convertType(
                 strList, new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super CharSequence>>() {
@@ -109,7 +109,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             strList,
-            Gek.convertType(
+            Jie.convertType(
                 strList, new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super CharSequence>>() {
@@ -118,13 +118,13 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             strList,
-            Gek.convert(
+            Jie.convert(
                 strList, List.class
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Gek.convert(
+            Jie.convert(
                 strList,
                 new TypeRef<List<? super Integer>>() {
                 }.getType()
@@ -132,7 +132,7 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(new T1("1"), new T1("2")),
-            Gek.convertType(
+            Jie.convertType(
                 Arrays.asList(new T2("1"), new T2("2")),
                 new TypeRef<List<T2>>() {
                 }.getType(),
@@ -142,7 +142,7 @@ public class ConvertTest {
         );
         Assert.assertNotEquals(
             Arrays.asList(new T1("1"), new T1("2")),
-            Gek.convertType(
+            Jie.convertType(
                 Arrays.asList(new T2("1"), new T2("2")),
                 new TypeRef<List<T2>>() {
                 }.getType(),
@@ -152,28 +152,28 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             E1.E1,
-            Gek.convert(
+            Jie.convert(
                 "E1",
                 E1.class
             )
         );
         Assert.assertEquals(
             "E2",
-            Gek.convert(
+            Jie.convert(
                 E1.E2,
                 String.class
             )
         );
         Assert.assertEquals(
             E2.E1,
-            Gek.convert(
+            Jie.convert(
                 E1.E1,
                 E2.class
             )
         );
         Assert.assertEquals(
             E1.E2,
-            Gek.convert(
+            Jie.convert(
                 E2.E2,
                 E1.class
             )

@@ -4,7 +4,7 @@ import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.collect.GekArray;
 
@@ -22,10 +22,10 @@ public class JmhRunner {
 
     private static void runBenchmark(String[] args) throws Exception {
         if (GekArray.isEmpty(args)) {
-            Gek.log("No JMH task.");
+            Jie.log("No JMH task.");
             return;
         }
-        Gek.log("JMH tasks: ", Arrays.toString(args));
+        Jie.log("JMH tasks: ", Arrays.toString(args));
         Path resultDir = Paths.get("benchmark");
         File resultDirFile = resultDir.toFile();
         resultDirFile.mkdirs();

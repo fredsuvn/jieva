@@ -1,7 +1,7 @@
 package xyz.fslabo.common.proxy;
 
 /**
- * Exception for Gek proxy.
+ * Exception for Jie proxy.
  *
  * @author fredsuvn
  */

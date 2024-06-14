@@ -1,7 +1,7 @@
 package xyz.fslabo.common.net.http;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.io.GekIO;
 
 import java.io.IOException;
@@ -50,13 +50,13 @@ final class HttpClientImpl implements GekHttpClient {
             if (!(urlConnection instanceof HttpURLConnection)) {
                 throw new GekHttpException("Not a http url: " + urlConnection);
             }
-            connection = Gek.as(urlConnection);
+            connection = Jie.as(urlConnection);
         } else {
             URLConnection urlConnection = url.openConnection(proxy);
             if (!(urlConnection instanceof HttpURLConnection)) {
                 throw new GekHttpException("Not a http url: " + urlConnection);
             }
-            connection = Gek.as(urlConnection);
+            connection = Jie.as(urlConnection);
         }
         connection.setDoInput(true);
         connection.setRequestMethod(request.getMethod());

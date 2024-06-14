@@ -5,7 +5,7 @@ import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Flag;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekObject;
 import xyz.fsgek.common.mapper.handlers.*;
 import xyz.fslabo.common.reflect.TypeRef;
@@ -66,9 +66,9 @@ public interface JieMapper {
      *         return null;
      *     }
      *     if (result instanceof GekObject) {
-     *         return Gek.as(((GekObject) result).getValue());
+     *         return Jie.as(((GekObject) result).getValue());
      *     }
-     *     return Gek.as(result);
+     *     return Jie.as(result);
      * </pre>
      *
      * @param result result from {@link #map(Object, Type, Type, MapperOption...)}
@@ -81,9 +81,9 @@ public interface JieMapper {
             return null;
         }
         if (result instanceof GekObject) {
-            return Gek.as(((GekObject) result).getValue());
+            return Jie.as(((GekObject) result).getValue());
         }
-        return Gek.as(result);
+        return Jie.as(result);
     }
 
     /**

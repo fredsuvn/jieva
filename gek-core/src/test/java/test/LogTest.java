@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.ref.Var;
 import xyz.fslabo.common.ref.IntVar;
@@ -27,7 +27,7 @@ public class LogTest {
         logger2.error("test error");
         Assert.assertEquals(count.get(), 4);
 
-        Gek.log("Gek.log");
+        Jie.log("Jie.log");
     }
 
     private static GekLog getGekLog2(IntVar count) {

@@ -1,6 +1,6 @@
 package xyz.fslabo.common.proxy;
 
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.collect.GekColl;
 
 import java.lang.reflect.InvocationTargetException;
@@ -62,7 +62,7 @@ final class JdkProxyImpl<T> implements GekProxy<T> {
                     });
                 });
         }
-        return Gek.as(inst);
+        return Jie.as(inst);
     }
 
     private static final class MethodSignature {

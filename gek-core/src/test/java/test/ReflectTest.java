@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.Gek;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.base.obj.GekObj;
 import xyz.fslabo.common.collect.GekColl;
@@ -484,8 +484,8 @@ public class ReflectTest {
         // V(23805079)=class java.lang.Long(746023354)
         GekLog.getInstance().info(GekColl.toMap(
             map.entrySet(),
-            it -> it.getKey() + "(" + Gek.systemHash(it.getKey()) + ")",
-            it -> it.getValue() + "(" + Gek.systemHash(it.getValue()) + ")"
+            it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
+            it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
         ));
         Map<TypeVariable<?>, Type> map2 = GekReflect.getTypeParameterMapping(
             T.class.getDeclaredField("x").getGenericType());
@@ -498,8 +498,8 @@ public class ReflectTest {
         // V(23805079)=class java.lang.Long(746023354)
         GekLog.getInstance().info(GekColl.toMap(
             map2.entrySet(),
-            it -> it.getKey() + "(" + Gek.systemHash(it.getKey()) + ")",
-            it -> it.getValue() + "(" + Gek.systemHash(it.getValue()) + ")"
+            it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
+            it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
         ));
     }
 
