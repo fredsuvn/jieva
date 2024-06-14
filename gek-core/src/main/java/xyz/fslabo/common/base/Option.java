@@ -2,7 +2,6 @@ package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.collect.JieArray;
-import xyz.fslabo.common.collect.JieColl;
 
 import java.util.Objects;
 
@@ -65,28 +64,6 @@ public interface Option<K, V> {
     }
 
     /**
-     * Finds and returns option value of specified key in given options, or null if not found.
-     *
-     * @param key     specified key
-     * @param options given options
-     * @param <K>     type of keys
-     * @param <V>     type of values
-     * @return option value of specified key in given options, or null if not found
-     */
-    @Nullable
-    static <K, V> V find(K key, Iterable<Option<?, ?>> options) {
-        if (JieColl.isEmpty(options)) {
-            return null;
-        }
-        for (Option<?, ?> option : options) {
-            if (option != null && Objects.equals(option.getKey(), key)) {
-                return Jie.as(option.getValue());
-            }
-        }
-        return null;
-    }
-
-    /**
      * Finds and returns option value of specified key in given options, or default value if not found.
      *
      * @param key          specified key
@@ -97,20 +74,6 @@ public interface Option<K, V> {
      * @return option value of specified key in given options, or default value if not found
      */
     static <K, V> V find(K key, V defaultValue, Option<?, ?>... options) {
-        return Jie.orDefault(find(key, options), defaultValue);
-    }
-
-    /**
-     * Finds and returns option value of specified key in given options, or default value if not found.
-     *
-     * @param key          specified key
-     * @param defaultValue default value
-     * @param options      given options
-     * @param <K>          type of keys
-     * @param <V>          type of values
-     * @return option value of specified key in given options, or default value if not found
-     */
-    static <K, V> V find(K key, V defaultValue, Iterable<Option<?, ?>> options) {
         return Jie.orDefault(find(key, options), defaultValue);
     }
 
