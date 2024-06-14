@@ -5,12 +5,12 @@ package xyz.fslabo.common.bean;
  *
  * @author fredsuvn
  */
-public class GekBeanException extends RuntimeException {
+public class BeanException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekBeanException() {
+    public BeanException() {
     }
 
     /**
@@ -18,7 +18,7 @@ public class GekBeanException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekBeanException(String message) {
+    public BeanException(String message) {
         super(message);
     }
 
@@ -28,7 +28,7 @@ public class GekBeanException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekBeanException(String message, Throwable cause) {
+    public BeanException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +37,7 @@ public class GekBeanException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekBeanException(Throwable cause) {
+    public BeanException(Throwable cause) {
         super(cause);
     }
 }

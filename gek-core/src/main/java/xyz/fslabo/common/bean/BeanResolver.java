@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Resolver for {@link GekBeanInfo}, usually consists of a {@link Handler} list.
+ * Resolver for {@link BeanInfo}, usually consists of a {@link Handler} list.
  * There are 3 built-in resolvers:
  * <ul>
  *     <li>{@link JavaBeanResolverHandler} (default handler);</li>
@@ -26,14 +26,14 @@ import java.util.Map;
  * @author fredsuvn
  */
 @ThreadSafe
-public interface GekBeanResolver {
+public interface BeanResolver {
 
     /**
      * Returns default bean resolver of which handler is {@link JavaBeanResolverHandler}.
      *
      * @return default bean resolver
      */
-    static GekBeanResolver defaultResolver() {
+    static BeanResolver defaultResolver() {
         return ResolverImpl.DEFAULT_RESOLVER;
     }
 
@@ -43,7 +43,7 @@ public interface GekBeanResolver {
      * @param handlers given handlers
      * @return new bean resolver
      */
-    static GekBeanResolver withHandlers(Handler... handlers) {
+    static BeanResolver withHandlers(Handler... handlers) {
         return withHandlers(JieArray.asList(handlers));
     }
 
@@ -53,17 +53,18 @@ public interface GekBeanResolver {
      * @param handlers given handlers
      * @return new bean resolver
      */
-    static GekBeanResolver withHandlers(Iterable<Handler> handlers) {
+    static BeanResolver withHandlers(Iterable<Handler> handlers) {
         return new ResolverImpl(handlers);
     }
 
     /**
-     * Resolves given type to {@link GekBeanInfo}.
+     * Resolves given type to {@link BeanInfo}.
      *
      * @param type given type
-     * @return resolved {@link GekBeanInfo}
+     * @return resolved {@link BeanInfo}
+     * @throws BeanResolvingException if any problem occurs when resolving
      */
-    GekBeanInfo resolve(Type type);
+    BeanInfo resolve(Type type) throws BeanResolvingException;
 
     /**
      * Returns handlers of this resolver.
@@ -80,7 +81,7 @@ public interface GekBeanResolver {
      * @return a resolver with handler list consists of given handler as first one, followed by the handler list of
      * current resolver
      */
-    GekBeanResolver withFirstHandler(Handler handler);
+    BeanResolver withFirstHandler(Handler handler);
 
     /**
      * Returns a resolver with handler list consists of the handler list of current resolver, followed by given handler
@@ -90,7 +91,7 @@ public interface GekBeanResolver {
      * @return a resolver with handler list consists of the handler list of current resolver, followed by given handler
      * as last one
      */
-    GekBeanResolver withLastHandler(Handler handler);
+    BeanResolver withLastHandler(Handler handler);
 
     /**
      * Returns this resolver as {@link Handler}.
@@ -100,10 +101,10 @@ public interface GekBeanResolver {
     Handler asHandler();
 
     /**
-     * Handler of {@link GekBeanResolver}.
+     * Handler of {@link BeanResolver}.
      *
      * @author fredsuvn
-     * @see GekBeanResolver
+     * @see BeanResolver
      */
     @ThreadSafe
     interface Handler {
@@ -111,7 +112,7 @@ public interface GekBeanResolver {
         /**
          * Resolves type of bean from given context.
          * <p>
-         * Property-base map from {@link Context#getProperties()} and method-base list from {@link Context#getMethods()}
+         * BeanProperty-base map from {@link Context#getProperties()} and method-base list from {@link Context#getMethods()}
          * are readable and writeable. Each handler can operate the map/list -- adding or removing or modifying the
          * member-base which is resolved by previous handler.
          * <p>
@@ -120,17 +121,18 @@ public interface GekBeanResolver {
          * Other returned value will be ignored.
          *
          * @param context given resolving context
-         * @see GekBeanResolver
+         * @throws BeanResolvingException if any problem occurs when resolving
+         * @see BeanResolver
          */
         @Nullable
-        Flag resolve(Context context);
+        Flag resolve(Context context) throws BeanResolvingException;
     }
 
     /**
-     * Resolving context of {@link GekBeanResolver}.
+     * Resolving context of {@link BeanResolver}.
      *
      * @author fredsuvn
-     * @see GekBeanResolver
+     * @see BeanResolver
      */
     interface Context {
 
@@ -149,7 +151,7 @@ public interface GekBeanResolver {
          *
          * @return property-base map in current resolving context
          */
-        Map<String, GekPropertyBase> getProperties();
+        Map<String, BeanPropertyBase> getProperties();
 
         /**
          * Returns bean method-base list in current resolving context.
@@ -159,6 +161,6 @@ public interface GekBeanResolver {
          *
          * @return method-base map in current resolving context
          */
-        List<GekMethodBase> getMethods();
+        List<BeanMethodBase> getMethods();
     }
 }

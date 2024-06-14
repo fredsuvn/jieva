@@ -3,7 +3,7 @@ package xyz.fslabo.common.mapper.handlers;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.io.GekIO;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
@@ -39,7 +39,7 @@ public class BytesConvertHandler implements JieMapper.Handler {
                     return src.clone();
                 }
                 return source;
-            } else if (GekReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
+            } else if (JieReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = ((ByteBuffer) source).slice();
                 return GekIO.read(src);
             } else {
@@ -52,7 +52,7 @@ public class BytesConvertHandler implements JieMapper.Handler {
                     return ByteBuffer.wrap(src.clone());
                 }
                 return ByteBuffer.wrap(src);
-            } else if (GekReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
+            } else if (JieReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = (ByteBuffer) source;
                 ByteBuffer slice = src.slice();
                 ByteBuffer buffer = ByteBuffer.allocate(slice.remaining());

@@ -3,13 +3,13 @@ package xyz.fslabo.common.bean.handlers;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.GekCase;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.bean.GekBeanResolver;
+import xyz.fslabo.common.bean.BeanResolver;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * {@link GekBeanResolver.Handler} for non-getter-prefix style (but setters have),
+ * {@link BeanResolver.Handler} for non-getter-prefix style (but setters have),
  * of which getters' names are themselves, and setters' names are start with "set".
  * For example:
  * <pre>

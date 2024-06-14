@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.bean.GekBeanInfo;
+import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.collect.GekCollector;
@@ -459,18 +459,18 @@ public class Jie {
     }
 
     /**
-     * Resolves given object to {@link GekBeanInfo}.
-     * If the object is an instance of {@link Map}, call {@link GekBeanInfo#wrap(Map)},
-     * otherwise call {@link GekBeanInfo#get(Type)}.
+     * Resolves given object to {@link BeanInfo}.
+     * If the object is an instance of {@link Map}, call {@link BeanInfo#wrap(Map)},
+     * otherwise call {@link BeanInfo#get(Type)}.
      *
      * @param obj given object
-     * @return {@link GekBeanInfo} of given object
+     * @return {@link BeanInfo} of given object
      */
-    public static GekBeanInfo toBean(Object obj) {
+    public static BeanInfo toBean(Object obj) {
         if (obj instanceof Map) {
-            return GekBeanInfo.wrap(Jie.as(obj));
+            return BeanInfo.wrap(Jie.as(obj));
         }
-        return GekBeanInfo.get(obj.getClass());
+        return BeanInfo.get(obj.getClass());
     }
 
     /**

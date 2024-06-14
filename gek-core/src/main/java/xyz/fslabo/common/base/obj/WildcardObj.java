@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base.obj;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -22,7 +22,7 @@ public interface WildcardObj<T> extends GekObj<T> {
     WildcardType getType();
 
     /**
-     * Returns upper bound by {@link GekReflect#getUpperBound(WildcardType)}.
+     * Returns upper bound by {@link JieReflect#getUpperBound(WildcardType)}.
      *
      * @return upper bound type or null
      */
@@ -30,7 +30,7 @@ public interface WildcardObj<T> extends GekObj<T> {
     Type getUpperBound();
 
     /**
-     * Returns upper bound by {@link GekReflect#getLowerBound(WildcardType)}.
+     * Returns upper bound by {@link JieReflect#getLowerBound(WildcardType)}.
      *
      * @return lower bound type or null
      */

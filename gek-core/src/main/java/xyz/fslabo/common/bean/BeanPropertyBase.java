@@ -2,8 +2,7 @@ package xyz.fslabo.common.bean;
 
 import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -12,13 +11,12 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Base info of {@link GekPropertyInfo}.
+ * Base info of {@link BeanProperty}.
  *
  * @author fredsuvn
  */
 @Immutable
-@ThreadSafe
-public interface GekPropertyBase {
+public interface BeanPropertyBase {
 
     /**
      * Returns name of this property.
@@ -54,14 +52,14 @@ public interface GekPropertyBase {
     /**
      * Returns raw type of this property:
      * <pre>
-     *     return GekReflect.getRawType(getType());
+     *     return JieReflect.getRawType(getType());
      * </pre>
      *
      * @return raw type of this property
      */
     @Nullable
     default Class<?> getRawType() {
-        return GekReflect.getRawType(getType());
+        return JieReflect.getRawType(getType());
     }
 
     /**

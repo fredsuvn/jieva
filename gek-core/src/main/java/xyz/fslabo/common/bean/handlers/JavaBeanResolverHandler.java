@@ -3,14 +3,14 @@ package xyz.fslabo.common.bean.handlers;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.GekCase;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.bean.GekBeanResolver;
+import xyz.fslabo.common.bean.BeanResolver;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * {@link GekBeanResolver.Handler} for the classical java bean, of which getters' names are start with:
+ * {@link BeanResolver.Handler} for the classical java bean, of which getters' names are start with:
  * <ul>
  *     <li>"get" -- for non-boolean returned type;</li>
  *     <li>"is" -- for boolean returned type;</li>

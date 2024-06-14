@@ -1,7 +1,7 @@
 package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.mapper.JieMapper;
 
@@ -26,7 +26,7 @@ import java.util.Objects;
  *         </ul>
  *     </li>
  *     <li>
- *         If target type is assignable from source type by {@link GekReflect#isAssignableFrom(Type, Type)}:
+ *         If target type is assignable from source type by {@link JieReflect#isAssignableFrom(Type, Type)}:
  *         <ul>
  *             <li>
  *                 If {@link JieMapper.Options#reusePolicy()} is {@link JieMapper.Options#REUSE_ASSIGNABLE},
@@ -101,7 +101,7 @@ public class ReuseConvertHandler implements JieMapper.Handler {
             }
             return null;
         }
-        if (GekReflect.isAssignableFrom(targetType, sourceType)) {
+        if (JieReflect.isAssignableFrom(targetType, sourceType)) {
             if (reusePolicy == JieMapper.Options.REUSE_ASSIGNABLE) {
                 return source;
             }
@@ -112,11 +112,11 @@ public class ReuseConvertHandler implements JieMapper.Handler {
         }
         if (sourceType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) sourceType;
-            Type sourceUpper = GekReflect.getUpperBound(wildcardType);
+            Type sourceUpper = JieReflect.getUpperBound(wildcardType);
             if (sourceUpper != null) {
                 return mapper.asHandler().map(source, sourceUpper, targetType, null);
             } else {
-                Type sourceLower = GekReflect.getLowerBound(wildcardType);
+                Type sourceLower = JieReflect.getLowerBound(wildcardType);
                 if (sourceLower != null) {
                     return mapper.asHandler().map(source, Object.class, targetType, null);
                 }
@@ -124,11 +124,11 @@ public class ReuseConvertHandler implements JieMapper.Handler {
         }
         if (targetType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) targetType;
-            Type targetUpper = GekReflect.getUpperBound(wildcardType);
+            Type targetUpper = JieReflect.getUpperBound(wildcardType);
             if (targetUpper != null) {
                 return mapper.asHandler().map(source, sourceType, targetUpper, null);
             } else {
-                Type targetLower = GekReflect.getLowerBound(wildcardType);
+                Type targetLower = JieReflect.getLowerBound(wildcardType);
                 if (targetLower != null) {
                     return mapper
                         .withOptions(mapper.getOptions().replaceReusePolicy(JieMapper.Options.REUSE_EQUAL))

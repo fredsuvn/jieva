@@ -7,62 +7,67 @@ import xyz.fslabo.common.collect.JieColl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
-final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
+final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
 
     static ResolverImpl DEFAULT_RESOLVER =
         new ResolverImpl(Collections.singletonList(JavaBeanResolverHandler.INSTANCE));
 
-    private final List<GekBeanResolver.Handler> handlers;
+    private final List<BeanResolver.Handler> handlers;
 
-    ResolverImpl(Iterable<GekBeanResolver.Handler> handlers) {
+    ResolverImpl(Iterable<BeanResolver.Handler> handlers) {
         this.handlers = JieColl.toList(handlers);
     }
 
     @Override
-    public GekBeanInfo resolve(Type type) {
-        Context builder = new Context(type);
-        for (Handler handler : handlers) {
-            Flag flag = handler.resolve(builder);
-            if (Objects.equals(flag, Flag.BREAK)) {
-                break;
+    public BeanInfo resolve(Type type) throws BeanResolvingException {
+        try {
+            Context builder = new Context(type);
+            for (Handler handler : handlers) {
+                Flag flag = handler.resolve(builder);
+                if (Objects.equals(flag, Flag.BREAK)) {
+                    break;
+                }
             }
+            return builder.build();
+        } catch (BeanResolvingException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BeanResolvingException(type, e);
         }
-        return builder.build();
     }
 
     @Override
-    public List<GekBeanResolver.Handler> getHandlers() {
+    public List<BeanResolver.Handler> getHandlers() {
         return handlers;
     }
 
     @Override
-    public GekBeanResolver withFirstHandler(Handler handler) {
-        List<GekBeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
+    public BeanResolver withFirstHandler(Handler handler) {
+        List<BeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
         newHandlers.add(handler);
         newHandlers.addAll(handlers);
         return new ResolverImpl(newHandlers);
     }
 
     @Override
-    public GekBeanResolver withLastHandler(Handler handler) {
-        List<GekBeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
+    public BeanResolver withLastHandler(Handler handler) {
+        List<BeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
         newHandlers.addAll(handlers);
         newHandlers.add(handler);
         return new ResolverImpl(newHandlers);
     }
 
     @Override
-    public GekBeanResolver.Handler asHandler() {
+    public BeanResolver.Handler asHandler() {
         return this;
     }
 
     @Override
-    public @Nullable Flag resolve(GekBeanResolver.Context builder) {
-        for (GekBeanResolver.Handler handler : handlers) {
+    public @Nullable Flag resolve(BeanResolver.Context builder) {
+        for (BeanResolver.Handler handler : handlers) {
             Flag flag = handler.resolve(builder);
             if (Objects.equals(flag, Flag.BREAK)) {
                 return Flag.BREAK;
@@ -71,11 +76,11 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
         return null;
     }
 
-    static final class Context implements GekBeanResolver.Context {
+    static final class Context implements BeanResolver.Context {
 
         private final Type type;
-        private final Map<String, GekPropertyBase> properties = new LinkedHashMap<>();
-        private final List<GekMethodBase> methods = new LinkedList<>();
+        private final Map<String, BeanPropertyBase> properties = new LinkedHashMap<>();
+        private final List<BeanMethodBase> methods = new LinkedList<>();
 
         Context(Type type) {
             this.type = type;
@@ -87,30 +92,30 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
         }
 
         @Override
-        public Map<String, GekPropertyBase> getProperties() {
+        public Map<String, BeanPropertyBase> getProperties() {
             return properties;
         }
 
         @Override
-        public List<GekMethodBase> getMethods() {
+        public List<BeanMethodBase> getMethods() {
             return methods;
         }
 
-        private GekBeanInfo build() {
+        private BeanInfo build() {
             return new BeanInfoImpl(type, properties, methods);
         }
     }
 
-    private static final class BeanInfoImpl implements GekBeanInfo {
+    private static final class BeanInfoImpl implements BeanInfo {
 
         private final Type type;
-        private final Map<String, GekPropertyInfo> properties;
-        private final List<GekMethodInfo> methods;
+        private final Map<String, BeanProperty> properties;
+        private final List<BeanMethod> methods;
 
-        private BeanInfoImpl(Type type, Map<String, GekPropertyBase> properties, List<GekMethodBase> methods) {
+        private BeanInfoImpl(Type type, Map<String, BeanPropertyBase> properties, List<BeanMethodBase> methods) {
             this.type = type;
-            this.properties = JieColl.toMap(properties, name -> name, PropertyInfoImpl::new);
-            this.methods = JieColl.toList(methods, MethodInfoImpl::new);
+            this.properties = JieColl.toMap(properties, name -> name, BeanPropertyImpl::new);
+            this.methods = JieColl.toList(methods, BeanMethodImpl::new);
         }
 
         @Override
@@ -119,40 +124,40 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
         }
 
         @Override
-        public Map<String, GekPropertyInfo> getProperties() {
+        public Map<String, BeanProperty> getProperties() {
             return properties;
         }
 
         @Override
-        public List<GekMethodInfo> getMethods() {
+        public List<BeanMethod> getMethods() {
             return methods;
         }
 
         @Override
         public boolean equals(Object o) {
-            return GekBeanInfo.equals(this, o);
+            return JieBean.equals(this, o);
         }
 
         @Override
         public int hashCode() {
-            return GekBeanInfo.hashCode(this);
+            return JieBean.hashCode(this);
         }
 
         @Override
         public String toString() {
-            return GekBeanInfo.toString(this);
+            return JieBean.toString(this);
         }
 
-        private final class PropertyInfoImpl implements GekPropertyInfo {
+        private final class BeanPropertyImpl implements BeanProperty {
 
-            private final GekPropertyBase base;
+            private final BeanPropertyBase base;
 
-            private PropertyInfoImpl(GekPropertyBase propBase) {
+            private BeanPropertyImpl(BeanPropertyBase propBase) {
                 this.base = propBase;
             }
 
             @Override
-            public GekBeanInfo getOwner() {
+            public BeanInfo getOwner() {
                 return BeanInfoImpl.this;
             }
 
@@ -183,12 +188,12 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
             }
 
             @Override
-            public @Nullable Method getGetter() {
+            public @Nullable java.lang.reflect.Method getGetter() {
                 return base.getGetter();
             }
 
             @Override
-            public @Nullable Method getSetter() {
+            public @Nullable java.lang.reflect.Method getSetter() {
                 return base.getSetter();
             }
 
@@ -230,30 +235,30 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
             @Override
             public boolean equals(Object o) {
                 return o != null && Objects.equals(getClass(), o.getClass())
-                    && GekPropertyInfo.equals(this, o);
+                    && JieBean.equals(this, o);
             }
 
             @Override
             public int hashCode() {
-                return GekPropertyInfo.hashCode(this);
+                return JieBean.hashCode(this);
             }
 
             @Override
             public String toString() {
-                return GekPropertyInfo.toString(this);
+                return JieBean.toString(this);
             }
         }
 
-        private final class MethodInfoImpl implements GekMethodInfo {
+        private final class BeanMethodImpl implements BeanMethod {
 
-            private final GekMethodBase base;
+            private final BeanMethodBase base;
 
-            private MethodInfoImpl(GekMethodBase propBase) {
+            private BeanMethodImpl(BeanMethodBase propBase) {
                 this.base = propBase;
             }
 
             @Override
-            public GekBeanInfo getOwner() {
+            public BeanInfo getOwner() {
                 return BeanInfoImpl.this;
             }
 
@@ -268,7 +273,7 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
             }
 
             @Override
-            public Method getMethod() {
+            public java.lang.reflect.Method getMethod() {
                 return base.getMethod();
             }
 

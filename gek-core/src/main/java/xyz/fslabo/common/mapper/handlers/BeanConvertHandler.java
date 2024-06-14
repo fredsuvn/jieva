@@ -2,9 +2,9 @@ package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.GekObject;
-import xyz.fslabo.common.bean.GekBeanResolver;
+import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.mapper.JieMapper;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
 import java.time.*;
@@ -71,16 +71,16 @@ public class BeanConvertHandler implements JieMapper.Handler {
         GENERATOR_MAP.put(ConcurrentSkipListMap.class, ConcurrentSkipListMap::new);
     }
 
-    private final GekBeanResolver beanResolver;
+    private final BeanResolver beanResolver;
     private final GekBeanCopier copier;
 
     /**
-     * Constructs with {@link GekBeanResolver#defaultResolver()}.
+     * Constructs with {@link BeanResolver#defaultResolver()}.
      *
-     * @see #BeanConvertHandler(GekBeanResolver)
+     * @see #BeanConvertHandler(BeanResolver)
      */
     public BeanConvertHandler() {
-        this(GekBeanResolver.defaultResolver());
+        this(BeanResolver.defaultResolver());
     }
 
     /**
@@ -88,7 +88,7 @@ public class BeanConvertHandler implements JieMapper.Handler {
      *
      * @param beanResolver bean resolver
      */
-    public BeanConvertHandler(GekBeanResolver beanResolver) {
+    public BeanConvertHandler(BeanResolver beanResolver) {
         this.beanResolver = beanResolver;
         this.copier = GekBeanCopier.defaultCopier().toBuilder()
             .beanResolver(beanResolver)
@@ -100,7 +100,7 @@ public class BeanConvertHandler implements JieMapper.Handler {
         if (source == null) {
             return GekObject.empty();
         }
-        Class<?> targetRawType = GekReflect.getRawType(targetType);
+        Class<?> targetRawType = JieReflect.getRawType(targetType);
         if (targetRawType == null || targetRawType.isArray() || UNSUPPORTED_TYPES.contains(targetRawType)) {
             return null;
         }
@@ -109,7 +109,7 @@ public class BeanConvertHandler implements JieMapper.Handler {
         if (generator != null) {
             dest = generator.get();
         } else {
-            dest = GekReflect.newInstance(targetRawType);
+            dest = JieReflect.newInstance(targetRawType);
         }
         if (dest == null) {
             return null;
@@ -122,7 +122,7 @@ public class BeanConvertHandler implements JieMapper.Handler {
      *
      * @return bean resolver of this handler
      */
-    public GekBeanResolver getBeanResolver() {
+    public BeanResolver getBeanResolver() {
         return beanResolver;
     }
 

@@ -5,7 +5,7 @@ import xyz.fslabo.common.mapper.GekConvertException;
 import xyz.fslabo.common.mapper.JieMapper;
 
 /**
- * Options for gek bean operations.
+ * {@link Option} for jie bean operations.
  *
  * @author sunqian
  */
@@ -17,8 +17,8 @@ public interface BeanOption extends Option<BeanOption.Key, Object> {
     enum Key {
 
         /**
-         * To specify the {@link GekBeanProvider}.
-         * Default is {@link GekBeanProvider#defaultProvider()}.
+         * To specify the {@link BeanProvider}.
+         * Default is {@link BeanProvider#defaultProvider()}.
          */
         PROVIDER,
 
@@ -40,7 +40,7 @@ public interface BeanOption extends Option<BeanOption.Key, Object> {
         IGNORE_NULL,
 
         /**
-         * To specify whether a {@link GekBeanCopyException} should be thrown when any part of conversion fails.
+         * To specify whether a {@link BeanCopyException} should be thrown when any part of conversion fails.
          * Default is true, if it is set to false, failed property copy will be ignored.
          */
         THROWN_IF_ANY_FAILS,
@@ -53,13 +53,13 @@ public interface BeanOption extends Option<BeanOption.Key, Object> {
     }
 
     /**
-     * Option to specify the {@link GekBeanProvider}.
-     * Default is {@link GekBeanProvider#defaultProvider()}.
+     * Option to specify the {@link BeanProvider}.
+     * Default is {@link BeanProvider#defaultProvider()}.
      *
      * @param provider bean info provider
-     * @return option to specify the {@link GekBeanProvider}
+     * @return option to specify the {@link BeanProvider}
      */
-    static BeanOption provider(GekBeanProvider provider) {
+    static BeanOption provider(BeanProvider provider) {
         return new OptionImpl(Key.PROVIDER, provider);
     }
 

@@ -6,7 +6,7 @@ import xyz.fslabo.common.base.Option;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.reflect.GekParamType;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -22,7 +22,7 @@ final class CopierImpl implements GekBeanCopier {
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
         Option<?, ?>... options
-    ) throws GekBeanCopyException {
+    ) throws BeanCopyException {
         try {
             if (source instanceof Map) {
                 if (dest instanceof Map) {
@@ -37,10 +37,10 @@ final class CopierImpl implements GekBeanCopier {
                     dataToData(source, sourceType, dest, destType, options);
                 }
             }
-        } catch (GekBeanCopyException e) {
+        } catch (BeanCopyException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekBeanCopyException(sourceType, destType, e);
+            throw new BeanCopyException(sourceType, destType, e);
         }
     }
 
@@ -49,12 +49,12 @@ final class CopierImpl implements GekBeanCopier {
         @Nullable Object dest, Type destType,
         Option<?, ?>... options
     ) {
-        GekParamType sourceParamType = GekReflect.getGenericSuperType(sourceType, Map.class);
+        GekParamType sourceParamType = JieReflect.getGenericSuperType(sourceType, Map.class);
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
         Map<Object, Object> sourceMap = Jie.as(source);
-        GekParamType destParamType = GekReflect.getGenericSuperType(destType, Map.class);
+        GekParamType destParamType = JieReflect.getGenericSuperType(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
@@ -74,7 +74,7 @@ final class CopierImpl implements GekBeanCopier {
             Object destKey = converter.map(key, sourceKeyType, destKeyType, options);
             if (destKey == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekBeanCopyException(sourceKeyType, destKeyType);
+                    throw new BeanCopyException(sourceKeyType, destKeyType);
                 } else {
                     return;
                 }
@@ -86,7 +86,7 @@ final class CopierImpl implements GekBeanCopier {
             Object destValue = converter.map(value, sourceValueType, destValueType, options);
             if (destValue == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekBeanCopyException(sourceValueType, destValueType);
+                    throw new BeanCopyException(sourceValueType, destValueType);
                 } else {
                     return;
                 }
@@ -101,14 +101,14 @@ final class CopierImpl implements GekBeanCopier {
         @Nullable Object dest, Type destType,
         Option<?, ?>... options
     ) {
-        GekParamType sourceParamType = GekReflect.getGenericSuperType(sourceType, Map.class);
+        GekParamType sourceParamType = JieReflect.getGenericSuperType(sourceType, Map.class);
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
         Map<Object, Object> sourceMap = Jie.as(source);
-        GekBeanResolver resolver = Option.find(BeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
-        GekBeanInfo destData = resolver.resolve(destType);
-        Map<String, GekPropertyInfo> destProperties = destData.getProperties();
+        BeanResolver resolver = Option.find(BeanOption.Key.PROVIDER, BeanResolver.defaultResolver(), options);
+        BeanInfo destData = resolver.resolve(destType);
+        Map<String, PropertyInfo> destProperties = destData.getProperties();
         JieMapper converter = Option.find(BeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
         Object ignoredProperties = Option.find(BeanOption.Key.IGNORED_PROPERTIES, options);
         Object ignoreNull = Option.find(BeanOption.Key.IGNORE_NULL, options);
@@ -123,20 +123,20 @@ final class CopierImpl implements GekBeanCopier {
             Object destKey = converter.map(key, sourceKeyType, String.class, options);
             if (destKey == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekBeanCopyException(sourceKeyType, String.class);
+                    throw new BeanCopyException(sourceKeyType, String.class);
                 } else {
                     return;
                 }
             }
             String destName = destKey.toString();
-            GekPropertyInfo destProperty = destProperties.get(destName);
+            PropertyInfo destProperty = destProperties.get(destName);
             if (destProperty == null) {
                 return;
             }
             Object destValue = converter.map(value, sourceValueType, destProperty.getType(), options);
             if (destValue == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekBeanCopyException(sourceValueType, destProperty.getType());
+                    throw new BeanCopyException(sourceValueType, destProperty.getType());
                 } else {
                     return;
                 }
@@ -151,10 +151,10 @@ final class CopierImpl implements GekBeanCopier {
         @Nullable Object dest, Type destType,
         Option<?, ?>... options
     ) {
-        GekBeanResolver resolver = Option.find(BeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
-        GekBeanInfo sourceData = resolver.resolve(sourceType);
-        Map<String, GekPropertyInfo> sourceProperties = sourceData.getProperties();
-        GekParamType destParamType = GekReflect.getGenericSuperType(destType, Map.class);
+        BeanResolver resolver = Option.find(BeanOption.Key.PROVIDER, BeanResolver.defaultResolver(), options);
+        BeanInfo sourceData = resolver.resolve(sourceType);
+        Map<String, PropertyInfo> sourceProperties = sourceData.getProperties();
+        GekParamType destParamType = JieReflect.getGenericSuperType(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
@@ -175,7 +175,7 @@ final class CopierImpl implements GekBeanCopier {
             Object destKey = converter.map(name, String.class, destKeyType, options);
             if (destKey == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekBeanCopyException(String.class, destKeyType);
+                    throw new BeanCopyException(String.class, destKeyType);
                 } else {
                     return;
                 }
@@ -187,7 +187,7 @@ final class CopierImpl implements GekBeanCopier {
             Object destValue = converter.map(value, property.getType(), destValueType, options);
             if (destValue == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekBeanCopyException(property.getType(), destValueType);
+                    throw new BeanCopyException(property.getType(), destValueType);
                 } else {
                     return;
                 }
@@ -202,11 +202,11 @@ final class CopierImpl implements GekBeanCopier {
         @Nullable Object dest, Type destType,
         Option<?, ?>... options
     ) {
-        GekBeanResolver resolver = Option.find(BeanOption.Key.PROVIDER, GekBeanResolver.defaultResolver(), options);
-        GekBeanInfo sourceData = resolver.resolve(sourceType);
-        Map<String, GekPropertyInfo> sourceProperties = sourceData.getProperties();
-        GekBeanInfo destData = resolver.resolve(destType);
-        Map<String, GekPropertyInfo> destProperties = destData.getProperties();
+        BeanResolver resolver = Option.find(BeanOption.Key.PROVIDER, BeanResolver.defaultResolver(), options);
+        BeanInfo sourceData = resolver.resolve(sourceType);
+        Map<String, PropertyInfo> sourceProperties = sourceData.getProperties();
+        BeanInfo destData = resolver.resolve(destType);
+        Map<String, PropertyInfo> destProperties = destData.getProperties();
         JieMapper converter = Option.find(BeanOption.Key.CONVERTER, JieMapper.defaultMapper(), options);
         Object ignoredProperties = Option.find(BeanOption.Key.IGNORED_PROPERTIES, options);
         Object ignoreNull = Option.find(BeanOption.Key.IGNORE_NULL, options);
@@ -219,14 +219,14 @@ final class CopierImpl implements GekBeanCopier {
             if (value == null && ignoreNull != null && Objects.equals(true, ignoreNull)) {
                 return;
             }
-            GekPropertyInfo destProperty = destProperties.get(name);
+            PropertyInfo destProperty = destProperties.get(name);
             if (destProperty == null) {
                 return;
             }
             Object destValue = converter.map(value, property.getType(), destProperty.getType(), options);
             if (destValue == null) {
                 if (thrownIfConversionFails != null && Objects.equals(false, ignoreNull)) {
-                    throw new GekBeanCopyException(property.getType(), destProperty.getType());
+                    throw new BeanCopyException(property.getType(), destProperty.getType());
                 } else {
                     return;
                 }
@@ -261,11 +261,11 @@ final class CopierImpl implements GekBeanCopier {
 
     private void checkMapType(@Nullable GekParamType paramType) {
         if (paramType == null) {
-            throw new GekBeanCopyException("Not a Map type: null.");
+            throw new BeanCopyException("Not a Map type: null.");
         }
         List<Type> types = paramType.getActualTypeArgumentList();
         if (JieColl.isEmpty(types) || types.size() != 2) {
-            throw new GekBeanCopyException("Not a Map type: " + paramType + ".");
+            throw new BeanCopyException("Not a Map type: " + paramType + ".");
         }
     }
 }

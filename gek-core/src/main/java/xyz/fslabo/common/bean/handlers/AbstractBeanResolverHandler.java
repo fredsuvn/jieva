@@ -3,11 +3,10 @@ package xyz.fslabo.common.bean.handlers;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.GekRuntimeException;
-import xyz.fsgek.common.bean.*;
 import xyz.fslabo.common.bean.*;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.invoke.GekInvoker;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -17,55 +16,60 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 /**
- * Base abstract gek bean resolving handler, provides a skeletal implementation of the {@link GekBeanResolver.Handler}
+ * Base abstract gek bean resolving handler, provides a skeletal implementation of the {@link BeanResolver.Handler}
  * to minimize the effort required to implement the interface backed by "method-based" getters/setters.
  * <p>
  * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
  * {@link #resolveGetter(Method)} and {@link #resolveSetter(Method)} method to determine whether it is a getter/setter.
- * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link GekMethodInfo}.
+ * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link BeanMethod}.
  * Subtypes can use {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create
  * getter/setter.
  *
  * @author fredsuvn
  */
-public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Handler {
+public abstract class AbstractBeanResolverHandler implements BeanResolver.Handler {
 
     @Override
-    public @Nullable Flag resolve(GekBeanResolver.Context context) {
-
+    public @Nullable Flag resolve(BeanResolver.Context context) throws BeanResolvingException {
         Type type = context.getType();
-        Class<?> rawType = GekReflect.getRawType(type);
-        if (rawType == null) {
-            throw new IllegalArgumentException("The type to be resolved must be Class or ParameterizedType: " + type + ".");
-        }
-        Method[] methods = rawType.getMethods();
-        Map<String, Method> getters = new LinkedHashMap<>();
-        Map<String, Method> setters = new LinkedHashMap<>();
-        for (Method method : methods) {
-            if (method.isBridge()) {
-                continue;
+        try {
+            Class<?> rawType = JieReflect.getRawType(type);
+            if (rawType == null) {
+                throw new BeanResolvingException("The type to be resolved must be Class or ParameterizedType: " + type + ".");
             }
-            Getter getter = resolveGetter(method);
-            if (getter != null) {
-                getters.put(getter.getName(), method);
-                continue;
+            Method[] methods = rawType.getMethods();
+            Map<String, Method> getters = new LinkedHashMap<>();
+            Map<String, Method> setters = new LinkedHashMap<>();
+            for (Method method : methods) {
+                if (method.isBridge()) {
+                    continue;
+                }
+                Getter getter = resolveGetter(method);
+                if (getter != null) {
+                    getters.put(getter.getName(), method);
+                    continue;
+                }
+                Setter setter = resolveSetter(method);
+                if (setter != null) {
+                    setters.put(setter.getName(), method);
+                    continue;
+                }
+                context.getMethods().add(new MethodBaseImpl(method));
             }
-            Setter setter = resolveSetter(method);
-            if (setter != null) {
-                setters.put(setter.getName(), method);
-                continue;
+            if (JieColl.isNotEmpty(getters) || JieColl.isNotEmpty(setters)) {
+                mergeAccessors(context, getters, setters, rawType);
             }
-            context.getMethods().add(new MethodBaseImpl(method));
+            return null;
+        } catch (BeanResolvingException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BeanResolvingException(type, e);
         }
-        if (JieColl.isNotEmpty(getters) || JieColl.isNotEmpty(setters)) {
-            mergeAccessors(context, getters, setters, rawType);
-        }
-        return null;
     }
 
     private void mergeAccessors(
-        GekBeanResolver.Context context, Map<String, Method> getters, Map<String, Method> setters, Class<?> rawType) {
-        Map<TypeVariable<?>, Type> typeParameterMapping = GekReflect.getTypeParameterMapping(context.getType());
+        BeanResolver.Context context, Map<String, Method> getters, Map<String, Method> setters, Class<?> rawType) {
+        Map<TypeVariable<?>, Type> typeParameterMapping = JieReflect.getTypeParameterMapping(context.getType());
         Set<Type> stack = new HashSet<>();
         getters.forEach((name, getter) -> {
             Method setter = setters.get(name);
@@ -82,13 +86,13 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
                     return;
                 }
             }
-            context.getProperties().put(name, new PropertyBaseImpl(name, getter, setter, returnType, rawType));
+            context.getProperties().put(name, new BaseImpl(name, getter, setter, returnType, rawType));
             setters.remove(name);
         });
         setters.forEach((name, setter) -> {
             Type setType = setter.getGenericParameterTypes()[0];
             setType = getActualType(setType, typeParameterMapping, stack);
-            context.getProperties().put(name, new PropertyBaseImpl(name, null, setter, setType, rawType));
+            context.getProperties().put(name, new BaseImpl(name, null, setter, setType, rawType));
         });
     }
 
@@ -168,14 +172,14 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         String getName();
     }
 
-    private static final class PropertyBaseImpl implements GekPropertyBase {
+    private static final class BaseImpl implements BeanPropertyBase {
 
         private static final Field EMPTY_FIELD;
         private static final GekInvoker EMPTY_INVOKER;
 
         static {
             try {
-                EMPTY_FIELD = PropertyBaseImpl.class.getDeclaredField("EMPTY_FIELD");
+                EMPTY_FIELD = BaseImpl.class.getDeclaredField("EMPTY_FIELD");
                 EMPTY_INVOKER = new GekInvoker() {
                     @Override
                     public @Nullable Object invoke(@Nullable Object inst, Object... args) {
@@ -200,7 +204,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         private List<Annotation> fieldAnnotations;
         private List<Annotation> allAnnotations;
 
-        private PropertyBaseImpl(
+        private BaseImpl(
             String name, @Nullable Method getter, @Nullable Method setter, Type type, Class<?> rawType) {
             this.name = name;
             this.getter = getter;
@@ -219,7 +223,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         @Override
         public @Nullable Object getValue(Object bean) {
             if (getterInvoker == EMPTY_INVOKER) {
-                throw new GekBeanException("Property is not readable: " + name + ".");
+                throw new BeanException("BeanProperty is not readable: " + name + ".");
             }
             if (getterInvoker == null) {
                 getterInvoker = buildMethodInvoker(getter);
@@ -230,7 +234,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         @Override
         public void setValue(Object bean, @Nullable Object value) {
             if (setterInvoker == EMPTY_INVOKER) {
-                throw new GekBeanException("Property is not writeable: " + name + ".");
+                throw new BeanException("BeanProperty is not writeable: " + name + ".");
             }
             if (setterInvoker == null) {
                 setterInvoker = buildMethodInvoker(getter);
@@ -326,7 +330,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         }
     }
 
-    private static final class MethodBaseImpl implements GekMethodBase {
+    private static final class MethodBaseImpl implements BeanMethodBase {
 
         private final Method method;
         private List<Annotation> annotations;

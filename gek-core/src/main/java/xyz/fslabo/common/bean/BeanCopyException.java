@@ -3,16 +3,16 @@ package xyz.fslabo.common.bean;
 import java.lang.reflect.Type;
 
 /**
- * Exception for bean object copy.
+ * Exception for bean copy.
  *
  * @author fredsuvn
  */
-public class GekBeanCopyException extends RuntimeException {
+public class BeanCopyException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekBeanCopyException() {
+    public BeanCopyException() {
     }
 
     /**
@@ -20,7 +20,7 @@ public class GekBeanCopyException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekBeanCopyException(String message) {
+    public BeanCopyException(String message) {
         super(message);
     }
 
@@ -30,7 +30,7 @@ public class GekBeanCopyException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekBeanCopyException(String message, Throwable cause) {
+    public BeanCopyException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -39,7 +39,7 @@ public class GekBeanCopyException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekBeanCopyException(Throwable cause) {
+    public BeanCopyException(Throwable cause) {
         super(cause);
     }
 
@@ -49,7 +49,7 @@ public class GekBeanCopyException extends RuntimeException {
      * @param sourceType source type
      * @param destType   destination type
      */
-    public GekBeanCopyException(Type sourceType, Type destType) {
+    public BeanCopyException(Type sourceType, Type destType) {
         this("Failed to copy properties from " + sourceType.getTypeName() + " to " + destType.getTypeName() + ".");
     }
 
@@ -60,7 +60,7 @@ public class GekBeanCopyException extends RuntimeException {
      * @param destType   destination type
      * @param cause      exception cause
      */
-    public GekBeanCopyException(Type sourceType, Type destType, Throwable cause) {
+    public BeanCopyException(Type sourceType, Type destType, Throwable cause) {
         this("Failed to copy properties from " + sourceType.getTypeName() + " to " + destType.getTypeName() + ".", cause);
     }
 }

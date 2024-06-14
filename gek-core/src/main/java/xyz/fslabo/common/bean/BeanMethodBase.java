@@ -1,20 +1,18 @@
 package xyz.fslabo.common.bean;
 
 import xyz.fslabo.annotations.Immutable;
-import xyz.fslabo.annotations.ThreadSafe;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Base info of {@link GekMemberInfo}.
+ * Base info of {@link BeanMember}.
  *
  * @author fredsuvn
  */
 @Immutable
-@ThreadSafe
-public interface GekMethodBase {
+public interface BeanMethodBase {
 
     /**
      * Returns name of this method.

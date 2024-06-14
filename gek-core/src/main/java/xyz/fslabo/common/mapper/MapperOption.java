@@ -51,13 +51,13 @@ public interface MapperOption extends Option<MapperOption.Key, Object> {
     }
     //
     // /**
-    //  * Option to specify the {@link GekBeanProvider}.
-    //  * Default is {@link GekBeanProvider#defaultProvider()}.
+    //  * Option to specify the {@link BeanProvider}.
+    //  * Default is {@link BeanProvider#defaultProvider()}.
     //  *
     //  * @param provider bean info provider
-    //  * @return option to specify the {@link GekBeanProvider}
+    //  * @return option to specify the {@link BeanProvider}
     //  */
-    // static MapperOption provider(GekBeanProvider provider) {
+    // static MapperOption provider(BeanProvider provider) {
     //     return new OptionImpl(Key.PROVIDER, provider);
     // }
     //

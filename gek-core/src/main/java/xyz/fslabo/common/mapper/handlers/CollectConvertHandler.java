@@ -8,7 +8,7 @@ import xyz.fslabo.common.base.obj.ParameterizedObj;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.mapper.JieMapper;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.GekType;
 
 import java.lang.reflect.Array;
@@ -94,7 +94,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
     @Nullable
     private Object convertIterableType(
         @Nullable Object obj, Type sourceType, Type targetType, JieMapper converter) {
-        ParameterizedType targetItType = GekReflect.getGenericSuperType(targetType, Iterable.class);
+        ParameterizedType targetItType = JieReflect.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
             return null;
         }
@@ -102,10 +102,10 @@ public class CollectConvertHandler implements JieMapper.Handler {
         if (sourceInfo == null) {
             return null;
         }
-        if (GekReflect.getRawType(sourceInfo.getType()).isArray()) {
+        if (JieReflect.getRawType(sourceInfo.getType()).isArray()) {
             return convertArray(sourceInfo, targetItType.getActualTypeArguments()[0], converter);
         }
-        Generator generator = GENERATOR_MAP.get(GekReflect.getRawType(targetItType));
+        Generator generator = GENERATOR_MAP.get(JieReflect.getRawType(targetItType));
         if (generator == null) {
             return null;
         }
@@ -159,7 +159,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
         } else {
             srcList = JieColl.collect(new LinkedList<>(), sourceInfo.getObject());
         }
-        Class<?> targetArrayClass = GekReflect.arrayClass(targetComponentType);
+        Class<?> targetArrayClass = JieReflect.arrayClass(targetComponentType);
         Object targetArray = JieArray.newArray(targetArrayClass.getComponentType(), srcList.size());
         int i = 0;
         for (Object srcValue : srcList) {
@@ -203,7 +203,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
         if (!(obj instanceof Iterable)) {
             return null;
         }
-        ParameterizedType itType = GekReflect.getGenericSuperType(type, Iterable.class);
+        ParameterizedType itType = JieReflect.getGenericSuperType(type, Iterable.class);
         if (itType == null) {
             return null;
         }

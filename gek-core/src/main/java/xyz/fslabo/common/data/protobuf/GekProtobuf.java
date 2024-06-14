@@ -1,6 +1,6 @@
 package xyz.fslabo.common.data.protobuf;
 
-import xyz.fslabo.common.bean.GekBeanResolver;
+import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.mapper.JieMapper;
 
 /**
@@ -9,7 +9,7 @@ import xyz.fslabo.common.mapper.JieMapper;
  */
 public class GekProtobuf {
 
-    private static final GekBeanResolver RESOLVER = GekBeanResolver.defaultResolver()
+    private static final BeanResolver RESOLVER = BeanResolver.defaultResolver()
         .withFirstHandler(ProtobufResolveHandler.INSTANCE);
     private static final JieMapper CONVERTER = JieMapper.defaultMapper()
         .insertFirstMiddleHandler(ByteStringConvertHandler.INSTANCE)
@@ -17,11 +17,11 @@ public class GekProtobuf {
     private static final GekBeanCopier COPIER = ProtobufBeanConvertHandler.INSTANCE.getCopier();
 
     /**
-     * Returns bean resolver supports protobuf based on {@link GekBeanResolver#defaultResolver()}.
+     * Returns bean resolver supports protobuf based on {@link BeanResolver#defaultResolver()}.
      *
-     * @return bean resolver supports protobuf based on {@link GekBeanResolver#defaultResolver()}
+     * @return bean resolver supports protobuf based on {@link BeanResolver#defaultResolver()}
      */
-    public static GekBeanResolver protobufBeanResolver() {
+    public static BeanResolver protobufBeanResolver() {
         return RESOLVER;
     }
 

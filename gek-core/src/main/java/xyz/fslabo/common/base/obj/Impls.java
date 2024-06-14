@@ -3,7 +3,7 @@ package xyz.fslabo.common.base.obj;
 import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.*;
 import java.util.List;
@@ -123,7 +123,7 @@ final class Impls {
         @Nullable
         public Type getUpperBound() {
             if (upperBound == null) {
-                upperBound = GekReflect.getUpperBound(getType());
+                upperBound = JieReflect.getUpperBound(getType());
             }
             return upperBound;
         }
@@ -131,7 +131,7 @@ final class Impls {
         @Nullable
         public Type getLowerBound() {
             if (lowerBound == null) {
-                lowerBound = GekReflect.getLowerBound(getType());
+                lowerBound = JieReflect.getLowerBound(getType());
             }
             return lowerBound;
         }

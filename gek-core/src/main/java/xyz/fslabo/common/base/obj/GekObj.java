@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base.obj;
 
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.GekType;
 import xyz.fslabo.common.reflect.TypeRef;
 
@@ -90,7 +90,7 @@ public interface GekObj<T> {
             return (ClassObj<T>) this;
         }
         if (this instanceof ParameterizedObj) {
-            return new Impls.ClassImpl<>(getObject(), GekReflect.getRawType(getType()));
+            return new Impls.ClassImpl<>(getObject(), JieReflect.getRawType(getType()));
         }
         return new Impls.ClassImpl<>(getObject(), (Class<?>) getType());
     }

@@ -9,23 +9,23 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Information about the member ({@link GekPropertyInfo} or {@link GekMethodInfo}) of {@link GekBeanInfo}.
+ * Information about the member ({@link BeanProperty} or {@link BeanMethod}) of {@link BeanInfo}.
  *
  * @author fredsuvn
- * @see GekBeanInfo
- * @see GekPropertyInfo
- * @see GekMethodInfo
+ * @see BeanInfo
+ * @see BeanProperty
+ * @see BeanMethod
  */
 @Immutable
 @ThreadSafe
-public interface GekMemberInfo {
+public interface BeanMember {
 
     /**
      * Returns owner bean info of this info.
      *
      * @return owner bean info of this info
      */
-    GekBeanInfo getOwner();
+    BeanInfo getOwner();
 
     /**
      * Returns name of this member.

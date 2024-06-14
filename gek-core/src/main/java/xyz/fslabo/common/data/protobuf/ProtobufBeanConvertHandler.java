@@ -2,11 +2,11 @@ package xyz.fslabo.common.data.protobuf;
 
 import com.google.protobuf.Message;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.bean.GekBeanResolver;
+import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.mapper.GekConvertException;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.mapper.handlers.BeanConvertHandler;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -27,7 +27,7 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
     /**
      * Constructs with {@link GekProtobuf#protobufBeanCopier()}.
      *
-     * @see #ProtobufBeanConvertHandler(GekBeanResolver)
+     * @see #ProtobufBeanConvertHandler(BeanResolver)
      */
     public ProtobufBeanConvertHandler() {
         this(GekProtobuf.protobufBeanResolver());
@@ -38,7 +38,7 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
      *
      * @param resolver given object converter
      */
-    public ProtobufBeanConvertHandler(GekBeanResolver resolver) {
+    public ProtobufBeanConvertHandler(BeanResolver resolver) {
         super(resolver);
     }
 
@@ -50,7 +50,7 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
         if (!(targetType instanceof Class<?>)) {
             return super.map(source, sourceType, targetType, mapper);
         }
-        Class<?> rawType = GekReflect.getRawType(targetType);
+        Class<?> rawType = JieReflect.getRawType(targetType);
         //Check whether it is a protobuf object
         boolean isProtobuf = false;
         boolean isBuilder = false;

@@ -3,18 +3,18 @@ package xyz.fslabo.common.bean;
 import java.lang.reflect.Type;
 
 /**
- * This provider class provides a standard way to get gek bean info ({@link GekBeanInfo}).
+ * This provider class provides a standard way to get gek bean info ({@link BeanInfo}).
  *
  * @author sunqian
  */
-public interface GekBeanProvider {
+public interface BeanProvider {
 
     /**
      * Returns default bean provider.
      *
      * @return default bean provider
      */
-    static GekBeanProvider defaultProvider() {
+    static BeanProvider defaultProvider() {
         return ProviderImpl.DEFAULT_PROVIDER;
     }
 
@@ -23,7 +23,7 @@ public interface GekBeanProvider {
      *
      * @return specified resolver
      */
-    static GekBeanProvider withResolver(GekBeanResolver resolver) {
+    static BeanProvider withResolver(BeanResolver resolver) {
         return new ProviderImpl(resolver);
     }
 
@@ -33,5 +33,5 @@ public interface GekBeanProvider {
      * @param type given type
      * @return bean info of given type
      */
-    GekBeanInfo getBeanInfo(Type type);
+    BeanInfo getBeanInfo(Type type);
 }

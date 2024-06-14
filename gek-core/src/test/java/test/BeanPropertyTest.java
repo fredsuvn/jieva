@@ -13,10 +13,10 @@ import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
 import xyz.fslabo.common.mapper.JieMapper;
-import xyz.fslabo.common.bean.GekBeanInfo;
-import xyz.fslabo.common.bean.GekBeanResolver;
-import xyz.fslabo.common.bean.GekPropertyInfo;
-import xyz.fslabo.common.bean.GekPropertyBase;
+import xyz.fslabo.common.bean.BeanInfo;
+import xyz.fslabo.common.bean.BeanResolver;
+import xyz.fslabo.common.bean.PropertyInfo;
+import xyz.fslabo.common.bean.PropertyBase;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
@@ -26,19 +26,19 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class BeanTest {
+public class BeanPropertyTest {
 
     @Test
     public void testTypeBean() throws Exception {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
-        GekBeanInfo ccBean = GekBeanInfo.get(ccType);
+        BeanInfo ccBean = BeanInfo.get(ccType);
         GekLog.getInstance().info("ccBean: ", ccBean);
-        GekPropertyInfo cc = ccBean.getProperty("cc");
-        GekPropertyInfo c1 = ccBean.getProperty("c1");
-        GekPropertyInfo c2 = ccBean.getProperty("c2");
-        GekPropertyInfo i1 = ccBean.getProperty("i1");
-        GekPropertyInfo i2 = ccBean.getProperty("i2");
+        PropertyInfo cc = ccBean.getProperty("cc");
+        PropertyInfo c1 = ccBean.getProperty("c1");
+        PropertyInfo c2 = ccBean.getProperty("c2");
+        PropertyInfo i1 = ccBean.getProperty("i1");
+        PropertyInfo i2 = ccBean.getProperty("i2");
         Assert.assertEquals(cc.getType(), Double.class);
         Assert.assertEquals(c2.getType(), Long.class);
         Assert.assertEquals(i1.getType(), String.class);
@@ -68,15 +68,15 @@ public class BeanTest {
     @Test
     public void testClassBean() throws Exception {
         Type ccType = Cc.class;
-        GekBeanInfo ccBean = GekBeanInfo.get(ccType);
+        BeanInfo ccBean = BeanInfo.get(ccType);
         GekLog.getInstance().info("ccBean: ", ccBean);
-        GekPropertyInfo cc = ccBean.getProperty("cc");
-        GekPropertyInfo c1 = ccBean.getProperty("c1");
-        GekPropertyInfo c2 = ccBean.getProperty("c2");
-        GekPropertyInfo i1 = ccBean.getProperty("i1");
-        GekPropertyInfo i2 = ccBean.getProperty("i2");
-        GekPropertyInfo e1 = ccBean.getProperty("e1");
-        GekPropertyInfo e2 = ccBean.getProperty("e2");
+        PropertyInfo cc = ccBean.getProperty("cc");
+        PropertyInfo c1 = ccBean.getProperty("c1");
+        PropertyInfo c2 = ccBean.getProperty("c2");
+        PropertyInfo i1 = ccBean.getProperty("i1");
+        PropertyInfo i2 = ccBean.getProperty("i2");
+        PropertyInfo e1 = ccBean.getProperty("e1");
+        PropertyInfo e2 = ccBean.getProperty("e2");
         Assert.assertEquals(cc.getType().toString(), "T");
         Assert.assertEquals(c2.getType(), Long.class);
         Assert.assertEquals(i1.getType(), String.class);
@@ -113,22 +113,22 @@ public class BeanTest {
         map.put("1", 10086L);
         map.put("2", 10010L);
         map.put("3", 10000L);
-        GekBeanInfo mapBean = GekBeanInfo.wrap(map, mapType);
+        BeanInfo mapBean = BeanInfo.wrap(map, mapType);
         GekLog.getInstance().info("mapBean: ", mapBean);
-        GekPropertyInfo p1 = mapBean.getProperty("1");
-        GekPropertyInfo p2 = mapBean.getProperty("2");
-        GekPropertyInfo p3 = mapBean.getProperty("3");
-        GekPropertyInfo p4 = mapBean.getProperty("4");
+        PropertyInfo p1 = mapBean.getProperty("1");
+        PropertyInfo p2 = mapBean.getProperty("2");
+        PropertyInfo p3 = mapBean.getProperty("3");
+        PropertyInfo p4 = mapBean.getProperty("4");
         Assert.assertEquals(p1.getType(), Long.class);
         Assert.assertEquals(p2.getType(), Long.class);
         Assert.assertEquals(p3.getType(), Long.class);
         Assert.assertNull(p4);
-        Map<String, GekPropertyInfo> properties = mapBean.getProperties();
+        Map<String, PropertyInfo> properties = mapBean.getProperties();
         Assert.assertSame(properties, mapBean.getProperties());
         map.put("4", 12345L);
         Assert.assertEquals(properties, mapBean.getProperties());
         Assert.assertNull(p4);
-        GekPropertyInfo p42 = mapBean.getProperty("4");
+        PropertyInfo p42 = mapBean.getProperty("4");
         Assert.assertEquals(p42.getType(), Long.class);
         Assert.assertEquals(p1, mapBean.getProperties().get("1"));
         Assert.assertEquals(p1, mapBean.getProperty("1"));
@@ -136,8 +136,8 @@ public class BeanTest {
         Assert.assertNull(mapBean.getProperty("2"));
         GekLog.getInstance().info("mapBean: ", mapBean);
 
-        GekBeanInfo mapObjBean = GekBeanInfo.wrap(map);
-        GekPropertyInfo p1Obj = mapObjBean.getProperty("1");
+        BeanInfo mapObjBean = BeanInfo.wrap(map);
+        PropertyInfo p1Obj = mapObjBean.getProperty("1");
         Assert.assertEquals(p1Obj.getType(), Object.class);
         Assert.assertEquals(
             p1.getValue(map),
@@ -145,7 +145,7 @@ public class BeanTest {
         );
 
         Assert.assertThrows(IllegalArgumentException.class, () -> {
-            GekBeanInfo.wrap(map, new TypeRef<Map<Object, Long>>() {
+            BeanInfo.wrap(map, new TypeRef<Map<Object, Long>>() {
             }.getType());
         });
     }
@@ -154,24 +154,24 @@ public class BeanTest {
     public void testBeanResolver() {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
-        GekBeanInfo ccBean1 = GekBeanInfo.get(ccType);
-        GekBeanInfo ccBean2 = GekBeanInfo.get(ccType);
+        BeanInfo ccBean1 = BeanInfo.get(ccType);
+        BeanInfo ccBean2 = BeanInfo.get(ccType);
         Assert.assertSame(ccBean1, ccBean2);
-        GekBeanResolver resolver = GekBeanResolver.withHandlers(
+        BeanResolver resolver = BeanResolver.withHandlers(
             Collections.singletonList(new JavaBeanResolverHandler()),
             null
         );
-        GekBeanInfo ccBean3 = resolver.resolve(ccType);
+        BeanInfo ccBean3 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean1, ccBean3);
         Assert.assertEquals(ccBean1, ccBean3);
-        GekBeanInfo ccBean4 = resolver.resolve(ccType);
+        BeanInfo ccBean4 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean4, ccBean3);
         Assert.assertEquals(ccBean4, ccBean3);
     }
 
     @Test
     public void testBeanResolveHandler() {
-        GekBeanInfo aaa = GekBeanInfo.get(TestHandler.class);
+        BeanInfo aaa = BeanInfo.get(TestHandler.class);
         Assert.assertEquals(aaa.getProperties().size(), 3);
         Assert.assertNotNull(aaa.getProperty("aaa"));
         Assert.assertNotNull(aaa.getProperty("bbb"));
@@ -179,7 +179,7 @@ public class BeanTest {
         Assert.assertTrue(aaa.getProperty("aaa").isWriteable());
         Assert.assertFalse(aaa.getProperty("bbb").isReadable());
         Assert.assertTrue(aaa.getProperty("bbb").isWriteable());
-        GekBeanInfo bbb = GekBeanResolver.withHandlers(NonGetterPrefixResolverHandler.INSTANCE).resolve(TestHandler.class);
+        BeanInfo bbb = BeanResolver.withHandlers(NonGetterPrefixResolverHandler.INSTANCE).resolve(TestHandler.class);
         Assert.assertEquals(bbb.getProperties().size(), 3);
         Assert.assertNotNull(bbb.getProperty("aaa"));
         Assert.assertNotNull(bbb.getProperty("bbb"));
@@ -334,10 +334,10 @@ public class BeanTest {
     @Test
     public void testResolverAsHandler() {
         int[] x = {0};
-        GekBeanResolver.Handler handler = GekBeanResolver.defaultResolver()
-            .withFirstHandler(new GekBeanResolver.Handler() {
+        BeanResolver.Handler handler = BeanResolver.defaultResolver()
+            .withFirstHandler(new BeanResolver.Handler() {
                 @Override
-                public @Nullable Flag resolve(GekBeanResolver.Context context) {
+                public @Nullable Flag resolve(BeanResolver.Context context) {
                     if (Objects.equals(context.getType(), Integer.class)) {
                         x[0]++;
                         return null;
@@ -346,7 +346,7 @@ public class BeanTest {
                 }
             })
             .asHandler();
-        GekBeanResolver.Context context1 = new GekBeanResolver.Context() {
+        BeanResolver.Context context1 = new BeanResolver.Context() {
 
             @Override
             public Type getType() {
@@ -354,13 +354,13 @@ public class BeanTest {
             }
 
             @Override
-            public Map<String, GekPropertyBase> getProperties() {
+            public Map<String, PropertyBase> getProperties() {
                 return new HashMap<>();
             }
         };
         handler.resolve(context1);
         Assert.assertEquals(x[0], 1);
-        GekBeanResolver.Context context2 = new GekBeanResolver.Context() {
+        BeanResolver.Context context2 = new BeanResolver.Context() {
 
             @Override
             public Type getType() {
@@ -368,7 +368,7 @@ public class BeanTest {
             }
 
             @Override
-            public Map<String, GekPropertyBase> getProperties() {
+            public Map<String, PropertyBase> getProperties() {
                 return new HashMap<>();
             }
         };

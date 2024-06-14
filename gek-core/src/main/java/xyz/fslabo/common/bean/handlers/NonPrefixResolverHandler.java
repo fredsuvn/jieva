@@ -1,13 +1,13 @@
 package xyz.fslabo.common.bean.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.bean.GekBeanResolver;
+import xyz.fslabo.common.bean.BeanResolver;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * {@link GekBeanResolver.Handler} for non-prefix style, of which getters' and setters' names are themselves.
+ * {@link BeanResolver.Handler} for non-prefix style, of which getters' and setters' names are themselves.
  * For example:
  * <pre>
  *     // Getter of "foo"

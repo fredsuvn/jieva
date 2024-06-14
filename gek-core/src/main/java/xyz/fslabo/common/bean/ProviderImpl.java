@@ -4,20 +4,20 @@ import xyz.fslabo.common.cache.GekCache;
 
 import java.lang.reflect.Type;
 
-final class ProviderImpl implements GekBeanProvider {
+final class ProviderImpl implements BeanProvider {
 
-    static ProviderImpl DEFAULT_PROVIDER = new ProviderImpl(GekBeanResolver.defaultResolver());
+    static ProviderImpl DEFAULT_PROVIDER = new ProviderImpl(BeanResolver.defaultResolver());
 
-    private final GekBeanResolver resolver;
-    private final GekCache<Type, GekBeanInfo> cache;
+    private final BeanResolver resolver;
+    private final GekCache<Type, BeanInfo> cache;
 
-    ProviderImpl(GekBeanResolver resolver) {
+    ProviderImpl(BeanResolver resolver) {
         this.resolver = resolver;
         this.cache = GekCache.softCache();
     }
 
     @Override
-    public GekBeanInfo getBeanInfo(Type type) {
+    public BeanInfo getBeanInfo(Type type) {
         if (cache == null) {
             return resolver.resolve(type);
         }

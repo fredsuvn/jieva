@@ -8,9 +8,9 @@ import test.protobuf.Data;
 import test.protobuf.Enum;
 import test.protobuf.Request;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.bean.GekBeanInfo;
-import xyz.fslabo.common.bean.GekBeanResolver;
-import xyz.fslabo.common.bean.GekPropertyInfo;
+import xyz.fslabo.common.bean.BeanInfo;
+import xyz.fslabo.common.bean.BeanResolver;
+import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.data.protobuf.GekProtobuf;
 import xyz.fslabo.common.reflect.TypeRef;
@@ -33,9 +33,9 @@ public class ProtobufTest {
             map<string, string> entry = 5;
         }
          */
-        GekBeanResolver resolver = GekProtobuf.protobufBeanResolver();
-        GekBeanInfo dataBean = resolver.resolve(Data.class);
-        Map<String, GekPropertyInfo> propertyMap = dataBean.getProperties();
+        BeanResolver resolver = GekProtobuf.protobufBeanResolver();
+        BeanInfo dataBean = resolver.resolve(Data.class);
+        Map<String, PropertyInfo> propertyMap = dataBean.getProperties();
         Assert.assertEquals(propertyMap.size(), 14);
         Assert.assertEquals(propertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(propertyMap.get("str").getType(), String.class);
@@ -50,8 +50,8 @@ public class ProtobufTest {
         Assert.assertFalse(propertyMap.get("textList").isWriteable());
         Assert.assertFalse(propertyMap.get("entryMap").isWriteable());
 
-        GekBeanInfo dataBuilderBean = resolver.resolve(Data.newBuilder().getClass());
-        Map<String, GekPropertyInfo> builderPropertyMap = dataBuilderBean.getProperties();
+        BeanInfo dataBuilderBean = resolver.resolve(Data.newBuilder().getClass());
+        Map<String, PropertyInfo> builderPropertyMap = dataBuilderBean.getProperties();
         Assert.assertEquals(builderPropertyMap.size(), 14);
         Assert.assertEquals(builderPropertyMap.get("em").getType(), Enum.class);
         Assert.assertEquals(builderPropertyMap.get("str").getType(), String.class);

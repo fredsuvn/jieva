@@ -2,7 +2,7 @@ package xyz.fslabo.common.proxy;
 
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -188,11 +188,11 @@ public interface GekProxy<T> {
         }
 
         private boolean hasSpring() {
-            return GekReflect.hasClass("org.springframework.cglib.proxy.Enhancer");
+            return JieReflect.hasClass("org.springframework.cglib.proxy.Enhancer");
         }
 
         private boolean hasCglib() {
-            return GekReflect.hasClass("net.sf.cglib.proxy.Enhancer");
+            return JieReflect.hasClass("net.sf.cglib.proxy.Enhancer");
         }
     }
 }

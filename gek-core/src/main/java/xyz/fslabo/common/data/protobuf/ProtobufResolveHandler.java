@@ -5,12 +5,12 @@ import com.google.protobuf.Message;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.bean.GekBeanException;
-import xyz.fslabo.common.bean.GekBeanResolver;
-import xyz.fslabo.common.bean.GekPropertyBase;
+import xyz.fslabo.common.bean.BeanException;
+import xyz.fslabo.common.bean.BeanResolver;
+import xyz.fslabo.common.bean.PropertyBase;
 import xyz.fslabo.common.mapper.GekConvertException;
 import xyz.fslabo.common.invoke.GekInvoker;
-import xyz.fslabo.common.reflect.GekReflect;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
-public class ProtobufResolveHandler implements GekBeanResolver.Handler {
+public class ProtobufResolveHandler implements BeanResolver.Handler {
 
     /**
      * An instance.
@@ -35,9 +35,9 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
     public static final ProtobufResolveHandler INSTANCE = new ProtobufResolveHandler();
 
     @Override
-    public @Nullable Flag resolve(GekBeanResolver.Context context) {
+    public @Nullable Flag resolve(BeanResolver.Context context) {
         try {
-            Class<?> rawType = GekReflect.getRawType(context.getType());
+            Class<?> rawType = JieReflect.getRawType(context.getType());
             if (rawType == null) {
                 return null;
             }
@@ -57,7 +57,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
             Method getDescriptorMethod = rawType.getMethod("getDescriptor");
             Descriptors.Descriptor descriptor = (Descriptors.Descriptor) getDescriptorMethod.invoke(null);
             for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
-                GekPropertyBase propBase = buildProperty(context, field, rawType, isBuilder);
+                PropertyBase propBase = buildProperty(context, field, rawType, isBuilder);
                 context.getProperties().put(propBase.getName(), propBase);
             }
             return Flag.BREAK;
@@ -68,8 +68,8 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
         }
     }
 
-    private GekPropertyBase buildProperty(
-        GekBeanResolver.Context builder,
+    private PropertyBase buildProperty(
+        BeanResolver.Context builder,
         Descriptors.FieldDescriptor field,
         Class<?> rawClass,
         boolean isBuilder
@@ -81,7 +81,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
         if (field.isMapField()) {
             String name = rawName + "Map";
             Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(name));
-            Type type = GekReflect.getGenericSuperType(getterMethod.getGenericReturnType(), Map.class);
+            Type type = JieReflect.getGenericSuperType(getterMethod.getGenericReturnType(), Map.class);
             GekInvoker getter = GekInvoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + GekString.capitalize(rawName));
@@ -93,15 +93,15 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
                             clearMethod.invoke(inst);
                             return putAllMethod.invoke(inst, args);
                         } catch (InvocationTargetException e) {
-                            throw new GekBeanException(e.getCause());
+                            throw new BeanException(e.getCause());
                         } catch (Exception e) {
-                            throw new GekBeanException(e);
+                            throw new BeanException(e);
                         }
                     }
                 };
-                return new PropertyImpl(name, type, getterMethod, null, getter, setter);
+                return new Impl(name, type, getterMethod, null, getter, setter);
             } else {
-                return new PropertyImpl(name, type, getterMethod, null, getter, null);
+                return new Impl(name, type, getterMethod, null, getter, null);
             }
         }
 
@@ -109,7 +109,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
         if (field.isRepeated()) {
             String name = rawName + "List";
             Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(name));
-            Type type = GekReflect.getGenericSuperType(getterMethod.getGenericReturnType(), List.class);
+            Type type = JieReflect.getGenericSuperType(getterMethod.getGenericReturnType(), List.class);
             GekInvoker getter = GekInvoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + GekString.capitalize(rawName));
@@ -121,15 +121,15 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
                             clearMethod.invoke(inst);
                             return addAllMethod.invoke(inst, args);
                         } catch (InvocationTargetException e) {
-                            throw new GekBeanException(e.getCause());
+                            throw new BeanException(e.getCause());
                         } catch (Exception e) {
-                            throw new GekBeanException(e);
+                            throw new BeanException(e);
                         }
                     }
                 };
-                return new PropertyImpl(name, type, getterMethod, null, getter, setter);
+                return new Impl(name, type, getterMethod, null, getter, setter);
             } else {
-                return new PropertyImpl(name, type, getterMethod, null, getter, null);
+                return new Impl(name, type, getterMethod, null, getter, null);
             }
         }
 
@@ -138,15 +138,15 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
         Type type = getterMethod.getGenericReturnType();
         GekInvoker getter = GekInvoker.reflectMethod(getterMethod);
         if (isBuilder) {
-            Method setterMethod = rawClass.getMethod("set" + GekString.capitalize(rawName), GekReflect.getRawType(type));
+            Method setterMethod = rawClass.getMethod("set" + GekString.capitalize(rawName), JieReflect.getRawType(type));
             GekInvoker setter = GekInvoker.reflectMethod(setterMethod);
-            return new PropertyImpl(rawName, type, getterMethod, setterMethod, getter, setter);
+            return new Impl(rawName, type, getterMethod, setterMethod, getter, setter);
         } else {
-            return new PropertyImpl(rawName, type, getterMethod, null, getter, null);
+            return new Impl(rawName, type, getterMethod, null, getter, null);
         }
     }
 
-    private static final class PropertyImpl implements GekPropertyBase {
+    private static final class Impl implements PropertyBase {
 
         private final String name;
         private final Type type;
@@ -155,7 +155,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
         private final GekInvoker getter;
         private final @Nullable GekInvoker setter;
 
-        private PropertyImpl(
+        private Impl(
             String name,
             Type type,
             @Nullable Method getterMethod,
@@ -184,7 +184,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
         @Override
         public void setValue(Object bean, @Nullable Object value) {
             if (setter == null) {
-                throw new GekBeanException("Not writeable.");
+                throw new BeanException("Not writeable.");
             }
             setter.invoke(bean, value);
         }
