@@ -5,7 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.GekCase;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.util.Arrays;
 
@@ -22,7 +22,7 @@ public class CaseTest {
         Assert.assertEquals(GekCase.UPPER_CAMEL.toCase("AaBbCCcc", GekCase.LOWER_CAMEL), "aaBbCCcc");
         Assert.assertEquals(GekCase.LOWER_CAMEL.toCase("aaBbCCcc", GekCase.UPPER_CAMEL), "AaBbCCcc");
         Assert.assertEquals(
-            GekColl.toStringList(GekCase.UPPER_CAMEL.tokenize("AAAAABBBBBCCCCCcccccDDEe")),
+            JieColl.toStringList(GekCase.UPPER_CAMEL.tokenize("AAAAABBBBBCCCCCcccccDDEe")),
             Arrays.asList("AAAAABBBBBCCCC", "Cccccc", "DD", "Ee")
         );
 

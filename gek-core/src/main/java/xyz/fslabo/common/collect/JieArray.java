@@ -15,7 +15,7 @@ import java.util.function.Function;
  *
  * @author fredsuvn
  */
-public class GekArray {
+public class JieArray {
 
     /**
      * Returns given elements itself as array.

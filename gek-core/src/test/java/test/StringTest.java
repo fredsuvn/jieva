@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -116,27 +116,27 @@ public class StringTest {
     @Test
     public void testSplit() {
         Assert.assertEquals(
-            GekColl.toStringList(GekString.split("123--123--123--", "--")),
+            JieColl.toStringList(GekString.split("123--123--123--", "--")),
             Arrays.asList("123", "123", "123", "")
         );
         Assert.assertEquals(
-            GekColl.toStringList(GekString.split("123", "1234")),
+            JieColl.toStringList(GekString.split("123", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            GekColl.toStringList(GekString.split("", "1234")),
+            JieColl.toStringList(GekString.split("", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            GekColl.toStringList(GekString.split("123", "123")),
+            JieColl.toStringList(GekString.split("123", "123")),
             Arrays.asList("", "")
         );
         Assert.assertEquals(
-            GekColl.toStringList(GekString.split("123--123--123----", "--")),
+            JieColl.toStringList(GekString.split("123--123--123----", "--")),
             Arrays.asList("123", "123", "123", "", "")
         );
         Assert.assertEquals(
-            GekColl.toStringList(GekString.split("--123--123--123----", "--")),
+            JieColl.toStringList(GekString.split("--123--123--123----", "--")),
             Arrays.asList("", "123", "123", "123", "", "")
         );
     }

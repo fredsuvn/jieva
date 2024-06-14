@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -115,7 +115,7 @@ public interface GekRandom<T> {
          * @return built instance of {@link GekRandom}
          */
         public <R extends T> GekRandom<R> build() {
-            if (GekColl.isEmpty(parts)) {
+            if (JieColl.isEmpty(parts)) {
                 throw new IllegalStateException("There is no score build.");
             }
             return Jie.as(new Impl<>(Jie.orDefault(random, new Random()), parts));
@@ -128,7 +128,7 @@ public interface GekRandom<T> {
 
             private Impl(Random random, List<Part> parts) {
                 this.random = random;
-                this.parts = GekColl.toArray(parts, Part.class);
+                this.parts = JieColl.toArray(parts, Part.class);
             }
 
             @Override

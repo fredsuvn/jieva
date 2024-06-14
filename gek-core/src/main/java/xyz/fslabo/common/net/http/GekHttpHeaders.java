@@ -3,7 +3,7 @@ package xyz.fslabo.common.net.http;
 import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,7 +99,7 @@ public class GekHttpHeaders {
     @Nullable
     public String getHeaderFirst(String key) {
         List<String> list = headerMap.get(key);
-        return GekColl.isEmpty(list) ? null : list.get(0);
+        return JieColl.isEmpty(list) ? null : list.get(0);
     }
 
     /**

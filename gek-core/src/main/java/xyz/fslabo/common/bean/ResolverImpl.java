@@ -3,7 +3,7 @@ package xyz.fslabo.common.bean;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -19,7 +19,7 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
     private final List<GekBeanResolver.Handler> handlers;
 
     ResolverImpl(Iterable<GekBeanResolver.Handler> handlers) {
-        this.handlers = GekColl.toList(handlers);
+        this.handlers = JieColl.toList(handlers);
     }
 
     @Override
@@ -109,8 +109,8 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
 
         private BeanInfoImpl(Type type, Map<String, GekPropertyBase> properties, List<GekMethodBase> methods) {
             this.type = type;
-            this.properties = GekColl.toMap(properties, name -> name, PropertyInfoImpl::new);
-            this.methods = GekColl.toList(methods, MethodInfoImpl::new);
+            this.properties = JieColl.toMap(properties, name -> name, PropertyInfoImpl::new);
+            this.methods = JieColl.toList(methods, MethodInfoImpl::new);
         }
 
         @Override

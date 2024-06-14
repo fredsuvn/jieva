@@ -1,7 +1,8 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.GekArray;
+import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.util.Objects;
 
@@ -52,7 +53,7 @@ public interface Option<K, V> {
      */
     @Nullable
     static <K, V> V find(K key, Option<?, ?>... options) {
-        if (GekArray.isEmpty(options)) {
+        if (JieArray.isEmpty(options)) {
             return null;
         }
         for (Option<?, ?> option : options) {
@@ -74,7 +75,7 @@ public interface Option<K, V> {
      */
     @Nullable
     static <K, V> V find(K key, Iterable<Option<?, ?>> options) {
-        if (GekArray.isEmpty(options)) {
+        if (JieColl.isEmpty(options)) {
             return null;
         }
         for (Option<?, ?> option : options) {

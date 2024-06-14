@@ -2,7 +2,7 @@ package xyz.fslabo.common.mapper;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fsgek.common.mapper.handlers.*;
 import xyz.fslabo.common.mapper.handlers.*;
 
@@ -28,7 +28,7 @@ final class MapperImpl implements JieMapper, JieMapper.Handler {
     private final List<JieMapper.Handler> handlers;
 
     MapperImpl(Iterable<JieMapper.Handler> handlers) {
-        this.handlers = GekColl.toList(handlers);
+        this.handlers = JieColl.toList(handlers);
     }
 
     @Override

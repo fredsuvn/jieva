@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.util.Map;
 
@@ -441,7 +441,7 @@ public class GekSystem {
      * @return all system properties
      */
     public static Map<String, String> allProperties() {
-        return GekColl.toMap(System.getProperties());
+        return JieColl.toMap(System.getProperties());
     }
 
     /**

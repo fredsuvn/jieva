@@ -1,7 +1,7 @@
 package xyz.fslabo.common.net.http;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -109,7 +109,7 @@ public interface GekHttpRequest {
          */
         public Builder url(String url, Map<String, String> queryString) {
             try {
-                if (GekColl.isEmpty(queryString)) {
+                if (JieColl.isEmpty(queryString)) {
                     this.url = new URL(url);
                 } else {
                     String query = queryString.entrySet().stream().map(it ->

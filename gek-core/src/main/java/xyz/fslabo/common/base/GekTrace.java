@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.GekArray;
+import xyz.fslabo.common.collect.JieArray;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -54,7 +54,7 @@ public class GekTrace {
     @Nullable
     public static StackTraceElement findCallerTrace(String className, String methodName, int offset) {
         StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
-        if (GekArray.isEmpty(stackTraces)) {
+        if (JieArray.isEmpty(stackTraces)) {
             return null;
         }
         for (int i = 0; i < stackTraces.length; i++) {

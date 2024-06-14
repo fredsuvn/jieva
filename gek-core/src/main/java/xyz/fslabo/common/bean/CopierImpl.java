@@ -3,7 +3,7 @@ package xyz.fslabo.common.bean;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.Option;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.reflect.GekParamType;
 import xyz.fslabo.common.reflect.GekReflect;
@@ -264,7 +264,7 @@ final class CopierImpl implements GekBeanCopier {
             throw new GekBeanCopyException("Not a Map type: null.");
         }
         List<Type> types = paramType.getActualTypeArgumentList();
-        if (GekColl.isEmpty(types) || types.size() != 2) {
+        if (JieColl.isEmpty(types) || types.size() != 2) {
             throw new GekBeanCopyException("Not a Map type: " + paramType + ".");
         }
     }

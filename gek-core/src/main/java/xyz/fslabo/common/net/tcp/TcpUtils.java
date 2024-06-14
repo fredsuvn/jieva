@@ -1,6 +1,6 @@
 package xyz.fslabo.common.net.tcp;
 
-import xyz.fslabo.common.collect.GekArray;
+import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.io.GekIO;
 
 import java.nio.ByteBuffer;
@@ -23,7 +23,7 @@ final class TcpUtils {
 
     static ByteBuffer compact(ByteBuffer buffer, byte[] newBytes, IntFunction<ByteBuffer> generator) {
         if (buffer.remaining() <= 0) {
-            if (GekArray.isEmpty(newBytes)) {
+            if (JieArray.isEmpty(newBytes)) {
                 return GekIO.emptyBuffer();
             }
             ByteBuffer newBuffer = generator.apply(newBytes.length);

@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -236,7 +236,7 @@ public abstract class GekCase {
 
         @Override
         public String join(List<Token> tokens) {
-            if (GekColl.isEmpty(tokens)) {
+            if (JieColl.isEmpty(tokens)) {
                 return "";
             }
             StringBuilder sb = new StringBuilder();

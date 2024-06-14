@@ -7,7 +7,7 @@ import xyz.fslabo.common.bean.handlers.AbstractBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonPrefixResolverHandler;
-import xyz.fslabo.common.collect.GekArray;
+import xyz.fslabo.common.collect.JieArray;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -44,7 +44,7 @@ public interface GekBeanResolver {
      * @return new bean resolver
      */
     static GekBeanResolver withHandlers(Handler... handlers) {
-        return withHandlers(GekArray.asList(handlers));
+        return withHandlers(JieArray.asList(handlers));
     }
 
     /**

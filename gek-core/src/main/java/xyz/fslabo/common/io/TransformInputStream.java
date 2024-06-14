@@ -1,7 +1,7 @@
 package xyz.fslabo.common.io;
 
 import xyz.fslabo.common.base.GekCheck;
-import xyz.fslabo.common.collect.GekArray;
+import xyz.fslabo.common.collect.JieArray;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,7 +144,7 @@ public class TransformInputStream extends InputStream {
                 return;
             }
             byte[] transformed = transformer.apply(sourceBytes);
-            if (GekArray.isNotEmpty(transformed)) {
+            if (JieArray.isNotEmpty(transformed)) {
                 buffer = ByteBuffer.wrap(transformed);
                 return;
             }

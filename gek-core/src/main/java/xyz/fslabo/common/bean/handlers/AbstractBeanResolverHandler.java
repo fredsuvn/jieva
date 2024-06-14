@@ -5,7 +5,7 @@ import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.GekRuntimeException;
 import xyz.fsgek.common.bean.*;
 import xyz.fslabo.common.bean.*;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.invoke.GekInvoker;
 import xyz.fslabo.common.reflect.GekReflect;
 
@@ -57,7 +57,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
             }
             context.getMethods().add(new MethodBaseImpl(method));
         }
-        if (GekColl.isNotEmpty(getters) || GekColl.isNotEmpty(setters)) {
+        if (JieColl.isNotEmpty(getters) || JieColl.isNotEmpty(setters)) {
             mergeAccessors(context, getters, setters, rawType);
         }
         return null;
@@ -137,7 +137,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
             return type;
         }
         stack.clear();
-        Type result = GekColl.getNested(typeParameterMapping, type, stack);
+        Type result = JieColl.getNested(typeParameterMapping, type, stack);
         if (result == null) {
             return type;
         }
@@ -264,7 +264,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         @Override
         public List<Annotation> getGetterAnnotations() {
             if (getterAnnotations == null) {
-                getterAnnotations = getter == null ? Collections.emptyList() : GekColl.listOf(getter.getAnnotations());
+                getterAnnotations = getter == null ? Collections.emptyList() : JieColl.listOf(getter.getAnnotations());
             }
             return getterAnnotations;
         }
@@ -272,7 +272,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         @Override
         public List<Annotation> getSetterAnnotations() {
             if (setterAnnotations == null) {
-                setterAnnotations = setter == null ? Collections.emptyList() : GekColl.listOf(setter.getAnnotations());
+                setterAnnotations = setter == null ? Collections.emptyList() : JieColl.listOf(setter.getAnnotations());
             }
             return setterAnnotations;
         }
@@ -281,7 +281,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         public List<Annotation> getFieldAnnotations() {
             if (fieldAnnotations == null) {
                 Field field = getField();
-                fieldAnnotations = field == null ? Collections.emptyList() : GekColl.listOf(field.getAnnotations());
+                fieldAnnotations = field == null ? Collections.emptyList() : JieColl.listOf(field.getAnnotations());
             }
             return fieldAnnotations;
         }
@@ -357,7 +357,7 @@ public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Han
         @Override
         public List<Annotation> getAnnotations() {
             if (annotations == null) {
-                annotations = GekColl.listOf(method.getAnnotations());
+                annotations = JieColl.listOf(method.getAnnotations());
             }
             return annotations;
         }

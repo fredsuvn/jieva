@@ -1,7 +1,7 @@
 package xyz.fslabo.common.reflect;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -29,7 +29,7 @@ public interface GekWildcard extends WildcardType {
     @Nullable
     default Type getUpperBound() {
         List<Type> uppers = getUpperBoundList();
-        if (GekColl.isNotEmpty(uppers)) {
+        if (JieColl.isNotEmpty(uppers)) {
             return uppers.get(0);
         }
         return null;
@@ -50,7 +50,7 @@ public interface GekWildcard extends WildcardType {
     @Nullable
     default Type getLowerBound() {
         List<Type> lowers = getLowerBoundList();
-        if (GekColl.isNotEmpty(lowers)) {
+        if (JieColl.isNotEmpty(lowers)) {
             return lowers.get(0);
         }
         return null;

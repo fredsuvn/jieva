@@ -3,7 +3,7 @@ package xyz.fslabo.common.net.tcp;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.data.GekData;
 import xyz.fslabo.common.io.GekIO;
 import xyz.fslabo.common.net.GekNetException;
@@ -171,7 +171,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
          * @return this builder
          */
         public Builder addChannelHandlers(Iterable<GekTcpChannelHandler<?>> channelHandlers) {
-            GekColl.collect(this.channelHandlers, channelHandlers);
+            JieColl.collect(this.channelHandlers, channelHandlers);
             return this;
         }
 
@@ -249,7 +249,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
                 this.port = builder.port;
                 this.address = builder.address;
                 this.clientHandler = Jie.orDefault(builder.clientHandler, EMPTY_CLIENT_HANDLER);
-                this.channelHandlers = GekColl.toList(builder.channelHandlers);
+                this.channelHandlers = JieColl.toList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
                     throw new GekNetException("Channel handlers are empty.");
                 }

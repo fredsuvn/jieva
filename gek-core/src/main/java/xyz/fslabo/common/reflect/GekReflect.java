@@ -5,8 +5,8 @@ import xyz.fslabo.annotations.OutParam;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.cache.GekCache;
-import xyz.fslabo.common.collect.GekArray;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -78,11 +78,11 @@ public class GekReflect {
     @Nullable
     public static Type getUpperBound(WildcardType type) {
         Type[] lowerBounds = type.getLowerBounds();
-        if (GekArray.isNotEmpty(lowerBounds)) {
+        if (JieArray.isNotEmpty(lowerBounds)) {
             return null;
         }
         Type[] upperBounds = type.getUpperBounds();
-        if (GekArray.isEmpty(upperBounds)) {
+        if (JieArray.isEmpty(upperBounds)) {
             return Object.class;
         }
         return upperBounds[0];
@@ -98,7 +98,7 @@ public class GekReflect {
     @Nullable
     public static Type getLowerBound(WildcardType type) {
         Type[] lowerBounds = type.getLowerBounds();
-        if (GekArray.isEmpty(lowerBounds)) {
+        if (JieArray.isEmpty(lowerBounds)) {
             return null;
         }
         return lowerBounds[0];
@@ -567,14 +567,14 @@ public class GekReflect {
             return null;
         }
         TypeVariable<?>[] typeParameters = target.getTypeParameters();
-        if (GekArray.isEmpty(typeParameters)) {
+        if (JieArray.isEmpty(typeParameters)) {
             throw new IllegalArgumentException("Given \"to\" type doesn't have type parameter.");
         }
         Map<TypeVariable<?>, Type> typeArguments = getTypeParameterMapping(type);
         Set<Type> stack = new HashSet<>();
         List<Type> actualTypeArguments = Arrays.stream(typeParameters)
             .map(it -> {
-                Type nestedValue = GekColl.getNested(typeArguments, it, stack);
+                Type nestedValue = JieColl.getNested(typeArguments, it, stack);
                 stack.clear();
                 return nestedValue == null ? it : nestedValue;
             }).collect(Collectors.toList());
@@ -641,7 +641,7 @@ public class GekReflect {
     }
 
     private static void parseSuperTypes(Type[] superTypes, @OutParam Map<TypeVariable<?>, Type> typeMap) {
-        if (GekArray.isNotEmpty(superTypes)) {
+        if (JieArray.isNotEmpty(superTypes)) {
             for (Type superType : superTypes) {
                 parseSuperGeneric(superType, typeMap);
                 Class<?> superRaw = getRawType(superType);

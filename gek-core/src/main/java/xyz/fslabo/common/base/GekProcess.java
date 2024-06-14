@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.io.GekIO;
 import xyz.fslabo.common.io.GekIOConfigurer;
 import xyz.fslabo.common.io.GekIOException;
@@ -328,7 +328,7 @@ public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
      * @throws GekIOException IO exception
      */
     public Process start() throws GekIOException {
-        if (GekColl.isEmpty(command)) {
+        if (JieColl.isEmpty(command)) {
             throw new IllegalArgumentException("No command.");
         }
         try {

@@ -2,8 +2,8 @@ package xyz.fslabo.common.reflect;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.collect.GekArray;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -29,7 +29,7 @@ public class GekType {
      * @return parameterized type
      */
     public static GekParamType paramType(Type rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
-        return paramType(rawType, ownerType, GekColl.toArray(actualTypeArguments, Type.class));
+        return paramType(rawType, ownerType, JieColl.toArray(actualTypeArguments, Type.class));
     }
 
     /**
@@ -85,8 +85,8 @@ public class GekType {
      */
     public static GekWildcard wildcard(@Nullable Iterable<Type> upperBounds, @Nullable Iterable<Type> lowerBounds) {
         return new GekWildcardImpl(
-            upperBounds == null ? null : GekColl.toArray(upperBounds, Type.class),
-            lowerBounds == null ? null : GekColl.toArray(lowerBounds, Type.class)
+            upperBounds == null ? null : JieColl.toArray(upperBounds, Type.class),
+            lowerBounds == null ? null : JieColl.toArray(lowerBounds, Type.class)
         );
     }
 
@@ -212,7 +212,7 @@ public class GekType {
             } else {
                 sb.append(rawType.getTypeName());
             }
-            if (GekArray.isNotEmpty(actualTypeArguments)) {
+            if (JieArray.isNotEmpty(actualTypeArguments)) {
                 sb.append("<");
                 boolean first = true;
                 for (Type t : actualTypeArguments) {
@@ -234,7 +234,7 @@ public class GekType {
         @Override
         public List<Type> getActualTypeArgumentList() {
             if (actualTypeArgumentList == null) {
-                actualTypeArgumentList = GekColl.asList(actualTypeArguments);
+                actualTypeArgumentList = JieColl.asList(actualTypeArguments);
             }
             return actualTypeArgumentList;
         }
@@ -248,8 +248,8 @@ public class GekType {
         private List<Type> lowerBoundList;
 
         private GekWildcardImpl(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
-            this.upperBounds = GekArray.isEmpty(upperBounds) ? new Type[]{Object.class} : upperBounds.clone();
-            this.lowerBounds = GekArray.isEmpty(lowerBounds) ? new Type[0] : lowerBounds.clone();
+            this.upperBounds = JieArray.isEmpty(upperBounds) ? new Type[]{Object.class} : upperBounds.clone();
+            this.lowerBounds = JieArray.isEmpty(lowerBounds) ? new Type[0] : lowerBounds.clone();
         }
 
         @Override
@@ -316,7 +316,7 @@ public class GekType {
         @Override
         public List<Type> getUpperBoundList() {
             if (upperBoundList == null) {
-                upperBoundList = GekColl.asList(upperBounds);
+                upperBoundList = JieColl.asList(upperBounds);
             }
             return upperBoundList;
         }
@@ -324,7 +324,7 @@ public class GekType {
         @Override
         public List<Type> getLowerBoundList() {
             if (lowerBoundList == null) {
-                lowerBoundList = GekColl.asList(lowerBounds);
+                lowerBoundList = JieColl.asList(lowerBounds);
             }
             return lowerBoundList;
         }

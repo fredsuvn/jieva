@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
  *
  * @author fresduvn
  */
-public class GekColl {
+public class JieColl {
 
     /**
      * Returns given elements as immutable list, any change for the elements will reflect to the list.
@@ -26,7 +26,7 @@ public class GekColl {
      */
     @SafeVarargs
     public static <T> List<T> asList(T... elements) {
-        return GekArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements);
+        return JieArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements);
     }
 
     /**
@@ -38,7 +38,7 @@ public class GekColl {
      */
     @SafeVarargs
     public static <T> Set<T> asSet(T... elements) {
-        return GekArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements, true);
+        return JieArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements, true);
     }
 
     /**
@@ -50,7 +50,7 @@ public class GekColl {
      */
     @SafeVarargs
     public static <T> List<T> listOf(T... elements) {
-        return GekArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements.clone());
+        return JieArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements.clone());
     }
 
     /**
@@ -62,7 +62,7 @@ public class GekColl {
      */
     @SafeVarargs
     public static <T> Set<T> setOf(T... elements) {
-        return GekArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements.clone(), true);
+        return JieArray.isEmpty(elements) ? Collections.emptySet() : new ImmutableSet<>(elements.clone(), true);
     }
 
     /**
@@ -78,7 +78,7 @@ public class GekColl {
      */
     @SafeVarargs
     public static <K, V, T> Map<K, V> mapOf(T... elements) {
-        return GekArray.isEmpty(elements) ? Collections.emptyMap() : new ImmutableMap<>(elements);
+        return JieArray.isEmpty(elements) ? Collections.emptyMap() : new ImmutableMap<>(elements);
     }
 
     /**
@@ -91,7 +91,7 @@ public class GekColl {
      */
     @SafeVarargs
     public static <K, V> Map<K, V> mapOfEntries(Map.Entry<? extends K, ? extends V>... entries) {
-        if (GekArray.isEmpty(entries)) {
+        if (JieArray.isEmpty(entries)) {
             return Collections.emptyMap();
         }
         Object[] array = new Object[entries.length * 2];
@@ -127,10 +127,10 @@ public class GekColl {
      */
     public static <T> T[] toArray(@Nullable Iterable<? extends T> elements, Class<T> type) {
         if (elements == null) {
-            return GekArray.newArray(type, 0);
+            return JieArray.newArray(type, 0);
         }
         return StreamSupport.stream(elements.spliterator(), false)
-            .toArray(size -> GekArray.newArray(type, size));
+            .toArray(size -> JieArray.newArray(type, size));
     }
 
     /**
@@ -144,11 +144,11 @@ public class GekColl {
     public static <T, R> R[] toArray(
         @Nullable Iterable<? extends T> elements, Class<R> type, Function<? super T, ? extends R> function) {
         if (elements == null) {
-            return GekArray.newArray(type, 0);
+            return JieArray.newArray(type, 0);
         }
         return StreamSupport.stream(elements.spliterator(), false)
             .map(function)
-            .toArray(size -> GekArray.newArray(type, size));
+            .toArray(size -> JieArray.newArray(type, size));
     }
 
     /**
@@ -365,7 +365,7 @@ public class GekColl {
      */
     @SafeVarargs
     public static <T, C extends Collection<? super T>> C collect(C dest, T... elements) {
-        if (GekArray.isEmpty(elements)) {
+        if (JieArray.isEmpty(elements)) {
             return dest;
         }
         dest.addAll(asList(elements));

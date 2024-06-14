@@ -3,7 +3,7 @@ package xyz.fslabo.common.proxy;
 import org.springframework.cglib.core.SpringNamingPolicy;
 import org.springframework.cglib.proxy.*;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,8 +26,8 @@ final class SpringProxyImpl<T> implements GekProxy<T> {
             enhancer.setSuperclass(superClass);
             inherited = true;
         }
-        if (GekColl.isNotEmpty(superInterfaces)) {
-            enhancer.setInterfaces(GekColl.toArray(superInterfaces, Class.class));
+        if (JieColl.isNotEmpty(superInterfaces)) {
+            enhancer.setInterfaces(JieColl.toArray(superInterfaces, Class.class));
             inherited = true;
         }
         if (!inherited) {

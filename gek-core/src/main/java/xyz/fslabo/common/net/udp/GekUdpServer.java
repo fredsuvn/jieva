@@ -3,7 +3,7 @@ package xyz.fslabo.common.net.udp;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.io.GekIO;
 import xyz.fslabo.common.net.GekNetException;
 import xyz.fslabo.common.net.GekServerStates;
@@ -226,7 +226,7 @@ public interface GekUdpServer extends GekUdpClient {
          * @return this builder
          */
         public Builder addPacketHandlers(Iterable<GekUdpPacketHandler<?>> packetHandlers) {
-            GekColl.collect(this.packetHandlers, packetHandlers);
+            JieColl.collect(this.packetHandlers, packetHandlers);
             return this;
         }
 
@@ -280,7 +280,7 @@ public interface GekUdpServer extends GekUdpClient {
                 this.port = builder.port;
                 this.address = builder.address;
                 this.serverHandler = Jie.orDefault(builder.serverHandler, EMPTY_SERVER_HANDLER);
-                this.packetHandlers = GekColl.toList(builder.packetHandlers);
+                this.packetHandlers = JieColl.toList(builder.packetHandlers);
                 if (packetHandlers.isEmpty()) {
                     throw new GekNetException("Packet handlers are empty.");
                 }

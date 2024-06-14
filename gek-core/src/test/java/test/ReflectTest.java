@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.base.obj.GekObj;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.reflect.GekReflect;
 import xyz.fslabo.common.reflect.GekType;
 import xyz.fslabo.common.reflect.TypeRef;
@@ -482,7 +482,7 @@ public class ReflectTest {
         // A(844996153)=A(726237730)
         // B(1498084403)=A(844996153)
         // V(23805079)=class java.lang.Long(746023354)
-        GekLog.getInstance().info(GekColl.toMap(
+        GekLog.getInstance().info(JieColl.toMap(
             map.entrySet(),
             it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
             it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
@@ -496,7 +496,7 @@ public class ReflectTest {
         // A(844996153)=A(726237730)
         // B(1498084403)=A(844996153)
         // V(23805079)=class java.lang.Long(746023354)
-        GekLog.getInstance().info(GekColl.toMap(
+        GekLog.getInstance().info(JieColl.toMap(
             map2.entrySet(),
             it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
             it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"

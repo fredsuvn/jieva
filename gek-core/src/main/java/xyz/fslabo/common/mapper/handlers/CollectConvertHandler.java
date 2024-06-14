@@ -5,8 +5,8 @@ import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.obj.GekObj;
 import xyz.fslabo.common.base.obj.ParameterizedObj;
-import xyz.fslabo.common.collect.GekArray;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.reflect.GekReflect;
 import xyz.fslabo.common.reflect.GekType;
@@ -110,7 +110,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
             return null;
         }
         if (generator.needSize()) {
-            Collection<?> srcList = GekColl.orList(sourceInfo.getObject());
+            Collection<?> srcList = JieColl.orList(sourceInfo.getObject());
             return convertCollection(
                 srcList,
                 generator.generate(srcList.size()),
@@ -157,10 +157,10 @@ public class CollectConvertHandler implements JieMapper.Handler {
         if (sourceInfo.getObject() instanceof Collection) {
             srcList = (Collection<?>) sourceInfo.getObject();
         } else {
-            srcList = GekColl.collect(new LinkedList<>(), sourceInfo.getObject());
+            srcList = JieColl.collect(new LinkedList<>(), sourceInfo.getObject());
         }
         Class<?> targetArrayClass = GekReflect.arrayClass(targetComponentType);
-        Object targetArray = GekArray.newArray(targetArrayClass.getComponentType(), srcList.size());
+        Object targetArray = JieArray.newArray(targetArrayClass.getComponentType(), srcList.size());
         int i = 0;
         for (Object srcValue : srcList) {
             Object targetValue = converter.convertType(
@@ -222,31 +222,31 @@ public class CollectConvertHandler implements JieMapper.Handler {
             return (Iterable<?>) obj;
         }
         if (obj instanceof Object[]) {
-            return GekArray.asList((Object[]) obj);
+            return JieArray.asList((Object[]) obj);
         }
         if (obj instanceof boolean[]) {
-            return GekArray.asList((boolean[]) obj);
+            return JieArray.asList((boolean[]) obj);
         }
         if (obj instanceof byte[]) {
-            return GekArray.asList((byte[]) obj);
+            return JieArray.asList((byte[]) obj);
         }
         if (obj instanceof short[]) {
-            return GekArray.asList((short[]) obj);
+            return JieArray.asList((short[]) obj);
         }
         if (obj instanceof char[]) {
-            return GekArray.asList((char[]) obj);
+            return JieArray.asList((char[]) obj);
         }
         if (obj instanceof int[]) {
-            return GekArray.asList((int[]) obj);
+            return JieArray.asList((int[]) obj);
         }
         if (obj instanceof long[]) {
-            return GekArray.asList((long[]) obj);
+            return JieArray.asList((long[]) obj);
         }
         if (obj instanceof float[]) {
-            return GekArray.asList((float[]) obj);
+            return JieArray.asList((float[]) obj);
         }
         if (obj instanceof double[]) {
-            return GekArray.asList((double[]) obj);
+            return JieArray.asList((double[]) obj);
         }
         return null;
     }

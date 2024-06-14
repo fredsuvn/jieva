@@ -7,7 +7,7 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekChars;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.data.GekData;
 import xyz.fslabo.common.io.GekIO;
 import xyz.fslabo.common.net.GekNetException;
@@ -525,7 +525,7 @@ public class NetTest {
         System.out.println("----------------------------------");
         GekHttpResponse response2 = GekHttp.get(
             "http://localhost:" + server.getPort(),
-            GekColl.mapOf("hello", "hello world")
+            JieColl.mapOf("hello", "hello world")
         );
         System.out.println("response2 Server received:");
         System.out.println(new String(received.toByteArray(), GekChars.defaultCharset()));

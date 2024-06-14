@@ -1,7 +1,7 @@
 package xyz.fslabo.common.proxy;
 
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,11 +15,11 @@ final class JdkProxyImpl<T> implements GekProxy<T> {
     private final Map<MethodSignature, GekProxyMethod> methodMap;
 
     JdkProxyImpl(Iterable<Class<?>> superInterfaces, Map<Predicate<Method>, GekProxyMethod> proxyMap) {
-        if (GekColl.isEmpty(superInterfaces)) {
+        if (JieColl.isEmpty(superInterfaces)) {
             throw new GekProxyException("No super interface to be proxied.");
         }
-        this.superInterfaces = GekColl.toArray(superInterfaces, Class.class);
-        if (GekColl.isEmpty(proxyMap)) {
+        this.superInterfaces = JieColl.toArray(superInterfaces, Class.class);
+        if (JieColl.isEmpty(proxyMap)) {
             this.methodMap = Collections.emptyMap();
             return;
         }

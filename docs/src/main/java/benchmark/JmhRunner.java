@@ -6,7 +6,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.collect.GekArray;
+import xyz.fslabo.common.collect.JieArray;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class JmhRunner {
     }
 
     private static void runBenchmark(String[] args) throws Exception {
-        if (GekArray.isEmpty(args)) {
+        if (JieArray.isEmpty(args)) {
             Jie.log("No JMH task.");
             return;
         }

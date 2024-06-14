@@ -2,8 +2,8 @@ package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.bean.GekBeanInfo;
-import xyz.fslabo.common.collect.GekArray;
-import xyz.fslabo.common.collect.GekColl;
+import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.collect.GekCollector;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.reflect.TypeRef;
@@ -521,11 +521,11 @@ public class Jie {
      * @see GekBeanCopier
      */
     public static <T> T copyProperties(Object source, T dest, String... ignoredProperties) {
-        if (GekArray.isEmpty(ignoredProperties)) {
+        if (JieArray.isEmpty(ignoredProperties)) {
             return GekBeanCopier.defaultCopier().copyProperties(source, dest);
         }
         return GekBeanCopier.defaultCopier().toBuilder()
-            .propertyNameMapper(name -> GekArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .propertyNameMapper(name -> JieArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
             .build()
             .copyProperties(source, dest);
     }
@@ -544,12 +544,12 @@ public class Jie {
      * @see GekBeanCopier
      */
     public static <T> T copyProperties(Object source, T dest, boolean copyNull, String... ignoredProperties) {
-        if (copyNull && GekArray.isEmpty(ignoredProperties)) {
+        if (copyNull && JieArray.isEmpty(ignoredProperties)) {
             return GekBeanCopier.defaultCopier().copyProperties(source, dest);
         }
         return GekBeanCopier.defaultCopier().toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
-            .propertyNameMapper(name -> GekArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .propertyNameMapper(name -> JieArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
             .build()
             .copyProperties(source, dest);
     }
@@ -607,11 +607,11 @@ public class Jie {
      */
     public static <T> T copyProperties(
         Object source, Type sourceType, T dest, Type destType, String... ignoredProperties) {
-        if (GekArray.isEmpty(ignoredProperties)) {
+        if (JieArray.isEmpty(ignoredProperties)) {
             return GekBeanCopier.defaultCopier().copyProperties(source, dest);
         }
         return GekBeanCopier.defaultCopier().toBuilder()
-            .propertyNameMapper(name -> GekArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .propertyNameMapper(name -> JieArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
             .build()
             .copyProperties(source, sourceType, dest, destType);
     }
@@ -633,12 +633,12 @@ public class Jie {
      */
     public static <T> T copyProperties(
         Object source, Type sourceType, T dest, Type destType, boolean copyNull, String... ignoredProperties) {
-        if (copyNull && GekArray.isEmpty(ignoredProperties)) {
+        if (copyNull && JieArray.isEmpty(ignoredProperties)) {
             return GekBeanCopier.defaultCopier().copyProperties(source, dest);
         }
         return GekBeanCopier.defaultCopier().toBuilder()
             .sourcePropertyFilter((name, value) -> value != null)
-            .propertyNameMapper(name -> GekArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
+            .propertyNameMapper(name -> JieArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
             .build()
             .copyProperties(source, sourceType, dest, destType);
     }
@@ -745,7 +745,7 @@ public class Jie {
     /**
      * Returns given elements itself as array.
      * <p>
-     * This method directly invoke {@link GekArray#asArray(Object[])}.
+     * This method directly invoke {@link JieArray#asArray(Object[])}.
      *
      * @param elements given elements
      * @param <T>      component type
@@ -753,67 +753,67 @@ public class Jie {
      */
     @SafeVarargs
     public static <T> T[] asArray(T... elements) {
-        return GekArray.asArray(elements);
+        return JieArray.asArray(elements);
     }
 
     /**
      * Returns given elements as immutable list, any change for the elements will reflect to the list.
      * <p>
-     * This method directly invoke {@link GekColl#asList(Object[])}.
+     * This method directly invoke {@link JieColl#asList(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
      * @return given elements as immutable list
-     * @see GekColl#asList(Object[])
+     * @see JieColl#asList(Object[])
      */
     @SafeVarargs
     public static <T> List<T> asList(T... elements) {
-        return GekColl.asList(elements);
+        return JieColl.asList(elements);
     }
 
     /**
      * Returns given elements as immutable set, any change for the elements will reflect to the set.
      * <p>
-     * This method directly invoke {@link GekColl#asSet(Object[])}.
+     * This method directly invoke {@link JieColl#asSet(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
      * @return given elements as immutable set
-     * @see GekColl#asSet(Object[])
+     * @see JieColl#asSet(Object[])
      */
     @SafeVarargs
     public static <T> Set<T> asSet(T... elements) {
-        return GekColl.asSet(elements);
+        return JieColl.asSet(elements);
     }
 
     /**
      * Returns an immutable list contains given elements.
      * <p>
-     * This method directly invoke {@link GekColl#listOf(Object[])}.
+     * This method directly invoke {@link JieColl#listOf(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
      * @return an immutable list contains given elements
-     * @see GekColl#listOf(Object[])
+     * @see JieColl#listOf(Object[])
      */
     @SafeVarargs
     public static <T> List<T> listOf(T... elements) {
-        return GekColl.listOf(elements);
+        return JieColl.listOf(elements);
     }
 
     /**
      * Returns an immutable set contains given elements.
      * <p>
-     * This method directly invoke {@link GekColl#setOf(Object[])}.
+     * This method directly invoke {@link JieColl#setOf(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
      * @return an immutable set contains given elements
-     * @see GekColl#setOf(Object[])
+     * @see JieColl#setOf(Object[])
      */
     @SafeVarargs
     public static <T> Set<T> setOf(T... elements) {
-        return GekColl.setOf(elements);
+        return JieColl.setOf(elements);
     }
 
     /**
@@ -821,29 +821,29 @@ public class Jie {
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      * <p>
-     * This method directly invoke {@link GekColl#mapOf(Object...)}.
+     * This method directly invoke {@link JieColl#mapOf(Object...)}.
      *
      * @param elements given elements
      * @param <K>      type of keys
      * @param <V>      type of values
      * @param <T>      type of element
      * @return an immutable map contains given elements
-     * @see GekColl#mapOf(Object...)
+     * @see JieColl#mapOf(Object...)
      */
     @SafeVarargs
     public static <K, V, T> Map<K, V> mapOf(T... elements) {
-        return GekColl.mapOf(elements);
+        return JieColl.mapOf(elements);
     }
 
     /**
      * Returns a new collection configurer to create a collection.
      * <p>
-     * This method directly invoke {@link GekColl#collector()}.
+     * This method directly invoke {@link JieColl#collector()}.
      *
      * @return a new collection configurer to create a collection
-     * @see GekColl#collector()
+     * @see JieColl#collector()
      */
     public static GekCollector collector() {
-        return GekColl.collector();
+        return JieColl.collector();
     }
 }
