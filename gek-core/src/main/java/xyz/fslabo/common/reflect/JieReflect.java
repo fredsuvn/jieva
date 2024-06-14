@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  *
  * @author fredsuvn
  */
-public class GekReflect {
+public class JieReflect {
 
     private static final GekCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = GekCache.softCache();
 
