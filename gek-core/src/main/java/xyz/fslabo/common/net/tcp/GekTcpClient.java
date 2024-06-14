@@ -248,13 +248,13 @@ public interface GekTcpClient extends GekTcpEndpoint {
             private SocketTcpClient(Builder builder) {
                 this.port = builder.port;
                 this.address = builder.address;
-                this.clientHandler = Gek.notNull(builder.clientHandler, EMPTY_CLIENT_HANDLER);
+                this.clientHandler = Gek.orDefault(builder.clientHandler, EMPTY_CLIENT_HANDLER);
                 this.channelHandlers = GekColl.toList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
                     throw new GekNetException("Channel handlers are empty.");
                 }
                 this.socketConfig = builder.socketConfig;
-                this.bufferGenerator = Gek.notNull(builder.bufferGenerator, ByteBuffer::allocate);
+                this.bufferGenerator = Gek.orDefault(builder.bufferGenerator, ByteBuffer::allocate);
                 this.channelBufferSize = builder.channelBufferSize;
                 if (channelBufferSize <= 0) {
                     throw new GekNetException("Channel buffer size must > 0.");

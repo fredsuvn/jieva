@@ -1,7 +1,7 @@
 package xyz.fslabo.common.bean.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.GekRuntimeException;
 import xyz.fsgek.common.bean.*;
 import xyz.fslabo.common.bean.*;
@@ -31,7 +31,7 @@ import java.util.*;
 public abstract class AbstractBeanResolverHandler implements GekBeanResolver.Handler {
 
     @Override
-    public @Nullable GekFlag resolve(GekBeanResolver.Context context) {
+    public @Nullable Flag resolve(GekBeanResolver.Context context) {
 
         Type type = context.getType();
         Class<?> rawType = GekReflect.getRawType(type);

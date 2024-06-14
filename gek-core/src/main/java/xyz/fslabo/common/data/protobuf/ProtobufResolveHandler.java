@@ -3,7 +3,7 @@ package xyz.fslabo.common.data.protobuf;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.bean.GekBeanException;
 import xyz.fslabo.common.bean.GekBeanResolver;
@@ -35,7 +35,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
     public static final ProtobufResolveHandler INSTANCE = new ProtobufResolveHandler();
 
     @Override
-    public @Nullable GekFlag resolve(GekBeanResolver.Context context) {
+    public @Nullable Flag resolve(GekBeanResolver.Context context) {
         try {
             Class<?> rawType = GekReflect.getRawType(context.getType());
             if (rawType == null) {
@@ -60,7 +60,7 @@ public class ProtobufResolveHandler implements GekBeanResolver.Handler {
                 GekPropertyBase propBase = buildProperty(context, field, rawType, isBuilder);
                 context.getProperties().put(propBase.getName(), propBase);
             }
-            return GekFlag.BREAK;
+            return Flag.BREAK;
         } catch (GekConvertException e) {
             throw e;
         } catch (Exception e) {

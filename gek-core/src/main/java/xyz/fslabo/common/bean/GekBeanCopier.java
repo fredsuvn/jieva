@@ -1,7 +1,7 @@
 package xyz.fslabo.common.bean;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.JieOption;
+import xyz.fslabo.common.base.Option;
 import xyz.fslabo.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
@@ -64,6 +64,6 @@ public interface GekBeanCopier {
     void copyProperties(
         @Nullable Object source, Type sourceType,
         @Nullable Object dest, Type destType,
-        JieOption<?, ?>... options
+        Option<?, ?>... options
     ) throws GekBeanCopyException;
 }

@@ -2,7 +2,7 @@ package xyz.fslabo.common.bean;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.handlers.AbstractBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
@@ -116,14 +116,14 @@ public interface GekBeanResolver {
          * member-base which is resolved by previous handler.
          * <p>
          * This method will be invoked for each handler in the resolver from {@link #getHandlers()} sequentially.
-         * If a handler want to prevent the rest resolving, return {@link GekFlag#BREAK} to break invoking-sequence.
+         * If a handler want to prevent the rest resolving, return {@link Flag#BREAK} to break invoking-sequence.
          * Other returned value will be ignored.
          *
          * @param context given resolving context
          * @see GekBeanResolver
          */
         @Nullable
-        GekFlag resolve(Context context);
+        Flag resolve(Context context);
     }
 
     /**

@@ -118,7 +118,7 @@ public interface GekRandom<T> {
             if (GekColl.isEmpty(parts)) {
                 throw new IllegalStateException("There is no score build.");
             }
-            return Gek.as(new Impl<>(Gek.notNull(random, new Random()), parts));
+            return Gek.as(new Impl<>(Gek.orDefault(random, new Random()), parts));
         }
 
         private static final class Impl<T> implements GekRandom<T> {

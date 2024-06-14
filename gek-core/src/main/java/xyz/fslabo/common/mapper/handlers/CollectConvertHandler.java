@@ -1,8 +1,8 @@
 package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Gek;
-import xyz.fslabo.common.base.GekFlag;
 import xyz.fslabo.common.base.obj.GekObj;
 import xyz.fslabo.common.base.obj.ParameterizedObj;
 import xyz.fslabo.common.collect.GekArray;
@@ -140,7 +140,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
         for (Object srcValue : source) {
             Object targetValue = converter.convertType(srcValue, sourceComponentType, destComponentType);
             if (targetValue == null) {
-                return GekFlag.BREAK;
+                return Flag.BREAK;
             }
             dest.add(JieMapper.resolveResult(targetValue));
         }
@@ -166,7 +166,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
             Object targetValue = converter.convertType(
                 srcValue, sourceInfo.getActualTypeArgument(0), targetComponentType);
             if (targetValue == null) {
-                return GekFlag.BREAK;
+                return Flag.BREAK;
             }
             Array.set(targetArray, i, JieMapper.resolveResult(targetValue));
             i++;

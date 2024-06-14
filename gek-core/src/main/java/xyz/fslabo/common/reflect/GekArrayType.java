@@ -21,7 +21,7 @@ public interface GekArrayType extends GenericArrayType {
      */
     default Class<?> getComponentType() {
         Type componentType = getGenericComponentType();
-        return Gek.notNull(GekReflect.getRawType(componentType), Object.class);
+        return Gek.orDefault(GekReflect.getRawType(componentType), Object.class);
     }
 
     /**

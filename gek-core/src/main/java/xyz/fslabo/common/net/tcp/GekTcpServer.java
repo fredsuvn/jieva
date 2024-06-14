@@ -255,7 +255,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                 this.port = builder.port;
                 this.maxConnection = builder.maxConnection;
                 this.address = builder.address;
-                this.serverHandler = Gek.notNull(builder.serverHandler, EMPTY_SERVER_HANDLER);
+                this.serverHandler = Gek.orDefault(builder.serverHandler, EMPTY_SERVER_HANDLER);
                 this.channelHandlers = GekColl.toList(builder.channelHandlers);
                 if (channelHandlers.isEmpty()) {
                     throw new GekNetException("Channel handlers are empty.");
@@ -265,7 +265,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                     throw new GekNetException("Executor is null.");
                 }
                 this.socketConfig = builder.socketConfig;
-                this.bufferGenerator = Gek.notNull(builder.bufferGenerator, ByteBuffer::allocate);
+                this.bufferGenerator = Gek.orDefault(builder.bufferGenerator, ByteBuffer::allocate);
                 this.channelBufferSize = builder.channelBufferSize;
                 if (channelBufferSize <= 0) {
                     throw new GekNetException("Channel buffer size must > 0.");

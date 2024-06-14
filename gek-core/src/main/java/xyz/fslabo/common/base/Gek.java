@@ -47,7 +47,7 @@ public class Gek {
      * @param <T>          type of values
      * @return default value if given object is null, or given object itself if it is not null
      */
-    public static <T> T notNull(@Nullable T obj, T defaultValue) {
+    public static <T> T orDefault(@Nullable T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
     }
 
@@ -62,7 +62,7 @@ public class Gek {
      * @param <T>           type of values
      * @return computed value if given object is null, or given object itself if it is not null
      */
-    public static <T> T notNull(@Nullable T obj, Supplier<? extends T> computedValue) {
+    public static <T> T orDefault(@Nullable T obj, Supplier<? extends T> computedValue) {
         return obj == null ? computedValue.get() : obj;
     }
 
@@ -79,7 +79,7 @@ public class Gek {
      * @param <V>          type of result
      * @return default value if given object is null, or the value computed by given function if it is not null
      */
-    public static <K, V> V notNull(@Nullable K obj, V defaultValue, Function<? super K, ? extends V> function) {
+    public static <K, V> V orDefault(@Nullable K obj, V defaultValue, Function<? super K, ? extends V> function) {
         return obj == null ? defaultValue : function.apply(obj);
     }
 

@@ -130,8 +130,8 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      */
     public ExecutorService build() throws GekIOException {
         try {
-            Duration keepTime = Gek.notNull(keepAliveTime, Duration.ZERO);
-            BlockingQueue<Runnable> queue = Gek.notNull(workQueue, LinkedBlockingQueue::new);
+            Duration keepTime = Gek.orDefault(keepAliveTime, Duration.ZERO);
+            BlockingQueue<Runnable> queue = Gek.orDefault(workQueue, LinkedBlockingQueue::new);
             int maxPool = Math.max(maxPoolSize, corePoolSize);
             ThreadPoolExecutor pool;
             if (threadFactory == null && rejectHandler == null) {

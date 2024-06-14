@@ -1,6 +1,6 @@
 package xyz.fslabo.common.bean;
 
-import xyz.fslabo.common.base.JieOption;
+import xyz.fslabo.common.base.Option;
 import xyz.fslabo.common.mapper.GekConvertException;
 import xyz.fslabo.common.mapper.JieMapper;
 
@@ -9,7 +9,7 @@ import xyz.fslabo.common.mapper.JieMapper;
  *
  * @author sunqian
  */
-public interface BeanOption extends JieOption<BeanOption.Key, Object> {
+public interface BeanOption extends Option<BeanOption.Key, Object> {
 
     /**
      * Key of {@link BeanOption}.

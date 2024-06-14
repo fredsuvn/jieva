@@ -8,7 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Gek;
-import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
@@ -337,12 +337,12 @@ public class BeanTest {
         GekBeanResolver.Handler handler = GekBeanResolver.defaultResolver()
             .withFirstHandler(new GekBeanResolver.Handler() {
                 @Override
-                public @Nullable GekFlag resolve(GekBeanResolver.Context context) {
+                public @Nullable Flag resolve(GekBeanResolver.Context context) {
                     if (Objects.equals(context.getType(), Integer.class)) {
                         x[0]++;
                         return null;
                     }
-                    return GekFlag.BREAK;
+                    return Flag.BREAK;
                 }
             })
             .asHandler();

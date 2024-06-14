@@ -2,7 +2,7 @@ package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.reflect.GekReflect;
-import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.mapper.JieMapper;
 
 import java.lang.reflect.Type;
@@ -35,7 +35,7 @@ import java.util.Objects;
  *         </ul>
  *     </li>
  *     <li>
- *         If target type is {@link TypeVariable}, return {@link GekFlag#BREAK};
+ *         If target type is {@link TypeVariable}, return {@link Flag#BREAK};
  *     </li>
  *     <li>
  *         If source type is {@link WildcardType}:
@@ -108,7 +108,7 @@ public class ReuseConvertHandler implements JieMapper.Handler {
             return null;
         }
         if (targetType instanceof TypeVariable<?>) {
-            return GekFlag.BREAK;
+            return Flag.BREAK;
         }
         if (sourceType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) sourceType;

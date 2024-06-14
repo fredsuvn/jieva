@@ -1,7 +1,7 @@
 package xyz.fslabo.common.mapper;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.collect.GekColl;
 import xyz.fsgek.common.mapper.handlers.*;
 import xyz.fslabo.common.mapper.handlers.*;
@@ -59,10 +59,10 @@ final class MapperImpl implements JieMapper, JieMapper.Handler {
 
     @Override
     public @Nullable Object map(
-        @Nullable Object source, Type sourceType, Type targetType, JieMapper mapper, JieMapperOption... options) {
+        @Nullable Object source, Type sourceType, Type targetType, JieMapper mapper, MapperOption... options) {
         Object result = map(source, sourceType, targetType, options);
-        if (result == GekFlag.BREAK) {
-            return GekFlag.CONTINUE;
+        if (result == Flag.BREAK) {
+            return Flag.CONTINUE;
         }
         return result;
     }

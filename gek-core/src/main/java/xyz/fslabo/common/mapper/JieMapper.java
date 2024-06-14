@@ -4,8 +4,8 @@ import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Gek;
-import xyz.fslabo.common.base.GekFlag;
 import xyz.fslabo.common.base.GekObject;
 import xyz.fsgek.common.mapper.handlers.*;
 import xyz.fslabo.common.reflect.TypeRef;
@@ -18,12 +18,12 @@ import java.util.List;
  * Mapper to map object from source type to target type.
  * <p>
  * A {@link JieMapper} consists of a list of {@link Handler}s. In general, the mapper will call
- * {@link Handler#map(Object, Type, Type, JieMapper, JieMapperOption...)} for each handler in
+ * {@link Handler#map(Object, Type, Type, JieMapper, MapperOption...)} for each handler in
  * {@link JieMapper#getHandlers()} sequentially. More detail of mapping process, see
- * {@link Handler#map(Object, Type, Type, JieMapper, JieMapperOption...)}.
+ * {@link Handler#map(Object, Type, Type, JieMapper, MapperOption...)}.
  *
  * @author fredsuvn
- * @see Handler#map(Object, Type, Type, JieMapper, JieMapperOption...)
+ * @see Handler#map(Object, Type, Type, JieMapper, MapperOption...)
  */
 @ThreadSafe
 public interface JieMapper {
@@ -59,10 +59,10 @@ public interface JieMapper {
     }
 
     /**
-     * Returns actual result from {@link #map(Object, Type, Type, JieMapperOption...)}.
+     * Returns actual result from {@link #map(Object, Type, Type, MapperOption...)}.
      * The code is similar to the following:
      * <pre>
-     *     if (result == null || result == GekFlag.BREAK) {
+     *     if (result == null || result == Flag.BREAK) {
      *         return null;
      *     }
      *     if (result instanceof GekObject) {
@@ -71,13 +71,13 @@ public interface JieMapper {
      *     return Gek.as(result);
      * </pre>
      *
-     * @param result result from {@link #map(Object, Type, Type, JieMapperOption...)}
+     * @param result result from {@link #map(Object, Type, Type, MapperOption...)}
      * @param <T>    target type
      * @return the actual result
      */
     @Nullable
     static <T> T resolveResult(Object result) {
-        if (result == null || result == GekFlag.BREAK) {
+        if (result == null || result == Flag.BREAK) {
             return null;
         }
         if (result instanceof GekObject) {
@@ -97,7 +97,7 @@ public interface JieMapper {
      * @return converted object or null
      */
     @Nullable
-    default <T> T map(@Nullable Object source, Class<T> targetType, JieMapperOption... options) {
+    default <T> T map(@Nullable Object source, Class<T> targetType, MapperOption... options) {
         return map(source, (Type) targetType, options);
     }
 
@@ -112,7 +112,7 @@ public interface JieMapper {
      * @return converted object or null
      */
     @Nullable
-    default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef, JieMapperOption... options) {
+    default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef, MapperOption... options) {
         Object result = map(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
         return resolveResult(result);
     }
@@ -128,7 +128,7 @@ public interface JieMapper {
      * @return mapping result
      */
     @Nullable
-    default <T> T map(@Nullable Object source, Type targetType, JieMapperOption... options) {
+    default <T> T map(@Nullable Object source, Type targetType, MapperOption... options) {
         Object result = map(source, source == null ? Object.class : source.getClass(), targetType, options);
         return resolveResult(result);
     }
@@ -137,7 +137,7 @@ public interface JieMapper {
      * Maps source object from source type to target type. The result of this method in 3 types:
      * <ul>
      *     <li>
-     *         {@link GekFlag#BREAK}: fails and unsupported to map;
+     *         {@link Flag#BREAK}: fails and unsupported to map;
      *     </li>
      *     <li>
      *         {@link GekObject}: mapping successful, the result is {@link GekObject#getValue()};
@@ -154,21 +154,21 @@ public interface JieMapper {
      * @return converted object or null
      */
     @Nullable
-    default Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapperOption... options) {
+    default Object map(@Nullable Object source, Type sourceType, Type targetType, MapperOption... options) {
         for (Handler handler : getHandlers()) {
             Object value = handler.map(source, sourceType, targetType, this, options);
-            if (value == GekFlag.CONTINUE) {
+            if (value == Flag.CONTINUE) {
                 continue;
             }
-            if (value == GekFlag.BREAK) {
-                return GekFlag.BREAK;
+            if (value == Flag.BREAK) {
+                return Flag.BREAK;
             }
             if (value instanceof GekObject) {
                 return ((GekObject) value).getValue();
             }
             return value;
         }
-        return GekFlag.BREAK;
+        return Flag.BREAK;
     }
 
     /**
@@ -222,10 +222,10 @@ public interface JieMapper {
          * The result of this method in 4 types:
          * <ul>
          *     <li>
-         *         {@link GekFlag#CONTINUE}: fails to map, hands off to next handler;
+         *         {@link Flag#CONTINUE}: fails to map, hands off to next handler;
          *     </li>
          *     <li>
-         *         {@link GekFlag#BREAK}: fails to map, breaks the handler chain;
+         *         {@link Flag#BREAK}: fails to map, breaks the handler chain;
          *     </li>
          *     <li>
          *         {@link GekObject}: mapping successful, the result is {@link GekObject#getValue()};
@@ -243,7 +243,7 @@ public interface JieMapper {
          * @return converted object or null
          */
         @Nullable
-        Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper, JieMapperOption... options);
+        Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper, MapperOption... options);
     }
 
     /**

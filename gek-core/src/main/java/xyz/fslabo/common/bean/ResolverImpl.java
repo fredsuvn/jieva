@@ -1,7 +1,7 @@
 package xyz.fslabo.common.bean;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fslabo.common.collect.GekColl;
 
@@ -26,8 +26,8 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
     public GekBeanInfo resolve(Type type) {
         Context builder = new Context(type);
         for (Handler handler : handlers) {
-            GekFlag flag = handler.resolve(builder);
-            if (Objects.equals(flag, GekFlag.BREAK)) {
+            Flag flag = handler.resolve(builder);
+            if (Objects.equals(flag, Flag.BREAK)) {
                 break;
             }
         }
@@ -61,11 +61,11 @@ final class ResolverImpl implements GekBeanResolver, GekBeanResolver.Handler {
     }
 
     @Override
-    public @Nullable GekFlag resolve(GekBeanResolver.Context builder) {
+    public @Nullable Flag resolve(GekBeanResolver.Context builder) {
         for (GekBeanResolver.Handler handler : handlers) {
-            GekFlag flag = handler.resolve(builder);
-            if (Objects.equals(flag, GekFlag.BREAK)) {
-                return GekFlag.BREAK;
+            Flag flag = handler.resolve(builder);
+            if (Objects.equals(flag, Flag.BREAK)) {
+                return Flag.BREAK;
             }
         }
         return null;

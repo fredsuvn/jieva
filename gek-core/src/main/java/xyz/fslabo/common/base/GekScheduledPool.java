@@ -94,7 +94,7 @@ public abstract class GekScheduledPool {
         try {
             ScheduledThreadPoolExecutor pool = buildExecutor();
             if (allowCoreThreadTimeOut) {
-                Duration keepTime = Gek.notNull(keepAliveTime, Duration.ZERO);
+                Duration keepTime = Gek.orDefault(keepAliveTime, Duration.ZERO);
                 pool.setKeepAliveTime(keepTime.toNanos(), TimeUnit.NANOSECONDS);
                 pool.allowCoreThreadTimeOut(true);
             }

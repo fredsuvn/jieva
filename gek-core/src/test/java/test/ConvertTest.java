@@ -8,7 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Gek;
-import xyz.fslabo.common.base.GekFlag;
+import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.mapper.JieMapper;
 import xyz.fslabo.common.reflect.TypeRef;
 
@@ -269,7 +269,7 @@ public class ConvertTest {
                     if (Objects.equals(source, "3")) {
                         return null;
                     }
-                    return GekFlag.BREAK;
+                    return Flag.BREAK;
                 }
             })
             .asHandler();
@@ -280,7 +280,7 @@ public class ConvertTest {
         Assert.assertEquals(
             handler.map("3", String.class, Integer.class, JieMapper.defaultMapper()), 3);
         Assert.assertEquals(
-            handler.map("4", String.class, Integer.class, JieMapper.defaultMapper()), GekFlag.BREAK);
+            handler.map("4", String.class, Integer.class, JieMapper.defaultMapper()), Flag.BREAK);
     }
 
     public enum E1 {
