@@ -3,7 +3,7 @@ package xyz.fslabo.common.mapper.handlers;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.GekObject;
 import xyz.fslabo.common.bean.BeanResolver;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
@@ -37,7 +37,7 @@ import java.util.function.Supplier;
  *
  * @author fredsuvn
  */
-public class BeanConvertHandler implements JieMapper.Handler {
+public class BeanConvertHandler implements Mapper.Handler {
 
     /**
      * An instance with {@link #BeanConvertHandler()}.
@@ -96,7 +96,7 @@ public class BeanConvertHandler implements JieMapper.Handler {
     }
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
         if (source == null) {
             return GekObject.empty();
         }

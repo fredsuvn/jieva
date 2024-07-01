@@ -11,7 +11,7 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.bean.PropertyInfo;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.data.protobuf.GekProtobuf;
 import xyz.fslabo.common.reflect.TypeRef;
 
@@ -205,7 +205,7 @@ public class ProtobufTest {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         ByteString bs = ByteString.copyFrom(bytes);
         String str = bs.toStringUtf8();
-        JieMapper converter = GekProtobuf.protobufConverter();
+        Mapper converter = GekProtobuf.protobufConverter();
         Assert.assertEquals(converter.map(bytes, ByteBuffer.class), buffer.slice());
         Assert.assertEquals(converter.map(bs, ByteBuffer.class), buffer.slice());
         Assert.assertEquals(converter.map(buffer, ByteBuffer.class), buffer.slice());

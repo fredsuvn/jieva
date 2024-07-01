@@ -1,7 +1,7 @@
 package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class NumberConvertHandler implements JieMapper.Handler {
+public class NumberConvertHandler implements Mapper.Handler {
 
     /**
      * An instance.
@@ -32,7 +32,7 @@ public class NumberConvertHandler implements JieMapper.Handler {
     public static final NumberConvertHandler INSTANCE = new NumberConvertHandler();
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
         if (source == null) {
             return null;
         }

@@ -1,7 +1,7 @@
 package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -22,7 +22,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class StringConvertHandler implements JieMapper.Handler {
+public class StringConvertHandler implements Mapper.Handler {
 
     /**
      * An instance.
@@ -30,7 +30,7 @@ public class StringConvertHandler implements JieMapper.Handler {
     public static final StringConvertHandler INSTANCE = new StringConvertHandler();
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
         if (source == null) {
             return null;
         }

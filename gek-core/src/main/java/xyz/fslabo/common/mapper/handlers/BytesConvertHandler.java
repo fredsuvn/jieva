@@ -1,7 +1,7 @@
 package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.io.GekIO;
 import xyz.fslabo.common.reflect.JieReflect;
 
@@ -20,7 +20,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class BytesConvertHandler implements JieMapper.Handler {
+public class BytesConvertHandler implements Mapper.Handler {
 
     /**
      * An instance.
@@ -28,14 +28,14 @@ public class BytesConvertHandler implements JieMapper.Handler {
     public static final BytesConvertHandler INSTANCE = new BytesConvertHandler();
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
         if (source == null) {
             return null;
         }
         if (Objects.equals(targetType, byte[].class)) {
             if (Objects.equals(sourceType, byte[].class)) {
                 byte[] src = (byte[]) source;
-                if (mapper.getOptions().reusePolicy() == JieMapper.Options.NO_REUSE) {
+                if (mapper.getOptions().reusePolicy() == Mapper.Options.NO_REUSE) {
                     return src.clone();
                 }
                 return source;
@@ -48,7 +48,7 @@ public class BytesConvertHandler implements JieMapper.Handler {
         } else if (Objects.equals(targetType, ByteBuffer.class)) {
             if (Objects.equals(sourceType, byte[].class)) {
                 byte[] src = (byte[]) source;
-                if (mapper.getOptions().reusePolicy() == JieMapper.Options.NO_REUSE) {
+                if (mapper.getOptions().reusePolicy() == Mapper.Options.NO_REUSE) {
                     return ByteBuffer.wrap(src.clone());
                 }
                 return ByteBuffer.wrap(src);

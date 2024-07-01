@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-final class MapperImpl implements JieMapper, JieMapper.Handler {
+final class MapperImpl implements Mapper, Mapper.Handler {
 
-    static final MapperImpl DEFAULT_MAPPER = new MapperImpl(Arrays.asList(
+    static final BeanMapperImpl DEFAULT_MAPPER = new BeanMapperImpl(Arrays.asList(
         ReuseConvertHandler.INSTANCE,
         EnumConvertHandler.INSTANCE,
         DateConvertHandler.INSTANCE,
@@ -25,9 +25,9 @@ final class MapperImpl implements JieMapper, JieMapper.Handler {
         BeanConvertHandler.INSTANCE
     ));
 
-    private final List<JieMapper.Handler> handlers;
+    private final List<Mapper.Handler> handlers;
 
-    MapperImpl(Iterable<JieMapper.Handler> handlers) {
+    MapperImpl(Iterable<Mapper.Handler> handlers) {
         this.handlers = JieColl.toList(handlers);
     }
 
@@ -37,19 +37,19 @@ final class MapperImpl implements JieMapper, JieMapper.Handler {
     }
 
     @Override
-    public JieMapper withFirstHandler(Handler handler) {
+    public Mapper withFirstHandler(Handler handler) {
         List<Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
         newHandlers.add(handler);
         newHandlers.addAll(handlers);
-        return new MapperImpl(newHandlers);
+        return new BeanMapperImpl(newHandlers);
     }
 
     @Override
-    public JieMapper withLastHandler(Handler handler) {
+    public Mapper withLastHandler(Handler handler) {
         List<Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
         newHandlers.addAll(handlers);
         newHandlers.add(handler);
-        return new MapperImpl(newHandlers);
+        return new BeanMapperImpl(newHandlers);
     }
 
     @Override
@@ -59,8 +59,8 @@ final class MapperImpl implements JieMapper, JieMapper.Handler {
 
     @Override
     public @Nullable Object map(
-        @Nullable Object source, Type sourceType, Type targetType, JieMapper mapper, MapperOption... options) {
-        Object result = map(source, sourceType, targetType, options);
+        @Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOption... options) {
+        Object result = mapObject(source, sourceType, targetType, options);
         if (result == Flag.BREAK) {
             return Flag.CONTINUE;
         }

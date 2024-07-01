@@ -8,7 +8,7 @@ import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.bean.PropertyBase;
-import xyz.fslabo.common.mapper.GekConvertException;
+import xyz.fslabo.common.mapper.MapperException;
 import xyz.fslabo.common.invoke.GekInvoker;
 import xyz.fslabo.common.reflect.JieReflect;
 
@@ -61,10 +61,10 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
                 context.getProperties().put(propBase.getName(), propBase);
             }
             return Flag.BREAK;
-        } catch (GekConvertException e) {
+        } catch (MapperException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekConvertException(e);
+            throw new MapperException(e);
         }
     }
 

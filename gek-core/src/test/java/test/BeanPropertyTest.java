@@ -12,7 +12,7 @@ import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.bean.PropertyInfo;
@@ -248,10 +248,10 @@ public class BeanPropertyTest {
             }.getType());
         Assert.assertEquals(ccs.getCc(), cc1.getCc().toString());
 
-        JieMapper kConverter = JieMapper.defaultMapper().insertFirstMiddleHandler(new JieMapper.Handler() {
+        Mapper kConverter = Mapper.defaultMapper().insertFirstMiddleHandler(new Mapper.Handler() {
             @Override
             public @Nullable Object map(
-                @Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+                @Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
                 if (Objects.equals(targetType, Kk.class)) {
                     return new Kk(String.valueOf(source));
                 }

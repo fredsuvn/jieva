@@ -31,6 +31,11 @@ public enum Flag {
      * Instruction {@code goto}, to go to a point of process.
      */
     GOTO,
+
+    /**
+     * Flag value: unsupported.
+     */
+    UNSUPPORTED,
     ;
 
     @Override

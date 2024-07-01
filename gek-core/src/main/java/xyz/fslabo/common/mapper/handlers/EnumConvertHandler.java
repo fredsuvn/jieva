@@ -2,7 +2,7 @@ package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 
 import java.lang.reflect.Type;
 
@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
  *
  * @author fredsuvn
  */
-public class EnumConvertHandler implements JieMapper.Handler {
+public class EnumConvertHandler implements Mapper.Handler {
 
     /**
      * An instance.
@@ -20,7 +20,7 @@ public class EnumConvertHandler implements JieMapper.Handler {
     public static final EnumConvertHandler INSTANCE = new EnumConvertHandler();
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
         if (source == null) {
             return null;
         }

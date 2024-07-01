@@ -7,7 +7,7 @@ import xyz.fslabo.common.base.obj.GekObj;
 import xyz.fslabo.common.base.obj.ParameterizedObj;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.GekType;
 
@@ -43,7 +43,7 @@ import java.util.function.IntFunction;
  *
  * @author fredsuvn
  */
-public class CollectConvertHandler implements JieMapper.Handler {
+public class CollectConvertHandler implements Mapper.Handler {
 
     /**
      * An instance.
@@ -68,7 +68,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
     }
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
         if (source == null) {
             return null;
         }
@@ -93,7 +93,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
 
     @Nullable
     private Object convertIterableType(
-        @Nullable Object obj, Type sourceType, Type targetType, JieMapper converter) {
+        @Nullable Object obj, Type sourceType, Type targetType, Mapper converter) {
         ParameterizedType targetItType = JieReflect.getGenericSuperType(targetType, Iterable.class);
         if (targetItType == null) {
             return null;
@@ -135,14 +135,14 @@ public class CollectConvertHandler implements JieMapper.Handler {
         Collection<Object> dest,
         Type sourceComponentType,
         Type destComponentType,
-        JieMapper converter
+        Mapper converter
     ) {
         for (Object srcValue : source) {
             Object targetValue = converter.convertType(srcValue, sourceComponentType, destComponentType);
             if (targetValue == null) {
                 return Flag.BREAK;
             }
-            dest.add(JieMapper.resolveResult(targetValue));
+            dest.add(Mapper.resolveResult(targetValue));
         }
         return dest;
     }
@@ -151,7 +151,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
     private Object convertArray(
         ParameterizedObj<Iterable<?>> sourceInfo,
         Type targetComponentType,
-        JieMapper converter
+        Mapper converter
     ) {
         Collection<?> srcList;
         if (sourceInfo.getObject() instanceof Collection) {
@@ -168,7 +168,7 @@ public class CollectConvertHandler implements JieMapper.Handler {
             if (targetValue == null) {
                 return Flag.BREAK;
             }
-            Array.set(targetArray, i, JieMapper.resolveResult(targetValue));
+            Array.set(targetArray, i, Mapper.resolveResult(targetValue));
             i++;
         }
         return targetArray;

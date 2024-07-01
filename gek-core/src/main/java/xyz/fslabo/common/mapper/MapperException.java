@@ -3,16 +3,16 @@ package xyz.fslabo.common.mapper;
 import java.lang.reflect.Type;
 
 /**
- * Exception for conversion.
+ * Exception for mapper.
  *
  * @author fredsuvn
  */
-public class GekConvertException extends RuntimeException {
+public class MapperException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekConvertException() {
+    public MapperException() {
     }
 
     /**
@@ -20,7 +20,7 @@ public class GekConvertException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekConvertException(String message) {
+    public MapperException(String message) {
         super(message);
     }
 
@@ -30,7 +30,7 @@ public class GekConvertException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekConvertException(String message, Throwable cause) {
+    public MapperException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -39,7 +39,7 @@ public class GekConvertException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekConvertException(Throwable cause) {
+    public MapperException(Throwable cause) {
         super(cause);
     }
 
@@ -49,8 +49,8 @@ public class GekConvertException extends RuntimeException {
      * @param sourceType source type
      * @param targetType target type
      */
-    public GekConvertException(Type sourceType, Type targetType) {
-        this("Failed to convert from " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".");
+    public MapperException(Type sourceType, Type targetType) {
+        this("Mapping failed: " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".");
     }
 
     /**
@@ -60,7 +60,7 @@ public class GekConvertException extends RuntimeException {
      * @param targetType target type
      * @param cause      exception cause
      */
-    public GekConvertException(Type sourceType, Type targetType, Throwable cause) {
-        this("Failed to convert from " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".", cause);
+    public MapperException(Type sourceType, Type targetType, Throwable cause) {
+        this("Mapping failed: " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".", cause);
     }
 }

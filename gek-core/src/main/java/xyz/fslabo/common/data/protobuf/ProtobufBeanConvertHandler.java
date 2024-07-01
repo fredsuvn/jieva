@@ -3,8 +3,8 @@ package xyz.fslabo.common.data.protobuf;
 import com.google.protobuf.Message;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.bean.BeanResolver;
-import xyz.fslabo.common.mapper.GekConvertException;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.MapperException;
+import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.mapper.handlers.BeanConvertHandler;
 import xyz.fslabo.common.reflect.JieReflect;
 
@@ -43,7 +43,7 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
     }
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
         if (source == null) {
             return null;
         }
@@ -70,10 +70,10 @@ public class ProtobufBeanConvertHandler extends BeanConvertHandler {
 
                 .copyProperties(source, sourceType, builder, builder.getClass());
             return build(builder, isBuilder);
-        } catch (GekConvertException e) {
+        } catch (MapperException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekConvertException(e);
+            throw new MapperException(e);
         }
     }
 

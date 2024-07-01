@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.Flag;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
@@ -184,9 +184,9 @@ public class ConvertTest {
     public void testConvertBytes() {
         byte[] low = {1, 2, 3};
         ByteBuffer buffer = ByteBuffer.wrap(new byte[]{1, 2, 3});
-        JieMapper converter = JieMapper.defaultMapper();
-        JieMapper newConverter = converter.withOptions(
-            converter.getOptions().replaceReusePolicy(JieMapper.Options.NO_REUSE));
+        Mapper converter = Mapper.defaultMapper();
+        Mapper newConverter = converter.withOptions(
+            converter.getOptions().replaceReusePolicy(Mapper.Options.NO_REUSE));
         Assert.assertEquals(
             converter.map(low, byte[].class),
             low
@@ -224,14 +224,14 @@ public class ConvertTest {
     @Test
     public void testConvertHandler() {
         Object x = new Object();
-        JieMapper.Handler handler = new JieMapper.Handler() {
+        Mapper.Handler handler = new Mapper.Handler() {
             @Override
             public @Nullable Object map(
-                @Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+                @Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
                 return x;
             }
         };
-        JieMapper converter = JieMapper.defaultMapper().insertFirstMiddleHandler(handler);
+        Mapper converter = Mapper.defaultMapper().insertFirstMiddleHandler(handler);
         Assert.assertSame(
             x,
             converter.map(
@@ -240,7 +240,7 @@ public class ConvertTest {
                 }.getType()
             )
         );
-        JieMapper converter2 = converter.withOptions(converter.getOptions());
+        Mapper converter2 = converter.withOptions(converter.getOptions());
         Assert.assertSame(converter, converter2);
         converter2 = converter.withOptions(converter.getOptions()
             .replaceReusePolicy(converter.getOptions().reusePolicy()));
@@ -256,10 +256,10 @@ public class ConvertTest {
 
     @Test
     public void testConvertAsHandler() {
-        JieMapper.Handler handler = JieMapper.defaultMapper()
-            .insertFirstMiddleHandler(new JieMapper.Handler() {
+        Mapper.Handler handler = Mapper.defaultMapper()
+            .insertFirstMiddleHandler(new Mapper.Handler() {
                 @Override
-                public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper) {
+                public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
                     if (Objects.equals(source, "1")) {
                         return "2";
                     }
@@ -274,13 +274,13 @@ public class ConvertTest {
             })
             .asHandler();
         Assert.assertEquals(
-            handler.map("1", String.class, Integer.class, JieMapper.defaultMapper()), "2");
+            handler.map("1", String.class, Integer.class, Mapper.defaultMapper()), "2");
         Assert.assertEquals(
-            handler.map("2", String.class, Integer.class, JieMapper.defaultMapper()), "1");
+            handler.map("2", String.class, Integer.class, Mapper.defaultMapper()), "1");
         Assert.assertEquals(
-            handler.map("3", String.class, Integer.class, JieMapper.defaultMapper()), 3);
+            handler.map("3", String.class, Integer.class, Mapper.defaultMapper()), 3);
         Assert.assertEquals(
-            handler.map("4", String.class, Integer.class, JieMapper.defaultMapper()), Flag.BREAK);
+            handler.map("4", String.class, Integer.class, Mapper.defaultMapper()), Flag.BREAK);
     }
 
     public enum E1 {

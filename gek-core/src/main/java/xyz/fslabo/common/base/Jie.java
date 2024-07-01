@@ -5,7 +5,7 @@ import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.collect.GekCollector;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.io.IOException;
@@ -393,11 +393,11 @@ public class Jie {
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see JieMapper#convert(Object, Class)
+     * @see Mapper#convert(Object, Class)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, Class<T> targetType) {
-        return JieMapper.defaultMapper().map(source, targetType);
+        return Mapper.defaultMapper().map(source, targetType);
     }
 
     /**
@@ -408,11 +408,11 @@ public class Jie {
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see JieMapper#convert(Object, TypeRef)
+     * @see Mapper#convert(Object, TypeRef)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, TypeRef<T> targetType) {
-        return JieMapper.defaultMapper().map(source, targetType);
+        return Mapper.defaultMapper().map(source, targetType);
     }
 
     /**
@@ -423,11 +423,11 @@ public class Jie {
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see JieMapper#convert(Object, Type)
+     * @see Mapper#convert(Object, Type)
      */
     @Nullable
     public static <T> T convert(@Nullable Object source, Type targetType) {
-        return JieMapper.defaultMapper().map(source, targetType);
+        return Mapper.defaultMapper().map(source, targetType);
     }
 
     /**
@@ -445,17 +445,17 @@ public class Jie {
      *         Others: any other type of returned object is the actual result of conversion.
      *     </li>
      * </ul>
-     * Using {@link JieMapper#resolveResult(Object)} can get actual result object from wrapper.
+     * Using {@link Mapper#resolveResult(Object)} can get actual result object from wrapper.
      *
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
      * @return converted object or null
-     * @see JieMapper#convertType(Object, Type, Type)
+     * @see Mapper#convertType(Object, Type, Type)
      */
     @Nullable
     public static Object convertType(@Nullable Object source, Type sourceType, Type targetType) {
-        return JieMapper.defaultMapper().convertType(source, sourceType, targetType);
+        return Mapper.defaultMapper().convertType(source, sourceType, targetType);
     }
 
     /**

@@ -8,6 +8,7 @@ import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekObject;
 import xyz.fsgek.common.mapper.handlers.*;
+import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.TypeRef;
 import xyz.fslabo.common.mapper.handlers.*;
 
@@ -17,16 +18,16 @@ import java.util.List;
 /**
  * Mapper to map object from source type to target type.
  * <p>
- * A {@link JieMapper} consists of a list of {@link Handler}s. In general, the mapper will call
- * {@link Handler#map(Object, Type, Type, JieMapper, MapperOption...)} for each handler in
- * {@link JieMapper#getHandlers()} sequentially. More detail of mapping process, see
- * {@link Handler#map(Object, Type, Type, JieMapper, MapperOption...)}.
+ * A {@link Mapper} consists of a list of {@link Handler}s. In general, the mapper will call
+ * {@link Handler#map(Object, Type, Type, Mapper, MapperOption...)} for each handler in
+ * {@link Mapper#getHandlers()} sequentially. More detail of mapping process, see
+ * {@link Handler#map(Object, Type, Type, Mapper, MapperOption...)}.
  *
  * @author fredsuvn
- * @see Handler#map(Object, Type, Type, JieMapper, MapperOption...)
+ * @see Handler#map(Object, Type, Type, Mapper, MapperOption...)
  */
 @ThreadSafe
-public interface JieMapper {
+public interface Mapper {
 
     /**
      * Returns default mapper, of which handlers are:
@@ -44,8 +45,8 @@ public interface JieMapper {
      *
      * @return default converter
      */
-    static JieMapper defaultMapper() {
-        return MapperImpl.DEFAULT_MAPPER;
+    static Mapper defaultMapper() {
+        return BeanMapperImpl.DEFAULT_MAPPER;
     }
 
     /**
@@ -54,34 +55,34 @@ public interface JieMapper {
      * @param middleHandlers handlers
      * @return new mapper
      */
-    static JieMapper withHandlers(Iterable<Handler> middleHandlers) {
-        return new MapperImpl(middleHandlers);
+    static Mapper withHandlers(Iterable<Handler> middleHandlers) {
+        return new BeanMapperImpl(middleHandlers);
     }
 
     /**
-     * Returns actual result from {@link #map(Object, Type, Type, MapperOption...)}.
+     * Returns actual result from {@link #mapObject(Object, Type, MapperOptions)}.
      * The code is similar to the following:
      * <pre>
-     *     if (result == null || result == Flag.BREAK) {
+     *     if (result == null || result == Flag.UNSUPPORTED) {
      *         return null;
      *     }
-     *     if (result instanceof GekObject) {
-     *         return Jie.as(((GekObject) result).getValue());
+     *     if (result instanceof Val) {
+     *         return Jie.as(((Val&lt;?&gt;) result).get());
      *     }
      *     return Jie.as(result);
      * </pre>
      *
-     * @param result result from {@link #map(Object, Type, Type, MapperOption...)}
+     * @param result result from {@link #mapObject(Object, Type, MapperOptions)}
      * @param <T>    target type
      * @return the actual result
      */
     @Nullable
     static <T> T resolveResult(Object result) {
-        if (result == null || result == Flag.BREAK) {
+        if (result == null || result == Flag.UNSUPPORTED) {
             return null;
         }
-        if (result instanceof GekObject) {
-            return Jie.as(((GekObject) result).getValue());
+        if (result instanceof Val) {
+            return Jie.as(((Val<?>) result).get());
         }
         return Jie.as(result);
     }
@@ -113,7 +114,7 @@ public interface JieMapper {
      */
     @Nullable
     default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef, MapperOption... options) {
-        Object result = map(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
+        Object result = mapObject(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
         return resolveResult(result);
     }
 
@@ -129,7 +130,7 @@ public interface JieMapper {
      */
     @Nullable
     default <T> T map(@Nullable Object source, Type targetType, MapperOption... options) {
-        Object result = map(source, source == null ? Object.class : source.getClass(), targetType, options);
+        Object result = mapObject(source, source == null ? Object.class : source.getClass(), targetType, options);
         return resolveResult(result);
     }
 
@@ -137,10 +138,10 @@ public interface JieMapper {
      * Maps source object from source type to target type. The result of this method in 3 types:
      * <ul>
      *     <li>
-     *         {@link Flag#BREAK}: fails and unsupported to map;
+     *         {@link Flag#UNSUPPORTED}: fails and unsupported to map;
      *     </li>
      *     <li>
-     *         {@link GekObject}: mapping successful, the result is {@link GekObject#getValue()};
+     *         {@link Val}: mapping successful, the result is {@link Val#get()};
      *     </li>
      *     <li>
      *         {@code others}: mapping successful, the result is result object, including {@code null};
@@ -154,21 +155,21 @@ public interface JieMapper {
      * @return converted object or null
      */
     @Nullable
-    default Object map(@Nullable Object source, Type sourceType, Type targetType, MapperOption... options) {
+    default Object mapObject(@Nullable Object source, Type targetType, MapperOptions options) {
         for (Handler handler : getHandlers()) {
             Object value = handler.map(source, sourceType, targetType, this, options);
             if (value == Flag.CONTINUE) {
                 continue;
             }
             if (value == Flag.BREAK) {
-                return Flag.BREAK;
+                return Flag.UNSUPPORTED;
             }
             if (value instanceof GekObject) {
                 return ((GekObject) value).getValue();
             }
             return value;
         }
-        return Flag.BREAK;
+        return Flag.UNSUPPORTED;
     }
 
     /**
@@ -187,7 +188,7 @@ public interface JieMapper {
      * @return a mapper with handler list consists of given handler as first one, followed by the handler list of
      * current resolver
      */
-     JieMapper withFirstHandler(Handler handler);
+     Mapper withFirstHandler(Handler handler);
 
     /**
      * Returns a mapper with handler list consists of the handler list of current resolver, followed by given handler
@@ -197,7 +198,7 @@ public interface JieMapper {
      * @return a mapper with handler list consists of the handler list of current resolver, followed by given handler
      * as last one
      */
-     JieMapper withLastHandler(Handler handler) ;
+     Mapper withLastHandler(Handler handler) ;
 
     /**
      * Returns this mapper as {@link Handler}.
@@ -207,10 +208,10 @@ public interface JieMapper {
     Handler asHandler();
 
     /**
-     * Handler of {@link JieMapper}.
+     * Handler of {@link Mapper}.
      *
      * @author fredsuvn
-     * @see JieMapper
+     * @see Mapper
      */
     @ThreadSafe
     interface Handler {
@@ -218,7 +219,7 @@ public interface JieMapper {
         /**
          * Maps object from source type to target type.
          * <p>
-         * In general, this method of all handlers in {@link JieMapper#getHandlers()} will be invoked sequentially.
+         * In general, this method of all handlers in {@link Mapper#getHandlers()} will be invoked sequentially.
          * The result of this method in 4 types:
          * <ul>
          *     <li>
@@ -243,7 +244,7 @@ public interface JieMapper {
          * @return converted object or null
          */
         @Nullable
-        Object map(@Nullable Object source, Type sourceType, Type targetType, JieMapper mapper, MapperOption... options);
+        Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOption... options);
     }
 
     /**

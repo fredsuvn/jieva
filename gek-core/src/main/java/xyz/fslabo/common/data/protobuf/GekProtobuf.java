@@ -1,7 +1,7 @@
 package xyz.fslabo.common.data.protobuf;
 
 import xyz.fslabo.common.bean.BeanResolver;
-import xyz.fslabo.common.mapper.JieMapper;
+import xyz.fslabo.common.mapper.Mapper;
 
 /**
  * Utilities for <a href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>.
@@ -11,7 +11,7 @@ public class GekProtobuf {
 
     private static final BeanResolver RESOLVER = BeanResolver.defaultResolver()
         .withFirstHandler(ProtobufResolveHandler.INSTANCE);
-    private static final JieMapper CONVERTER = JieMapper.defaultMapper()
+    private static final Mapper CONVERTER = Mapper.defaultMapper()
         .insertFirstMiddleHandler(ByteStringConvertHandler.INSTANCE)
         .withSuffixHandler(ProtobufBeanConvertHandler.INSTANCE);
     private static final GekBeanCopier COPIER = ProtobufBeanConvertHandler.INSTANCE.getCopier();
@@ -26,11 +26,11 @@ public class GekProtobuf {
     }
 
     /**
-     * Returns object converter supports protobuf based on {@link JieMapper#defaultMapper()}.
+     * Returns object converter supports protobuf based on {@link Mapper#defaultMapper()}.
      *
-     * @return object converter supports protobuf based on {@link JieMapper#defaultMapper()}
+     * @return object converter supports protobuf based on {@link Mapper#defaultMapper()}
      */
-    public static JieMapper protobufConverter() {
+    public static Mapper protobufConverter() {
         return CONVERTER;
     }
 

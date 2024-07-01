@@ -1,4 +1,4 @@
-package xyz.fslabo.common.bean;
+package xyz.fslabo.common.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode
 @AllArgsConstructor
-final class OptionImpl implements BeanOption {
+final class OptionImpl implements MapperOptions {
 
     private final Key key;
     private final Object value;
