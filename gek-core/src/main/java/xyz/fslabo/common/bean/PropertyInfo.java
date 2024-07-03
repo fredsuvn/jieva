@@ -7,5 +7,5 @@ package xyz.fslabo.common.bean;
  * @author fredsuvn
  * @see BeanInfo
  */
-public interface BeanProperty extends BeanMember, BeanPropertyBase {
+public interface PropertyInfo extends MemberInfo, BasePropertyInfo {
 }

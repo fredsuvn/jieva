@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
  *
  * @author fredsuvn
  */
-public class BeanResolvingException extends RuntimeException {
+public class BeanResolvingException extends BeanException {
 
     /**
      * Empty constructor.
@@ -59,6 +59,6 @@ public class BeanResolvingException extends RuntimeException {
      * @param cause exception cause
      */
     public BeanResolvingException(Type type, Throwable cause) {
-        this("Failed to resolve bean " + type.getTypeName() + ".", cause);
+        this("Failed to resolve bean " + type.getTypeName() + "[" + type.getClass().getName() + "].", cause);
     }
 }

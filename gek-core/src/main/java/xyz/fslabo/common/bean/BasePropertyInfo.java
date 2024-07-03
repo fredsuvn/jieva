@@ -11,12 +11,12 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Base info of {@link BeanProperty}.
+ * Base info of {@link PropertyInfo}.
  *
  * @author fredsuvn
  */
 @Immutable
-public interface BeanPropertyBase {
+public interface BasePropertyInfo {
 
     /**
      * Returns name of this property.

@@ -39,54 +39,54 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link BeanProperty}.
-     * This method compares result of {@link Object#getClass()}, {@link BeanProperty#getName()} and
-     * {@link BeanProperty#getOwner()}. The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link PropertyInfo}.
+     * This method compares result of {@link Object#getClass()}, {@link PropertyInfo#getName()} and
+     * {@link PropertyInfo#getOwner()}. The code is similar to the following:
      * <pre>
      *     return Objects.equals(info.getClass(), other.getClass())
      *         && Objects.equals(info.getName(), other.getName())
      *         && Objects.equals(info.getOwner(), other.getOwner());
      * </pre>
-     * And it works in conjunction with {@link #hashCode(BeanProperty)}.
+     * And it works in conjunction with {@link #hashCode(PropertyInfo)}.
      *
      * @param info info to be compared
      * @param o    object to be compared
      * @return true if equals false otherwise
      */
-    public static boolean equals(BeanProperty info, @Nullable Object o) {
+    public static boolean equals(PropertyInfo info, @Nullable Object o) {
         if (info == o) {
             return true;
         }
         if (o == null || !info.getClass().equals(o.getClass())) {
             return false;
         }
-        BeanProperty other = (BeanProperty) o;
+        PropertyInfo other = (PropertyInfo) o;
         return Objects.equals(info.getName(), other.getName())
             && Objects.equals(info.getOwner(), other.getOwner());
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link BeanMethod}.
-     * This method compares result of {@link Object#getClass()} and {@link BeanMethod#getMethod()}.
+     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link MethodInfo}.
+     * This method compares result of {@link Object#getClass()} and {@link MethodInfo#getMethod()}.
      * The code is similar to the following:
      * <pre>
      *     return Objects.equals(info.getMethod(), other.getMethod())
      *         && Objects.equals(info.getName(), other.getName());
      * </pre>
-     * And it works in conjunction with {@link #hashCode(BeanMethod)}.
+     * And it works in conjunction with {@link #hashCode(MethodInfo)}.
      *
      * @param info info to be compared
      * @param o    object to be compared
      * @return true if equals false otherwise
      */
-    public static boolean equals(BeanMethod info, @Nullable Object o) {
+    public static boolean equals(MethodInfo info, @Nullable Object o) {
         if (info == o) {
             return true;
         }
         if (o == null || !info.getClass().equals(o.getClass())) {
             return false;
         }
-        BeanMethod other = (BeanMethod) o;
+        MethodInfo other = (MethodInfo) o;
         return Objects.equals(info.getMethod(), other.getMethod())
             && Objects.equals(info.getOwner(), other.getOwner());
     }
@@ -108,39 +108,39 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link BeanProperty}.
-     * This method uses {@link Object#hashCode()} of {@link BeanProperty#getName()} to compute.
+     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link PropertyInfo}.
+     * This method uses {@link Object#hashCode()} of {@link PropertyInfo#getName()} to compute.
      * The code is similar to the following:
      * <pre>
      *     return info.getName().hashCode();
      * </pre>
-     * And it works in conjunction with {@link #equals(BeanProperty, Object)}.
+     * And it works in conjunction with {@link #equals(PropertyInfo, Object)}.
      *
      * @param info info to be hashed
      * @return hash code of given info
      */
-    public static int hashCode(BeanProperty info) {
+    public static int hashCode(PropertyInfo info) {
         return info.getName().hashCode();
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link BeanMethod}.
-     * This method uses {@link Object#hashCode()} of {@link BeanMethod#getMethod()} to compute.
+     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link MethodInfo}.
+     * This method uses {@link Object#hashCode()} of {@link MethodInfo#getMethod()} to compute.
      * The code is similar to the following:
      * <pre>
      *     return info.getMethod().hashCode();
      * </pre>
-     * And it works in conjunction with {@link #equals(BeanMethod, Object)}.
+     * And it works in conjunction with {@link #equals(MethodInfo, Object)}.
      *
      * @param info info to be hashed
      * @return hash code of given info
      */
-    public static int hashCode(BeanMethod info) {
+    public static int hashCode(MethodInfo info) {
         return info.getMethod().hashCode();
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#toString()} for {@link BeanProperty}.
+     * Utility method which is a simple implementing of {@link Object#toString()} for {@link PropertyInfo}.
      * The code is similar to the following:
      * <pre>
      *     return info.getOwner().getType().getTypeName() + "." + info.getName()
@@ -150,13 +150,13 @@ public class JieBean {
      * @param info info to be string description
      * @return a string description for given info
      */
-    public static String toString(BeanProperty info) {
+    public static String toString(PropertyInfo info) {
         return info.getOwner().getType().getTypeName() + "." + info.getName()
             + "[" + info.getType().getTypeName() + "]";
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#toString()} for {@link BeanMethod}.
+     * Utility method which is a simple implementing of {@link Object#toString()} for {@link MethodInfo}.
      * The code is similar to the following:
      * <pre>
      *     return info.getOwner().getType().getTypeName() + "." + info.getName()
@@ -168,7 +168,7 @@ public class JieBean {
      * @param info info to be string description
      * @return a string description for given info
      */
-    public static String toString(BeanMethod info) {
+    public static String toString(MethodInfo info) {
         return info.getOwner().getType().getTypeName() + "." + info.getName()
             + "(" + Arrays.stream(info.getMethod().getGenericParameterTypes())
             .map(Type::getTypeName).collect(Collectors.joining(", ")) + ")["

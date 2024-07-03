@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Information about the member ({@link BeanProperty} or {@link BeanMethod}) of {@link BeanInfo}.
+ * Common information about the member of {@link BeanInfo} such as {@link PropertyInfo} and {@link MethodInfo}.
  *
  * @author fredsuvn
  * @see BeanInfo
- * @see BeanProperty
- * @see BeanMethod
+ * @see PropertyInfo
+ * @see MethodInfo
  */
 @Immutable
 @ThreadSafe
-public interface BeanMember {
+public interface MemberInfo {
 
     /**
      * Returns owner bean info of this info.

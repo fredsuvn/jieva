@@ -21,7 +21,7 @@ import java.util.*;
  * <p>
  * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
  * {@link #resolveGetter(Method)} and {@link #resolveSetter(Method)} method to determine whether it is a getter/setter.
- * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link BeanMethod}.
+ * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link MethodInfo}.
  * Subtypes can use {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create
  * getter/setter.
  *
@@ -54,7 +54,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
                     setters.put(setter.getName(), method);
                     continue;
                 }
-                context.getMethods().add(new MethodBaseImpl(method));
+                context.getMethods().add(new BaseMethodInfoImpl(method));
             }
             if (JieColl.isNotEmpty(getters) || JieColl.isNotEmpty(setters)) {
                 mergeAccessors(context, getters, setters, rawType);
@@ -86,13 +86,13 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
                     return;
                 }
             }
-            context.getProperties().put(name, new BaseImpl(name, getter, setter, returnType, rawType));
+            context.getProperties().put(name, new BasePropertyInfoImpl(name, getter, setter, returnType, rawType));
             setters.remove(name);
         });
         setters.forEach((name, setter) -> {
             Type setType = setter.getGenericParameterTypes()[0];
             setType = getActualType(setType, typeParameterMapping, stack);
-            context.getProperties().put(name, new BaseImpl(name, null, setter, setType, rawType));
+            context.getProperties().put(name, new BasePropertyInfoImpl(name, null, setter, setType, rawType));
         });
     }
 
@@ -172,14 +172,14 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         String getName();
     }
 
-    private static final class BaseImpl implements BeanPropertyBase {
+    private static final class BasePropertyInfoImpl implements BasePropertyInfo {
 
         private static final Field EMPTY_FIELD;
         private static final GekInvoker EMPTY_INVOKER;
 
         static {
             try {
-                EMPTY_FIELD = BaseImpl.class.getDeclaredField("EMPTY_FIELD");
+                EMPTY_FIELD = BasePropertyInfoImpl.class.getDeclaredField("EMPTY_FIELD");
                 EMPTY_INVOKER = new GekInvoker() {
                     @Override
                     public @Nullable Object invoke(@Nullable Object inst, Object... args) {
@@ -204,7 +204,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         private List<Annotation> fieldAnnotations;
         private List<Annotation> allAnnotations;
 
-        private BaseImpl(
+        private BasePropertyInfoImpl(
             String name, @Nullable Method getter, @Nullable Method setter, Type type, Class<?> rawType) {
             this.name = name;
             this.getter = getter;
@@ -223,7 +223,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         @Override
         public @Nullable Object getValue(Object bean) {
             if (getterInvoker == EMPTY_INVOKER) {
-                throw new BeanException("BeanProperty is not readable: " + name + ".");
+                throw new BeanException("PropertyInfo is not readable: " + name + ".");
             }
             if (getterInvoker == null) {
                 getterInvoker = buildMethodInvoker(getter);
@@ -234,7 +234,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         @Override
         public void setValue(Object bean, @Nullable Object value) {
             if (setterInvoker == EMPTY_INVOKER) {
-                throw new BeanException("BeanProperty is not writeable: " + name + ".");
+                throw new BeanException("PropertyInfo is not writeable: " + name + ".");
             }
             if (setterInvoker == null) {
                 setterInvoker = buildMethodInvoker(getter);
@@ -330,13 +330,13 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         }
     }
 
-    private static final class MethodBaseImpl implements BeanMethodBase {
+    private static final class BaseMethodInfoImpl implements BaseMethodInfo {
 
         private final Method method;
         private List<Annotation> annotations;
         private GekInvoker invoker;
 
-        private MethodBaseImpl(Method method) {
+        private BaseMethodInfoImpl(Method method) {
             this.method = method;
         }
 

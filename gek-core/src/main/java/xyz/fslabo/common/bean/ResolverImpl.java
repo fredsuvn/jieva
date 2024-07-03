@@ -79,8 +79,8 @@ final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
     static final class Context implements BeanResolver.Context {
 
         private final Type type;
-        private final Map<String, BeanPropertyBase> properties = new LinkedHashMap<>();
-        private final List<BeanMethodBase> methods = new LinkedList<>();
+        private final Map<String, BasePropertyInfo> properties = new LinkedHashMap<>();
+        private final List<BaseMethodInfo> methods = new LinkedList<>();
 
         Context(Type type) {
             this.type = type;
@@ -92,12 +92,12 @@ final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
         }
 
         @Override
-        public Map<String, BeanPropertyBase> getProperties() {
+        public Map<String, BasePropertyInfo> getProperties() {
             return properties;
         }
 
         @Override
-        public List<BeanMethodBase> getMethods() {
+        public List<BaseMethodInfo> getMethods() {
             return methods;
         }
 
@@ -109,13 +109,13 @@ final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
     private static final class BeanInfoImpl implements BeanInfo {
 
         private final Type type;
-        private final Map<String, BeanProperty> properties;
-        private final List<BeanMethod> methods;
+        private final Map<String, PropertyInfo> properties;
+        private final List<MethodInfo> methods;
 
-        private BeanInfoImpl(Type type, Map<String, BeanPropertyBase> properties, List<BeanMethodBase> methods) {
+        private BeanInfoImpl(Type type, Map<String, BasePropertyInfo> properties, List<BaseMethodInfo> methods) {
             this.type = type;
-            this.properties = JieColl.toMap(properties, name -> name, BeanPropertyImpl::new);
-            this.methods = JieColl.toList(methods, BeanMethodImpl::new);
+            this.properties = JieColl.toMap(properties, name -> name, PropertyInfoImpl::new);
+            this.methods = JieColl.toList(methods, MethodInfoImpl::new);
         }
 
         @Override
@@ -124,12 +124,12 @@ final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
         }
 
         @Override
-        public Map<String, BeanProperty> getProperties() {
+        public Map<String, PropertyInfo> getProperties() {
             return properties;
         }
 
         @Override
-        public List<BeanMethod> getMethods() {
+        public List<MethodInfo> getMethods() {
             return methods;
         }
 
@@ -148,11 +148,11 @@ final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
             return JieBean.toString(this);
         }
 
-        private final class BeanPropertyImpl implements BeanProperty {
+        private final class PropertyInfoImpl implements PropertyInfo {
 
-            private final BeanPropertyBase base;
+            private final BasePropertyInfo base;
 
-            private BeanPropertyImpl(BeanPropertyBase propBase) {
+            private PropertyInfoImpl(BasePropertyInfo propBase) {
                 this.base = propBase;
             }
 
@@ -249,11 +249,11 @@ final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
             }
         }
 
-        private final class BeanMethodImpl implements BeanMethod {
+        private final class MethodInfoImpl implements MethodInfo {
 
-            private final BeanMethodBase base;
+            private final BaseMethodInfo base;
 
-            private BeanMethodImpl(BeanMethodBase propBase) {
+            private MethodInfoImpl(BaseMethodInfo propBase) {
                 this.base = propBase;
             }
 

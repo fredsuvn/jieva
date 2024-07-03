@@ -112,13 +112,13 @@ public interface BeanResolver {
         /**
          * Resolves type of bean from given context.
          * <p>
-         * BeanProperty-base map from {@link Context#getProperties()} and method-base list from {@link Context#getMethods()}
-         * are readable and writeable. Each handler can operate the map/list -- adding or removing or modifying the
-         * member-base which is resolved by previous handler.
+         * Properties map from {@link Context#getProperties()} and methods list from {@link Context#getMethods()} are
+         * mutable. Each handler can operate the map/list -- adding or removing or modifying the content of maps which
+         * is resolved by previous handlers.
          * <p>
-         * This method will be invoked for each handler in the resolver from {@link #getHandlers()} sequentially.
-         * If a handler want to prevent the rest resolving, return {@link Flag#BREAK} to break invoking-sequence.
-         * Other returned value will be ignored.
+         * This method will be invoked for each handler from {@link #getHandlers()} sequentially. If a handler want to
+         * prevent the remaining resolving, return {@link Flag#BREAK} to break invoking-sequence. Other returned value
+         * will be ignored.
          *
          * @param context given resolving context
          * @throws BeanResolvingException if any problem occurs when resolving
@@ -129,7 +129,10 @@ public interface BeanResolver {
     }
 
     /**
-     * Resolving context of {@link BeanResolver}.
+     * Context for resolving of {@link BeanResolver}.
+     * <p>
+     * The context includes a mutable properties map {@link #getProperties()} and a mutable methods list
+     * {@link #getMethods()}, resolving handlers can modify the content of maps.
      *
      * @author fredsuvn
      * @see BeanResolver
@@ -144,23 +147,23 @@ public interface BeanResolver {
         Type getType();
 
         /**
-         * Returns bean property-base map in current resolving context.
+         * Returns properties map in current resolving context.
          * <p>
-         * The map through whole resolving process, store and share all property-base for all handlers.
-         * Each handler can add or remove or modify property base info which is resolved by previous handler in this map.
+         * The map through whole resolving process, store and share all base property info for all handlers.
+         * Each handler can add or remove or modify base property info which is resolved by previous handlers in this map.
          *
-         * @return property-base map in current resolving context
+         * @return properties map in current resolving context
          */
-        Map<String, BeanPropertyBase> getProperties();
+        Map<String, BasePropertyInfo> getProperties();
 
         /**
-         * Returns bean method-base list in current resolving context.
+         * Returns methods list in current resolving context.
          * <p>
-         * The list through whole resolving process, store and share all method-base for all handlers.
-         * Each handler can add or remove or modify method base info which is resolved by previous handler in this list.
+         * The list through whole resolving process, store and share all base method info for all handlers.
+         * Each handler can add or remove or modify base method info which is resolved by previous handlers in this list.
          *
-         * @return method-base map in current resolving context
+         * @return methods map in current resolving context
          */
-        List<BeanMethodBase> getMethods();
+        List<BaseMethodInfo> getMethods();
     }
 }

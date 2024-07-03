@@ -7,12 +7,12 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Base info of {@link BeanMember}.
+ * Base info of {@link MemberInfo}.
  *
  * @author fredsuvn
  */
 @Immutable
-public interface BeanMethodBase {
+public interface BaseMethodInfo {
 
     /**
      * Returns name of this method.
