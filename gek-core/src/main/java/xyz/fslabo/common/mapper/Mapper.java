@@ -6,25 +6,22 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.base.GekObject;
-import xyz.fsgek.common.mapper.handlers.*;
+import xyz.fslabo.common.mapper.handlers.*;
 import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.TypeRef;
-import xyz.fslabo.common.mapper.handlers.*;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Mapper to map object from source type to target type.
+ * Mapper interface to map object from source type to target type.
  * <p>
  * A {@link Mapper} consists of a list of {@link Handler}s. In general, the mapper will call
- * {@link Handler#map(Object, Type, Type, Mapper, MapperOption...)} for each handler in
- * {@link Mapper#getHandlers()} sequentially. More detail of mapping process, see
- * {@link Handler#map(Object, Type, Type, Mapper, MapperOption...)}.
+ * {@link Handler#map(Object, Type, Type, Mapper, MapperOptions)} for each handler in {@link Mapper#getHandlers()}
+ * sequentially. More detail of mapping process, see {@link Handler#map(Object, Type, Type, Mapper, MapperOptions)}.
  *
  * @author fredsuvn
- * @see Handler#map(Object, Type, Type, Mapper, MapperOption...)
+ * @see Handler#map(Object, Type, Type, Mapper, MapperOptions)
  */
 @ThreadSafe
 public interface Mapper {
@@ -32,7 +29,7 @@ public interface Mapper {
     /**
      * Returns default mapper, of which handlers are:
      * <ul>
-     *     <li>{@link ReuseConvertHandler};</li>
+     *     <li>{@link ReuseMapperHandler};</li>
      *     <li>{@link EnumConvertHandler};</li>
      *     <li>{@link DateConvertHandler};</li>
      *     <li>{@link BytesConvertHandler};</li>
@@ -46,7 +43,7 @@ public interface Mapper {
      * @return default converter
      */
     static Mapper defaultMapper() {
-        return BeanMapperImpl.DEFAULT_MAPPER;
+        return MapperImpl.DEFAULT_MAPPER;
     }
 
     /**
@@ -56,11 +53,11 @@ public interface Mapper {
      * @return new mapper
      */
     static Mapper withHandlers(Iterable<Handler> middleHandlers) {
-        return new BeanMapperImpl(middleHandlers);
+        return new MapperImpl(middleHandlers);
     }
 
     /**
-     * Returns actual result from {@link #mapObject(Object, Type, MapperOptions)}.
+     * Returns actual result from {@link #map(Object, Type, Type, MapperOptions)}.
      * The code is similar to the following:
      * <pre>
      *     if (result == null || result == Flag.UNSUPPORTED) {
@@ -72,7 +69,7 @@ public interface Mapper {
      *     return Jie.as(result);
      * </pre>
      *
-     * @param result result from {@link #mapObject(Object, Type, MapperOptions)}
+     * @param result result from {@link #map(Object, Type, Type, MapperOptions)}
      * @param <T>    target type
      * @return the actual result
      */
@@ -98,7 +95,7 @@ public interface Mapper {
      * @return converted object or null
      */
     @Nullable
-    default <T> T map(@Nullable Object source, Class<T> targetType, MapperOption... options) {
+    default <T> T map(@Nullable Object source, Class<T> targetType, MapperOptions options) {
         return map(source, (Type) targetType, options);
     }
 
@@ -113,8 +110,8 @@ public interface Mapper {
      * @return converted object or null
      */
     @Nullable
-    default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef, MapperOption... options) {
-        Object result = mapObject(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
+    default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef, MapperOptions options) {
+        Object result = map(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
         return resolveResult(result);
     }
 
@@ -129,8 +126,8 @@ public interface Mapper {
      * @return mapping result
      */
     @Nullable
-    default <T> T map(@Nullable Object source, Type targetType, MapperOption... options) {
-        Object result = mapObject(source, source == null ? Object.class : source.getClass(), targetType, options);
+    default <T> T map(@Nullable Object source, Type targetType, MapperOptions options) {
+        Object result = map(source, source == null ? Object.class : source.getClass(), targetType, options);
         return resolveResult(result);
     }
 
@@ -144,7 +141,7 @@ public interface Mapper {
      *         {@link Val}: mapping successful, the result is {@link Val#get()};
      *     </li>
      *     <li>
-     *         {@code others}: mapping successful, the result is result object, including {@code null};
+     *         {@code others}: mapping successful, the result is returned object, including {@code null};
      *     </li>
      * </ul>
      *
@@ -155,7 +152,7 @@ public interface Mapper {
      * @return converted object or null
      */
     @Nullable
-    default Object mapObject(@Nullable Object source, Type targetType, MapperOptions options) {
+    default Object map(@Nullable Object source, Type sourceType, Type targetType, MapperOptions options) {
         for (Handler handler : getHandlers()) {
             Object value = handler.map(source, sourceType, targetType, this, options);
             if (value == Flag.CONTINUE) {
@@ -164,8 +161,8 @@ public interface Mapper {
             if (value == Flag.BREAK) {
                 return Flag.UNSUPPORTED;
             }
-            if (value instanceof GekObject) {
-                return ((GekObject) value).getValue();
+            if (value instanceof Val) {
+                return ((Val<?>) value).get();
             }
             return value;
         }
@@ -188,7 +185,7 @@ public interface Mapper {
      * @return a mapper with handler list consists of given handler as first one, followed by the handler list of
      * current resolver
      */
-     Mapper withFirstHandler(Handler handler);
+    Mapper withFirstHandler(Handler handler);
 
     /**
      * Returns a mapper with handler list consists of the handler list of current resolver, followed by given handler
@@ -198,7 +195,7 @@ public interface Mapper {
      * @return a mapper with handler list consists of the handler list of current resolver, followed by given handler
      * as last one
      */
-     Mapper withLastHandler(Handler handler) ;
+    Mapper withLastHandler(Handler handler);
 
     /**
      * Returns this mapper as {@link Handler}.
@@ -219,7 +216,7 @@ public interface Mapper {
         /**
          * Maps object from source type to target type.
          * <p>
-         * In general, this method of all handlers in {@link Mapper#getHandlers()} will be invoked sequentially.
+         * In general, all handlers in {@link Mapper#getHandlers()} will be invoked sequentially.
          * The result of this method in 4 types:
          * <ul>
          *     <li>
@@ -229,10 +226,10 @@ public interface Mapper {
          *         {@link Flag#BREAK}: fails to map, breaks the handler chain;
          *     </li>
          *     <li>
-         *         {@link GekObject}: mapping successful, the result is {@link GekObject#getValue()};
+         *         {@link Val}: mapping successful, the result is {@link Val#get()};
          *     </li>
          *     <li>
-         *         {@code others}: mapping successful, the result is result object, including {@code null};
+         *         {@code others}: mapping successful, the result is returned object, including {@code null};
          *     </li>
          * </ul>
          *
@@ -244,7 +241,7 @@ public interface Mapper {
          * @return converted object or null
          */
         @Nullable
-        Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOption... options);
+        Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options);
     }
 
     /**

@@ -1,6 +1,7 @@
 package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.mapper.MapperOptions;
 import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.mapper.Mapper;
@@ -82,17 +83,26 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class ReuseConvertHandler implements Mapper.Handler {
+public class ReuseMapperHandler implements Mapper.Handler {
+
+    private static final Object SUPER = new Object();
 
     /**
      * An instance.
      */
-    public static final ReuseConvertHandler INSTANCE = new ReuseConvertHandler();
+    public static final ReuseMapperHandler INSTANCE = new ReuseMapperHandler();
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
+    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options) {
         if (source == null) {
             return null;
+        }
+        // ? super
+        if (targetType instanceof WildcardType) {
+            ((WildcardType) targetType).getLowerBounds();
+        }
+        if (options.isDeepCopy()) {
+            return Flag.CONTINUE;
         }
         int reusePolicy = mapper.getOptions().reusePolicy();
         if (Objects.equals(targetType, sourceType)) {

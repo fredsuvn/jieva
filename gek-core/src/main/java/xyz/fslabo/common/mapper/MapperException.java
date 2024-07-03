@@ -50,7 +50,7 @@ public class MapperException extends RuntimeException {
      * @param targetType target type
      */
     public MapperException(Type sourceType, Type targetType) {
-        this("Mapping failed: " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".");
+        this("Failed to map " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".");
     }
 
     /**
@@ -61,6 +61,6 @@ public class MapperException extends RuntimeException {
      * @param cause      exception cause
      */
     public MapperException(Type sourceType, Type targetType, Throwable cause) {
-        this("Mapping failed: " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".", cause);
+        this("Failed to map " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".", cause);
     }
 }

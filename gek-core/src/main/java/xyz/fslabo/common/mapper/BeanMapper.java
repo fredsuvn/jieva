@@ -1,10 +1,10 @@
 package xyz.fslabo.common.mapper;
 
-import xyz.fslabo.common.bean.BeanCopyException;
 import xyz.fslabo.common.bean.BeanInfo;
-import xyz.fslabo.common.bean.BeanProperty;
 import xyz.fslabo.common.bean.BeanProvider;
+import xyz.fslabo.common.bean.PropertyInfo;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -12,15 +12,32 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
-public interface BeanMapper {
+public interface
+BeanMapper {
 
     /**
      * Returns default bean mapper.
      *
      * @return default bean mapper
      */
-    static BeanMapper defaultCopier() {
+    static BeanMapper defaultMapper() {
         return BeanMapperImpl.DEFAULT_MAPPER;
+    }
+
+    /**
+     * Copies properties from source object to dest object. Supports both bean object and {@link Map} object.
+     * This method is equivalent to {@link #copyProperties(Object, Type, Object, Type, MapperOptions)}:
+     * <pre>
+     *     copyProperties(source, source.getClass(), dest, dest.getClass(), options);
+     * </pre>
+     *
+     * @param source  source object
+     * @param dest    dest object
+     * @param options mapper options
+     * @throws MapperException exception when copying
+     */
+    default void copyProperties(Object source, Object dest, MapperOptions options) throws MapperException {
+        copyProperties(source, source.getClass(), dest, dest.getClass(), options);
     }
 
     /**
@@ -33,17 +50,23 @@ public interface BeanMapper {
      *     </li>
      *     <li>
      *         For bean object, bean info will be provided by {@link BeanProvider} first, type of properties' names
-     *         is {@link String} and types of properties' values are come from {@link BeanProperty#getType()};
+     *         is always {@link String} and types of properties' values are come from {@link PropertyInfo#getType()};
      *     </li>
      *     <li>
-     *         For {@link Map} object, type of properties' names and values are come from {@link Map} itself or options;
+     *         For {@link Map} object, types of keys and values are come from {@code sourceType} or {@code destType};
      *     </li>
      * </ul>
      *
-     * @param source  source object
-     * @param dest    dest object
-     * @param options copying options
-     * @throws BeanCopyException exception when copying
+     * @param source     source object
+     * @param sourceType type of source object
+     * @param dest       dest object
+     * @param destType   type of dest object
+     * @param options    mapper options
+     * @throws MapperException exception when copying
      */
-    void copyProperties(Object source, Object dest, MapperOptions options) throws MapperException;
+    void copyProperties(
+        Object source, Type sourceType,
+        Object dest, Type destType,
+        MapperOptions options
+    ) throws MapperException;
 }
