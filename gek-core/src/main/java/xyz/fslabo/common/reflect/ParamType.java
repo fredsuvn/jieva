@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author fredsuvn
  */
-public interface GekParamType extends ParameterizedType {
+public interface ParamType extends ParameterizedType {
 
     /**
      * Returns immutable list of {@link #getActualTypeArguments()}.

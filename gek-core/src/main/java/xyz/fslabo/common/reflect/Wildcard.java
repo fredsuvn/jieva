@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author fredsuvn
  */
-public interface GekWildcard extends WildcardType {
+public interface Wildcard extends WildcardType {
 
     /**
      * Returns immutable list of {@link #getUpperBounds()}.
@@ -22,9 +22,9 @@ public interface GekWildcard extends WildcardType {
     List<Type> getUpperBoundList();
 
     /**
-     * Returns upper bound (? extends) of this wildcard, or null if it doesn't have.
+     * Returns upper bound (? extends) of this wildcard, or null if it has no upper bound.
      *
-     * @return upper bound (? extends) of this wildcard, or null if it doesn't have
+     * @return upper bound (? extends) of this wildcard, or null if it has no upper bound
      */
     @Nullable
     default Type getUpperBound() {
@@ -43,9 +43,9 @@ public interface GekWildcard extends WildcardType {
     List<Type> getLowerBoundList();
 
     /**
-     * Returns lower bound (? super) of this wildcard, or null if it doesn't have.
+     * Returns lower bound (? super) of this wildcard, or null if it has no lower bound.
      *
-     * @return lower bound (? super) of this wildcard, or null if it doesn't have
+     * @return lower bound (? super) of this wildcard, or null if it has no lower bound
      */
     @Nullable
     default Type getLowerBound() {

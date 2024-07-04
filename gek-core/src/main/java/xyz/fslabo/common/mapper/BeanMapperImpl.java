@@ -9,7 +9,7 @@ import xyz.fslabo.common.bean.BeanProvider;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.ref.Val;
-import xyz.fslabo.common.reflect.GekParamType;
+import xyz.fslabo.common.reflect.ParamType;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
@@ -46,12 +46,12 @@ final class BeanMapperImpl implements BeanMapper {
     }
 
     private void mapToMap(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
-        GekParamType sourceParamType = JieReflect.getGenericSuperType(sourceType, Map.class);
+        ParamType sourceParamType = JieReflect.getGenericSuperType(sourceType, Map.class);
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
         Map<Object, Object> sourceMap = Jie.as(source);
-        GekParamType destParamType = JieReflect.getGenericSuperType(destType, Map.class);
+        ParamType destParamType = JieReflect.getGenericSuperType(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
@@ -81,7 +81,7 @@ final class BeanMapperImpl implements BeanMapper {
     }
 
     public void mapToBean(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
-        GekParamType sourceParamType = JieReflect.getGenericSuperType(sourceType, Map.class);
+        ParamType sourceParamType = JieReflect.getGenericSuperType(sourceType, Map.class);
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
@@ -116,7 +116,7 @@ final class BeanMapperImpl implements BeanMapper {
         BeanProvider beanProvider = Jie.orDefault(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo sourceInfo = beanProvider.getBeanInfo(sourceType);
         Map<String, PropertyInfo> sourceProperties = sourceInfo.getProperties();
-        GekParamType destParamType = JieReflect.getGenericSuperType(destType, Map.class);
+        ParamType destParamType = JieReflect.getGenericSuperType(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
@@ -168,7 +168,7 @@ final class BeanMapperImpl implements BeanMapper {
         });
     }
 
-    private void checkMapType(@Nullable GekParamType paramType) {
+    private void checkMapType(@Nullable ParamType paramType) {
         if (paramType == null) {
             throw new BeanException("Not a Map type: null.");
         }

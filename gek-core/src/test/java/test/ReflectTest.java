@@ -7,7 +7,7 @@ import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.base.obj.GekObj;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.reflect.JieReflect;
-import xyz.fslabo.common.reflect.GekType;
+import xyz.fslabo.common.reflect.JieType;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.ParameterizedType;
@@ -76,17 +76,17 @@ public class ReflectTest {
             Integer.class
         );
         GekObj<?> wType = GekObj.wrap(null,
-            GekType.wildcard(Collections.singletonList(String.class), null));
+            JieType.wildcard(Collections.singletonList(String.class), null));
         Assert.assertEquals(
             wType.toWildcardObj().getType(),
-            GekType.wildcard(Collections.singletonList(String.class), null)
+            JieType.wildcard(Collections.singletonList(String.class), null)
         );
         Assert.assertEquals(
             wType.toWildcardObj().getUpperBound(),
             String.class
         );
         wType = GekObj.wrap(null,
-            GekType.wildcard(null, Collections.singletonList(Integer.class)));
+            JieType.wildcard(null, Collections.singletonList(Integer.class)));
         Assert.assertEquals(
             wType.toWildcardObj().getLowerBound(),
             Integer.class
@@ -131,7 +131,7 @@ public class ReflectTest {
             t2.toString(),
             "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
         );
-        ParameterizedType p1 = GekType.paramType(T.class, Arrays.asList(Integer.class));
+        ParameterizedType p1 = JieType.paramType(T.class, Arrays.asList(Integer.class));
         Assert.assertEquals(
             p1.toString(),
             "test.ReflectTest$T<java.lang.Integer>"
@@ -140,7 +140,7 @@ public class ReflectTest {
             t1,
             p1
         );
-        ParameterizedType p2 = GekType.paramType(T.V.class, p1, Arrays.asList(String.class));
+        ParameterizedType p2 = JieType.paramType(T.V.class, p1, Arrays.asList(String.class));
         Assert.assertEquals(
             p2.toString(),
             "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
@@ -157,7 +157,7 @@ public class ReflectTest {
             t3.toString(),
             "? super java.lang.Integer"
         );
-        Type w1 = GekType.wildcard(null, Arrays.asList(Integer.class));
+        Type w1 = JieType.wildcard(null, Arrays.asList(Integer.class));
         Assert.assertEquals(
             w1.toString(),
             "? super java.lang.Integer"
@@ -172,7 +172,7 @@ public class ReflectTest {
             t4.toString(),
             "? extends java.lang.Integer"
         );
-        Type w2 = GekType.wildcard(Arrays.asList(Integer.class), null);
+        Type w2 = JieType.wildcard(Arrays.asList(Integer.class), null);
         Assert.assertEquals(
             w2.toString(),
             "? extends java.lang.Integer"
@@ -189,9 +189,9 @@ public class ReflectTest {
             t5.toString(),
             "java.util.List<? extends java.lang.Integer>[]"
         );
-        Type g1 = GekType.arrayType(
-            GekType.paramType(List.class, Arrays.asList(
-                GekType.wildcard(Arrays.asList(Integer.class), null))));
+        Type g1 = JieType.arrayType(
+            JieType.paramType(List.class, Arrays.asList(
+                JieType.wildcard(Arrays.asList(Integer.class), null))));
         Assert.assertEquals(
             g1.toString(),
             "java.util.List<? extends java.lang.Integer>[]"
@@ -526,7 +526,7 @@ public class ReflectTest {
 
         Assert.assertEquals(
             JieReflect.getGenericSuperType(Iterable.class, Iterable.class),
-            GekType.paramType(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
+            JieType.paramType(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
         );
     }
 

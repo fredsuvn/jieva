@@ -18,7 +18,7 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class GekType {
+public class JieType {
 
     /**
      * Returns parameterized type with given raw type, owner type and actual type arguments.
@@ -28,7 +28,7 @@ public class GekType {
      * @param actualTypeArguments actual type arguments
      * @return parameterized type
      */
-    public static GekParamType paramType(Type rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
+    public static ParamType paramType(Type rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
         return paramType(rawType, ownerType, JieColl.toArray(actualTypeArguments, Type.class));
     }
 
@@ -39,7 +39,7 @@ public class GekType {
      * @param actualTypeArguments actual type arguments
      * @return parameterized type
      */
-    public static GekParamType paramType(Type rawType, Iterable<Type> actualTypeArguments) {
+    public static ParamType paramType(Type rawType, Iterable<Type> actualTypeArguments) {
         return paramType(rawType, null, actualTypeArguments);
     }
 
@@ -51,8 +51,8 @@ public class GekType {
      * @param actualTypeArguments actual type arguments
      * @return parameterized type
      */
-    public static GekParamType paramType(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
-        return new GekParamTypeImpl(rawType, ownerType, actualTypeArguments);
+    public static ParamType paramType(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
+        return new ParamTypeImpl(rawType, ownerType, actualTypeArguments);
     }
 
     /**
@@ -62,17 +62,17 @@ public class GekType {
      * @param actualTypeArguments actual type arguments
      * @return parameterized type
      */
-    public static GekParamType paramType(Type rawType, Type[] actualTypeArguments) {
+    public static ParamType paramType(Type rawType, Type[] actualTypeArguments) {
         return paramType(rawType, null, actualTypeArguments);
     }
 
     /**
-     * Returns given parameterized type as {@link GekParamType}.
+     * Returns given parameterized type as {@link ParamType}.
      *
      * @param type given parameterized type
      * @return parameterized type
      */
-    public static GekParamType paramType(ParameterizedType type) {
+    public static ParamType paramType(ParameterizedType type) {
         return paramType(type.getRawType(), type.getOwnerType(), type.getActualTypeArguments());
     }
 
@@ -83,8 +83,8 @@ public class GekType {
      * @param lowerBounds given lower bounds
      * @return wildcard type
      */
-    public static GekWildcard wildcard(@Nullable Iterable<Type> upperBounds, @Nullable Iterable<Type> lowerBounds) {
-        return new GekWildcardImpl(
+    public static Wildcard wildcard(@Nullable Iterable<Type> upperBounds, @Nullable Iterable<Type> lowerBounds) {
+        return new WildcardImpl(
             upperBounds == null ? null : JieColl.toArray(upperBounds, Type.class),
             lowerBounds == null ? null : JieColl.toArray(lowerBounds, Type.class)
         );
@@ -97,18 +97,27 @@ public class GekType {
      * @param lowerBounds given lower bounds
      * @return wildcard type
      */
-    public static GekWildcard wildcard(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
-        return new GekWildcardImpl(upperBounds, lowerBounds);
+    public static Wildcard wildcard(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
+        return new WildcardImpl(upperBounds, lowerBounds);
     }
 
     /**
-     * Returns given wildcard type as {@link GekWildcard}.
+     * Returns given wildcard type as {@link Wildcard}.
      *
      * @param type given wildcard type
      * @return wildcard type
      */
-    public static GekWildcard wildcard(WildcardType type) {
-        return new GekWildcardImpl(type.getUpperBounds(), type.getLowerBounds());
+    public static Wildcard wildcard(WildcardType type) {
+        return new WildcardImpl(type.getUpperBounds(), type.getLowerBounds());
+    }
+
+    /**
+     * Returns a singleton wildcard type represents {@code ?}.
+     *
+     * @return a singleton wildcard type represents {@code ?}
+     */
+    public static Wildcard questionMark() {
+        return WildcardImpl.QUESTION_MARK;
     }
 
     /**
@@ -117,28 +126,29 @@ public class GekType {
      * @param componentType given component type
      * @return generic array type
      */
-    public static GekArrayType arrayType(Type componentType) {
-        return new GekArrayTypeImpl(componentType);
+    public static ArrayType arrayType(Type componentType) {
+        return new ArrayTypeImpl(componentType);
     }
 
     /**
-     * Returns given generic array type as {@link GekArrayType}.
+     * Returns given generic array type as {@link ArrayType}.
      *
      * @param type given generic array type
      * @return generic array type
      */
-    public static GekArrayType arrayType(GenericArrayType type) {
-        return new GekArrayTypeImpl(type.getGenericComponentType());
+    public static ArrayType arrayType(GenericArrayType type) {
+        return new ArrayTypeImpl(type.getGenericComponentType());
     }
 
-    private static final class GekParamTypeImpl implements GekParamType {
+    private static final class ParamTypeImpl implements ParamType {
 
         private final Type rawType;
         private final @Nullable Type ownerType;
         private final Type[] actualTypeArguments;
         private List<Type> actualTypeArgumentList;
+        private String toString;
 
-        private GekParamTypeImpl(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
+        private ParamTypeImpl(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
             this.rawType = rawType;
             this.ownerType = ownerType == null ?
                 ((rawType instanceof Class) ? ((Class<?>) rawType).getDeclaringClass() : null) : ownerType;
@@ -168,8 +178,8 @@ public class GekType {
             if (o == null) {
                 return false;
             }
-            if (o instanceof GekParamTypeImpl) {
-                GekParamTypeImpl other = (GekParamTypeImpl) o;
+            if (o instanceof ParamTypeImpl) {
+                ParamTypeImpl other = (ParamTypeImpl) o;
                 return Objects.equals(rawType, other.rawType)
                     && Objects.equals(ownerType, other.ownerType)
                     && Arrays.equals(actualTypeArguments, other.actualTypeArguments);
@@ -192,6 +202,9 @@ public class GekType {
 
         @Override
         public String toString() {
+            if (toString != null) {
+                return toString;
+            }
             StringBuilder sb = new StringBuilder();
             if (ownerType != null) {
                 //test.A<String>
@@ -228,7 +241,8 @@ public class GekType {
                 }
                 sb.append(">");
             }
-            return sb.toString();
+            toString = sb.toString();
+            return toString;
         }
 
         @Override
@@ -240,14 +254,17 @@ public class GekType {
         }
     }
 
-    private static final class GekWildcardImpl implements GekWildcard {
+    private static class WildcardImpl implements Wildcard {
+
+        static final WildcardImpl QUESTION_MARK = new WildcardImpl(null, null);
 
         private final Type[] upperBounds;
         private List<Type> upperBoundList;
         private final Type[] lowerBounds;
         private List<Type> lowerBoundList;
+        private String toString;
 
-        private GekWildcardImpl(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
+        private WildcardImpl(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
             this.upperBounds = JieArray.isEmpty(upperBounds) ? new Type[]{Object.class} : upperBounds.clone();
             this.lowerBounds = JieArray.isEmpty(lowerBounds) ? new Type[0] : lowerBounds.clone();
         }
@@ -270,8 +287,8 @@ public class GekType {
             if (o == null) {
                 return false;
             }
-            if (o instanceof GekWildcardImpl) {
-                GekWildcardImpl other = (GekWildcardImpl) o;
+            if (o instanceof WildcardImpl) {
+                WildcardImpl other = (WildcardImpl) o;
                 return Arrays.equals(upperBounds, other.upperBounds)
                     && Arrays.equals(lowerBounds, other.lowerBounds);
             }
@@ -290,13 +307,15 @@ public class GekType {
 
         @Override
         public String toString() {
+            if (toString != null) {
+                return toString;
+            }
             StringBuilder builder;
             Type[] bounds;
             if (lowerBounds.length == 0) {
                 if (upperBounds.length == 0 || Objects.equals(Object.class, upperBounds[0])) {
                     return "?";
                 }
-
                 bounds = upperBounds;
                 builder = new StringBuilder("? extends ");
             } else {
@@ -307,10 +326,10 @@ public class GekType {
                 if (i > 0) {
                     builder.append(" & ");
                 }
-
                 builder.append(bounds[i] instanceof Class ? ((Class<?>) bounds[i]).getName() : bounds[i].toString());
             }
-            return builder.toString();
+            toString = builder.toString();
+            return toString;
         }
 
         @Override
@@ -330,11 +349,12 @@ public class GekType {
         }
     }
 
-    private static final class GekArrayTypeImpl implements GekArrayType {
+    private static final class ArrayTypeImpl implements ArrayType {
 
         private final Type componentType;
+        private String toString;
 
-        private GekArrayTypeImpl(Type componentType) {
+        private ArrayTypeImpl(Type componentType) {
             this.componentType = componentType;
         }
 
@@ -365,6 +385,9 @@ public class GekType {
 
         @Override
         public String toString() {
+            if (toString != null) {
+                return toString;
+            }
             Type type = this.getGenericComponentType();
             StringBuilder builder = new StringBuilder();
             if (type instanceof Class) {
@@ -373,7 +396,8 @@ public class GekType {
                 builder.append(type.toString());
             }
             builder.append("[]");
-            return builder.toString();
+            toString = builder.toString();
+            return toString;
         }
     }
 }

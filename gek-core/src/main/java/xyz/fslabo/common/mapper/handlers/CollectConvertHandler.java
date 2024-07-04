@@ -9,7 +9,7 @@ import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.reflect.JieReflect;
-import xyz.fslabo.common.reflect.GekType;
+import xyz.fslabo.common.reflect.JieType;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -184,7 +184,7 @@ public class CollectConvertHandler implements Mapper.Handler {
             return Jie.as(
                 GekObj.wrap(
                     it,
-                    GekType.paramType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+                    JieType.paramType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
                 ).toParameterizedObj()
             );
         }
@@ -196,7 +196,7 @@ public class CollectConvertHandler implements Mapper.Handler {
             return Jie.as(
                 GekObj.wrap(
                     it,
-                    GekType.paramType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+                    JieType.paramType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
                 ).toParameterizedObj()
             );
         }
