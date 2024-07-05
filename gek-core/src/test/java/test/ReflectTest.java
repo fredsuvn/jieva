@@ -215,125 +215,125 @@ public class ReflectTest {
 
     @Test
     public void testAssignableFrom() {
-        Assert.assertTrue(JieReflect.isAssignableFrom(int.class, Integer.class));
-        Assert.assertTrue(JieReflect.isAssignableFrom(int.class, int.class));
-        Assert.assertFalse(JieReflect.isAssignableFrom(int.class, Double.class));
+        Assert.assertTrue(JieReflect.isAssignable(int.class, Integer.class));
+        Assert.assertTrue(JieReflect.isAssignable(int.class, int.class));
+        Assert.assertFalse(JieReflect.isAssignable(int.class, Double.class));
 
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<List<String>>() {
             }.getType(),
             new TypeRef<List<String>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<List<? extends CharSequence>>() {
             }.getType(),
             new TypeRef<List<String>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<List<? extends CharSequence>>() {
             }.getType(),
             new TypeRef<List<? extends String>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<List<? super String>>() {
             }.getType(),
             new TypeRef<List<CharSequence>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<List<? super String>>() {
             }.getType(),
             new TypeRef<List<? super CharSequence>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<List<List<List<List<? super String>>>>>() {
             }.getType(),
             new TypeRef<List<List<List<List<? super CharSequence>>>>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<List<? super String>>() {
             }.getType(),
             new TypeRef<List<? extends CharSequence>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<List<CharSequence>>() {
             }.getType(),
             new TypeRef<List<String>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<Collection<?>>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<Collection<?>>() {
             }.getType(),
             new TypeRef<Collection<?>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<Collection<Object>>() {
             }.getType(),
             new TypeRef<Collection<?>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<List<? extends List<? extends List<? extends CharSequence>>>>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends CharSequence>>>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<List<? extends List<? extends List<CharSequence>>>>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<Collection[]>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<Collection<? extends Object>[]>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<Collection<Object>[]>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<Collection[]>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<Collection<Object>[]>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             new TypeRef<Collection<?>[][]>() {
             }.getType(),
             new TypeRef<List<? extends List<? extends List<? extends String>>>[][]>() {
@@ -341,17 +341,17 @@ public class ReflectTest {
         ));
         //        List<? extends List<? extends List<? extends String>>>[][] l = null;
         //        Collection<? extends Object>[][] c = l;
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<Map<String, String>>() {
             }.getType(),
             Map.class
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             Object[].class,
             new TypeRef<Map<String, String>[]>() {
             }.getType()
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             Object[].class,
             Object[][].class
         ));
@@ -382,37 +382,37 @@ public class ReflectTest {
             private List<? super String> list = ll;
         }
         TypeVariable<?>[] tvs = TAF.class.getTypeParameters();
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             tvs[0],
             tvs[1]
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             tvs[0],
             tvs[2]
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             tvs[0],
             tvs[7]
         ));
-        Assert.assertTrue(JieReflect.isAssignableFrom(
+        Assert.assertTrue(JieReflect.isAssignable(
             JieReflect.getField(TAF.class, "f1s").getGenericType(),
             JieReflect.getField(TAF.class, "f2s").getGenericType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             JieReflect.getField(TAF.class, "f2s").getGenericType(),
             JieReflect.getField(TAF.class, "f1s").getGenericType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             tvs[5],
             new TypeRef<List<String>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             tvs[5],
             new TypeRef<List<Integer>>() {
             }.getType()
         ));
-        Assert.assertFalse(JieReflect.isAssignableFrom(
+        Assert.assertFalse(JieReflect.isAssignable(
             new TypeRef<Collection<CharSequence>>() {
             }.getType(),
             tvs[6]

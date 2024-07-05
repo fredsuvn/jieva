@@ -27,7 +27,7 @@ import java.util.Objects;
  *         </ul>
  *     </li>
  *     <li>
- *         If target type is assignable from source type by {@link JieReflect#isAssignableFrom(Type, Type)}:
+ *         If target type is assignable from source type by {@link JieReflect#isAssignable(Type, Type)}:
  *         <ul>
  *             <li>
  *                 If {@link Mapper.Options#reusePolicy()} is {@link Mapper.Options#REUSE_ASSIGNABLE},
@@ -111,7 +111,7 @@ public class ReuseMapperHandler implements Mapper.Handler {
             }
             return null;
         }
-        if (JieReflect.isAssignableFrom(targetType, sourceType)) {
+        if (JieReflect.isAssignable(targetType, sourceType)) {
             if (reusePolicy == Mapper.Options.REUSE_ASSIGNABLE) {
                 return source;
             }

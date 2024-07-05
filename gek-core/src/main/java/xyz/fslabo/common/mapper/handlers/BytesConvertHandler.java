@@ -39,7 +39,7 @@ public class BytesConvertHandler implements Mapper.Handler {
                     return src.clone();
                 }
                 return source;
-            } else if (JieReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
+            } else if (JieReflect.isAssignable(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = ((ByteBuffer) source).slice();
                 return GekIO.read(src);
             } else {
@@ -52,7 +52,7 @@ public class BytesConvertHandler implements Mapper.Handler {
                     return ByteBuffer.wrap(src.clone());
                 }
                 return ByteBuffer.wrap(src);
-            } else if (JieReflect.isAssignableFrom(ByteBuffer.class, sourceType)) {
+            } else if (JieReflect.isAssignable(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = (ByteBuffer) source;
                 ByteBuffer slice = src.slice();
                 ByteBuffer buffer = ByteBuffer.allocate(slice.remaining());

@@ -21,6 +21,8 @@ public class JieReflect {
 
     private static final GekCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = GekCache.softCache();
 
+    private static final Type[] EMPTY_TYPES = {};
+
     /**
      * Returns last name of given class. The last name is sub-string after last dot, for example:
      * <p>
@@ -69,15 +71,31 @@ public class JieReflect {
     }
 
     /**
-     * Returns upper bound type of given type (? extends).
+     * Returns first upper bound type of given type (? extends).
+     * Note that if no upper bound is explicitly declared, return {@code Object.class}.
      *
      * @param type given type
-     * @return upper bound type of given type
+     * @return first upper bound type of given type
      */
     public static Type getUpperBound(WildcardType type) {
         Type[] upperBounds = type.getUpperBounds();
         if (JieArray.isNotEmpty(upperBounds)) {
             return upperBounds[0];
+        }
+        return Object.class;
+    }
+
+    /**
+     * Returns first upper bound type of given type (T extends).
+     * Note that if no upper bound is explicitly declared, return {@code Object.class}.
+     *
+     * @param type given type
+     * @return first upper bound type of given type
+     */
+    public static Type getUpperBound(TypeVariable<?> type) {
+        Type[] bounds = type.getBounds();
+        if (JieArray.isNotEmpty(bounds)) {
+            return bounds[0];
         }
         return Object.class;
     }
@@ -89,12 +107,10 @@ public class JieReflect {
      *         If given type is instance of {@link Class}, return itself;
      *     </li>
      *     <li>
-     *         If given type is instance of {@link WildcardType}, return upper bound from
-     *         {@link WildcardType#getUpperBounds()};
+     *         If given type is instance of {@link WildcardType}, call {@link #getUpperBounds(WildcardType)};
      *     </li>
      *     <li>
-     *         If given type is instance of {@link TypeVariable}, return upper bound from
-     *         {@link TypeVariable#getBounds()};
+     *         If given type is instance of {@link TypeVariable}, call {@link #getUpperBounds(TypeVariable)};
      *     </li>
      *     <li>
      *         If given type is instance of {@link GenericArrayType}, return a type of which component type is upper
@@ -102,7 +118,7 @@ public class JieReflect {
      *     </li>
      *     <li>
      *         If given type is instance of {@link ParameterizedType}, return a type of which actual type arguments are
-     *         upper bound of {@link ParameterizedType#getActualTypeArguments()};
+     *         upper bounds of {@link ParameterizedType#getActualTypeArguments()};
      *     </li>
      * </ul>
      *
@@ -119,11 +135,7 @@ public class JieReflect {
         }
         if (type instanceof TypeVariable) {
             TypeVariable<?> typeVariable = (TypeVariable<?>) type;
-            Type[] uppers = typeVariable.getBounds();
-            if (JieArray.isNotEmpty(uppers)) {
-                return uppers[0];
-            }
-            return Object.class;
+            return getUpperBound(typeVariable);
         }
         if (type instanceof GenericArrayType) {
             GenericArrayType genericArrayType = (GenericArrayType) type;
@@ -154,11 +166,35 @@ public class JieReflect {
     }
 
     /**
-     * Returns lower bound type of given type (? super).
+     * Returns upper bounds of given type (? extends).
+     * Note that if no upper bound is explicitly declared, return an empty array.
+     *
+     * @param type given type
+     * @return upper bounds of given type
+     */
+    public static Type[] getUpperBounds(WildcardType type) {
+        Type[] bounds = type.getUpperBounds();
+        return Jie.orDefault(bounds, EMPTY_TYPES);
+    }
+
+    /**
+     * Returns upper bounds of given type (T extends).
+     * Note that if no upper bound is explicitly declared, return an empty array.
+     *
+     * @param type given type
+     * @return upper bounds of given type
+     */
+    public static Type[] getUpperBounds(TypeVariable<?> type) {
+        Type[] bounds = type.getBounds();
+        return Jie.orDefault(bounds, EMPTY_TYPES);
+    }
+
+    /**
+     * Returns first lower bound type of given type (? super).
      * If given type has no lower bound, return null.
      *
      * @param type given type
-     * @return lower bound type of given type or null
+     * @return first lower bound type of given type or null
      */
     @Nullable
     public static Type getLowerBound(WildcardType type) {
@@ -176,8 +212,7 @@ public class JieReflect {
      *         If given type is instance of {@link Class}, return itself;
      *     </li>
      *     <li>
-     *         If given type is instance of {@link WildcardType}, return lower bound from
-     *         {@link WildcardType#getLowerBounds()}, or null if it has no lower bound;
+     *         If given type is instance of {@link WildcardType}, call {@link #getLowerBound(WildcardType)};
      *     </li>
      *     <li>
      *         If given type is instance of {@link TypeVariable}, return null;
@@ -188,7 +223,7 @@ public class JieReflect {
      *     </li>
      *     <li>
      *         If given type is instance of {@link ParameterizedType}, return a type of which actual type arguments are
-     *         lower bound (including null) of {@link ParameterizedType#getActualTypeArguments()};
+     *         lower bounds (including null) of {@link ParameterizedType#getActualTypeArguments()};
      *     </li>
      * </ul>
      *
@@ -233,6 +268,19 @@ public class JieReflect {
             return JieType.paramType(parameterizedType.getRawType(), parameterizedType.getOwnerType(), lowerArgs);
         }
         throw new UnsupportedOperationException("Unknown type: " + type);
+    }
+
+    /**
+     * Returns lower bounds of given type (? super).
+     * If given type has no lower bound, return null.
+     *
+     * @param type given type
+     * @return lower bounds of given type or null
+     */
+    @Nullable
+    public static Type[] getLowerBounds(WildcardType type) {
+        Type[] bounds = type.getLowerBounds();
+        return JieArray.isEmpty(bounds) ? null : bounds;
     }
 
     /**
@@ -462,49 +510,294 @@ public class JieReflect {
     }
 
     /**
-     * Returns whether type {@code a} is in the bounds of type {@code b}.
+     * Returns whether the give {@code type} matches the specified {@code pattern}.
      * <p>
-     * If two types are equal, return true. Otherwise, it returns true if and only if upper and lower bounds of type
-     * {@code a} within the bounds of type {@code b}.
+     * If given {@code type} and specified {@code pattern} are equal, return true. Otherwise, it returns true if and
+     * only if upper and lower bounds of given {@code type} within the bounds specified by {@code pattern}.
+     * <p>
+     * Not if given {@code type} is not {@link WildcardType} or {@link TypeVariable}, the upper and lower bounds are
+     * commonly same with its raw class type.
      * For examples:
      * <pre>
-     *     inBounds(Object.class, Object.class);// true
-     *     inBounds(String.class, Object.class);// false
-     *     inBounds(int.class, int.class);// true
-     *     inBounds(int.class, long.class);// false
-     *     inBounds(new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType());// true
-     *     inBounds(new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;List&lt;? super Object&gt;&gt;() {}.getType());// false
+     *     matches(Object.class, Object.class);// true
+     *     matches(String.class, Object.class);// false: String is lower than Object
+     *     matches(Integer.class, Long.class);// false: they have no inheritance relationship
+     *     matches(int.class, int.class);// true
+     *     matches(int.class, long.class);// false: they have no inheritance relationship
+     *     matches(
+     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType(),
+     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType()
+     *     );// true
+     *     matches(
+     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType(),
+     *         new TypeRef&lt;List&lt;? super Object&gt;&gt;() {}.getType()
+     *     );// false: String out of bounds of "? super Object"
+     *     matches(
+     *         new TypeRef&lt;Collection&lt;String&gt;&gt;() {}.getType(),
+     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType()
+     *     );// false: Collection is upper than List;
+     *       // upper bound: List&lt;String&gt;, lower bound: List&lt;no--lower&gt;
+     *     matches(
+     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType(),
+     *         new TypeRef&lt;Collection&lt;? extends String&gt;&gt;() {}.getType()
+     *     );// false: List is lower than Collection;
+     *       // upper bound: Collection&lt;String&gt;, lower bound: Collection&lt;no--lower&gt;
      * </pre>
      *
-     * @param a type a
-     * @param b type b
-     * @return whether type {@code a} is in the bounds of type {@code b}
+     * @param type    given type
+     * @param pattern specified pattern
+     * @return whether the give {@code type} matches the specified {@code pattern}
      */
-    public static boolean inBounds(Type a, Type b) {
-        if (Objects.equals(a, b)) {
+    public static boolean matches(Type type, Type pattern) {
+        if (Objects.equals(type, pattern)) {
             return true;
         }
-        Type upperA = getUpperBound(a);
-        Type upperB = getUpperBound(b);
-        if (!isUpper(upperB, upperA)) {
+        if (type instanceof Class) {
+            if (pattern instanceof Class) {
+                // must equal
+                return false;
+            }
+            Class<?> ca = (Class<?>) type;
+            if (pattern instanceof ParameterizedType) {
+                ParameterizedType pb = (ParameterizedType) pattern;
+                Class<?> pbRaw = (Class<?>) pb.getRawType();
+                if (!Objects.equals(ca, pbRaw)) {
+                    return false;
+                }
+                Type[] args = pb.getActualTypeArguments();
+                if (JieArray.isEmpty(args)) {
+                    return true;
+                }
+                for (Type arg : args) {
+                    if (!matches(JieType.questionMark(), arg)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof TypeVariable) {
+                TypeVariable<?> vb = (TypeVariable<?>) pattern;
+                Type[] upperBounds = getUpperBounds(vb);
+                for (Type bb : upperBounds) {
+                    if (!isAssignable(bb, ca)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof WildcardType) {
+                WildcardType wb = (WildcardType) pattern;
+                Type upper = getUpperBound(wb);
+                if (!isAssignable(upper, ca)) {
+                    return false;
+                }
+                Type lower = getLowerBound(wb);
+                if (lower != null) {
+                    if (!isAssignable(ca, lower)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof GenericArrayType) {
+                if (!ca.isArray()) {
+                    return false;
+                }
+                GenericArrayType gb = (GenericArrayType) pattern;
+                Type componentA = ca.getComponentType();
+                Type componentB = gb.getGenericComponentType();
+                return matches(componentA, componentB);
+            }
             return false;
         }
-        Type lowerA = getLowerBound(a);
-        Type lowerB = getLowerBound(b);
-        if (!isLower(lowerB, lowerA)) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pa = (ParameterizedType) type;
+            if (pattern instanceof Class) {
+                Class<?> cb = (Class<?>) pattern;
+                Class<?> paRaw = (Class<?>) pa.getRawType();
+                if (!Objects.equals(cb, paRaw)) {
+                    return false;
+                }
+                Type[] args = pa.getActualTypeArguments();
+                if (JieArray.isEmpty(args)) {
+                    return true;
+                }
+                for (Type arg : args) {
+                    if (!matches(arg, JieType.questionMark())) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof ParameterizedType) {
+                ParameterizedType pb = (ParameterizedType) pattern;
+                Class<?> paRaw = (Class<?>) pa.getRawType();
+                Class<?> pbRaw = (Class<?>) pb.getRawType();
+                if (!Objects.equals(paRaw, pbRaw)) {
+                    return false;
+                }
+                Type[] argsA = Jie.orDefault(pa.getActualTypeArguments(), EMPTY_TYPES);
+                Type[] argsB = Jie.orDefault(pb.getActualTypeArguments(), EMPTY_TYPES);
+                int size = Math.max(argsA.length, argsB.length);
+                if (size <= 0) {
+                    return true;
+                }
+                for (int i = 0; i < size; i++) {
+                    Type aa = i < argsA.length ? argsA[i] : JieType.questionMark();
+                    Type ab = i < argsB.length ? argsB[i] : JieType.questionMark();
+                    if (!matches(aa, ab)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof TypeVariable) {
+                TypeVariable<?> vb = (TypeVariable<?>) pattern;
+                Type[] upperBounds = getUpperBounds(vb);
+                for (Type bb : upperBounds) {
+                    if (!isAssignable(bb, pa)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof WildcardType) {
+                WildcardType wb = (WildcardType) pattern;
+                Type upper = getUpperBound(wb);
+                if (!isAssignable(upper, pa)) {
+                    return false;
+                }
+                Type lower = getLowerBound(wb);
+                if (lower != null) {
+                    if (!isAssignable(pa, lower)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
             return false;
         }
-        return true;
-    }
-
-    private static boolean isUpper(Type a, Type b) {
-
-    }
-
-    private static boolean isLower(Type a, Type b) {
-
+        if (type instanceof TypeVariable) {
+            TypeVariable<?> va = (TypeVariable<?>) type;
+            if (pattern instanceof TypeVariable) {
+                TypeVariable<?> vb = (TypeVariable<?>) pattern;
+                Type[] boundsB = getUpperBounds(vb);
+                Type[] boundsA = getUpperBounds(va);
+                for (Type bb : boundsB) {
+                    boolean ok = false;
+                    for (Type ba : boundsA) {
+                        if (isAssignable(bb, ba)) {
+                            ok = true;
+                            break;
+                        }
+                    }
+                    if (!ok) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof WildcardType) {
+                WildcardType wb = (WildcardType) pattern;
+                Type lowerB = getLowerBound(wb);
+                if (lowerB != null) {
+                    return false;
+                }
+                Type[] boundsA = getUpperBounds(va);
+                Type upperB = getUpperBound(wb);
+                for (Type ba : boundsA) {
+                    if (isAssignable(upperB, ba)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            return false;
+        }
+        if (type instanceof WildcardType) {
+            WildcardType wa = (WildcardType) type;
+            if (pattern instanceof Class || pattern instanceof ParameterizedType || pattern instanceof GenericArrayType) {
+                Type lowerA = getLowerBound(wa);
+                if (lowerA == null) {
+                    return false;
+                }
+                Type upperA = getUpperBound(wa);
+                return matches(upperA, pattern) && matches(lowerA, pattern);
+            }
+            if (pattern instanceof TypeVariable) {
+                TypeVariable<?> vb = (TypeVariable<?>) pattern;
+                Type upperA = getUpperBound(wa);
+                Type[] boundsB = getUpperBounds(vb);
+                for (Type bb : boundsB) {
+                    if (!isAssignable(bb, upperA)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof WildcardType) {
+                WildcardType wb = (WildcardType) pattern;
+                Type upperA = getUpperBound(wa);
+                Type upperB = getUpperBound(wb);
+                if (!isAssignable(upperB, upperA)) {
+                    return false;
+                }
+                Type lowerA = getLowerBound(wa);
+                Type lowerB = getLowerBound(wb);
+                if (lowerA == null) {
+                    return lowerB == null;
+                }
+                if (lowerB == null) {
+                    return true;
+                }
+                return isAssignable(lowerA, lowerB);
+            }
+            return false;
+        }
+        if (type instanceof GenericArrayType) {
+            GenericArrayType ga = (GenericArrayType) type;
+            if (pattern instanceof Class) {
+                Class<?> cb = (Class<?>) pattern;
+                if (!cb.isArray()) {
+                    return false;
+                }
+                Type componentA = ga.getGenericComponentType();
+                Type componentB = cb.getComponentType();
+                return matches(componentA, componentB);
+            }
+            if (pattern instanceof TypeVariable) {
+                TypeVariable<?> vb = (TypeVariable<?>) pattern;
+                Type[] upperBounds = getUpperBounds(vb);
+                for (Type bb : upperBounds) {
+                    if (!isAssignable(bb, ga)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof WildcardType) {
+                WildcardType wb = (WildcardType) pattern;
+                Type upper = getUpperBound(wb);
+                if (!isAssignable(upper, ga)) {
+                    return false;
+                }
+                Type lower = getLowerBound(wb);
+                if (lower != null) {
+                    if (!isAssignable(ga, lower)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (pattern instanceof GenericArrayType) {
+                GenericArrayType gb = (GenericArrayType) pattern;
+                Type componentA = ga.getGenericComponentType();
+                Type componentB = gb.getGenericComponentType();
+                return matches(componentA, componentB);
+            }
+            return false;
+        }
+        return false;
     }
 
     /**
@@ -515,7 +808,7 @@ public class JieReflect {
      * @param sourceType source type
      * @return whether target type can be assigned by source type
      */
-    public static boolean isAssignableFrom(Class<?> targetType, Class<?> sourceType) {
+    public static boolean isAssignable(Class<?> targetType, Class<?> sourceType) {
         if (targetType.isPrimitive() || sourceType.isPrimitive()) {
             return toWrapperClass(targetType).isAssignableFrom(toWrapperClass(sourceType));
         }
@@ -525,7 +818,7 @@ public class JieReflect {
     /**
      * Returns whether target type can be assigned by source type.
      * If given type is primitive, it will be converted to its wrapper type.
-     * This method is similar as {@link #isAssignableFrom(Class, Class)} but supports {@link Type}.
+     * This method is similar as {@link #isAssignable(Class, Class)} but supports {@link Type}.
      * <p>
      * Note in this type, {@link Object} can be assigned from any type,
      * {@link WildcardType} can not assign to or be assigned from any type.
@@ -534,7 +827,7 @@ public class JieReflect {
      * @param sourceType source type
      * @return whether target type can be assigned by source type
      */
-    public static boolean isAssignableFrom(Type targetType, Type sourceType) {
+    public static boolean isAssignable(Type targetType, Type sourceType) {
         if (Objects.equals(targetType, sourceType) || Objects.equals(targetType, Object.class)) {
             return true;
         }
@@ -546,7 +839,7 @@ public class JieReflect {
             Class<?> c1 = (Class<?>) targetType;
             if (sourceType instanceof Class<?>) {
                 Class<?> c2 = (Class<?>) sourceType;
-                return isAssignableFrom(c1, c2);
+                return isAssignable(c1, c2);
             }
             if (sourceType instanceof ParameterizedType) {
                 ParameterizedType p2 = (ParameterizedType) sourceType;
@@ -554,13 +847,13 @@ public class JieReflect {
                 if (r2 == null) {
                     return false;
                 }
-                return isAssignableFrom(c1, r2);
+                return isAssignable(c1, r2);
             }
             if (sourceType instanceof TypeVariable<?>) {
                 TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
                 Type[] bounds = v2.getBounds();
                 for (Type bound : bounds) {
-                    if (isAssignableFrom(targetType, bound)) {
+                    if (isAssignable(targetType, bound)) {
                         return true;
                     }
                 }
@@ -575,7 +868,7 @@ public class JieReflect {
                 if (gc2 == null) {
                     return false;
                 }
-                return isAssignableFrom(c1.getComponentType(), gc2);
+                return isAssignable(c1.getComponentType(), gc2);
             }
             return false;
         }
@@ -586,7 +879,7 @@ public class JieReflect {
                 if (p2 == null) {
                     return false;
                 }
-                return isAssignableFrom(p1, p2);
+                return isAssignable(p1, p2);
             }
             if (sourceType instanceof ParameterizedType) {
                 ParameterizedType p2 = (ParameterizedType) sourceType;
@@ -609,13 +902,13 @@ public class JieReflect {
                 if (sp2 == null) {
                     return false;
                 }
-                return isAssignableFrom(p1, sp2);
+                return isAssignable(p1, sp2);
             }
             if (sourceType instanceof TypeVariable<?>) {
                 TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
                 Type[] bounds = v2.getBounds();
                 for (Type bound : bounds) {
-                    if (isAssignableFrom(targetType, bound)) {
+                    if (isAssignable(targetType, bound)) {
                         return true;
                     }
                 }
@@ -629,7 +922,7 @@ public class JieReflect {
                 TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
                 Type[] bounds = v2.getBounds();
                 for (Type bound : bounds) {
-                    if (isAssignableFrom(targetType, bound)) {
+                    if (isAssignable(targetType, bound)) {
                         return true;
                     }
                 }
@@ -648,13 +941,13 @@ public class JieReflect {
                     return false;
                 }
                 Class<?> tc2 = c2.getComponentType();
-                return isAssignableFrom(tc1, tc2);
+                return isAssignable(tc1, tc2);
             }
             if (sourceType instanceof GenericArrayType) {
                 GenericArrayType g2 = (GenericArrayType) sourceType;
                 Type tc1 = g1.getGenericComponentType();
                 Type tc2 = g2.getGenericComponentType();
-                return isAssignableFrom(tc1, tc2);
+                return isAssignable(tc1, tc2);
             }
             return false;
         }
@@ -675,11 +968,11 @@ public class JieReflect {
                     Type upperBound2 = getUpperBound(w2);
                     //? extends
                     if (upperBound2 != null) {
-                        return isAssignableFrom(upperBound, upperBound2);
+                        return isAssignable(upperBound, upperBound2);
                     }
                     return false;
                 }
-                return isAssignableFrom(upperBound, t2);
+                return isAssignable(upperBound, t2);
             }
             Type lowerBound = getLowerBound(w1);
             //? super
@@ -689,11 +982,11 @@ public class JieReflect {
                     Type lowerBound2 = getLowerBound(w2);
                     //? super
                     if (lowerBound2 != null) {
-                        return isAssignableFrom(lowerBound2, lowerBound);
+                        return isAssignable(lowerBound2, lowerBound);
                     }
                     return false;
                 }
-                return isAssignableFrom(t2, lowerBound);
+                return isAssignable(t2, lowerBound);
             }
         }
         return false;
