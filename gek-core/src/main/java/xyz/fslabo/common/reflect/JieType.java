@@ -77,6 +77,20 @@ public class JieType {
     }
 
     /**
+     * Returns wildcard type with given upper bound and lower bound.
+     *
+     * @param upperBound given upper bound
+     * @param lowerBound given lower bound
+     * @return wildcard type
+     */
+    public static Wildcard wildcard(@Nullable Type upperBound, @Nullable Type lowerBound) {
+        return new WildcardImpl(
+            upperBound == null ? null : new Type[]{upperBound},
+            lowerBound == null ? null : new Type[]{lowerBound}
+        );
+    }
+
+    /**
      * Returns wildcard type with given upper bounds and lower bounds.
      *
      * @param upperBounds given upper bounds
@@ -257,6 +271,8 @@ public class JieType {
     private static class WildcardImpl implements Wildcard {
 
         static final WildcardImpl QUESTION_MARK = new WildcardImpl(null, null);
+        static final Type[] OBJECT_ARRAY = {Object.class};
+        static final Type[] EMPTY = {};
 
         private final Type[] upperBounds;
         private List<Type> upperBoundList;
@@ -265,8 +281,8 @@ public class JieType {
         private String toString;
 
         private WildcardImpl(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
-            this.upperBounds = JieArray.isEmpty(upperBounds) ? new Type[]{Object.class} : upperBounds.clone();
-            this.lowerBounds = JieArray.isEmpty(lowerBounds) ? new Type[0] : lowerBounds.clone();
+            this.upperBounds = JieArray.isEmpty(upperBounds) ? OBJECT_ARRAY : upperBounds.clone();
+            this.lowerBounds = JieArray.isEmpty(lowerBounds) ? EMPTY : lowerBounds.clone();
         }
 
         @Override
