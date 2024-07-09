@@ -19,9 +19,8 @@ import java.util.stream.Collectors;
  */
 public class JieReflect {
 
+    private static final Type[] EMPTY_TYPE_ARRAY = {};
     private static final GekCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = GekCache.softCache();
-
-    private static final Type[] EMPTY_TYPES = {};
 
     /**
      * Returns last name of given class. The last name is sub-string after last dot, for example:
@@ -174,7 +173,7 @@ public class JieReflect {
      */
     public static Type[] getUpperBounds(WildcardType type) {
         Type[] bounds = type.getUpperBounds();
-        return Jie.orDefault(bounds, EMPTY_TYPES);
+        return Jie.orDefault(bounds, EMPTY_TYPE_ARRAY);
     }
 
     /**
@@ -186,7 +185,7 @@ public class JieReflect {
      */
     public static Type[] getUpperBounds(TypeVariable<?> type) {
         Type[] bounds = type.getBounds();
-        return Jie.orDefault(bounds, EMPTY_TYPES);
+        return Jie.orDefault(bounds, EMPTY_TYPE_ARRAY);
     }
 
     /**
@@ -510,294 +509,46 @@ public class JieReflect {
     }
 
     /**
-     * Returns whether the give {@code type} matches the specified {@code pattern}.
+     * Returns whether the give matched type matches the specified pattern.
      * <p>
-     * If given {@code type} and specified {@code pattern} are equal, return true. Otherwise, it returns true if and
-     * only if upper and lower bounds of given {@code type} within the bounds specified by {@code pattern}.
+     * If given matched type and specified pattern are equal, return true. Otherwise, it returns true if and only if
+     * upper and lower bounds of given type within the bounds of specified pattern.
      * <p>
-     * Not if given {@code type} is not {@link WildcardType} or {@link TypeVariable}, the upper and lower bounds are
-     * commonly same with its raw class type.
+     * Not if given type is not {@link WildcardType} or {@link TypeVariable}, the upper and lower bounds are commonly
+     * same with its raw class type.
      * For examples:
      * <pre>
      *     matches(Object.class, Object.class);// true
-     *     matches(String.class, Object.class);// false: String is lower than Object
+     *     matches(Object.class, String.class);// false: String is lower than Object
      *     matches(Integer.class, Long.class);// false: they have no inheritance relationship
      *     matches(int.class, int.class);// true
      *     matches(int.class, long.class);// false: they have no inheritance relationship
      *     matches(
-     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType()
+     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType(),
+     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType()
      *     );// true
      *     matches(
-     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;List&lt;? super Object&gt;&gt;() {}.getType()
+     *         new TypeRef&lt;List&lt;? super Object&gt;&gt;() {}.getType(),
+     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType()
      *     );// false: String out of bounds of "? super Object"
      *     matches(
-     *         new TypeRef&lt;Collection&lt;String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType()
+     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType(),
+     *         new TypeRef&lt;Collection&lt;String&gt;&gt;() {}.getType()
      *     );// false: Collection is upper than List;
      *       // upper bound: List&lt;String&gt;, lower bound: List&lt;no--lower&gt;
      *     matches(
-     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;Collection&lt;? extends String&gt;&gt;() {}.getType()
+     *         new TypeRef&lt;Collection&lt;? extends String&gt;&gt;() {}.getType(),
+     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType()
      *     );// false: List is lower than Collection;
      *       // upper bound: Collection&lt;String&gt;, lower bound: Collection&lt;no--lower&gt;
      * </pre>
      *
-     * @param type    given type
+     * @param matched given type to be matched
      * @param pattern specified pattern
-     * @return whether the give {@code type} matches the specified {@code pattern}
+     * @return whether the give matched type matches the specified pattern
      */
-    public static boolean matches(Type type, Type pattern) {
-        if (Objects.equals(type, pattern)) {
-            return true;
-        }
-        if (type instanceof Class) {
-            if (pattern instanceof Class) {
-                // must equal
-                return false;
-            }
-            Class<?> ca = (Class<?>) type;
-            if (pattern instanceof ParameterizedType) {
-                ParameterizedType pb = (ParameterizedType) pattern;
-                Class<?> pbRaw = (Class<?>) pb.getRawType();
-                if (!Objects.equals(ca, pbRaw)) {
-                    return false;
-                }
-                Type[] args = pb.getActualTypeArguments();
-                if (JieArray.isEmpty(args)) {
-                    return true;
-                }
-                for (Type arg : args) {
-                    if (!matches(JieType.questionMark(), arg)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof TypeVariable) {
-                TypeVariable<?> vb = (TypeVariable<?>) pattern;
-                Type[] upperBounds = getUpperBounds(vb);
-                for (Type bb : upperBounds) {
-                    if (!isAssignable(bb, ca)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof WildcardType) {
-                WildcardType wb = (WildcardType) pattern;
-                Type upper = getUpperBound(wb);
-                if (!isAssignable(upper, ca)) {
-                    return false;
-                }
-                Type lower = getLowerBound(wb);
-                if (lower != null) {
-                    if (!isAssignable(ca, lower)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof GenericArrayType) {
-                if (!ca.isArray()) {
-                    return false;
-                }
-                GenericArrayType gb = (GenericArrayType) pattern;
-                Type componentA = ca.getComponentType();
-                Type componentB = gb.getGenericComponentType();
-                return matches(componentA, componentB);
-            }
-            return false;
-        }
-        if (type instanceof ParameterizedType) {
-            ParameterizedType pa = (ParameterizedType) type;
-            if (pattern instanceof Class) {
-                Class<?> cb = (Class<?>) pattern;
-                Class<?> paRaw = (Class<?>) pa.getRawType();
-                if (!Objects.equals(cb, paRaw)) {
-                    return false;
-                }
-                Type[] args = pa.getActualTypeArguments();
-                if (JieArray.isEmpty(args)) {
-                    return true;
-                }
-                for (Type arg : args) {
-                    if (!matches(arg, JieType.questionMark())) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof ParameterizedType) {
-                ParameterizedType pb = (ParameterizedType) pattern;
-                Class<?> paRaw = (Class<?>) pa.getRawType();
-                Class<?> pbRaw = (Class<?>) pb.getRawType();
-                if (!Objects.equals(paRaw, pbRaw)) {
-                    return false;
-                }
-                Type[] argsA = Jie.orDefault(pa.getActualTypeArguments(), EMPTY_TYPES);
-                Type[] argsB = Jie.orDefault(pb.getActualTypeArguments(), EMPTY_TYPES);
-                int size = Math.max(argsA.length, argsB.length);
-                if (size <= 0) {
-                    return true;
-                }
-                for (int i = 0; i < size; i++) {
-                    Type aa = i < argsA.length ? argsA[i] : JieType.questionMark();
-                    Type ab = i < argsB.length ? argsB[i] : JieType.questionMark();
-                    if (!matches(aa, ab)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof TypeVariable) {
-                TypeVariable<?> vb = (TypeVariable<?>) pattern;
-                Type[] upperBounds = getUpperBounds(vb);
-                for (Type bb : upperBounds) {
-                    if (!isAssignable(bb, pa)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof WildcardType) {
-                WildcardType wb = (WildcardType) pattern;
-                Type upper = getUpperBound(wb);
-                if (!isAssignable(upper, pa)) {
-                    return false;
-                }
-                Type lower = getLowerBound(wb);
-                if (lower != null) {
-                    if (!isAssignable(pa, lower)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-        if (type instanceof TypeVariable) {
-            TypeVariable<?> va = (TypeVariable<?>) type;
-            if (pattern instanceof TypeVariable) {
-                TypeVariable<?> vb = (TypeVariable<?>) pattern;
-                Type[] boundsB = getUpperBounds(vb);
-                Type[] boundsA = getUpperBounds(va);
-                for (Type bb : boundsB) {
-                    boolean ok = false;
-                    for (Type ba : boundsA) {
-                        if (isAssignable(bb, ba)) {
-                            ok = true;
-                            break;
-                        }
-                    }
-                    if (!ok) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof WildcardType) {
-                WildcardType wb = (WildcardType) pattern;
-                Type lowerB = getLowerBound(wb);
-                if (lowerB != null) {
-                    return false;
-                }
-                Type[] boundsA = getUpperBounds(va);
-                Type upperB = getUpperBound(wb);
-                for (Type ba : boundsA) {
-                    if (isAssignable(upperB, ba)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            return false;
-        }
-        if (type instanceof WildcardType) {
-            WildcardType wa = (WildcardType) type;
-            if (pattern instanceof Class || pattern instanceof ParameterizedType || pattern instanceof GenericArrayType) {
-                Type lowerA = getLowerBound(wa);
-                if (lowerA == null) {
-                    return false;
-                }
-                Type upperA = getUpperBound(wa);
-                return matches(upperA, pattern) && matches(lowerA, pattern);
-            }
-            if (pattern instanceof TypeVariable) {
-                TypeVariable<?> vb = (TypeVariable<?>) pattern;
-                Type upperA = getUpperBound(wa);
-                Type[] boundsB = getUpperBounds(vb);
-                for (Type bb : boundsB) {
-                    if (!isAssignable(bb, upperA)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof WildcardType) {
-                WildcardType wb = (WildcardType) pattern;
-                Type upperA = getUpperBound(wa);
-                Type upperB = getUpperBound(wb);
-                if (!isAssignable(upperB, upperA)) {
-                    return false;
-                }
-                Type lowerA = getLowerBound(wa);
-                Type lowerB = getLowerBound(wb);
-                if (lowerA == null) {
-                    return lowerB == null;
-                }
-                if (lowerB == null) {
-                    return true;
-                }
-                return isAssignable(lowerA, lowerB);
-            }
-            return false;
-        }
-        if (type instanceof GenericArrayType) {
-            GenericArrayType ga = (GenericArrayType) type;
-            if (pattern instanceof Class) {
-                Class<?> cb = (Class<?>) pattern;
-                if (!cb.isArray()) {
-                    return false;
-                }
-                Type componentA = ga.getGenericComponentType();
-                Type componentB = cb.getComponentType();
-                return matches(componentA, componentB);
-            }
-            if (pattern instanceof TypeVariable) {
-                TypeVariable<?> vb = (TypeVariable<?>) pattern;
-                Type[] upperBounds = getUpperBounds(vb);
-                for (Type bb : upperBounds) {
-                    if (!isAssignable(bb, ga)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof WildcardType) {
-                WildcardType wb = (WildcardType) pattern;
-                Type upper = getUpperBound(wb);
-                if (!isAssignable(upper, ga)) {
-                    return false;
-                }
-                Type lower = getLowerBound(wb);
-                if (lower != null) {
-                    if (!isAssignable(ga, lower)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (pattern instanceof GenericArrayType) {
-                GenericArrayType gb = (GenericArrayType) pattern;
-                Type componentA = ga.getGenericComponentType();
-                Type componentB = gb.getGenericComponentType();
-                return matches(componentA, componentB);
-            }
-            return false;
-        }
-        return false;
+    public static boolean matches(Type pattern, Type matched) {
+        return TypePattern.matches(pattern, matched);
     }
 
     /**
