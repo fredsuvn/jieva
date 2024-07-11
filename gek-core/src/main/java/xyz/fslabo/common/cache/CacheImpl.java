@@ -397,6 +397,9 @@ final class CacheImpl<K, V> implements Cache<K, V> {
 
         @Override
         public RemovalListener.Cause syncCause(RemovalListener.Cause cause) {
+            if (CacheImpl.this.removalListener == null) {
+                return cause;
+            }
             RemovalListener.Cause thisCause = this.cause;
             if (thisCause != null) {
                 return thisCause;
