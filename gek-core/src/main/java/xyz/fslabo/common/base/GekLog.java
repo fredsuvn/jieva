@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.cache.GekCache;
+import xyz.fslabo.common.cache.Cache;
 
 import java.time.Instant;
 import java.util.Date;
@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public abstract class GekLog {
 
-    private static final GekCache<Level, GekLog> cache = GekCache.softCache();
+    private static final Cache<Level, GekLog> cache = Cache.softCache();
 
     /**
      * Returns instance of {@link GekLog} with {@link Level#INFO}.
@@ -34,7 +34,7 @@ public abstract class GekLog {
      * @return instance of {@link GekLog} with specified level
      */
     public static GekLog getInstance(Level level) {
-        return cache.get(level, Impl::new);
+        return cache.compute(level, Impl::new);
     }
 
     private final Level level;

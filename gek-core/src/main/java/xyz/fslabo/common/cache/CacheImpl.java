@@ -2,321 +2,180 @@ package xyz.fslabo.common.cache;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.ref.Var;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-final class CacheImpl<K, V> implements GekCache<K, V> {
+final class CacheImpl<K, V> implements Cache<K, V> {
 
     private final boolean useSoft;
-    private final Map<K, Entry<K>> data;
+    private final Map<K, ValueReference<K>> data;
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
-    private final long expireAfterWrite;
-    private final long expireAfterAccess;
     private final RemovalListener<? super K, ? super V> removalListener;
 
-    CacheImpl(Builder<K, V> builder) {
-        this.useSoft = builder.isSoftValues();
-        this.expireAfterAccess = builder.expireAfterAccessMillis();
-        this.expireAfterWrite = builder.expireAfterWriteMillis();
-        this.data = builder.initialCapacity() <= 0 ?
-            new ConcurrentHashMap<>() : new ConcurrentHashMap<>(builder.initialCapacity());
-        this.removalListener = builder.removeListener();
-        ;
+    CacheImpl(boolean useSoft, int initialCapacity, @Nullable RemovalListener<? super K, ? super V> removalListener) {
+        this.useSoft = useSoft;
+        this.data = new ConcurrentHashMap<>(initialCapacity);
+        this.removalListener = removalListener;
     }
 
     @Override
     public @Nullable V get(K key) {
-        Entry<K> entry = data.get(key);
-        if (entry == null) {
-            cleanUp();
-            return null;
+        ValueReference<K> old = data.get(key);
+        if (old != null) {
+            Object oldValue = resolveGet(old);
+            return resolveValue(oldValue);
         }
-        if (entry.isExpired()) {
-            entry.clear(RemovalListener.Cause.EXPIRED);
-            cleanUp();
-            return null;
-        }
-        entry.refreshAccess();
         cleanUp();
-        return valueAs(entry.value());
+        return null;
     }
 
     @Override
-    public @Nullable V get(K key, Function<? super K, ? extends V> loader) {
-        Entry<K> entry = data.get(key);
-        if (entry == null) {
-            return compute(key, loader);
+    public @Nullable Val<V> getVal(K key) {
+        ValueReference<K> old = data.get(key);
+        if (old != null) {
+            Object oldValue = resolveGet(old);
+            return valValue(oldValue);
         }
-        if (entry.isExpired()) {
-            entry.clear(RemovalListener.Cause.EXPIRED);
-            return compute(key, loader);
-        }
-        Object value = entry.value();
-        if (value == null) {
-            return compute(key, loader);
-        }
-        entry.refreshAccess();
         cleanUp();
-        return valueAs(value);
+        return null;
     }
 
-    private @Nullable V compute(K key, Function<? super K, ? extends V> loader) {
+    @Nullable
+    private Object resolveGet(ValueReference<K> old) {
+        Object value = resolveExpiry(old);
+        cleanUp();
+        return value;
+    }
+
+    @Override
+    public @Nullable V put(K key, V value) {
+        ValueReference<K> old = data.put(key, newEntry(key, value, null));
+        if (old != null) {
+            Object oldValue = resolvePut(old);
+            return resolveValue(oldValue);
+        }
+        cleanUp();
+        return null;
+    }
+
+    @Override
+    public @Nullable Val<V> putVal(K key, Value<? extends V> value) {
+        ValueReference<K> old = data.put(key, newEntry(key, value.getData(), value.getExpiry()));
+        if (old != null) {
+            Object oldValue = resolvePut(old);
+            return valValue(oldValue);
+        }
+        cleanUp();
+        return null;
+    }
+
+    @Nullable
+    private Object resolvePut(ValueReference<K> old) {
+        Object value = resolveExpiry(old);
+        old.remove(RemovalListener.Cause.REPLACED);
+        cleanUp();
+        return value;
+    }
+
+    @Override
+    public @Nullable V remove(K key) {
+        ValueReference<K> old = data.remove(key);
+        if (old != null) {
+            Object oldValue = resolveRemove(old);
+            return resolveValue(oldValue);
+        }
+        cleanUp();
+        return null;
+    }
+
+    @Override
+    public @Nullable Val<V> removeVal(K key) {
+        ValueReference<K> old = data.remove(key);
+        if (old != null) {
+            Object oldValue = resolveRemove(old);
+            return valValue(oldValue);
+        }
+        cleanUp();
+        return null;
+    }
+
+    @Nullable
+    private Object resolveRemove(ValueReference<K> old) {
+        Object value = resolveExpiry(old);
+        old.remove(RemovalListener.Cause.EXPLICIT);
+        cleanUp();
+        return value;
+    }
+
+    @Override
+    public @Nullable V compute(K key, Function<? super K, ? extends V> loader) {
         Var<V> result = Var.ofNull();
         data.compute(key, (k, old) -> {
-            if (old == null) {
-                V nv = loader.apply(k);
-                Entry<K> newEntry = newEntry(k, nv, expireAfterWrite, expireAfterAccess);
-                result.set(nv);
-                return newEntry;
+            if (old != null) {
+                Object oldValue = resolveGet(old);
+                if (oldValue != null) {
+                    result.set(resolveValue(oldValue));
+                    return old;
+                }
             }
-            if (old.isExpired()) {
-                old.clear(RemovalListener.Cause.EXPIRED);
-                V nv = loader.apply(k);
-                Entry<K> newEntry = newEntry(k, nv, expireAfterWrite, expireAfterAccess);
-                result.set(nv);
-                return newEntry;
-            }
-            Object ov = old.value();
-            if (ov == null) {
-                V nv = loader.apply(k);
-                Entry<K> newEntry = newEntry(k, nv, expireAfterWrite, expireAfterAccess);
-                result.set(nv);
-                return newEntry;
-            }
-            result.set(valueAs(ov));
-            old.refreshAccess();
-            return old;
+            V newValue = loader.apply(k);
+            result.set(newValue);
+            return newEntry(k, newValue, null);
         });
-        cleanUp();
         return result.get();
     }
 
-//    @Override
-//    public @Nullable GekObject<V> getWrapper(K key) {
-//        Entry<K> entry = data.get(key);
-//        if (entry == null) {
-//            cleanUp();
-//            return null;
-//        }
-//        if (entry.isExpired()) {
-//            entry.clear(RemovalListener.Cause.EXPIRED);
-//            cleanUp();
-//            return null;
-//        }
-//        Object value = entry.value();
-//        if (value == null) {
-//            return null;
-//        }
-//        entry.refreshAccess();
-//        cleanUp();
-//        return GekObject.of(valueAs(value));
-//    }
-
-//    @Override
-//    public @Nullable GekObject<V> getWrapper(
-//        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
-//        Entry<K> entry = data.get(key);
-//        if (entry == null) {
-//            return computeWrapper(key, loader);
-//        }
-//        if (entry.isExpired()) {
-//            entry.clear(RemovalListener.Cause.EXPIRED);
-//            return computeWrapper(key, loader);
-//        }
-//        Object value = entry.value();
-//        if (value == null) {
-//            return computeWrapper(key, loader);
-//        }
-//        entry.refreshAccess();
-//        cleanUp();
-//        return GekObject.of(valueAs(value));
-//    }
-
-//    private @Nullable GekObject<V> computeWrapper(
-//        K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
-//        Var<GekObject<V>> result = Var.ofNull();
-//        data.compute(key, (k, old) -> {
-//            if (old == null) {
-//                Value<? extends V> nv = loader.apply(k);
-//                if (nv == null) {
-//                    return null;
-//                }
-//                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-//                result.set(GekObject.of(nv.get()));
-//                return newEntry;
-//            }
-//            if (old.isExpired()) {
-//                old.clear(RemovalListener.Cause.EXPIRED);
-//                Value<? extends V> nv = loader.apply(k);
-//                if (nv == null) {
-//                    return null;
-//                }
-//                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-//                result.set(GekObject.of(nv.get()));
-//                return newEntry;
-//            }
-//            Object ov = old.value();
-//            if (ov == null) {
-//                Value<? extends V> nv = loader.apply(k);
-//                if (nv == null) {
-//                    return null;
-//                }
-//                Entry<K> newEntry = newEntry(k, nv.get(), nv.expireAfterWriteMillis(), nv.expireAfterAccessMillis());
-//                result.set(GekObject.of(nv.get()));
-//                return newEntry;
-//            }
-//            result.set(GekObject.of(valueAs(ov)));
-//            old.refreshAccess();
-//            return old;
-//        });
-//        cleanUp();
-//        return result.get();
-//    }
+    @Override
+    public @Nullable Val<V> computeVal(K key, Function<? super K, @Nullable ? extends Value<? extends V>> loader) {
+        Var<V> result = Var.ofNull();
+        Object isNull = data.compute(key, (k, old) -> {
+            if (old != null) {
+                Object oldValue = resolveGet(old);
+                if (oldValue != null) {
+                    result.set(resolveValue(oldValue));
+                    return old;
+                }
+            }
+            Value<? extends V> newValue = loader.apply(k);
+            if (newValue == null) {
+                return null;
+            }
+            result.set(newValue.getData());
+            return newEntry(k, newValue.getData(), newValue.getExpiry());
+        });
+        return isNull == null ? null : result;
+    }
 
     @Override
     public boolean contains(K key) {
-        Entry<K> entry = data.get(key);
-        if (entry == null) {
-            cleanUp();
-            return false;
-        }
-        if (entry.isExpired()) {
-            entry.clear(RemovalListener.Cause.EXPIRED);
-            cleanUp();
-            return false;
-        }
-        Object value = entry.value();
-        if (value == null) {
-            cleanUp();
-            return false;
-        }
-        cleanUp();
-        return true;
-    }
-
-    @Override
-    public void put(K key, V value) {
-        put(key, value, expireAfterWrite);
-    }
-
-    @Override
-    public void put(K key, V value, long expireAfterWriteMillis) {
-        Entry<K> old = data.put(key, newEntry(key, value, expireAfterWriteMillis, expireAfterAccess));
+        ValueReference<K> old = data.get(key);
         if (old != null) {
-            old.clear(RemovalListener.Cause.REPLACED);
+            Object oldValue = resolveGet(old);
+            return oldValue != null;
         }
         cleanUp();
+        return false;
     }
 
     @Override
-    public void put(K key, Value<? extends V> value) {
-        Entry<K> old = data.put(
-            key, newEntry(key, value.get(), value.expireAfterWriteMillis(), value.expireAfterAccessMillis()));
+    public void expire(K key, @Nullable Duration expire) {
+        ValueReference<K> old = data.get(key);
         if (old != null) {
-            old.clear(RemovalListener.Cause.REPLACED);
+            Object oldValue = resolveGet(old);
+            if (oldValue != null) {
+                old.expire(expire);
+                return;
+            }
         }
-        cleanUp();
-    }
-
-    @Override
-    public void expire(K key, long expireAfterWriteMillis) {
-        Entry<K> entry = data.get(key);
-        if (entry == null) {
-            cleanUp();
-            return;
-        }
-        entry.setExpireAfterWrite(expireAfterWriteMillis);
-        entry.refreshWrite();
-        cleanUp();
-    }
-
-    @Override
-    public void expire(K key, long expireAfterWriteMillis, long expireAfterAccessMillis) {
-        Entry<K> entry = data.get(key);
-        if (entry == null) {
-            cleanUp();
-            return;
-        }
-        entry.setExpireAfterWrite(expireAfterWriteMillis);
-        entry.setExpireAfterAccess(expireAfterAccessMillis);
-        entry.refreshWrite();
-        cleanUp();
-    }
-
-    @Override
-    public void expire(K key, @Nullable Duration expireAfterWrite, @Nullable Duration expireAfterAccess) {
-        expire(
-            key,
-            expireAfterWrite == null ? -1 : expireAfterWrite.toMillis(),
-            expireAfterAccess == null ? -1 : expireAfterAccess.toMillis()
-        );
-    }
-
-    @Override
-    public void remove(K key) {
-        Entry<K> entry = data.remove(key);
-        if (entry != null) {
-            entry.clear(RemovalListener.Cause.EXPLICIT);
-        }
-        cleanUp();
-    }
-
-    @Override
-    public void removeIf(BiPredicate<? super K, ? super V> predicate) {
-        data.entrySet().removeIf(it -> {
-            K key = it.getKey();
-            Entry<K> entry = it.getValue();
-            if (entry == null) {
-                return true;
-            }
-            if (entry.isExpired()) {
-                entry.clear(RemovalListener.Cause.EXPIRED);
-                return true;
-            }
-            Object value = entry.value();
-            if (value == null) {
-                return true;
-            }
-            if (predicate.test(key, valueAs(value))) {
-                entry.clear(RemovalListener.Cause.EXPLICIT);
-                return true;
-            }
-            return false;
-        });
-        cleanUp();
-    }
-
-    @Override
-    public void removeEntry(BiPredicate<? super K, ? super Value<? super V>> predicate) {
-        data.entrySet().removeIf(it -> {
-            K key = it.getKey();
-            Entry<K> entry = it.getValue();
-            if (entry == null) {
-                return true;
-            }
-            if (entry.isExpired()) {
-                entry.clear(RemovalListener.Cause.EXPIRED);
-                return true;
-            }
-            Object value = entry.value();
-            if (value == null) {
-                return true;
-            }
-            Value<V> v = Value.of(valueAs(value), entry.expireAfterWrite(), entry.expireAfterAccess());
-            if (predicate.test(key, v)) {
-                entry.clear(RemovalListener.Cause.EXPLICIT);
-                return true;
-            }
-            return false;
-        });
         cleanUp();
     }
 
@@ -329,19 +188,15 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
     @Override
     public void clear() {
         data.entrySet().removeIf(it -> {
-            Entry<K> entry = it.getValue();
+            ValueReference<K> entry = it.getValue();
             if (entry == null) {
                 return true;
             }
             if (entry.isExpired()) {
-                entry.clear(RemovalListener.Cause.EXPIRED);
+                entry.remove(RemovalListener.Cause.EXPIRED);
                 return true;
             }
-            Object value = entry.value();
-            if (value == null) {
-                return true;
-            }
-            entry.clear(RemovalListener.Cause.EXPLICIT);
+            entry.remove(RemovalListener.Cause.EXPLICIT);
             return true;
         });
         cleanUp();
@@ -354,8 +209,7 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
             if (x == null) {
                 break;
             }
-            Entry<K> entry = Jie.as(x);
-            entry.onRemoval(RemovalListener.Cause.COLLECTED);
+            ValueReference<K> entry = Jie.as(x);
             K key = entry.key();
             data.computeIfPresent(key, (k, v) -> {
                 if (v == entry) {
@@ -363,27 +217,50 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
                 }
                 return v;
             });
+            if (CacheImpl.this.removalListener != null) {
+                RemovalListener.Cause cause = entry.syncCause(RemovalListener.Cause.COLLECTED);
+                CacheImpl.this.removalListener.onRemoval(key, resolveValue(entry.value()), cause);
+            }
         }
     }
 
-    private Entry<K> newEntry(K key, @Nullable V value, long expireAfterWrite, long expireAfterAccess) {
+    @Nullable
+    private Object resolveExpiry(ValueReference<K> old) {
+        if (old.isExpired()) {
+            old.remove(RemovalListener.Cause.EXPIRED);
+            cleanUp();
+            return null;
+        }
+        Object value = old.value();
+        if (value == null) {
+            cleanUp();
+            return null;
+        }
+        return value;
+    }
+
+    private ValueReference<K> newEntry(K key, @Nullable V value, @Nullable Duration expiry) {
         Object v = value == null ? new Null() : value;
         return useSoft ?
-            new SoftEntry(key, v, expireAfterWrite, expireAfterAccess)
+            new SoftValueReference(key, v, expiry)
             :
-            new WeakEntry(key, value, expireAfterWrite, expireAfterAccess);
+            new WeakValueReference(key, value, expiry);
     }
 
     @Nullable
-    private V valueAs(@Nullable Object value) {
+    private V resolveValue(@Nullable Object value) {
         if (value == null || value instanceof Null) {
             return null;
         }
         return Jie.as(value);
     }
 
+    @Nullable
+    private Val<V> valValue(@Nullable Object value) {
+        return value == null ? null : Val.of(resolveValue(value));
+    }
 
-    protected interface Entry<K> {
+    protected interface ValueReference<K> {
 
         K key();
 
@@ -391,37 +268,27 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
 
         boolean isExpired();
 
-        void refreshWrite();
+        void expire(@Nullable Duration expiry);
 
-        void refreshAccess();
+        void remove(RemovalListener.Cause cause);
 
-        void setExpireAfterWrite(long expireAfterWrite);
-
-        void setExpireAfterAccess(long expireAfterAccess);
-
-        long expireAfterWrite();
-
-        long expireAfterAccess();
-
-        void clear(RemovalListener.Cause cause);
-
-        void onRemoval(RemovalListener.Cause cause);
+        RemovalListener.Cause syncCause(RemovalListener.Cause cause);
     }
 
-    private final class SoftEntry extends SoftReference<Object> implements Entry<K> {
+    private final class SoftValueReference extends SoftReference<Object> implements ValueReference<K> {
 
         private final K key;
-        private long customExpireAfterWrite;
-        private long customExpireAfterAccess;
-        private long expiredAt = -1;
-        private boolean removed = false;
+        private Instant startTime;
+        private Instant expiryAt;
+        private volatile RemovalListener.Cause cause;
 
-        public SoftEntry(K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
+        public SoftValueReference(K key, Object referent, @Nullable Duration expiry) {
             super(referent, CacheImpl.this.queue);
             this.key = key;
-            this.customExpireAfterWrite = expireAfterWrite;
-            this.customExpireAfterAccess = expireAfterAccess;
-            refreshWrite();
+            if (expiry != null) {
+                startTime = Instant.now();
+                expiryAt = startTime.plus(expiry);
+            }
         }
 
         @Override
@@ -435,94 +302,63 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         public boolean isExpired() {
-            if (removed) {
-                return true;
-            }
-            if (expiredAt < 0) {
+            if (expiryAt == null) {
                 return false;
             }
-            long now = System.currentTimeMillis();
-            return now > expiredAt;
+            return Instant.now().compareTo(expiryAt) > 0;
         }
 
-        public void refreshWrite() {
-            long exp = expireAfterWrite();
-            if (exp < 0) {
-                return;
+        @Override
+        public void expire(@Nullable Duration expiry) {
+            if (expiry == null) {
+                startTime = null;
+                expiryAt = null;
+            } else {
+                startTime = Instant.now();
+                expiryAt = startTime.plus(expiry);
             }
-            this.expiredAt = System.currentTimeMillis() + exp;
-        }
-
-        public void refreshAccess() {
-            long exp = expireAfterAccess();
-            if (exp < 0) {
-                return;
-            }
-            this.expiredAt = System.currentTimeMillis() + exp;
         }
 
         @Override
-        public void setExpireAfterWrite(long expireAfterWrite) {
-            customExpireAfterWrite = expireAfterWrite;
+        public void remove(RemovalListener.Cause cause) {
+            syncCause(cause);
+            super.enqueue();
         }
 
         @Override
-        public void setExpireAfterAccess(long expireAfterAccess) {
-            customExpireAfterAccess = expireAfterAccess;
-        }
-
-        @Override
-        public long expireAfterWrite() {
-            return customExpireAfterWrite < 0 ? CacheImpl.this.expireAfterWrite : customExpireAfterWrite;
-        }
-
-        @Override
-        public long expireAfterAccess() {
-            return customExpireAfterAccess < 0 ? CacheImpl.this.expireAfterAccess : customExpireAfterAccess;
-        }
-
-        @Override
-        public void clear(RemovalListener.Cause cause) {
-            if (removed) {
-                return;
-            }
-            super.clear();
-            onRemoval(cause);
-        }
-
-        @Override
-        public void onRemoval(RemovalListener.Cause cause) {
-            if (removed) {
-                return;
-            }
+        public RemovalListener.Cause syncCause(RemovalListener.Cause cause) {
             if (CacheImpl.this.removalListener == null) {
-                removed = true;
-                return;
+                return cause;
             }
-            synchronized (SoftEntry.this) {
-                if (removed) {
-                    return;
+            RemovalListener.Cause thisCause = this.cause;
+            if (thisCause != null) {
+                return thisCause;
+            }
+            synchronized (SoftValueReference.this) {
+                RemovalListener.Cause syncCause = this.cause;
+                if (syncCause != null) {
+                    return syncCause;
                 }
-                removed = true;
-                CacheImpl.this.removalListener.onRemoval(key(), valueAs(value()), cause);
+                this.cause = cause;
+                return cause;
             }
         }
     }
 
-    private final class WeakEntry extends WeakReference<Object> implements Entry<K> {
+    private final class WeakValueReference extends WeakReference<Object> implements ValueReference<K> {
 
         private final K key;
-        private long customExpireAfterWrite;
-        private long customExpireAfterAccess;
-        private long expiredAt = -1;
-        private boolean removed = false;
+        private Instant startTime;
+        private Instant expiryAt;
+        private RemovalListener.Cause cause;
 
-        public WeakEntry(K key, Object referent, long expireAfterWrite, long expireAfterAccess) {
+        public WeakValueReference(K key, Object referent, @Nullable Duration expiry) {
             super(referent, CacheImpl.this.queue);
             this.key = key;
-            this.customExpireAfterWrite = expireAfterWrite;
-            this.customExpireAfterAccess = expireAfterAccess;
-            refreshWrite();
+            if (expiry != null) {
+                startTime = Instant.now();
+                expiryAt = startTime.plus(expiry);
+            }
         }
 
         @Override
@@ -536,76 +372,42 @@ final class CacheImpl<K, V> implements GekCache<K, V> {
         }
 
         public boolean isExpired() {
-            if (removed) {
-                return true;
-            }
-            if (expiredAt < 0) {
+            if (expiryAt == null) {
                 return false;
             }
-            long now = System.currentTimeMillis();
-            return now > expiredAt;
+            return Instant.now().compareTo(expiryAt) > 0;
         }
 
-        public void refreshWrite() {
-            long exp = expireAfterWrite();
-            if (exp < 0) {
-                return;
+        @Override
+        public void expire(@Nullable Duration expiry) {
+            if (expiry == null) {
+                startTime = null;
+                expiryAt = null;
+            } else {
+                startTime = Instant.now();
+                expiryAt = startTime.plus(expiry);
             }
-            this.expiredAt = System.currentTimeMillis() + exp;
         }
 
-        public void refreshAccess() {
-            long exp = expireAfterAccess();
-            if (exp < 0) {
-                return;
+        @Override
+        public void remove(RemovalListener.Cause cause) {
+            syncCause(cause);
+            super.enqueue();
+        }
+
+        @Override
+        public RemovalListener.Cause syncCause(RemovalListener.Cause cause) {
+            RemovalListener.Cause thisCause = this.cause;
+            if (thisCause != null) {
+                return thisCause;
             }
-            this.expiredAt = System.currentTimeMillis() + exp;
-        }
-
-        @Override
-        public void setExpireAfterWrite(long expireAfterWrite) {
-            customExpireAfterWrite = expireAfterWrite;
-        }
-
-        @Override
-        public void setExpireAfterAccess(long expireAfterAccess) {
-            customExpireAfterAccess = expireAfterAccess;
-        }
-
-        @Override
-        public long expireAfterWrite() {
-            return customExpireAfterWrite < 0 ? CacheImpl.this.expireAfterWrite : customExpireAfterWrite;
-        }
-
-        @Override
-        public long expireAfterAccess() {
-            return customExpireAfterAccess < 0 ? CacheImpl.this.expireAfterAccess : customExpireAfterAccess;
-        }
-
-        @Override
-        public void clear(RemovalListener.Cause cause) {
-            if (removed) {
-                return;
-            }
-            super.clear();
-            onRemoval(cause);
-        }
-
-        @Override
-        public void onRemoval(RemovalListener.Cause cause) {
-            if (removed) {
-                return;
-            }
-            if (CacheImpl.this.removalListener == null) {
-                removed = true;
-                return;
-            }
-            synchronized (WeakEntry.this) {
-                if (removed) {
-                    return;
+            synchronized (WeakValueReference.this) {
+                RemovalListener.Cause syncCause = this.cause;
+                if (syncCause != null) {
+                    return syncCause;
                 }
-                removed = true;
-                CacheImpl.this.removalListener.onRemoval(key(), valueAs(value()), cause);
+                this.cause = cause;
+                return cause;
             }
         }
     }

@@ -1,12 +1,11 @@
 package benchmark;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.Blackhole;
-import xyz.fslabo.common.cache.GekCache;
+import xyz.fslabo.common.cache.Cache;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,21 +22,21 @@ public class CacheJmh {
     private static final int INIT_SIZE = 1024 * 10;
     private static final int MAX_SIZE = INIT_SIZE * 2;
 
-    private GekCache<Integer, Integer> fsSoft;
-    private GekCache<Integer, Integer> fsWeak;
+    private Cache<Integer, Integer> fsSoft;
+    private Cache<Integer, Integer> fsWeak;
     private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeine;
     private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeineSoft;
     private com.github.benmanes.caffeine.cache.Cache<Integer, Integer> caffeineWeak;
-    private Cache<Integer, Integer> guava;
-    private Cache<Integer, Integer> guavaSoft;
-    private Cache<Integer, Integer> guavaWeak;
+    private com.google.common.cache.Cache<Integer, Integer> guava;
+    private com.google.common.cache.Cache<Integer, Integer> guavaSoft;
+    private com.google.common.cache.Cache<Integer, Integer> guavaWeak;
 
     @Setup(Level.Iteration)
     public void init(BenchmarkParams params) {
         if (params.getBenchmark().endsWith(".fsSoft")
             || params.getBenchmark().endsWith(".fsSoftGs")
             || params.getBenchmark().endsWith(".fsSoftFull")) {
-            fsSoft = GekCache.newBuilder()
+            fsSoft = Cache.newBuilder()
                 // .removeListener((k, v, c) -> {
                 // })
                 .softValues()
@@ -49,7 +48,7 @@ public class CacheJmh {
         }
         if (params.getBenchmark().endsWith(".fsWeak")
             || params.getBenchmark().endsWith(".fsWeakFull")) {
-            fsWeak = GekCache.newBuilder()
+            fsWeak = Cache.newBuilder()
                 // .removeListener((k, v, c) -> {
                 // })
                 .weakValues()
@@ -141,8 +140,8 @@ public class CacheJmh {
     public void fsSoft(Blackhole bh) {
         int value = next(INIT_SIZE);
         bh.consume(fsSoft.get(value));
-        bh.consume(fsSoft.get(value * 100, k -> k));
-        bh.consume(fsSoft.get(value * 100, k -> k));
+        bh.consume(fsSoft.compute(value * 100, k -> k));
+        bh.consume(fsSoft.compute(value * 100, k -> k));
     }
 
     @Benchmark
@@ -150,8 +149,8 @@ public class CacheJmh {
     public void fsSoftGs(Blackhole bh) {
         int value = nextGaussian(MAX_SIZE);
         bh.consume(fsSoft.get(value));
-        bh.consume(fsSoft.get(value * 100, k -> k));
-        bh.consume(fsSoft.get(value * 100, k -> k));
+        bh.consume(fsSoft.compute(value * 100, k -> k));
+        bh.consume(fsSoft.compute(value * 100, k -> k));
     }
 
     @Benchmark
@@ -161,8 +160,8 @@ public class CacheJmh {
         bh.consume(fsSoft.get(value));
         fsSoft.put(value, value);
         fsSoft.remove(value);
-        bh.consume(fsSoft.get(value * 100, k -> k));
-        bh.consume(fsSoft.get(value * 100, k -> k));
+        bh.consume(fsSoft.compute(value * 100, k -> k));
+        bh.consume(fsSoft.compute(value * 100, k -> k));
     }
 
     @Benchmark
@@ -170,8 +169,8 @@ public class CacheJmh {
     public void fsWeak(Blackhole bh) {
         int value = next(INIT_SIZE);
         bh.consume(fsWeak.get(value));
-        bh.consume(fsWeak.get(value * 100, k -> k));
-        bh.consume(fsWeak.get(value * 100, k -> k));
+        bh.consume(fsWeak.compute(value * 100, k -> k));
+        bh.consume(fsWeak.compute(value * 100, k -> k));
     }
 
     @Benchmark
@@ -181,8 +180,8 @@ public class CacheJmh {
         bh.consume(fsWeak.get(value));
         fsWeak.put(value, value);
         fsWeak.remove(value);
-        bh.consume(fsWeak.get(value * 100, k -> k));
-        bh.consume(fsWeak.get(value * 100, k -> k));
+        bh.consume(fsWeak.compute(value * 100, k -> k));
+        bh.consume(fsWeak.compute(value * 100, k -> k));
     }
 
 

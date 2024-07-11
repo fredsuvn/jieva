@@ -6,11 +6,11 @@ import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.GekCheck;
-import xyz.fslabo.common.ref.BooleanVar;
-import xyz.fslabo.common.ref.Var;
-import xyz.fslabo.common.ref.LongVar;
-import xyz.fslabo.common.cache.GekCache;
+import xyz.fslabo.common.cache.Cache;
 import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.ref.BooleanVar;
+import xyz.fslabo.common.ref.LongVar;
+import xyz.fslabo.common.ref.Var;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -293,7 +293,7 @@ public interface GekFileCache {
         }
 
         /**
-         * Sets cache generator, default uses {@link GekCache#softCache(GekCache.RemovalListener)}.
+         * Sets cache generator, default uses {@link Cache#softCache(Cache.RemovalListener)}.
          *
          * @param chunkCacheGenerator cache generator
          * @return this builder
@@ -378,10 +378,10 @@ public interface GekFileCache {
 
         private static final class ChunkCacheImpl implements ChunkCache {
 
-            private final GekCache<ChunkIndex, Chunk> cache;
+            private final Cache<ChunkIndex, Chunk> cache;
 
             private ChunkCacheImpl(ChunkCacheGenerator.RemoveListener removeListener) {
-                this.cache = GekCache.softCache((k, v, c) ->
+                this.cache = Cache.softCache((k, v, c) ->
                     removeListener.onCacheRemove(k, ChunkCacheImpl.this));
             }
 
@@ -390,7 +390,7 @@ public interface GekFileCache {
                 if (function == null) {
                     return cache.get(key);
                 }
-                return cache.get(key, function);
+                return cache.compute(key, function);
             }
 
             @Override

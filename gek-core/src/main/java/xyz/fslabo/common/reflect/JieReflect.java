@@ -4,7 +4,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.OutParam;
 import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.cache.GekCache;
+import xyz.fslabo.common.cache.Cache;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class JieReflect {
 
     private static final Type[] EMPTY_TYPE_ARRAY = {};
-    private static final GekCache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = GekCache.softCache();
+    private static final Cache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = Cache.softCache();
 
     /**
      * Returns last name of given class. The last name is sub-string after last dot, for example:
@@ -55,18 +55,6 @@ public class JieReflect {
             return (Class<?>) ((ParameterizedType) type).getRawType();
         }
         return null;
-    }
-
-    /**
-     * Returns actual type argument of given parameterized type at specified index
-     *
-     * @param type  given parameterized type
-     * @param index specified index
-     * @return actual type argument at specified index
-     */
-    public static Type getActualTypeArgument(ParameterizedType type, int index) {
-        Type[] args = type.getActualTypeArguments();
-        return args[index];
     }
 
     /**
@@ -552,195 +540,16 @@ public class JieReflect {
     }
 
     /**
-     * Returns whether target type can be assigned by source type with {@link Class#isAssignableFrom(Class)}.
-     * If given type is primitive, it will be converted to its wrapper type.
+     * Returns whether a type can be assigned by another type.
+     * This method is {@link Type} version of {@link Class#isAssignableFrom(Class)}, supporting {@link Class},
+     * {@link ParameterizedType}, {@link WildcardType}, {@link TypeVariable} and {@link GenericArrayType}.
      *
-     * @param targetType target type
-     * @param sourceType source type
-     * @return whether target type can be assigned by source type
+     * @param assigned the type to be assigned
+     * @param assignee the assignee type
+     * @return whether a type can be assigned by another type
      */
-    public static boolean isAssignable(Class<?> targetType, Class<?> sourceType) {
-        if (targetType.isPrimitive() || sourceType.isPrimitive()) {
-            return toWrapperClass(targetType).isAssignableFrom(toWrapperClass(sourceType));
-        }
-        return targetType.isAssignableFrom(sourceType);
-    }
-
-    /**
-     * Returns whether target type can be assigned by source type.
-     * If given type is primitive, it will be converted to its wrapper type.
-     * This method is similar as {@link #isAssignable(Class, Class)} but supports {@link Type}.
-     * <p>
-     * Note in this type, {@link Object} can be assigned from any type,
-     * {@link WildcardType} can not assign to or be assigned from any type.
-     *
-     * @param targetType target type
-     * @param sourceType source type
-     * @return whether target type can be assigned by source type
-     */
-    public static boolean isAssignable(Type targetType, Type sourceType) {
-        if (Objects.equals(targetType, sourceType) || Objects.equals(targetType, Object.class)) {
-            return true;
-        }
-        if ((targetType instanceof WildcardType)
-            || (sourceType instanceof WildcardType)) {
-            return false;
-        }
-        if (targetType instanceof Class<?>) {
-            Class<?> c1 = (Class<?>) targetType;
-            if (sourceType instanceof Class<?>) {
-                Class<?> c2 = (Class<?>) sourceType;
-                return isAssignable(c1, c2);
-            }
-            if (sourceType instanceof ParameterizedType) {
-                ParameterizedType p2 = (ParameterizedType) sourceType;
-                Class<?> r2 = getRawType(p2);
-                if (r2 == null) {
-                    return false;
-                }
-                return isAssignable(c1, r2);
-            }
-            if (sourceType instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
-                Type[] bounds = v2.getBounds();
-                for (Type bound : bounds) {
-                    if (isAssignable(targetType, bound)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            if (sourceType instanceof GenericArrayType) {
-                if (!c1.isArray()) {
-                    return false;
-                }
-                GenericArrayType g2 = (GenericArrayType) sourceType;
-                Class<?> gc2 = getRawType(g2.getGenericComponentType());
-                if (gc2 == null) {
-                    return false;
-                }
-                return isAssignable(c1.getComponentType(), gc2);
-            }
-            return false;
-        }
-        if (targetType instanceof ParameterizedType) {
-            ParameterizedType p1 = (ParameterizedType) targetType;
-            if (sourceType instanceof Class<?>) {
-                ParameterizedType p2 = getGenericSuperType(sourceType, (Class<?>) p1.getRawType());
-                if (p2 == null) {
-                    return false;
-                }
-                return isAssignable(p1, p2);
-            }
-            if (sourceType instanceof ParameterizedType) {
-                ParameterizedType p2 = (ParameterizedType) sourceType;
-                if (Objects.equals(p1.getRawType(), p2.getRawType())) {
-                    Type[] a1 = p1.getActualTypeArguments();
-                    Type[] a2 = p2.getActualTypeArguments();
-                    if (a1 == null || a2 == null || a1.length != a2.length) {
-                        return false;
-                    }
-                    for (int i = 0; i < a1.length; i++) {
-                        Type at1 = a1[i];
-                        Type at2 = a2[i];
-                        if (!isAssignableFromForParameterizedType(at1, at2)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-                ParameterizedType sp2 = getGenericSuperType(p2, (Class<?>) p1.getRawType());
-                if (sp2 == null) {
-                    return false;
-                }
-                return isAssignable(p1, sp2);
-            }
-            if (sourceType instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
-                Type[] bounds = v2.getBounds();
-                for (Type bound : bounds) {
-                    if (isAssignable(targetType, bound)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            return false;
-        }
-        if (targetType instanceof TypeVariable<?>) {
-            TypeVariable<?> v1 = (TypeVariable<?>) targetType;
-            if (sourceType instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
-                Type[] bounds = v2.getBounds();
-                for (Type bound : bounds) {
-                    if (isAssignable(targetType, bound)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }
-        if (targetType instanceof GenericArrayType) {
-            GenericArrayType g1 = (GenericArrayType) targetType;
-            if (sourceType instanceof Class<?>) {
-                Class<?> c2 = (Class<?>) sourceType;
-                if (!c2.isArray()) {
-                    return false;
-                }
-                Class<?> tc1 = getRawType(g1.getGenericComponentType());
-                if (tc1 == null) {
-                    return false;
-                }
-                Class<?> tc2 = c2.getComponentType();
-                return isAssignable(tc1, tc2);
-            }
-            if (sourceType instanceof GenericArrayType) {
-                GenericArrayType g2 = (GenericArrayType) sourceType;
-                Type tc1 = g1.getGenericComponentType();
-                Type tc2 = g2.getGenericComponentType();
-                return isAssignable(tc1, tc2);
-            }
-            return false;
-        }
-        return false;
-    }
-
-    private static boolean isAssignableFromForParameterizedType(Type t1, Type t2) {
-        if (Objects.equals(t1, t2)) {
-            return true;
-        }
-        if (t1 instanceof WildcardType) {
-            WildcardType w1 = (WildcardType) t1;
-            Type upperBound = getUpperBound(w1);
-            //? extends
-            if (upperBound != null) {
-                if (t2 instanceof WildcardType) {
-                    WildcardType w2 = (WildcardType) t2;
-                    Type upperBound2 = getUpperBound(w2);
-                    //? extends
-                    if (upperBound2 != null) {
-                        return isAssignable(upperBound, upperBound2);
-                    }
-                    return false;
-                }
-                return isAssignable(upperBound, t2);
-            }
-            Type lowerBound = getLowerBound(w1);
-            //? super
-            if (lowerBound != null) {
-                if (t2 instanceof WildcardType) {
-                    WildcardType w2 = (WildcardType) t2;
-                    Type lowerBound2 = getLowerBound(w2);
-                    //? super
-                    if (lowerBound2 != null) {
-                        return isAssignable(lowerBound2, lowerBound);
-                    }
-                    return false;
-                }
-                return isAssignable(t2, lowerBound);
-            }
-        }
-        return false;
+    public static boolean isAssignable(Type assigned, Type assignee) {
+        return TypePattern.isAssignable(assigned, assignee);
     }
 
     /**
@@ -830,7 +639,7 @@ public class JieReflect {
      * @return a mapping of type parameters for given type
      */
     public static Map<TypeVariable<?>, Type> getTypeParameterMapping(Type type) {
-        return TYPE_PARAMETER_MAPPING_CACHE.get(type, it -> {
+        return TYPE_PARAMETER_MAPPING_CACHE.compute(type, it -> {
             Map<TypeVariable<?>, Type> result = new HashMap<>();
             parseTypeParameterMapping(type, result);
             return Collections.unmodifiableMap(result);

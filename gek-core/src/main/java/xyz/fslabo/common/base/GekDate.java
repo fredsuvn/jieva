@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.cache.GekCache;
+import xyz.fslabo.common.cache.Cache;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -52,7 +52,7 @@ public class GekDate {
      */
     public static final DateTimeFormatter FORMATTER_OFFSET = DateTimeFormatter.ofPattern(PATTERN_OFFSET);
 
-    private static final GekCache<CharSequence, DateTimeFormatter> FORMATTER_CACHE = GekCache.softCache();
+    private static final Cache<CharSequence, DateTimeFormatter> FORMATTER_CACHE = Cache.softCache();
 
     /**
      * Returns {@link DateFormat} of given pattern.
@@ -78,7 +78,7 @@ public class GekDate {
         } else if (GekString.charEquals(PATTERN_OFFSET, pattern)) {
             return FORMATTER_OFFSET;
         } else {
-            return FORMATTER_CACHE.get(pattern, p -> DateTimeFormatter.ofPattern(p.toString()));
+            return FORMATTER_CACHE.compute(pattern, p -> DateTimeFormatter.ofPattern(p.toString()));
         }
     }
 

@@ -1,6 +1,6 @@
 package xyz.fslabo.common.bean;
 
-import xyz.fslabo.common.cache.GekCache;
+import xyz.fslabo.common.cache.Cache;
 
 import java.lang.reflect.Type;
 
@@ -9,11 +9,11 @@ final class ProviderImpl implements BeanProvider {
     static ProviderImpl DEFAULT_PROVIDER = new ProviderImpl(BeanResolver.defaultResolver());
 
     private final BeanResolver resolver;
-    private final GekCache<Type, BeanInfo> cache;
+    private final Cache<Type, BeanInfo> cache;
 
     ProviderImpl(BeanResolver resolver) {
         this.resolver = resolver;
-        this.cache = GekCache.softCache();
+        this.cache = Cache.softCache();
     }
 
     @Override
@@ -21,6 +21,6 @@ final class ProviderImpl implements BeanProvider {
         if (cache == null) {
             return resolver.resolve(type);
         }
-        return cache.get(type, resolver::resolve);
+        return cache.compute(type, resolver::resolve);
     }
 }
