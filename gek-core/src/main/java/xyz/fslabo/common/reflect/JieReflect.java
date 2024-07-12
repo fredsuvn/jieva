@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public class JieReflect {
 
-    private static final Type[] EMPTY_TYPE_ARRAY = {};
+    private static final Type[] SINGLETON_OBJECT_CLASS_ARRAY = {Object.class};
     private static final Cache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = Cache.softCache();
 
     /**
@@ -154,26 +154,26 @@ public class JieReflect {
 
     /**
      * Returns upper bounds of given type (? extends).
-     * Note that if no upper bound is explicitly declared, return an empty array.
+     * Note that if no upper bound is explicitly declared, return an array with singleton element {@code Object.class}.
      *
      * @param type given type
      * @return upper bounds of given type
      */
     public static Type[] getUpperBounds(WildcardType type) {
         Type[] bounds = type.getUpperBounds();
-        return Jie.orDefault(bounds, EMPTY_TYPE_ARRAY);
+        return JieArray.isEmpty(bounds) ? SINGLETON_OBJECT_CLASS_ARRAY.clone() : bounds;
     }
 
     /**
      * Returns upper bounds of given type (T extends).
-     * Note that if no upper bound is explicitly declared, return an empty array.
+     * Note that if no upper bound is explicitly declared, return an array with singleton element {@code Object.class}.
      *
      * @param type given type
      * @return upper bounds of given type
      */
     public static Type[] getUpperBounds(TypeVariable<?> type) {
         Type[] bounds = type.getBounds();
-        return Jie.orDefault(bounds, EMPTY_TYPE_ARRAY);
+        return JieArray.isEmpty(bounds) ? SINGLETON_OBJECT_CLASS_ARRAY.clone() : bounds;
     }
 
     /**
@@ -536,7 +536,7 @@ public class JieReflect {
      * @return whether the give matched type matches the specified pattern
      */
     public static boolean matches(Type pattern, Type matched) {
-        return TypePattern.matches(pattern, matched);
+        return TypePattern.defaultPattern().matches(pattern, matched);
     }
 
     /**
@@ -549,7 +549,7 @@ public class JieReflect {
      * @return whether a type can be assigned by another type
      */
     public static boolean isAssignable(Type assigned, Type assignee) {
-        return TypePattern.isAssignable(assigned, assignee);
+        return TypePattern.defaultPattern().isAssignable(assigned, assignee);
     }
 
     /**

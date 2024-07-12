@@ -1,405 +1,305 @@
 package xyz.fslabo.common.reflect;
 
-import xyz.fslabo.common.base.Jie;
-
 import java.lang.reflect.*;
 import java.util.Objects;
 
-final class TypePattern {
+interface TypePattern {
 
-    private static final Type[] EMPTY_TYPE_ARRAY = {};
+    static TypePattern defaultPattern() {
+        return TypePatternImpl.INSTANCE;
+    }
 
-    static boolean matches(Type pattern, Type matched) {
+    default boolean matches(Type pattern, Type matched) {
         if (Objects.equals(pattern, matched)) {
             return true;
         }
         if (pattern instanceof Class<?>) {
-            Class<?> p = (Class<?>) pattern;
             if (matched instanceof Class<?>) {
-                return false;
+                return matchesClassToClass((Class<?>) pattern, (Class<?>) matched);
             }
             if (matched instanceof ParameterizedType) {
-                ParameterizedType m = (ParameterizedType) matched;
-                Class<?> mRaw = (Class<?>) m.getRawType();
-                if (!Objects.equals(p, mRaw)) {
-                    return false;
-                }
-                Type[] args = m.getActualTypeArguments();
-                return matchesTypeArgs(EMPTY_TYPE_ARRAY, args);
-            }
-            if (matched instanceof TypeVariable<?>) {
-                return false;
+                return matchesClassToParameterized((Class<?>) pattern, (ParameterizedType) matched);
             }
             if (matched instanceof WildcardType) {
-                return matchesTypeWildcard(pattern, (WildcardType) matched);
+                return matchesClassToWildcard((Class<?>) pattern, (WildcardType) matched);
+            }
+            if (matched instanceof TypeVariable<?>) {
+                return matchesClassToTypeVariable((Class<?>) pattern, (TypeVariable<?>) matched);
             }
             if (matched instanceof GenericArrayType) {
-                GenericArrayType m = (GenericArrayType) matched;
-                if (!p.isArray()) {
-                    return false;
-                }
-                Type mComponent = m.getGenericComponentType();
-                Type pComponent = p.getComponentType();
-                return matches(pComponent, mComponent);
+                return matchesClassToGenericArray((Class<?>) pattern, (GenericArrayType) matched);
             }
             return false;
         }
         if (pattern instanceof ParameterizedType) {
-            ParameterizedType p = (ParameterizedType) pattern;
             if (matched instanceof Class<?>) {
-                Class<?> m = (Class<?>) matched;
-                Class<?> pRaw = (Class<?>) p.getRawType();
-                if (!Objects.equals(pRaw, m)) {
-                    return false;
-                }
-                Type[] args = p.getActualTypeArguments();
-                return matchesTypeArgs(args, EMPTY_TYPE_ARRAY);
+                return matchesParameterizedToClass((ParameterizedType) pattern, (Class<?>) matched);
             }
             if (matched instanceof ParameterizedType) {
-                ParameterizedType m = (ParameterizedType) matched;
-                Class<?> pRaw = (Class<?>) p.getRawType();
-                Class<?> mRaw = (Class<?>) m.getRawType();
-                if (!Objects.equals(pRaw, mRaw)) {
-                    return false;
-                }
-                Type[] pArgs = Jie.orDefault(p.getActualTypeArguments(), EMPTY_TYPE_ARRAY);
-                Type[] mArgs = Jie.orDefault(m.getActualTypeArguments(), EMPTY_TYPE_ARRAY);
-                return matchesTypeArgs(pArgs, mArgs);
-            }
-            if (matched instanceof TypeVariable<?>) {
-                return false;
+                return matchesParameterizedToParameterized((ParameterizedType) pattern, (ParameterizedType) matched);
             }
             if (matched instanceof WildcardType) {
-                return matchesTypeWildcard(pattern, (WildcardType) matched);
+                return matchesParameterizedToWildcard((ParameterizedType) pattern, (WildcardType) matched);
+            }
+            if (matched instanceof TypeVariable<?>) {
+                return matchesParameterizedToTypeVariable((ParameterizedType) pattern, (TypeVariable<?>) matched);
             }
             if (matched instanceof GenericArrayType) {
-                return false;
+                return matchesParameterizedToGenericArray((ParameterizedType) pattern, (GenericArrayType) matched);
+            }
+            return false;
+        }
+        if (pattern instanceof Wildcard) {
+            if (matched instanceof Class<?>) {
+                return matchesWildcardToClass((Wildcard) pattern, (Class<?>) matched);
+            }
+            if (matched instanceof ParameterizedType) {
+                return matchesWildcardToParameterized((Wildcard) pattern, (ParameterizedType) matched);
+            }
+            if (matched instanceof WildcardType) {
+                return matchesWildcardToWildcard((Wildcard) pattern, (WildcardType) matched);
+            }
+            if (matched instanceof TypeVariable<?>) {
+                return matchesWildcardToTypeVariable((Wildcard) pattern, (TypeVariable<?>) matched);
+            }
+            if (matched instanceof GenericArrayType) {
+                return matchesWildcardToGenericArray((Wildcard) pattern, (GenericArrayType) matched);
             }
             return false;
         }
         if (pattern instanceof TypeVariable<?>) {
-            TypeVariable<?> p = (TypeVariable<?>) pattern;
             if (matched instanceof Class<?>) {
-                return matchesTypeVariable(p, matched);
+                return matchesTypeVariableToClass((TypeVariable<?>) pattern, (Class<?>) matched);
             }
             if (matched instanceof ParameterizedType) {
-                return matchesTypeVariable(p, matched);
-            }
-            if (matched instanceof TypeVariable<?>) {
-                TypeVariable<?> m = (TypeVariable<?>) matched;
-                Type[] pBounds = JieReflect.getUpperBounds(p);
-                Type[] mBounds = JieReflect.getUpperBounds(m);
-                for (Type pu : pBounds) {
-                    boolean ok = false;
-                    for (Type mu : mBounds) {
-                        if (isAssignable(pu, mu)) {
-                            ok = true;
-                            break;
-                        }
-                    }
-                    if (!ok) {
-                        return false;
-                    }
-                }
-                return true;
+                return matchesTypeVariableToParameterized((TypeVariable<?>) pattern, (ParameterizedType) matched);
             }
             if (matched instanceof WildcardType) {
-                WildcardType m = (WildcardType) matched;
-                Type mUpper = JieReflect.getUpperBound(m);
-                Type[] pUpper = JieReflect.getUpperBounds(p);
-                for (Type pu : pUpper) {
-                    if (!isAssignable(pu, mUpper)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            if (matched instanceof GenericArrayType) {
-                return matchesTypeVariable(p, matched);
-            }
-            return false;
-        }
-        if (pattern instanceof WildcardType) {
-            WildcardType p = (WildcardType) pattern;
-            if (matched instanceof Class<?>) {
-                return matchesWildcardType(p, matched);
-            }
-            if (matched instanceof ParameterizedType) {
-                return matchesWildcardType(p, matched);
+                return matchesTypeVariableToWildcard((TypeVariable<?>) pattern, (WildcardType) matched);
             }
             if (matched instanceof TypeVariable<?>) {
-                TypeVariable<?> m = (TypeVariable<?>) matched;
-                Type pLower = JieReflect.getLowerBound(p);
-                if (pLower != null) {
-                    return false;
-                }
-                Type[] mUppers = JieReflect.getUpperBounds(m);
-                Type pUpper = JieReflect.getUpperBound(p);
-                for (Type mu : mUppers) {
-                    if (isAssignable(pUpper, mu)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            if (matched instanceof WildcardType) {
-                WildcardType m = (WildcardType) matched;
-                Type pUpper = JieReflect.getUpperBound(p);
-                Type mUpper = JieReflect.getUpperBound(m);
-                if (!isAssignable(pUpper, mUpper)) {
-                    return false;
-                }
-                Type pLower = JieReflect.getLowerBound(p);
-                if (pLower == null) {
-                    return true;
-                }
-                Type mLower = JieReflect.getLowerBound(m);
-                if (mLower == null) {
-                    return false;
-                }
-                return isAssignable(mLower, pLower);
+                return matchesTypeVariableToTypeVariable((TypeVariable<?>) pattern, (TypeVariable<?>) matched);
             }
             if (matched instanceof GenericArrayType) {
-                return matchesWildcardType(p, matched);
+                return matchesTypeVariableToGenericArray((TypeVariable<?>) pattern, (GenericArrayType) matched);
             }
             return false;
         }
         if (pattern instanceof GenericArrayType) {
-            GenericArrayType p = (GenericArrayType) pattern;
             if (matched instanceof Class<?>) {
-                Class<?> m = (Class<?>) matched;
-                if (!m.isArray()) {
-                    return false;
-                }
-                Type pComponent = p.getGenericComponentType();
-                Type mComponent = m.getComponentType();
-                return matches(pComponent, mComponent);
+                return matchesGenericArrayToClass((GenericArrayType) pattern, (Class<?>) matched);
             }
             if (matched instanceof ParameterizedType) {
-                return false;
-            }
-            if (matched instanceof TypeVariable<?>) {
-                return false;
+                return matchesGenericArrayToParameterized((GenericArrayType) pattern, (ParameterizedType) matched);
             }
             if (matched instanceof WildcardType) {
-                return matchesTypeWildcard(pattern, (WildcardType) matched);
+                return matchesGenericArrayToWildcard((GenericArrayType) pattern, (WildcardType) matched);
+            }
+            if (matched instanceof TypeVariable<?>) {
+                return matchesGenericArrayToTypeVariable((GenericArrayType) pattern, (TypeVariable<?>) matched);
             }
             if (matched instanceof GenericArrayType) {
-                GenericArrayType m = (GenericArrayType) matched;
-                Type pComponent = p.getGenericComponentType();
-                Type mComponent = m.getGenericComponentType();
-                return matches(pComponent, mComponent);
+                return matchesGenericArrayToGenericArray((GenericArrayType) pattern, (GenericArrayType) matched);
             }
             return false;
         }
         return false;
     }
 
-    private static boolean matchesTypeArgs(Type[] pArgs, Type[] mArgs) {
-        int size = Math.max(pArgs.length, mArgs.length);
-        for (int i = 0; i < size; i++) {
-            Type p = i < pArgs.length ? pArgs[i] : JieType.questionMark();
-            Type m = i < mArgs.length ? mArgs[i] : JieType.questionMark();
-            if (!matches(p, m)) {
-                return false;
-            }
-        }
-        return true;
-    }
+    boolean matchesClassToClass(Class<?> pattern, Class<?> matched);
 
-    private static boolean matchesTypeWildcard(Type pattern, WildcardType matched) {
-        Type mLower = JieReflect.getLowerBound(matched);
-        if (mLower == null) {
-            return false;
-        }
-        Type mUpper = JieReflect.getUpperBound(matched);
-        return matches(pattern, mLower) && matches(pattern, mUpper);
-    }
+    boolean matchesClassToParameterized(Class<?> pattern, ParameterizedType matched);
 
-    private static boolean matchesTypeVariable(TypeVariable<?> pattern, Type type) {
-        Type[] upperBounds = JieReflect.getUpperBounds(pattern);
-        for (Type ub : upperBounds) {
-            if (!isAssignable(ub, type)) {
-                return false;
-            }
-        }
-        return true;
-    }
+    boolean matchesClassToWildcard(Class<?> pattern, WildcardType matched);
 
-    private static boolean matchesWildcardType(WildcardType pattern, Type type) {
-        Type upper = JieReflect.getUpperBound(pattern);
-        if (!isAssignable(upper, type)) {
-            return false;
-        }
-        Type lower = JieReflect.getLowerBound(pattern);
-        if (lower == null) {
+    boolean matchesClassToTypeVariable(Class<?> pattern, TypeVariable<?> matched);
+
+    boolean matchesClassToGenericArray(Class<?> pattern, GenericArrayType matched);
+
+    boolean matchesParameterizedToClass(ParameterizedType pattern, Class<?> matched);
+
+    boolean matchesParameterizedToParameterized(ParameterizedType pattern, ParameterizedType matched);
+
+    boolean matchesParameterizedToWildcard(ParameterizedType pattern, WildcardType matched);
+
+    boolean matchesParameterizedToTypeVariable(ParameterizedType pattern, TypeVariable<?> matched);
+
+    boolean matchesParameterizedToGenericArray(ParameterizedType pattern, GenericArrayType matched);
+
+    boolean matchesWildcardToClass(Wildcard pattern, Class<?> matched);
+
+    boolean matchesWildcardToParameterized(Wildcard pattern, ParameterizedType matched);
+
+    boolean matchesWildcardToWildcard(Wildcard pattern, WildcardType matched);
+
+    boolean matchesWildcardToTypeVariable(Wildcard pattern, TypeVariable<?> matched);
+
+    boolean matchesWildcardToGenericArray(Wildcard pattern, GenericArrayType matched);
+
+    boolean matchesTypeVariableToClass(TypeVariable<?> pattern, Class<?> matched);
+
+    boolean matchesTypeVariableToParameterized(TypeVariable<?> pattern, ParameterizedType matched);
+
+    boolean matchesTypeVariableToWildcard(TypeVariable<?> pattern, WildcardType matched);
+
+    boolean matchesTypeVariableToTypeVariable(TypeVariable<?> pattern, TypeVariable<?> matched);
+
+    boolean matchesTypeVariableToGenericArray(TypeVariable<?> pattern, GenericArrayType matched);
+
+    boolean matchesGenericArrayToClass(GenericArrayType pattern, Class<?> matched);
+
+    boolean matchesGenericArrayToParameterized(GenericArrayType pattern, ParameterizedType matched);
+
+    boolean matchesGenericArrayToWildcard(GenericArrayType pattern, WildcardType matched);
+
+    boolean matchesGenericArrayToTypeVariable(GenericArrayType pattern, TypeVariable<?> matched);
+
+    boolean matchesGenericArrayToGenericArray(GenericArrayType pattern, GenericArrayType matched);
+
+    default boolean isAssignable(Type assigned, Type assignee) {
+        if (Objects.equals(assigned, assignee)) {
             return true;
         }
-        return isAssignable(type, lower);
-    }
-
-   static boolean isAssignable(Type targetType, Type sourceType) {
-        if (Objects.equals(targetType, sourceType) || Objects.equals(targetType, Object.class)) {
-            return true;
-        }
-        if ((targetType instanceof WildcardType)
-            || (sourceType instanceof WildcardType)) {
-            return false;
-        }
-        if (targetType instanceof Class<?>) {
-            Class<?> c1 = (Class<?>) targetType;
-            if (sourceType instanceof Class<?>) {
-                Class<?> c2 = (Class<?>) sourceType;
-                return isAssignable2(c1, c2);
+        if (assigned instanceof Class<?>) {
+            if (assignee instanceof Class<?>) {
+                return isAssignableClassToClass((Class<?>) assigned, (Class<?>) assignee);
             }
-            if (sourceType instanceof ParameterizedType) {
-                ParameterizedType p2 = (ParameterizedType) sourceType;
-                Class<?> r2 = getRawType(p2);
-                if (r2 == null) {
-                    return false;
-                }
-                return isAssignable2(c1, r2);
+            if (assignee instanceof ParameterizedType) {
+                return isAssignableClassToParameterized((Class<?>) assigned, (ParameterizedType) assignee);
             }
-            if (sourceType instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
-                Type[] bounds = v2.getBounds();
-                for (Type bound : bounds) {
-                    if (isAssignable(targetType, bound)) {
-                        return true;
-                    }
-                }
-                return false;
+            if (assignee instanceof WildcardType) {
+                return isAssignableClassToWildcard((Class<?>) assigned, (WildcardType) assignee);
             }
-            if (sourceType instanceof GenericArrayType) {
-                if (!c1.isArray()) {
-                    return false;
-                }
-                GenericArrayType g2 = (GenericArrayType) sourceType;
-                Class<?> gc2 = getRawType(g2.getGenericComponentType());
-                if (gc2 == null) {
-                    return false;
-                }
-                return isAssignable2(c1.getComponentType(), gc2);
+            if (assignee instanceof TypeVariable<?>) {
+                return isAssignableClassToTypeVariable((Class<?>) assigned, (TypeVariable<?>) assignee);
+            }
+            if (assignee instanceof GenericArrayType) {
+                return isAssignableClassToGenericArray((Class<?>) assigned, (GenericArrayType) assignee);
             }
             return false;
         }
-        if (targetType instanceof ParameterizedType) {
-            ParameterizedType p1 = (ParameterizedType) targetType;
-            if (sourceType instanceof Class<?>) {
-                ParameterizedType p2 = getGenericSuperType(sourceType, (Class<?>) p1.getRawType());
-                if (p2 == null) {
-                    return false;
-                }
-                return isAssignable(p1, p2);
+        if (assigned instanceof ParameterizedType) {
+            if (assignee instanceof Class<?>) {
+                return isAssignableParameterizedToClass((ParameterizedType) assigned, (Class<?>) assignee);
             }
-            if (sourceType instanceof ParameterizedType) {
-                ParameterizedType p2 = (ParameterizedType) sourceType;
-                if (Objects.equals(p1.getRawType(), p2.getRawType())) {
-                    Type[] a1 = p1.getActualTypeArguments();
-                    Type[] a2 = p2.getActualTypeArguments();
-                    if (a1 == null || a2 == null || a1.length != a2.length) {
-                        return false;
-                    }
-                    for (int i = 0; i < a1.length; i++) {
-                        Type at1 = a1[i];
-                        Type at2 = a2[i];
-                        if (!isAssignableFromForParameterizedType(at1, at2)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-                ParameterizedType sp2 = getGenericSuperType(p2, (Class<?>) p1.getRawType());
-                if (sp2 == null) {
-                    return false;
-                }
-                return isAssignable(p1, sp2);
+            if (assignee instanceof ParameterizedType) {
+                return isAssignableParameterizedToParameterized((ParameterizedType) assigned, (ParameterizedType) assignee);
             }
-            if (sourceType instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
-                Type[] bounds = v2.getBounds();
-                for (Type bound : bounds) {
-                    if (isAssignable(targetType, bound)) {
-                        return true;
-                    }
-                }
-                return false;
+            if (assignee instanceof WildcardType) {
+                return isAssignableParameterizedToWildcard((ParameterizedType) assigned, (WildcardType) assignee);
+            }
+            if (assignee instanceof TypeVariable<?>) {
+                return isAssignableParameterizedToTypeVariable((ParameterizedType) assigned, (TypeVariable<?>) assignee);
+            }
+            if (assignee instanceof GenericArrayType) {
+                return isAssignableParameterizedToGenericArray((ParameterizedType) assigned, (GenericArrayType) assignee);
             }
             return false;
         }
-        if (targetType instanceof TypeVariable<?>) {
-            TypeVariable<?> v1 = (TypeVariable<?>) targetType;
-            if (sourceType instanceof TypeVariable<?>) {
-                TypeVariable<?> v2 = (TypeVariable<?>) sourceType;
-                Type[] bounds = v2.getBounds();
-                for (Type bound : bounds) {
-                    if (isAssignable(targetType, bound)) {
-                        return true;
-                    }
-                }
-                return false;
+        if (assigned instanceof Wildcard) {
+            if (assignee instanceof Class<?>) {
+                return isAssignableWildcardToClass((Wildcard) assigned, (Class<?>) assignee);
             }
+            if (assignee instanceof ParameterizedType) {
+                return isAssignableWildcardToParameterized((Wildcard) assigned, (ParameterizedType) assignee);
+            }
+            if (assignee instanceof WildcardType) {
+                return isAssignableWildcardToWildcard((Wildcard) assigned, (WildcardType) assignee);
+            }
+            if (assignee instanceof TypeVariable<?>) {
+                return isAssignableWildcardToTypeVariable((Wildcard) assigned, (TypeVariable<?>) assignee);
+            }
+            if (assignee instanceof GenericArrayType) {
+                return isAssignableWildcardToGenericArray((Wildcard) assigned, (GenericArrayType) assignee);
+            }
+            return false;
         }
-        if (targetType instanceof GenericArrayType) {
-            GenericArrayType g1 = (GenericArrayType) targetType;
-            if (sourceType instanceof Class<?>) {
-                Class<?> c2 = (Class<?>) sourceType;
-                if (!c2.isArray()) {
-                    return false;
-                }
-                Class<?> tc1 = getRawType(g1.getGenericComponentType());
-                if (tc1 == null) {
-                    return false;
-                }
-                Class<?> tc2 = c2.getComponentType();
-                return isAssignable2(tc1, tc2);
+        if (assigned instanceof TypeVariable<?>) {
+            if (assignee instanceof Class<?>) {
+                return isAssignableTypeVariableToClass((TypeVariable<?>) assigned, (Class<?>) assignee);
             }
-            if (sourceType instanceof GenericArrayType) {
-                GenericArrayType g2 = (GenericArrayType) sourceType;
-                Type tc1 = g1.getGenericComponentType();
-                Type tc2 = g2.getGenericComponentType();
-                return isAssignable(tc1, tc2);
+            if (assignee instanceof ParameterizedType) {
+                return isAssignableTypeVariableToParameterized((TypeVariable<?>) assigned, (ParameterizedType) assignee);
+            }
+            if (assignee instanceof WildcardType) {
+                return isAssignableTypeVariableToWildcard((TypeVariable<?>) assigned, (WildcardType) assignee);
+            }
+            if (assignee instanceof TypeVariable<?>) {
+                return isAssignableTypeVariableToTypeVariable((TypeVariable<?>) assigned, (TypeVariable<?>) assignee);
+            }
+            if (assignee instanceof GenericArrayType) {
+                return isAssignableTypeVariableToGenericArray((TypeVariable<?>) assigned, (GenericArrayType) assignee);
+            }
+            return false;
+        }
+        if (assigned instanceof GenericArrayType) {
+            if (assignee instanceof Class<?>) {
+                return isAssignableGenericArrayToClass((GenericArrayType) assigned, (Class<?>) assignee);
+            }
+            if (assignee instanceof ParameterizedType) {
+                return isAssignableGenericArrayToParameterized((GenericArrayType) assigned, (ParameterizedType) assignee);
+            }
+            if (assignee instanceof WildcardType) {
+                return isAssignableGenericArrayToWildcard((GenericArrayType) assigned, (WildcardType) assignee);
+            }
+            if (assignee instanceof TypeVariable<?>) {
+                return isAssignableGenericArrayToTypeVariable((GenericArrayType) assigned, (TypeVariable<?>) assignee);
+            }
+            if (assignee instanceof GenericArrayType) {
+                return isAssignableGenericArrayToGenericArray((GenericArrayType) assigned, (GenericArrayType) assignee);
             }
             return false;
         }
         return false;
     }
 
-    private static boolean isAssignableFromForParameterizedType(Type t1, Type t2) {
-        if (Objects.equals(t1, t2)) {
-            return true;
-        }
-        if (t1 instanceof WildcardType) {
-            WildcardType w1 = (WildcardType) t1;
-            Type upperBound = getUpperBound(w1);
-            //? extends
-            if (upperBound != null) {
-                if (t2 instanceof WildcardType) {
-                    WildcardType w2 = (WildcardType) t2;
-                    Type upperBound2 = getUpperBound(w2);
-                    //? extends
-                    if (upperBound2 != null) {
-                        return isAssignable(upperBound, upperBound2);
-                    }
-                    return false;
-                }
-                return isAssignable(upperBound, t2);
-            }
-            Type lowerBound = getLowerBound(w1);
-            //? super
-            if (lowerBound != null) {
-                if (t2 instanceof WildcardType) {
-                    WildcardType w2 = (WildcardType) t2;
-                    Type lowerBound2 = getLowerBound(w2);
-                    //? super
-                    if (lowerBound2 != null) {
-                        return isAssignable(lowerBound2, lowerBound);
-                    }
-                    return false;
-                }
-                return isAssignable(t2, lowerBound);
-            }
-        }
-        return false;
-    }
+    boolean isAssignableClassToClass(Class<?> assigned, Class<?> assignee);
+
+    boolean isAssignableClassToParameterized(Class<?> assigned, ParameterizedType assignee);
+
+    boolean isAssignableClassToWildcard(Class<?> assigned, WildcardType assignee);
+
+    boolean isAssignableClassToTypeVariable(Class<?> assigned, TypeVariable<?> assignee);
+
+    boolean isAssignableClassToGenericArray(Class<?> assigned, GenericArrayType assignee);
+
+    boolean isAssignableParameterizedToClass(ParameterizedType assigned, Class<?> assignee);
+
+    boolean isAssignableParameterizedToParameterized(ParameterizedType assigned, ParameterizedType assignee);
+
+    boolean isAssignableParameterizedToWildcard(ParameterizedType assigned, WildcardType assignee);
+
+    boolean isAssignableParameterizedToTypeVariable(ParameterizedType assigned, TypeVariable<?> assignee);
+
+    boolean isAssignableParameterizedToGenericArray(ParameterizedType assigned, GenericArrayType assignee);
+
+    boolean isAssignableWildcardToClass(Wildcard assigned, Class<?> assignee);
+
+    boolean isAssignableWildcardToParameterized(Wildcard assigned, ParameterizedType assignee);
+
+    boolean isAssignableWildcardToWildcard(Wildcard assigned, WildcardType assignee);
+
+    boolean isAssignableWildcardToTypeVariable(Wildcard assigned, TypeVariable<?> assignee);
+
+    boolean isAssignableWildcardToGenericArray(Wildcard assigned, GenericArrayType assignee);
+
+    boolean isAssignableTypeVariableToClass(TypeVariable<?> assigned, Class<?> assignee);
+
+    boolean isAssignableTypeVariableToParameterized(TypeVariable<?> assigned, ParameterizedType assignee);
+
+    boolean isAssignableTypeVariableToWildcard(TypeVariable<?> assigned, WildcardType assignee);
+
+    boolean isAssignableTypeVariableToTypeVariable(TypeVariable<?> assigned, TypeVariable<?> assignee);
+
+    boolean isAssignableTypeVariableToGenericArray(TypeVariable<?> assigned, GenericArrayType assignee);
+
+    boolean isAssignableGenericArrayToClass(GenericArrayType assigned, Class<?> assignee);
+
+    boolean isAssignableGenericArrayToParameterized(GenericArrayType assigned, ParameterizedType assignee);
+
+    boolean isAssignableGenericArrayToWildcard(GenericArrayType assigned, WildcardType assignee);
+
+    boolean isAssignableGenericArrayToTypeVariable(GenericArrayType assigned, TypeVariable<?> assignee);
+
+    boolean isAssignableGenericArrayToGenericArray(GenericArrayType assigned, GenericArrayType assignee);
 }
