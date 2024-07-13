@@ -2,8 +2,8 @@ package xyz.fslabo.common.io;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.GekBytes;
-import xyz.fslabo.common.base.GekChars;
 import xyz.fslabo.common.base.GekCheck;
+import xyz.fslabo.common.base.JieChars;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -20,7 +20,7 @@ import java.util.function.IntFunction;
  *
  * @author fresduvn
  */
-public class GekIO {
+public class JieIO {
 
     /**
      * Default IO buffer size: 1024 * 8 = 8192.
@@ -529,7 +529,7 @@ public class GekIO {
     }
 
     /**
-     * Reads all bytes from source stream into a string with {@link GekChars#defaultCharset()}.
+     * Reads all bytes from source stream into a string with {@link JieChars#defaultCharset()}.
      * Returns the string, or null if no data read out and reaches to the end of stream.
      *
      * @param source source stream
@@ -538,7 +538,7 @@ public class GekIO {
      */
     @Nullable
     public static String readString(InputStream source) throws GekIOException {
-        return readString(source, GekChars.defaultCharset());
+        return readString(source, JieChars.defaultCharset());
     }
 
     /**
@@ -564,7 +564,7 @@ public class GekIO {
     }
 
     /**
-     * Reads available bytes from source stream into a string with {@link GekChars#defaultCharset()}.
+     * Reads available bytes from source stream into a string with {@link JieChars#defaultCharset()}.
      * Returns the string, or null if no data read out and reaches to the end of stream.
      *
      * @param source source stream
@@ -573,7 +573,7 @@ public class GekIO {
      */
     @Nullable
     public static String avalaibleString(InputStream source) throws GekIOException {
-        return avalaibleString(source, GekChars.defaultCharset());
+        return avalaibleString(source, JieChars.defaultCharset());
     }
 
     /**
@@ -599,14 +599,14 @@ public class GekIO {
     }
 
     /**
-     * Wraps given stream as {@link Reader} with {@link GekChars#defaultCharset()}.
+     * Wraps given stream as {@link Reader} with {@link JieChars#defaultCharset()}.
      *
      * @param stream given stream
      * @return given stream as {@link Reader}
      * @throws GekIOException IO exception
      */
     public static Reader toReader(InputStream stream) throws GekIOException {
-        return toReader(stream, GekChars.defaultCharset());
+        return toReader(stream, JieChars.defaultCharset());
     }
 
     /**
@@ -633,7 +633,7 @@ public class GekIO {
     }
 
     /**
-     * Wraps given reader as {@link InputStream} with {@link GekChars#defaultCharset()}.
+     * Wraps given reader as {@link InputStream} with {@link JieChars#defaultCharset()}.
      * The returned stream doesn't support mark/reset methods.
      *
      * @param reader given reader
@@ -641,7 +641,7 @@ public class GekIO {
      * @throws GekIOException IO exception
      */
     public static InputStream toInputStream(Reader reader) throws GekIOException {
-        return toInputStream(reader, GekChars.defaultCharset());
+        return toInputStream(reader, JieChars.defaultCharset());
     }
 
     /**
@@ -693,18 +693,18 @@ public class GekIO {
     }
 
     /**
-     * Wraps given stream as {@link Writer} with {@link GekChars#defaultCharset()}.
+     * Wraps given stream as {@link Writer} with {@link JieChars#defaultCharset()}.
      *
      * @param stream given stream
      * @return given stream as {@link Writer}
      * @throws GekIOException IO exception
      */
     public static Writer toWriter(OutputStream stream) throws GekIOException {
-        return toWriter(stream, GekChars.defaultCharset());
+        return toWriter(stream, JieChars.defaultCharset());
     }
 
     /**
-     * Wraps given stream as {@link Writer} with {@link GekChars#defaultCharset()}.
+     * Wraps given stream as {@link Writer} with {@link JieChars#defaultCharset()}.
      *
      * @param stream  given stream
      * @param charset specified charset
@@ -727,7 +727,7 @@ public class GekIO {
     }
 
     /**
-     * Wraps given appendable as {@link OutputStream} with {@link GekChars#defaultCharset()}.
+     * Wraps given appendable as {@link OutputStream} with {@link JieChars#defaultCharset()}.
      * <p>
      * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid
      * if given appendable is instance of {@link Writer}.
@@ -737,7 +737,7 @@ public class GekIO {
      * @throws GekIOException IO exception
      */
     public static OutputStream toOutputStream(Appendable appendable) throws GekIOException {
-        return toOutputStream(appendable, GekChars.defaultCharset());
+        return toOutputStream(appendable, JieChars.defaultCharset());
     }
 
     /**
@@ -1038,7 +1038,7 @@ public class GekIO {
     }
 
     /**
-     * Reads all bytes from source buffer into a string with {@link GekChars#defaultCharset()}.
+     * Reads all bytes from source buffer into a string with {@link JieChars#defaultCharset()}.
      * Returns the string, or null if no data read out and reaches to the end of buffer.
      *
      * @param source source buffer
@@ -1047,7 +1047,7 @@ public class GekIO {
      */
     @Nullable
     public static String readString(ByteBuffer source) throws GekIOException {
-        return readString(source, GekChars.defaultCharset());
+        return readString(source, JieChars.defaultCharset());
     }
 
     /**
@@ -1540,7 +1540,7 @@ public class GekIO {
      */
     public static byte[] readBytes(Path path, long offset, long length) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
-            return GekIO.read(GekIO.toInputStream(random, offset, length));
+            return JieIO.read(JieIO.toInputStream(random, offset, length));
         } catch (Exception e) {
             throw new GekIOException(e);
         }
@@ -1548,13 +1548,13 @@ public class GekIO {
 
     /**
      * Using {@link RandomAccessFile} to read all bytes of given file of path.
-     * The read bytes will be encoded to String with {@link GekChars#defaultCharset()}.
+     * The read bytes will be encoded to String with {@link JieChars#defaultCharset()}.
      *
      * @param path given file of path
      * @return read string
      */
     public static String readString(Path path) {
-        return readString(path, GekChars.defaultCharset());
+        return readString(path, JieChars.defaultCharset());
     }
 
     /**
@@ -1572,7 +1572,7 @@ public class GekIO {
     /**
      * Using {@link RandomAccessFile} to read given length bytes of given file of path from offset position,
      * the given length may be set to -1 to read to end of file.
-     * The read bytes will be encoded to String with {@link GekChars#defaultCharset()}.
+     * The read bytes will be encoded to String with {@link JieChars#defaultCharset()}.
      *
      * @param path   given file of path
      * @param offset offset position
@@ -1580,7 +1580,7 @@ public class GekIO {
      * @return read string
      */
     public static String readString(Path path, long offset, long length) {
-        return readString(path, offset, length, GekChars.defaultCharset());
+        return readString(path, offset, length, JieChars.defaultCharset());
     }
 
     /**
@@ -1596,7 +1596,7 @@ public class GekIO {
      */
     public static String readString(Path path, long offset, long length, Charset charset) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
-            return GekIO.readString(GekIO.toInputStream(random, offset, length), charset);
+            return JieIO.readString(JieIO.toInputStream(random, offset, length), charset);
         } catch (Exception e) {
             throw new GekIOException(e);
         }
@@ -1623,8 +1623,8 @@ public class GekIO {
      */
     public static void writeBytes(Path path, long offset, long length, InputStream data) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
-            OutputStream dest = GekIO.toOutputStream(random, offset, length);
-            GekIO.readTo(data, dest);
+            OutputStream dest = JieIO.toOutputStream(random, offset, length);
+            JieIO.readTo(data, dest);
             dest.flush();
         } catch (Exception e) {
             throw new GekIOException(e);
@@ -1633,13 +1633,13 @@ public class GekIO {
 
     /**
      * Using {@link RandomAccessFile} to write given data into given file.
-     * The written bytes will be decoded from given data with {@link GekChars#defaultCharset()}.
+     * The written bytes will be decoded from given data with {@link JieChars#defaultCharset()}.
      *
      * @param path given file of path
      * @param data given data
      */
     public static void writeString(Path path, CharSequence data) {
-        writeString(path, data, GekChars.defaultCharset());
+        writeString(path, data, JieChars.defaultCharset());
     }
 
     /**
@@ -1657,7 +1657,7 @@ public class GekIO {
     /**
      * Using {@link RandomAccessFile} to write given data into given file of path from offset position,
      * the given length may be set to -1 to write unlimitedly.
-     * The written bytes will be decoded from given data with {@link GekChars#defaultCharset()}.
+     * The written bytes will be decoded from given data with {@link JieChars#defaultCharset()}.
      *
      * @param path   given file of path
      * @param offset offset position
@@ -1665,7 +1665,7 @@ public class GekIO {
      * @param data   given data
      */
     public static void writeString(Path path, long offset, long length, CharSequence data) {
-        writeString(path, offset, length, data, GekChars.defaultCharset());
+        writeString(path, offset, length, data, JieChars.defaultCharset());
     }
 
     /**
@@ -1681,7 +1681,7 @@ public class GekIO {
      */
     public static void writeString(Path path, long offset, long length, CharSequence data, Charset charset) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
-            Writer writer = GekIO.toWriter(GekIO.toOutputStream(random, offset, length), charset);
+            Writer writer = JieIO.toWriter(JieIO.toOutputStream(random, offset, length), charset);
             writer.append(data);
             writer.flush();
         } catch (Exception e) {

@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.GekBytesBuilder;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public class BufferTest {
         buffer.mark();
         Assert.assertEquals(
             GekString.encode("123456789"),
-            GekIO.read(buffer)
+            JieIO.read(buffer)
         );
         Assert.assertEquals(
             buffer.position(),
@@ -27,7 +27,7 @@ public class BufferTest {
         buffer.reset();
         Assert.assertEquals(
             GekString.encode("12345"),
-            GekIO.read(buffer, 5)
+            JieIO.read(buffer, 5)
         );
         Assert.assertEquals(
             buffer.position(),
@@ -36,7 +36,7 @@ public class BufferTest {
         buffer.reset();
         Assert.assertEquals(
             "123456789",
-            GekIO.readString(buffer)
+            JieIO.readString(buffer)
         );
         Assert.assertEquals(
             buffer.position(),
@@ -45,7 +45,7 @@ public class BufferTest {
         buffer.reset();
         Assert.assertEquals(
             GekString.encode("12345"),
-            GekIO.read(GekIO.slice(buffer, 5))
+            JieIO.read(JieIO.slice(buffer, 5))
         );
         Assert.assertEquals(
             buffer.position(),
@@ -72,7 +72,7 @@ public class BufferTest {
         buffer2.position(4);
         builder.append(buffer2);
         Assert.assertEquals(
-            GekIO.read(builder.toByteBuffer()),
+            JieIO.read(builder.toByteBuffer()),
             GekString.encode("a1234567893456745678956789")
         );
     }
@@ -81,31 +81,31 @@ public class BufferTest {
     public void testSplit() {
         ByteBuffer buffer = ByteBuffer.wrap(GekString.encode("1234567890"));
         Assert.assertEquals(
-            GekIO.split(buffer, 4).stream().map(GekIO::readString).collect(Collectors.toList()),
+            JieIO.split(buffer, 4).stream().map(JieIO::readString).collect(Collectors.toList()),
             Arrays.asList("1234", "5678")
         );
         Assert.assertEquals(buffer.position(), 8);
         buffer = ByteBuffer.wrap(GekString.encode("1234567890"));
         Assert.assertEquals(
-            GekIO.split(buffer, 5).stream().map(GekIO::readString).collect(Collectors.toList()),
+            JieIO.split(buffer, 5).stream().map(JieIO::readString).collect(Collectors.toList()),
             Arrays.asList("12345", "67890")
         );
         Assert.assertEquals(buffer.position(), 10);
         buffer = ByteBuffer.wrap(GekString.encode("123|456|"));
         Assert.assertEquals(
-            GekIO.split(buffer, (byte) '|').stream().map(GekIO::readString).collect(Collectors.toList()),
+            JieIO.split(buffer, (byte) '|').stream().map(JieIO::readString).collect(Collectors.toList()),
             Arrays.asList("123", "456")
         );
         Assert.assertEquals(buffer.position(), 8);
         buffer = ByteBuffer.wrap(GekString.encode("|123|456|"));
         Assert.assertEquals(
-            GekIO.split(buffer, (byte) '|').stream().map(GekIO::readString).collect(Collectors.toList()),
+            JieIO.split(buffer, (byte) '|').stream().map(JieIO::readString).collect(Collectors.toList()),
             Arrays.asList(null, "123", "456")
         );
         Assert.assertEquals(buffer.position(), 9);
         buffer = ByteBuffer.wrap(GekString.encode("|123|456"));
         Assert.assertEquals(
-            GekIO.split(buffer, (byte) '|').stream().map(GekIO::readString).collect(Collectors.toList()),
+            JieIO.split(buffer, (byte) '|').stream().map(JieIO::readString).collect(Collectors.toList()),
             Arrays.asList(null, "123")
         );
         Assert.assertEquals(buffer.position(), 5);
@@ -117,7 +117,7 @@ public class BufferTest {
         buffer.mark();
         Assert.assertEquals(
             GekString.encode("12345"),
-            GekIO.read(GekIO.slice(buffer, 5))
+            JieIO.read(JieIO.slice(buffer, 5))
         );
         Assert.assertEquals(
             buffer.position(),
@@ -126,7 +126,7 @@ public class BufferTest {
         buffer.reset();
         Assert.assertEquals(
             GekString.encode("56789"),
-            GekIO.read(GekIO.subBuffer(buffer, 4))
+            JieIO.read(JieIO.subBuffer(buffer, 4))
         );
         Assert.assertEquals(
             buffer.position(),
@@ -135,7 +135,7 @@ public class BufferTest {
         buffer.reset();
         Assert.assertEquals(
             GekString.encode("567"),
-            GekIO.read(GekIO.subBuffer(buffer, 4, 3))
+            JieIO.read(JieIO.subBuffer(buffer, 4, 3))
         );
         Assert.assertEquals(
             buffer.position(),
@@ -143,7 +143,7 @@ public class BufferTest {
         );
 
         ByteBuffer bf = ByteBuffer.wrap(GekString.encode("123456789"), 1, 7).slice();
-        ByteBuffer slice = GekIO.slice(bf, 1);
+        ByteBuffer slice = JieIO.slice(bf, 1);
         Assert.assertEquals(
             slice.position(),
             0
@@ -157,7 +157,7 @@ public class BufferTest {
             slice.arrayOffset(),
             1
         );
-        ByteBuffer view = GekIO.subBuffer(bf, 2, 2);
+        ByteBuffer view = JieIO.subBuffer(bf, 2, 2);
         Assert.assertEquals(
             view.position(),
             0

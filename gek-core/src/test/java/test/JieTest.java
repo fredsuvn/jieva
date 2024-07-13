@@ -4,7 +4,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.*;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.io.IOException;
 import java.net.URL;
@@ -51,10 +51,10 @@ public class JieTest {
     @Test
     public void testRes() throws IOException {
         URL f1 = Jie.findRes("/t2/f1.txt");
-        Assert.assertEquals(GekIO.readString(f1.openStream(), GekChars.defaultCharset()), "f1.txt");
+        Assert.assertEquals(JieIO.readString(f1.openStream(), JieChars.defaultCharset()), "f1.txt");
         Set<URL> set = Jie.findAllRes("/t2/f2.txt");
         for (URL url : set) {
-            Assert.assertEquals(GekIO.readString(url.openStream(), GekChars.defaultCharset()), "f2.txt");
+            Assert.assertEquals(JieIO.readString(url.openStream(), JieChars.defaultCharset()), "f2.txt");
         }
     }
 
@@ -62,7 +62,7 @@ public class JieTest {
     public void testSystem() {
         GekLog.getInstance().info(GekSystem.getJavaVersion());
         GekLog.getInstance().info(GekSystem.javaMajorVersion());
-        GekLog.getInstance().info(GekChars.nativeCharset());
+        GekLog.getInstance().info(JieChars.nativeCharset());
         GekLog.getInstance().info(GekSystem.getOsName());
         GekLog.getInstance().info(GekSystem.isWindows());
         GekLog.getInstance().info(GekSystem.isLinux());

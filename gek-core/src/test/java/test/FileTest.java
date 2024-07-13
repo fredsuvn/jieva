@@ -3,12 +3,12 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.ref.Var;
 import xyz.fslabo.common.ref.LongVar;
 import xyz.fslabo.common.file.GekFile;
 import xyz.fslabo.common.file.GekFileCache;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.io.GekIOException;
 
 import java.io.File;
@@ -32,7 +32,7 @@ public class FileTest {
         createGeneratedTempDir();
         File file = new File(GENERATED_TEMP_DIR + "/" + path);
         FileOutputStream fileOutputStream = new FileOutputStream(file, false);
-        fileOutputStream.write(data.getBytes(GekChars.defaultCharset()));
+        fileOutputStream.write(data.getBytes(JieChars.defaultCharset()));
         fileOutputStream.close();
         return file;
     }
@@ -45,7 +45,7 @@ public class FileTest {
     @Test
     public void testFile() throws IOException {
         String data = DATA;
-        byte[] bytes = data.getBytes(GekChars.defaultCharset());
+        byte[] bytes = data.getBytes(JieChars.defaultCharset());
         File file = createFile("FileTest-testFile.txt", data);
         GekFile gekFile = GekFile.from(file.toPath());
         Assert.expectThrows(GekIOException.class, () -> gekFile.bindInputStream());
@@ -54,7 +54,7 @@ public class FileTest {
         InputStream bin = gekFile.bindInputStream();
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);
         gekFile.position(2);
-        IOTest.testInputStream(data, 2, 130, GekIO.limit(gekFile.bindInputStream(), 130), false);
+        IOTest.testInputStream(data, 2, 130, JieIO.limit(gekFile.bindInputStream(), 130), false);
         gekFile.close();
         Assert.expectThrows(GekIOException.class, () -> gekFile.bindInputStream());
         Assert.expectThrows(GekIOException.class, () -> bin.read());
@@ -62,21 +62,21 @@ public class FileTest {
         gekFile.position(3);
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);
         gekFile.position(2);
-        IOTest.testInputStream(data, 2, 130, GekIO.limit(gekFile.bindInputStream(), 130), false);
+        IOTest.testInputStream(data, 2, 130, JieIO.limit(gekFile.bindInputStream(), 130), false);
         gekFile.position(4);
         IOTest.testOutStream(-1, gekFile.bindOutputStream(), (offset, length) ->
-            GekIO.readBytes(file.toPath(), offset + 4, length));
+            JieIO.readBytes(file.toPath(), offset + 4, length));
         long fileLength = gekFile.length();
         gekFile.position(fileLength);
         LongVar newLength = Var.ofLong(fileLength);
         IOTest.testOutStream(-1, gekFile.bindOutputStream(), (offset, length) -> {
             newLength.incrementAndGet(length);
-            return GekIO.readBytes(file.toPath(), offset + fileLength, length);
+            return JieIO.readBytes(file.toPath(), offset + fileLength, length);
         });
         Assert.assertEquals(gekFile.length(), newLength.get());
         gekFile.position(8);
-        IOTest.testOutStream(233, GekIO.limit(gekFile.bindOutputStream(), 233), (offset, length) ->
-            GekIO.readBytes(file.toPath(), offset + 8, length));
+        IOTest.testOutStream(233, JieIO.limit(gekFile.bindOutputStream(), 233), (offset, length) ->
+            JieIO.readBytes(file.toPath(), offset + 8, length));
         file.delete();
     }
 
@@ -90,37 +90,37 @@ public class FileTest {
 
     private void testFileCacheIO0(int chunkSize, int bufferSize) throws IOException {
         String data = DATA;
-        byte[] bytes = data.getBytes(GekChars.defaultCharset());
+        byte[] bytes = data.getBytes(JieChars.defaultCharset());
         File file = createFile("FileTest-testFileCacheIO.txt", data);
         GekFileCache fileCache = GekFileCache.newBuilder()
             .chunkSize(chunkSize)
             .bufferSize(bufferSize)
             .build();
         IOTest.testInputStream(data, 0, bytes.length, fileCache.getInputStream(file.toPath(), 0), false);
-        IOTest.testInputStream(data, 5, 230, GekIO.limit(fileCache.getInputStream(file.toPath(), 5), 230), false);
-        IOTest.testInputStream(data, 0, 230, GekIO.limit(fileCache.getInputStream(file.toPath(), 0), 230), false);
+        IOTest.testInputStream(data, 5, 230, JieIO.limit(fileCache.getInputStream(file.toPath(), 5), 230), false);
+        IOTest.testInputStream(data, 0, 230, JieIO.limit(fileCache.getInputStream(file.toPath(), 0), 230), false);
         IOTest.testInputStream(data, 0, bytes.length, fileCache.getInputStream(file.toPath(), 0), false);
         IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), 4), (offset, length) ->
-            GekIO.readBytes(file.toPath(), offset + 4, length));
+            JieIO.readBytes(file.toPath(), offset + 4, length));
         long fileLength = file.length();
         LongVar newLength = Var.ofLong(fileLength);
         IOTest.testOutStream(-1, fileCache.getOutputStream(file.toPath(), fileLength), (offset, length) -> {
             newLength.incrementAndGet(length);
-            return GekIO.readBytes(file.toPath(), offset + fileLength, length);
+            return JieIO.readBytes(file.toPath(), offset + fileLength, length);
         });
         Assert.assertEquals(file.length(), newLength.get());
-        IOTest.testOutStream(233, GekIO.limit(fileCache.getOutputStream(file.toPath(), 0), 233), (offset, length) ->
-            GekIO.readBytes(file.toPath(), offset, length));
-        IOTest.testOutStream(233, GekIO.limit(fileCache.getOutputStream(file.toPath(), 3), 233), (offset, length) ->
-            GekIO.readBytes(file.toPath(), offset + 3, length));
+        IOTest.testOutStream(233, JieIO.limit(fileCache.getOutputStream(file.toPath(), 0), 233), (offset, length) ->
+            JieIO.readBytes(file.toPath(), offset, length));
+        IOTest.testOutStream(233, JieIO.limit(fileCache.getOutputStream(file.toPath(), 3), 233), (offset, length) ->
+            JieIO.readBytes(file.toPath(), offset + 3, length));
         file.delete();
     }
 
     @Test
     public void testFileCache() throws IOException {
         String data = "01234567890123456789";
-        byte[] bytes1 = data.getBytes(GekChars.defaultCharset());
-        byte[] bytes2 = (data + data + data).getBytes(GekChars.defaultCharset());
+        byte[] bytes1 = data.getBytes(JieChars.defaultCharset());
+        byte[] bytes2 = (data + data + data).getBytes(JieChars.defaultCharset());
         File file1 = createFile("FileTest-testFileCache1.txt", data);
         File file2 = createFile("FileTest-testFileCache2.txt", data + data + data);
         LongVar cacheRead = Var.ofLong(0);

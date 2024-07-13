@@ -4,7 +4,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.collect.JieColl;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.GekNetException;
 import xyz.fslabo.common.net.GekServerStates;
 
@@ -151,7 +151,7 @@ public interface GekUdpServer extends GekUdpClient {
         private final List<GekUdpPacketHandler<?>> packetHandlers = new LinkedList<>();
         private @Nullable GekUdpServerHandler serverHandler;
         private @Nullable ExecutorService executor;
-        private int packetBufferSize = GekIO.IO_BUFFER_SIZE;
+        private int packetBufferSize = JieIO.IO_BUFFER_SIZE;
 
         /**
          * Sets local port, maybe 0 to get an available one from system.
@@ -317,7 +317,7 @@ public interface GekUdpServer extends GekUdpClient {
                 if (buffer.hasArray()) {
                     datagramPacket = new DatagramPacket(buffer.array(), buffer.arrayOffset(), buffer.remaining());
                 } else {
-                    byte[] bytes = GekIO.read(buffer);
+                    byte[] bytes = JieIO.read(buffer);
                     datagramPacket = new DatagramPacket(bytes, bytes.length);
                 }
                 datagramPacket.setSocketAddress(packet.getHeader().getInetSocketAddress());
@@ -498,7 +498,7 @@ public interface GekUdpServer extends GekUdpClient {
                 if (!buffer.hasRemaining()) {
                     return EMPTY_BUFFER;
                 }
-                return ByteBuffer.wrap(GekIO.read(buffer)).asReadOnlyBuffer();
+                return ByteBuffer.wrap(JieIO.read(buffer)).asReadOnlyBuffer();
             }
         }
     }

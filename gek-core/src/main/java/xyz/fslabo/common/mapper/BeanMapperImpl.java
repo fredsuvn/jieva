@@ -9,7 +9,6 @@ import xyz.fslabo.common.bean.BeanProvider;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.ref.Val;
-import xyz.fslabo.common.reflect.ParamType;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
@@ -46,15 +45,15 @@ final class BeanMapperImpl implements BeanMapper {
     }
 
     private void mapToMap(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
-        ParamType sourceParamType = JieReflect.getActualTypeArguments(sourceType, Map.class);
-        checkMapType(sourceParamType);
-        Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
-        Type sourceValueType = sourceParamType.getActualTypeArgument(1);
+        List<Type> sourceTypeArgs = JieReflect.getActualTypeArguments(sourceType, Map.class);
+        checkMapArgs(sourceTypeArgs, sourceType);
+        Type sourceKeyType = sourceTypeArgs.get(0);
+        Type sourceValueType = sourceTypeArgs.get(1);
         Map<Object, Object> sourceMap = Jie.as(source);
-        ParamType destParamType = JieReflect.getActualTypeArguments(destType, Map.class);
-        checkMapType(destParamType);
-        Type destKeyType = destParamType.getActualTypeArgument(0);
-        Type destValueType = destParamType.getActualTypeArgument(1);
+        List<Type> destParamType = JieReflect.getActualTypeArguments(destType, Map.class);
+        checkMapArgs(destParamType, destType);
+        Type destKeyType = destParamType.get(0);
+        Type destValueType = destParamType.get(1);
         Map<Object, Object> destMap = Jie.as(dest);
         Collection<?> ignored = Jie.orDefault(options.getIgnored(), Collections.emptyList());
         boolean ignoreNull = options.isIgnoreNull();
@@ -81,10 +80,10 @@ final class BeanMapperImpl implements BeanMapper {
     }
 
     public void mapToBean(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
-        ParamType sourceParamType = JieReflect.getActualTypeArguments(sourceType, Map.class);
-        checkMapType(sourceParamType);
-        Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
-        Type sourceValueType = sourceParamType.getActualTypeArgument(1);
+        List<Type> sourceTypeArgs = JieReflect.getActualTypeArguments(sourceType, Map.class);
+        checkMapArgs(sourceTypeArgs, sourceType);
+        Type sourceKeyType = sourceTypeArgs.get(0);
+        Type sourceValueType = sourceTypeArgs.get(1);
         Map<Object, Object> sourceMap = Jie.as(source);
         BeanProvider beanProvider = Jie.orDefault(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo destInfo = beanProvider.getBeanInfo(destType);
@@ -116,10 +115,10 @@ final class BeanMapperImpl implements BeanMapper {
         BeanProvider beanProvider = Jie.orDefault(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo sourceInfo = beanProvider.getBeanInfo(sourceType);
         Map<String, PropertyInfo> sourceProperties = sourceInfo.getProperties();
-        ParamType destParamType = JieReflect.getActualTypeArguments(destType, Map.class);
-        checkMapType(destParamType);
-        Type destKeyType = destParamType.getActualTypeArgument(0);
-        Type destValueType = destParamType.getActualTypeArgument(1);
+        List<Type> destTypeArgs = JieReflect.getActualTypeArguments(destType, Map.class);
+        checkMapArgs(destTypeArgs, destType);
+        Type destKeyType = destTypeArgs.get(0);
+        Type destValueType = destTypeArgs.get(1);
         Map<Object, Object> destMap = Jie.as(dest);
         Collection<?> ignored = Jie.orDefault(options.getIgnored(), Collections.emptyList());
         boolean ignoreNull = options.isIgnoreNull();
@@ -168,13 +167,9 @@ final class BeanMapperImpl implements BeanMapper {
         });
     }
 
-    private void checkMapType(@Nullable ParamType paramType) {
-        if (paramType == null) {
-            throw new BeanException("Not a Map type: null.");
-        }
-        List<Type> types = paramType.getActualTypeArgumentList();
-        if (JieColl.isEmpty(types) || types.size() != 2) {
-            throw new BeanException("Not a Map type: " + paramType + ".");
+    private void checkMapArgs(@Nullable List<Type> args, Type type) {
+        if (JieColl.isEmpty(args) || args.size() != 2) {
+            throw new BeanException("Not a Map type: " + type.getTypeName() + "!");
         }
     }
 
@@ -207,7 +202,7 @@ final class BeanMapperImpl implements BeanMapper {
         }
         Object destValue;
         try {
-            destValue = mapper.map(sourceValue, sourceValueType, destValueType, options);
+            destValue = mapper.mapObject(sourceValue, sourceValueType, destValueType, options);
             if (Objects.equals(destValue, Flag.UNSUPPORTED)) {
                 if (ignoreError) {
                     return;
@@ -265,7 +260,7 @@ final class BeanMapperImpl implements BeanMapper {
         }
         Object destValue;
         try {
-            destValue = mapper.map(sourceValue, sourceValueType, destProperty.getType(), options);
+            destValue = mapper.mapObject(sourceValue, sourceValueType, destProperty.getType(), options);
             if (Objects.equals(destValue, Flag.UNSUPPORTED)) {
                 if (ignoreError) {
                     return;
@@ -300,7 +295,7 @@ final class BeanMapperImpl implements BeanMapper {
         boolean ignoreError = options.isIgnoreError();
         Object destKey;
         try {
-            destKey = mapper.map(mappedKey, sourceKeyType, destKeyType, options);
+            destKey = mapper.mapObject(mappedKey, sourceKeyType, destKeyType, options);
             if (Objects.equals(destKey, Flag.UNSUPPORTED)) {
                 if (ignoreError) {
                     return F.RETURN;

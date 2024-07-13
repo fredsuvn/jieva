@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author fredsuvn
  */
-public class GekChars {
+public class JieChars {
 
     /**
      * Charset: UTF-8.

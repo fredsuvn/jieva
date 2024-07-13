@@ -138,7 +138,7 @@ public class TransformInputStream extends InputStream {
 
     private void refreshBuffer() {
         while (buffer == null || !buffer.hasRemaining()) {
-            byte[] sourceBytes = GekIO.read(source, blockSize);
+            byte[] sourceBytes = JieIO.read(source, blockSize);
             if (sourceBytes == null) {
                 end = true;
                 return;

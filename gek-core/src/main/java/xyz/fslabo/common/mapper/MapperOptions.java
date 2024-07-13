@@ -3,9 +3,11 @@ package xyz.fslabo.common.mapper;
 import lombok.Builder;
 import lombok.Getter;
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.bean.BeanProvider;
 
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
@@ -51,25 +53,37 @@ public class MapperOptions {
 
     /**
      * Whether the null value should be ignored when mapping.
+     * <p>
      * Default is false.
      */
     private boolean ignoreNull;
 
     /**
      * Whether ignore error when mapping.
+     * <p>
      * Default is false.
      */
     private boolean ignoreError;
 
     /**
      * Whether put the value into dest map if the dest map doesn't contain the value.
+     * <p>
      * Default is true.
      */
     private boolean putNew;
 
     /**
-     * Whether to use deep copy for mapping.
+     * Whether to use deep copy for mapping with {@link BeanMapper}. For {@link Mapper}, if this option is true and
+     * target mapping type is mutable, the mapper will create a new instance to return.
+     * <p>
      * Default is false (shallow copy).
      */
     private boolean deepCopy;
+
+    /**
+     * Charset option to determine which Charset to use for character data conversion.
+     * <p>
+     * Default is {@link JieChars#defaultCharset()}.
+     */
+    private @Nullable Charset charset;
 }

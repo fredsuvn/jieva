@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.common.collect.JieColl;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.io.GekIOConfigurer;
 import xyz.fslabo.common.io.GekIOException;
 
@@ -388,23 +388,23 @@ public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
         }
         Process process = builder.start();
         if (in != null) {
-            GekIO.readTo(in, process.getOutputStream());
+            JieIO.readTo(in, process.getOutputStream());
         }
         if (out != null) {
-            GekIO.readTo(process.getInputStream(), out);
+            JieIO.readTo(process.getInputStream(), out);
         }
         if (err != null) {
-            GekIO.readTo(process.getErrorStream(), out);
+            JieIO.readTo(process.getErrorStream(), out);
         }
         return process;
     }
 
     private InputStream inputToStream() {
         if (input instanceof byte[]) {
-            return GekIO.toInputStream((byte[]) input);
+            return JieIO.toInputStream((byte[]) input);
         }
         if (input instanceof ByteBuffer) {
-            return GekIO.toInputStream((ByteBuffer) input);
+            return JieIO.toInputStream((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return (InputStream) input;
@@ -414,10 +414,10 @@ public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
 
     private OutputStream outputToStream(Object out) {
         if (out instanceof byte[]) {
-            return GekIO.toOutputStream((byte[]) out);
+            return JieIO.toOutputStream((byte[]) out);
         }
         if (out instanceof ByteBuffer) {
-            return GekIO.toOutputStream((ByteBuffer) out);
+            return JieIO.toOutputStream((ByteBuffer) out);
         }
         if (out instanceof OutputStream) {
             return (OutputStream) out;

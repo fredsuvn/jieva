@@ -2,7 +2,7 @@ package xyz.fslabo.common.data.protobuf;
 
 import com.google.protobuf.ByteString;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.mapper.Mapper;
 
 import java.lang.reflect.Type;
@@ -35,10 +35,10 @@ public class ByteStringConvertHandler implements Mapper.Handler {
     private final Charset charset;
 
     /**
-     * Constructs with {@link GekChars#defaultCharset()}.
+     * Constructs with {@link JieChars#defaultCharset()}.
      */
     public ByteStringConvertHandler() {
-        this.charset = GekChars.defaultCharset();
+        this.charset = JieChars.defaultCharset();
     }
 
     /**

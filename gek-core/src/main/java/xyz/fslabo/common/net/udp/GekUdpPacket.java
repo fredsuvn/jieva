@@ -1,6 +1,6 @@
 package xyz.fslabo.common.net.udp;
 
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
@@ -48,7 +48,7 @@ public interface GekUdpPacket {
      * @return UDP packet
      */
     static GekUdpPacket of(ByteBuffer buffer, InetSocketAddress address) {
-        ByteBuffer data = ByteBuffer.wrap(GekIO.read(buffer));
+        ByteBuffer data = ByteBuffer.wrap(JieIO.read(buffer));
         return new GekUdpPacket() {
 
             @Override

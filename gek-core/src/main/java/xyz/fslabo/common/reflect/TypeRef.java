@@ -36,11 +36,11 @@ public abstract class TypeRef<T> {
                 return parameterizedSuper.getActualTypeArguments()[0];
             }
         }
-        List<Type> parameterizedType = JieReflect.getActualTypeArguments(genericSuper, TypeRef.class);
-        if (JieColl.isEmpty(parameterizedType)) {
+        List<Type> typeArgs = JieReflect.getActualTypeArguments(genericSuper, TypeRef.class);
+        if (JieColl.isEmpty(typeArgs)) {
             throw new IllegalStateException("Not subtype of TypeRef: " + getClass().getName() + "!");
         }
-        return parameterizedType.get(0);
+        return typeArgs.get(0);
     }
 
     /**

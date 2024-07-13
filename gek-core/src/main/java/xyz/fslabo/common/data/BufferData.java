@@ -1,7 +1,7 @@
 package xyz.fslabo.common.data;
 
 import xyz.fslabo.common.base.GekCheck;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,17 +67,17 @@ final class BufferData implements GekData.OfBuffer {
 
     @Override
     public int write(ByteBuffer dest, int length) {
-        return GekIO.readTo(buffer, dest, length);
+        return JieIO.readTo(buffer, dest, length);
     }
 
     @Override
     public long write(OutputStream dest) {
-        return GekIO.readTo(GekIO.toInputStream(buffer), dest);
+        return JieIO.readTo(JieIO.toInputStream(buffer), dest);
     }
 
     @Override
     public long write(OutputStream dest, long length) {
-        return GekIO.readTo(GekIO.toInputStream(buffer), dest, length);
+        return JieIO.readTo(JieIO.toInputStream(buffer), dest, length);
     }
 
     @Override
@@ -85,11 +85,11 @@ final class BufferData implements GekData.OfBuffer {
         if (!buffer.hasRemaining()) {
             return null;
         }
-        return GekIO.read(buffer);
+        return JieIO.read(buffer);
     }
 
     @Override
     public InputStream asInputStream() {
-        return GekIO.toInputStream(buffer);
+        return JieIO.toInputStream(buffer);
     }
 }

@@ -2,7 +2,7 @@ package test;
 
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.*;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.Semaphore;
@@ -24,7 +24,7 @@ public class ProcessTest {
     private void testEcho(String command) throws InterruptedException {
         Process process = Jie.process().command(command).start();
         process.waitFor();
-        String output = GekIO.readString(process.getInputStream(), GekChars.nativeCharset());
+        String output = JieIO.readString(process.getInputStream(), JieChars.nativeCharset());
         process.destroy();
         System.out.println(output);
     }
@@ -36,7 +36,7 @@ public class ProcessTest {
         semaphore.acquire();
         Jie.thread().task(() -> {
             while (true) {
-                String output = GekIO.avalaibleString(process.getInputStream(), GekChars.nativeCharset());
+                String output = JieIO.avalaibleString(process.getInputStream(), JieChars.nativeCharset());
                 if (output == null) {
                     semaphore.release();
                     return;
@@ -60,6 +60,6 @@ public class ProcessTest {
         Process process = Jie.process().command("ping", "-n", "5", "127.0.0.1").output(dest).start();
         process.waitFor();
         process.destroy();
-        System.out.println(GekString.of(dest.toByteArray(), GekChars.nativeCharset()));
+        System.out.println(GekString.of(dest.toByteArray(), JieChars.nativeCharset()));
     }
 }

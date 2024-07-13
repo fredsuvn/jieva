@@ -1,8 +1,8 @@
 package xyz.fslabo.common.io;
 
-import xyz.fslabo.common.base.GekChars;
 import xyz.fslabo.common.base.GekConfigurer;
 import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieChars;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -79,13 +79,13 @@ public interface GekIOConfigurer<T extends GekIOConfigurer<T>> extends GekConfig
     T input(InputStream in);
 
     /**
-     * Sets input to given string with {@link GekChars#defaultCharset()}.
+     * Sets input to given string with {@link JieChars#defaultCharset()}.
      *
      * @param str given string
      * @return this
      */
     default T input(String str) {
-        return input(str, GekChars.defaultCharset());
+        return input(str, JieChars.defaultCharset());
     }
 
     /**

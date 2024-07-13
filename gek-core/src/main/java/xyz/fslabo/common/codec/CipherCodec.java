@@ -2,7 +2,7 @@ package xyz.fslabo.common.codec;
 
 import org.springframework.core.codec.CodecException;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import javax.crypto.Cipher;
 import java.io.InputStream;
@@ -248,13 +248,13 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
             initCipher(cipher);
             InputStream source;
             if (input instanceof ByteBuffer) {
-                source = GekIO.toInputStream((ByteBuffer) input);
+                source = JieIO.toInputStream((ByteBuffer) input);
             } else if (input instanceof InputStream) {
                 source = (InputStream) input;
             } else {
                 throw new CodecException("Unknown input type: " + input.getClass());
             }
-            return GekIO.transform(source, blockSize, bytes -> GekCodec.doCipher(cipher, ByteBuffer.wrap(bytes)));
+            return JieIO.transform(source, blockSize, bytes -> GekCodec.doCipher(cipher, ByteBuffer.wrap(bytes)));
         } catch (CodecException e) {
             throw e;
         } catch (Exception e) {

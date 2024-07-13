@@ -14,18 +14,18 @@ import java.util.function.Supplier;
 public class GekString {
 
     /**
-     * Returns string decoding from given bytes with {@link GekChars#defaultCharset()}.
+     * Returns string decoding from given bytes with {@link JieChars#defaultCharset()}.
      *
      * @param bytes given bytes
      * @return string decoding from given bytes and charset
      */
     public static String of(byte[] bytes) {
-        return of(bytes, GekChars.defaultCharset());
+        return of(bytes, JieChars.defaultCharset());
     }
 
     /**
      * Returns string decoding from given bytes (from given offset to specified length)
-     * with {@link GekChars#defaultCharset()}.
+     * with {@link JieChars#defaultCharset()}.
      *
      * @param bytes  given bytes
      * @param offset given offset
@@ -33,7 +33,7 @@ public class GekString {
      * @return string decoding from given bytes and charset
      */
     public static String of(byte[] bytes, int offset, int length) {
-        return of(bytes, offset, length, GekChars.defaultCharset());
+        return of(bytes, offset, length, JieChars.defaultCharset());
     }
 
     /**
@@ -61,13 +61,13 @@ public class GekString {
     }
 
     /**
-     * Encodes given chars with {@link GekChars#defaultCharset()}.
+     * Encodes given chars with {@link JieChars#defaultCharset()}.
      *
      * @param chars given chars
      * @return encoded bytes
      */
     public static byte[] encode(CharSequence chars) {
-        return encode(chars, GekChars.defaultCharset());
+        return encode(chars, JieChars.defaultCharset());
     }
 
     /**

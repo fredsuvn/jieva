@@ -7,7 +7,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.GekCheck;
 import xyz.fslabo.common.cache.Cache;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.ref.BooleanVar;
 import xyz.fslabo.common.ref.LongVar;
 import xyz.fslabo.common.ref.Var;
@@ -260,7 +260,7 @@ public interface GekFileCache {
         private static final ChunkCacheGenerator DEFAULT_CACHE_GENERATOR = ChunkCacheImpl::new;
         private static final FileAccessGenerator DEFAULT_FILE_ACCESS_GENERATOR = GekFile::from;
         private int chunkSize = 1024 * 4;
-        private int bufferSize = GekIO.IO_BUFFER_SIZE;
+        private int bufferSize = JieIO.IO_BUFFER_SIZE;
         private ChunkCacheGenerator chunkCacheGenerator = DEFAULT_CACHE_GENERATOR;
         private FileAccessGenerator fileAccessGenerator = DEFAULT_FILE_ACCESS_GENERATOR;
         private CacheReadListener cacheReadListener = null;
@@ -269,7 +269,7 @@ public interface GekFileCache {
         private FileWriteListener fileWriteListener = null;
 
         /**
-         * Sets file chunk size for caching, default is {@link GekIO#IO_BUFFER_SIZE}.
+         * Sets file chunk size for caching, default is {@link JieIO#IO_BUFFER_SIZE}.
          *
          * @param chunkSize chunk size
          * @return this builder
@@ -281,7 +281,7 @@ public interface GekFileCache {
         }
 
         /**
-         * Sets buffer size for IO operation, default is {@link GekIO#IO_BUFFER_SIZE}.
+         * Sets buffer size for IO operation, default is {@link JieIO#IO_BUFFER_SIZE}.
          *
          * @param bufferSize buffer size
          * @return this builder
@@ -545,7 +545,7 @@ public interface GekFileCache {
                                 }
                                 buffered = new BufferedInputStream(underlying.bindInputStream(), bufferSize);
                             }
-                            byte[] readBytes = GekIO.read(buffered, chunkSize);
+                            byte[] readBytes = JieIO.read(buffered, chunkSize);
                             if (readBytes == null) {
                                 return EOF;
                             }

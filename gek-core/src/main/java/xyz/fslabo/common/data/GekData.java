@@ -1,7 +1,7 @@
 package xyz.fslabo.common.data;
 
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.GekCheck;
 import xyz.fslabo.common.base.GekString;
 
@@ -19,7 +19,7 @@ public interface GekData extends GekDataOutput {
 
     /**
      * Wraps given string to {@link OfArray}.
-     * The given string will be decoded by {@link GekChars#defaultCharset()}.
+     * The given string will be decoded by {@link JieChars#defaultCharset()}.
      *
      * @param str given string
      * @return the {@link OfArray}

@@ -1,7 +1,7 @@
 package xyz.fslabo.common.codec;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -282,7 +282,7 @@ public class GekCodec {
             int outSize = 0;
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
-                ByteBuffer r = GekIO.readSlice(in, inSize);
+                ByteBuffer r = JieIO.readSlice(in, inSize);
                 outSize += cipher.doFinal(r, out);
                 remaining -= inSize;
             }
@@ -317,7 +317,7 @@ public class GekCodec {
             long outSize = 0;
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
-                ByteBuffer r = GekIO.readSlice(in, inSize);
+                ByteBuffer r = JieIO.readSlice(in, inSize);
                 byte[] outBytes = doCipher(cipher, r);
                 if (outBytes != null) {
                     out.write(outBytes);
@@ -345,7 +345,7 @@ public class GekCodec {
     public static int doCipher(Cipher cipher, InputStream in, ByteBuffer out, int blockSize) throws GekCodecException {
         try {
             if (blockSize <= 0) {
-                byte[] inBytes = GekIO.read(in);
+                byte[] inBytes = JieIO.read(in);
                 if (inBytes == null) {
                     return 0;
                 }
@@ -354,7 +354,7 @@ public class GekCodec {
             int outSize = 0;
             byte[] inBytes = new byte[blockSize];
             while (true) {
-                int readCount = GekIO.readTo(in, inBytes);
+                int readCount = JieIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -387,7 +387,7 @@ public class GekCodec {
     public static long doCipher(Cipher cipher, InputStream in, OutputStream out, int blockSize) throws GekCodecException {
         try {
             if (blockSize <= 0) {
-                byte[] inBytes = GekIO.read(in);
+                byte[] inBytes = JieIO.read(in);
                 if (inBytes == null) {
                     return 0;
                 }
@@ -398,7 +398,7 @@ public class GekCodec {
             int outSize = 0;
             byte[] inBytes = new byte[blockSize];
             while (true) {
-                int readCount = GekIO.readTo(in, inBytes);
+                int readCount = JieIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -438,7 +438,7 @@ public class GekCodec {
             if (in.hasArray()) {
                 return cipher.doFinal(in.array(), in.arrayOffset() + in.position(), in.remaining());
             }
-            byte[] inBytes = GekIO.read(in);
+            byte[] inBytes = JieIO.read(in);
             return cipher.doFinal(inBytes);
         } catch (Exception e) {
             throw new GekCodecException(e);
@@ -459,7 +459,7 @@ public class GekCodec {
     @Nullable
     public static byte[] doCipher(Cipher cipher, InputStream in) throws GekCodecException {
         try {
-            byte[] inBytes = GekIO.read(in);
+            byte[] inBytes = JieIO.read(in);
             if (inBytes == null) {
                 return null;
             }
@@ -497,7 +497,7 @@ public class GekCodec {
      * @throws GekCodecException codec exception
      */
     public static byte[] doDigest(MessageDigest digest, InputStream in) throws GekCodecException {
-        return doDigest(digest, in, GekIO.IO_BUFFER_SIZE);
+        return doDigest(digest, in, JieIO.IO_BUFFER_SIZE);
     }
 
     /**
@@ -513,12 +513,12 @@ public class GekCodec {
     public static byte[] doDigest(MessageDigest digest, InputStream in, int bufferSize) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.read(in);
+                byte[] input = JieIO.read(in);
                 return digest.digest(input);
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = GekIO.readTo(in, inBytes);
+                int readCount = JieIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -564,7 +564,7 @@ public class GekCodec {
      * @throws GekCodecException codec exception
      */
     public static byte[] doMac(Mac mac, InputStream in) throws GekCodecException {
-        return doMac(mac, in, GekIO.IO_BUFFER_SIZE);
+        return doMac(mac, in, JieIO.IO_BUFFER_SIZE);
     }
 
     /**
@@ -580,12 +580,12 @@ public class GekCodec {
     public static byte[] doMac(Mac mac, InputStream in, int bufferSize) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.read(in);
+                byte[] input = JieIO.read(in);
                 return mac.doFinal(input);
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = GekIO.readTo(in, inBytes);
+                int readCount = JieIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -631,7 +631,7 @@ public class GekCodec {
      * @throws GekCodecException codec exception
      */
     public static byte[] doSign(Signature sign, InputStream in) throws GekCodecException {
-        return doSign(sign, in, GekIO.IO_BUFFER_SIZE);
+        return doSign(sign, in, JieIO.IO_BUFFER_SIZE);
     }
 
     /**
@@ -647,13 +647,13 @@ public class GekCodec {
     public static byte[] doSign(Signature sign, InputStream in, int bufferSize) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.read(in);
+                byte[] input = JieIO.read(in);
                 sign.update(input);
                 return sign.sign();
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = GekIO.readTo(in, inBytes);
+                int readCount = JieIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -701,7 +701,7 @@ public class GekCodec {
      * @throws GekCodecException codec exception
      */
     public static boolean doVerify(Signature sign, InputStream in, byte[] signature) throws GekCodecException {
-        return doVerify(sign, in, GekIO.IO_BUFFER_SIZE, signature);
+        return doVerify(sign, in, JieIO.IO_BUFFER_SIZE, signature);
     }
 
     /**
@@ -718,13 +718,13 @@ public class GekCodec {
     public static boolean doVerify(Signature sign, InputStream in, int bufferSize, byte[] signature) throws GekCodecException {
         try {
             if (bufferSize <= 0) {
-                byte[] input = GekIO.read(in);
+                byte[] input = JieIO.read(in);
                 sign.update(input);
                 return sign.verify(signature);
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = GekIO.readTo(in, inBytes);
+                int readCount = JieIO.readTo(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }

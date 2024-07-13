@@ -1,8 +1,8 @@
 package xyz.fslabo.common.codec;
 
 import org.springframework.core.codec.CodecException;
-import xyz.fslabo.common.base.GekChars;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.base.JieChars;
+import xyz.fslabo.common.io.JieIO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +69,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
     public HexCodec reset() {
         this.input = null;
         this.output = null;
-        this.blockSize = GekIO.IO_BUFFER_SIZE;
+        this.blockSize = JieIO.IO_BUFFER_SIZE;
         this.mode = ENCODE_MODE;
         return this;
     }
@@ -128,7 +128,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
                     return doEncode(ByteBuffer.wrap(src), dest);
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
-                    return doEncode(GekIO.toInputStream(src), dest);
+                    return doEncode(JieIO.toInputStream(src), dest);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -142,7 +142,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
                     return doEncode(src, dest);
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
-                    return doEncode(GekIO.toInputStream(src), dest);
+                    return doEncode(JieIO.toInputStream(src), dest);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -150,10 +150,10 @@ public class HexCodec implements CodecProcess<HexCodec> {
                 InputStream src = (InputStream) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    return doEncode(src, GekIO.toOutputStream(dest));
+                    return doEncode(src, JieIO.toOutputStream(dest));
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    return doEncode(src, GekIO.toOutputStream(dest));
+                    return doEncode(src, JieIO.toOutputStream(dest));
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
                     return doEncode(src, dest);
@@ -209,7 +209,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
                     return doDecode(ByteBuffer.wrap(src), dest);
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
-                    return doDecode(GekIO.toInputStream(src), dest);
+                    return doDecode(JieIO.toInputStream(src), dest);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -223,7 +223,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
                     return doDecode(src, dest);
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
-                    return doDecode(GekIO.toInputStream(src), dest);
+                    return doDecode(JieIO.toInputStream(src), dest);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -231,10 +231,10 @@ public class HexCodec implements CodecProcess<HexCodec> {
                 InputStream src = (InputStream) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    return doDecode(src, GekIO.toOutputStream(dest));
+                    return doDecode(src, JieIO.toOutputStream(dest));
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    return doDecode(src, GekIO.toOutputStream(dest));
+                    return doDecode(src, JieIO.toOutputStream(dest));
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
                     return doDecode(src, dest);
@@ -313,28 +313,28 @@ public class HexCodec implements CodecProcess<HexCodec> {
      *         If it is encode mode, same with {@link #finalLatinString()};
      *     </li>
      *     <li>
-     *         Otherwise with {@link GekChars#defaultCharset()}.
+     *         Otherwise with {@link JieChars#defaultCharset()}.
      *     </li>
      * </ul>
      *
-     * @return encode mode same with {@link #finalLatinString()}, otherwise {@link GekChars#defaultCharset()}
+     * @return encode mode same with {@link #finalLatinString()}, otherwise {@link JieChars#defaultCharset()}
      */
     @Override
     public String finalString() {
-        return mode == ENCODE_MODE ? finalLatinString() : finalString(GekChars.defaultCharset());
+        return mode == ENCODE_MODE ? finalLatinString() : finalString(JieChars.defaultCharset());
     }
 
     @Override
     public InputStream finalStream() {
         switch (mode) {
             case ENCODE_MODE:
-                return GekIO.transform(inputToInputStream(), blockSize, bytes -> {
+                return JieIO.transform(inputToInputStream(), blockSize, bytes -> {
                     byte[] dest = new byte[bytes.length * 2];
                     doEncode(ByteBuffer.wrap(bytes), ByteBuffer.wrap(dest));
                     return dest;
                 });
             case DECODE_MODE:
-                return GekIO.transform(inputToInputStream(), blockSize, bytes -> {
+                return JieIO.transform(inputToInputStream(), blockSize, bytes -> {
                     if (bytes.length % 2 != 0) {
                         throw new GekCodecException("Source may not hex data: bytes.length % 2 != 0");
                     }
@@ -351,20 +351,20 @@ public class HexCodec implements CodecProcess<HexCodec> {
             return (byte[]) input;
         }
         if (input instanceof ByteBuffer) {
-            return GekIO.read((ByteBuffer) input);
+            return JieIO.read((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
-            return GekIO.read((InputStream) input);
+            return JieIO.read((InputStream) input);
         }
         throw new CodecException("Unknown input type: " + input.getClass());
     }
 
     private InputStream inputToInputStream() {
         if (input instanceof byte[]) {
-            return GekIO.toInputStream((byte[]) input);
+            return JieIO.toInputStream((byte[]) input);
         }
         if (input instanceof ByteBuffer) {
-            return GekIO.toInputStream((ByteBuffer) input);
+            return JieIO.toInputStream((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return (InputStream) input;

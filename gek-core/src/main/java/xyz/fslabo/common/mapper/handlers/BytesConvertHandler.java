@@ -2,7 +2,7 @@ package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
@@ -41,7 +41,7 @@ public class BytesConvertHandler implements Mapper.Handler {
                 return source;
             } else if (JieReflect.isAssignable(ByteBuffer.class, sourceType)) {
                 ByteBuffer src = ((ByteBuffer) source).slice();
-                return GekIO.read(src);
+                return JieIO.read(src);
             } else {
                 return null;
             }

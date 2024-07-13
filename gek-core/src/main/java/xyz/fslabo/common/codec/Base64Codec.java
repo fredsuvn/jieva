@@ -2,9 +2,9 @@ package xyz.fslabo.common.codec;
 
 import lombok.Data;
 import org.springframework.core.codec.CodecException;
-import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.GekString;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
     public Base64Codec reset() {
         this.input = null;
         this.output = null;
-        this.blockSize = GekIO.IO_BUFFER_SIZE;
+        this.blockSize = JieIO.IO_BUFFER_SIZE;
         this.mode = ENCODE_MODE;
         this.type = BASIC_TYPE;
         this.withoutPadding = false;
@@ -197,7 +197,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                     return encoder.encode(src, dest);
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (GekIO.isSimpleWrapper(dest)) {
+                    if (JieIO.isSimpleWrapper(dest)) {
                         int writeNum = encoder.encode(src, dest.array());
                         dest.position(writeNum);
                         return writeNum;
@@ -217,18 +217,18 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                 ByteBuffer src = (ByteBuffer) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    if (GekIO.isSimpleWrapper(src)) {
+                    if (JieIO.isSimpleWrapper(src)) {
                         int writeNum = encoder.encode(src.array(), dest);
                         src.position(src.limit());
                         return writeNum;
                     }
                     ByteBuffer encoded = encoder.encode(src);
                     int writeNum = encoded.remaining();
-                    GekIO.readTo(encoded, dest);
+                    JieIO.readTo(encoded, dest);
                     return writeNum;
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (GekIO.isSimpleWrapper(src) && GekIO.isSimpleWrapper(dest)) {
+                    if (JieIO.isSimpleWrapper(src) && JieIO.isSimpleWrapper(dest)) {
                         int writeNum = encoder.encode(src.array(), dest.array());
                         src.position(src.limit());
                         dest.position(writeNum);
@@ -242,10 +242,10 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                     OutputStream dest = (OutputStream) output;
                     ByteBuffer encoded = encoder.encode(src);
                     int writeNum = encoded.remaining();
-                    if (GekIO.isSimpleWrapper(encoded)) {
+                    if (JieIO.isSimpleWrapper(encoded)) {
                         dest.write(encoded.array());
                     } else {
-                        dest.write(GekIO.read(encoded));
+                        dest.write(JieIO.read(encoded));
                     }
                     return writeNum;
                 } else {
@@ -255,23 +255,23 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                 InputStream src = (InputStream) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    byte[] in = GekIO.read(src);
+                    byte[] in = JieIO.read(src);
                     return encoder.encode(in, dest);
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (GekIO.isSimpleWrapper(dest)) {
-                        int writeNum = encoder.encode(GekIO.read(src), dest.array());
+                    if (JieIO.isSimpleWrapper(dest)) {
+                        int writeNum = encoder.encode(JieIO.read(src), dest.array());
                         dest.position(writeNum);
                         return writeNum;
                     }
-                    byte[] encoded = encoder.encode(GekIO.read(src));
+                    byte[] encoded = encoder.encode(JieIO.read(src));
                     dest.put(encoded);
                     return encoded.length;
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
                     OutputCounter counter = new OutputCounter(dest);
                     OutputStream wrapper = encoder.wrap(counter);
-                    GekIO.readTo(src, wrapper, -1, blockSize);
+                    JieIO.readTo(src, wrapper, -1, blockSize);
                     wrapper.close();
                     return counter.count;
                 } else {
@@ -297,7 +297,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                     return decoder.decode(src, dest);
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (GekIO.isSimpleWrapper(dest)) {
+                    if (JieIO.isSimpleWrapper(dest)) {
                         int writeNum = decoder.decode(src, dest.array());
                         dest.position(writeNum);
                         return writeNum;
@@ -317,18 +317,18 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                 ByteBuffer src = (ByteBuffer) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    if (GekIO.isSimpleWrapper(src)) {
+                    if (JieIO.isSimpleWrapper(src)) {
                         int writeNum = decoder.decode(src.array(), dest);
                         src.position(src.limit());
                         return writeNum;
                     }
                     ByteBuffer encoded = decoder.decode(src);
                     int writeNum = encoded.remaining();
-                    GekIO.readTo(encoded, dest);
+                    JieIO.readTo(encoded, dest);
                     return writeNum;
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (GekIO.isSimpleWrapper(src) && GekIO.isSimpleWrapper(dest)) {
+                    if (JieIO.isSimpleWrapper(src) && JieIO.isSimpleWrapper(dest)) {
                         int writeNum = decoder.decode(src.array(), dest.array());
                         src.position(src.limit());
                         dest.position(writeNum);
@@ -342,10 +342,10 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                     OutputStream dest = (OutputStream) output;
                     ByteBuffer encoded = decoder.decode(src);
                     int writeNum = encoded.remaining();
-                    if (GekIO.isSimpleWrapper(encoded)) {
+                    if (JieIO.isSimpleWrapper(encoded)) {
                         dest.write(encoded.array());
                     } else {
-                        dest.write(GekIO.read(encoded));
+                        dest.write(JieIO.read(encoded));
                     }
                     return writeNum;
                 } else {
@@ -355,23 +355,23 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                 InputStream src = (InputStream) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    byte[] in = GekIO.read(src);
+                    byte[] in = JieIO.read(src);
                     return decoder.decode(in, dest);
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (GekIO.isSimpleWrapper(dest)) {
-                        int writeNum = decoder.decode(GekIO.read(src), dest.array());
+                    if (JieIO.isSimpleWrapper(dest)) {
+                        int writeNum = decoder.decode(JieIO.read(src), dest.array());
                         dest.position(writeNum);
                         return writeNum;
                     }
-                    byte[] encoded = decoder.decode(GekIO.read(src));
+                    byte[] encoded = decoder.decode(JieIO.read(src));
                     dest.put(encoded);
                     return encoded.length;
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
                     InputStream wrapper = decoder.wrap(src);
                     OutputCounter counter = new OutputCounter(dest);
-                    GekIO.readTo(wrapper, counter, -1, blockSize);
+                    JieIO.readTo(wrapper, counter, -1, blockSize);
                     return counter.count;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
@@ -403,7 +403,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
             case ENCODE_MODE:
                 return getEncoder().encodeToString(inputToBytes());
             case DECODE_MODE:
-                return GekString.of(getDecoder().decode(inputToBytes()), GekChars.latinCharset());
+                return GekString.of(getDecoder().decode(inputToBytes()), JieChars.latinCharset());
         }
         throw new IllegalStateException("Unknown mode: " + mode);
     }
@@ -415,15 +415,15 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
      *         If it is encode mode, same with {@link #finalLatinString()};
      *     </li>
      *     <li>
-     *         Otherwise with {@link GekChars#defaultCharset()}.
+     *         Otherwise with {@link JieChars#defaultCharset()}.
      *     </li>
      * </ul>
      *
-     * @return encode mode same with {@link #finalLatinString()}, otherwise {@link GekChars#defaultCharset()}
+     * @return encode mode same with {@link #finalLatinString()}, otherwise {@link JieChars#defaultCharset()}
      */
     @Override
     public String finalString() {
-        return mode == ENCODE_MODE ? finalLatinString() : finalString(GekChars.defaultCharset());
+        return mode == ENCODE_MODE ? finalLatinString() : finalString(JieChars.defaultCharset());
     }
 
     @Override
@@ -434,7 +434,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                 InputStream enIn = inputToInputStream();
                 ByteArrayOutputStream bsOut = new ByteArrayOutputStream();
                 OutputStream wrapper = encoder.wrap(bsOut);
-                return GekIO.transform(enIn, blockSize, bytes -> {
+                return JieIO.transform(enIn, blockSize, bytes -> {
                     try {
                         wrapper.write(bytes);
                         if (bytes.length != blockSize) {
@@ -459,20 +459,20 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
             return (byte[]) input;
         }
         if (input instanceof ByteBuffer) {
-            return GekIO.read((ByteBuffer) input);
+            return JieIO.read((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
-            return GekIO.read((InputStream) input);
+            return JieIO.read((InputStream) input);
         }
         throw new CodecException("Unknown input type: " + input.getClass());
     }
 
     private InputStream inputToInputStream() {
         if (input instanceof byte[]) {
-            return GekIO.toInputStream((byte[]) input);
+            return JieIO.toInputStream((byte[]) input);
         }
         if (input instanceof ByteBuffer) {
-            return GekIO.toInputStream((ByteBuffer) input);
+            return JieIO.toInputStream((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return (InputStream) input;

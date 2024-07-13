@@ -3,7 +3,7 @@ package xyz.fslabo.common.net.http;
 import lombok.Getter;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.net.Proxy;
 import java.time.Duration;
@@ -61,7 +61,7 @@ public interface GekHttpClient {
         /**
          * Chunk size.
          */
-        private int chunkSize = GekIO.IO_BUFFER_SIZE;
+        private int chunkSize = JieIO.IO_BUFFER_SIZE;
         /**
          * Proxy info.
          */

@@ -2,7 +2,7 @@ package xyz.fslabo.common.net.http;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +79,7 @@ final class HttpClientImpl implements GekHttpClient {
             InputStream bodyStream = prepareWriting(connection, requestBody);
             connection.setDoOutput(true);
             OutputStream out = connection.getOutputStream();
-            GekIO.readTo(bodyStream, out);
+            JieIO.readTo(bodyStream, out);
             out.flush();
             out.close();
         }
@@ -121,7 +121,7 @@ final class HttpClientImpl implements GekHttpClient {
             return (InputStream) requestBody;
         } else if (requestBody instanceof ByteBuffer) {
             connection.setFixedLengthStreamingMode(((ByteBuffer) requestBody).remaining());
-            return GekIO.toInputStream((ByteBuffer) requestBody);
+            return JieIO.toInputStream((ByteBuffer) requestBody);
         } else {
             throw new GekHttpException("Invalid body type: " + requestBody.getClass());
         }

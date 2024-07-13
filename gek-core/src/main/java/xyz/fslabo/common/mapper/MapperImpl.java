@@ -13,13 +13,13 @@ import java.util.List;
 final class MapperImpl implements Mapper, Mapper.Handler {
 
     static final MapperImpl DEFAULT_MAPPER = new MapperImpl(Arrays.asList(
-        ReuseMapperHandler.INSTANCE,
+        AssignableMapperHandler.INSTANCE,
         EnumConvertHandler.INSTANCE,
         DateConvertHandler.INSTANCE,
         BytesConvertHandler.INSTANCE,
         BooleanConvertHandler.INSTANCE,
-        NumberConvertHandler.INSTANCE,
-        StringConvertHandler.INSTANCE,
+        NumberMapperHandler.INSTANCE,
+        StringMapperHandler.INSTANCE,
         CollectConvertHandler.INSTANCE,
         BeanConvertHandler.INSTANCE
     ));
@@ -59,7 +59,7 @@ final class MapperImpl implements Mapper, Mapper.Handler {
     @Override
     public @Nullable Object map(
         @Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options) {
-        Object result = map(source, sourceType, targetType, options);
+        Object result = mapObject(source, sourceType, targetType, options);
         if (result == Flag.UNSUPPORTED) {
             return Flag.CONTINUE;
         }

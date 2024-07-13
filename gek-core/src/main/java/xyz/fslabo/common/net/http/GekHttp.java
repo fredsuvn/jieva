@@ -1,6 +1,6 @@
 package xyz.fslabo.common.net.http;
 
-import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.base.JieChars;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -169,13 +169,13 @@ public class GekHttp {
 
     /**
      * Encodes given form string (for application/x-www-form-urlencoded) with {@link URLEncoder#encode(String, String)}.
-     * Using {@link GekChars#defaultCharset()}.
+     * Using {@link JieChars#defaultCharset()}.
      *
      * @param formString given form string
      * @return encoded string
      */
     public static String encodeForm(String formString) {
-        return encodeForm(formString, GekChars.defaultCharset());
+        return encodeForm(formString, JieChars.defaultCharset());
     }
 
     /**
@@ -196,13 +196,13 @@ public class GekHttp {
     /**
      * Encodes given query string (for url after '?')
      * with {@link URLEncoder#encode(String, String)} and replace '+' to '%20'.
-     * Using {@link GekChars#defaultCharset()}.
+     * Using {@link JieChars#defaultCharset()}.
      *
      * @param queryString given query string
      * @return encoded string
      */
     public static String encodeQuery(String queryString) {
-        return encodeQuery(queryString, GekChars.defaultCharset());
+        return encodeQuery(queryString, JieChars.defaultCharset());
     }
 
     /**
@@ -219,13 +219,13 @@ public class GekHttp {
 
     /**
      * Decodes given form or query string with {@link URLDecoder#decode(String, String)}.
-     * Using {@link GekChars#defaultCharset()}.
+     * Using {@link JieChars#defaultCharset()}.
      *
      * @param encoded given form or query string
      * @return decoded string
      */
     public static String decodeFormOrQuery(String encoded) {
-        return decodeFormOrQuery(encoded, GekChars.defaultCharset());
+        return decodeFormOrQuery(encoded, JieChars.defaultCharset());
     }
 
     /**

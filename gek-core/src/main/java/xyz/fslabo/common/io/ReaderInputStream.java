@@ -40,7 +40,7 @@ final class ReaderInputStream extends InputStream {
     }
 
     ReaderInputStream(Reader reader, Charset charset) {
-        this(reader, charset, GekIO.IO_BUFFER_SIZE);
+        this(reader, charset, JieIO.IO_BUFFER_SIZE);
     }
 
     @Override

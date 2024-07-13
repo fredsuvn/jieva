@@ -2,9 +2,9 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.data.GekData;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,7 +18,7 @@ public class DataTest {
 
     @Test
     public void testData() {
-        byte[] bytes = DATA.getBytes(GekChars.defaultCharset());
+        byte[] bytes = DATA.getBytes(JieChars.defaultCharset());
         testData(bytes, () -> GekData.wrap(bytes));
         testData(bytes, () -> GekData.wrap(ByteBuffer.wrap(bytes)));
         testData(bytes, () -> GekData.wrap(new ByteArrayInputStream(bytes)));
@@ -26,9 +26,9 @@ public class DataTest {
 
         Assert.assertEquals(GekData.wrap(bytes, 0, 0).write(new byte[0]), -1);
         Assert.assertEquals(GekData.wrap(bytes, 0, 0).write(new byte[bytes.length], 2, 9), -1);
-        Assert.assertEquals(GekData.wrap(GekIO.emptyBuffer()).write(new byte[bytes.length], 2, 9), -1);
+        Assert.assertEquals(GekData.wrap(JieIO.emptyBuffer()).write(new byte[bytes.length], 2, 9), -1);
         Assert.assertEquals(GekData.wrap(new ByteArrayInputStream(new byte[0])).write(new byte[bytes.length], 2, 9), -1);
-        Assert.assertNull(GekData.wrap(GekIO.emptyBuffer()).toBuffer());
+        Assert.assertNull(GekData.wrap(JieIO.emptyBuffer()).toBuffer());
         Assert.assertEquals(GekData.wrap(bytes).write(new byte[bytes.length], 2, 0), 0);
     }
 
@@ -45,11 +45,11 @@ public class DataTest {
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
         supplier.get().write(buffer);
         buffer.flip();
-        Assert.assertEquals(GekIO.read(buffer), data);
+        Assert.assertEquals(JieIO.read(buffer), data);
         buffer.clear();
         supplier.get().write(buffer, 11);
         buffer.flip();
-        Assert.assertEquals(GekIO.read(buffer, 11), Arrays.copyOfRange(data, 0, 11));
+        Assert.assertEquals(JieIO.read(buffer, 11), Arrays.copyOfRange(data, 0, 11));
 
         //stream:
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -61,7 +61,7 @@ public class DataTest {
 
         //to/as:
         Assert.assertEquals(supplier.get().toArray(), data);
-        Assert.assertEquals(GekIO.read(supplier.get().toBuffer()), data);
-        Assert.assertEquals(GekIO.read(supplier.get().asInputStream()), data);
+        Assert.assertEquals(JieIO.read(supplier.get().toBuffer()), data);
+        Assert.assertEquals(JieIO.read(supplier.get().asInputStream()), data);
     }
 }

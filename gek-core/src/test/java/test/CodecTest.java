@@ -8,7 +8,7 @@ import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.codec.CipherCodec;
 import xyz.fslabo.common.codec.CodecProcess;
 import xyz.fslabo.common.codec.GekCodec;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -81,7 +81,7 @@ public class CodecTest {
         long deResultSize = GekCodec.doCipher(cipher, outBuffer, comBuffer, deBlockSize);
         Assert.assertEquals(deResultSize, dataSize);
         comBuffer.flip();
-        Assert.assertEquals(GekIO.read(comBuffer), data);
+        Assert.assertEquals(JieIO.read(comBuffer), data);
 
         //buffer -> stream
         cipher.init(Cipher.ENCRYPT_MODE, encryptKey);
@@ -104,10 +104,10 @@ public class CodecTest {
         outBuffer.flip();
         cipher.init(Cipher.DECRYPT_MODE, decryptKey);
         comBuffer.clear();
-        deResultSize = GekCodec.doCipher(cipher, new ByteArrayInputStream(GekIO.read(outBuffer)), comBuffer, deBlockSize);
+        deResultSize = GekCodec.doCipher(cipher, new ByteArrayInputStream(JieIO.read(outBuffer)), comBuffer, deBlockSize);
         Assert.assertEquals(deResultSize, dataSize);
         comBuffer.flip();
-        Assert.assertEquals(GekIO.read(comBuffer), data);
+        Assert.assertEquals(JieIO.read(comBuffer), data);
 
         //stream -> stream
         cipher.init(Cipher.ENCRYPT_MODE, encryptKey);
@@ -156,18 +156,18 @@ public class CodecTest {
         enBytes = cipher.input(ByteBuffer.wrap(data)).blockSize(enBlockSize).key(publicKey).encrypt().finalBytes();
         deBytes = cipher.input(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
-        enBytes = cipher.input(GekIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().finalBytes();
-        deBytes = cipher.input(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
+        enBytes = cipher.input(JieIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().finalBytes();
+        deBytes = cipher.input(JieIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
-        enBytes = GekIO.read(
-            cipher.input(GekIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().finalStream());
-        deBytes = GekIO.read(
-            cipher.input(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().finalStream());
+        enBytes = JieIO.read(
+            cipher.input(JieIO.toInputStream(data)).blockSize(enBlockSize).key(publicKey).encrypt().finalStream());
+        deBytes = JieIO.read(
+            cipher.input(JieIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().finalStream());
         Assert.assertEquals(data, deBytes);
         byte[] enDest = new byte[dataSize * 10];
         int destSize = (int) cipher.input(data, 2, data.length - 2).blockSize(enBlockSize).key(publicKey).encrypt().output(enDest, 1).doFinal();
         enBytes = Arrays.copyOfRange(enDest, 1, destSize + 1);
-        deBytes = cipher.input(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
+        deBytes = cipher.input(JieIO.toInputStream(enBytes)).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
         Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
     }
 
@@ -183,18 +183,18 @@ public class CodecTest {
         enBytes = cipher.input(ByteBuffer.wrap(data)).blockSize(enBlockSize).key(key).encrypt().finalBytes();
         deBytes = cipher.input(ByteBuffer.wrap(enBytes)).blockSize(deBlockSize).key(key).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
-        enBytes = cipher.input(GekIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().finalBytes();
-        deBytes = cipher.input(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().finalBytes();
+        enBytes = cipher.input(JieIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().finalBytes();
+        deBytes = cipher.input(JieIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
-        enBytes = GekIO.read(
-            cipher.input(GekIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().finalStream());
-        deBytes = GekIO.read(
-            cipher.input(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().finalStream());
+        enBytes = JieIO.read(
+            cipher.input(JieIO.toInputStream(data)).blockSize(enBlockSize).key(key).encrypt().finalStream());
+        deBytes = JieIO.read(
+            cipher.input(JieIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().finalStream());
         Assert.assertEquals(data, deBytes);
         byte[] enDest = new byte[dataSize * 10];
         int destSize = (int) cipher.input(data, 2, data.length - 2).blockSize(enBlockSize).key(key).encrypt().output(enDest, 1).doFinal();
         enBytes = Arrays.copyOfRange(enDest, 1, destSize + 1);
-        deBytes = cipher.input(GekIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().finalBytes();
+        deBytes = cipher.input(JieIO.toInputStream(enBytes)).blockSize(deBlockSize).key(key).decrypt().finalBytes();
         Assert.assertEquals(Arrays.copyOfRange(data, 2, data.length), deBytes);
     }
 
@@ -321,7 +321,7 @@ public class CodecTest {
             Arrays.copyOfRange(destBytesPadding, 10, 10 + size),
             destBytes
         );
-        size = codec.input(srcBytes).output(GekIO.toOutputStream(finalBytes)).doFinalInt();
+        size = codec.input(srcBytes).output(JieIO.toOutputStream(finalBytes)).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(finalBytes, 0, size),
             destBytes
@@ -347,7 +347,7 @@ public class CodecTest {
             Arrays.copyOfRange(destBytesPadding, 10, 10 + size),
             destBytes
         );
-        size = codec.input(srcBytesPadding, 10, srcBytes.length).output(GekIO.toOutputStream(finalBytes)).doFinalInt();
+        size = codec.input(srcBytesPadding, 10, srcBytes.length).output(JieIO.toOutputStream(finalBytes)).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(finalBytes, 0, size),
             destBytes
@@ -373,7 +373,7 @@ public class CodecTest {
             Arrays.copyOfRange(destBytesPadding, 10, 10 + size),
             destBytes
         );
-        size = codec.input(ByteBuffer.wrap(srcBytes)).output(GekIO.toOutputStream(finalBytes)).doFinalInt();
+        size = codec.input(ByteBuffer.wrap(srcBytes)).output(JieIO.toOutputStream(finalBytes)).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(finalBytes, 0, size),
             destBytes
@@ -399,33 +399,33 @@ public class CodecTest {
             Arrays.copyOfRange(destBytesPadding, 10, 10 + size),
             destBytes
         );
-        size = codec.input(ByteBuffer.wrap(srcBytesPadding, 10, srcBytes.length)).output(GekIO.toOutputStream(finalBytes)).doFinalInt();
+        size = codec.input(ByteBuffer.wrap(srcBytesPadding, 10, srcBytes.length)).output(JieIO.toOutputStream(finalBytes)).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(finalBytes, 0, size),
             destBytes
         );
         //stream
-        size = codec.input(GekIO.toInputStream(srcBytes)).output(finalBytes).doFinalInt();
+        size = codec.input(JieIO.toInputStream(srcBytes)).output(finalBytes).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(finalBytes, 0, size),
             destBytes
         );
-        size = codec.input(GekIO.toInputStream(srcBytes)).output(destBytesPadding, 10).doFinalInt();
+        size = codec.input(JieIO.toInputStream(srcBytes)).output(destBytesPadding, 10).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(destBytesPadding, 10, 10 + size),
             destBytes
         );
-        size = codec.input(GekIO.toInputStream(srcBytes)).output(ByteBuffer.wrap(finalBytes)).doFinalInt();
+        size = codec.input(JieIO.toInputStream(srcBytes)).output(ByteBuffer.wrap(finalBytes)).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(finalBytes, 0, size),
             destBytes
         );
-        size = codec.input(GekIO.toInputStream(srcBytes)).output(ByteBuffer.wrap(destBytesPadding, 10, destBytesPadding.length - 10)).doFinalInt();
+        size = codec.input(JieIO.toInputStream(srcBytes)).output(ByteBuffer.wrap(destBytesPadding, 10, destBytesPadding.length - 10)).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(destBytesPadding, 10, 10 + size),
             destBytes
         );
-        size = codec.input(GekIO.toInputStream(srcBytes)).output(GekIO.toOutputStream(finalBytes)).doFinalInt();
+        size = codec.input(JieIO.toInputStream(srcBytes)).output(JieIO.toOutputStream(finalBytes)).doFinalInt();
         Assert.assertEquals(
             Arrays.copyOfRange(finalBytes, 0, size),
             destBytes
@@ -436,7 +436,7 @@ public class CodecTest {
             destBytes
         );
         Assert.assertEquals(
-            GekIO.read(codec.input(srcBytes).finalStream()),
+            JieIO.read(codec.input(srcBytes).finalStream()),
             destBytes
         );
         Assert.assertEquals(

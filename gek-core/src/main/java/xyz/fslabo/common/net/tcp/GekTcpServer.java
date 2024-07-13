@@ -5,7 +5,7 @@ import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.data.GekData;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.GekNetException;
 import xyz.fslabo.common.net.GekNetServerException;
 import xyz.fslabo.common.net.GekServerStates;
@@ -95,7 +95,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
         private @Nullable GekTcpServerHandler serverHandler;
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;
         private @Nullable ExecutorService executor;
-        private int channelBufferSize = GekIO.IO_BUFFER_SIZE;
+        private int channelBufferSize = JieIO.IO_BUFFER_SIZE;
         private @Nullable Consumer<ServerSocket> socketConfig;
 
         /**
@@ -611,7 +611,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
 
                 @Override
                 public synchronized void send(GekData data) {
-                    GekIO.readTo(data.asInputStream(), getOutputStream());
+                    JieIO.readTo(data.asInputStream(), getOutputStream());
                 }
 
                 @Override
@@ -637,13 +637,13 @@ public interface GekTcpServer extends GekTcpEndpoint {
                     if (data.hasArray()) {
                         send(data.array(), data.arrayOffset(), data.remaining());
                     } else {
-                        send(GekIO.read(data));
+                        send(JieIO.read(data));
                     }
                 }
 
                 @Override
                 public synchronized void send(InputStream data) {
-                    GekIO.readTo(data, getOutputStream());
+                    JieIO.readTo(data, getOutputStream());
                 }
 
                 @Override

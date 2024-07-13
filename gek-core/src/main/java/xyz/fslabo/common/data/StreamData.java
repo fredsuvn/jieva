@@ -1,7 +1,7 @@
 package xyz.fslabo.common.data;
 
 import xyz.fslabo.common.base.GekCheck;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,7 +53,7 @@ final class StreamData implements GekData.OfStream {
     @Override
     public int write(byte[] dest, int offset, int length) {
         GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
-        byte[] buffer = GekIO.read(stream, length);
+        byte[] buffer = JieIO.read(stream, length);
         if (buffer == null) {
             return -1;
         }
@@ -66,22 +66,22 @@ final class StreamData implements GekData.OfStream {
 
     @Override
     public int write(ByteBuffer dest, int length) {
-        return (int) GekIO.readTo(stream, GekIO.toOutputStream(dest), length);
+        return (int) JieIO.readTo(stream, JieIO.toOutputStream(dest), length);
     }
 
     @Override
     public long write(OutputStream dest) {
-        return GekIO.readTo(stream, dest);
+        return JieIO.readTo(stream, dest);
     }
 
     @Override
     public long write(OutputStream dest, long length) {
-        return GekIO.readTo(stream, dest, length);
+        return JieIO.readTo(stream, dest, length);
     }
 
     @Override
     public byte[] toArray() {
-        return GekIO.read(stream);
+        return JieIO.read(stream);
     }
 
     @Override

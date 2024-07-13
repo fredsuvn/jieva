@@ -4,12 +4,12 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.base.GekChars;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.data.GekData;
-import xyz.fslabo.common.io.GekIO;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.GekNetException;
 import xyz.fslabo.common.net.GekNetServerException;
 import xyz.fslabo.common.net.http.GekHttp;
@@ -101,7 +101,7 @@ public class NetTest {
                 @Override
                 public @Nullable Object onMessage(GekTcpChannel channel, List<ByteBuffer> message) {
                     for (ByteBuffer buffer : message) {
-                        String str = GekIO.readString(buffer);
+                        String str = JieIO.readString(buffer);
                         TestUtil.count(str, data);
                         System.out.println("TCP receive (" + channel.getRemoteSocketAddress() + "): " + str);
                         switch (str) {
@@ -227,7 +227,7 @@ public class NetTest {
     }
 
     private byte[] buildServerData(String data) {
-        byte[] dataBytes = data.getBytes(GekChars.defaultCharset());
+        byte[] dataBytes = data.getBytes(JieChars.defaultCharset());
         byte[] bytes = new byte[6];
         bytes[0] = 0;
         bytes[1] = 0;
@@ -239,11 +239,11 @@ public class NetTest {
     }
 
     private String parseServerData(ByteBuffer buffer) {
-        byte[] bytes = GekIO.read(buffer);
+        byte[] bytes = JieIO.read(buffer);
         if (bytes.length != 6) {
             throw new GekNetException("bytes.length != 6");
         }
-        return new String(bytes, 3, 3, GekChars.defaultCharset());
+        return new String(bytes, 3, 3, JieChars.defaultCharset());
     }
 
     private void testTcpDelimiterBased(int bufferSize, int serverThreads, int clientThreads) {
@@ -288,7 +288,7 @@ public class NetTest {
                 @Override
                 public @Nullable Object onMessage(GekTcpChannel channel, List<ByteBuffer> message) {
                     for (ByteBuffer buffer : message) {
-                        String str = GekIO.readString(buffer);
+                        String str = JieIO.readString(buffer);
                         TestUtil.count(str, data);
                         System.out.println("TCP receive (" + channel.getRemoteSocketAddress() + "): " + str);
                         switch (str) {
@@ -337,7 +337,7 @@ public class NetTest {
                 @Override
                 public @Nullable Object onMessage(GekTcpChannel channel, List<ByteBuffer> message) {
                     for (ByteBuffer buffer : message) {
-                        String str = GekIO.readString(buffer);
+                        String str = JieIO.readString(buffer);
                         TestUtil.count(str, data);
                         switch (str) {
                             case "hlo": {
@@ -435,7 +435,7 @@ public class NetTest {
             .addPacketHandler(new GekUdpPacketHandler<ByteBuffer>() {
                 @Override
                 public @Nullable Object onPacket(GekUdpHeader header, GekUdpClient client, ByteBuffer buffer) {
-                    String str = GekIO.readString(buffer);
+                    String str = JieIO.readString(buffer);
                     TestUtil.count(str, data);
                     System.out.println("UDP receive (" + header.getInetSocketAddress() + "): " + str);
                     return null;
@@ -459,7 +459,7 @@ public class NetTest {
                 try {
                     for (int i = 0; i < 10; i++) {
                         c.send(GekUdpPacket.of(
-                            ByteBuffer.wrap("udp-client".getBytes(GekChars.defaultCharset())),
+                            ByteBuffer.wrap("udp-client".getBytes(JieChars.defaultCharset())),
                             new InetSocketAddress("localhost", udpServer.getPort()))
                         );
                         Jie.sleep(50);
@@ -487,7 +487,7 @@ public class NetTest {
             .addChannelHandler(new GekTcpChannelHandler<ByteBuffer>() {
                 @Override
                 public @Nullable Object onMessage(GekTcpChannel channel, ByteBuffer message) {
-                    GekIO.readTo(GekIO.toInputStream(message), received);
+                    JieIO.readTo(JieIO.toInputStream(message), received);
                     String response = "HTTP/1.1 200 OK\r\n" +
                         "Content-Length: 9\r\n" +
                         "Content-Length2: 9\r\n" +
@@ -509,13 +509,13 @@ public class NetTest {
             )
         );
         System.out.println("response1 Server received:");
-        System.out.println(new String(received.toByteArray(), GekChars.defaultCharset()));
+        System.out.println(new String(received.toByteArray(), JieChars.defaultCharset()));
         System.out.println("response1 Client response header:");
         GekHttpHeaders headers = response1.getHeaders();
         System.out.println(headers);
         InputStream body = response1.getBody();
         System.out.println("response1 Client response body:");
-        String bodyString = GekIO.readString(body);
+        String bodyString = JieIO.readString(body);
         System.out.println(bodyString);
         body.close();
         Assert.assertEquals(headers.getHeaderFirst("Content-Length"), "9");
@@ -528,13 +528,13 @@ public class NetTest {
             JieColl.mapOf("hello", "hello world")
         );
         System.out.println("response2 Server received:");
-        System.out.println(new String(received.toByteArray(), GekChars.defaultCharset()));
+        System.out.println(new String(received.toByteArray(), JieChars.defaultCharset()));
         System.out.println("response2 Client response header:");
         headers = response2.getHeaders();
         System.out.println(headers);
         body = response2.getBody();
         System.out.println("response2 Client response body:");
-        bodyString = GekIO.readString(body);
+        bodyString = JieIO.readString(body);
         System.out.println(bodyString);
         body.close();
         Assert.assertEquals(headers.getHeaderFirst("Content-Length"), "9");
@@ -547,13 +547,13 @@ public class NetTest {
             new ByteArrayInputStream(GekString.encode("request3"))
         );
         System.out.println("response3 Server received:");
-        System.out.println(new String(received.toByteArray(), GekChars.defaultCharset()));
+        System.out.println(new String(received.toByteArray(), JieChars.defaultCharset()));
         System.out.println("response3 Client response header:");
         headers = response3.getHeaders();
         System.out.println(headers);
         body = response3.getBody();
         System.out.println("response3 Client response body:");
-        bodyString = GekIO.readString(body);
+        bodyString = JieIO.readString(body);
         System.out.println(bodyString);
         body.close();
         Assert.assertEquals(headers.getHeaderFirst("Content-Length"), "9");
@@ -566,13 +566,13 @@ public class NetTest {
             ByteBuffer.wrap(GekString.encode("request4"))
         );
         System.out.println("response4 Server received:");
-        System.out.println(new String(received.toByteArray(), GekChars.defaultCharset()));
+        System.out.println(new String(received.toByteArray(), JieChars.defaultCharset()));
         System.out.println("response4 Client response header:");
         headers = response4.getHeaders();
         System.out.println(headers);
         body = response4.getBody();
         System.out.println("response4 Client response body:");
-        bodyString = GekIO.readString(body);
+        bodyString = JieIO.readString(body);
         System.out.println(bodyString);
         body.close();
         Assert.assertEquals(headers.getHeaderFirst("Content-Length"), "9");
