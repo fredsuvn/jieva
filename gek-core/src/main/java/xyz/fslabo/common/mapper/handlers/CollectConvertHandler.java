@@ -94,7 +94,7 @@ public class CollectConvertHandler implements Mapper.Handler {
     @Nullable
     private Object convertIterableType(
         @Nullable Object obj, Type sourceType, Type targetType, Mapper converter) {
-        ParameterizedType targetItType = JieReflect.getGenericSuperType(targetType, Iterable.class);
+        ParameterizedType targetItType = JieReflect.getActualTypeArguments(targetType, Iterable.class);
         if (targetItType == null) {
             return null;
         }
@@ -203,7 +203,7 @@ public class CollectConvertHandler implements Mapper.Handler {
         if (!(obj instanceof Iterable)) {
             return null;
         }
-        ParameterizedType itType = JieReflect.getGenericSuperType(type, Iterable.class);
+        ParameterizedType itType = JieReflect.getActualTypeArguments(type, Iterable.class);
         if (itType == null) {
             return null;
         }

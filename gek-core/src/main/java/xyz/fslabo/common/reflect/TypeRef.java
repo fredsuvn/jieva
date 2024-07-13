@@ -43,7 +43,7 @@ public abstract class TypeRef<T> {
                 return p.getActualTypeArguments()[0];
             }
         }
-        ParameterizedType parameterizedType = JieReflect.getGenericSuperType(generic, TypeRef.class);
+        ParameterizedType parameterizedType = JieReflect.getActualTypeArguments(generic, TypeRef.class);
         if (parameterizedType == null) {
             throw new IllegalStateException("Current type is not subtype of TypeRef: " + getClass().getName());
         }

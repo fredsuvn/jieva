@@ -1,5 +1,6 @@
 package xyz.fslabo.common.reflect;
 
+import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.OutParam;
 import xyz.fslabo.common.base.GekString;
@@ -553,70 +554,64 @@ public class JieReflect {
     }
 
     /**
-     * Returns generic super type with actual arguments from given type to given target type
-     * (target type is super type of given type).
-     * <p>
-     * For example, these types:
+     * Return a list to describe the generalized representation of the given type from the specified raw type, each
+     * element of the list is actual type argument type of the raw type on given type. For example, for the types:
      * <pre>
      *     private static interface Z&lt;B, T, U, R&gt; {}
      *     private static class ZS implements Z&lt;String, Integer, Long, Boolean&gt; {}
      * </pre>
      * The result of this method:
      * <pre>
-     *     getGenericSuperType(ZS.class, Z.class);
+     *     getActualTypeArguments(ZS.class, Z.class);
      * </pre>
      * will be:
      * <pre>
-     *     Z&lt;String, Integer, Long, Boolean&gt;
+     *     [String.class, Integer.class, Long.class, Boolean.class]
      * </pre>
-     * Note given type must be subtype of target type, if it is not, return null.
+     * Typically, the given type is same with or subtype of the specified raw type, and it returns an empty list if
+     * failed.
      *
-     * @param type   given type
-     * @param target target type
-     * @return generic super type with actual arguments
+     * @param type    given type
+     * @param rawType specified raw type
+     * @return a list to describe the generalized representation of the given type from the specified raw type
      */
-    @Nullable
-    public static ParamType getGenericSuperType(Type type, Class<?> target) {
+    public static List<Type> getActualTypeArguments(Type type, Class<?> rawType) {
         boolean supportedType = false;
         if (type instanceof Class<?>) {
             supportedType = true;
-            Class<?> cType = (Class<?>) type;
-            if (!target.isAssignableFrom(cType)) {
-                return null;
+            Class<?> subType = (Class<?>) type;
+            if (!rawType.isAssignableFrom(subType)) {
+                return Collections.emptyList();
             }
         }
         if (type instanceof ParameterizedType) {
             supportedType = true;
-            ParameterizedType pType = (ParameterizedType) type;
-            Class<?> rawType = (Class<?>) pType.getRawType();
-            if (!target.isAssignableFrom(rawType)) {
-                return null;
+            ParameterizedType subType = (ParameterizedType) type;
+            Class<?> subRawType = (Class<?>) subType.getRawType();
+            if (!rawType.isAssignableFrom(subRawType)) {
+                return Collections.emptyList();
             }
         }
         if (!supportedType) {
-            return null;
+            return Collections.emptyList();
         }
-        TypeVariable<?>[] typeParameters = target.getTypeParameters();
+        TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
         if (JieArray.isEmpty(typeParameters)) {
-            throw new IllegalArgumentException("Given \"to\" type doesn't have type parameter.");
+            return Collections.emptyList();
         }
         Map<TypeVariable<?>, Type> typeArguments = getTypeParameterMapping(type);
         Set<Type> stack = new HashSet<>();
-        List<Type> actualTypeArguments = Arrays.stream(typeParameters)
+        return Arrays.stream(typeParameters)
             .map(it -> {
                 Type nestedValue = JieColl.getNested(typeArguments, it, stack);
                 stack.clear();
                 return nestedValue == null ? it : nestedValue;
             }).collect(Collectors.toList());
-        return JieType.paramType(target, target.getDeclaringClass(), actualTypeArguments);
     }
 
     /**
-     * Returns a mapping of type parameters for given type.
-     * The key of mapping is type parameter, and the value is actual type argument
-     * or inherited type parameter of subtype.
-     * <p>
-     * For example, these types:
+     * Returns a type parameters mapping for given type, the key of mapping is type parameter, and the value is actual
+     * type argument or inherited type parameter. For example, for these types:
      * <pre>
      *     private static class X extends Y&lt;Integer, Long&gt;{}
      *     private static class Y&lt;K, V&gt; implements Z&lt;Float, Double, V&gt; {}
@@ -624,7 +619,7 @@ public class JieReflect {
      * </pre>
      * The result of this method
      * <pre>
-     *     parseActualTypeMapping(x)
+     *     getTypeParameterMapping(x.class)
      * </pre>
      * will be:
      * <pre>
@@ -638,24 +633,25 @@ public class JieReflect {
      * @param type given type
      * @return a mapping of type parameters for given type
      */
+    @Immutable
     public static Map<TypeVariable<?>, Type> getTypeParameterMapping(Type type) {
         return TYPE_PARAMETER_MAPPING_CACHE.compute(type, it -> {
             Map<TypeVariable<?>, Type> result = new HashMap<>();
-            parseTypeParameterMapping(type, result);
+            getTypeParameterMapping(type, result);
             return Collections.unmodifiableMap(result);
         });
     }
 
-    private static void parseTypeParameterMapping(Type type, @OutParam Map<TypeVariable<?>, Type> typeMap) {
+    private static void getTypeParameterMapping(Type type, @OutParam Map<TypeVariable<?>, Type> mapping) {
         if (type instanceof Class) {
             Class<?> cur = (Class<?>) type;
             while (true) {
-                Type superClass = cur.getGenericSuperclass();
-                if (superClass != null) {
-                    parseSuperGeneric(superClass, typeMap);
+                Type superType = cur.getGenericSuperclass();
+                if (superType != null) {
+                    mappingActualTypeArgument(superType, mapping);
                 }
                 Type[] superTypes = cur.getGenericInterfaces();
-                parseSuperTypes(superTypes, typeMap);
+                mappingInterfaceActualTypeArguments(superTypes, mapping);
                 cur = cur.getSuperclass();
                 if (cur == null) {
                     return;
@@ -663,43 +659,46 @@ public class JieReflect {
             }
         }
         if (type instanceof ParameterizedType) {
-            parseSuperGeneric(type, typeMap);
-            parseTypeParameterMapping(((ParameterizedType) type).getRawType(), typeMap);
+            mappingActualTypeArgument(type, mapping);
+            getTypeParameterMapping(((ParameterizedType) type).getRawType(), mapping);
+        }
+    }
+
+    private static void mappingInterfaceActualTypeArguments(Type[] interfaceTypes, @OutParam Map<TypeVariable<?>, Type> mapping) {
+        if (JieArray.isEmpty(interfaceTypes)) {
             return;
         }
-        throw new IllegalArgumentException("Given type must be Class or ParameterizedType.");
-    }
-
-    private static void parseSuperTypes(Type[] superTypes, @OutParam Map<TypeVariable<?>, Type> typeMap) {
-        if (JieArray.isNotEmpty(superTypes)) {
-            for (Type superType : superTypes) {
-                parseSuperGeneric(superType, typeMap);
-                Class<?> superRaw = getRawType(superType);
-                if (superRaw != null) {
-                    Type[] superSuperTypes = superRaw.getGenericInterfaces();
-                    parseSuperTypes(superSuperTypes, typeMap);
-                }
+        for (Type interfaceType : interfaceTypes) {
+            mappingActualTypeArgument(interfaceType, mapping);
+            Class<?> interfaceClass = getRawType(interfaceType);
+            if (interfaceClass != null) {
+                Type[] superInterfaces = interfaceClass.getGenericInterfaces();
+                mappingInterfaceActualTypeArguments(superInterfaces, mapping);
             }
         }
     }
 
-    private static void parseSuperGeneric(Type superGeneric, @OutParam Map<TypeVariable<?>, Type> typeMap) {
-        if (superGeneric instanceof ParameterizedType) {
-            ParameterizedType superParameterized = (ParameterizedType) superGeneric;
-            Class<?> superRaw = (Class<?>) superParameterized.getRawType();
-            Type[] superActualTypeArgs = superParameterized.getActualTypeArguments();
-            TypeVariable<?>[] superTypeVariables = superRaw.getTypeParameters();
-            for (int i = 0; i < superActualTypeArgs.length; i++) {
-                Type actualType = superActualTypeArgs[i];
-                typeMap.put(superTypeVariables[i], actualType);
+    private static void mappingActualTypeArgument(Type type, @OutParam Map<TypeVariable<?>, Type> mapping) {
+        if (!(type instanceof ParameterizedType)) {
+            return;
+        }
+        ParameterizedType parameterizedType = (ParameterizedType) type;
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        Class<?> rawClass = (Class<?>) parameterizedType.getRawType();
+        TypeVariable<?>[] typeParameters = rawClass.getTypeParameters();
+        for (int i = 0; i < typeParameters.length; i++) {
+            if (i >= actualTypeArguments.length) {
+                continue;
             }
+            TypeVariable<?> typeVariable = typeParameters[i];
+            Type actualTypeArgument = actualTypeArguments[i];
+            mapping.put(typeVariable, actualTypeArgument);
         }
     }
 
     /**
-     * Replaces the types in given {@code type} (including itself) that same with the {@code matcher}
-     * with {@code replacement}.
-     * This method supports:
+     * Replaces the types in given {@code type} (including itself) which equals to {@code matcher} with
+     * {@code replacement}. This method supports:
      * <ul>
      *     <li>
      *         ParameterizedType: rawType, ownerType, actualTypeArguments;
@@ -711,7 +710,7 @@ public class JieReflect {
      *         GenericArrayType: componentType;
      *     </li>
      * </ul>
-     * If the {@code deep} parameter is true, this method will recursively replace unmatched types.
+     * If the {@code deep} parameter is true, this method will recursively resolve unmatched types to replace.
      * <p>
      * If no type is matched or the type is not supported for replacing, return given type itself.
      *

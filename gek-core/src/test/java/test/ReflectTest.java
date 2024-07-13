@@ -505,27 +505,27 @@ public class ReflectTest {
 
     @Test
     public void testGetGenericSuperType() {
-        ParameterizedType generic = JieReflect.getGenericSuperType(ZS.class, Z.class);
+        ParameterizedType generic = JieReflect.getActualTypeArguments(ZS.class, Z.class);
         GekLog.getInstance().info(generic);
         Assert.assertEquals(generic, new TypeRef<Z<String, Integer, Long, Boolean>>() {
         }.getType());
-        generic = JieReflect.getGenericSuperType(new TypeRef<ZB<String>>() {
+        generic = JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
         }.getType(), Z.class);
         GekLog.getInstance().info(generic);
         Assert.assertEquals(generic, new TypeRef<Z<String, String, Long, Boolean>>() {
         }.getType());
         Assert.assertEquals(
-            JieReflect.getGenericSuperType(new TypeRef<ZB<String>>() {
+            JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
             }.getType(), ZB.class),
             new TypeRef<ZB<String>>() {
             }.getType()
         );
 
-        Assert.assertNull(JieReflect.getGenericSuperType(Z.class, ZS.class));
-        Assert.assertNull(JieReflect.getGenericSuperType(ZB.class, ZS.class));
+        Assert.assertNull(JieReflect.getActualTypeArguments(Z.class, ZS.class));
+        Assert.assertNull(JieReflect.getActualTypeArguments(ZB.class, ZS.class));
 
         Assert.assertEquals(
-            JieReflect.getGenericSuperType(Iterable.class, Iterable.class),
+            JieReflect.getActualTypeArguments(Iterable.class, Iterable.class),
             JieType.paramType(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
         );
     }

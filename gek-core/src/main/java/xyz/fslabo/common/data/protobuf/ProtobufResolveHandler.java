@@ -81,7 +81,7 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         if (field.isMapField()) {
             String name = rawName + "Map";
             Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(name));
-            Type type = JieReflect.getGenericSuperType(getterMethod.getGenericReturnType(), Map.class);
+            Type type = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), Map.class);
             GekInvoker getter = GekInvoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + GekString.capitalize(rawName));
@@ -109,7 +109,7 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         if (field.isRepeated()) {
             String name = rawName + "List";
             Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(name));
-            Type type = JieReflect.getGenericSuperType(getterMethod.getGenericReturnType(), List.class);
+            Type type = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), List.class);
             GekInvoker getter = GekInvoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + GekString.capitalize(rawName));

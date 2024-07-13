@@ -5,7 +5,7 @@ import xyz.fslabo.common.base.Jie;
 import java.lang.reflect.*;
 import java.util.Objects;
 
-final class TypePatternImpl implements TypePattern {
+final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     private static final Type[] EMPTY_TYPE_ARRAY = {};
     static final TypePatternImpl INSTANCE = new TypePatternImpl();
@@ -282,7 +282,7 @@ final class TypePatternImpl implements TypePattern {
         }
         Type[] assignedArgs = Jie.orDefault(assigned.getActualTypeArguments(), EMPTY_TYPE_ARRAY);
         Type[] assigneeArgs = Jie.orDefault(assignee.getActualTypeArguments(), EMPTY_TYPE_ARRAY);
-        return matchesTypeArgs(assignedArgs, assigneeArgs);
+        return isAssignableTypeArgs(assignedArgs, assigneeArgs);
     }
 
     @Override
@@ -400,5 +400,27 @@ final class TypePatternImpl implements TypePattern {
         Type assignedComponent = assigned.getGenericComponentType();
         Type assigneeComponent = assignee.getGenericComponentType();
         return isAssignable(assignedComponent, assigneeComponent);
+    }
+
+    private boolean isAssignableTypeArgs(Type[] pArgs, Type[] mArgs) {
+        int size = Math.max(pArgs.length, mArgs.length);
+        for (int i = 0; i < size; i++) {
+            Type p = i < pArgs.length ? pArgs[i] : JieType.questionMark();
+            Type m = i < mArgs.length ? mArgs[i] : JieType.questionMark();
+            if (!isAssignableParameterized(p, m)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isAssignableParameterized(Type assigned, Type assignee) {
+        if (Objects.equals(assigned, assignee)) {
+            return true;
+        }
+        if (assigned instanceof WildcardType) {
+            return isAssignable(assigned, assignee);
+        }
+        return false;
     }
 }

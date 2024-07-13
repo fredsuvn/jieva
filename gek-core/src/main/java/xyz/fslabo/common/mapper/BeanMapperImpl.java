@@ -46,12 +46,12 @@ final class BeanMapperImpl implements BeanMapper {
     }
 
     private void mapToMap(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
-        ParamType sourceParamType = JieReflect.getGenericSuperType(sourceType, Map.class);
+        ParamType sourceParamType = JieReflect.getActualTypeArguments(sourceType, Map.class);
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
         Map<Object, Object> sourceMap = Jie.as(source);
-        ParamType destParamType = JieReflect.getGenericSuperType(destType, Map.class);
+        ParamType destParamType = JieReflect.getActualTypeArguments(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
@@ -81,7 +81,7 @@ final class BeanMapperImpl implements BeanMapper {
     }
 
     public void mapToBean(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
-        ParamType sourceParamType = JieReflect.getGenericSuperType(sourceType, Map.class);
+        ParamType sourceParamType = JieReflect.getActualTypeArguments(sourceType, Map.class);
         checkMapType(sourceParamType);
         Type sourceKeyType = sourceParamType.getActualTypeArgument(0);
         Type sourceValueType = sourceParamType.getActualTypeArgument(1);
@@ -116,7 +116,7 @@ final class BeanMapperImpl implements BeanMapper {
         BeanProvider beanProvider = Jie.orDefault(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo sourceInfo = beanProvider.getBeanInfo(sourceType);
         Map<String, PropertyInfo> sourceProperties = sourceInfo.getProperties();
-        ParamType destParamType = JieReflect.getGenericSuperType(destType, Map.class);
+        ParamType destParamType = JieReflect.getActualTypeArguments(destType, Map.class);
         checkMapType(destParamType);
         Type destKeyType = destParamType.getActualTypeArgument(0);
         Type destValueType = destParamType.getActualTypeArgument(1);
