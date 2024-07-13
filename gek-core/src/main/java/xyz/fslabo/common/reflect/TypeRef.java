@@ -1,86 +1,54 @@
 package xyz.fslabo.common.reflect;
 
-import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.collect.JieColl;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * This class represents type reference, usually used to obtain type instance for java, for examples:
- * <p>
- * String.class:
+ * This abstract class is a utility class used for obtaining runtime {@link Type} instance:
  * <pre>
- *     TypeRef&lt;String&gt; typeRef = new TypeRef&lt;String&gt;(){};
- *     Type type = typeRef.getType();
- * </pre>
- * <p>
- * Generic type Map&lt;String, String&gt;:
- * <pre>
- *     TypeRef&lt;Map&lt;String, String&gt;&gt; typeRef = new TypeRef&lt;Map&lt;String, String&gt;&gt;(){};
- *     Type type = typeRef.getType();
+ *     TypeRef&lt;String&gt; classRef = new TypeRef&lt;String&gt;(){};
+ *     Type classType = classRef.getType();
+ *     Objects.equals(classType, String.class);//true
+ *     TypeRef&lt;List&lt;String&gt;&gt; parameterizedRef = new TypeRef&lt;List&lt;String&gt;&gt;(){};
+ *     Type parameterizedType = parameterizedRef.getType();
+ *     System.out.println(parameterizedType.getTypeName());//List&lt;String&gt;
  * </pre>
  *
  * @author fredsuvn
  */
 public abstract class TypeRef<T> {
 
-    /**
-     * Actual runtime type.
-     */
-    private volatile Type type;
+    private final Type type;
 
-    /**
-     * Empty constructor, used to get a generic type.
-     */
     protected TypeRef() {
+        this.type = reflectToActualType();
     }
 
     private Type reflectToActualType() {
-        Type generic = getClass().getGenericSuperclass();
-        if (generic instanceof ParameterizedType) {
-            ParameterizedType p = (ParameterizedType) generic;
-            if (Jie.equals(p.getRawType(), TypeRef.class)) {
-                return p.getActualTypeArguments()[0];
+        Type genericSuper = getClass().getGenericSuperclass();
+        if (genericSuper instanceof ParameterizedType) {
+            ParameterizedType parameterizedSuper = (ParameterizedType) genericSuper;
+            if (Objects.equals(parameterizedSuper.getRawType(), TypeRef.class)) {
+                return parameterizedSuper.getActualTypeArguments()[0];
             }
         }
-        ParameterizedType parameterizedType = JieReflect.getActualTypeArguments(generic, TypeRef.class);
-        if (parameterizedType == null) {
-            throw new IllegalStateException("Current type is not subtype of TypeRef: " + getClass().getName());
+        List<Type> parameterizedType = JieReflect.getActualTypeArguments(genericSuper, TypeRef.class);
+        if (JieColl.isEmpty(parameterizedType)) {
+            throw new IllegalStateException("Not subtype of TypeRef: " + getClass().getName() + "!");
         }
-        return parameterizedType.getActualTypeArguments()[0];
+        return parameterizedType.get(0);
     }
 
     /**
-     * Returns type of this type-ref.
+     * Returns actual type of this reference.
      *
-     * @return type of this type-ref
+     * @return actual type of this reference
      */
     public Type getType() {
-        if (type == null) {
-            synchronized (this) {
-                if (type == null) {
-                    type = reflectToActualType();
-                }
-            }
-        }
         return type;
-    }
-
-    /**
-     * Returns {@link #getType()} as {@link ParameterizedType} of this type-ref.
-     *
-     * @return type as {@link ParameterizedType} of this type-ref
-     */
-    public ParameterizedType asParameterized() {
-        return (ParameterizedType) getType();
-    }
-
-    /**
-     * Returns {@link #getType()} as {@link Class} of this type-ref.
-     *
-     * @return type as {@link Class} of this type-ref
-     */
-    public Class<T> asClass() {
-        return (Class<T>) getType();
     }
 }
