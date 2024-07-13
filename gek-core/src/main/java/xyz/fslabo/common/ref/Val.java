@@ -1,6 +1,7 @@
 package xyz.fslabo.common.ref;
 
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.Jie;
 
 /**
  * This interface represents an immutable value reference.
@@ -20,7 +21,7 @@ public interface Val<T> {
      * @return an instance of {@link Val} of null initialized value
      */
     static <T> Val<T> ofNull() {
-        return of(null);
+        return Jie.as(ValImpls.OF_NULL);
     }
 
     /**

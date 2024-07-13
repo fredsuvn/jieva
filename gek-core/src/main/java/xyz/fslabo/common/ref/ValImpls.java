@@ -5,6 +5,8 @@ import xyz.fslabo.annotations.Nullable;
 
 final class ValImpls {
 
+    static Val<?> OF_NULL = of(null);
+
     static <T> Val<T> of(@Nullable T value) {
         return new ValImpl<>(value);
     }
@@ -44,7 +46,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class ValImpl<T> implements Val<T> {
 
-        private T value;
+        private final T value;
 
         @Override
         public @Nullable T get() {
@@ -55,7 +57,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class BooleanValImpl implements BooleanVal {
 
-        private boolean value;
+        private final boolean value;
 
         @Override
         public boolean get() {
@@ -66,7 +68,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class IntValImpl implements IntVal {
 
-        private int value;
+        private final int value;
 
         @Override
         public int get() {
@@ -77,7 +79,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class LongValImpl implements LongVal {
 
-        private long value;
+        private final long value;
 
         @Override
         public long get() {
@@ -88,7 +90,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class ShortValImpl implements ShortVal {
 
-        private short value;
+        private final short value;
 
         @Override
         public short get() {
@@ -99,7 +101,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class FloatValImpl implements FloatVal {
 
-        private float value;
+        private final float value;
 
         @Override
         public float get() {
@@ -110,7 +112,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class DoubleValImpl implements DoubleVal {
 
-        private double value;
+        private final double value;
 
         @Override
         public double get() {
@@ -121,7 +123,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class ByteValImpl implements ByteVal {
 
-        private byte value;
+        private final byte value;
 
         @Override
         public byte get() {
@@ -132,7 +134,7 @@ final class ValImpls {
     @AllArgsConstructor
     private static final class CharValImpl implements CharVal {
 
-        private char value;
+        private final char value;
 
         @Override
         public char get() {
