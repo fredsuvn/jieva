@@ -95,6 +95,10 @@ public class NumberMapperHandler implements Mapper.Handler {
         }
     }
 
+    private Object stringToNumber() {
+
+    }
+
     private Object mapZero(Type targetType) {
         if (Objects.equals(targetType, byte.class) || Objects.equals(targetType, Byte.class)) {
             return (byte) 0;

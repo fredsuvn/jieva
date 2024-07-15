@@ -8,6 +8,7 @@ import xyz.fslabo.common.bean.BeanProvider;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
@@ -81,9 +82,16 @@ public class MapperOptions {
     private boolean deepCopy;
 
     /**
-     * Charset option to determine which Charset to use for character data conversion.
+     * Charset option to determine which charset to use for character data conversion.
      * <p>
      * Default is {@link JieChars#defaultCharset()}.
      */
     private @Nullable Charset charset;
+
+    /**
+     * Charset option to determine which format to use for number data conversion.
+     * <p>
+     * Default is {@code null}.
+     */
+    private @Nullable NumberFormat numberFormat;
 }
