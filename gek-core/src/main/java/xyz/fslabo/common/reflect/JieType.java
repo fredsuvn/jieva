@@ -1,7 +1,6 @@
 package xyz.fslabo.common.reflect;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
 
@@ -10,7 +9,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -21,152 +19,130 @@ import java.util.Objects;
 public class JieType {
 
     /**
-     * Returns parameterized type with given raw type, owner type and actual type arguments.
+     * Returns a {@link ParameterizedType} with given raw type and actual type arguments.
+     * <p>
+     * Note that the array {@code actualTypeArgs} will be referenced directly in the return value, so any modifications
+     * to this array will affect the return value.
      *
-     * @param rawType             given raw type
-     * @param ownerType           given owner type
-     * @param actualTypeArguments actual type arguments
-     * @return parameterized type
+     * @param rawType        given raw type
+     * @param actualTypeArgs actual type arguments
+     * @return a {@link ParameterizedType}
      */
-    public static ParamType paramType(Type rawType, @Nullable Type ownerType, Iterable<Type> actualTypeArguments) {
-        return paramType(rawType, ownerType, JieColl.toArray(actualTypeArguments, Type.class));
+    public static ParameterizedType parameterized(Class<?> rawType, Type[] actualTypeArgs) {
+        return parameterized(rawType, actualTypeArgs, null);
     }
 
     /**
-     * Returns parameterized type with given raw type and actual type arguments.
+     * Returns a {@link ParameterizedType} with given raw type and actual type arguments.
      *
-     * @param rawType             given raw type
-     * @param actualTypeArguments actual type arguments
-     * @return parameterized type
+     * @param rawType        given raw type
+     * @param actualTypeArgs actual type arguments
+     * @return a {@link ParameterizedType}
      */
-    public static ParamType paramType(Type rawType, Iterable<Type> actualTypeArguments) {
-        return paramType(rawType, null, actualTypeArguments);
+    public static ParameterizedType parameterized(Class<?> rawType, Iterable<Type> actualTypeArgs) {
+        return parameterized(rawType, JieColl.toArray(actualTypeArgs, Type.class));
     }
 
     /**
-     * Returns parameterized type with given raw type, owner type and actual type arguments.
+     * Returns a {@link ParameterizedType} with given raw type, owner type and actual type arguments.
+     * <p>
+     * Note that the array {@code actualTypeArgs} will be referenced directly in the return value, so any modifications
+     * to this array will affect the return value.
      *
-     * @param rawType             given raw type
-     * @param ownerType           given owner type
-     * @param actualTypeArguments actual type arguments
-     * @return parameterized type
+     * @param rawType        given raw type
+     * @param actualTypeArgs actual type arguments
+     * @param ownerType      given owner type
+     * @return a {@link ParameterizedType}
      */
-    public static ParamType paramType(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
-        return new ParamTypeImpl(rawType, ownerType, actualTypeArguments);
+    public static ParameterizedType parameterized(Class<?> rawType, Type[] actualTypeArgs, @Nullable Type ownerType) {
+        return new ParameterizedTypeImpl(rawType, actualTypeArgs, ownerType);
     }
 
     /**
-     * Returns parameterized type with given raw type and actual type arguments.
+     * Returns a {@link ParameterizedType} with given raw type, owner type and actual type arguments.
      *
-     * @param rawType             given raw type
-     * @param actualTypeArguments actual type arguments
-     * @return parameterized type
+     * @param rawType        given raw type
+     * @param actualTypeArgs actual type arguments
+     * @param ownerType      given owner type
+     * @return a {@link ParameterizedType}
      */
-    public static ParamType paramType(Type rawType, Type[] actualTypeArguments) {
-        return paramType(rawType, null, actualTypeArguments);
+    public static ParameterizedType parameterized(Class<?> rawType, Iterable<Type> actualTypeArgs, @Nullable Type ownerType) {
+        return parameterized(rawType, JieColl.toArray(actualTypeArgs, Type.class), ownerType);
     }
 
     /**
-     * Returns given parameterized type as {@link ParamType}.
-     *
-     * @param type given parameterized type
-     * @return parameterized type
-     */
-    public static ParamType paramType(ParameterizedType type) {
-        return paramType(type.getRawType(), type.getOwnerType(), type.getActualTypeArguments());
-    }
-
-    /**
-     * Returns wildcard type with given upper bound and lower bound.
+     * Returns a {@link WildcardType} with given upper bound, it is equivalent to the declaration of:
+     * <pre>
+     *     ? extends T
+     * </pre>
      *
      * @param upperBound given upper bound
+     * @return a {@link WildcardType}
+     */
+    public static WildcardType upperBound(Type upperBound) {
+        return new WildcardTypeImpl(true, upperBound);
+    }
+
+    /**
+     * Returns a {@link WildcardType} with given lower bound, it is equivalent to the declaration of:
+     * <pre>
+     *     ? super T
+     * </pre>
+     *
      * @param lowerBound given lower bound
-     * @return wildcard type
+     * @return a {@link WildcardType}
      */
-    public static Wildcard wildcard(@Nullable Type upperBound, @Nullable Type lowerBound) {
-        return new WildcardImpl(
-            upperBound == null ? null : new Type[]{upperBound},
-            lowerBound == null ? null : new Type[]{lowerBound}
-        );
+    public static WildcardType lowerBound(Type lowerBound) {
+        return new WildcardTypeImpl(false, lowerBound);
     }
 
     /**
-     * Returns wildcard type with given upper bounds and lower bounds.
+     * Returns a singleton {@link WildcardType} represents {@code ?}.
+     *
+     * @return a singleton {@link WildcardType} represents {@code ?}
+     */
+    public static WildcardType questionMark() {
+        return WildcardTypeImpl.QUESTION_MARK;
+    }
+
+    /**
+     * Returns a {@link WildcardType} with given upper bounds and lower bounds.
+     * <p>
+     * Note that the array {@code upperBounds} and {@code lowerBounds} will be referenced directly in the return value,
+     * so any modifications to the arrays will affect the return value.
      *
      * @param upperBounds given upper bounds
      * @param lowerBounds given lower bounds
-     * @return wildcard type
+     * @return a {@link WildcardType}
      */
-    public static Wildcard wildcard(@Nullable Iterable<Type> upperBounds, @Nullable Iterable<Type> lowerBounds) {
-        return new WildcardImpl(
-            upperBounds == null ? null : JieColl.toArray(upperBounds, Type.class),
-            lowerBounds == null ? null : JieColl.toArray(lowerBounds, Type.class)
-        );
+    public static WildcardType wildcard(Type[] upperBounds, Type[] lowerBounds) {
+        return new WildcardTypeImpl(upperBounds, lowerBounds);
     }
 
     /**
-     * Returns wildcard type with given upper bounds and lower bounds.
-     *
-     * @param upperBounds given upper bounds
-     * @param lowerBounds given lower bounds
-     * @return wildcard type
-     */
-    public static Wildcard wildcard(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
-        return new WildcardImpl(upperBounds, lowerBounds);
-    }
-
-    /**
-     * Returns given wildcard type as {@link Wildcard}.
-     *
-     * @param type given wildcard type
-     * @return wildcard type
-     */
-    public static Wildcard wildcard(WildcardType type) {
-        return new WildcardImpl(type.getUpperBounds(), type.getLowerBounds());
-    }
-
-    /**
-     * Returns a singleton wildcard type represents {@code ?}.
-     *
-     * @return a singleton wildcard type represents {@code ?}
-     */
-    public static Wildcard questionMark() {
-        return WildcardImpl.QUESTION_MARK;
-    }
-
-    /**
-     * Returns generic array type with given component type.
+     * Returns a {@link GenericArrayType} with given component type.
      *
      * @param componentType given component type
-     * @return generic array type
+     * @return a {@link GenericArrayType}
      */
-    public static ArrayType arrayType(Type componentType) {
-        return new ArrayTypeImpl(componentType);
+    public static GenericArrayType array(Type componentType) {
+        return new GenericArrayTypeImpl(componentType);
     }
 
-    /**
-     * Returns given generic array type as {@link ArrayType}.
-     *
-     * @param type given generic array type
-     * @return generic array type
-     */
-    public static ArrayType arrayType(GenericArrayType type) {
-        return new ArrayTypeImpl(type.getGenericComponentType());
-    }
+    private static final class ParameterizedTypeImpl implements ParameterizedType {
 
-    private static final class ParamTypeImpl implements ParamType {
-
-        private final Type rawType;
-        private final @Nullable Type ownerType;
+        private final Class<?> rawType;
         private final Type[] actualTypeArguments;
-        private List<Type> actualTypeArgumentList;
-        private String toString;
+        private final @Nullable Type ownerType;
 
-        private ParamTypeImpl(Type rawType, @Nullable Type ownerType, Type[] actualTypeArguments) {
+        private ParameterizedTypeImpl(Class<?> rawType, Type[] actualTypeArguments, @Nullable Type ownerType) {
             this.rawType = rawType;
-            this.ownerType = ownerType == null ?
-                ((rawType instanceof Class) ? ((Class<?>) rawType).getDeclaringClass() : null) : ownerType;
-            this.actualTypeArguments = actualTypeArguments.clone();
+            this.actualTypeArguments = actualTypeArguments;
+            if (ownerType != null) {
+                this.ownerType = ownerType;
+            } else {
+                this.ownerType = rawType.getDeclaringClass();
+            }
         }
 
         @Override
@@ -192,17 +168,17 @@ public class JieType {
             if (o == null) {
                 return false;
             }
-            if (o instanceof ParamTypeImpl) {
-                ParamTypeImpl other = (ParamTypeImpl) o;
-                return Objects.equals(rawType, other.rawType)
-                    && Objects.equals(ownerType, other.ownerType)
-                    && Arrays.equals(actualTypeArguments, other.actualTypeArguments);
+            if (o instanceof ParameterizedTypeImpl) {
+                ParameterizedTypeImpl that = (ParameterizedTypeImpl) o;
+                return Objects.equals(rawType, that.rawType)
+                    && Objects.equals(ownerType, that.ownerType)
+                    && Arrays.equals(actualTypeArguments, that.actualTypeArguments);
             }
             if (o instanceof ParameterizedType) {
-                ParameterizedType other = (ParameterizedType) o;
-                return Objects.equals(rawType, other.getRawType())
-                    && Objects.equals(ownerType, other.getOwnerType())
-                    && Arrays.equals(actualTypeArguments, other.getActualTypeArguments());
+                ParameterizedType that = (ParameterizedType) o;
+                return Objects.equals(rawType, that.getRawType())
+                    && Objects.equals(ownerType, that.getOwnerType())
+                    && Arrays.equals(actualTypeArguments, that.getActualTypeArguments());
             }
             return false;
         }
@@ -210,34 +186,23 @@ public class JieType {
         @Override
         public int hashCode() {
             return Arrays.hashCode(this.actualTypeArguments)
-                ^ (this.ownerType == null ? 0 : this.ownerType.hashCode())
-                ^ (this.rawType == null ? 0 : this.rawType.hashCode());
+                ^ Objects.hashCode(this.ownerType)
+                ^ Objects.hashCode(this.rawType);
         }
 
         @Override
         public String toString() {
-            if (toString != null) {
-                return toString;
-            }
             StringBuilder sb = new StringBuilder();
             if (ownerType != null) {
-                //test.A<String>
+                //test.A<T>
                 sb.append(ownerType.getTypeName());
-                //test.A$B
-                String rawTypeName = rawType.getTypeName();
-                //test.A
-                String ownerRawTypeName;
-                if (ownerType instanceof ParameterizedType) {
-                    ownerRawTypeName = ((ParameterizedType) ownerType).getRawType().getTypeName();
-                } else {
-                    ownerRawTypeName = ownerType.getTypeName();
-                }
-                //test.A$B -> $B
-                String lastName = GekString.replace(rawTypeName, ownerRawTypeName, "");
-                //test.A<String>$B
-                sb.append(lastName);
+                //test.A<T>$
+                sb.append("$");
+                //test.A<T>$B
+                sb.append(rawType.getSimpleName());
             } else {
-                sb.append(rawType.getTypeName());
+                //test.B
+                sb.append(rawType.getName());
             }
             if (JieArray.isNotEmpty(actualTypeArguments)) {
                 sb.append("<");
@@ -246,43 +211,40 @@ public class JieType {
                     if (!first) {
                         sb.append(", ");
                     }
-                    if (t instanceof Class) {
-                        sb.append(((Class<?>) t).getName());
-                    } else {
-                        sb.append(t.toString());
-                    }
+                    sb.append(t.getTypeName());
                     first = false;
                 }
                 sb.append(">");
             }
-            toString = sb.toString();
-            return toString;
-        }
-
-        @Override
-        public List<Type> getActualTypeArgumentList() {
-            if (actualTypeArgumentList == null) {
-                actualTypeArgumentList = JieColl.asList(actualTypeArguments);
-            }
-            return actualTypeArgumentList;
+            return sb.toString();
         }
     }
 
-    private static class WildcardImpl implements Wildcard {
+    private static class WildcardTypeImpl implements WildcardType {
 
-        static final WildcardImpl QUESTION_MARK = new WildcardImpl(null, null);
         static final Type[] OBJECT_ARRAY = {Object.class};
-        static final Type[] EMPTY = {};
+        static final Type[] EMPTY_ARRAY = {};
+
+        static final WildcardTypeImpl QUESTION_MARK = new WildcardTypeImpl(true, null);
 
         private final Type[] upperBounds;
-        private List<Type> upperBoundList;
         private final Type[] lowerBounds;
-        private List<Type> lowerBoundList;
-        private String toString;
 
-        private WildcardImpl(@Nullable Type[] upperBounds, @Nullable Type[] lowerBounds) {
-            this.upperBounds = JieArray.isEmpty(upperBounds) ? OBJECT_ARRAY : upperBounds.clone();
-            this.lowerBounds = JieArray.isEmpty(lowerBounds) ? EMPTY : lowerBounds.clone();
+        private WildcardTypeImpl(boolean isUpperBounds, Type bound) {
+            if (isUpperBounds) {
+                // ? extends String
+                this.upperBounds = bound == null ? OBJECT_ARRAY : new Type[]{bound};
+                this.lowerBounds = EMPTY_ARRAY;
+            } else {
+                // ? super String
+                this.upperBounds = OBJECT_ARRAY;
+                this.lowerBounds = bound == null ? OBJECT_ARRAY : new Type[]{bound};
+            }
+        }
+
+        private WildcardTypeImpl(Type[] upperBounds, Type[] lowerBounds) {
+            this.upperBounds = upperBounds;
+            this.lowerBounds = lowerBounds;
         }
 
         @Override
@@ -303,8 +265,8 @@ public class JieType {
             if (o == null) {
                 return false;
             }
-            if (o instanceof WildcardImpl) {
-                WildcardImpl other = (WildcardImpl) o;
+            if (o instanceof WildcardTypeImpl) {
+                WildcardTypeImpl other = (WildcardTypeImpl) o;
                 return Arrays.equals(upperBounds, other.upperBounds)
                     && Arrays.equals(lowerBounds, other.lowerBounds);
             }
@@ -323,9 +285,6 @@ public class JieType {
 
         @Override
         public String toString() {
-            if (toString != null) {
-                return toString;
-            }
             StringBuilder builder;
             Type[] bounds;
             if (lowerBounds.length == 0) {
@@ -342,35 +301,17 @@ public class JieType {
                 if (i > 0) {
                     builder.append(" & ");
                 }
-                builder.append(bounds[i] instanceof Class ? ((Class<?>) bounds[i]).getName() : bounds[i].toString());
+                builder.append(bounds[i].getTypeName());
             }
-            toString = builder.toString();
-            return toString;
-        }
-
-        @Override
-        public List<Type> getUpperBoundList() {
-            if (upperBoundList == null) {
-                upperBoundList = JieColl.asList(upperBounds);
-            }
-            return upperBoundList;
-        }
-
-        @Override
-        public List<Type> getLowerBoundList() {
-            if (lowerBoundList == null) {
-                lowerBoundList = JieColl.asList(lowerBounds);
-            }
-            return lowerBoundList;
+            return builder.toString();
         }
     }
 
-    private static final class ArrayTypeImpl implements ArrayType {
+    private static final class GenericArrayTypeImpl implements GenericArrayType {
 
         private final Type componentType;
-        private String toString;
 
-        private ArrayTypeImpl(Type componentType) {
+        private GenericArrayTypeImpl(Type componentType) {
             this.componentType = componentType;
         }
 
@@ -401,9 +342,6 @@ public class JieType {
 
         @Override
         public String toString() {
-            if (toString != null) {
-                return toString;
-            }
             Type type = this.getGenericComponentType();
             StringBuilder builder = new StringBuilder();
             if (type instanceof Class) {
@@ -412,8 +350,7 @@ public class JieType {
                 builder.append(type.toString());
             }
             builder.append("[]");
-            toString = builder.toString();
-            return toString;
+            return builder.toString();
         }
     }
 }

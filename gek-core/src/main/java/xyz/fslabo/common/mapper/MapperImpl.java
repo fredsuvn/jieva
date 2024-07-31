@@ -19,7 +19,7 @@ final class MapperImpl implements Mapper, Mapper.Handler {
         BytesConvertHandler.INSTANCE,
         BooleanConvertHandler.INSTANCE,
         NumberMapperHandler.INSTANCE,
-        StringMapperHandler.INSTANCE,
+        ToStringHandler.INSTANCE,
         CollectConvertHandler.INSTANCE,
         BeanConvertHandler.INSTANCE
     ));

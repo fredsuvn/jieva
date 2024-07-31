@@ -184,7 +184,7 @@ public class CollectConvertHandler implements Mapper.Handler {
             return Jie.as(
                 GekObj.wrap(
                     it,
-                    JieType.paramType(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
+                    JieType.parameterized(it.getClass(), Collections.singletonList(((Class<?>) type).getComponentType()))
                 ).toParameterizedObj()
             );
         }
@@ -196,7 +196,7 @@ public class CollectConvertHandler implements Mapper.Handler {
             return Jie.as(
                 GekObj.wrap(
                     it,
-                    JieType.paramType(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
+                    JieType.parameterized(it.getClass(), Collections.singletonList(((GenericArrayType) type).getGenericComponentType()))
                 ).toParameterizedObj()
             );
         }

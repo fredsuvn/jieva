@@ -59,11 +59,11 @@ public class JieReflect {
     }
 
     /**
-     * Returns first upper bound type of given type (? extends).
+     * Returns first upper bound type of given wildcard type (? extends).
      * Note that if no upper bound is explicitly declared, return {@code Object.class}.
      *
-     * @param type given type
-     * @return first upper bound type of given type
+     * @param type given wildcard type
+     * @return first upper bound type of given wildcard type
      */
     public static Type getUpperBound(WildcardType type) {
         Type[] upperBounds = type.getUpperBounds();
@@ -74,115 +74,11 @@ public class JieReflect {
     }
 
     /**
-     * Returns first upper bound type of given type (T extends).
-     * Note that if no upper bound is explicitly declared, return {@code Object.class}.
-     *
-     * @param type given type
-     * @return first upper bound type of given type
-     */
-    public static Type getUpperBound(TypeVariable<?> type) {
-        Type[] bounds = type.getBounds();
-        if (JieArray.isNotEmpty(bounds)) {
-            return bounds[0];
-        }
-        return Object.class;
-    }
-
-    /**
-     * Returns upper bound of given type:
-     * <ul>
-     *     <li>
-     *         If given type is instance of {@link Class}, return itself;
-     *     </li>
-     *     <li>
-     *         If given type is instance of {@link WildcardType}, call {@link #getUpperBounds(WildcardType)};
-     *     </li>
-     *     <li>
-     *         If given type is instance of {@link TypeVariable}, call {@link #getUpperBounds(TypeVariable)};
-     *     </li>
-     *     <li>
-     *         If given type is instance of {@link GenericArrayType}, return a type of which component type is upper
-     *         bound of {@link GenericArrayType#getGenericComponentType()};
-     *     </li>
-     *     <li>
-     *         If given type is instance of {@link ParameterizedType}, return a type of which actual type arguments are
-     *         upper bounds of {@link ParameterizedType#getActualTypeArguments()};
-     *     </li>
-     * </ul>
-     *
-     * @param type given type
-     * @return upper bound of given type
-     */
-    public static Type getUpperBound(Type type) {
-        if (type instanceof Class) {
-            return type;
-        }
-        if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
-            return getUpperBound(wildcardType);
-        }
-        if (type instanceof TypeVariable) {
-            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
-            return getUpperBound(typeVariable);
-        }
-        if (type instanceof GenericArrayType) {
-            GenericArrayType genericArrayType = (GenericArrayType) type;
-            Type componentType = genericArrayType.getGenericComponentType();
-            Type upperComponentType = getUpperBound(componentType);
-            if (Objects.equals(componentType, upperComponentType)) {
-                return type;
-            }
-            return JieType.arrayType(upperComponentType);
-        }
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            Type[] arguments = parameterizedType.getActualTypeArguments();
-            if (JieArray.isEmpty(arguments)) {
-                return type;
-            }
-            Type[] upperArgs = arguments.clone();
-            for (int i = 0; i < arguments.length; i++) {
-                Type upper = getUpperBound(arguments[i]);
-                upperArgs[i] = upper;
-            }
-            if (Arrays.equals(arguments, upperArgs)) {
-                return type;
-            }
-            return JieType.paramType(parameterizedType.getRawType(), parameterizedType.getOwnerType(), upperArgs);
-        }
-        throw new UnsupportedOperationException("Unknown type: " + type);
-    }
-
-    /**
-     * Returns upper bounds of given type (? extends).
-     * Note that if no upper bound is explicitly declared, return an array with singleton element {@code Object.class}.
-     *
-     * @param type given type
-     * @return upper bounds of given type
-     */
-    public static Type[] getUpperBounds(WildcardType type) {
-        Type[] bounds = type.getUpperBounds();
-        return JieArray.isEmpty(bounds) ? SINGLETON_OBJECT_CLASS_ARRAY.clone() : bounds;
-    }
-
-    /**
-     * Returns upper bounds of given type (T extends).
-     * Note that if no upper bound is explicitly declared, return an array with singleton element {@code Object.class}.
-     *
-     * @param type given type
-     * @return upper bounds of given type
-     */
-    public static Type[] getUpperBounds(TypeVariable<?> type) {
-        Type[] bounds = type.getBounds();
-        return JieArray.isEmpty(bounds) ? SINGLETON_OBJECT_CLASS_ARRAY.clone() : bounds;
-    }
-
-    /**
-     * Returns first lower bound type of given type (? super).
+     * Returns first lower bound type of given wildcard type (? super).
      * If given type has no lower bound, return null.
      *
-     * @param type given type
-     * @return first lower bound type of given type or null
+     * @param type given wildcard type
+     * @return first lower bound type of given wildcard type or null
      */
     @Nullable
     public static Type getLowerBound(WildcardType type) {
@@ -194,81 +90,18 @@ public class JieReflect {
     }
 
     /**
-     * Returns lower bound of given type:
-     * <ul>
-     *     <li>
-     *         If given type is instance of {@link Class}, return itself;
-     *     </li>
-     *     <li>
-     *         If given type is instance of {@link WildcardType}, call {@link #getLowerBound(WildcardType)};
-     *     </li>
-     *     <li>
-     *         If given type is instance of {@link TypeVariable}, return null;
-     *     </li>
-     *     <li>
-     *         If given type is instance of {@link GenericArrayType}, return a type of which component type is lower
-     *         bound (including null) of {@link GenericArrayType#getGenericComponentType()};
-     *     </li>
-     *     <li>
-     *         If given type is instance of {@link ParameterizedType}, return a type of which actual type arguments are
-     *         lower bounds (including null) of {@link ParameterizedType#getActualTypeArguments()};
-     *     </li>
-     * </ul>
+     * Returns first bound type of given type variable (T extends).
+     * Note that if no upper bound is explicitly declared, return {@code Object.class}.
      *
-     * @param type given type
-     * @return lower bound of given type
+     * @param type given type variable
+     * @return first upper bound type of given type variable
      */
-    @Nullable
-    private static Type getLowerBound(Type type) {
-        if (type instanceof Class) {
-            return type;
+    public static Type getBound(TypeVariable<?> type) {
+        Type[] bounds = type.getBounds();
+        if (JieArray.isNotEmpty(bounds)) {
+            return bounds[0];
         }
-        if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
-            return getLowerBound(wildcardType);
-        }
-        if (type instanceof TypeVariable) {
-            return null;
-        }
-        if (type instanceof GenericArrayType) {
-            GenericArrayType genericArrayType = (GenericArrayType) type;
-            Type componentType = genericArrayType.getGenericComponentType();
-            Type lowerComponentType = getLowerBound(componentType);
-            if (Objects.equals(componentType, lowerComponentType)) {
-                return type;
-            }
-            return JieType.arrayType(lowerComponentType);
-        }
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            Type[] arguments = parameterizedType.getActualTypeArguments();
-            if (JieArray.isEmpty(arguments)) {
-                return type;
-            }
-            Type[] lowerArgs = arguments.clone();
-            for (int i = 0; i < arguments.length; i++) {
-                Type lower = getLowerBound(arguments[i]);
-                lowerArgs[i] = lower;
-            }
-            if (Arrays.equals(arguments, lowerArgs)) {
-                return type;
-            }
-            return JieType.paramType(parameterizedType.getRawType(), parameterizedType.getOwnerType(), lowerArgs);
-        }
-        throw new UnsupportedOperationException("Unknown type: " + type);
-    }
-
-    /**
-     * Returns lower bounds of given type (? super).
-     * If given type has no lower bound, return null.
-     *
-     * @param type given type
-     * @return lower bounds of given type or null
-     */
-    @Nullable
-    public static Type[] getLowerBounds(WildcardType type) {
-        Type[] bounds = type.getLowerBounds();
-        return JieArray.isEmpty(bounds) ? null : bounds;
+        return Object.class;
     }
 
     /**
@@ -727,15 +560,15 @@ public class JieReflect {
         boolean matched = false;
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
-            Type rawType = parameterizedType.getRawType();
+            Class<?> rawType = (Class<?>) parameterizedType.getRawType();
             if (Objects.equals(rawType, matcher)) {
                 matched = true;
-                rawType = replacement;
+                rawType = (Class<?>) replacement;
             } else if (deep) {
                 Type newRawType = replaceType(rawType, matcher, replacement, true);
                 if (!Objects.equals(rawType, newRawType)) {
                     matched = true;
-                    rawType = newRawType;
+                    rawType = (Class<?>) newRawType;
                 }
             }
             Type ownerType = parameterizedType.getOwnerType();
@@ -764,7 +597,7 @@ public class JieReflect {
                 }
             }
             if (matched) {
-                return JieType.paramType(rawType, ownerType, actualTypeArguments);
+                return JieType.parameterized(rawType, actualTypeArguments, ownerType);
             } else {
                 return type;
             }
@@ -819,7 +652,7 @@ public class JieReflect {
                 }
             }
             if (matched) {
-                return JieType.arrayType(componentType);
+                return JieType.array(componentType);
             } else {
                 return type;
             }

@@ -49,21 +49,21 @@ interface TypePattern {
             }
             return false;
         }
-        if (pattern instanceof Wildcard) {
+        if (pattern instanceof WildcardType) {
             if (matched instanceof Class<?>) {
-                return matchesWildcardToClass((Wildcard) pattern, (Class<?>) matched);
+                return matchesWildcardToClass((WildcardType) pattern, (Class<?>) matched);
             }
             if (matched instanceof ParameterizedType) {
-                return matchesWildcardToParameterized((Wildcard) pattern, (ParameterizedType) matched);
+                return matchesWildcardToParameterized((WildcardType) pattern, (ParameterizedType) matched);
             }
             if (matched instanceof WildcardType) {
-                return matchesWildcardToWildcard((Wildcard) pattern, (WildcardType) matched);
+                return matchesWildcardToWildcard((WildcardType) pattern, (WildcardType) matched);
             }
             if (matched instanceof TypeVariable<?>) {
-                return matchesWildcardToTypeVariable((Wildcard) pattern, (TypeVariable<?>) matched);
+                return matchesWildcardToTypeVariable((WildcardType) pattern, (TypeVariable<?>) matched);
             }
             if (matched instanceof GenericArrayType) {
-                return matchesWildcardToGenericArray((Wildcard) pattern, (GenericArrayType) matched);
+                return matchesWildcardToGenericArray((WildcardType) pattern, (GenericArrayType) matched);
             }
             return false;
         }
@@ -126,15 +126,15 @@ interface TypePattern {
 
     boolean matchesParameterizedToGenericArray(ParameterizedType pattern, GenericArrayType matched);
 
-    boolean matchesWildcardToClass(Wildcard pattern, Class<?> matched);
+    boolean matchesWildcardToClass(WildcardType pattern, Class<?> matched);
 
-    boolean matchesWildcardToParameterized(Wildcard pattern, ParameterizedType matched);
+    boolean matchesWildcardToParameterized(WildcardType pattern, ParameterizedType matched);
 
-    boolean matchesWildcardToWildcard(Wildcard pattern, WildcardType matched);
+    boolean matchesWildcardToWildcard(WildcardType pattern, WildcardType matched);
 
-    boolean matchesWildcardToTypeVariable(Wildcard pattern, TypeVariable<?> matched);
+    boolean matchesWildcardToTypeVariable(WildcardType pattern, TypeVariable<?> matched);
 
-    boolean matchesWildcardToGenericArray(Wildcard pattern, GenericArrayType matched);
+    boolean matchesWildcardToGenericArray(WildcardType pattern, GenericArrayType matched);
 
     boolean matchesTypeVariableToClass(TypeVariable<?> pattern, Class<?> matched);
 
@@ -196,21 +196,21 @@ interface TypePattern {
             }
             return false;
         }
-        if (assigned instanceof Wildcard) {
+        if (assigned instanceof WildcardType) {
             if (assignee instanceof Class<?>) {
-                return isAssignableWildcardToClass((Wildcard) assigned, (Class<?>) assignee);
+                return isAssignableWildcardToClass((WildcardType) assigned, (Class<?>) assignee);
             }
             if (assignee instanceof ParameterizedType) {
-                return isAssignableWildcardToParameterized((Wildcard) assigned, (ParameterizedType) assignee);
+                return isAssignableWildcardToParameterized((WildcardType) assigned, (ParameterizedType) assignee);
             }
             if (assignee instanceof WildcardType) {
-                return isAssignableWildcardToWildcard((Wildcard) assigned, (WildcardType) assignee);
+                return isAssignableWildcardToWildcard((WildcardType) assigned, (WildcardType) assignee);
             }
             if (assignee instanceof TypeVariable<?>) {
-                return isAssignableWildcardToTypeVariable((Wildcard) assigned, (TypeVariable<?>) assignee);
+                return isAssignableWildcardToTypeVariable((WildcardType) assigned, (TypeVariable<?>) assignee);
             }
             if (assignee instanceof GenericArrayType) {
-                return isAssignableWildcardToGenericArray((Wildcard) assigned, (GenericArrayType) assignee);
+                return isAssignableWildcardToGenericArray((WildcardType) assigned, (GenericArrayType) assignee);
             }
             return false;
         }
@@ -273,15 +273,15 @@ interface TypePattern {
 
     boolean isAssignableParameterizedToGenericArray(ParameterizedType assigned, GenericArrayType assignee);
 
-    boolean isAssignableWildcardToClass(Wildcard assigned, Class<?> assignee);
+    boolean isAssignableWildcardToClass(WildcardType assigned, Class<?> assignee);
 
-    boolean isAssignableWildcardToParameterized(Wildcard assigned, ParameterizedType assignee);
+    boolean isAssignableWildcardToParameterized(WildcardType assigned, ParameterizedType assignee);
 
-    boolean isAssignableWildcardToWildcard(Wildcard assigned, WildcardType assignee);
+    boolean isAssignableWildcardToWildcard(WildcardType assigned, WildcardType assignee);
 
-    boolean isAssignableWildcardToTypeVariable(Wildcard assigned, TypeVariable<?> assignee);
+    boolean isAssignableWildcardToTypeVariable(WildcardType assigned, TypeVariable<?> assignee);
 
-    boolean isAssignableWildcardToGenericArray(Wildcard assigned, GenericArrayType assignee);
+    boolean isAssignableWildcardToGenericArray(WildcardType assigned, GenericArrayType assignee);
 
     boolean isAssignableTypeVariableToClass(TypeVariable<?> assigned, Class<?> assignee);
 

@@ -68,17 +68,17 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
     }
 
     @Override
-    public boolean matchesWildcardToClass(Wildcard pattern, Class<?> matched) {
+    public boolean matchesWildcardToClass(WildcardType pattern, Class<?> matched) {
         return matchesWildcardType(pattern, matched);
     }
 
     @Override
-    public boolean matchesWildcardToParameterized(Wildcard pattern, ParameterizedType matched) {
+    public boolean matchesWildcardToParameterized(WildcardType pattern, ParameterizedType matched) {
         return matchesWildcardType(pattern, matched);
     }
 
     @Override
-    public boolean matchesWildcardToWildcard(Wildcard pattern, WildcardType matched) {
+    public boolean matchesWildcardToWildcard(WildcardType pattern, WildcardType matched) {
         Type pUpper = JieReflect.getUpperBound(pattern);
         Type mUpper = JieReflect.getUpperBound(matched);
         if (!isAssignable(pUpper, mUpper)) {
@@ -96,12 +96,12 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
     }
 
     @Override
-    public boolean matchesWildcardToTypeVariable(Wildcard pattern, TypeVariable<?> matched) {
+    public boolean matchesWildcardToTypeVariable(WildcardType pattern, TypeVariable<?> matched) {
         Type pLower = JieReflect.getLowerBound(pattern);
         if (pLower != null) {
             return false;
         }
-        Type[] mUppers = JieReflect.getUpperBounds(matched);
+        Type[] mUppers = matched.getBounds();
         Type pUpper = JieReflect.getUpperBound(pattern);
         for (Type mu : mUppers) {
             if (isAssignable(pUpper, mu)) {
@@ -112,7 +112,7 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
     }
 
     @Override
-    public boolean matchesWildcardToGenericArray(Wildcard pattern, GenericArrayType matched) {
+    public boolean matchesWildcardToGenericArray(WildcardType pattern, GenericArrayType matched) {
         return matchesWildcardType(pattern, matched);
     }
 
@@ -128,7 +128,7 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     @Override
     public boolean matchesTypeVariableToWildcard(TypeVariable<?> pattern, WildcardType matched) {
-        Type[] pUppers = JieReflect.getUpperBounds(pattern);
+        Type[] pUppers = pattern.getBounds();
         Type mUpper = JieReflect.getUpperBound(matched);
         for (Type pu : pUppers) {
             if (!isAssignable(pu, mUpper)) {
@@ -140,8 +140,8 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     @Override
     public boolean matchesTypeVariableToTypeVariable(TypeVariable<?> pattern, TypeVariable<?> matched) {
-        Type[] pUppers = JieReflect.getUpperBounds(pattern);
-        Type[] mUppers = JieReflect.getUpperBounds(matched);
+        Type[] pUppers = pattern.getBounds();
+        Type[] mUppers = matched.getBounds();
         for (Type pu : pUppers) {
             boolean ok = false;
             for (Type mu : mUppers) {
@@ -214,7 +214,7 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
     }
 
     private boolean matchesTypeVariable(TypeVariable<?> pattern, Type type) {
-        Type[] pUppers = JieReflect.getUpperBounds(pattern);
+        Type[] pUppers = pattern.getBounds();
         for (Type ub : pUppers) {
             if (!isAssignable(ub, type)) {
                 return false;
@@ -242,7 +242,7 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     @Override
     public boolean isAssignableClassToTypeVariable(Class<?> assigned, TypeVariable<?> assignee) {
-        Type[] assigneeUppers = JieReflect.getUpperBounds(assignee);
+        Type[] assigneeUppers = assignee.getBounds();
         for (Type assigneeUpper : assigneeUppers) {
             if (!isAssignable(assigned, assigneeUpper)) {
                 return false;
@@ -293,7 +293,7 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     @Override
     public boolean isAssignableParameterizedToTypeVariable(ParameterizedType assigned, TypeVariable<?> assignee) {
-        Type[] assigneeUppers = JieReflect.getUpperBounds(assignee);
+        Type[] assigneeUppers = assignee.getBounds();
         for (Type assigneeUpper : assigneeUppers) {
             if (!isAssignable(assigned, assigneeUpper)) {
                 return false;
@@ -308,27 +308,27 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
     }
 
     @Override
-    public boolean isAssignableWildcardToClass(Wildcard assigned, Class<?> assignee) {
+    public boolean isAssignableWildcardToClass(WildcardType assigned, Class<?> assignee) {
         return matchesWildcardToClass(assigned, assignee);
     }
 
     @Override
-    public boolean isAssignableWildcardToParameterized(Wildcard assigned, ParameterizedType assignee) {
+    public boolean isAssignableWildcardToParameterized(WildcardType assigned, ParameterizedType assignee) {
         return matchesWildcardToParameterized(assigned, assignee);
     }
 
     @Override
-    public boolean isAssignableWildcardToWildcard(Wildcard assigned, WildcardType assignee) {
+    public boolean isAssignableWildcardToWildcard(WildcardType assigned, WildcardType assignee) {
         return matchesWildcardToWildcard(assigned, assignee);
     }
 
     @Override
-    public boolean isAssignableWildcardToTypeVariable(Wildcard assigned, TypeVariable<?> assignee) {
+    public boolean isAssignableWildcardToTypeVariable(WildcardType assigned, TypeVariable<?> assignee) {
         return matchesWildcardToTypeVariable(assigned, assignee);
     }
 
     @Override
-    public boolean isAssignableWildcardToGenericArray(Wildcard assigned, GenericArrayType assignee) {
+    public boolean isAssignableWildcardToGenericArray(WildcardType assigned, GenericArrayType assignee) {
         return matchesWildcardToGenericArray(assigned, assignee);
     }
 
@@ -386,7 +386,7 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     @Override
     public boolean isAssignableGenericArrayToTypeVariable(GenericArrayType assigned, TypeVariable<?> assignee) {
-        Type[] assigneeUppers = JieReflect.getUpperBounds(assignee);
+        Type[] assigneeUppers = assignee.getBounds();
         for (Type assigneeUpper : assigneeUppers) {
             if (!isAssignable(assigned, assigneeUpper)) {
                 return false;

@@ -34,7 +34,7 @@ public interface Mapper {
      *     <li>{@link BytesConvertHandler};</li>
      *     <li>{@link BooleanConvertHandler};</li>
      *     <li>{@link NumberMapperHandler};</li>
-     *     <li>{@link StringMapperHandler};</li>
+     *     <li>{@link ToStringHandler};</li>
      *     <li>{@link CollectConvertHandler};</li>
      *     <li>{@link BeanConvertHandler};</li>
      * </ul>

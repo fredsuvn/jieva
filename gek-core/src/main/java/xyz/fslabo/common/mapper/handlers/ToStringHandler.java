@@ -35,15 +35,19 @@ import java.util.Objects;
  *
  * @author fredsuvn
  */
-public class StringMapperHandler implements Mapper.Handler {
+public class ToStringHandler implements Mapper.Handler {
 
     /**
      * An instance.
      */
-    public static final StringMapperHandler INSTANCE = new StringMapperHandler();
+    public static final ToStringHandler INSTANCE = new ToStringHandler();
 
     @Override
     public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options) {
+
+    }
+
+    private String toString(Object source, Type targetType, MapperOptions options) {
         if (source instanceof Number) {
             return numberToString((Number) source, targetType, options);
         }
@@ -54,6 +58,20 @@ public class StringMapperHandler implements Mapper.Handler {
             return byteBufferToString((ByteBuffer) source, targetType, options);
         }
         return objToString(source, targetType, options);
+    }
+
+    private String numberToString(Number source, Type targetType, MapperOptions options) {
+        NumberFormat numberFormat = options.getNumberFormat();
+        if (numberFormat == null) {
+            return source.toString();
+        }
+        return numberFormat.format(source);
+    }
+
+    private String dateToString(Object source, Type targetType, MapperOptions options) {
+    }
+
+    private String bytesToString(Object source, Type targetType, MapperOptions options) {
     }
 
     private Object objToString(@Nullable Object source, Type targetType, MapperOptions options) {
@@ -100,27 +118,27 @@ public class StringMapperHandler implements Mapper.Handler {
         }
     }
 
-    private Object numberToString(Number source, Type targetType, MapperOptions options) {
-        NumberFormat numberFormat = options.getNumberFormat();
-        if (numberFormat == null) {
-            return objToString(source, targetType, options);
-        }
-        if (Objects.equals(targetType, String.class) || Objects.equals(targetType, CharSequence.class)) {
-            return numberFormat.format(source);
-        } else if (Objects.equals(targetType, StringBuilder.class)) {
-            return new StringBuilder(numberFormat.format(source));
-        } else if (Objects.equals(targetType, StringBuffer.class)) {
-            return new StringBuffer(numberFormat.format(source));
-        } else if (Objects.equals(targetType, char[].class)) {
-            return numberFormat.format(source).toCharArray();
-        } else if (Objects.equals(targetType, byte[].class)) {
-            return numberFormat.format(source).getBytes(getCharset(options));
-        } else if (Objects.equals(targetType, ByteBuffer.class)) {
-            return ByteBuffer.wrap(numberFormat.format(source).getBytes(getCharset(options)));
-        } else {
-            return Flag.CONTINUE;
-        }
-    }
+//    private Object numberToString(Number source, Type targetType, MapperOptions options) {
+//        NumberFormat numberFormat = options.getNumberFormat();
+//        if (numberFormat == null) {
+//            return objToString(source, targetType, options);
+//        }
+//        if (Objects.equals(targetType, String.class) || Objects.equals(targetType, CharSequence.class)) {
+//            return numberFormat.format(source);
+//        } else if (Objects.equals(targetType, StringBuilder.class)) {
+//            return new StringBuilder(numberFormat.format(source));
+//        } else if (Objects.equals(targetType, StringBuffer.class)) {
+//            return new StringBuffer(numberFormat.format(source));
+//        } else if (Objects.equals(targetType, char[].class)) {
+//            return numberFormat.format(source).toCharArray();
+//        } else if (Objects.equals(targetType, byte[].class)) {
+//            return numberFormat.format(source).getBytes(getCharset(options));
+//        } else if (Objects.equals(targetType, ByteBuffer.class)) {
+//            return ByteBuffer.wrap(numberFormat.format(source).getBytes(getCharset(options)));
+//        } else {
+//            return Flag.CONTINUE;
+//        }
+//    }
 
     private Charset getCharset(MapperOptions options) {
         return Jie.orDefault(options.getCharset(), JieChars.defaultCharset());
