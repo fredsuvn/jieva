@@ -3,6 +3,7 @@ package xyz.fslabo.common.bean;
 import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
+import xyz.fslabo.common.base.Jie;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -42,16 +43,17 @@ public interface MemberInfo {
     List<Annotation> getAnnotations();
 
     /**
-     * Returns first annotation of specified type on {@link #getAnnotations()}, or null if not found.
+     * Returns annotation of specified type in order of {@link #getAnnotations()}, may be null if not found.
      *
      * @param annotationType specified type
-     * @return first annotation of specified type on {@link #getAnnotations()}, or null if not found
+     * @param <A>            type of annotation
+     * @return annotation of specified type, may be null if not found
      */
     @Nullable
-    default Annotation getAnnotation(Class<?> annotationType) {
+    default <A extends Annotation> A getAnnotation(Class<A> annotationType) {
         for (Annotation annotation : getAnnotations()) {
             if (Objects.equals(annotationType, annotation.getClass())) {
-                return annotation;
+                return Jie.as(annotation);
             }
         }
         return null;

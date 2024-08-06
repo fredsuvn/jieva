@@ -2,10 +2,9 @@ package xyz.fslabo.common.bean.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
-import xyz.fslabo.common.base.GekRuntimeException;
 import xyz.fslabo.common.bean.*;
 import xyz.fslabo.common.collect.JieColl;
-import xyz.fslabo.common.invoke.GekInvoker;
+import xyz.fslabo.common.invoke.Invoker;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.annotation.Annotation;
@@ -174,45 +173,43 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
 
     private static final class BasePropertyInfoImpl implements BasePropertyInfo {
 
-        private static final Field EMPTY_FIELD;
-        private static final GekInvoker EMPTY_INVOKER;
-
-        static {
-            try {
-                EMPTY_FIELD = BasePropertyInfoImpl.class.getDeclaredField("EMPTY_FIELD");
-                EMPTY_INVOKER = new GekInvoker() {
-                    @Override
-                    public @Nullable Object invoke(@Nullable Object inst, Object... args) {
-                        return null;
-                    }
-                };
-            } catch (NoSuchFieldException e) {
-                throw new GekRuntimeException(e);
-            }
-        }
-
         private final String name;
         private final @Nullable Method getter;
         private final @Nullable Method setter;
         private final Type type;
-        private final Class<?> rawType;
-        private GekInvoker getterInvoker;
-        private GekInvoker setterInvoker;
-        private Field field;
-        private List<Annotation> getterAnnotations;
-        private List<Annotation> setterAnnotations;
-        private List<Annotation> fieldAnnotations;
-        private List<Annotation> allAnnotations;
+        private final @Nullable Invoker getterInvoker;
+        private final @Nullable Invoker setterInvoker;
+        private final @Nullable Field field;
+        private final List<Annotation> getterAnnotations;
+        private final List<Annotation> setterAnnotations;
+        private final List<Annotation> fieldAnnotations;
+        private final List<Annotation> allAnnotations;
 
         private BasePropertyInfoImpl(
             String name, @Nullable Method getter, @Nullable Method setter, Type type, Class<?> rawType) {
             this.name = name;
             this.getter = getter;
-            this.getterInvoker = getter == null ? EMPTY_INVOKER : null;
+            this.getterInvoker = getter == null ? null : buildMethodInvoker(getter);
             this.setter = setter;
-            this.setterInvoker = setter == null ? EMPTY_INVOKER : null;
+            this.setterInvoker = setter == null ? null : buildMethodInvoker(setter);
             this.type = type;
-            this.rawType = rawType;
+            this.field = findField(name, rawType);
+            this.getterAnnotations = getter == null ? Collections.emptyList() : JieColl.asList(getter.getAnnotations());
+            this.setterAnnotations = setter == null ? Collections.emptyList() : JieColl.asList(setter.getAnnotations());
+            this.fieldAnnotations = field == null ? Collections.emptyList() : JieColl.asList(field.getAnnotations());
+            int size = getGetterAnnotations().size() + getSetterAnnotations().size() + getFieldAnnotations().size();
+            Annotation[] array = new Annotation[size];
+            int i = 0;
+            for (Annotation annotation : getterAnnotations) {
+                array[i++] = annotation;
+            }
+            for (Annotation annotation : setterAnnotations) {
+                array[i++] = annotation;
+            }
+            for (Annotation annotation : fieldAnnotations) {
+                array[i++] = annotation;
+            }
+            this.allAnnotations = JieColl.asList(array);
         }
 
         @Override
@@ -222,22 +219,16 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
 
         @Override
         public @Nullable Object getValue(Object bean) {
-            if (getterInvoker == EMPTY_INVOKER) {
-                throw new BeanException("PropertyInfo is not readable: " + name + ".");
-            }
             if (getterInvoker == null) {
-                getterInvoker = buildMethodInvoker(getter);
+                throw new BeanException("PropertyInfo is not readable: " + name + ".");
             }
             return getterInvoker.invoke(bean);
         }
 
         @Override
         public void setValue(Object bean, @Nullable Object value) {
-            if (setterInvoker == EMPTY_INVOKER) {
-                throw new BeanException("PropertyInfo is not writeable: " + name + ".");
-            }
             if (setterInvoker == null) {
-                setterInvoker = buildMethodInvoker(getter);
+                throw new BeanException("PropertyInfo is not writeable: " + name + ".");
             }
             setterInvoker.invoke(bean, value);
         }
@@ -259,47 +250,26 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
 
         @Override
         public @Nullable Field getField() {
-            if (field == null) {
-                field = findField(name, rawType);
-            }
-            return field == EMPTY_FIELD ? null : field;
+            return field;
         }
 
         @Override
         public List<Annotation> getGetterAnnotations() {
-            if (getterAnnotations == null) {
-                getterAnnotations = getter == null ? Collections.emptyList() : JieColl.listOf(getter.getAnnotations());
-            }
             return getterAnnotations;
         }
 
         @Override
         public List<Annotation> getSetterAnnotations() {
-            if (setterAnnotations == null) {
-                setterAnnotations = setter == null ? Collections.emptyList() : JieColl.listOf(setter.getAnnotations());
-            }
             return setterAnnotations;
         }
 
         @Override
         public List<Annotation> getFieldAnnotations() {
-            if (fieldAnnotations == null) {
-                Field field = getField();
-                fieldAnnotations = field == null ? Collections.emptyList() : JieColl.listOf(field.getAnnotations());
-            }
             return fieldAnnotations;
         }
 
         @Override
         public List<Annotation> getAnnotations() {
-            if (allAnnotations == null) {
-                List<Annotation> annotations = new ArrayList<>(
-                    getGetterAnnotations().size() + getSetterAnnotations().size() + getFieldAnnotations().size());
-                annotations.addAll(getGetterAnnotations());
-                annotations.addAll(getSetterAnnotations());
-                annotations.addAll(getFieldAnnotations());
-                allAnnotations = Collections.unmodifiableList(annotations);
-            }
             return allAnnotations;
         }
 
@@ -312,32 +282,19 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         public boolean isWriteable() {
             return setterInvoker != null;
         }
-
-        private Field findField(String name, Class<?> type) {
-            try {
-                return type.getField(name);
-            } catch (NoSuchFieldException e) {
-                Class<?> cur = type;
-                while (cur != null) {
-                    try {
-                        return cur.getDeclaredField(name);
-                    } catch (NoSuchFieldException ex) {
-                        cur = cur.getSuperclass();
-                    }
-                }
-            }
-            return EMPTY_FIELD;
-        }
     }
 
     private static final class BaseMethodInfoImpl implements BaseMethodInfo {
 
         private final Method method;
-        private List<Annotation> annotations;
-        private GekInvoker invoker;
+        private final List<Annotation> annotations;
+        private final Invoker invoker;
 
         private BaseMethodInfoImpl(Method method) {
             this.method = method;
+            this.annotations = JieColl.asList(method.getAnnotations());
+            this.invoker = buildMethodInvoker(method);
+            ;
         }
 
         @Override
@@ -347,9 +304,6 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
 
         @Override
         public Object invoke(Object bean, Object... args) {
-            if (invoker == null) {
-                invoker = buildMethodInvoker(method);
-            }
             return invoker.invoke(bean, args);
         }
 
@@ -360,14 +314,28 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
 
         @Override
         public List<Annotation> getAnnotations() {
-            if (annotations == null) {
-                annotations = JieColl.listOf(method.getAnnotations());
-            }
             return annotations;
         }
     }
 
-    private static GekInvoker buildMethodInvoker(Method method) {
-        return GekInvoker.reflectMethod(method);
+    @Nullable
+    private static Field findField(String name, Class<?> type) {
+        try {
+            return type.getField(name);
+        } catch (NoSuchFieldException e) {
+            Class<?> cur = type;
+            while (cur != null) {
+                try {
+                    return cur.getDeclaredField(name);
+                } catch (NoSuchFieldException ex) {
+                    cur = cur.getSuperclass();
+                }
+            }
+        }
+        return null;
+    }
+
+    private static Invoker buildMethodInvoker(Method method) {
+        return Invoker.reflectMethod(method);
     }
 }

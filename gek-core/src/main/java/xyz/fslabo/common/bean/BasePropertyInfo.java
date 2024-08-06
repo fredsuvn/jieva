@@ -87,6 +87,13 @@ public interface BasePropertyInfo {
     Field getField();
 
     /**
+     * Returns annotations on backed field.
+     *
+     * @return annotations on backed field
+     */
+    List<Annotation> getFieldAnnotations();
+
+    /**
      * Returns annotations on getter.
      *
      * @return annotations on getter
@@ -99,13 +106,6 @@ public interface BasePropertyInfo {
      * @return annotations on setter
      */
     List<Annotation> getSetterAnnotations();
-
-    /**
-     * Returns annotations on backed field.
-     *
-     * @return annotations on backed field
-     */
-    List<Annotation> getFieldAnnotations();
 
     /**
      * Returns annotations on getter, setter and backed field (in this order).

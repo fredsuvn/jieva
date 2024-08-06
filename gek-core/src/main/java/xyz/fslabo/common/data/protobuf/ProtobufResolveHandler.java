@@ -9,7 +9,7 @@ import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.bean.PropertyBase;
 import xyz.fslabo.common.mapper.MapperException;
-import xyz.fslabo.common.invoke.GekInvoker;
+import xyz.fslabo.common.invoke.Invoker;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.annotation.Annotation;
@@ -82,11 +82,11 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
             String name = rawName + "Map";
             Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(name));
             Type type = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), Map.class);
-            GekInvoker getter = GekInvoker.reflectMethod(getterMethod);
+            Invoker getter = Invoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + GekString.capitalize(rawName));
                 Method putAllMethod = rawClass.getMethod("putAll" + GekString.capitalize(rawName), Map.class);
-                GekInvoker setter = new GekInvoker() {
+                Invoker setter = new Invoker() {
                     @Override
                     public @Nullable Object invoke(@Nullable Object inst, Object... args) {
                         try {
@@ -110,11 +110,11 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
             String name = rawName + "List";
             Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(name));
             Type type = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), List.class);
-            GekInvoker getter = GekInvoker.reflectMethod(getterMethod);
+            Invoker getter = Invoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + GekString.capitalize(rawName));
                 Method addAllMethod = rawClass.getMethod("addAll" + GekString.capitalize(rawName), Iterable.class);
-                GekInvoker setter = new GekInvoker() {
+                Invoker setter = new Invoker() {
                     @Override
                     public @Nullable Object invoke(@Nullable Object inst, Object... args) {
                         try {
@@ -136,10 +136,10 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         // Simple object
         Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(rawName));
         Type type = getterMethod.getGenericReturnType();
-        GekInvoker getter = GekInvoker.reflectMethod(getterMethod);
+        Invoker getter = Invoker.reflectMethod(getterMethod);
         if (isBuilder) {
             Method setterMethod = rawClass.getMethod("set" + GekString.capitalize(rawName), JieReflect.getRawType(type));
-            GekInvoker setter = GekInvoker.reflectMethod(setterMethod);
+            Invoker setter = Invoker.reflectMethod(setterMethod);
             return new Impl(rawName, type, getterMethod, setterMethod, getter, setter);
         } else {
             return new Impl(rawName, type, getterMethod, null, getter, null);
@@ -152,16 +152,16 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         private final Type type;
         private final @Nullable Method getterMethod;
         private final @Nullable Method setterMethod;
-        private final GekInvoker getter;
-        private final @Nullable GekInvoker setter;
+        private final Invoker getter;
+        private final @Nullable Invoker setter;
 
         private Impl(
             String name,
             Type type,
             @Nullable Method getterMethod,
             @Nullable Method setterMethod,
-            GekInvoker getter,
-            @Nullable GekInvoker setter
+            Invoker getter,
+            @Nullable Invoker setter
         ) {
             this.name = name;
             this.type = type;
