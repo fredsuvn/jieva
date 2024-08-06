@@ -5,8 +5,10 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.reflect.JieReflect;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -80,4 +82,22 @@ public interface BeanInfo {
      */
     @Immutable
     List<MethodInfo> getMethods();
+
+    /**
+     * Returns method info with given name and parameter types in this bean info.
+     *
+     * @param name           given name
+     * @param parameterTypes given parameter types
+     * @return method info with given name and parameter types in this bean info
+     */
+    @Nullable
+    default MethodInfo getMethod(String name, Class<?>... parameterTypes) {
+        for (MethodInfo method : getMethods()) {
+            Method m = method.getMethod();
+            if (m.getName().equals(name) && Arrays.equals(m.getParameterTypes(), parameterTypes)) {
+                return method;
+            }
+        }
+        return null;
+    }
 }
