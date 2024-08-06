@@ -8,9 +8,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-final class Impls {
+final class InvokerImpls {
 
-    static final class OfMethod implements GekInvoker {
+    static final class OfMethod implements Invoker {
 
         private final Method method;
 
@@ -23,12 +23,12 @@ final class Impls {
             try {
                 return method.invoke(inst, args);
             } catch (Exception e) {
-                throw new GekInvokeException(e);
+                throw new InvokerException(e);
             }
         }
     }
 
-    static final class OfConstructor implements GekInvoker {
+    static final class OfConstructor implements Invoker {
 
         private final Constructor<?> constructor;
 
@@ -41,12 +41,12 @@ final class Impls {
             try {
                 return constructor.newInstance(args);
             } catch (Exception e) {
-                throw new GekInvokeException(e);
+                throw new InvokerException(e);
             }
         }
     }
 
-    static final class OfMethodHandle implements GekInvoker {
+    static final class OfMethodHandle implements Invoker {
 
         private final MethodHandle methodHandle;
         private final boolean isStatic;
@@ -56,7 +56,7 @@ final class Impls {
                 this.methodHandle = MethodHandles.lookup().unreflect(method);
                 this.isStatic = Modifier.isStatic(method.getModifiers());
             } catch (IllegalAccessException e) {
-                throw new GekInvokeException(e);
+                throw new InvokerException(e);
             }
         }
 
@@ -65,7 +65,7 @@ final class Impls {
                 this.methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
                 this.isStatic = true;
             } catch (IllegalAccessException e) {
-                throw new GekInvokeException(e);
+                throw new InvokerException(e);
             }
         }
 
@@ -74,7 +74,7 @@ final class Impls {
             try {
                 return isStatic ? invokeStatic(args) : invokeVirtual(inst, args);
             } catch (Throwable e) {
-                throw new GekInvokeException(e);
+                throw new InvokerException(e);
             }
         }
 

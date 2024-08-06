@@ -3,7 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.GekLog;
-import xyz.fslabo.common.invoke.GekInvoker;
+import xyz.fslabo.common.invoke.Invoker;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -23,16 +23,16 @@ public class InvokeTest {
         constructor.setAccessible(true);
         helloStatic.setAccessible(true);
         helloVirtual.setAccessible(true);
-        TT tt = (TT) (reflect ? GekInvoker.reflectConstructor(constructor) : GekInvoker.unreflectConstructor(constructor)).invoke(null);
+        TT tt = (TT) (reflect ? Invoker.reflectConstructor(constructor) : Invoker.unreflectConstructor(constructor)).invoke(null);
         GekLog.getInstance().info(tt);
         Assert.assertNotNull(tt);
         Assert.assertEquals(
-            (reflect ? GekInvoker.reflectMethod(helloStatic) : GekInvoker.unreflectMethod(helloStatic))
+            (reflect ? Invoker.reflectMethod(helloStatic) : Invoker.unreflectMethod(helloStatic))
                 .invoke(null, "a", "b"),
             "helloStatic: a, b"
         );
         Assert.assertEquals(
-            (reflect ? GekInvoker.reflectMethod(helloVirtual) : GekInvoker.unreflectMethod(helloVirtual))
+            (reflect ? Invoker.reflectMethod(helloVirtual) : Invoker.unreflectMethod(helloVirtual))
                 .invoke(tt, "a", "b"),
             "helloVirtual: a, b"
         );

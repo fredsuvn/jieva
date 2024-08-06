@@ -5,12 +5,12 @@ package xyz.fslabo.common.invoke;
  *
  * @author fredsuvn
  */
-public class GekInvokeException extends RuntimeException {
+public class InvokerException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekInvokeException() {
+    public InvokerException() {
     }
 
     /**
@@ -18,7 +18,7 @@ public class GekInvokeException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekInvokeException(String message) {
+    public InvokerException(String message) {
         super(message);
     }
 
@@ -28,7 +28,7 @@ public class GekInvokeException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekInvokeException(String message, Throwable cause) {
+    public InvokerException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +37,7 @@ public class GekInvokeException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekInvokeException(Throwable cause) {
+    public InvokerException(Throwable cause) {
         super(cause);
     }
 }
