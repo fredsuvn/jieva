@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
  *
  * @author fredsuvn
  */
+@FunctionalInterface
 public interface Invoker {
 
     /**
