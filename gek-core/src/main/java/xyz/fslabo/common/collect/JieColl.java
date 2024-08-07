@@ -258,6 +258,20 @@ public class JieColl {
     }
 
     /**
+     * Reads all properties into a new {@link LinkedHashMap}.
+     *
+     * @param properties given properties
+     * @return a new {@link LinkedHashMap}
+     */
+    public static LinkedHashMap<String, String> toMap(Properties properties) {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        properties.forEach((k, v) -> {
+            map.put(String.valueOf(k), String.valueOf(v));
+        });
+        return map;
+    }
+
+    /**
      * Converts given elements to immutable map, each element of source map will be converted to a map's entry.
      *
      * @param elements      given elements
@@ -750,24 +764,11 @@ public class JieColl {
     }
 
     /**
-     * Reads all properties into a new {@link LinkedHashMap}.
-     *
-     * @param properties given properties
-     * @return a new {@link LinkedHashMap}
-     */
-    public static LinkedHashMap<String, String> toMap(Properties properties) {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        properties.forEach((k, v) -> {
-            map.put(String.valueOf(k), String.valueOf(v));
-        });
-        return map;
-    }
-
-    /**
      * Nested get value from given map with given key.
+     * <p>
      * This method gets value of given key, then let the value as next key to find next value and keep looping.
-     * If last value as key cannot find next value, the last value will be returned.
-     * If given key cannot find at least one value, or a same value in the given stack
+     * If last value as key cannot find next value (return null by {@link Map#get(Object)}), the last value will be
+     * returned. If given key cannot find at least one value, or a same value in the given stack
      * (which will cause an infinite loop), return null.
      *
      * @param map   given map
@@ -782,10 +783,7 @@ public class JieColl {
         stack.add(cur);
         while (true) {
             T result = map.get(cur);
-            if (result == null) {
-                break;
-            }
-            if (stack.contains(result)) {
+            if (result == null || stack.contains(result)) {
                 break;
             }
             cur = result;
