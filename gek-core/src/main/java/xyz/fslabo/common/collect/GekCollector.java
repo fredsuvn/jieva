@@ -1,7 +1,7 @@
 package xyz.fslabo.common.collect;
 
-import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekConfigurer;
+import xyz.fslabo.common.base.Jie;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -377,7 +377,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
         }
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
-                return Jie.as(JieColl.mapOf((Object[]) initialElements));
+                return Jie.as(JieColl.toMap((Object[]) initialElements));
             }
             if (initialElements instanceof Iterable) {
                 return Jie.as(JieColl.toMap((Iterable<?>) initialElements));

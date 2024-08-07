@@ -789,31 +789,31 @@ public class Jie {
     /**
      * Returns an immutable list contains given elements.
      * <p>
-     * This method directly invoke {@link JieColl#listOf(Object[])}.
+     * This method directly invoke {@link JieColl#toList(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
      * @return an immutable list contains given elements
-     * @see JieColl#listOf(Object[])
+     * @see JieColl#toList(Object[])
      */
     @SafeVarargs
     public static <T> List<T> listOf(T... elements) {
-        return JieColl.listOf(elements);
+        return JieColl.toList(elements);
     }
 
     /**
      * Returns an immutable set contains given elements.
      * <p>
-     * This method directly invoke {@link JieColl#setOf(Object[])}.
+     * This method directly invoke {@link JieColl#toSet(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
      * @return an immutable set contains given elements
-     * @see JieColl#setOf(Object[])
+     * @see JieColl#toSet(Object[])
      */
     @SafeVarargs
     public static <T> Set<T> setOf(T... elements) {
-        return JieColl.setOf(elements);
+        return JieColl.toSet(elements);
     }
 
     /**
@@ -821,18 +821,18 @@ public class Jie {
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
      * <p>
-     * This method directly invoke {@link JieColl#mapOf(Object...)}.
+     * This method directly invoke {@link JieColl#toMap(Object...)}.
      *
      * @param elements given elements
      * @param <K>      type of keys
      * @param <V>      type of values
      * @param <T>      type of element
      * @return an immutable map contains given elements
-     * @see JieColl#mapOf(Object...)
+     * @see JieColl#toMap(Object...)
      */
     @SafeVarargs
     public static <K, V, T> Map<K, V> mapOf(T... elements) {
-        return JieColl.mapOf(elements);
+        return JieColl.toMap(elements);
     }
 
     /**
