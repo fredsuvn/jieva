@@ -202,7 +202,7 @@ final class BeanMapperImpl implements BeanMapper {
         }
         Object destValue;
         try {
-            destValue = mapper.mapObject(sourceValue, sourceValueType, destValueType, options);
+            destValue = mapper.map(sourceValue, sourceValueType, destValueType, options);
             if (Objects.equals(destValue, Flag.UNSUPPORTED)) {
                 if (ignoreError) {
                     return;
@@ -260,7 +260,7 @@ final class BeanMapperImpl implements BeanMapper {
         }
         Object destValue;
         try {
-            destValue = mapper.mapObject(sourceValue, sourceValueType, destProperty.getType(), options);
+            destValue = mapper.map(sourceValue, sourceValueType, destProperty.getType(), options);
             if (Objects.equals(destValue, Flag.UNSUPPORTED)) {
                 if (ignoreError) {
                     return;
@@ -295,7 +295,7 @@ final class BeanMapperImpl implements BeanMapper {
         boolean ignoreError = options.isIgnoreError();
         Object destKey;
         try {
-            destKey = mapper.mapObject(mappedKey, sourceKeyType, destKeyType, options);
+            destKey = mapper.map(mappedKey, sourceKeyType, destKeyType, options);
             if (Objects.equals(destKey, Flag.UNSUPPORTED)) {
                 if (ignoreError) {
                     return F.RETURN;

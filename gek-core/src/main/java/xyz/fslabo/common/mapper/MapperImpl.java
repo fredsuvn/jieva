@@ -59,7 +59,7 @@ final class MapperImpl implements Mapper, Mapper.Handler {
     @Override
     public @Nullable Object map(
         @Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options) {
-        Object result = mapObject(source, sourceType, targetType, options);
+        Object result = map(source, sourceType, targetType, options);
         if (result == Flag.UNSUPPORTED) {
             return Flag.CONTINUE;
         }

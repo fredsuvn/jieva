@@ -44,7 +44,7 @@ public class AssignableMapperHandler implements Mapper.Handler {
                     if (lowerClass.isInterface()) {
                         return new Object();
                     }
-                    Object tryLower = mapper.mapObject(source, sourceType, lowerClass, options);
+                    Object tryLower = mapper.map(source, sourceType, lowerClass, options);
                     if (tryLower == null) {
                         return new Object();
                     }
@@ -58,7 +58,7 @@ public class AssignableMapperHandler implements Mapper.Handler {
             // T extends
             Type[] uppers = JieReflect.getUpperBounds(targetTypeVariable);
             if (uppers.length == 1) {
-                Object tryUpper = mapper.mapObject(source, sourceType, uppers[0], options);
+                Object tryUpper = mapper.map(source, sourceType, uppers[0], options);
                 if (tryUpper == null) {
                     return Flag.BREAK;
                 }

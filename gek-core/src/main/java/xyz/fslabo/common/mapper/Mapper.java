@@ -5,6 +5,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapper.handlers.*;
 import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.TypeRef;
@@ -13,11 +14,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Mapper interface to map object from source type to target type.
- * <p>
- * A {@link Mapper} consists of a list of {@link Handler}s. In general, the mapper will call
- * {@link Handler#map(Object, Type, Type, Mapper, MapperOptions)} for each handler in {@link Mapper#getHandlers()}
- * sequentially. More detail of mapping process, see {@link Handler#map(Object, Type, Type, Mapper, MapperOptions)}.
+ * Mapper interface to map object from source type to target type. A {@link Mapper} typically has a list of
+ * {@link Handler}s, and  default implementation, the {@link Handler}s provide map operation for core methods
+ * {@link #map(Object, Type, Type, MapperOptions)} and {@link #mapProperty(Object, Type, PropertyInfo, MapperOptions)}.
  *
  * @author fredsuvn
  * @see Handler#map(Object, Type, Type, Mapper, MapperOptions)
@@ -56,7 +55,7 @@ public interface Mapper {
     }
 
     /**
-     * Returns actual result from {@link #mapObject(Object, Type, Type, MapperOptions)}.
+     * Returns actual result from {@link #map(Object, Type, Type, MapperOptions)}.
      * The code is similar to the following:
      * <pre>
      *     if (result == null) {
@@ -68,7 +67,7 @@ public interface Mapper {
      *     return Jie.as(result);
      * </pre>
      *
-     * @param result result from {@link #mapObject(Object, Type, Type, MapperOptions)}
+     * @param result result from {@link #map(Object, Type, Type, MapperOptions)}
      * @param <T>    target type
      * @return the actual result
      */
@@ -84,14 +83,17 @@ public interface Mapper {
     }
 
     /**
-     * Maps source object from source type to target.
-     * Returns null if mapping failed or the result itself is null.
+     * Maps source object from source type to target, returns null if mapping failed or the result itself is null.
+     * This method is equivalent to:
+     * <pre>
+     *     return map(source, (Type) targetType, options);
+     * </pre>
      *
      * @param source     source object
      * @param targetType target type
      * @param options    mapping options
      * @param <T>        target type
-     * @return converted object or null
+     * @return mapped object or null
      */
     @Nullable
     default <T> T map(@Nullable Object source, Class<T> targetType, MapperOptions options) {
@@ -99,39 +101,48 @@ public interface Mapper {
     }
 
     /**
-     * Maps source object from source type to target type ref.
-     * Returns null if mapping failed or the result itself is null.
+     * Maps source object from source type to target type ref, returns null if mapping failed or the result itself is null.
+     * This method is equivalent to:
+     * <pre>
+     *     Object result = map(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
+     *     return resolveResult(result);
+     * </pre>
      *
      * @param source        source object
      * @param targetTypeRef type reference target type
      * @param options       mapping options
      * @param <T>           target type
-     * @return converted object or null
+     * @return mapped object or null
      */
     @Nullable
     default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef, MapperOptions options) {
-        Object result = mapObject(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
+        Object result = map(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
         return resolveResult(result);
     }
 
     /**
-     * Maps source object from source type to target type.
-     * Returns null if mapping failed or the result itself is null.
+     * Maps source object from source type to target type, returns null if mapping failed or the result itself is null.
+     * This method is equivalent to:
+     * <pre>
+     *     Object result = map(source, source == null ? Object.class : source.getClass(), targetType, options);
+     *     return resolveResult(result);
+     * </pre>
      *
      * @param source     source object
      * @param targetType target type
      * @param options    mapping options
      * @param <T>        target type
-     * @return mapping result
+     * @return mapped object or null
      */
     @Nullable
     default <T> T map(@Nullable Object source, Type targetType, MapperOptions options) {
-        Object result = mapObject(source, source == null ? Object.class : source.getClass(), targetType, options);
+        Object result = map(source, source == null ? Object.class : source.getClass(), targetType, options);
         return resolveResult(result);
     }
 
     /**
-     * Maps source object from source type to target type. The result of this method in 3 types:
+     * Maps source object from source type to target type.
+     * The result of this method in 3 types:
      * <ul>
      *     <li>
      *         {@code null}: mapping failed;
@@ -143,17 +154,95 @@ public interface Mapper {
      *         {@code others}: mapping successful, the result is returned object;
      *     </li>
      * </ul>
+     * In the default implementation, this method will invoke
+     * {@link Handler#map(Object, Type, Type, Mapper, MapperOptions)} for each handler in {@link Mapper#getHandlers()}
+     * sequentially. It is equivalent to:
+     * <pre>
+     *     for (Handler handler : getHandlers()) {
+     *         Object value = handler.map(source, sourceType, targetType, this, options);
+     *         if (value == Flag.CONTINUE) {
+     *             continue;
+     *         }
+     *         if (value == Flag.BREAK) {
+     *             return null;
+     *         }
+     *         if (value instanceof Val) {
+     *             return ((Val<?>) value).get();
+     *         }
+     *         return value;
+     *     }
+     *     return null;
+     * </pre>
      *
      * @param source     source object
      * @param sourceType source type
      * @param targetType target type
      * @param options    mapping options
-     * @return converted object or null
+     * @return mapped object or null
      */
     @Nullable
-    default Object mapObject(@Nullable Object source, Type sourceType, Type targetType, MapperOptions options) {
+    default Object map(@Nullable Object source, Type sourceType, Type targetType, MapperOptions options) {
         for (Handler handler : getHandlers()) {
             Object value = handler.map(source, sourceType, targetType, this, options);
+            if (value == Flag.CONTINUE) {
+                continue;
+            }
+            if (value == Flag.BREAK) {
+                return null;
+            }
+            if (value instanceof Val) {
+                return ((Val<?>) value).get();
+            }
+            return value;
+        }
+        return null;
+    }
+
+    /**
+     * Maps source object from source type to the type which defined by target bean property.
+     * The result of this method in 3 types:
+     * <ul>
+     *     <li>
+     *         {@code null}: mapping failed;
+     *     </li>
+     *     <li>
+     *         {@link Val}: mapping successful, the result is {@link Val#get()};
+     *     </li>
+     *     <li>
+     *         {@code others}: mapping successful, the result is returned object;
+     *     </li>
+     * </ul>
+     * In the default implementation, this method will invoke
+     * {@link Handler#mapProperty(Object, Type, PropertyInfo, Mapper, MapperOptions)} for each handler in
+     * {@link Mapper#getHandlers()} sequentially. It is equivalent to:
+     * <pre>
+     *     for (Handler handler : getHandlers()) {
+     *         Object value = handler.mapProperty(source, sourceType, targetType, this, options);
+     *         if (value == Flag.CONTINUE) {
+     *             continue;
+     *         }
+     *         if (value == Flag.BREAK) {
+     *             return null;
+     *         }
+     *         if (value instanceof Val) {
+     *             return ((Val<?>) value).get();
+     *         }
+     *         return value;
+     *     }
+     *     return null;
+     * </pre>
+     *
+     * @param source         source object
+     * @param sourceType     source type
+     * @param targetProperty target bean property
+     * @param options        mapping options
+     * @return mapped object or null
+     */
+    @Nullable
+    default Object mapProperty(
+        @Nullable Object source, Type sourceType, PropertyInfo targetProperty, MapperOptions options) {
+        for (Handler handler : getHandlers()) {
+            Object value = handler.mapProperty(source, sourceType, targetProperty, this, options);
             if (value == Flag.CONTINUE) {
                 continue;
             }
@@ -204,7 +293,9 @@ public interface Mapper {
     Handler asHandler();
 
     /**
-     * Handler of {@link Mapper}, provides a default util method {@link #wrapResult(Object)}.
+     * Handler of {@link Mapper} to provide map operation.
+     * <p>
+     * This interface also provides a default util method {@link #wrapResult(Object)}.
      *
      * @author fredsuvn
      * @see Mapper
@@ -214,8 +305,6 @@ public interface Mapper {
 
         /**
          * Maps object from source type to target type.
-         * <p>
-         * In general, all handlers in {@link Mapper#getHandlers()} will be invoked sequentially.
          * The result of this method in 4 types:
          * <ul>
          *     <li>
@@ -240,6 +329,34 @@ public interface Mapper {
          * @return converted object
          */
         Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options);
+
+        /**
+         * Maps object from source type to the type which defined by target bean property.
+         * The result of this method in 4 types:
+         * <ul>
+         *     <li>
+         *         {@link Flag#CONTINUE}: mapping failed, hands off to next handler;
+         *     </li>
+         *     <li>
+         *         {@link Flag#BREAK}: mapping failed, breaks the handler chain;
+         *     </li>
+         *     <li>
+         *         {@link Val}: mapping successful, the result is {@link Val#get()};
+         *     </li>
+         *     <li>
+         *         {@code others}: mapping successful, the result is returned object;
+         *     </li>
+         * </ul>
+         *
+         * @param source         source object
+         * @param sourceType     source type
+         * @param targetProperty target bean property
+         * @param mapper         mapper of current context.
+         * @param options        mapping options
+         * @return converted object
+         */
+        Object mapProperty(
+            @Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MapperOptions options);
 
 
         /**

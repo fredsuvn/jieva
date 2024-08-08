@@ -1,10 +1,7 @@
 package xyz.fslabo.common.mapper;
 
-import lombok.Builder;
-import lombok.Getter;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.bean.BeanProvider;
-import xyz.fslabo.common.bean.PropertyInfo;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
@@ -12,22 +9,20 @@ import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
- * Options for {@link Mapper} and {@link BeanMapper}.
+ * Context in mapping process of {@link BeanMapper} and {@link Mapper}.
  *
- * @author sunqian
+ * @author fredsuvn
  */
-@Builder
-@Getter
-public class MapperOptions {
+public interface MappingContext {
 
     /**
      * Option for {@link BeanProvider}, to resolve bean infos if needed.
      * If this option is null, the mapper will use {@link BeanProvider#defaultProvider()}.
      */
-    private @Nullable BeanProvider beanProvider;
+    @Nullable
+    BeanProvider beanProvider();
 
     /**
      * Option for {@link Mapper}, to map objects in types if needed.
@@ -35,12 +30,12 @@ public class MapperOptions {
      * dest properties or entries.
      * If this option is null, the mapper will use {@link Mapper#defaultMapper()}.
      */
-    private @Nullable Mapper mapper;
+     @Nullable Mapper mapper;
 
     /**
      * Ignored names or keys when mapping properties.
      */
-    private @Nullable Collection<?> ignored;
+     @Nullable Collection<?> ignored;
 
     /**
      * Mapper function for property names of bean and keys of map.
@@ -52,7 +47,7 @@ public class MapperOptions {
      * <p>
      * Note the {@link #getMapper()} option will still valid for the names and keys after mapping by this name mapper.
      */
-    private @Nullable BiFunction<Object, Type, @Nullable Object> nameMapper;
+     @Nullable BiFunction<Object, Type, @Nullable Object> nameMapper;
 
     /**
      * Whether the null value should be ignored when mapping.
@@ -103,28 +98,4 @@ public class MapperOptions {
      * Default is {@code null}.
      */
     private @Nullable DateTimeFormatter dateFormat;
-
-    /**
-     * Charset function to determine which charset to use for character conversion. This option is typically used in
-     * {@link BeanMapper}.
-     * <p>
-     * Default is {@code null}.
-     */
-    private @Nullable Function<PropertyInfo, Charset> propertyCharset;
-
-    /**
-     * Charset function to determine which format to use for number conversion. This option is typically used in
-     * {@link BeanMapper}.
-     * <p>
-     * Default is {@code null}.
-     */
-    private @Nullable Function<PropertyInfo, NumberFormat> propertyNumberFormat;
-
-    /**
-     * Charset function to determine which format to use for date conversion. This option is typically used in
-     * {@link BeanMapper}.
-     * <p>
-     * Default is {@code null}.
-     */
-    private @Nullable Function<PropertyInfo, DateTimeFormatter> propertyDateFormat;
 }
