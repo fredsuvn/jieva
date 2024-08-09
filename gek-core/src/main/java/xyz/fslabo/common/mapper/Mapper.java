@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Mapper interface to map object from source type to target type. A {@link Mapper} typically has a list of
- * {@link Handler}s, and  default implementation, the {@link Handler}s provide map operation for core methods
+ * {@link Handler}s, and in default implementation, the {@link Handler}s provide actual map operation for core methods
  * {@link #map(Object, Type, Type, MapperOptions)} and {@link #mapProperty(Object, Type, PropertyInfo, MapperOptions)}.
  *
  * @author fredsuvn

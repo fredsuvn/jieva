@@ -2,6 +2,7 @@ package xyz.fslabo.common.mapper;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
+import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.mapper.handlers.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 final class MapperImpl implements Mapper, Mapper.Handler {
 
     static final MapperImpl DEFAULT_MAPPER = new MapperImpl(Arrays.asList(
-        AssignableMapperHandler.INSTANCE,
+        AssignableMapperHandler.SINGLETON,
         EnumConvertHandler.INSTANCE,
         DateConvertHandler.INSTANCE,
         BytesConvertHandler.INSTANCE,
@@ -60,6 +61,16 @@ final class MapperImpl implements Mapper, Mapper.Handler {
     public @Nullable Object map(
         @Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options) {
         Object result = map(source, sourceType, targetType, options);
+        if (result == Flag.UNSUPPORTED) {
+            return Flag.CONTINUE;
+        }
+        return result;
+    }
+
+    @Override
+    public Object mapProperty(
+        @Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MapperOptions options) {
+        Object result = mapProperty(source, sourceType, targetProperty, options);
         if (result == Flag.UNSUPPORTED) {
             return Flag.CONTINUE;
         }

@@ -2,6 +2,7 @@ package xyz.fslabo.common.mapper.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
+import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.mapper.MapperOptions;
 import xyz.fslabo.common.reflect.JieReflect;
@@ -11,7 +12,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 
 /**
- * Default first handler.
+ * Default first {@link Mapper.Handler} of {@link Mapper#getHandlers()}, has a singleton instance {@link #SINGLETON}.
  * <p>
  * If target type is assignable from source type, and the {@code deepCopy} option is false, return source object.
  * Otherwise, if target type is {@link WildcardType} or {@link TypeVariable}, this handler will try to find an explicit
@@ -22,9 +23,12 @@ import java.lang.reflect.WildcardType;
 public class AssignableMapperHandler implements Mapper.Handler {
 
     /**
-     * An instance.
+     * Singleton instance.
      */
-    public static final AssignableMapperHandler INSTANCE = new AssignableMapperHandler();
+    public static final AssignableMapperHandler SINGLETON = new AssignableMapperHandler();
+
+    private AssignableMapperHandler() {
+    }
 
     @Override
     public Object map(
@@ -67,5 +71,10 @@ public class AssignableMapperHandler implements Mapper.Handler {
             return Flag.CONTINUE;
         }
         return Flag.CONTINUE;
+    }
+
+    @Override
+    public Object mapProperty(@Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MapperOptions options) {
+        return null;
     }
 }

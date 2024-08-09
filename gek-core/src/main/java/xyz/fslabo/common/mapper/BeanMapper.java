@@ -12,8 +12,7 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
-public interface
-BeanMapper {
+public interface BeanMapper {
 
     /**
      * Returns default bean mapper.
@@ -43,7 +42,7 @@ BeanMapper {
     /**
      * Copies properties from source object to dest object.
      * <p>
-     * For default implementation:
+     * In default implementation:
      * <ul>
      *     <li>
      *         Supports both bean object and {@link Map} object;
