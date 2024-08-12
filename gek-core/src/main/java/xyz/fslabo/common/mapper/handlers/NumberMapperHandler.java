@@ -3,7 +3,7 @@ package xyz.fslabo.common.mapper.handlers;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.mapper.MapperOptions;
+import xyz.fslabo.common.mapper.MappingOptions;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -34,7 +34,7 @@ public class NumberMapperHandler implements Mapper.Handler {
     public static final NumberMapperHandler INSTANCE = new NumberMapperHandler();
 
     @Override
-    public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options) {
+    public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {
         if (source == null) {
             return mapZero(targetType);
         }

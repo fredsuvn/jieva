@@ -21,7 +21,7 @@ final class BeanMapperImpl implements BeanMapper {
 
     @Override
     public void copyProperties(
-        Object source, Type sourceType, Object dest, Type destType, MapperOptions options
+        Object source, Type sourceType, Object dest, Type destType, MappingOptions options
     ) throws MapperException {
         try {
             if (source instanceof Map) {
@@ -44,7 +44,7 @@ final class BeanMapperImpl implements BeanMapper {
         }
     }
 
-    private void mapToMap(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
+    private void mapToMap(Object source, Type sourceType, Object dest, Type destType, MappingOptions options) {
         List<Type> sourceTypeArgs = JieReflect.getActualTypeArguments(sourceType, Map.class);
         checkMapArgs(sourceTypeArgs, sourceType);
         Type sourceKeyType = sourceTypeArgs.get(0);
@@ -79,7 +79,7 @@ final class BeanMapperImpl implements BeanMapper {
         });
     }
 
-    public void mapToBean(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
+    public void mapToBean(Object source, Type sourceType, Object dest, Type destType, MappingOptions options) {
         List<Type> sourceTypeArgs = JieReflect.getActualTypeArguments(sourceType, Map.class);
         checkMapArgs(sourceTypeArgs, sourceType);
         Type sourceKeyType = sourceTypeArgs.get(0);
@@ -111,7 +111,7 @@ final class BeanMapperImpl implements BeanMapper {
         });
     }
 
-    public void beanToMap(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
+    public void beanToMap(Object source, Type sourceType, Object dest, Type destType, MappingOptions options) {
         BeanProvider beanProvider = Jie.orDefault(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo sourceInfo = beanProvider.getBeanInfo(sourceType);
         Map<String, PropertyInfo> sourceProperties = sourceInfo.getProperties();
@@ -141,7 +141,7 @@ final class BeanMapperImpl implements BeanMapper {
         });
     }
 
-    public void beanToBean(Object source, Type sourceType, Object dest, Type destType, MapperOptions options) {
+    public void beanToBean(Object source, Type sourceType, Object dest, Type destType, MappingOptions options) {
         BeanProvider beanProvider = Jie.orDefault(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo sourceInfo = beanProvider.getBeanInfo(sourceType);
         Map<String, PropertyInfo> sourceProperties = sourceInfo.getProperties();
@@ -176,7 +176,7 @@ final class BeanMapperImpl implements BeanMapper {
     private void putToMap(
         Object mappedKey, Type sourceKeyType, Type destKeyType,
         Object sourceValue, Type sourceValueType, Type destValueType,
-        Map<Object, Object> destMap, Mapper mapper, MapperOptions options
+        Map<Object, Object> destMap, Mapper mapper, MappingOptions options
     ) {
         if (mappedKey instanceof Collection) {
             for (Object mk : ((Collection<?>) mappedKey)) {
@@ -190,7 +190,7 @@ final class BeanMapperImpl implements BeanMapper {
     private void putToMap0(
         Object mappedKey, Type sourceKeyType, Type destKeyType,
         Object sourceValue, Type sourceValueType, Type destValueType,
-        Map<Object, Object> destMap, Mapper mapper, MapperOptions options
+        Map<Object, Object> destMap, Mapper mapper, MappingOptions options
     ) {
         boolean ignoreError = options.isIgnoreError();
         Object destKey = getDestKey(mappedKey, sourceKeyType, destKeyType, mapper, options);
@@ -233,7 +233,7 @@ final class BeanMapperImpl implements BeanMapper {
 
     private void putToBean(
         Object mappedKey, Type sourceKeyType, Object sourceValue, Type sourceValueType,
-        Object dest, Map<String, PropertyInfo> destProperties, Mapper mapper, MapperOptions options
+        Object dest, Map<String, PropertyInfo> destProperties, Mapper mapper, MappingOptions options
     ) {
         if (mappedKey instanceof Collection) {
             for (Object mk : ((Collection<?>) mappedKey)) {
@@ -246,7 +246,7 @@ final class BeanMapperImpl implements BeanMapper {
 
     private void putToBean0(
         Object mappedKey, Type sourceKeyType, Object sourceValue, Type sourceValueType,
-        Object dest, Map<String, PropertyInfo> destProperties, Mapper mapper, MapperOptions options
+        Object dest, Map<String, PropertyInfo> destProperties, Mapper mapper, MappingOptions options
     ) {
         boolean ignoreError = options.isIgnoreError();
         Object destKey = getDestKey(mappedKey, sourceKeyType, String.class, mapper, options);
@@ -291,7 +291,7 @@ final class BeanMapperImpl implements BeanMapper {
 
     @Nullable
     private Object getDestKey(
-        Object mappedKey, Type sourceKeyType, Type destKeyType, Mapper mapper, MapperOptions options) {
+        Object mappedKey, Type sourceKeyType, Type destKeyType, Mapper mapper, MappingOptions options) {
         boolean ignoreError = options.isIgnoreError();
         Object destKey;
         try {

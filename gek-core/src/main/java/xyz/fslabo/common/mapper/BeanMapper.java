@@ -25,7 +25,7 @@ public interface BeanMapper {
 
     /**
      * Copies properties from source object to dest object. Supports both bean object and {@link Map} object.
-     * This method is equivalent to {@link #copyProperties(Object, Type, Object, Type, MapperOptions)}:
+     * This method is equivalent to {@link #copyProperties(Object, Type, Object, Type, MappingOptions)}:
      * <pre>
      *     copyProperties(source, source.getClass(), dest, dest.getClass(), options);
      * </pre>
@@ -35,7 +35,7 @@ public interface BeanMapper {
      * @param options mapper options
      * @throws MapperException exception when copying
      */
-    default void copyProperties(Object source, Object dest, MapperOptions options) throws MapperException {
+    default void copyProperties(Object source, Object dest, MappingOptions options) throws MapperException {
         copyProperties(source, source.getClass(), dest, dest.getClass(), options);
     }
 
@@ -66,6 +66,6 @@ public interface BeanMapper {
     void copyProperties(
         Object source, Type sourceType,
         Object dest, Type destType,
-        MapperOptions options
+        MappingOptions options
     ) throws MapperException;
 }

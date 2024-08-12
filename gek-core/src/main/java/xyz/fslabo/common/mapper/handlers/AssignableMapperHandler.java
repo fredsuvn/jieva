@@ -4,7 +4,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.mapper.MapperOptions;
+import xyz.fslabo.common.mapper.MappingOptions;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
@@ -27,12 +27,36 @@ public class AssignableMapperHandler implements Mapper.Handler {
      */
     public static final AssignableMapperHandler SINGLETON = new AssignableMapperHandler();
 
-    private AssignableMapperHandler() {
+    protected AssignableMapperHandler() {
     }
 
     @Override
     public Object map(
-        @Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options) {
+        @Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {
+        switch (options.getCopyLevel()) {
+            case MappingOptions.COPY_LEVEL_ASSIGNABLE: {
+                if (JieReflect.isAssignable(targetType, sourceType)) {
+                    return wrapResult(source);
+                }
+                if (targetType instanceof WildcardType) {
+                    WildcardType targetWildcard = (WildcardType) targetType;
+                    Type lower = JieReflect.getLowerBound(targetWildcard);
+                    // ? super T
+                    if (lower != null) {
+                        return new Object();
+                    }
+                    // ? extends T
+                    Type upper = JieReflect.getUpperBound(targetWildcard);
+                    return mapper.asHandler().map(source, sourceType, upper, mapper, options);
+                }
+            }
+            case MappingOptions.COPY_LEVEL_EQUAL:
+            case MappingOptions.COPY_LEVEL_DEEP:
+            default:
+                return Flag.CONTINUE;
+        }
+
+
         if (JieReflect.isAssignable(targetType, sourceType)) {
             if (!options.isDeepCopy()) {
                 return wrapResult(source);
@@ -74,7 +98,7 @@ public class AssignableMapperHandler implements Mapper.Handler {
     }
 
     @Override
-    public Object mapProperty(@Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MapperOptions options) {
+    public Object mapProperty(@Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options) {
         return null;
     }
 }

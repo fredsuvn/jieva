@@ -15,13 +15,37 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * Options for {@link Mapper} and {@link BeanMapper}.
+ * Mapping options for {@link Mapper} and {@link BeanMapper}.
  *
  * @author sunqian
  */
 @Builder
 @Getter
-public class MapperOptions {
+public class MappingOptions {
+
+    /**
+     * Copy level: {@code ASSIGNABLE}.
+     * <p>
+     * In this level, if target type is assignable from type of source object, the source object will be returned as
+     * mapping result. This is similar to shadow copy.
+     */
+    public static final int COPY_LEVEL_ASSIGNABLE = 1;
+
+    /**
+     * Copy level: {@code EQUAL}.
+     * <p>
+     * In this level, if target type is equal to type of source object, the source object will be returned as
+     * mapping result. This is similar to strict shadow copy.
+     */
+    public static final int COPY_LEVEL_EQUAL = 2;
+
+    /**
+     * Copy level: {@code DEEP}.
+     * <p>
+     * In this level, the mapper should always create a new instance to return as mapping result. This is similar to
+     * deep copy.
+     */
+    public static final int COPY_LEVEL_DEEP = 3;
 
     /**
      * Option for {@link BeanProvider}, to resolve bean infos if needed.
@@ -76,12 +100,17 @@ public class MapperOptions {
     private boolean putNew;
 
     /**
-     * Whether to use deep copy for mapping with {@link BeanMapper}. For {@link Mapper}, if this option is true and
-     * target mapping type is mutable, the mapper will create a new instance to return.
+     * Copy level option. This option determines whether a new instance must be created during the mapping process,
+     * similar to shallow copy and deep copy. Here are levels:
+     * <ul>
+     *     <li>{@link #COPY_LEVEL_ASSIGNABLE};</li>
+     *     <li>{@link #COPY_LEVEL_EQUAL};</li>
+     *     <li>{@link #COPY_LEVEL_DEEP};</li>
+     * </ul>
      * <p>
-     * Default is false (shallow copy).
+     * Default is {@link #COPY_LEVEL_ASSIGNABLE}.
      */
-    private boolean deepCopy;
+    private int copyLevel;
 
     /**
      * Charset option to determine which charset to use for character conversion.

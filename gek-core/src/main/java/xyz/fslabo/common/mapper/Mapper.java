@@ -16,10 +16,10 @@ import java.util.List;
 /**
  * Mapper interface to map object from source type to target type. A {@link Mapper} typically has a list of
  * {@link Handler}s, and in default implementation, the {@link Handler}s provide actual map operation for core methods
- * {@link #map(Object, Type, Type, MapperOptions)} and {@link #mapProperty(Object, Type, PropertyInfo, MapperOptions)}.
+ * {@link #map(Object, Type, Type, MappingOptions)} and {@link #mapProperty(Object, Type, PropertyInfo, MappingOptions)}.
  *
  * @author fredsuvn
- * @see Handler#map(Object, Type, Type, Mapper, MapperOptions)
+ * @see Handler#map(Object, Type, Type, Mapper, MappingOptions)
  */
 @ThreadSafe
 public interface Mapper {
@@ -55,7 +55,7 @@ public interface Mapper {
     }
 
     /**
-     * Returns actual result from {@link #map(Object, Type, Type, MapperOptions)}.
+     * Returns actual result from {@link #map(Object, Type, Type, MappingOptions)}.
      * The code is similar to the following:
      * <pre>
      *     if (result == null) {
@@ -67,7 +67,7 @@ public interface Mapper {
      *     return Jie.as(result);
      * </pre>
      *
-     * @param result result from {@link #map(Object, Type, Type, MapperOptions)}
+     * @param result result from {@link #map(Object, Type, Type, MappingOptions)}
      * @param <T>    target type
      * @return the actual result
      */
@@ -96,7 +96,7 @@ public interface Mapper {
      * @return mapped object or null
      */
     @Nullable
-    default <T> T map(@Nullable Object source, Class<T> targetType, MapperOptions options) {
+    default <T> T map(@Nullable Object source, Class<T> targetType, MappingOptions options) {
         return map(source, (Type) targetType, options);
     }
 
@@ -115,7 +115,7 @@ public interface Mapper {
      * @return mapped object or null
      */
     @Nullable
-    default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef, MapperOptions options) {
+    default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef, MappingOptions options) {
         Object result = map(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
         return resolveResult(result);
     }
@@ -135,7 +135,7 @@ public interface Mapper {
      * @return mapped object or null
      */
     @Nullable
-    default <T> T map(@Nullable Object source, Type targetType, MapperOptions options) {
+    default <T> T map(@Nullable Object source, Type targetType, MappingOptions options) {
         Object result = map(source, source == null ? Object.class : source.getClass(), targetType, options);
         return resolveResult(result);
     }
@@ -155,7 +155,7 @@ public interface Mapper {
      *     </li>
      * </ul>
      * In the default implementation, this method will invoke
-     * {@link Handler#map(Object, Type, Type, Mapper, MapperOptions)} for each handler in {@link Mapper#getHandlers()}
+     * {@link Handler#map(Object, Type, Type, Mapper, MappingOptions)} for each handler in {@link Mapper#getHandlers()}
      * sequentially. It is equivalent to:
      * <pre>
      *     for (Handler handler : getHandlers()) {
@@ -181,7 +181,7 @@ public interface Mapper {
      * @return mapped object or null
      */
     @Nullable
-    default Object map(@Nullable Object source, Type sourceType, Type targetType, MapperOptions options) {
+    default Object map(@Nullable Object source, Type sourceType, Type targetType, MappingOptions options) {
         for (Handler handler : getHandlers()) {
             Object value = handler.map(source, sourceType, targetType, this, options);
             if (value == Flag.CONTINUE) {
@@ -213,7 +213,7 @@ public interface Mapper {
      *     </li>
      * </ul>
      * In the default implementation, this method will invoke
-     * {@link Handler#mapProperty(Object, Type, PropertyInfo, Mapper, MapperOptions)} for each handler in
+     * {@link Handler#mapProperty(Object, Type, PropertyInfo, Mapper, MappingOptions)} for each handler in
      * {@link Mapper#getHandlers()} sequentially. It is equivalent to:
      * <pre>
      *     for (Handler handler : getHandlers()) {
@@ -240,7 +240,7 @@ public interface Mapper {
      */
     @Nullable
     default Object mapProperty(
-        @Nullable Object source, Type sourceType, PropertyInfo targetProperty, MapperOptions options) {
+        @Nullable Object source, Type sourceType, PropertyInfo targetProperty, MappingOptions options) {
         for (Handler handler : getHandlers()) {
             Object value = handler.mapProperty(source, sourceType, targetProperty, this, options);
             if (value == Flag.CONTINUE) {
@@ -328,7 +328,7 @@ public interface Mapper {
          * @param options    mapping options
          * @return converted object
          */
-        Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options);
+        Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options);
 
         /**
          * Maps object from source type to the type which defined by target bean property.
@@ -356,7 +356,7 @@ public interface Mapper {
          * @return converted object
          */
         Object mapProperty(
-            @Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MapperOptions options);
+            @Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options);
 
 
         /**

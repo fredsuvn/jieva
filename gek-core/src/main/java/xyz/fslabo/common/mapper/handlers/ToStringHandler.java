@@ -6,7 +6,7 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.mapper.MapperOptions;
+import xyz.fslabo.common.mapper.MappingOptions;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
@@ -27,10 +27,10 @@ import java.util.Objects;
  *     <li>{@code byte[]};</li>
  *     <li>{@link ByteBuffer};</li>
  * </ul>
- * Note 1: This handler supports {@link MapperOptions#getCharset()} to set the charset in mapping between
+ * Note 1: This handler supports {@link MappingOptions#getCharset()} to set the charset in mapping between
  * {@code byte[]}/{@link ByteBuffer} and string types.
  * <p>
- * Note 2: This handler supports {@link MapperOptions#getNumberFormat()} to set the format in mapping between
+ * Note 2: This handler supports {@link MappingOptions#getNumberFormat()} to set the format in mapping between
  * number types and string types.
  *
  * @author fredsuvn
@@ -43,11 +43,11 @@ public class ToStringHandler implements Mapper.Handler {
     public static final ToStringHandler INSTANCE = new ToStringHandler();
 
     @Override
-    public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MapperOptions options) {
+    public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {
 
     }
 
-    private String toString(Object source, Type targetType, MapperOptions options) {
+    private String toString(Object source, Type targetType, MappingOptions options) {
         if (source instanceof Number) {
             return numberToString((Number) source, targetType, options);
         }
@@ -60,7 +60,7 @@ public class ToStringHandler implements Mapper.Handler {
         return objToString(source, targetType, options);
     }
 
-    private String numberToString(Number source, Type targetType, MapperOptions options) {
+    private String numberToString(Number source, Type targetType, MappingOptions options) {
         NumberFormat numberFormat = options.getNumberFormat();
         if (numberFormat == null) {
             return source.toString();
@@ -68,13 +68,13 @@ public class ToStringHandler implements Mapper.Handler {
         return numberFormat.format(source);
     }
 
-    private String dateToString(Object source, Type targetType, MapperOptions options) {
+    private String dateToString(Object source, Type targetType, MappingOptions options) {
     }
 
-    private String bytesToString(Object source, Type targetType, MapperOptions options) {
+    private String bytesToString(Object source, Type targetType, MappingOptions options) {
     }
 
-    private Object objToString(@Nullable Object source, Type targetType, MapperOptions options) {
+    private Object objToString(@Nullable Object source, Type targetType, MappingOptions options) {
         if (Objects.equals(targetType, String.class) || Objects.equals(targetType, CharSequence.class)) {
             return String.valueOf(source);
         } else if (Objects.equals(targetType, StringBuilder.class)) {
@@ -93,12 +93,12 @@ public class ToStringHandler implements Mapper.Handler {
     }
 
     private Object byteArrayToString(
-        @Nullable byte[] source, Type targetType, MapperOptions options) {
+        @Nullable byte[] source, Type targetType, MappingOptions options) {
         return byteArrayToString0(source, targetType, options, true);
     }
 
     private Object byteBufferToString(
-        @Nullable ByteBuffer source, Type targetType, MapperOptions options) {
+        @Nullable ByteBuffer source, Type targetType, MappingOptions options) {
         source.mark();
         byte[] bytes = JieIO.read(source);
         source.reset();
@@ -106,7 +106,7 @@ public class ToStringHandler implements Mapper.Handler {
     }
 
     private Object byteArrayToString0(
-        @Nullable byte[] source, Type targetType, MapperOptions options, boolean deep) {
+            @Nullable byte[] source, Type targetType, MappingOptions options, boolean deep) {
         if (Objects.equals(targetType, char[].class)) {
             return new String(source, getCharset(options)).toCharArray();
         } else if (Objects.equals(targetType, byte[].class)) {
@@ -140,7 +140,7 @@ public class ToStringHandler implements Mapper.Handler {
 //        }
 //    }
 
-    private Charset getCharset(MapperOptions options) {
+    private Charset getCharset(MappingOptions options) {
         return Jie.orDefault(options.getCharset(), JieChars.defaultCharset());
     }
 }
