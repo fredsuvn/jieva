@@ -314,6 +314,7 @@ public class CollectionMappingHandler implements Mapper.Handler {
          * @param initialSize    initial size
          * @return a new collection of target type and initial size or null if unsupported
          */
+        @Nullable
         Object generate(Type collectionType, int initialSize);
     }
 }

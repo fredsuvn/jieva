@@ -6,7 +6,6 @@ import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapper.BeanMapper;
 import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.mapper.MappingOptions;
-import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
@@ -21,7 +20,7 @@ import java.util.function.Supplier;
  * handler is last handler in {@link Mapper#getHandlers()}.
  * <p>
  * This handler has a bean generator ({@link BeanGenerator}). If source object is {@code null}, return
- * {@link Val#ofNull()}. Else the generator tries to create a new object of target type as target bean object, if the
+ * {@link Flag#CONTINUE}. Else the generator tries to create a new object of target type as target bean object, if the
  * generator return {@code null}, this handler return {@link Flag#CONTINUE}, else this handler will get the bean mapper
  * by {@link MappingOptions#getBeanMapper()} and call
  * {@link BeanMapper#copyProperties(Object, Type, Object, Type, MappingOptions)} to map the properties, then return
@@ -111,15 +110,15 @@ public class BeanMapperHandler implements Mapper.Handler {
     @Override
     public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {
         if (source == null) {
-            return Val.ofNull();
+            return Flag.CONTINUE;
         }
-        Object dest = generator.generate(targetType);
-        if (dest == null) {
+        Object targetObject = generator.generate(targetType);
+        if (targetObject == null) {
             return Flag.CONTINUE;
         }
         BeanMapper beanMapper = options.getBeanMapper();
-        beanMapper.copyProperties(source, sourceType, dest, targetType, options);
-        return wrapResult(dest);
+        beanMapper.copyProperties(source, sourceType, targetObject, targetType, options);
+        return wrapResult(targetObject);
     }
 
     @Override
@@ -139,6 +138,7 @@ public class BeanMapperHandler implements Mapper.Handler {
          * @param targetType target type
          * @return a new object of target type or null if unsupported
          */
+        @Nullable
         Object generate(Type targetType);
     }
 }
