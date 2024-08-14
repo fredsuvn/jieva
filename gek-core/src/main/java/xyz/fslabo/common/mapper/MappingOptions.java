@@ -48,18 +48,24 @@ public class MappingOptions {
     public static final int COPY_LEVEL_DEEP = 3;
 
     /**
-     * Option for {@link BeanProvider}, to resolve bean infos if needed.
-     * If this option is null, the mapper will use {@link BeanProvider#defaultProvider()}.
-     */
-    private @Nullable BeanProvider beanProvider;
-
-    /**
      * Option for {@link Mapper}, to map objects in types if needed.
      * For {@link BeanMapper}, names of properties and keys of entries will be mapped by this mapper before finding
      * dest properties or entries.
      * If this option is null, the mapper will use {@link Mapper#defaultMapper()}.
      */
     private @Nullable Mapper mapper;
+
+    /**
+     * Option for {@link BeanProvider}, to resolve bean infos if needed.
+     * If this option is null, the mapper will use {@link BeanProvider#defaultProvider()}.
+     */
+    private @Nullable BeanProvider beanProvider;
+
+    /**
+     * Option for {@link BeanMapper}, to map bean infos if needed.
+     * If this option is null, the mapper will use {@link BeanMapper#defaultMapper()}.
+     */
+    private @Nullable BeanMapper beanMapper;
 
     /**
      * Ignored names or keys when mapping properties.

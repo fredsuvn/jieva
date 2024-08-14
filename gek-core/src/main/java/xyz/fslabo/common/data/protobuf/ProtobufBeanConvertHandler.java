@@ -5,7 +5,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.mapper.MapperException;
 import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.mapper.handlers.BeanConvertHandler;
+import xyz.fslabo.common.mapper.handlers.BeanMapperHandler;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Method;
@@ -13,11 +13,11 @@ import java.lang.reflect.Type;
 
 /**
  * Convert handler implementation for <a href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>.
- * This class extends {@link BeanConvertHandler} to supports convert to protobuf types.
+ * This class extends {@link BeanMapperHandler} to supports convert to protobuf types.
  *
  * @author fredsuvn
  */
-public class ProtobufBeanConvertHandler extends BeanConvertHandler {
+public class ProtobufBeanConvertHandler extends BeanMapperHandler {
 
     /**
      * An instance with {@link #ProtobufBeanConvertHandler()}.

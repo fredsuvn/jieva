@@ -15,14 +15,14 @@ final class MapperImpl implements Mapper, Mapper.Handler {
 
     static final MapperImpl DEFAULT_MAPPER = new MapperImpl(Arrays.asList(
         AssignableMapperHandler.SINGLETON,
-        EnumConvertHandler.INSTANCE,
+        EnumMapperHandler.SINGLETON,
         DateConvertHandler.INSTANCE,
         BytesConvertHandler.INSTANCE,
         BooleanConvertHandler.INSTANCE,
         NumberMapperHandler.INSTANCE,
         ToStringHandler.INSTANCE,
-        CollectConvertHandler.INSTANCE,
-        BeanConvertHandler.INSTANCE
+        CollectionMappingHandler.INSTANCE,
+        BeanMapperHandler.INSTANCE
     ));
 
     private final List<Mapper.Handler> handlers;
@@ -69,8 +69,8 @@ final class MapperImpl implements Mapper, Mapper.Handler {
 
     @Override
     public Object mapProperty(
-        @Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options) {
-        Object result = mapProperty(source, sourceType, targetProperty, options);
+        @Nullable Object source, Type sourceType, Type targetType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options) {
+        Object result = mapProperty(source, sourceType, targetType, targetProperty, options);
         if (result == Flag.UNSUPPORTED) {
             return Flag.CONTINUE;
         }

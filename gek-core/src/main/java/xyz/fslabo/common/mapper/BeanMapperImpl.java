@@ -260,7 +260,7 @@ final class BeanMapperImpl implements BeanMapper {
         }
         Object destValue;
         try {
-            destValue = mapper.mapProperty(sourceValue, sourceValueType, destProperty, options);
+            destValue = mapper.mapProperty(sourceValue, sourceValueType, destProperty.getType(), destProperty, options);
             if (Objects.equals(destValue, Flag.UNSUPPORTED)) {
                 if (ignoreError) {
                     return;

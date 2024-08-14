@@ -16,10 +16,12 @@ import java.util.List;
 /**
  * Mapper interface to map object from source type to target type. A {@link Mapper} typically has a list of
  * {@link Handler}s, and in default implementation, the {@link Handler}s provide actual map operation for core methods
- * {@link #map(Object, Type, Type, MappingOptions)} and {@link #mapProperty(Object, Type, PropertyInfo, MappingOptions)}.
+ * {@link #map(Object, Type, Type, MappingOptions)} and
+ * {@link #mapProperty(Object, Type, Type, PropertyInfo, MappingOptions)}.
  *
  * @author fredsuvn
  * @see Handler#map(Object, Type, Type, Mapper, MappingOptions)
+ * @see Handler#mapProperty(Object, Type, Type, PropertyInfo, Mapper, MappingOptions)
  */
 @ThreadSafe
 public interface Mapper {
@@ -28,14 +30,14 @@ public interface Mapper {
      * Returns default mapper, of which handlers are:
      * <ul>
      *     <li>{@link AssignableMapperHandler};</li>
-     *     <li>{@link EnumConvertHandler};</li>
+     *     <li>{@link EnumMapperHandler};</li>
      *     <li>{@link DateConvertHandler};</li>
      *     <li>{@link BytesConvertHandler};</li>
      *     <li>{@link BooleanConvertHandler};</li>
      *     <li>{@link NumberMapperHandler};</li>
      *     <li>{@link ToStringHandler};</li>
-     *     <li>{@link CollectConvertHandler};</li>
-     *     <li>{@link BeanConvertHandler};</li>
+     *     <li>{@link CollectionMappingHandler};</li>
+     *     <li>{@link BeanMapperHandler};</li>
      * </ul>
      *
      * @return default converter
@@ -199,7 +201,8 @@ public interface Mapper {
     }
 
     /**
-     * Maps source object from source type to the type which defined by target bean property.
+     * Maps source object from source type to target property. The target type is specified in current context, may not
+     * equal to {@link PropertyInfo#getType()} of target property.
      * The result of this method in 3 types:
      * <ul>
      *     <li>
@@ -213,7 +216,7 @@ public interface Mapper {
      *     </li>
      * </ul>
      * In the default implementation, this method will invoke
-     * {@link Handler#mapProperty(Object, Type, PropertyInfo, Mapper, MappingOptions)} for each handler in
+     * {@link Handler#mapProperty(Object, Type, Type, PropertyInfo, Mapper, MappingOptions)} for each handler in
      * {@link Mapper#getHandlers()} sequentially. It is equivalent to:
      * <pre>
      *     for (Handler handler : getHandlers()) {
@@ -234,15 +237,21 @@ public interface Mapper {
      *
      * @param source         source object
      * @param sourceType     source type
-     * @param targetProperty target bean property
+     * @param targetProperty target property
+     * @param targetType     target type
      * @param options        mapping options
      * @return mapped object or null
      */
     @Nullable
     default Object mapProperty(
-        @Nullable Object source, Type sourceType, PropertyInfo targetProperty, MappingOptions options) {
+        @Nullable Object source,
+        Type sourceType,
+        Type targetType,
+        PropertyInfo targetProperty,
+        MappingOptions options
+    ) {
         for (Handler handler : getHandlers()) {
-            Object value = handler.mapProperty(source, sourceType, targetProperty, this, options);
+            Object value = handler.mapProperty(source, sourceType, targetType, targetProperty, this, options);
             if (value == Flag.CONTINUE) {
                 continue;
             }
@@ -328,10 +337,17 @@ public interface Mapper {
          * @param options    mapping options
          * @return converted object
          */
-        Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options);
+        Object map(
+            @Nullable Object source,
+            Type sourceType,
+            Type targetType,
+            Mapper mapper,
+            MappingOptions options
+        );
 
         /**
-         * Maps object from source type to the type which defined by target bean property.
+         * Maps object from source type to the target type of target property. The target type is specified in current
+         * context, may not equal to {@link PropertyInfo#getType()} of target property.
          * The result of this method in 4 types:
          * <ul>
          *     <li>
@@ -350,13 +366,20 @@ public interface Mapper {
          *
          * @param source         source object
          * @param sourceType     source type
-         * @param targetProperty target bean property
+         * @param targetType     target type
+         * @param targetProperty target property
          * @param mapper         mapper of current context.
          * @param options        mapping options
          * @return converted object
          */
         Object mapProperty(
-            @Nullable Object source, Type sourceType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options);
+            @Nullable Object source,
+            Type sourceType,
+            Type targetType,
+            PropertyInfo targetProperty,
+            Mapper mapper,
+            MappingOptions options
+        );
 
 
         /**
