@@ -37,10 +37,10 @@ public class JieIO {
      *
      * @param source source stream
      * @return the array, or null if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static byte[] read(InputStream source) throws GekIOException {
+    public static byte[] read(InputStream source) throws JieIOException {
         try {
             int available = source.available();
             ByteArrayOutputStream dest;
@@ -78,7 +78,7 @@ public class JieIO {
             }
             return dest.toByteArray();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -94,10 +94,10 @@ public class JieIO {
      * @param source source stream
      * @param number specified number
      * @return the array, or null if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static byte[] read(InputStream source, int number) throws GekIOException {
+    public static byte[] read(InputStream source, int number) throws JieIOException {
         if (number < 0) {
             return read(source);
         }
@@ -123,7 +123,7 @@ public class JieIO {
             }
             return dest;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -136,7 +136,7 @@ public class JieIO {
      * @param source source stream
      * @param dest   dest array
      * @return actual read number, or -1 if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     public static int readTo(InputStream source, byte[] dest) {
         return readTo(source, dest, 0, dest.length);
@@ -153,9 +153,9 @@ public class JieIO {
      * @param offset given offset
      * @param length specified length
      * @return actual read number, or -1 if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static int readTo(InputStream source, byte[] dest, int offset, int length) throws GekIOException {
+    public static int readTo(InputStream source, byte[] dest, int offset, int length) throws JieIOException {
         try {
             GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
             if (length < 0) {
@@ -179,7 +179,7 @@ public class JieIO {
             }
             return length;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -192,7 +192,7 @@ public class JieIO {
      * @param source source stream
      * @param dest   dest buffer
      * @return actual read number, or -1 if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     public static int readTo(InputStream source, ByteBuffer dest) {
         try {
@@ -216,7 +216,7 @@ public class JieIO {
             dest.put(bytes);
             return bytes.length;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -228,9 +228,9 @@ public class JieIO {
      * @param source source stream
      * @param dest   dest stream
      * @return actual read number, or -1 if no data read out and reaches to the end of source stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static long readTo(InputStream source, OutputStream dest) throws GekIOException {
+    public static long readTo(InputStream source, OutputStream dest) throws JieIOException {
         return readTo(source, dest, -1);
     }
 
@@ -247,9 +247,9 @@ public class JieIO {
      * @param dest   dest stream
      * @param number specified number
      * @return actual read number, or -1 if no data read out and reaches to the end of source stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static long readTo(InputStream source, OutputStream dest, long number) throws GekIOException {
+    public static long readTo(InputStream source, OutputStream dest, long number) throws JieIOException {
         return readTo(source, dest, number, IO_BUFFER_SIZE);
     }
 
@@ -267,9 +267,9 @@ public class JieIO {
      * @param number     specified number
      * @param bufferSize buffer size for each IO operation
      * @return actual read number, or -1 if no data read out and reaches to the end of source stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static long readTo(InputStream source, OutputStream dest, long number, int bufferSize) throws GekIOException {
+    public static long readTo(InputStream source, OutputStream dest, long number, int bufferSize) throws JieIOException {
         try {
             if (bufferSize <= 0) {
                 throw new IllegalArgumentException("bufferSize <= 0.");
@@ -302,7 +302,7 @@ public class JieIO {
             }
             return readNum;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -312,10 +312,10 @@ public class JieIO {
      *
      * @param source source stream
      * @return the array, or null if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static byte[] available(InputStream source) throws GekIOException {
+    public static byte[] available(InputStream source) throws JieIOException {
         try {
             int available = source.available();
             if (available > 0) {
@@ -342,7 +342,7 @@ public class JieIO {
             }
             return null;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -353,9 +353,9 @@ public class JieIO {
      * @param source source stream
      * @param dest   dest stream
      * @return actual read number, or -1 if no data read out and reaches to the end of source stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static long availableTo(InputStream source, OutputStream dest) throws GekIOException {
+    public static long availableTo(InputStream source, OutputStream dest) throws JieIOException {
         try {
             byte[] available = available(source);
             if (available == null) {
@@ -367,7 +367,7 @@ public class JieIO {
             dest.write(available);
             return available.length;
         } catch (IOException e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -377,10 +377,10 @@ public class JieIO {
      *
      * @param source source reader
      * @return the string, or null if no data read out and reaches to the end of reader
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static String read(Reader source) throws GekIOException {
+    public static String read(Reader source) throws JieIOException {
         try {
             StringBuilder dest = new StringBuilder();
             long readCount = readTo(source, dest);
@@ -389,7 +389,7 @@ public class JieIO {
             }
             return dest.toString();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -405,10 +405,10 @@ public class JieIO {
      * @param source source reader
      * @param number specified number
      * @return the string, or null if no data read out and reaches to the end of reader
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static String read(Reader source, int number) throws GekIOException {
+    public static String read(Reader source, int number) throws JieIOException {
         try {
             StringBuilder dest = new StringBuilder();
             long readCount = readTo(source, dest, number);
@@ -417,7 +417,7 @@ public class JieIO {
             }
             return dest.toString();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -429,14 +429,14 @@ public class JieIO {
      * @param source source reader
      * @param dest   dest appendable
      * @return actual read number, or -1 if no data read out and reaches to the end of reader
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static long readTo(Reader source, Appendable dest) throws GekIOException {
+    public static long readTo(Reader source, Appendable dest) throws JieIOException {
         if (dest instanceof CharBuffer) {
             try {
                 return source.read((CharBuffer) dest);
             } catch (IOException e) {
-                throw new GekIOException(e);
+                throw new JieIOException(e);
             }
         }
         return readTo(source, dest, -1);
@@ -455,9 +455,9 @@ public class JieIO {
      * @param dest   dest appendable
      * @param number specified number
      * @return actual read number, or -1 if no data read out and reaches to the end of source reader
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static long readTo(Reader source, Appendable dest, int number) throws GekIOException {
+    public static long readTo(Reader source, Appendable dest, int number) throws JieIOException {
         return readTo(source, dest, number, IO_BUFFER_SIZE);
     }
 
@@ -475,9 +475,9 @@ public class JieIO {
      * @param number     specified number
      * @param bufferSize buffer size for each IO operation
      * @return actual read number, or -1 if no data read out and reaches to the end of source reader
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static long readTo(Reader source, Appendable dest, int number, int bufferSize) throws GekIOException {
+    public static long readTo(Reader source, Appendable dest, int number, int bufferSize) throws JieIOException {
         try {
             if (bufferSize <= 0) {
                 throw new IllegalArgumentException("bufferSize <= 0.");
@@ -510,7 +510,7 @@ public class JieIO {
             }
             return readNum;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -534,10 +534,10 @@ public class JieIO {
      *
      * @param source source stream
      * @return the string, or null if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static String readString(InputStream source) throws GekIOException {
+    public static String readString(InputStream source) throws JieIOException {
         return readString(source, JieChars.defaultCharset());
     }
 
@@ -548,10 +548,10 @@ public class JieIO {
      * @param source  source stream
      * @param charset specified charset
      * @return the string, or null if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static String readString(InputStream source, Charset charset) throws GekIOException {
+    public static String readString(InputStream source, Charset charset) throws JieIOException {
         try {
             byte[] bytes = read(source);
             if (bytes == null) {
@@ -559,7 +559,7 @@ public class JieIO {
             }
             return new String(bytes, charset);
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -569,10 +569,10 @@ public class JieIO {
      *
      * @param source source stream
      * @return the string, or null if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static String avalaibleString(InputStream source) throws GekIOException {
+    public static String avalaibleString(InputStream source) throws JieIOException {
         return avalaibleString(source, JieChars.defaultCharset());
     }
 
@@ -583,10 +583,10 @@ public class JieIO {
      * @param source  source stream
      * @param charset specified charset
      * @return the string, or null if no data read out and reaches to the end of stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static String avalaibleString(InputStream source, Charset charset) throws GekIOException {
+    public static String avalaibleString(InputStream source, Charset charset) throws JieIOException {
         try {
             byte[] bytes = available(source);
             if (bytes == null) {
@@ -594,7 +594,7 @@ public class JieIO {
             }
             return new String(bytes, charset);
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -603,9 +603,9 @@ public class JieIO {
      *
      * @param stream given stream
      * @return given stream as {@link Reader}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static Reader toReader(InputStream stream) throws GekIOException {
+    public static Reader toReader(InputStream stream) throws JieIOException {
         return toReader(stream, JieChars.defaultCharset());
     }
 
@@ -615,9 +615,9 @@ public class JieIO {
      * @param stream  given stream
      * @param charset specified charset
      * @return given stream as {@link Reader}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static Reader toReader(InputStream stream, Charset charset) throws GekIOException {
+    public static Reader toReader(InputStream stream, Charset charset) throws JieIOException {
         return new InputStreamReader(stream, charset);
     }
 
@@ -626,9 +626,9 @@ public class JieIO {
      *
      * @param buffer given buffer
      * @return given buffer as {@link Reader}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static Reader toReader(CharBuffer buffer) throws GekIOException {
+    public static Reader toReader(CharBuffer buffer) throws JieIOException {
         return new CharBufferReader(buffer);
     }
 
@@ -638,9 +638,9 @@ public class JieIO {
      *
      * @param reader given reader
      * @return given reader as {@link InputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static InputStream toInputStream(Reader reader) throws GekIOException {
+    public static InputStream toInputStream(Reader reader) throws JieIOException {
         return toInputStream(reader, JieChars.defaultCharset());
     }
 
@@ -651,9 +651,9 @@ public class JieIO {
      * @param reader  given reader
      * @param charset specified charset
      * @return given reader as {@link InputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static InputStream toInputStream(Reader reader, Charset charset) throws GekIOException {
+    public static InputStream toInputStream(Reader reader, Charset charset) throws JieIOException {
         return new ReaderInputStream(reader, charset);
     }
 
@@ -662,9 +662,9 @@ public class JieIO {
      *
      * @param array given array
      * @return given array as {@link ByteArrayInputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static ByteArrayInputStream toInputStream(byte[] array) throws GekIOException {
+    public static ByteArrayInputStream toInputStream(byte[] array) throws JieIOException {
         return new ByteArrayInputStream(array);
     }
 
@@ -675,9 +675,9 @@ public class JieIO {
      * @param offset given offset
      * @param length specified length
      * @return given array as {@link ByteArrayInputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) throws GekIOException {
+    public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) throws JieIOException {
         return new ByteArrayInputStream(array, offset, length);
     }
 
@@ -686,9 +686,9 @@ public class JieIO {
      *
      * @param buffer given buffer
      * @return given buffer as {@link InputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static InputStream toInputStream(ByteBuffer buffer) throws GekIOException {
+    public static InputStream toInputStream(ByteBuffer buffer) throws JieIOException {
         return new ByteBufferInputStream(buffer);
     }
 
@@ -697,9 +697,9 @@ public class JieIO {
      *
      * @param stream given stream
      * @return given stream as {@link Writer}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static Writer toWriter(OutputStream stream) throws GekIOException {
+    public static Writer toWriter(OutputStream stream) throws JieIOException {
         return toWriter(stream, JieChars.defaultCharset());
     }
 
@@ -709,9 +709,9 @@ public class JieIO {
      * @param stream  given stream
      * @param charset specified charset
      * @return given stream as {@link Writer}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static Writer toWriter(OutputStream stream, Charset charset) throws GekIOException {
+    public static Writer toWriter(OutputStream stream, Charset charset) throws JieIOException {
         return new OutputStreamWriter(stream, charset);
     }
 
@@ -720,9 +720,9 @@ public class JieIO {
      *
      * @param buffer given buffer
      * @return given buffer as {@link Writer}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static Writer toWriter(CharBuffer buffer) throws GekIOException {
+    public static Writer toWriter(CharBuffer buffer) throws JieIOException {
         return new CharBufferWriter(buffer);
     }
 
@@ -734,9 +734,9 @@ public class JieIO {
      *
      * @param appendable given appendable
      * @return given appendable as {@link OutputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static OutputStream toOutputStream(Appendable appendable) throws GekIOException {
+    public static OutputStream toOutputStream(Appendable appendable) throws JieIOException {
         return toOutputStream(appendable, JieChars.defaultCharset());
     }
 
@@ -749,9 +749,9 @@ public class JieIO {
      * @param appendable given appendable
      * @param charset    specified charset
      * @return given appendable as {@link OutputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static OutputStream toOutputStream(Appendable appendable, Charset charset) throws GekIOException {
+    public static OutputStream toOutputStream(Appendable appendable, Charset charset) throws JieIOException {
         return new AppendableOutputStream(appendable, charset);
     }
 
@@ -760,9 +760,9 @@ public class JieIO {
      *
      * @param array given array
      * @return given array as {@link OutputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static OutputStream toOutputStream(byte[] array) throws GekIOException {
+    public static OutputStream toOutputStream(byte[] array) throws JieIOException {
         return new ByteArrayAsOutputStream(array, 0, array.length);
     }
 
@@ -773,9 +773,9 @@ public class JieIO {
      * @param offset given offset
      * @param length specified length
      * @return given array as {@link OutputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static OutputStream toOutputStream(byte[] array, int offset, int length) throws GekIOException {
+    public static OutputStream toOutputStream(byte[] array, int offset, int length) throws JieIOException {
         GekCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
         return new ByteArrayAsOutputStream(array, offset, length);
     }
@@ -785,9 +785,9 @@ public class JieIO {
      *
      * @param buffer given buffer
      * @return given buffer as {@link OutputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static OutputStream toOutputStream(ByteBuffer buffer) throws GekIOException {
+    public static OutputStream toOutputStream(ByteBuffer buffer) throws JieIOException {
         return new ByteBufferOutputStream(buffer);
     }
 
@@ -798,9 +798,9 @@ public class JieIO {
      * @param stream given stream
      * @param number number of readable bytes, must &gt;= 0
      * @return limited {@link InputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static InputStream limit(InputStream stream, long number) throws GekIOException {
+    public static InputStream limit(InputStream stream, long number) throws JieIOException {
         if (number < 0) {
             throw new IllegalArgumentException("number < 0.");
         }
@@ -813,9 +813,9 @@ public class JieIO {
      * @param stream given stream
      * @param number number of writeable bytes, must &gt;= 0
      * @return limited {@link OutputStream}
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static OutputStream limit(OutputStream stream, long number) throws GekIOException {
+    public static OutputStream limit(OutputStream stream, long number) throws JieIOException {
         if (number < 0) {
             throw new IllegalArgumentException("number < 0.");
         }
@@ -856,10 +856,10 @@ public class JieIO {
      *
      * @param source source buffer
      * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static byte[] read(ByteBuffer source) throws GekIOException {
+    public static byte[] read(ByteBuffer source) throws JieIOException {
         try {
             int length = source.remaining();
             if (length <= 0) {
@@ -869,7 +869,7 @@ public class JieIO {
             source.get(result);
             return result;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -885,10 +885,10 @@ public class JieIO {
      * @param source source buffer
      * @param number specified number
      * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static byte[] read(ByteBuffer source, int number) throws GekIOException {
+    public static byte[] read(ByteBuffer source, int number) throws JieIOException {
         if (number < 0) {
             return read(source);
         }
@@ -904,7 +904,53 @@ public class JieIO {
             source.get(result);
             return result;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
+        }
+    }
+
+    /**
+     * Marks and reads all bytes from source buffer into an array, resets the buffer after reading.
+     * Returns the array, or null if no data read out and reaches to the end of buffer.
+     *
+     * @param source source buffer
+     * @return the array, or null if no data read out and reaches to the end of buffer
+     * @throws JieIOException IO exception
+     */
+    @Nullable
+    public static byte[] readReset(ByteBuffer source) throws JieIOException {
+        try {
+            source.mark();
+            byte[] result = read(source);
+            source.reset();
+            return result;
+        } catch (Exception e) {
+            throw new JieIOException(e);
+        }
+    }
+
+    /**
+     * Marks and reads specified number of bytes from source buffer into an array, resets the buffer after reading.
+     * Returns the array, or null if no data read out and reaches to the end of buffer.
+     * <p>
+     * If the number &lt; 0, read all as {@link #read(ByteBuffer)};
+     * els if the number is 0, no read and return an empty array;
+     * else this method will keep reading until the read number reaches to the specified number,
+     * or the reading reaches the end of the buffer.
+     *
+     * @param source source buffer
+     * @param number specified number
+     * @return the array, or null if no data read out and reaches to the end of buffer
+     * @throws JieIOException IO exception
+     */
+    @Nullable
+    public static byte[] readReset(ByteBuffer source, int number) throws JieIOException {
+        try {
+            source.mark();
+            byte[] result = read(source, number);
+            source.reset();
+            return result;
+        } catch (Exception e) {
+            throw new JieIOException(e);
         }
     }
 
@@ -917,9 +963,9 @@ public class JieIO {
      * @param source source buffer
      * @param dest   dest buffer
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static int readTo(ByteBuffer source, ByteBuffer dest) throws GekIOException {
+    public static int readTo(ByteBuffer source, ByteBuffer dest) throws JieIOException {
         try {
             int sr = source.remaining();
             int dr = dest.remaining();
@@ -931,7 +977,7 @@ public class JieIO {
             dest.put(slice);
             return dr;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -948,9 +994,9 @@ public class JieIO {
      * @param dest   dest buffer
      * @param number specified number
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static int readTo(ByteBuffer source, ByteBuffer dest, int number) throws GekIOException {
+    public static int readTo(ByteBuffer source, ByteBuffer dest, int number) throws JieIOException {
         if (number < 0) {
             return readTo(source, dest);
         }
@@ -965,7 +1011,7 @@ public class JieIO {
             }
             return readNum;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -976,9 +1022,9 @@ public class JieIO {
      * @param source source buffer
      * @param dest   dest array
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer or array
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static int readTo(ByteBuffer source, byte[] dest) throws GekIOException {
+    public static int readTo(ByteBuffer source, byte[] dest) throws JieIOException {
         return readTo(source, dest, 0);
     }
 
@@ -990,9 +1036,9 @@ public class JieIO {
      * @param dest   dest array
      * @param offset given offset
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer or array
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static int readTo(ByteBuffer source, byte[] dest, int offset) throws GekIOException {
+    public static int readTo(ByteBuffer source, byte[] dest, int offset) throws JieIOException {
         try {
             GekCheck.checkInBounds(offset, 0, dest.length);
             int minLen = Math.min(source.remaining(), dest.length - offset);
@@ -1007,7 +1053,7 @@ public class JieIO {
             }
             return minLen;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1019,9 +1065,9 @@ public class JieIO {
      * @param source source buffer
      * @param dest   dest stream
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static int readTo(ByteBuffer source, OutputStream dest) throws GekIOException {
+    public static int readTo(ByteBuffer source, OutputStream dest) throws JieIOException {
         try {
             if (source.hasArray()) {
                 int remaining = source.remaining();
@@ -1033,7 +1079,7 @@ public class JieIO {
             dest.write(bytes);
             return bytes.length;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1043,10 +1089,10 @@ public class JieIO {
      *
      * @param source source buffer
      * @return the string, or null if no data read out and reaches to the end of buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static String readString(ByteBuffer source) throws GekIOException {
+    public static String readString(ByteBuffer source) throws JieIOException {
         return readString(source, JieChars.defaultCharset());
     }
 
@@ -1057,10 +1103,10 @@ public class JieIO {
      * @param source  source buffer
      * @param charset specified charset
      * @return the string, or null if no data read out and reaches to the end of buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
     @Nullable
-    public static String readString(ByteBuffer source, Charset charset) throws GekIOException {
+    public static String readString(ByteBuffer source, Charset charset) throws JieIOException {
         try {
             byte[] bytes = read(source);
             if (bytes == null) {
@@ -1068,7 +1114,7 @@ public class JieIO {
             }
             return new String(bytes, charset);
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1080,15 +1126,15 @@ public class JieIO {
      * @param buffer given buffer
      * @param number specified number
      * @return the slice buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static ByteBuffer slice(ByteBuffer buffer, int number) throws GekIOException {
+    public static ByteBuffer slice(ByteBuffer buffer, int number) throws JieIOException {
         try {
             ByteBuffer slice = buffer.slice();
             slice.limit(Math.min(number, buffer.remaining()));
             return slice;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1100,16 +1146,16 @@ public class JieIO {
      * @param buffer given buffer
      * @param number specified number
      * @return the slice buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static ByteBuffer readSlice(ByteBuffer buffer, int number) throws GekIOException {
+    public static ByteBuffer readSlice(ByteBuffer buffer, int number) throws JieIOException {
         try {
             ByteBuffer slice = buffer.slice();
             slice.limit(Math.min(number, buffer.remaining()));
             buffer.position(buffer.position() + slice.remaining());
             return slice;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1122,9 +1168,9 @@ public class JieIO {
      * @param buffer given buffer
      * @param offset given offset
      * @return the sub-buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset) throws GekIOException {
+    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset) throws JieIOException {
         try {
             GekCheck.checkInBounds(offset, 0, buffer.limit());
             int pos = buffer.position();
@@ -1133,7 +1179,7 @@ public class JieIO {
             buffer.position(pos);
             return slice;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1147,9 +1193,9 @@ public class JieIO {
      * @param offset given offset
      * @param length specified length
      * @return the sub-buffer
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset, int length) throws GekIOException {
+    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset, int length) throws JieIOException {
         try {
             GekCheck.checkRangeInBounds(offset, offset + length, 0, buffer.limit());
             int pos = buffer.position();
@@ -1158,7 +1204,7 @@ public class JieIO {
             buffer.position(pos);
             return slice;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1463,9 +1509,9 @@ public class JieIO {
      *
      * @param random given random access file
      * @return wrapped stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static InputStream toInputStream(RandomAccessFile random) throws GekIOException {
+    public static InputStream toInputStream(RandomAccessFile random) throws JieIOException {
         return toInputStream(random, 0, -1);
     }
 
@@ -1481,9 +1527,9 @@ public class JieIO {
      * @param offset offset position to start read
      * @param length length of readable bytes, or -1 to read to end of file
      * @return wrapped stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static InputStream toInputStream(RandomAccessFile random, long offset, long length) throws GekIOException {
+    public static InputStream toInputStream(RandomAccessFile random, long offset, long length) throws JieIOException {
         return new RandomInputStream(random, offset, length);
     }
 
@@ -1495,9 +1541,9 @@ public class JieIO {
      *
      * @param random given random access file
      * @return wrapped stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static OutputStream toOutputStream(RandomAccessFile random) throws GekIOException {
+    public static OutputStream toOutputStream(RandomAccessFile random) throws JieIOException {
         return toOutputStream(random, 0, -1);
     }
 
@@ -1513,9 +1559,9 @@ public class JieIO {
      * @param offset offset position to start write
      * @param length length of written bytes, or -1 to write unlimitedly
      * @return wrapped stream
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) throws GekIOException {
+    public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) throws JieIOException {
         return new RandomOutputStream(random, offset, length);
     }
 
@@ -1542,7 +1588,7 @@ public class JieIO {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
             return JieIO.read(JieIO.toInputStream(random, offset, length));
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1598,7 +1644,7 @@ public class JieIO {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
             return JieIO.readString(JieIO.toInputStream(random, offset, length), charset);
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1627,7 +1673,7 @@ public class JieIO {
             JieIO.readTo(data, dest);
             dest.flush();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -1685,7 +1731,7 @@ public class JieIO {
             writer.append(data);
             writer.flush();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 }

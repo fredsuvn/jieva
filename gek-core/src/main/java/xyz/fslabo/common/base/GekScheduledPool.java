@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.io.GekIOException;
+import xyz.fslabo.common.io.JieIOException;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -88,9 +88,9 @@ public abstract class GekScheduledPool {
      * Returns scheduled thread pool which is configured by this.
      *
      * @return scheduled thread pool which is configured by this
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public ScheduledExecutorService build() throws GekIOException {
+    public ScheduledExecutorService build() throws JieIOException {
         try {
             ScheduledThreadPoolExecutor pool = buildExecutor();
             if (allowCoreThreadTimeOut) {
@@ -100,7 +100,7 @@ public abstract class GekScheduledPool {
             }
             return pool;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 

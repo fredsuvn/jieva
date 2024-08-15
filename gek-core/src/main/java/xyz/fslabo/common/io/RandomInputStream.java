@@ -25,7 +25,7 @@ final class RandomInputStream extends InputStream {
             this.pos = offset;
             this.random.seek(pos);
         } catch (IOException e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 

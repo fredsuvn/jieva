@@ -5,12 +5,12 @@ package xyz.fslabo.common.io;
  *
  * @author fredsuvn
  */
-public class GekIOException extends RuntimeException {
+public class JieIOException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekIOException() {
+    public JieIOException() {
     }
 
     /**
@@ -18,7 +18,7 @@ public class GekIOException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekIOException(String message) {
+    public JieIOException(String message) {
         super(message);
     }
 
@@ -28,7 +28,7 @@ public class GekIOException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekIOException(String message, Throwable cause) {
+    public JieIOException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +37,7 @@ public class GekIOException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekIOException(Throwable cause) {
+    public JieIOException(Throwable cause) {
         super(cause);
     }
 }

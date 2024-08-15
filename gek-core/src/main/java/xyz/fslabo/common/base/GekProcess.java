@@ -3,7 +3,7 @@ package xyz.fslabo.common.base;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.io.GekIOConfigurer;
-import xyz.fslabo.common.io.GekIOException;
+import xyz.fslabo.common.io.JieIOException;
 
 import java.io.File;
 import java.io.IOException;
@@ -325,16 +325,16 @@ public abstract class GekProcess implements GekIOConfigurer<GekProcess> {
      * However, if redirected to files, this method will return immediately after starting process.
      *
      * @return the process which is started
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public Process start() throws GekIOException {
+    public Process start() throws JieIOException {
         if (JieColl.isEmpty(command)) {
             throw new IllegalArgumentException("No command.");
         }
         try {
             return startWithProcessBuilder();
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 

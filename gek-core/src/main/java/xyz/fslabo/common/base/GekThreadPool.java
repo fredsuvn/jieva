@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.io.GekIOException;
+import xyz.fslabo.common.io.JieIOException;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -126,9 +126,9 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      * Returns new thread pool which is configured by this.
      *
      * @return thread pool which is configured by this
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public ExecutorService build() throws GekIOException {
+    public ExecutorService build() throws JieIOException {
         try {
             Duration keepTime = Jie.orDefault(keepAliveTime, Duration.ZERO);
             BlockingQueue<Runnable> queue = Jie.orDefault(workQueue, LinkedBlockingQueue::new);
@@ -175,7 +175,7 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
             }
             return pool;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 

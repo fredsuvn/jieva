@@ -9,7 +9,7 @@ import xyz.fslabo.common.ref.LongVar;
 import xyz.fslabo.common.file.GekFile;
 import xyz.fslabo.common.file.GekFileCache;
 import xyz.fslabo.common.io.JieIO;
-import xyz.fslabo.common.io.GekIOException;
+import xyz.fslabo.common.io.JieIOException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,7 +48,7 @@ public class FileTest {
         byte[] bytes = data.getBytes(JieChars.defaultCharset());
         File file = createFile("FileTest-testFile.txt", data);
         GekFile gekFile = GekFile.from(file.toPath());
-        Assert.expectThrows(GekIOException.class, () -> gekFile.bindInputStream());
+        Assert.expectThrows(JieIOException.class, () -> gekFile.bindInputStream());
         gekFile.open("r");
         gekFile.position(3);
         InputStream bin = gekFile.bindInputStream();
@@ -56,8 +56,8 @@ public class FileTest {
         gekFile.position(2);
         IOTest.testInputStream(data, 2, 130, JieIO.limit(gekFile.bindInputStream(), 130), false);
         gekFile.close();
-        Assert.expectThrows(GekIOException.class, () -> gekFile.bindInputStream());
-        Assert.expectThrows(GekIOException.class, () -> bin.read());
+        Assert.expectThrows(JieIOException.class, () -> gekFile.bindInputStream());
+        Assert.expectThrows(JieIOException.class, () -> bin.read());
         gekFile.open("rw");
         gekFile.position(3);
         IOTest.testInputStream(data, 3, bytes.length - 3, bin, false);

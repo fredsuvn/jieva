@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.io.GekIOException;
+import xyz.fslabo.common.io.JieIOException;
 
 /**
  * This class is used to configure and start a {@link Thread} in method chaining:
@@ -128,9 +128,9 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * Returns thread which is configured by this, not started.
      *
      * @return thread which is configured by this, not started
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public Thread build() throws GekIOException {
+    public Thread build() throws JieIOException {
         try {
             String threadName = Jie.orDefault(name, () -> "GekThread-" + nextThreadNum());
             Thread thread;
@@ -148,7 +148,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
             }
             return thread;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
@@ -156,17 +156,17 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * Starts and returns new thread which is configured by this.
      *
      * @return the thread which is started
-     * @throws GekIOException IO exception
+     * @throws JieIOException IO exception
      */
-    public Thread start() throws GekIOException {
+    public Thread start() throws JieIOException {
         try {
             Thread thread = build();
             thread.start();
             return thread;
-        } catch (GekIOException e) {
+        } catch (JieIOException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekIOException(e);
+            throw new JieIOException(e);
         }
     }
 
