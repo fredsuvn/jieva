@@ -87,11 +87,6 @@ public class CollectionMappingHandler implements Mapper.Handler {
         return null;
     };
 
-    /**
-     * An instance with {@link #DEFAULT_GENERATOR}.
-     */
-    public static final CollectionMappingHandler INSTANCE = new CollectionMappingHandler();
-
     private final CollectionGenerator generator;
 
     /**

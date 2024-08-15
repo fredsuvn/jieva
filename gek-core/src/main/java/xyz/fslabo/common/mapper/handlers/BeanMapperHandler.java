@@ -84,11 +84,6 @@ public class BeanMapperHandler implements Mapper.Handler {
         return JieReflect.newInstance(rawType);
     };
 
-    /**
-     * An instance with {@link #DEFAULT_GENERATOR}.
-     */
-    public static final BeanMapperHandler INSTANCE = new BeanMapperHandler(DEFAULT_GENERATOR);
-
     private final BeanGenerator generator;
 
     /**

@@ -1,20 +1,404 @@
 package xyz.fslabo.common.mapper.handlers;
 
+import lombok.EqualsAndHashCode;
+import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.bean.PropertyInfo;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.mapper.MappingOptions;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
+/**
+ * Implementations of {@link TypedMapperHandler.Converter}.
+ *
+ * @author fredsuvn
+ */
 public class TypedConverters {
 
+    /**
+     * Default converter map, immutable. It supports:
+     * <ul>
+     *     <li>
+     *         Based on {@link StringConverter}: {@link String}, {@link StringBuilder}, {@link StringBuffer},
+     *         {@link CharSequence}, {@code char[]};
+     *     </li>
+     *     <li>
+     *         Based on {@link BytesConverter}: {@code byte[]}, {@link ByteBuffer}, {@link InputStream},
+     *         {@link ByteArrayInputStream};
+     *     </li>
+     *     <li>
+     *         Based on {@link NumberConverter}: {@link Number}, {@code byte}, {@link Byte}, {@code short},
+     *         {@link Short}, {@code int}, {@link Integer}, {@code long}, {@link Long}, {@code float}, {@link Float},
+     *         {@code double}, {@link Double}, {@link BigDecimal}, {@link BigInteger};
+     *     </li>
+     *     <li>
+     *         Based on {@link CharConverter}: {@code char}, {@link Character};
+     *     </li>
+     * </ul>
+     */
+    @Immutable
+    public static final Map<Type, TypedMapperHandler.Converter<?>> DEFAULT_CONVERTERS;
+
+    static {
+        Map<Type, TypedMapperHandler.Converter<?>> converters = new HashMap<>();
+        StringConverter stringConverter = new StringConverter();
+        converters.put(String.class, stringConverter);
+        converters.put(StringBuilder.class, (s, t, p, o) -> new StringBuilder(stringConverter.convert(s, t, p, o)));
+        converters.put(StringBuffer.class, (s, t, p, o) -> new StringBuffer(stringConverter.convert(s, t, p, o)));
+        converters.put(CharSequence.class, (s, t, p, o) -> new StringBuffer(stringConverter.convert(s, t, p, o)));
+        converters.put(char[].class, (s, t, p, o) -> stringConverter.convert(s, t, p, o).toCharArray());
+        BytesConverter bytesConverter = new BytesConverter();
+        converters.put(byte[].class, bytesConverter);
+        converters.put(ByteBuffer.class, (s, t, p, o) -> ByteBuffer.wrap(bytesConverter.convert(s, t, p, o)));
+        converters.put(InputStream.class, (s, t, p, o) -> new ByteArrayInputStream(bytesConverter.convert(s, t, p, o)));
+        converters.put(ByteArrayInputStream.class, (s, t, p, o) -> new ByteArrayInputStream(bytesConverter.convert(s, t, p, o)));
+        NumberConverter numberConverter = new NumberConverter();
+        converters.put(Number.class, numberConverter);
+        converters.put(byte.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).byteValue());
+        converters.put(Byte.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).byteValue());
+        converters.put(short.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).shortValue());
+        converters.put(Short.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).shortValue());
+        converters.put(int.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).intValue());
+        converters.put(Integer.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).intValue());
+        converters.put(long.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).longValue());
+        converters.put(Long.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).longValue());
+        converters.put(float.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).floatValue());
+        converters.put(Float.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).floatValue());
+        converters.put(double.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).doubleValue());
+        converters.put(Double.class, (s, t, p, o) -> numberConverter.convert(s, t, p, o).doubleValue());
+        converters.put(BigDecimal.class, (s, t, p, o) -> {
+            Number number = numberConverter.convert(s, t, p, o);
+            if (number instanceof BigDecimal) {
+                return number;
+            }
+            if (number instanceof BigInteger) {
+                return new BigDecimal((BigInteger) number);
+            }
+            return new BigDecimal(number.toString());
+        });
+        converters.put(BigInteger.class, (s, t, p, o) -> {
+            Number number = numberConverter.convert(s, t, p, o);
+            if (number instanceof BigInteger) {
+                return number;
+            }
+            if (number instanceof BigDecimal) {
+                return ((BigDecimal) number).toBigInteger();
+            }
+            return new BigInteger(number.toString());
+        });
+        CharConverter charConverter = new CharConverter();
+        converters.put(char.class, charConverter);
+        converters.put(Character.class, charConverter);
+        DEFAULT_CONVERTERS = Collections.unmodifiableMap(converters);
+    }
+
+    @Nullable
+    private static DateTimeFormatter getDateTimeFormatter(@Nullable PropertyInfo targetProperty, MappingOptions options) {
+        if (targetProperty == null) {
+            return options.getDateFormat();
+        }
+        Function<PropertyInfo, DateTimeFormatter> func = options.getPropertyDateFormat();
+        if (func == null) {
+            return options.getDateFormat();
+        }
+        DateTimeFormatter formatter = func.apply(targetProperty);
+        if (formatter != null) {
+            return formatter;
+        }
+        return options.getDateFormat();
+    }
+
+    @Nullable
+    private static NumberFormat getNumberFormatter(@Nullable PropertyInfo targetProperty, MappingOptions options) {
+        if (targetProperty == null) {
+            return options.getNumberFormat();
+        }
+        Function<PropertyInfo, NumberFormat> func = options.getPropertyNumberFormat();
+        if (func == null) {
+            return options.getNumberFormat();
+        }
+        NumberFormat formatter = func.apply(targetProperty);
+        if (formatter != null) {
+            return formatter;
+        }
+        return options.getNumberFormat();
+    }
+
+    @Nullable
+    private static Charset getCharset(@Nullable PropertyInfo targetProperty, MappingOptions options) {
+        if (targetProperty == null) {
+            return options.getCharset();
+        }
+        Function<PropertyInfo, Charset> func = options.getPropertyCharset();
+        if (func == null) {
+            return options.getCharset();
+        }
+        Charset formatter = func.apply(targetProperty);
+        if (formatter != null) {
+            return formatter;
+        }
+        return options.getCharset();
+    }
+
+    /**
+     * String converter.
+     * <p>
+     * It supports map subtypes of {@link Date}, {@link Number}, {@code byte[]} and
+     * {@link ByteBuffer} to {@link String}, or call {@link Object#toString()} for other source types.
+     * <p>
+     * Note:
+     * <ul>
+     *     <li>
+     *         For {@link ByteBuffer}, this converter use {@link JieIO#readReset(ByteBuffer)} to read and reset;
+     *     </li>
+     *     <li>
+     *         If charset option is not found, use {@link JieChars#UTF_8};
+     *     </li>
+     * </ul>
+     */
     public static class StringConverter implements TypedMapperHandler.Converter<String> {
 
         @Override
         public @Nullable String convert(
             Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
+            if (source instanceof Date) {
+                DateTimeFormatter dateTimeFormatter = getDateTimeFormatter(targetProperty, options);
+                if (dateTimeFormatter != null) {
+                    return dateTimeFormatter.format(((Date) source).toInstant());
+                }
+                return source.toString();
+            }
+            if (source instanceof TemporalAccessor) {
+                DateTimeFormatter dateTimeFormatter = getDateTimeFormatter(targetProperty, options);
+                if (dateTimeFormatter != null) {
+                    return dateTimeFormatter.format((TemporalAccessor) source);
+                }
+                return source.toString();
+            }
+            if (source instanceof Number) {
+                NumberFormat numberFormat = getNumberFormatter(targetProperty, options);
+                if (numberFormat != null) {
+                    return numberFormat.format(source);
+                }
+                return source.toString();
+            }
+            if (source instanceof byte[]) {
+                Charset charset = getCharset(targetProperty, options);
+                if (charset != null) {
+                    return new String((byte[]) source, charset);
+                }
+                return new String((byte[]) source, JieChars.UTF_8);
+            }
+            if (source instanceof ByteBuffer) {
+                Charset charset = getCharset(targetProperty, options);
+                byte[] bytes = JieIO.readReset((ByteBuffer) source);
+                if (charset != null) {
+                    return new String(bytes, charset);
+                }
+                return new String(bytes, JieChars.UTF_8);
+            }
+            return source.toString();
+        }
+    }
 
-            return "";
+    /**
+     * Bytes converter.
+     * <p>
+     * It supports map subtypes of {@link CharSequence}, {@code byte[]}, {@link ByteBuffer} and
+     * {@link InputStream} to {@link String}, or return {@code null} for other source types.
+     * <p>
+     * Note:
+     * <ul>
+     *     <li>
+     *         For {@link ByteBuffer}, this converter use {@link JieIO#readReset(ByteBuffer)} to read and reset, but no
+     *         reset for {@link InputStream};
+     *     </li>
+     *     <li>
+     *         If charset option is not found, use {@link JieChars#UTF_8};
+     *     </li>
+     * </ul>
+     */
+    public static class BytesConverter implements TypedMapperHandler.Converter<byte[]> {
+
+        @Override
+        public @Nullable byte[] convert(
+            Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
+            if (source instanceof CharSequence) {
+                Charset charset = getCharset(targetProperty, options);
+                if (charset != null) {
+                    return source.toString().getBytes(charset);
+                }
+                return source.toString().getBytes(JieChars.UTF_8);
+            }
+            if (source instanceof byte[]) {
+                return ((byte[]) source).clone();
+            }
+            if (source instanceof ByteBuffer) {
+                return JieIO.readReset((ByteBuffer) source);
+            }
+            if (source instanceof InputStream) {
+                return JieIO.read((InputStream) source);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Number converter.
+     * <p>
+     * It supports map subtypes of {@link Number}, {@link CharSequence}, {@code byte[]}, {@link ByteBuffer},
+     * {@link Character}, {@link Date}, {@link TemporalAccessor} to {@link Number}, or return {@code null} for other
+     * source types.
+     * <p>
+     * Note:
+     * <ul>
+     *     <li>
+     *         For {@link ByteBuffer}, this converter use {@link JieIO#readReset(ByteBuffer)} to read and reset;
+     *     </li>
+     *     <li>
+     *         For {@link Date} and {@link TemporalAccessor}, this converter map them as milliseconds;
+     *     </li>
+     * </ul>
+     */
+    public static class NumberConverter implements TypedMapperHandler.Converter<Number> {
+
+        @Override
+        public @Nullable Number convert(
+            Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
+            if (source instanceof Number) {
+                return (Number) source;
+            }
+            if (source instanceof CharSequence) {
+                return new StringNumber((CharSequence) source);
+            }
+            if (source instanceof byte[]) {
+                return new BigInteger((byte[]) source);
+            }
+            if (source instanceof ByteBuffer) {
+                return new BigInteger(JieIO.readReset((ByteBuffer) source));
+            }
+            if (source instanceof Character) {
+                char c = (Character) source;
+                return (int) c;
+            }
+            if (source instanceof Date) {
+                return ((Date) source).getTime();
+            }
+            if (source instanceof TemporalAccessor) {
+                TemporalAccessor temporal = (TemporalAccessor) source;
+                return temporal.getLong(ChronoField.EPOCH_DAY) * 24L * 60L * 60L * 1000L
+                    + temporal.getLong(ChronoField.SECOND_OF_DAY) * 1000L
+                    + temporal.getLong(ChronoField.NANO_OF_SECOND) / 1000000L;
+            }
+            return null;
+        }
+
+        @EqualsAndHashCode(callSuper = false)
+        private static final class StringNumber extends Number {
+
+            private final CharSequence string;
+
+            private StringNumber(CharSequence string) {
+                this.string = string;
+            }
+
+            @Override
+            public int intValue() {
+                return Integer.parseInt(string.toString());
+            }
+
+            @Override
+            public long longValue() {
+                return Long.parseLong(string.toString());
+            }
+
+            @Override
+            public float floatValue() {
+                return Float.parseFloat(string.toString());
+            }
+
+            @Override
+            public double doubleValue() {
+                return Double.parseDouble(string.toString());
+            }
+
+            @Override
+            public String toString() {
+                return string.toString();
+            }
+        }
+    }
+
+    /**
+     * Number converter.
+     * <p>
+     * It supports map subtypes of {@link Character}, {@link Number} to {@link Character}, or return {@code null} for
+     * other source types.
+     */
+    public static class CharConverter implements TypedMapperHandler.Converter<Character> {
+
+        @Override
+        public @Nullable Character convert(
+            Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
+            if (source instanceof Character) {
+                return (Character) source;
+            }
+            if (source instanceof Number) {
+                return (char) ((Number) source).intValue();
+            }
+            return null;
+        }
+
+        @EqualsAndHashCode(callSuper = false)
+        private static final class StringNumber extends Number {
+
+            private final CharSequence string;
+
+            private StringNumber(CharSequence string) {
+                this.string = string;
+            }
+
+            @Override
+            public int intValue() {
+                return Integer.parseInt(string.toString());
+            }
+
+            @Override
+            public long longValue() {
+                return Long.parseLong(string.toString());
+            }
+
+            @Override
+            public float floatValue() {
+                return Float.parseFloat(string.toString());
+            }
+
+            @Override
+            public double doubleValue() {
+                return Double.parseDouble(string.toString());
+            }
+
+            @Override
+            public String toString() {
+                return string.toString();
+            }
         }
     }
 }

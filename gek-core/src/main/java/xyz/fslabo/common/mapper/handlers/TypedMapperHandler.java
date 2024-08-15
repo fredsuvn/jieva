@@ -9,10 +9,36 @@ import xyz.fslabo.common.mapper.MappingOptions;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+/**
+ * Typed mapper handler implementation, which fast finds specified {@link Converter} for target type and convert from
+ * source object.
+ * <p>
+ * This handler has a {@link Converter} map ({@code Map<Type, Converter<?>>}). If source object is {@code null}, return
+ * {@link Flag#CONTINUE}. Else the map tries to find the converter for target type, if the converter is not found, or
+ * result of {@link Converter#convert(Object, Type, PropertyInfo, MappingOptions)} is {@code null}, return
+ * {@link Flag#CONTINUE}.
+ * <p>
+ * The converter map should be specified in {@link #TypedMapperHandler(Map)}, or use default map
+ * ({@link TypedConverters#DEFAULT_CONVERTERS}) in {@link #TypedMapperHandler()}.
+ *
+ * @author fredsuvn
+ */
 public class TypedMapperHandler implements Mapper.Handler {
 
     private final Map<Type, Converter<?>> converters;
 
+    /**
+     * Constructs with {@link TypedConverters#DEFAULT_CONVERTERS}.
+     */
+    public TypedMapperHandler() {
+        this(TypedConverters.DEFAULT_CONVERTERS);
+    }
+
+    /**
+     * Constructs with specified converter map.
+     *
+     * @param converters specified converter map
+     */
     public TypedMapperHandler(Map<Type, Converter<?>> converters) {
         this.converters = converters;
     }

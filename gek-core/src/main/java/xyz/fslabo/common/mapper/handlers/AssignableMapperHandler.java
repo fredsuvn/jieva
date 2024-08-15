@@ -13,7 +13,8 @@ import java.lang.reflect.WildcardType;
 import java.util.Objects;
 
 /**
- * Default first {@link Mapper.Handler} of {@link Mapper#getHandlers()}, has a singleton instance {@link #SINGLETON}.
+ * Default first {@link Mapper.Handler} of {@link Mapper#getHandlers()}, to check assignable relationship between source
+ * and target types.
  * <p>
  * In this handler, if value of {@link MappingOptions#getCopyLevel()} equals to {@link MappingOptions#COPY_LEVEL_EQUAL}
  * and the source type equals to target type, return source object wrapped by {@link #wrapResult(Object)}
@@ -37,12 +38,7 @@ import java.util.Objects;
  */
 public class AssignableMapperHandler implements Mapper.Handler {
 
-    /**
-     * Singleton instance.
-     */
-    public static final AssignableMapperHandler SINGLETON = new AssignableMapperHandler();
-
-    protected AssignableMapperHandler() {
+    public AssignableMapperHandler() {
     }
 
     @Override

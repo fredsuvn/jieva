@@ -141,7 +141,7 @@ public class MappingOptions {
 
     /**
      * Charset function to determine which charset to use for character conversion. This option is typically used in
-     * {@link BeanMapper}.
+     * {@link BeanMapper}, and if this option is {@code null}, the mapper should try to use {@link #getCharset()}.
      * <p>
      * Default is {@code null}.
      */
@@ -149,7 +149,7 @@ public class MappingOptions {
 
     /**
      * Charset function to determine which format to use for number conversion. This option is typically used in
-     * {@link BeanMapper}.
+     * {@link BeanMapper}, and if this option is {@code null}, the mapper should try to use {@link #getNumberFormat()}.
      * <p>
      * Default is {@code null}.
      */
@@ -157,7 +157,7 @@ public class MappingOptions {
 
     /**
      * Charset function to determine which format to use for date conversion. This option is typically used in
-     * {@link BeanMapper}.
+     * {@link BeanMapper}, and if this option is {@code null}, the mapper should try to use {@link #getDateFormat()}.
      * <p>
      * Default is {@code null}.
      */
