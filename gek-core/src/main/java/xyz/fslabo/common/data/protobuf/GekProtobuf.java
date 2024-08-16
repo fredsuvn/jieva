@@ -10,11 +10,11 @@ import xyz.fslabo.common.mapper.Mapper;
 public class GekProtobuf {
 
     private static final BeanResolver RESOLVER = BeanResolver.defaultResolver()
-        .withFirstHandler(ProtobufResolveHandler.INSTANCE);
+        .withFirstHandler(ProtobufBeanResolveHandler.INSTANCE);
     private static final Mapper CONVERTER = Mapper.defaultMapper()
-        .insertFirstMiddleHandler(ByteStringConvertHandler.INSTANCE)
-        .withSuffixHandler(ProtobufBeanConvertHandler.INSTANCE);
-    private static final GekBeanCopier COPIER = ProtobufBeanConvertHandler.INSTANCE.getCopier();
+        .insertFirstMiddleHandler(ProtobufMapperHandler.INSTANCE)
+        .withSuffixHandler(ProtobufBeanGenerator.INSTANCE);
+    private static final GekBeanCopier COPIER = ProtobufBeanGenerator.INSTANCE.getCopier();
 
     /**
      * Returns bean resolver supports protobuf based on {@link BeanResolver#defaultResolver()}.

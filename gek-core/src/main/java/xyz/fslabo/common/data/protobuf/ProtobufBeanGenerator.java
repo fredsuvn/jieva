@@ -2,9 +2,7 @@ package xyz.fslabo.common.data.protobuf;
 
 import com.google.protobuf.Message;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.mapper.MapperException;
-import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.mapper.handlers.BeanMapperHandler;
 import xyz.fslabo.common.reflect.JieReflect;
 
@@ -12,43 +10,19 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
- * Convert handler implementation for <a href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>.
- * This class extends {@link BeanMapperHandler} to supports convert to protobuf types.
+ * {@link BeanMapperHandler.BeanGenerator} implementation for
+ * <a href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>.
+ * <p>
+ * Note this handler depends on {@code protobuf libs} in the runtime.
  *
  * @author fredsuvn
  */
-public class ProtobufBeanConvertHandler extends BeanMapperHandler {
-
-    /**
-     * An instance with {@link #ProtobufBeanConvertHandler()}.
-     */
-    public static final ProtobufBeanConvertHandler INSTANCE = new ProtobufBeanConvertHandler();
-
-    /**
-     * Constructs with {@link GekProtobuf#protobufBeanCopier()}.
-     *
-     * @see #ProtobufBeanConvertHandler(BeanResolver)
-     */
-    public ProtobufBeanConvertHandler() {
-        this(GekProtobuf.protobufBeanResolver());
-    }
-
-    /**
-     * Constructs with given object converter.
-     *
-     * @param resolver given object converter
-     */
-    public ProtobufBeanConvertHandler(BeanResolver resolver) {
-        super(resolver);
-    }
+public class ProtobufBeanGenerator implements BeanMapperHandler.BeanGenerator {
 
     @Override
-    public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
-        if (source == null) {
-            return null;
-        }
+    public @Nullable Object generate(Type targetType) {
         if (!(targetType instanceof Class<?>)) {
-            return super.map(source, sourceType, targetType, mapper);
+            return BeanMapperHandler.DEFAULT_GENERATOR.generate(targetType);
         }
         Class<?> rawType = JieReflect.getRawType(targetType);
         //Check whether it is a protobuf object
@@ -62,16 +36,22 @@ public class ProtobufBeanConvertHandler extends BeanMapperHandler {
             isBuilder = true;
         }
         if (!isProtobuf) {
-            return super.map(source, sourceType, targetType, mapper);
+            return BeanMapperHandler.DEFAULT_GENERATOR.generate(targetType);
         }
         try {
-            Object builder = getProtobufBuilder(rawType, isBuilder);
-            getCopier().withConverter(mapper)
-
-                .copyProperties(source, sourceType, builder, builder.getClass());
-            return build(builder, isBuilder);
+            return getProtobufBuilder(rawType, isBuilder);
         } catch (MapperException e) {
             throw e;
+        } catch (Exception e) {
+            throw new MapperException(e);
+        }
+    }
+
+    @Override
+    public Object build(Object builder) {
+        boolean isBuilder = Message.Builder.class.isAssignableFrom(builder.getClass());
+        try {
+            return build(builder, isBuilder);
         } catch (Exception e) {
             throw new MapperException(e);
         }

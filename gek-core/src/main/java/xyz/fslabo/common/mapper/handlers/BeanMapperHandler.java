@@ -49,6 +49,7 @@ import java.util.function.Supplier;
  *     }
  *     return JieReflect.newInstance(rawType);
  * </pre>
+ * Method {@link BeanGenerator#build(Object)} of default generator will directly return given builder itself.
  *
  * @author fredsuvn
  * @see BeanGenerator
@@ -72,16 +73,24 @@ public class BeanMapperHandler implements Mapper.Handler {
     /**
      * Default bean generator.
      */
-    public static final BeanGenerator DEFAULT_GENERATOR = type -> {
-        Supplier<Object> supplier = NEW_INSTANCE_MAP.get(type);
-        if (supplier != null) {
-            return supplier.get();
+    public static final BeanGenerator DEFAULT_GENERATOR = new BeanGenerator() {
+        @Override
+        public @Nullable Object generate(Type type) {
+            Supplier<Object> supplier = NEW_INSTANCE_MAP.get(type);
+            if (supplier != null) {
+                return supplier.get();
+            }
+            Class<?> rawType = JieReflect.getRawType(type);
+            if (rawType == null) {
+                return null;
+            }
+            return JieReflect.newInstance(rawType);
         }
-        Class<?> rawType = JieReflect.getRawType(type);
-        if (rawType == null) {
-            return null;
+
+        @Override
+        public Object build(Object builder) {
+            return builder;
         }
-        return JieReflect.newInstance(rawType);
     };
 
     private final BeanGenerator generator;
@@ -113,7 +122,7 @@ public class BeanMapperHandler implements Mapper.Handler {
         }
         BeanMapper beanMapper = options.getBeanMapper();
         beanMapper.copyProperties(source, sourceType, targetObject, targetType, options);
-        return wrapResult(targetObject);
+        return wrapResult(generator.build(targetObject));
     }
 
     @Override
@@ -122,18 +131,30 @@ public class BeanMapperHandler implements Mapper.Handler {
     }
 
     /**
-     * Bean generator to create new object of target type.
+     * Bean generator to create new bean object of target type.
+     * <p>
+     * A bean object may be mutable or immutable. If it is mutable, {@link #generate(Type)} will directly create a new
+     * instance of bean, and {@link #build(Object)} should do nothing. If the bean is immutable, {@link #generate(Type)}
+     * should create a builder object of bean, and {@link #build(Object)} should complete to build object of bean.
      */
-    @FunctionalInterface
     public interface BeanGenerator {
 
         /**
-         * Generates and returns a new object of target type, or returns {@code null} if unsupported.
+         * Generates and returns a new bean object or its builder object of target type, or returns {@code null} if
+         * unsupported.
          *
          * @param targetType target type
-         * @return a new object of target type or null if unsupported
+         * @return a new bean object or its builder object of target type or null if unsupported
          */
         @Nullable
         Object generate(Type targetType);
+
+        /**
+         * Builds bean object of given bean builder. If the builder is bean object itself, return itself.
+         *
+         * @param builder given bean builder
+         * @return bean object
+         */
+        Object build(Object builder);
     }
 }

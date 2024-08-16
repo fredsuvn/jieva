@@ -13,7 +13,7 @@ import java.util.*;
 final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
 
     static ResolverImpl DEFAULT_RESOLVER =
-        new ResolverImpl(Collections.singletonList(JavaBeanResolverHandler.INSTANCE));
+        new ResolverImpl(Collections.singletonList(new JavaBeanResolverHandler()));
 
     private final List<BeanResolver.Handler> handlers;
 

@@ -24,11 +24,6 @@ import java.util.List;
  */
 public class NonGetterPrefixResolverHandler extends NonPrefixResolverHandler {
 
-    /**
-     * An instance.
-     */
-    public static final NonGetterPrefixResolverHandler INSTANCE = new NonGetterPrefixResolverHandler();
-
     private final GekCase namingCase = GekCase.LOWER_CAMEL;
 
     @Nullable

@@ -23,11 +23,6 @@ public class NonPrefixResolverHandler extends AbstractBeanResolverHandler {
 
     private static final Method[] BELONG_OBJECT = Object.class.getMethods();
 
-    /**
-     * An instance.
-     */
-    public static final NonPrefixResolverHandler INSTANCE = new NonPrefixResolverHandler();
-
     @Nullable
     protected Getter resolveGetter(Method method) {
         if (belongObject(method)) {

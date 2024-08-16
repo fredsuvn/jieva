@@ -5,11 +5,12 @@ import com.google.protobuf.Message;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.JieString;
+import xyz.fslabo.common.bean.BasePropertyInfo;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolver;
-import xyz.fslabo.common.bean.PropertyBase;
-import xyz.fslabo.common.mapper.MapperException;
+import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.invoke.Invoker;
+import xyz.fslabo.common.mapper.MapperException;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.annotation.Annotation;
@@ -22,17 +23,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Resolve handler implementation for <a href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>.
- * This handler depends on protobuf libs in the runtime.
+ * {@link BeanResolver.Handler} implementation for
+ * <a href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>.
+ * <p>
+ * Note this handler depends on {@code protobuf libs} in the runtime.
  *
  * @author fredsuvn
  */
-public class ProtobufResolveHandler implements BeanResolver.Handler {
-
-    /**
-     * An instance.
-     */
-    public static final ProtobufResolveHandler INSTANCE = new ProtobufResolveHandler();
+public class ProtobufBeanResolveHandler implements BeanResolver.Handler {
 
     @Override
     public @Nullable Flag resolve(BeanResolver.Context context) {
@@ -57,8 +55,8 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
             Method getDescriptorMethod = rawType.getMethod("getDescriptor");
             Descriptors.Descriptor descriptor = (Descriptors.Descriptor) getDescriptorMethod.invoke(null);
             for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
-                PropertyBase propBase = buildProperty(context, field, rawType, isBuilder);
-                context.getProperties().put(propBase.getName(), propBase);
+                BasePropertyInfo basePropertyInfo = buildProperty(context, field, rawType, isBuilder);
+                context.getProperties().put(basePropertyInfo.getName(), basePropertyInfo);
             }
             return Flag.BREAK;
         } catch (MapperException e) {
@@ -68,7 +66,7 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         }
     }
 
-    private PropertyBase buildProperty(
+    private BasePropertyInfo buildProperty(
         BeanResolver.Context builder,
         Descriptors.FieldDescriptor field,
         Class<?> rawClass,
@@ -81,7 +79,10 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         if (field.isMapField()) {
             String name = rawName + "Map";
             Method getterMethod = rawClass.getMethod("get" + JieString.capitalize(name));
-            Type type = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), Map.class);
+            List<Type> argsTypes = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), Map.class);
+            if (JieColl.isEmpty(argsTypes)) {
+                throw new BeanException("Cannot get actual argument type for " + getterMethod.getGenericReturnType() + ".");
+            }
             Invoker getter = Invoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + JieString.capitalize(rawName));
@@ -99,9 +100,9 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
                         }
                     }
                 };
-                return new Impl(name, type, getterMethod, null, getter, setter);
+                return new Impl(name, argsTypes.get(0), getterMethod, null, getter, setter);
             } else {
-                return new Impl(name, type, getterMethod, null, getter, null);
+                return new Impl(name, argsTypes.get(0), getterMethod, null, getter, null);
             }
         }
 
@@ -109,7 +110,10 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         if (field.isRepeated()) {
             String name = rawName + "List";
             Method getterMethod = rawClass.getMethod("get" + JieString.capitalize(name));
-            Type type = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), List.class);
+            List<Type> argsTypes = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), List.class);
+            if (JieColl.isEmpty(argsTypes)) {
+                throw new BeanException("Cannot get actual argument type for " + getterMethod.getGenericReturnType() + ".");
+            }
             Invoker getter = Invoker.reflectMethod(getterMethod);
             if (isBuilder) {
                 Method clearMethod = rawClass.getMethod("clear" + JieString.capitalize(rawName));
@@ -127,9 +131,9 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
                         }
                     }
                 };
-                return new Impl(name, type, getterMethod, null, getter, setter);
+                return new Impl(name, argsTypes.get(0), getterMethod, null, getter, setter);
             } else {
-                return new Impl(name, type, getterMethod, null, getter, null);
+                return new Impl(name, argsTypes.get(0), getterMethod, null, getter, null);
             }
         }
 
@@ -146,7 +150,7 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         }
     }
 
-    private static final class Impl implements PropertyBase {
+    private static final class Impl implements BasePropertyInfo {
 
         private final String name;
         private final Type type;

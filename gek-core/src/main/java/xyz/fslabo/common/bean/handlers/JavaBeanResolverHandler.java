@@ -21,11 +21,6 @@ import java.util.Objects;
  */
 public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
 
-    /**
-     * An instance.
-     */
-    public static final JavaBeanResolverHandler INSTANCE = new JavaBeanResolverHandler();
-
     private final GekCase namingCase = GekCase.LOWER_CAMEL;
 
     @Nullable

@@ -3,6 +3,8 @@ package xyz.fslabo.common.mapper;
 import lombok.Builder;
 import lombok.Getter;
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.bean.BeanProvider;
 import xyz.fslabo.common.bean.PropertyInfo;
 
@@ -46,6 +48,74 @@ public class MappingOptions {
      * deep copy.
      */
     public static final int COPY_LEVEL_DEEP = 3;
+
+    /**
+     * Returns actual {@link DateTimeFormatter} option from given property info and options, may be {@code null}.
+     *
+     * @param targetProperty given property info
+     * @param options        given options
+     * @return actual {@link DateTimeFormatter} option, may be {@code null}
+     */
+    @Nullable
+    public static DateTimeFormatter getDateTimeFormatter(@Nullable PropertyInfo targetProperty, MappingOptions options) {
+        if (targetProperty == null) {
+            return options.getDateFormat();
+        }
+        Function<PropertyInfo, DateTimeFormatter> func = options.getPropertyDateFormat();
+        if (func == null) {
+            return options.getDateFormat();
+        }
+        DateTimeFormatter formatter = func.apply(targetProperty);
+        if (formatter != null) {
+            return formatter;
+        }
+        return options.getDateFormat();
+    }
+
+    /**
+     * Returns actual {@link NumberFormat} option from given property info and options, may be {@code null}.
+     *
+     * @param targetProperty given property info
+     * @param options        given options
+     * @return actual {@link NumberFormat} option, may be {@code null}
+     */
+    @Nullable
+    public static NumberFormat getNumberFormatter(@Nullable PropertyInfo targetProperty, MappingOptions options) {
+        if (targetProperty == null) {
+            return options.getNumberFormat();
+        }
+        Function<PropertyInfo, NumberFormat> func = options.getPropertyNumberFormat();
+        if (func == null) {
+            return options.getNumberFormat();
+        }
+        NumberFormat formatter = func.apply(targetProperty);
+        if (formatter != null) {
+            return formatter;
+        }
+        return options.getNumberFormat();
+    }
+
+    /**
+     * Returns actual {@link Charset} option from given property info and options.
+     *
+     * @param targetProperty given property info
+     * @param options        given options
+     * @return actual {@link Charset} option
+     */
+    public static Charset getCharset(@Nullable PropertyInfo targetProperty, MappingOptions options) {
+        if (targetProperty == null) {
+            return Jie.orDefault(options.getCharset(), JieChars.UTF_8);
+        }
+        Function<PropertyInfo, Charset> func = options.getPropertyCharset();
+        if (func == null) {
+            return Jie.orDefault(options.getCharset(), JieChars.UTF_8);
+        }
+        Charset formatter = func.apply(targetProperty);
+        if (formatter != null) {
+            return formatter;
+        }
+        return Jie.orDefault(options.getCharset(), JieChars.UTF_8);
+    }
 
     /**
      * Option for {@link Mapper}, to map objects in types if needed.
@@ -119,7 +189,8 @@ public class MappingOptions {
     private int copyLevel;
 
     /**
-     * Charset option to determine which charset to use for character conversion.
+     * Charset option to determine which charset to use for character conversion. If it is {@code null}, the mapper
+     * should use {@link JieChars#UTF_8}.
      * <p>
      * Default is {@code null}.
      */
