@@ -10,22 +10,13 @@ import xyz.fslabo.common.mapper.MappingOptions;
 import java.lang.reflect.Type;
 
 /**
- * Enum mapper handler implementation which is used to support mapping from any object to enum types, has a singleton
- * instance {@link #SINGLETON}.
+ * Enum mapper handler implementation which is used to support mapping from any object to enum types.
  * <p>
  * If source object is null or target type is not an enum type, return {@link Flag#CONTINUE}.
  *
  * @author fredsuvn
  */
 public class EnumMapperHandler implements Mapper.Handler {
-
-    /**
-     * Singleton instance.
-     */
-    public static final EnumMapperHandler SINGLETON = new EnumMapperHandler();
-
-    protected EnumMapperHandler() {
-    }
 
     @Override
     public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {

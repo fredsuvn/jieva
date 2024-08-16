@@ -6,6 +6,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.mapper.MapperException;
 import xyz.fslabo.common.mapper.MappingOptions;
 
 import java.io.ByteArrayInputStream;
@@ -15,10 +16,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalField;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,6 +55,19 @@ public class TypedConverters {
      *     </li>
      *     <li>
      *         Based on {@link CharConverter}: {@code char}, {@link Character};
+     *     </li>
+     *     <li>
+     *         Based on {@link DateConverter}: {@link Date};
+     *     </li>
+     *     <li>
+     *         Based on {@link TemporalConverter}: {@link TemporalAccessor}, {@link Instant}, {@link LocalDateTime},
+     *         {@link OffsetDateTime}, {@link ZonedDateTime}, {@link LocalDate}, {@link LocalTime};
+     *     </li>
+     *     <li>
+     *         Based on {@link DurationConverter}: {@link Duration};
+     *     </li>
+     *     <li>
+     *         Based on {@link BooleanConverter}: {@code boolean}, {@link Boolean};
      *     </li>
      * </ul>
      */
@@ -91,6 +109,15 @@ public class TypedConverters {
             if (number instanceof BigInteger) {
                 return new BigDecimal((BigInteger) number);
             }
+            if (number instanceof Integer) {
+                return new BigDecimal((Integer) number);
+            }
+            if (number instanceof Long) {
+                return new BigDecimal((Long) number);
+            }
+            if (number instanceof Double) {
+                return BigDecimal.valueOf((Double) number);
+            }
             return new BigDecimal(number.toString());
         });
         converters.put(BigInteger.class, (s, t, p, o) -> {
@@ -101,12 +128,30 @@ public class TypedConverters {
             if (number instanceof BigDecimal) {
                 return ((BigDecimal) number).toBigInteger();
             }
+            if (number instanceof Long) {
+                return BigInteger.valueOf((Long) number);
+            }
             return new BigInteger(number.toString());
         });
         CharConverter charConverter = new CharConverter();
         converters.put(char.class, charConverter);
         converters.put(Character.class, charConverter);
         DEFAULT_CONVERTERS = Collections.unmodifiableMap(converters);
+        DateConverter dateConverter = new DateConverter();
+        converters.put(Date.class, dateConverter);
+        TemporalConverter temporalConverter = new TemporalConverter();
+        converters.put(TemporalAccessor.class, temporalConverter);
+        converters.put(Instant.class, (s, t, p, o) -> TemporalConverter.toInstant(temporalConverter.convert(s, t, p, o)));
+        converters.put(LocalDateTime.class, (s, t, p, o) -> TemporalConverter.toLocalDateTime(temporalConverter.convert(s, t, p, o)));
+        converters.put(OffsetDateTime.class, (s, t, p, o) -> TemporalConverter.toOffsetDateTime(temporalConverter.convert(s, t, p, o)));
+        converters.put(ZonedDateTime.class, (s, t, p, o) -> TemporalConverter.toZonedDateTime(temporalConverter.convert(s, t, p, o)));
+        converters.put(LocalDate.class, (s, t, p, o) -> TemporalConverter.toLocalDate(temporalConverter.convert(s, t, p, o)));
+        converters.put(LocalTime.class, (s, t, p, o) -> TemporalConverter.toLocalTime(temporalConverter.convert(s, t, p, o)));
+        DurationConverter durationConverter = new DurationConverter();
+        converters.put(Duration.class, durationConverter);
+        BooleanConverter booleanConverter = new BooleanConverter();
+        converters.put(boolean.class, booleanConverter);
+        converters.put(Boolean.class, booleanConverter);
     }
 
     @Nullable
@@ -155,6 +200,12 @@ public class TypedConverters {
             return formatter;
         }
         return options.getCharset();
+    }
+
+    private static long getMillis(TemporalAccessor temporal) {
+        return temporal.getLong(ChronoField.EPOCH_DAY) * 24L * 60L * 60L * 1000L
+            + temporal.getLong(ChronoField.SECOND_OF_DAY) * 1000L
+            + temporal.getLong(ChronoField.NANO_OF_SECOND) / 1000000L;
     }
 
     /**
@@ -365,40 +416,293 @@ public class TypedConverters {
             }
             return null;
         }
+    }
+
+    /**
+     * Date converter.
+     * <p>
+     * It supports map subtypes of {@link Date}, {@link TemporalAccessor}, {@code long}, {@link Long},
+     * {@link CharSequence} to {@link Date}, or return {@code null} for other source types.
+     * <p>
+     * Note:
+     * <ul>
+     *     <li>
+     *         For mapping from {@code long}/{@link Long} to {@link Date}, the long value will be considered as
+     *         milliseconds;
+     *     </li>
+     * </ul>
+     */
+    public static class DateConverter implements TypedMapperHandler.Converter<Date> {
+
+        @Override
+        public @Nullable Date convert(
+            Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
+            if (source instanceof Date) {
+                return new Date(((Date) source).getTime());
+            }
+            if (source instanceof TemporalAccessor) {
+                return new Date(getMillis((TemporalAccessor) source));
+            }
+            if (source instanceof Long) {
+                return new Date((Long) source);
+            }
+            if (source instanceof CharSequence) {
+                DateTimeFormatter formatter = getDateTimeFormatter(targetProperty, options);
+                if (formatter == null) {
+                    try {
+                        return DateFormat.getInstance().parse(source.toString());
+                    } catch (ParseException e) {
+                        throw new MapperException(e);
+                    }
+                }
+                return Date.from(Instant.from(formatter.parse(source.toString())));
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Temporal object converter.
+     * <p>
+     * It supports map subtypes of {@link Date}, {@link TemporalAccessor}, {@code long}, {@link Long},
+     * {@link CharSequence} to {@link TemporalAccessor}, or return {@code null} for other source types.
+     * <p>
+     * Note:
+     * <ul>
+     *     <li>
+     *         For mapping from {@code long}/{@link Long} to {@link TemporalAccessor}, the long value will be
+     *         considered as milliseconds;
+     *     </li>
+     * </ul>
+     */
+    public static class TemporalConverter implements TypedMapperHandler.Converter<TemporalAccessor> {
+
+        /**
+         * Maps given temporal object to {@link Instant}.
+         *
+         * @param temporal given temporal object
+         * @return mapped {@link Instant}
+         */
+        public static Instant toInstant(TemporalAccessor temporal) {
+            if (temporal instanceof StringTemporal) {
+                return ((StringTemporal) temporal).toInstant();
+            }
+            return Instant.from(temporal);
+        }
+
+        /**
+         * Maps given temporal object to {@link LocalDateTime}.
+         *
+         * @param temporal given temporal object
+         * @return mapped {@link LocalDateTime}
+         */
+        public static LocalDateTime toLocalDateTime(TemporalAccessor temporal) {
+            if (temporal instanceof StringTemporal) {
+                return ((StringTemporal) temporal).toLocalDateTime();
+            }
+            return LocalDateTime.from(temporal);
+        }
+
+        /**
+         * Maps given temporal object to {@link OffsetDateTime}.
+         *
+         * @param temporal given temporal object
+         * @return mapped {@link OffsetDateTime}
+         */
+        public static OffsetDateTime toOffsetDateTime(TemporalAccessor temporal) {
+            if (temporal instanceof StringTemporal) {
+                return ((StringTemporal) temporal).toOffsetDateTime();
+            }
+            return OffsetDateTime.from(temporal);
+        }
+
+        /**
+         * Maps given temporal object to {@link ZonedDateTime}.
+         *
+         * @param temporal given temporal object
+         * @return mapped {@link ZonedDateTime}
+         */
+        public static ZonedDateTime toZonedDateTime(TemporalAccessor temporal) {
+            if (temporal instanceof StringTemporal) {
+                return ((StringTemporal) temporal).toZonedDateTime();
+            }
+            return ZonedDateTime.from(temporal);
+        }
+
+        /**
+         * Maps given temporal object to {@link LocalDate}.
+         *
+         * @param temporal given temporal object
+         * @return mapped {@link LocalDate}
+         */
+        public static LocalDate toLocalDate(TemporalAccessor temporal) {
+            if (temporal instanceof StringTemporal) {
+                return ((StringTemporal) temporal).toLocalDate();
+            }
+            return LocalDate.from(temporal);
+        }
+
+        /**
+         * Maps given temporal object to {@link LocalTime}.
+         *
+         * @param temporal given temporal object
+         * @return mapped {@link LocalTime}
+         */
+        public static LocalTime toLocalTime(TemporalAccessor temporal) {
+            if (temporal instanceof StringTemporal) {
+                return ((StringTemporal) temporal).toLocalTime();
+            }
+            return LocalTime.from(temporal);
+        }
+
+        @Override
+        public @Nullable TemporalAccessor convert(
+            Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
+            if (source instanceof Date) {
+                return ((Date) source).toInstant();
+            }
+            if (source instanceof TemporalAccessor) {
+                return (TemporalAccessor) source;
+            }
+            if (source instanceof Long) {
+                return Instant.ofEpochMilli((Long) source);
+            }
+            if (source instanceof CharSequence) {
+                return new StringTemporal((CharSequence) source, targetProperty, options);
+            }
+            return null;
+        }
 
         @EqualsAndHashCode(callSuper = false)
-        private static final class StringNumber extends Number {
+        private static final class StringTemporal implements TemporalAccessor {
 
             private final CharSequence string;
+            private final @Nullable PropertyInfo targetProperty;
+            private final MappingOptions options;
 
-            private StringNumber(CharSequence string) {
+            private StringTemporal(CharSequence string, @Nullable PropertyInfo targetProperty, MappingOptions options) {
                 this.string = string;
+                this.targetProperty = targetProperty;
+                this.options = options;
             }
 
             @Override
-            public int intValue() {
-                return Integer.parseInt(string.toString());
+            public boolean isSupported(TemporalField field) {
+                return false;
             }
 
             @Override
-            public long longValue() {
-                return Long.parseLong(string.toString());
-            }
-
-            @Override
-            public float floatValue() {
-                return Float.parseFloat(string.toString());
-            }
-
-            @Override
-            public double doubleValue() {
-                return Double.parseDouble(string.toString());
+            public long getLong(TemporalField field) {
+                return 0;
             }
 
             @Override
             public String toString() {
                 return string.toString();
             }
+
+            public Instant toInstant() {
+                DateTimeFormatter formatter = getDateTimeFormatter(targetProperty, options);
+                if (formatter == null) {
+                    return Instant.parse(string);
+                }
+                return Instant.from(formatter.parse(string));
+            }
+
+            public LocalDateTime toLocalDateTime() {
+                DateTimeFormatter formatter = getDateTimeFormatter(targetProperty, options);
+                if (formatter == null) {
+                    return LocalDateTime.parse(string);
+                }
+                return LocalDateTime.parse(string, formatter);
+            }
+
+            public OffsetDateTime toOffsetDateTime() {
+                DateTimeFormatter formatter = getDateTimeFormatter(targetProperty, options);
+                if (formatter == null) {
+                    return OffsetDateTime.parse(string);
+                }
+                return OffsetDateTime.parse(string, formatter);
+            }
+
+            public ZonedDateTime toZonedDateTime() {
+                DateTimeFormatter formatter = getDateTimeFormatter(targetProperty, options);
+                if (formatter == null) {
+                    return ZonedDateTime.parse(string);
+                }
+                return ZonedDateTime.parse(string, formatter);
+            }
+
+            public LocalDate toLocalDate() {
+                DateTimeFormatter formatter = getDateTimeFormatter(targetProperty, options);
+                if (formatter == null) {
+                    return LocalDate.parse(string);
+                }
+                return LocalDate.parse(string, formatter);
+            }
+
+            public LocalTime toLocalTime() {
+                DateTimeFormatter formatter = getDateTimeFormatter(targetProperty, options);
+                if (formatter == null) {
+                    return LocalTime.parse(string);
+                }
+                return LocalTime.parse(string, formatter);
+            }
+        }
+    }
+
+    /**
+     * Duration converter.
+     * <p>
+     * It supports map subtypes of {@link Duration}, {@link CharSequence} to {@link Duration}, or return {@code null}
+     * for other source types.
+     */
+    public static class DurationConverter implements TypedMapperHandler.Converter<Duration> {
+
+        @Override
+        public @Nullable Duration convert(
+            Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
+            if (source instanceof Duration) {
+                return (Duration) source;
+            }
+            if (source instanceof CharSequence) {
+                return Duration.parse((CharSequence) source);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Duration converter.
+     * <p>
+     * It supports map subtypes of {@code boolean}, {@link Boolean}, {@link CharSequence} to {@link Number}, or return
+     * {@code null} for other source types.
+     * <p>
+     * Note:
+     * <ul>
+     *     <li>
+     *         Using {@link Boolean#valueOf(String)} to map from {@link CharSequence} to bool,
+     *     </li>
+     *     <li>
+     *         If source object is subtypes of {@link Number}, {@code 0} is false and others true.
+     *     </li>
+     * </ul>
+     */
+    public static class BooleanConverter implements TypedMapperHandler.Converter<Boolean> {
+
+        @Override
+        public @Nullable Boolean convert(
+            Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
+            if (source instanceof Boolean) {
+                return (Boolean) source;
+            }
+            if (source instanceof CharSequence) {
+                return Boolean.valueOf(source.toString());
+            }
+            if (source instanceof Number) {
+                return ((Number) source).intValue() != 0;
+            }
+            return null;
         }
     }
 }

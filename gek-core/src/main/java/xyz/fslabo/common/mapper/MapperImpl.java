@@ -14,15 +14,11 @@ import java.util.List;
 final class MapperImpl implements Mapper, Mapper.Handler {
 
     static final MapperImpl DEFAULT_MAPPER = new MapperImpl(Arrays.asList(
-        AssignableMapperHandler.SINGLETON,
-        EnumMapperHandler.SINGLETON,
-        DateConvertHandler.INSTANCE,
-        BytesConvertHandler.INSTANCE,
-        BooleanConvertHandler.INSTANCE,
-        NumberMapperHandler.INSTANCE,
-        ToStringHandler.INSTANCE,
-        CollectionMappingHandler.INSTANCE,
-        BeanMapperHandler.INSTANCE
+        new AssignableMapperHandler(),
+        new EnumMapperHandler(),
+        new TypedMapperHandler(),
+        new CollectionMappingHandler(),
+        new BeanMapperHandler()
     ));
 
     private final List<Mapper.Handler> handlers;

@@ -31,11 +31,7 @@ public interface Mapper {
      * <ul>
      *     <li>{@link AssignableMapperHandler};</li>
      *     <li>{@link EnumMapperHandler};</li>
-     *     <li>{@link DateConvertHandler};</li>
-     *     <li>{@link BytesConvertHandler};</li>
-     *     <li>{@link BooleanConvertHandler};</li>
-     *     <li>{@link NumberMapperHandler};</li>
-     *     <li>{@link ToStringHandler};</li>
+     *     <li>{@link TypedMapperHandler};</li>
      *     <li>{@link CollectionMappingHandler};</li>
      *     <li>{@link BeanMapperHandler};</li>
      * </ul>
