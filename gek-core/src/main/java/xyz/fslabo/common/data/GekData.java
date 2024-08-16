@@ -1,9 +1,9 @@
 package xyz.fslabo.common.data;
 
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.GekCheck;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieChars;
+import xyz.fslabo.common.base.JieString;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -25,7 +25,7 @@ public interface GekData extends GekDataOutput {
      * @return the {@link OfArray}
      */
     static GekData.OfArray wrap(String str) {
-        return wrap(GekString.encode(str));
+        return wrap(JieString.encode(str));
     }
 
     /**

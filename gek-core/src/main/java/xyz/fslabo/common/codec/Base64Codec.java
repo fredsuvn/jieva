@@ -3,7 +3,7 @@ package xyz.fslabo.common.codec;
 import lombok.Data;
 import org.springframework.core.codec.CodecException;
 import xyz.fslabo.common.base.JieChars;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.io.JieIO;
 
 import java.io.ByteArrayOutputStream;
@@ -403,7 +403,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
             case ENCODE_MODE:
                 return getEncoder().encodeToString(inputToBytes());
             case DECODE_MODE:
-                return GekString.of(getDecoder().decode(inputToBytes()), JieChars.latinCharset());
+                return JieString.of(getDecoder().decode(inputToBytes()), JieChars.latinCharset());
         }
         throw new IllegalStateException("Unknown mode: " + mode);
     }

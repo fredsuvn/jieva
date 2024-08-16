@@ -1,7 +1,7 @@
 package xyz.fslabo.common.io;
 
-import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.base.JieChars;
+import xyz.fslabo.common.base.JieString;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -76,6 +76,6 @@ public interface GekIOProcess<T extends GekIOProcess<T>> extends GekIOConfigurer
      * @return result as string with specified charset
      */
     default String finalString(Charset charset) {
-        return GekString.of(finalBytes(), charset);
+        return JieString.of(finalBytes(), charset);
     }
 }

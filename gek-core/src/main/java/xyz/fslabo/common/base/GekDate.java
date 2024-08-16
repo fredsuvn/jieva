@@ -71,11 +71,11 @@ public class GekDate {
      * @return {@link DateTimeFormatter} of given pattern
      */
     public static DateTimeFormatter toFormatter(CharSequence pattern) {
-        if (GekString.charEquals(PATTERN, pattern)) {
+        if (JieString.charEquals(PATTERN, pattern)) {
             return FORMATTER;
-        } else if (GekString.charEquals(PATTERN_SECOND, pattern)) {
+        } else if (JieString.charEquals(PATTERN_SECOND, pattern)) {
             return FORMATTER_SECOND;
-        } else if (GekString.charEquals(PATTERN_OFFSET, pattern)) {
+        } else if (JieString.charEquals(PATTERN_OFFSET, pattern)) {
             return FORMATTER_OFFSET;
         } else {
             return FORMATTER_CACHE.compute(pattern, p -> DateTimeFormatter.ofPattern(p.toString()));
@@ -138,7 +138,7 @@ public class GekDate {
      */
     @Nullable
     public static String toString(@Nullable Date date, @Nullable CharSequence pattern) {
-        if (date == null || GekString.isEmpty(pattern)) {
+        if (date == null || JieString.isEmpty(pattern)) {
             return null;
         }
         return format(date, pattern);
@@ -166,7 +166,7 @@ public class GekDate {
      */
     @Nullable
     public static Date toDate(@Nullable CharSequence date, @Nullable CharSequence pattern) {
-        if (GekString.isEmpty(date) || GekString.isEmpty(pattern)) {
+        if (JieString.isEmpty(date) || JieString.isEmpty(pattern)) {
             return null;
         }
         return parse(date, pattern);

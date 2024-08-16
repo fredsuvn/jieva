@@ -41,7 +41,7 @@ public class ProcessTest {
                     semaphore.release();
                     return;
                 }
-                if (GekString.isNotEmpty(output)) {
+                if (JieString.isNotEmpty(output)) {
                     GekLog.getInstance().info(output);
                 }
                 Jie.sleep(1);
@@ -60,6 +60,6 @@ public class ProcessTest {
         Process process = Jie.process().command("ping", "-n", "5", "127.0.0.1").output(dest).start();
         process.waitFor();
         process.destroy();
-        System.out.println(GekString.of(dest.toByteArray(), JieChars.nativeCharset()));
+        System.out.println(JieString.of(dest.toByteArray(), JieChars.nativeCharset()));
     }
 }

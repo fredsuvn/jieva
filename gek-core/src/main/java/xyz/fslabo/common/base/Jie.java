@@ -2,9 +2,9 @@ package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.bean.BeanInfo;
+import xyz.fslabo.common.collect.GekCollector;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
-import xyz.fslabo.common.collect.GekCollector;
 import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.reflect.TypeRef;
 
@@ -362,7 +362,7 @@ public class Jie {
      */
     public static URL findRes(String resPath) {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        return classLoader.getResource(GekString.removeStart(resPath, "/"));
+        return classLoader.getResource(JieString.removeStart(resPath, "/"));
     }
 
     /**
@@ -374,7 +374,7 @@ public class Jie {
     public static Set<URL> findAllRes(String resPath) {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         try {
-            Enumeration<URL> urls = classLoader.getResources(GekString.removeStart(resPath, "/"));
+            Enumeration<URL> urls = classLoader.getResources(JieString.removeStart(resPath, "/"));
             Set<URL> result = new LinkedHashSet<>();
             while (urls.hasMoreElements()) {
                 result.add(urls.nextElement());

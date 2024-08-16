@@ -6,7 +6,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.GekLog;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.data.GekData;
 import xyz.fslabo.common.io.JieIO;
@@ -544,7 +544,7 @@ public class NetTest {
         System.out.println("----------------------------------");
         GekHttpResponse response3 = GekHttp.post(
             "http://localhost:" + server.getPort(),
-            new ByteArrayInputStream(GekString.encode("request3"))
+            new ByteArrayInputStream(JieString.encode("request3"))
         );
         System.out.println("response3 Server received:");
         System.out.println(new String(received.toByteArray(), JieChars.defaultCharset()));
@@ -563,7 +563,7 @@ public class NetTest {
         System.out.println("----------------------------------");
         GekHttpResponse response4 = GekHttp.post(
             "http://localhost:" + server.getPort(),
-            ByteBuffer.wrap(GekString.encode("request4"))
+            ByteBuffer.wrap(JieString.encode("request4"))
         );
         System.out.println("response4 Server received:");
         System.out.println(new String(received.toByteArray(), JieChars.defaultCharset()));

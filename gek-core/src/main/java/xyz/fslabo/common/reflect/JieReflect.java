@@ -3,8 +3,8 @@ package xyz.fslabo.common.reflect;
 import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.OutParam;
-import xyz.fslabo.common.base.GekString;
 import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.cache.Cache;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
@@ -33,7 +33,7 @@ public class JieReflect {
      */
     public static String getLastName(Class<?> cls) {
         String name = cls.getName();
-        int index = GekString.lastIndexOf(name, ".");
+        int index = JieString.lastIndexOf(name, ".");
         if (index < 0) {
             return name;
         }

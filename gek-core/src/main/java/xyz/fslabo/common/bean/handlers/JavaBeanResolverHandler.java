@@ -2,7 +2,7 @@ package xyz.fslabo.common.bean.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.GekCase;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.bean.BeanResolver;
 
 import java.lang.reflect.Method;
@@ -51,8 +51,8 @@ public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
         }
         List<GekCase.Token> tokens = namingCase.tokenize(methodName);
         if (tokens.size() > 1 && (
-            GekString.charEquals(tokens.get(0).toChars(), "get")
-                || GekString.charEquals(tokens.get(0).toChars(), "is")
+            JieString.charEquals(tokens.get(0).toChars(), "get")
+                || JieString.charEquals(tokens.get(0).toChars(), "is")
         )) {
             return buildGetter(namingCase.join(tokens.subList(1, tokens.size())), method);
         }
@@ -71,7 +71,7 @@ public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
             return null;
         }
         List<GekCase.Token> tokens = namingCase.tokenize(methodName);
-        if (tokens.size() > 1 && GekString.charEquals(tokens.get(0).toChars(), "set")) {
+        if (tokens.size() > 1 && JieString.charEquals(tokens.get(0).toChars(), "set")) {
             return buildSetter(namingCase.join(tokens.subList(1, tokens.size())), method);
         }
         return null;

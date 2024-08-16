@@ -4,7 +4,7 @@ import com.google.common.base.CaseFormat;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.GekCase;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.collect.JieColl;
 
 import java.util.Arrays;
@@ -45,11 +45,11 @@ public class CaseTest {
         Assert.assertEquals(GekCase.LOWER_UNDERSCORE.toCase("AA_bb_cc", GekCase.LOWER_UNDERSCORE), "aa_bb_cc");
         Assert.assertEquals(GekCase.UPPER_UNDERSCORE.toCase("aa_BB_CC", GekCase.UPPER_UNDERSCORE), "AA_BB_CC");
         Assert.assertEquals(
-            GekCase.delimiterCase("_", t -> GekString.upperCase(t.toChars())).toCase("aa_bb_cc",
-                GekCase.delimiterCase("-", t -> GekString.upperCase(t.toChars()))), "AA-BB-CC");
+            GekCase.delimiterCase("_", t -> JieString.upperCase(t.toChars())).toCase("aa_bb_cc",
+                GekCase.delimiterCase("-", t -> JieString.upperCase(t.toChars()))), "AA-BB-CC");
         Assert.assertEquals(
-            GekCase.delimiterCase("_", t -> GekString.lowerCase(t.toChars())).toCase("AA_BB_CC",
-                GekCase.delimiterCase("-", t -> GekString.lowerCase(t.toChars()))), "aa-bb-cc");
+            GekCase.delimiterCase("_", t -> JieString.lowerCase(t.toChars())).toCase("AA_BB_CC",
+                GekCase.delimiterCase("-", t -> JieString.lowerCase(t.toChars()))), "aa-bb-cc");
         //Guava bug!
         // Assert.assertEquals(
         //     CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_UNDERSCORE, "AA_BB_CC"),

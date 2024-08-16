@@ -5,7 +5,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.collect.JieArray;
 
 import java.io.File;
@@ -42,7 +42,7 @@ public class JmhRunner {
         }
         new Runner(
             new OptionsBuilder()
-                .include("benchmark." + GekString.capitalize(taskName) + "Jmh")
+                .include("benchmark." + JieString.capitalize(taskName) + "Jmh")
                 .resultFormat(ResultFormatType.TEXT)
                 .result(resultFile.getAbsolutePath())
                 .build()

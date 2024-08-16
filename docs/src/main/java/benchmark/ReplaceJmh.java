@@ -1,7 +1,7 @@
 package benchmark;
 
 import org.openjdk.jmh.annotations.*;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 
 import java.util.concurrent.TimeUnit;
 
@@ -40,22 +40,22 @@ public class ReplaceJmh {
 
     @Benchmark
     public void fsShortEq() {
-        GekString.replace(shortString, "--", "++");
+        JieString.replace(shortString, "--", "++");
     }
 
     @Benchmark
     public void fsLongEq() {
-        GekString.replace(longString, "--", "++");
+        JieString.replace(longString, "--", "++");
     }
 
     @Benchmark
     public void fsShortNe() {
-        GekString.replace(shortString, "--", "+++");
+        JieString.replace(shortString, "--", "+++");
     }
 
     @Benchmark
     public void fsLongNe() {
-        GekString.replace(longString, "--", "+++");
+        JieString.replace(longString, "--", "+++");
     }
 
     @Benchmark

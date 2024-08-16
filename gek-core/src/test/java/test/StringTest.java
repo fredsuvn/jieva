@@ -3,7 +3,7 @@ package test;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.collect.JieColl;
 
 import java.util.Arrays;
@@ -23,11 +23,11 @@ public class StringTest {
             "fsafsaf"
         );
         Assert.assertEquals(
-            GekString.concat(list.toArray()),
+            JieString.concat(list.toArray()),
             String.join("", list)
         );
         Assert.assertEquals(
-            GekString.concat(list),
+            JieString.concat(list),
             String.join("", list)
         );
     }
@@ -36,35 +36,35 @@ public class StringTest {
     public void testStartWith() {
         String a = "123abc123";
         Assert.assertEquals(
-            GekString.startWith(a, "456"),
+            JieString.startWith(a, "456"),
             "456" + a
         );
         Assert.assertEquals(
-            GekString.startWith(a, "123"),
+            JieString.startWith(a, "123"),
             a
         );
         Assert.assertEquals(
-            GekString.endWith(a, "456"),
+            JieString.endWith(a, "456"),
             a + "456"
         );
         Assert.assertEquals(
-            GekString.endWith(a, "123"),
+            JieString.endWith(a, "123"),
             a
         );
         Assert.assertEquals(
-            GekString.removeStart(a, "456"),
+            JieString.removeStart(a, "456"),
             a
         );
         Assert.assertEquals(
-            GekString.removeStart(a, "123"),
+            JieString.removeStart(a, "123"),
             "abc123"
         );
         Assert.assertEquals(
-            GekString.removeEnd(a, "456"),
+            JieString.removeEnd(a, "456"),
             a
         );
         Assert.assertEquals(
-            GekString.removeEnd(a, "123"),
+            JieString.removeEnd(a, "123"),
             "123abc"
         );
     }
@@ -72,43 +72,43 @@ public class StringTest {
     @Test
     public void testIndexOf() {
         Assert.assertEquals(
-            GekString.indexOf("1234567890", "2"),
+            JieString.indexOf("1234567890", "2"),
             1
         );
         Assert.assertEquals(
-            GekString.lastIndexOf("1234567890", "2"),
+            JieString.lastIndexOf("1234567890", "2"),
             1
         );
         Assert.assertEquals(
-            GekString.indexOf("12345678901234567890", "2", 9),
+            JieString.indexOf("12345678901234567890", "2", 9),
             11
         );
         Assert.assertEquals(
-            GekString.lastIndexOf("12345678901234567890", "2", 9),
+            JieString.lastIndexOf("12345678901234567890", "2", 9),
             1
         );
         Assert.assertEquals(
-            GekString.indexOf("11", "11"),
+            JieString.indexOf("11", "11"),
             0
         );
         Assert.assertEquals(
-            GekString.lastIndexOf("11", "11"),
+            JieString.lastIndexOf("11", "11"),
             0
         );
         Assert.assertEquals(
-            GekString.indexOf("", ""),
+            JieString.indexOf("", ""),
             -1
         );
         Assert.assertEquals(
-            GekString.indexOf("1", "11"),
+            JieString.indexOf("1", "11"),
             -1
         );
         Assert.assertEquals(
-            GekString.lastIndexOf("", ""),
+            JieString.lastIndexOf("", ""),
             -1
         );
         Assert.assertEquals(
-            GekString.lastIndexOf("1", "11"),
+            JieString.lastIndexOf("1", "11"),
             -1
         );
     }
@@ -116,27 +116,27 @@ public class StringTest {
     @Test
     public void testSplit() {
         Assert.assertEquals(
-            JieColl.toStringList(GekString.split("123--123--123--", "--")),
+            JieColl.toStringList(JieString.split("123--123--123--", "--")),
             Arrays.asList("123", "123", "123", "")
         );
         Assert.assertEquals(
-            JieColl.toStringList(GekString.split("123", "1234")),
+            JieColl.toStringList(JieString.split("123", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            JieColl.toStringList(GekString.split("", "1234")),
+            JieColl.toStringList(JieString.split("", "1234")),
             Collections.emptyList()
         );
         Assert.assertEquals(
-            JieColl.toStringList(GekString.split("123", "123")),
+            JieColl.toStringList(JieString.split("123", "123")),
             Arrays.asList("", "")
         );
         Assert.assertEquals(
-            JieColl.toStringList(GekString.split("123--123--123----", "--")),
+            JieColl.toStringList(JieString.split("123--123--123----", "--")),
             Arrays.asList("123", "123", "123", "", "")
         );
         Assert.assertEquals(
-            JieColl.toStringList(GekString.split("--123--123--123----", "--")),
+            JieColl.toStringList(JieString.split("--123--123--123----", "--")),
             Arrays.asList("", "123", "123", "123", "", "")
         );
     }
@@ -144,19 +144,19 @@ public class StringTest {
     @Test
     public void testReplace() {
         Assert.assertEquals(
-            GekString.replace("123--123--123--", "--", "66"),
+            JieString.replace("123--123--123--", "--", "66"),
             "123661236612366"
         );
         Assert.assertEquals(
-            GekString.replace("----123--123--123----", "--", "+++"),
+            JieString.replace("----123--123--123----", "--", "+++"),
             "++++++123+++123+++123++++++"
         );
         Assert.assertEquals(
-            GekString.replace("-----123--123---123----", "--", "+++"),
+            JieString.replace("-----123--123---123----", "--", "+++"),
             "++++++-123+++123+++-123++++++"
         );
         Assert.assertEquals(
-            GekString.replace("-----123--123---123----", "--", ""),
+            JieString.replace("-----123--123---123----", "--", ""),
             "-123123-123"
         );
     }
@@ -164,15 +164,15 @@ public class StringTest {
     @Test
     public void testSubRef() {
         Assert.assertEquals(
-            GekString.subChars("12345678", 2, 7).toString(),
+            JieString.subChars("12345678", 2, 7).toString(),
             "34567"
         );
         Assert.assertEquals(
-            GekString.subChars("12345678", 2, 7).charAt(3),
+            JieString.subChars("12345678", 2, 7).charAt(3),
             '6'
         );
         Assert.assertEquals(
-            GekString.subChars("12345678", 2, 7).subSequence(1, 3).toString(),
+            JieString.subChars("12345678", 2, 7).subSequence(1, 3).toString(),
             "45"
         );
     }
@@ -180,16 +180,16 @@ public class StringTest {
     @Test
     public void testEqual() {
         Assert.assertTrue(
-            GekString.charEquals("123", "123")
+            JieString.charEquals("123", "123")
         );
         Assert.assertTrue(
-            GekString.charEquals("123", "1123".substring(1))
+            JieString.charEquals("123", "1123".substring(1))
         );
         Assert.assertFalse(
-            GekString.charEquals("1234", "123")
+            JieString.charEquals("1234", "123")
         );
         Assert.assertTrue(
-            GekString.charEquals("123", new CharSequence() {
+            JieString.charEquals("123", new CharSequence() {
                 @Override
                 public int length() {
                     return 3;
@@ -220,16 +220,16 @@ public class StringTest {
 
     @Test
     public void testCapitalize() {
-        Assert.assertEquals("Abc", GekString.capitalize("abc"));
-        Assert.assertEquals("Abc", GekString.capitalize("Abc"));
-        Assert.assertEquals("abc", GekString.uncapitalize("abc"));
-        Assert.assertEquals("abc", GekString.uncapitalize("Abc"));
+        Assert.assertEquals("Abc", JieString.capitalize("abc"));
+        Assert.assertEquals("Abc", JieString.capitalize("Abc"));
+        Assert.assertEquals("abc", JieString.uncapitalize("abc"));
+        Assert.assertEquals("abc", JieString.uncapitalize("Abc"));
     }
 
     @Test
     public void testLazyString() {
         int[] is = {0};
-        CharSequence lazy = GekString.lazyChars(() -> {
+        CharSequence lazy = JieString.lazyChars(() -> {
             is[0] = 1;
             return "8899";
         });

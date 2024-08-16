@@ -4,7 +4,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.codec.CipherCodec;
 import xyz.fslabo.common.codec.CodecProcess;
 import xyz.fslabo.common.codec.GekCodec;
@@ -51,7 +51,7 @@ public class CodecTest {
         int dataSize, String keyAlgorithm, String dataAlgorithm,
         int enBlockSize, int deBlockSize, long enOutSize, boolean isAsymmetric
     ) throws Exception {
-        byte[] data = GekString.encode(TestUtil.buildRandomString(dataSize, 0));
+        byte[] data = JieString.encode(TestUtil.buildRandomString(dataSize, 0));
         Cipher cipher = Cipher.getInstance(dataAlgorithm);
         Key encryptKey;
         Key decryptKey;
@@ -293,8 +293,8 @@ public class CodecTest {
 
     private void testEncodeCodec(
         CodecProcess<?> codec, String source, String dest, boolean encode) {
-        byte[] srcBytes = encode ? GekString.encode(source) : GekString.encode(source, StandardCharsets.ISO_8859_1);
-        byte[] destBytes = encode ? GekString.encode(dest, StandardCharsets.ISO_8859_1) : GekString.encode(dest);
+        byte[] srcBytes = encode ? JieString.encode(source) : JieString.encode(source, StandardCharsets.ISO_8859_1);
+        byte[] destBytes = encode ? JieString.encode(dest, StandardCharsets.ISO_8859_1) : JieString.encode(dest);
         byte[] srcBytesPadding = padBytes(srcBytes, 10);
         byte[] destBytesPadding = padBytes(destBytes, 10);
 

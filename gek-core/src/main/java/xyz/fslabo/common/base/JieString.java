@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  *
  * @author fredsuvn
  */
-public class GekString {
+public class JieString {
 
     /**
      * Returns string decoding from given bytes with {@link JieChars#defaultCharset()}.
@@ -407,7 +407,7 @@ public class GekString {
      * @return split list
      */
     public static List<CharSequence> split(CharSequence chars, CharSequence separator) {
-        return split(chars, separator, GekString::subChars);
+        return split(chars, separator, JieString::subChars);
     }
 
     /**
@@ -1097,7 +1097,7 @@ public class GekString {
 
         @Override
         public CharSequence subSequence(int start, int end) {
-            return GekString.chars(source, this.start + start, this.start + end);
+            return JieString.chars(source, this.start + start, this.start + end);
         }
 
         @Override

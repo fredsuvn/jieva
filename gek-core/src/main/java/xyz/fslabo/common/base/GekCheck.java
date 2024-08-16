@@ -43,7 +43,7 @@ public class GekCheck {
      */
     public static void checkNull(@Nullable Object obj, Object... messageArgs) throws NullPointerException {
         if (obj == null) {
-            throw new NullPointerException(GekString.concat(messageArgs));
+            throw new NullPointerException(JieString.concat(messageArgs));
         }
     }
 
@@ -80,7 +80,7 @@ public class GekCheck {
      */
     public static void checkNull(boolean expr, Object... messageArgs) throws NullPointerException {
         if (!expr) {
-            throw new NullPointerException(GekString.concat(messageArgs));
+            throw new NullPointerException(JieString.concat(messageArgs));
         }
     }
 
@@ -117,7 +117,7 @@ public class GekCheck {
      */
     public static void checkArgument(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new IllegalArgumentException(GekString.concat(messageArgs));
+            throw new IllegalArgumentException(JieString.concat(messageArgs));
         }
     }
 
@@ -154,7 +154,7 @@ public class GekCheck {
      */
     public static void checkState(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new IllegalStateException(GekString.concat(messageArgs));
+            throw new IllegalStateException(JieString.concat(messageArgs));
         }
     }
 
@@ -191,7 +191,7 @@ public class GekCheck {
      */
     public static void checkSupported(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new UnsupportedOperationException(GekString.concat(messageArgs));
+            throw new UnsupportedOperationException(JieString.concat(messageArgs));
         }
     }
 
@@ -228,7 +228,7 @@ public class GekCheck {
      */
     public static void checkElement(boolean expr, Object... messageArgs) throws IllegalArgumentException {
         if (!expr) {
-            throw new NoSuchElementException(GekString.concat(messageArgs));
+            throw new NoSuchElementException(JieString.concat(messageArgs));
         }
     }
 

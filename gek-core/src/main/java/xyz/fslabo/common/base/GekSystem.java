@@ -500,7 +500,7 @@ public class GekSystem {
         if (javaVersion == null) {
             return -1;
         }
-        int dotIndex = GekString.indexOf(javaVersion, ".");
+        int dotIndex = JieString.indexOf(javaVersion, ".");
         if (dotIndex <= 0) {
             return Integer.parseInt(javaVersion);
         }
@@ -509,7 +509,7 @@ public class GekSystem {
             return versionFirst;
         }
         if (versionFirst == 1) {
-            int nextDotIndex = GekString.indexOf(javaVersion, ".", dotIndex + 1);
+            int nextDotIndex = JieString.indexOf(javaVersion, ".", dotIndex + 1);
             if (nextDotIndex < 0) {
                 return -1;
             }

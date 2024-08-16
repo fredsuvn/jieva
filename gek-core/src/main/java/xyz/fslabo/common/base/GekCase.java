@@ -34,12 +34,12 @@ public abstract class GekCase {
      * Token function to make given chars upper case.
      * This function is used by {@link #UPPER_HYPHEN} and {@link #UPPER_UNDERSCORE}.
      */
-    public static final Function<Token, CharSequence> TO_UPPER_CASE = t -> GekString.upperCase(t.toChars());
+    public static final Function<Token, CharSequence> TO_UPPER_CASE = t -> JieString.upperCase(t.toChars());
     /**
      * Token function to make given chars lower case.
      * This function is used by {@link #LOWER_HYPHEN} and {@link #LOWER_UNDERSCORE}.
      */
-    public static final Function<Token, CharSequence> TO_LOWER_CASE = t -> GekString.lowerCase(t.toChars());
+    public static final Function<Token, CharSequence> TO_LOWER_CASE = t -> JieString.lowerCase(t.toChars());
     /**
      * Upper camel case with {@link #AS_LOWER} policy.
      */
@@ -159,7 +159,7 @@ public abstract class GekCase {
 
         @Override
         public List<Token> tokenize(CharSequence chars) {
-            if (GekString.isBlank(chars)) {
+            if (JieString.isBlank(chars)) {
                 return Collections.emptyList();
             }
             int len = chars.length();
@@ -254,13 +254,13 @@ public abstract class GekCase {
 
         private CharSequence processToken(Token token, boolean upper) {
             CharSequence chars = token.toChars();
-            if (GekString.isEmpty(chars)) {
+            if (JieString.isEmpty(chars)) {
                 return "";
             }
-            if (chars.length() > 1 && GekString.allUpperCase(chars)) {
+            if (chars.length() > 1 && JieString.allUpperCase(chars)) {
                 return chars;
             }
-            return GekString.firstCase(chars, upper);
+            return JieString.firstCase(chars, upper);
         }
     }
 
@@ -280,7 +280,7 @@ public abstract class GekCase {
 
         @Override
         public List<Token> tokenize(CharSequence chars) {
-            return GekString.split(chars, delimiter, CharsToken::of);
+            return JieString.split(chars, delimiter, CharsToken::of);
         }
 
         @Override
@@ -298,7 +298,7 @@ public abstract class GekCase {
         public String toCase(CharSequence chars, GekCase otherCase) {
             if (otherCase instanceof DelimiterCase
                 && ((DelimiterCase) otherCase).tokenProcessor == null) {
-                return GekString.replace(chars, this.delimiter, ((DelimiterCase) otherCase).delimiter);
+                return JieString.replace(chars, this.delimiter, ((DelimiterCase) otherCase).delimiter);
             }
             return super.toCase(chars, otherCase);
         }

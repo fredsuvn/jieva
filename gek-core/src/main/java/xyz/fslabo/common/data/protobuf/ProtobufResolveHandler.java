@@ -4,7 +4,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
-import xyz.fslabo.common.base.GekString;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.bean.PropertyBase;
@@ -80,12 +80,12 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         //map
         if (field.isMapField()) {
             String name = rawName + "Map";
-            Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(name));
+            Method getterMethod = rawClass.getMethod("get" + JieString.capitalize(name));
             Type type = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), Map.class);
             Invoker getter = Invoker.reflectMethod(getterMethod);
             if (isBuilder) {
-                Method clearMethod = rawClass.getMethod("clear" + GekString.capitalize(rawName));
-                Method putAllMethod = rawClass.getMethod("putAll" + GekString.capitalize(rawName), Map.class);
+                Method clearMethod = rawClass.getMethod("clear" + JieString.capitalize(rawName));
+                Method putAllMethod = rawClass.getMethod("putAll" + JieString.capitalize(rawName), Map.class);
                 Invoker setter = new Invoker() {
                     @Override
                     public @Nullable Object invoke(@Nullable Object inst, Object... args) {
@@ -108,12 +108,12 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         //repeated
         if (field.isRepeated()) {
             String name = rawName + "List";
-            Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(name));
+            Method getterMethod = rawClass.getMethod("get" + JieString.capitalize(name));
             Type type = JieReflect.getActualTypeArguments(getterMethod.getGenericReturnType(), List.class);
             Invoker getter = Invoker.reflectMethod(getterMethod);
             if (isBuilder) {
-                Method clearMethod = rawClass.getMethod("clear" + GekString.capitalize(rawName));
-                Method addAllMethod = rawClass.getMethod("addAll" + GekString.capitalize(rawName), Iterable.class);
+                Method clearMethod = rawClass.getMethod("clear" + JieString.capitalize(rawName));
+                Method addAllMethod = rawClass.getMethod("addAll" + JieString.capitalize(rawName), Iterable.class);
                 Invoker setter = new Invoker() {
                     @Override
                     public @Nullable Object invoke(@Nullable Object inst, Object... args) {
@@ -134,11 +134,11 @@ public class ProtobufResolveHandler implements BeanResolver.Handler {
         }
 
         // Simple object
-        Method getterMethod = rawClass.getMethod("get" + GekString.capitalize(rawName));
+        Method getterMethod = rawClass.getMethod("get" + JieString.capitalize(rawName));
         Type type = getterMethod.getGenericReturnType();
         Invoker getter = Invoker.reflectMethod(getterMethod);
         if (isBuilder) {
-            Method setterMethod = rawClass.getMethod("set" + GekString.capitalize(rawName), JieReflect.getRawType(type));
+            Method setterMethod = rawClass.getMethod("set" + JieString.capitalize(rawName), JieReflect.getRawType(type));
             Invoker setter = Invoker.reflectMethod(setterMethod);
             return new Impl(rawName, type, getterMethod, setterMethod, getter, setter);
         } else {
