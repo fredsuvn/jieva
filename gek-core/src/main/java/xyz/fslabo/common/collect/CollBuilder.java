@@ -1,6 +1,5 @@
 package xyz.fslabo.common.collect;
 
-import xyz.fslabo.common.base.GekConfigurer;
 import xyz.fslabo.common.base.Jie;
 
 import java.util.*;
@@ -10,7 +9,7 @@ import java.util.function.IntFunction;
 /**
  * Builder to build a {@link Collection}, for example:
  * <pre>
- *     collector.initialSize(100).initialFunction(i-&gt;random()).toList();
+ *     CollBuilder.newBuilder().initialSize(100).initialFunction(i-&gt;random()).toList();
  * </pre>
  *
  * @author fredsuvn
@@ -24,6 +23,7 @@ public class CollBuilder {
     private int initialCapacity;
     private int initialSize;
     private Object initialElements;
+    private Map<?, ?> initialEntries;
     private IntFunction<?> initialFunction;
     private boolean immutable;
 
@@ -90,28 +90,32 @@ public class CollBuilder {
      * @return this
      */
     public CollBuilder initialElements(Object... initialElements) {
-        this.initialElements = initialElements;
+        this.initialElements = JieArray.toList(initialElements);
         return this;
     }
 
     /**
-     * Sets initial function:
-     * <ul>
-     *     <li>
-     *         To build a collection, the function will be passed to the index and return an element at the index;
-     *     </li>
-     *     <li>
-     *         To build a map, the function will be passed to the index and return
-     *         an array of {@link Map.Entry} (such as {@link AbstractMap.SimpleImmutableEntry}) at the index;
-     *     </li>
-     * </ul>
-     * If the {@link #initialElements} is set, this configuration will be ignored.
+     * Sets initial function, the function will be passed to the index and return an element at the index. This is used
+     * to build collection, invalid for map.
+     * <p>
+     * If the {@code initialElements} is set, this configuration will be ignored.
      *
      * @param initialFunction initial function
      * @return this
      */
     public CollBuilder initialFunction(IntFunction<?> initialFunction) {
         this.initialFunction = initialFunction;
+        return this;
+    }
+
+    /**
+     * Sets initial entries. This is used to build map, invalid for collection.
+     *
+     * @param initialEntries initial entries
+     * @return this
+     */
+    public CollBuilder initialEntries(Map<?, ?> initialEntries) {
+        this.initialEntries = initialEntries;
         return this;
     }
 
