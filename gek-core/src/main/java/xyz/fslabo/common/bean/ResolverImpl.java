@@ -61,6 +61,22 @@ final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
     }
 
     @Override
+    public BeanResolver replaceFirstHandler(Handler handler) {
+        List<BeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size());
+        newHandlers.addAll(handlers);
+        newHandlers.set(0, handler);
+        return new ResolverImpl(newHandlers);
+    }
+
+    @Override
+    public BeanResolver replaceLastHandler(Handler handler) {
+        List<BeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size());
+        newHandlers.addAll(handlers);
+        newHandlers.set(newHandlers.size() - 1, handler);
+        return new ResolverImpl(newHandlers);
+    }
+
+    @Override
     public BeanResolver.Handler asHandler() {
         return this;
     }

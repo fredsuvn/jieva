@@ -12,7 +12,7 @@ import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.data.protobuf.GekProtobuf;
+import xyz.fslabo.common.data.protobuf.JieProtobuf;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.nio.ByteBuffer;
@@ -33,7 +33,7 @@ public class ProtobufTest {
             map<string, string> entry = 5;
         }
          */
-        BeanResolver resolver = GekProtobuf.protobufBeanResolver();
+        BeanResolver resolver = JieProtobuf.defaultBeanResolver();
         BeanInfo dataBean = resolver.resolve(Data.class);
         Map<String, PropertyInfo> propertyMap = dataBean.getProperties();
         Assert.assertEquals(propertyMap.size(), 14);
@@ -119,7 +119,7 @@ public class ProtobufTest {
         requestDto.setData(dataDto);
 
         //dto -> protobuf
-        ResponseDto responseDto = GekProtobuf.protobufConverter().map(requestDto, ResponseDto.class);
+        ResponseDto responseDto = JieProtobuf.defaultMapper().map(requestDto, ResponseDto.class);
         Assert.assertEquals(responseDto.getCode(), "111");
         Assert.assertEquals(responseDto.getMessage(), 111L);
         Data data = responseDto.getData();
@@ -138,7 +138,7 @@ public class ProtobufTest {
         Assert.assertEquals(data.getSint64(), dataDto.getSint64());
 
         //dto -> protobuf builder
-        Data.Builder dataBuilder = GekProtobuf.protobufConverter().map(requestDto.getData(), Data.Builder.class);
+        Data.Builder dataBuilder = JieProtobuf.defaultMapper().map(requestDto.getData(), Data.Builder.class);
         Assert.assertEquals(dataBuilder.getEm(), Enum.E2);
         Assert.assertEquals(dataBuilder.getStr(), dataDto.getStr());
         Assert.assertEquals(dataBuilder.getTextList(), dataDto.getTextList());
@@ -154,7 +154,7 @@ public class ProtobufTest {
         Assert.assertEquals(dataBuilder.getSint64(), dataDto.getSint64());
 
         //protobuf -> dto
-        DataDto dataDto1 = GekProtobuf.protobufConverter().convert(data, DataDto.class);
+        DataDto dataDto1 = JieProtobuf.defaultMapper().convert(data, DataDto.class);
         Assert.assertEquals(data.getEm(), Enum.E2);
         Assert.assertEquals(data.getStr(), dataDto.getStr());
         Assert.assertEquals(data.getTextList(), dataDto.getTextList());
@@ -170,7 +170,7 @@ public class ProtobufTest {
         Assert.assertEquals(data.getSint64(), dataDto.getSint64());
 
         //protobuf builder -> dto
-        DataDto dataDto2 = GekProtobuf.protobufConverter().convert(dataBuilder, DataDto.class);
+        DataDto dataDto2 = JieProtobuf.defaultMapper().convert(dataBuilder, DataDto.class);
         Assert.assertEquals(dataBuilder.getEm(), Enum.E2);
         Assert.assertEquals(dataBuilder.getStr(), dataDto.getStr());
         Assert.assertEquals(dataBuilder.getTextList(), dataDto.getTextList());
@@ -186,14 +186,14 @@ public class ProtobufTest {
         Assert.assertEquals(dataBuilder.getSint64(), dataDto.getSint64());
 
         //protobuf -> protobuf
-        Data.Builder dataBuilder1 = GekProtobuf.protobufConverter().convert(data, Data.Builder.class);
+        Data.Builder dataBuilder1 = JieProtobuf.defaultMapper().convert(data, Data.Builder.class);
         Assert.assertEquals(dataBuilder1.build(), dataBuilder.build());
-        Data data1 = GekProtobuf.protobufConverter().convert(dataBuilder1, Data.class);
+        Data data1 = JieProtobuf.defaultMapper().convert(dataBuilder1, Data.class);
         Assert.assertEquals(data1, dataBuilder1.build());
 
         Request request = Request.newBuilder()
             .setCode(3).setMessage(ByteString.copyFromUtf8("xxxx")).setData(data).build();
-        RequestDto requestDto1 = GekProtobuf.protobufConverter().convert(request, RequestDto.class);
+        RequestDto requestDto1 = JieProtobuf.defaultMapper().convert(request, RequestDto.class);
         Assert.assertEquals(requestDto1.getCode(), request.getCode());
         Assert.assertEquals(requestDto1.getMessage(), request.getMessage().toStringUtf8());
         Assert.assertEquals(requestDto1.getData(), dataDto);
@@ -205,7 +205,7 @@ public class ProtobufTest {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         ByteString bs = ByteString.copyFrom(bytes);
         String str = bs.toStringUtf8();
-        Mapper converter = GekProtobuf.protobufConverter();
+        Mapper converter = JieProtobuf.defaultMapper();
         Assert.assertEquals(converter.map(bytes, ByteBuffer.class), buffer.slice());
         Assert.assertEquals(converter.map(bs, ByteBuffer.class), buffer.slice());
         Assert.assertEquals(converter.map(buffer, ByteBuffer.class), buffer.slice());

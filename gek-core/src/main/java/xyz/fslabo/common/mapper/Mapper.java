@@ -271,24 +271,44 @@ public interface Mapper {
     List<Handler> getHandlers();
 
     /**
-     * Returns a mapper with handler list consists of given handler as first one, followed by the handler list of
-     * current resolver.
+     * Returns a new {@link Mapper} of which handler list consists of given handler as first element, followed by
+     * {@link #getHandlers()} of current mapper.
      *
      * @param handler given handler
-     * @return a mapper with handler list consists of given handler as first one, followed by the handler list of
-     * current resolver
+     * @return a new {@link Mapper} of which handler list consists of given handler as first element, followed by
+     * {@link #getHandlers()} of current mapper
      */
     Mapper withFirstHandler(Handler handler);
 
     /**
-     * Returns a mapper with handler list consists of the handler list of current resolver, followed by given handler
-     * as last one.
+     * Returns a new {@link Mapper} of which handler list consists of {@link #getHandlers()} of current mapper, followed
+     * by given handler as last element.
      *
      * @param handler given handler
-     * @return a mapper with handler list consists of the handler list of current resolver, followed by given handler
-     * as last one
+     * @return a {@link Mapper} of which handler list consists of {@link #getHandlers()} of current mapper, followed by
+     * given handler as last element.
      */
     Mapper withLastHandler(Handler handler);
+
+    /**
+     * Returns a new {@link Mapper} of which handler list comes from a copy of {@link #getHandlers()} of current mapper
+     * but the first element is replaced by given handler.
+     *
+     * @param handler given handler
+     * @return a new {@link Mapper} of which handler list comes from a copy of {@link #getHandlers()} of current mapper
+     * but the first element is replaced by given handler.
+     */
+    Mapper replaceFirstHandler(Handler handler);
+
+    /**
+     * Returns a new {@link Mapper} of which handler list comes from a copy of {@link #getHandlers()} of current mapper
+     * but the last element is replaced by given handler.
+     *
+     * @param handler given handler
+     * @return a new {@link Mapper} of which handler list comes from a copy of {@link #getHandlers()} of current mapper
+     * but the last element is replaced by given handler.
+     */
+    Mapper replaceLastHandler(Handler handler);
 
     /**
      * Returns this mapper as {@link Handler}.

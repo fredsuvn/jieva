@@ -49,6 +49,22 @@ final class MapperImpl implements Mapper, Mapper.Handler {
     }
 
     @Override
+    public Mapper replaceFirstHandler(Handler handler) {
+        List<Handler> newHandlers = new ArrayList<>(handlers.size());
+        newHandlers.addAll(handlers);
+        newHandlers.set(0, handler);
+        return new MapperImpl(newHandlers);
+    }
+
+    @Override
+    public Mapper replaceLastHandler(Handler handler) {
+        List<Handler> newHandlers = new ArrayList<>(handlers.size());
+        newHandlers.addAll(handlers);
+        newHandlers.set(newHandlers.size() - 1, handler);
+        return new MapperImpl(newHandlers);
+    }
+
+    @Override
     public Handler asHandler() {
         return this;
     }

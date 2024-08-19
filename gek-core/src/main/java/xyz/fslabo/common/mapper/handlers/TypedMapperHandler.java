@@ -7,6 +7,8 @@ import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.mapper.MappingOptions;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,7 +33,7 @@ public class TypedMapperHandler implements Mapper.Handler {
      * Constructs with {@link TypedConverters#DEFAULT_CONVERTERS}.
      */
     public TypedMapperHandler() {
-        this(TypedConverters.DEFAULT_CONVERTERS);
+        this(TypedConverters.DEFAULT_CONVERTERS, true);
     }
 
     /**
@@ -40,7 +42,11 @@ public class TypedMapperHandler implements Mapper.Handler {
      * @param converters specified converter map
      */
     public TypedMapperHandler(Map<Type, Converter<?>> converters) {
-        this.converters = converters;
+        this(converters, false);
+    }
+
+    private TypedMapperHandler(Map<Type, Converter<?>> converters, boolean directly) {
+        this.converters = directly ? converters : Collections.unmodifiableMap(new HashMap<>(converters));
     }
 
     @Override
@@ -62,6 +68,29 @@ public class TypedMapperHandler implements Mapper.Handler {
             return Flag.CONTINUE;
         }
         return wrapResult(targetObject);
+    }
+
+    /**
+     * Returns {@link Converter} map of this handler.
+     *
+     * @return {@link Converter} map of this handler
+     */
+    public Map<Type, Converter<?>> getConverters() {
+        return converters;
+    }
+
+    /**
+     * Returns a new {@link TypedMapperHandler} of which converter map includes original converters from
+     * {@link #getConverters()} and given more converters.
+     *
+     * @param moreConverters given more converters
+     * @return a new {@link TypedMapperHandler} of which converter map includes original converters from
+     * {@link #getConverters()} and given more converters
+     */
+    public TypedMapperHandler withMoreConverters(Map<Type, Converter<?>> moreConverters) {
+        Map<Type, Converter<?>> newConverters = new HashMap<>(this.converters);
+        newConverters.putAll(moreConverters);
+        return new TypedMapperHandler(Collections.unmodifiableMap(newConverters), true);
     }
 
     /**

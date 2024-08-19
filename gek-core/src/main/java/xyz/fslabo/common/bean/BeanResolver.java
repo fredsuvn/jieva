@@ -74,24 +74,44 @@ public interface BeanResolver {
     List<Handler> getHandlers();
 
     /**
-     * Returns a resolver with handler list consists of given handler as first one, followed by the handler list of
-     * current resolver.
+     * Returns a new {@link BeanResolver} of which handler list consists of given handler as first element, followed by
+     * {@link #getHandlers()} of current resolver.
      *
      * @param handler given handler
-     * @return a resolver with handler list consists of given handler as first one, followed by the handler list of
-     * current resolver
+     * @return a new {@link BeanResolver} of which handler list consists of given handler as first element, followed by
+     * {@link #getHandlers()} of current resolver
      */
     BeanResolver withFirstHandler(Handler handler);
 
     /**
-     * Returns a resolver with handler list consists of the handler list of current resolver, followed by given handler
-     * as last one.
+     * Returns a new {@link BeanResolver} of which handler list consists of {@link #getHandlers()} of current resolver,
+     * followed by given handler as last element.
      *
      * @param handler given handler
-     * @return a resolver with handler list consists of the handler list of current resolver, followed by given handler
-     * as last one
+     * @return a {@link BeanResolver} of which handler list consists of {@link #getHandlers()} of current resolver,
+     * followed by given handler as last element.
      */
     BeanResolver withLastHandler(Handler handler);
+
+    /**
+     * Returns a new {@link BeanResolver} of which handler list comes from a copy of {@link #getHandlers()} of current
+     * resolver but the first element is replaced by given handler.
+     *
+     * @param handler given handler
+     * @return a new {@link BeanResolver} of which handler list comes from a copy of {@link #getHandlers()} of current
+     * resolver but the first element is replaced by given handler.
+     */
+    BeanResolver replaceFirstHandler(Handler handler);
+
+    /**
+     * Returns a new {@link BeanResolver} of which handler list comes from a copy of {@link #getHandlers()} of current
+     * resolver but the last element is replaced by given handler.
+     *
+     * @param handler given handler
+     * @return a new {@link BeanResolver} of which handler list comes from a copy of {@link #getHandlers()} of current
+     * resolver but the last element is replaced by given handler.
+     */
+    BeanResolver replaceLastHandler(Handler handler);
 
     /**
      * Returns this resolver as {@link Handler}.
