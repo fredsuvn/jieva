@@ -181,35 +181,35 @@ public class TypedConverters {
         public @Nullable String convert(
             Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
             if (source instanceof Date) {
-                DateTimeFormatter dateTimeFormatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter dateTimeFormatter = options.getDateTimeFormatter(targetProperty);
                 if (dateTimeFormatter != null) {
                     return dateTimeFormatter.format(((Date) source).toInstant());
                 }
                 return source.toString();
             }
             if (source instanceof TemporalAccessor) {
-                DateTimeFormatter dateTimeFormatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter dateTimeFormatter = options.getDateTimeFormatter(targetProperty);
                 if (dateTimeFormatter != null) {
                     return dateTimeFormatter.format((TemporalAccessor) source);
                 }
                 return source.toString();
             }
             if (source instanceof Number) {
-                NumberFormat numberFormat = MappingOptions.getNumberFormatter(targetProperty, options);
+                NumberFormat numberFormat = options.getNumberFormatter(targetProperty);
                 if (numberFormat != null) {
                     return numberFormat.format(source);
                 }
                 return source.toString();
             }
             if (source instanceof byte[]) {
-                Charset charset = MappingOptions.getCharset(targetProperty, options);
+                Charset charset = options.getCharset(targetProperty);
                 if (charset != null) {
                     return new String((byte[]) source, charset);
                 }
                 return new String((byte[]) source, JieChars.UTF_8);
             }
             if (source instanceof ByteBuffer) {
-                Charset charset = MappingOptions.getCharset(targetProperty, options);
+                Charset charset = options.getCharset(targetProperty);
                 byte[] bytes = JieIO.readReset((ByteBuffer) source);
                 if (charset != null) {
                     return new String(bytes, charset);
@@ -246,7 +246,7 @@ public class TypedConverters {
         public @Nullable byte[] convert(
             Object source, Type sourceType, @Nullable PropertyInfo targetProperty, MappingOptions options) {
             if (source instanceof CharSequence) {
-                Charset charset = MappingOptions.getCharset(targetProperty, options);
+                Charset charset = options.getCharset(targetProperty);
                 if (charset != null) {
                     return source.toString().getBytes(charset);
                 }
@@ -401,7 +401,7 @@ public class TypedConverters {
                 return new Date((Long) source);
             }
             if (source instanceof CharSequence) {
-                DateTimeFormatter formatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter formatter = options.getDateTimeFormatter(targetProperty);
                 if (formatter == null) {
                     try {
                         return DateFormat.getInstance().parse(source.toString());
@@ -556,7 +556,7 @@ public class TypedConverters {
             }
 
             public Instant toInstant() {
-                DateTimeFormatter formatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter formatter = options.getDateTimeFormatter(targetProperty);
                 if (formatter == null) {
                     return Instant.parse(string);
                 }
@@ -564,7 +564,7 @@ public class TypedConverters {
             }
 
             public LocalDateTime toLocalDateTime() {
-                DateTimeFormatter formatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter formatter = options.getDateTimeFormatter(targetProperty);
                 if (formatter == null) {
                     return LocalDateTime.parse(string);
                 }
@@ -572,7 +572,7 @@ public class TypedConverters {
             }
 
             public OffsetDateTime toOffsetDateTime() {
-                DateTimeFormatter formatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter formatter = options.getDateTimeFormatter(targetProperty);
                 if (formatter == null) {
                     return OffsetDateTime.parse(string);
                 }
@@ -580,7 +580,7 @@ public class TypedConverters {
             }
 
             public ZonedDateTime toZonedDateTime() {
-                DateTimeFormatter formatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter formatter = options.getDateTimeFormatter(targetProperty);
                 if (formatter == null) {
                     return ZonedDateTime.parse(string);
                 }
@@ -588,7 +588,7 @@ public class TypedConverters {
             }
 
             public LocalDate toLocalDate() {
-                DateTimeFormatter formatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter formatter = options.getDateTimeFormatter(targetProperty);
                 if (formatter == null) {
                     return LocalDate.parse(string);
                 }
@@ -596,7 +596,7 @@ public class TypedConverters {
             }
 
             public LocalTime toLocalTime() {
-                DateTimeFormatter formatter = MappingOptions.getDateTimeFormatter(targetProperty, options);
+                DateTimeFormatter formatter = options.getDateTimeFormatter(targetProperty);
                 if (formatter == null) {
                     return LocalTime.parse(string);
                 }

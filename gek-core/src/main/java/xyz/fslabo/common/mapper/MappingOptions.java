@@ -50,74 +50,6 @@ public class MappingOptions {
     public static final int COPY_LEVEL_DEEP = 3;
 
     /**
-     * Returns actual {@link DateTimeFormatter} option from given property info and options, may be {@code null}.
-     *
-     * @param targetProperty given property info
-     * @param options        given options
-     * @return actual {@link DateTimeFormatter} option, may be {@code null}
-     */
-    @Nullable
-    public static DateTimeFormatter getDateTimeFormatter(@Nullable PropertyInfo targetProperty, MappingOptions options) {
-        if (targetProperty == null) {
-            return options.getDateFormat();
-        }
-        Function<PropertyInfo, DateTimeFormatter> func = options.getPropertyDateFormat();
-        if (func == null) {
-            return options.getDateFormat();
-        }
-        DateTimeFormatter formatter = func.apply(targetProperty);
-        if (formatter != null) {
-            return formatter;
-        }
-        return options.getDateFormat();
-    }
-
-    /**
-     * Returns actual {@link NumberFormat} option from given property info and options, may be {@code null}.
-     *
-     * @param targetProperty given property info
-     * @param options        given options
-     * @return actual {@link NumberFormat} option, may be {@code null}
-     */
-    @Nullable
-    public static NumberFormat getNumberFormatter(@Nullable PropertyInfo targetProperty, MappingOptions options) {
-        if (targetProperty == null) {
-            return options.getNumberFormat();
-        }
-        Function<PropertyInfo, NumberFormat> func = options.getPropertyNumberFormat();
-        if (func == null) {
-            return options.getNumberFormat();
-        }
-        NumberFormat formatter = func.apply(targetProperty);
-        if (formatter != null) {
-            return formatter;
-        }
-        return options.getNumberFormat();
-    }
-
-    /**
-     * Returns actual {@link Charset} option from given property info and options.
-     *
-     * @param targetProperty given property info
-     * @param options        given options
-     * @return actual {@link Charset} option
-     */
-    public static Charset getCharset(@Nullable PropertyInfo targetProperty, MappingOptions options) {
-        if (targetProperty == null) {
-            return Jie.orDefault(options.getCharset(), JieChars.UTF_8);
-        }
-        Function<PropertyInfo, Charset> func = options.getPropertyCharset();
-        if (func == null) {
-            return Jie.orDefault(options.getCharset(), JieChars.UTF_8);
-        }
-        Charset formatter = func.apply(targetProperty);
-        if (formatter != null) {
-            return formatter;
-        }
-        return Jie.orDefault(options.getCharset(), JieChars.UTF_8);
-    }
-
-    /**
      * Option for {@link Mapper}, to map objects in types if needed.
      * For {@link BeanMapper}, names of properties and keys of entries will be mapped by this mapper before finding
      * dest properties or entries.
@@ -233,4 +165,61 @@ public class MappingOptions {
      * Default is {@code null}.
      */
     private @Nullable Function<PropertyInfo, DateTimeFormatter> propertyDateFormat;
+
+    /**
+     * Returns {@link DateTimeFormatter} option from given property info and this options, may be {@code null}. If
+     * property info is not null and {@link #getPropertyDateFormat()} is not null, returns result of
+     * {@link #getPropertyDateFormat()}. Otherwise, it returns {@link #getDateFormat()}.
+     *
+     * @param targetProperty given property info
+     * @return {@link DateTimeFormatter} option, may be {@code null}
+     */
+    @Nullable
+    public DateTimeFormatter getDateTimeFormatter(@Nullable PropertyInfo targetProperty) {
+        if (targetProperty != null) {
+            Function<PropertyInfo, DateTimeFormatter> func = getPropertyDateFormat();
+            if (func != null) {
+                return func.apply(targetProperty);
+            }
+        }
+        return getDateFormat();
+    }
+
+    /**
+     * Returns {@link NumberFormat} option from given property info and this options, may be {@code null}. If property
+     * info is not null and {@link #getPropertyNumberFormat()} is not null, returns result of
+     * {@link #getPropertyNumberFormat()}. Otherwise, it returns {@link #getNumberFormat()}.
+     *
+     * @param targetProperty given property info
+     * @return {@link NumberFormat} option, may be {@code null}
+     */
+    @Nullable
+    public NumberFormat getNumberFormatter(@Nullable PropertyInfo targetProperty) {
+        if (targetProperty != null) {
+            Function<PropertyInfo, NumberFormat> func = getPropertyNumberFormat();
+            if (func != null) {
+                return func.apply(targetProperty);
+            }
+        }
+        return getNumberFormat();
+    }
+
+    /**
+     * Returns {@link Charset} option from given property info and this options. If property info is not null and
+     * {@link #getPropertyCharset()} is not null, obtains result of {@link #getPropertyCharset()}. Otherwise, obtains
+     * result of {@link #getCharset()}. If the result is not null, returns the result, else returns
+     * {@link JieChars#UTF_8}.
+     *
+     * @param targetProperty given property info
+     * @return {@link Charset} option
+     */
+    public Charset getCharset(@Nullable PropertyInfo targetProperty) {
+        if (targetProperty != null) {
+            Function<PropertyInfo, Charset> func = getPropertyCharset();
+            if (func != null) {
+                return Jie.orDefault(func.apply(targetProperty), JieChars.UTF_8);
+            }
+        }
+        return Jie.orDefault(getCharset(), JieChars.UTF_8);
+    }
 }
