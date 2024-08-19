@@ -2,7 +2,7 @@ package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.bean.BeanInfo;
-import xyz.fslabo.common.collect.GekCollector;
+import xyz.fslabo.common.collect.CollBuilder;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.mapper.Mapper;
@@ -843,7 +843,7 @@ public class Jie {
      * @return a new collection configurer to create a collection
      * @see JieColl#collector()
      */
-    public static GekCollector collector() {
+    public static CollBuilder collector() {
         return JieColl.collector();
     }
 }

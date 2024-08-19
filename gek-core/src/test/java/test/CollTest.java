@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.collect.JieColl;
-import xyz.fslabo.common.collect.GekCollector;
+import xyz.fslabo.common.collect.CollBuilder;
 
 import java.util.*;
 
@@ -27,7 +27,7 @@ public class CollTest {
 
     @Test
     public void testCollector() {
-        GekCollector collector = Jie.collector();
+        CollBuilder collector = Jie.collector();
         Assert.assertEquals(
             collector.reset().initialElements(1, 2, 3).toList(),
             Arrays.asList(1, 2, 3)

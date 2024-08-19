@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.collect.GekCollector;
+import xyz.fslabo.common.collect.CollBuilder;
 import xyz.fslabo.common.io.GekIOConfigurer;
 
 /**
@@ -22,7 +22,7 @@ import xyz.fslabo.common.io.GekIOConfigurer;
  * <pre>
  *     myProcess.setThis(a).setThat(b).process();
  * </pre>
- * Here are some implementations: {@link GekThread}, {@link GekThreadPool}, {@link GekProcess}, {@link GekCollector},
+ * Here are some implementations: {@link GekThread}, {@link GekThreadPool}, {@link GekProcess}, {@link CollBuilder},
  * {@link GekIOConfigurer}.
  *
  * @param <T> subtype of this interface, and is subtype itself

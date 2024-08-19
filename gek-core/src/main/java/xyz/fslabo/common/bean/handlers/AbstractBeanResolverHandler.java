@@ -3,6 +3,7 @@ package xyz.fslabo.common.bean.handlers;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.*;
+import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
 import xyz.fslabo.common.invoke.Invoker;
 import xyz.fslabo.common.reflect.JieReflect;
@@ -194,9 +195,9 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
             this.setterInvoker = setter == null ? null : buildMethodInvoker(setter);
             this.type = type;
             this.field = findField(name, rawType);
-            this.getterAnnotations = getter == null ? Collections.emptyList() : JieColl.asList(getter.getAnnotations());
-            this.setterAnnotations = setter == null ? Collections.emptyList() : JieColl.asList(setter.getAnnotations());
-            this.fieldAnnotations = field == null ? Collections.emptyList() : JieColl.asList(field.getAnnotations());
+            this.getterAnnotations = getter == null ? Collections.emptyList() : JieArray.asList(getter.getAnnotations());
+            this.setterAnnotations = setter == null ? Collections.emptyList() : JieArray.asList(setter.getAnnotations());
+            this.fieldAnnotations = field == null ? Collections.emptyList() : JieArray.asList(field.getAnnotations());
             int size = getGetterAnnotations().size() + getSetterAnnotations().size() + getFieldAnnotations().size();
             Annotation[] array = new Annotation[size];
             int i = 0;
@@ -209,7 +210,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
             for (Annotation annotation : fieldAnnotations) {
                 array[i++] = annotation;
             }
-            this.allAnnotations = JieColl.asList(array);
+            this.allAnnotations = JieArray.asList(array);
         }
 
         @Override
@@ -292,7 +293,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
 
         private BaseMethodInfoImpl(Method method) {
             this.method = method;
-            this.annotations = JieColl.asList(method.getAnnotations());
+            this.annotations = JieArray.asList(method.getAnnotations());
             this.invoker = buildMethodInvoker(method);
             ;
         }

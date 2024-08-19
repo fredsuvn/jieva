@@ -8,18 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntFunction;
 
 /**
- * This class is used to configure and build collection in method chaining:
+ * Builder to build a {@link Collection}, for example:
  * <pre>
  *     collector.initialSize(100).initialFunction(i-&gt;random()).toList();
  * </pre>
- * Its instance is reusable, re-set and re-build are permitted.
  *
  * @author fredsuvn
  */
-public abstract class GekCollector implements GekConfigurer<GekCollector> {
+public class CollBuilder {
 
-    static GekCollector newInstance() {
-        return new OfJdk8();
+    public static CollBuilder newBuilder() {
+        return new CollBuilder();
     }
 
     private int initialCapacity;
@@ -28,8 +27,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     private IntFunction<?> initialFunction;
     private boolean immutable;
 
-    GekCollector() {
-        reset();
+    private CollBuilder() {
     }
 
     /**
@@ -38,7 +36,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      * @param initialCapacity initial capacity
      * @return this
      */
-    public GekCollector initialCapacity(int initialCapacity) {
+    public CollBuilder initialCapacity(int initialCapacity) {
         this.initialCapacity = initialCapacity;
         return this;
     }
@@ -49,7 +47,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      * @param initialSize initial size
      * @return this
      */
-    public GekCollector initialSize(int initialSize) {
+    public CollBuilder initialSize(int initialSize) {
         this.initialSize = initialSize;
         return this;
     }
@@ -70,7 +68,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      * @param initialElements initial elements
      * @return this
      */
-    public GekCollector initialElements(Iterable<?> initialElements) {
+    public CollBuilder initialElements(Iterable<?> initialElements) {
         this.initialElements = initialElements;
         return this;
     }
@@ -91,7 +89,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      * @param initialElements initial elements
      * @return this
      */
-    public GekCollector initialElements(Object... initialElements) {
+    public CollBuilder initialElements(Object... initialElements) {
         this.initialElements = initialElements;
         return this;
     }
@@ -112,7 +110,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      * @param initialFunction initial function
      * @return this
      */
-    public GekCollector initialFunction(IntFunction<?> initialFunction) {
+    public CollBuilder initialFunction(IntFunction<?> initialFunction) {
         this.initialFunction = initialFunction;
         return this;
     }
@@ -123,7 +121,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      * @param immutable whether built collection is immutable
      * @return this
      */
-    public GekCollector immutable(boolean immutable) {
+    public CollBuilder immutable(boolean immutable) {
         this.immutable = immutable;
         return this;
     }
@@ -133,7 +131,7 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
      *
      * @return this
      */
-    public GekCollector immutable() {
+    public CollBuilder immutable() {
         return immutable(true);
     }
 
@@ -394,15 +392,12 @@ public abstract class GekCollector implements GekConfigurer<GekCollector> {
     }
 
     @Override
-    public GekCollector reset() {
+    public CollBuilder reset() {
         this.initialSize = 0;
         this.initialCapacity = 0;
         this.initialElements = null;
         this.initialFunction = null;
         this.immutable = false;
         return this;
-    }
-
-    private static final class OfJdk8 extends GekCollector {
     }
 }
