@@ -17,27 +17,6 @@ import java.util.stream.StreamSupport;
 public class JieColl {
 
     /**
-     * Returns an immutable map of given entries.
-     *
-     * @param entries given elements
-     * @param <K>     type of keys
-     * @param <V>     type of values
-     * @return an immutable map of given entries
-     */
-    @SafeVarargs
-    public static <K, V> Map<K, V> mapOfEntries(Map.Entry<? extends K, ? extends V>... entries) {
-        if (JieArray.isEmpty(entries)) {
-            return Collections.emptyMap();
-        }
-        Object[] array = new Object[entries.length * 2];
-        for (int i = 0; i < entries.length; i++) {
-            array[i * 2] = entries[i].getKey();
-            array[i * 2 + 1] = entries[i].getValue();
-        }
-        return new ImmutableMap<>(array);
-    }
-
-    /**
      * Collects given elements to array. If given elements is empty, return an empty array.
      *
      * @param elements given elements
@@ -126,9 +105,7 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptyList();
         }
-        return new ImmutableList<>(
-            StreamSupport.stream(elements.spliterator(), false).map(mapper).toArray()
-        );
+        return new ImmutableList<>(stream(elements).map(mapper).toArray());
     }
 
     /**
@@ -154,7 +131,7 @@ public class JieColl {
         if (JieArray.isEmpty(elements)) {
             return Collections.emptySet();
         }
-        return Collections.unmodifiableSet(new LinkedHashSet<>(JieArray.asList(elements)));
+        return Collections.unmodifiableSet(addAll(new LinkedHashSet<>(), elements));
     }
 
     /**
@@ -168,8 +145,7 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptySet();
         }
-        Set<T> set = collect(new LinkedHashSet<>(), elements);
-        return Collections.unmodifiableSet(set);
+        return Collections.unmodifiableSet(addAll(new LinkedHashSet<>(), elements));
     }
 
     /**
@@ -187,8 +163,7 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptySet();
         }
-        Set<R> set = collect(new LinkedHashSet<>(), elements, mapper);
-        return Collections.unmodifiableSet(set);
+        return Collections.unmodifiableSet(addAll(new LinkedHashSet<>(), elements, mapper));
     }
 
     /**
@@ -217,7 +192,7 @@ public class JieColl {
     @SafeVarargs
     public static <K, V, T> Map<K, V> toMap(T... elements) {
         return JieArray.isEmpty(elements) ?
-            Collections.emptyMap() : Collections.unmodifiableMap(collect(new LinkedHashMap<>(), elements));
+            Collections.emptyMap() : Collections.unmodifiableMap(addAll(new LinkedHashMap<>(), elements));
     }
 
     /**
@@ -236,7 +211,7 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(collect(new LinkedHashMap<>(), elements));
+        return Collections.unmodifiableMap(addAll(new LinkedHashMap<>(), elements));
     }
 
     /**
@@ -265,7 +240,7 @@ public class JieColl {
         if (JieArray.isEmpty(elements)) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(collect(new LinkedHashMap<>(), elements, keyMapper, valueMapper));
+        return Collections.unmodifiableMap(addAll(new LinkedHashMap<>(), elements, keyMapper, valueMapper));
     }
 
     /**
@@ -294,7 +269,7 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(collect(new LinkedHashMap<>(), elements, keyMapper, valueMapper));
+        return Collections.unmodifiableMap(addAll(new LinkedHashMap<>(), elements, keyMapper, valueMapper));
     }
 
     /**
@@ -333,7 +308,7 @@ public class JieColl {
         if (isEmpty(source)) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(collect(new LinkedHashMap<>(), source, keyMapper, valueMapper));
+        return Collections.unmodifiableMap(addAll(new LinkedHashMap<>(), source, keyMapper, valueMapper));
     }
 
     /**
@@ -365,7 +340,21 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest collection, and returns the dest collection.
+     * If given iterable is a collection, return itself, otherwise collects it into an immutable set and return.
+     *
+     * @param iterable given elements
+     * @param <T>      type of element
+     * @return collection
+     */
+    public static <T> Collection<T> orCollection(@Nullable Iterable<T> iterable) {
+        if (iterable instanceof Collection) {
+            return (Collection<T>) iterable;
+        }
+        return toSet(iterable);
+    }
+
+    /**
+     * Adds all given elements into dest collection, and returns the dest collection.
      *
      * @param dest     dest collection
      * @param elements given elements
@@ -374,7 +363,7 @@ public class JieColl {
      * @return dest collection
      */
     @SafeVarargs
-    public static <T, C extends Collection<? super T>> C collect(C dest, T... elements) {
+    public static <T, C extends Collection<? super T>> C addAll(C dest, T... elements) {
         if (JieArray.isEmpty(elements)) {
             return dest;
         }
@@ -383,7 +372,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest collection, and returns the dest collection.
+     * Adds all given elements into dest collection, and returns the dest collection.
      *
      * @param dest     dest collection
      * @param elements given elements
@@ -391,7 +380,7 @@ public class JieColl {
      * @param <C>      type of dest collection
      * @return dest collection
      */
-    public static <T, C extends Collection<? super T>> C collect(C dest, Iterable<T> elements) {
+    public static <T, C extends Collection<? super T>> C addAll(C dest, Iterable<T> elements) {
         if (isEmpty(elements)) {
             return dest;
         }
@@ -406,7 +395,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest collection, converts each element from type {@code T} to type {@code R} by
+     * Adds all given elements into dest collection, converts each element from type {@code T} to type {@code R} by
      * given {@code mapper}, and returns the dest collection.
      *
      * @param dest     dest collection
@@ -417,7 +406,7 @@ public class JieColl {
      * @param <C>      type of dest collection
      * @return dest collection
      */
-    public static <T, R, C extends Collection<? super R>> C collect(
+    public static <T, R, C extends Collection<? super R>> C addAll(
         C dest, Iterable<T> elements, Function<? super T, ? extends R> mapper) {
         if (isEmpty(elements)) {
             return dest;
@@ -429,7 +418,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest map, and returns the dest map.
+     * Adds all given elements into dest map, and returns the dest map.
      * <p>
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
@@ -443,7 +432,7 @@ public class JieColl {
      * @return dest map
      */
     @SafeVarargs
-    public static <K, V, M extends Map<K, V>, T> M collect(M dest, T... elements) {
+    public static <K, V, M extends Map<K, V>, T> M addAll(M dest, T... elements) {
         if (JieArray.isEmpty(elements)) {
             return dest;
         }
@@ -459,7 +448,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest map, and returns the dest map.
+     * Adds all given elements into dest map, and returns the dest map.
      * <p>
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
@@ -472,7 +461,7 @@ public class JieColl {
      * @param <T>      type of element
      * @return dest map
      */
-    public static <K, V, M extends Map<K, V>, T> M collect(M dest, Iterable<T> elements) {
+    public static <K, V, M extends Map<K, V>, T> M addAll(M dest, Iterable<T> elements) {
         if (isEmpty(elements)) {
             return dest;
         }
@@ -490,7 +479,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest map, converts each element from type {@code T} to type {@code R} by given
+     * Adds all given elements into dest map, converts each element from type {@code T} to type {@code R} by given
      * {@code mapper}, and returns the dest map.
      * <p>
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
@@ -506,7 +495,7 @@ public class JieColl {
      * @param <R>      type of target element
      * @return dest map
      */
-    public static <K, V, M extends Map<K, V>, T, R> M collect(
+    public static <K, V, M extends Map<K, V>, T, R> M addAll(
         M dest, Iterable<? extends T> elements, Function<? super T, ? extends R> mapper) {
         if (isEmpty(elements)) {
             return dest;
@@ -525,7 +514,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest map, and returns the dest map.
+     * Adds all given elements into dest map, and returns the dest map.
      * Each element will be mapped by {@code keyMapper} and {@code valueMapper} to product key and value, then the key
      * and value will be put into the dest map. It is equivalent to:
      * <pre>
@@ -544,7 +533,7 @@ public class JieColl {
      * @param <T>         type of element
      * @return dest map
      */
-    public static <K, V, M extends Map<K, V>, T> M collect(
+    public static <K, V, M extends Map<K, V>, T> M addAll(
         M dest, T[] elements, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
         if (JieArray.isEmpty(elements)) {
             return dest;
@@ -556,7 +545,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest map, and returns the dest map.
+     * Adds all given elements into dest map, and returns the dest map.
      * Each element will be mapped by {@code keyMapper} and {@code valueMapper} to product key and value, then the key
      * and value will be put into the dest map. It is equivalent to:
      * <pre>
@@ -575,7 +564,7 @@ public class JieColl {
      * @param <T>         type of element
      * @return dest map
      */
-    public static <K, V, M extends Map<K, V>, T> M collect(
+    public static <K, V, M extends Map<K, V>, T> M addAll(
         M dest, Iterable<T> elements, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
         if (isEmpty(elements)) {
             return dest;
@@ -587,7 +576,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into dest map, each entry of source map will be mapped from {@code K1} to {@code K2} and
+     * Adds all given elements into dest map, each entry of source map will be mapped from {@code K1} to {@code K2} and
      * {@code V1} and {@code V2} by {@code keyMapper} and {@code valueMapper}, and returns the dest map.
      *
      * @param dest        dest map
@@ -600,7 +589,7 @@ public class JieColl {
      * @param <V2>        type of target value
      * @return converted map
      */
-    public static <K1, V1, K2, V2, M extends Map<K2, V2>> M collect(
+    public static <K1, V1, K2, V2, M extends Map<K2, V2>> M addAll(
         M dest,
         Map<K1, V1> source,
         Function<? super K1, ? extends K2> keyMapper,
@@ -891,7 +880,7 @@ public class JieColl {
                 entries = Collections.emptySet();
                 return;
             }
-            Map<K, V> map = collect(new LinkedHashMap<>(), array);
+            Map<K, V> map = addAll(new LinkedHashMap<>(), array);
             entries = new ImmutableSet<>(
                 map.entrySet().stream().map(it -> new SimpleImmutableEntry<>(it.getKey(), it.getValue())).toArray(),
                 false

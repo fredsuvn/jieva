@@ -23,7 +23,6 @@ public class CollBuilder {
     private int initialCapacity;
     private int initialSize;
     private Object initialElements;
-    private Map<?, ?> initialEntries;
     private IntFunction<?> initialFunction;
     private boolean immutable;
 
@@ -42,7 +41,7 @@ public class CollBuilder {
     }
 
     /**
-     * Sets initial size.
+     * Sets initial size. This is typically used for {@link #initialFunction(IntFunction)}.
      *
      * @param initialSize initial size
      * @return this
@@ -90,32 +89,28 @@ public class CollBuilder {
      * @return this
      */
     public CollBuilder initialElements(Object... initialElements) {
-        this.initialElements = JieArray.toList(initialElements);
+        this.initialElements = JieArray.listOf(initialElements);
         return this;
     }
 
     /**
-     * Sets initial function, the function will be passed to the index and return an element at the index. This is used
-     * to build collection, invalid for map.
-     * <p>
-     * If the {@code initialElements} is set, this configuration will be ignored.
+     * Sets initial function, the function will be passed to the index (0 based) and return an element at the index:
+     * <ul>
+     *     <li>
+     *         To build a collection, each element will be added;
+     *     </li>
+     *     <li>
+     *         To build a map, the first element will be put as key1, second as value1,
+     *         third as key2, fourth as value2 and so on.
+     *         If last key{@code n} is not followed by a value{@code n}, it will be ignored;
+     *     </li>
+     * </ul>
      *
      * @param initialFunction initial function
      * @return this
      */
     public CollBuilder initialFunction(IntFunction<?> initialFunction) {
         this.initialFunction = initialFunction;
-        return this;
-    }
-
-    /**
-     * Sets initial entries. This is used to build map, invalid for collection.
-     *
-     * @param initialEntries initial entries
-     * @return this
-     */
-    public CollBuilder initialEntries(Map<?, ?> initialEntries) {
-        this.initialEntries = initialEntries;
         return this;
     }
 
@@ -146,7 +141,8 @@ public class CollBuilder {
      * @return {@link ArrayList}
      */
     public <T> ArrayList<T> toArrayList() {
-        ArrayList<T> result = initialCapacity <= 0 ? new ArrayList<>() : new ArrayList<>(initialCapacity);
+        ArrayList<T> result =
+            initialCapacity <= 0 ? new ArrayList<>() : new ArrayList<>(initialCapacity);
         fillCollection(result);
         return result;
     }
@@ -170,7 +166,8 @@ public class CollBuilder {
      * @return {@link HashSet}
      */
     public <T> HashSet<T> toHashSet() {
-        HashSet<T> result = initialCapacity <= 0 ? new HashSet<>() : new HashSet<>(initialCapacity);
+        HashSet<T> result =
+            initialCapacity <= 0 ? new HashSet<>() : new HashSet<>(initialCapacity);
         fillCollection(result);
         return result;
     }
@@ -182,7 +179,8 @@ public class CollBuilder {
      * @return {@link HashSet}
      */
     public <T> LinkedHashSet<T> toLinkedHashSet() {
-        LinkedHashSet<T> result = initialCapacity <= 0 ? new LinkedHashSet<>() : new LinkedHashSet<>(initialCapacity);
+        LinkedHashSet<T> result =
+            initialCapacity <= 0 ? new LinkedHashSet<>() : new LinkedHashSet<>(initialCapacity);
         fillCollection(result);
         return result;
     }
@@ -233,7 +231,8 @@ public class CollBuilder {
      * @return {@link HashMap}
      */
     public <K, V> HashMap<K, V> toHashMap() {
-        HashMap<K, V> result = initialSize <= 0 ? new HashMap<>() : new HashMap<>(initialCapacity);
+        HashMap<K, V> result =
+            initialCapacity <= 0 ? new HashMap<>() : new HashMap<>(initialCapacity);
         fillMap(result);
         return result;
     }
@@ -246,7 +245,8 @@ public class CollBuilder {
      * @return {@link LinkedHashMap}
      */
     public <K, V> LinkedHashMap<K, V> toLinkedHashMap() {
-        LinkedHashMap<K, V> result = initialSize <= 0 ? new LinkedHashMap<>() : new LinkedHashMap<>(initialCapacity);
+        LinkedHashMap<K, V> result =
+            initialCapacity <= 0 ? new LinkedHashMap<>() : new LinkedHashMap<>(initialCapacity);
         fillMap(result);
         return result;
     }
@@ -260,7 +260,7 @@ public class CollBuilder {
      */
     public <K, V> ConcurrentHashMap<K, V> toConcurrentHashMap() {
         ConcurrentHashMap<K, V> result =
-            initialSize <= 0 ? new ConcurrentHashMap<>() : new ConcurrentHashMap<>(initialCapacity);
+            initialCapacity <= 0 ? new ConcurrentHashMap<>() : new ConcurrentHashMap<>(initialCapacity);
         fillMap(result);
         return result;
     }
@@ -273,11 +273,11 @@ public class CollBuilder {
                 return;
             }
             if (initialElements instanceof Object[]) {
-                JieColl.collect(dest, (Object[]) initialElements);
+                JieColl.addAll(dest, (Object[]) initialElements);
                 return;
             }
             if (initialElements instanceof Iterable) {
-                ((Iterable<?>) initialElements).forEach(dest::add);
+                JieColl.addAll(dest, (Iterable<?>) initialElements);
                 return;
             }
             throw new IllegalArgumentException("Initial elements must be iterable or array.");
@@ -293,19 +293,21 @@ public class CollBuilder {
         Map<Object, Object> dest = Jie.as(map);
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
-                JieColl.collect(dest, (Object[]) initialElements);
+                JieColl.addAll(dest, (Object[]) initialElements);
                 return;
             }
             if (initialElements instanceof Iterable) {
-                Iterable<?> iterable = (Iterable<?>) initialElements;
-                JieColl.collect(dest, iterable);
+                JieColl.addAll(dest, (Iterable<?>) initialElements);
                 return;
             }
             throw new IllegalArgumentException("Initial elements must be iterable or array.");
         } else if (initialSize > 0 && initialFunction != null) {
-            for (int i = 0; i < initialSize; i++) {
-                Map.Entry<?, ?> p = Jie.as(initialFunction.apply(i));
-                dest.put(Jie.as(p.getKey()), Jie.as(p.getValue()));
+            int i = 1;
+            while (i < initialSize) {
+                Object key = initialFunction.apply(i - 1);
+                Object value = initialFunction.apply(i);
+                dest.put(key, value);
+                i += 2;
             }
         }
     }
@@ -322,7 +324,7 @@ public class CollBuilder {
         }
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
-                return Jie.as(JieColl.asList((Object[]) initialElements));
+                return Jie.as(JieColl.toList((Object[]) initialElements));
             }
             if (initialElements instanceof Iterable) {
                 return Jie.as(JieColl.toList((Iterable<?>) initialElements));
@@ -330,10 +332,11 @@ public class CollBuilder {
             throw new IllegalArgumentException("Initial elements must be iterable or array.");
         } else if (initialSize > 0 && initialFunction != null) {
             Object[] array = new Object[initialSize];
-            for (int i = 0; i < array.length; i++) {
-                array[i] = initialFunction.apply(i);
+            for (int i = 0; i < initialSize; i++) {
+                Object v = initialFunction.apply(i);
+                array[i] = v;
             }
-            return Jie.as(JieColl.asList(array));
+            return Jie.as(JieArray.listOf(array));
         }
         return Collections.emptyList();
     }
@@ -345,25 +348,7 @@ public class CollBuilder {
      * @return set
      */
     public <T> Set<T> toSet() {
-        if (!immutable) {
-            return toLinkedHashSet();
-        }
-        if (initialElements != null) {
-            if (initialElements instanceof Object[]) {
-                return Jie.as(JieColl.asSet((Object[]) initialElements));
-            }
-            if (initialElements instanceof Iterable) {
-                return Jie.as(JieColl.toSet((Iterable<?>) initialElements));
-            }
-            throw new IllegalArgumentException("Initial elements must be iterable or array.");
-        } else if (initialSize > 0 && initialFunction != null) {
-            Object[] array = new Object[initialSize];
-            for (int i = 0; i < array.length; i++) {
-                array[i] = initialFunction.apply(i);
-            }
-            return Jie.as(JieColl.asSet(array));
-        }
-        return Collections.emptySet();
+        return immutable ? Collections.unmodifiableSet(toLinkedHashSet()) : toLinkedHashSet();
     }
 
     /**
@@ -374,28 +359,14 @@ public class CollBuilder {
      * @return map
      */
     public <K, V> Map<K, V> toMap() {
-        if (!immutable) {
-            return toLinkedHashMap();
-        }
-        if (initialElements != null) {
-            if (initialElements instanceof Object[]) {
-                return Jie.as(JieColl.toMap((Object[]) initialElements));
-            }
-            if (initialElements instanceof Iterable) {
-                return Jie.as(JieColl.toMap((Iterable<?>) initialElements));
-            }
-            throw new IllegalArgumentException("Initial elements must be iterable or array.");
-        } else if (initialSize > 0 && initialFunction != null) {
-            Map.Entry<?, ?>[] entries = new Map.Entry<?, ?>[initialSize];
-            for (int i = 0; i < initialSize; i++) {
-                entries[i] = Jie.as(initialFunction.apply(i));
-            }
-            return Jie.as(JieColl.mapOfEntries(entries));
-        }
-        return Collections.emptyMap();
+        return immutable ? Collections.unmodifiableMap(toLinkedHashMap()) : toLinkedHashMap();
     }
 
-    @Override
+    /**
+     * Resets all build settings.
+     *
+     * @return this
+     */
     public CollBuilder reset() {
         this.initialSize = 0;
         this.initialCapacity = 0;

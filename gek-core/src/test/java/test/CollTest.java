@@ -189,27 +189,27 @@ public class CollTest {
             Jie.mapOf("1", "2", "3", "4")
         );
         Assert.assertEquals(
-            JieColl.collect(new LinkedHashMap<>(), 1, 2, 3),
+            JieColl.addAll(new LinkedHashMap<>(), 1, 2, 3),
             Jie.mapOf(1, 2, 3)
         );
         Assert.assertEquals(
-            JieColl.collect(new LinkedHashMap<>(), 1, 2, 3, 4),
+            JieColl.addAll(new LinkedHashMap<>(), 1, 2, 3, 4),
             Jie.mapOf(1, 2, 3, 4)
         );
         Assert.assertEquals(
-            JieColl.collect(new LinkedHashMap<>(), Jie.asList(1, 2, 3)),
+            JieColl.addAll(new LinkedHashMap<>(), Jie.asList(1, 2, 3)),
             Jie.mapOf(1, 2, 3)
         );
         Assert.assertEquals(
-            JieColl.collect(new LinkedHashMap<>(), Jie.asList(1, 2, 3, 4)),
+            JieColl.addAll(new LinkedHashMap<>(), Jie.asList(1, 2, 3, 4)),
             Jie.mapOf(1, 2, 3, 4)
         );
         Assert.assertEquals(
-            JieColl.collect(new LinkedHashMap<>(), Jie.asList(1, 2, 3, 4), String::valueOf),
+            JieColl.addAll(new LinkedHashMap<>(), Jie.asList(1, 2, 3, 4), String::valueOf),
             Jie.mapOf("1", "2", "3", "4")
         );
         Assert.assertEquals(
-            JieColl.collect(new LinkedHashMap<>(), Jie.mapOf(1, 2, 3, 4), String::valueOf, String::valueOf),
+            JieColl.addAll(new LinkedHashMap<>(), Jie.mapOf(1, 2, 3, 4), String::valueOf, String::valueOf),
             Jie.mapOf("1", "2", "3", "4")
         );
         Assert.assertEquals(

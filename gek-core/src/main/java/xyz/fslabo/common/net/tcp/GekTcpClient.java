@@ -171,7 +171,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
          * @return this builder
          */
         public Builder addChannelHandlers(Iterable<GekTcpChannelHandler<?>> channelHandlers) {
-            JieColl.collect(this.channelHandlers, channelHandlers);
+            JieColl.addAll(this.channelHandlers, channelHandlers);
             return this;
         }
 

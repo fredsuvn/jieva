@@ -226,7 +226,7 @@ public interface GekUdpServer extends GekUdpClient {
          * @return this builder
          */
         public Builder addPacketHandlers(Iterable<GekUdpPacketHandler<?>> packetHandlers) {
-            JieColl.collect(this.packetHandlers, packetHandlers);
+            JieColl.addAll(this.packetHandlers, packetHandlers);
             return this;
         }
 

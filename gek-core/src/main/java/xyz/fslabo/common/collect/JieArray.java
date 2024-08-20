@@ -672,11 +672,12 @@ public class JieArray {
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
      * @param <T>   component type
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     @SafeVarargs
     public static <T> List<T> asList(T... array) {
@@ -684,174 +685,191 @@ public class JieArray {
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     public static List<Boolean> asList(boolean[] array) {
         return new BooleanArrayList(array);
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     public static List<Byte> asList(byte[] array) {
         return new ByteArrayList(array);
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     public static List<Short> asList(short[] array) {
         return new ShortArrayList(array);
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     public static List<Character> asList(char[] array) {
         return new CharacterArrayList(array);
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     public static List<Integer> asList(int[] array) {
         return new IntegerArrayList(array);
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     public static List<Long> asList(long[] array) {
         return new LongArrayList(array);
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     public static List<Float> asList(float[] array) {
         return new FloatArrayList(array);
     }
 
     /**
-     * Returns a wrapper list for given array, the list's size is fixed and any operation will reflect to each other.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      *
      * @param array given array
-     * @return a wrapper list for given array
+     * @return given array as a mutable and size-fixed list
      */
     public static List<Double> asList(double[] array) {
         return new DoubleArrayList(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
      * @param <T>   component type
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
     @SafeVarargs
-    public static <T> List<T> toList(T... array) {
+    public static <T> List<T> listOf(T... array) {
         return new ImmutableList<>(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
-    public static List<Boolean> toList(boolean[] array) {
+    public static List<Boolean> listOf(boolean[] array) {
         return new BooleanImmutableList(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
-    public static List<Byte> toList(byte[] array) {
+    public static List<Byte> listOf(byte[] array) {
         return new ByteImmutableList(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
-    public static List<Short> toList(short[] array) {
+    public static List<Short> listOf(short[] array) {
         return new ShortImmutableList(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
-    public static List<Character> toList(char[] array) {
+    public static List<Character> listOf(char[] array) {
         return new CharImmutableList(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
-    public static List<Integer> toList(int[] array) {
+    public static List<Integer> listOf(int[] array) {
         return new IntImmutableList(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
-    public static List<Long> toList(long[] array) {
+    public static List<Long> listOf(long[] array) {
         return new LongImmutableList(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
-    public static List<Float> toList(float[] array) {
+    public static List<Float> listOf(float[] array) {
         return new FloatImmutableList(array);
     }
 
     /**
-     * Returns an immutable list of which elements are copied from given array.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      *
      * @param array given array
-     * @return an immutable list of which elements are copied from given array
+     * @return given array as an immutable list
      */
-    public static List<Double> toList(double[] array) {
+    public static List<Double> listOf(double[] array) {
         return new DoubleImmutableList(array);
     }
 
