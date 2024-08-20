@@ -15,10 +15,10 @@ public class JieTest {
     @Test
     public void testThrow() {
         BeanUtils.copyProperties(null, null);
-        GekLog.getInstance().info(GekTrace.toString(
+        GekLog.getInstance().info(JieTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())))
         );
-        GekLog.getInstance().info(GekTrace.toString(
+        GekLog.getInstance().info(JieTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())),
             " : ")
         );
@@ -101,13 +101,13 @@ public class JieTest {
 
     private static final class T3 {
         public static void invoke3() {
-            StackTraceElement element1 = GekTrace.findCallerTrace(T1.class.getName(), "invoke1");
+            StackTraceElement element1 = JieTrace.findCallerTrace(T1.class.getName(), "invoke1");
             Assert.assertEquals(element1.getClassName(), JieTest.class.getName());
             Assert.assertEquals(element1.getMethodName(), "testFindCallerStackTrace");
-            StackTraceElement element2 = GekTrace.findCallerTrace(T2.class.getName(), "invoke2");
+            StackTraceElement element2 = JieTrace.findCallerTrace(T2.class.getName(), "invoke2");
             Assert.assertEquals(element2.getClassName(), T1.class.getName());
             Assert.assertEquals(element2.getMethodName(), "invoke1");
-            StackTraceElement element3 = GekTrace.findCallerTrace(T3.class.getName(), "invoke3");
+            StackTraceElement element3 = JieTrace.findCallerTrace(T3.class.getName(), "invoke3");
             Assert.assertEquals(element3.getClassName(), T2.class.getName());
             Assert.assertEquals(element3.getMethodName(), "invoke2");
         }

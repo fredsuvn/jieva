@@ -27,12 +27,12 @@ public class ConvertTest {
         long now = System.currentTimeMillis();
         Assert.assertEquals(
             Instant.ofEpochMilli(now),
-            Jie.convert(new Date(now), Instant.class)
+            Jie.map(new Date(now), Instant.class)
         );
         Instant instant = Instant.ofEpochMilli(now);
         Assert.assertSame(
             instant,
-            Jie.convert(instant, Instant.class)
+            Jie.map(instant, Instant.class)
         );
         Assert.assertEquals(
             Arrays.asList("1", "2", "3"),
@@ -118,13 +118,13 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             strList,
-            Jie.convert(
+            Jie.map(
                 strList, List.class
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Jie.convert(
+            Jie.map(
                 strList,
                 new TypeRef<List<? super Integer>>() {
                 }.getType()
@@ -152,28 +152,28 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             E1.E1,
-            Jie.convert(
+            Jie.map(
                 "E1",
                 E1.class
             )
         );
         Assert.assertEquals(
             "E2",
-            Jie.convert(
+            Jie.map(
                 E1.E2,
                 String.class
             )
         );
         Assert.assertEquals(
             E2.E1,
-            Jie.convert(
+            Jie.map(
                 E1.E1,
                 E2.class
             )
         );
         Assert.assertEquals(
             E1.E2,
-            Jie.convert(
+            Jie.map(
                 E2.E2,
                 E1.class
             )

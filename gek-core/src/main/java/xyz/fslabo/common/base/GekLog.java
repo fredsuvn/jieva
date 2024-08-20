@@ -99,13 +99,13 @@ public abstract class GekLog {
     /**
      * Logs message with specified level and trace offset.
      * The trace offset specifies the offset from where logging occurs to this method,
-     * see {@link #buildRecord(int, Level, Object...)} and {@link GekTrace#findCallerTrace(String, String, int)}.
+     * see {@link #buildRecord(int, Level, Object...)} and {@link JieTrace#findCallerTrace(String, String, int)}.
      *
      * @param level    specified level
      * @param offset   trace offset
      * @param messages messages
      * @see #buildRecord(int, Level, Object...)
-     * @see GekTrace#findCallerTrace(String, String, int)
+     * @see JieTrace#findCallerTrace(String, String, int)
      */
     public void logOffset(Level level, int offset, Object... messages) {
         if (level == null) {
@@ -130,18 +130,18 @@ public abstract class GekLog {
     /**
      * Builds one log record of given message array, specified level and trace offset.
      * The trace offset specifies the offset from where logging occurs to this method,
-     * see {@link GekTrace#findCallerTrace(String, String, int)}.
+     * see {@link JieTrace#findCallerTrace(String, String, int)}.
      *
      * @param traceOffset offset from where logging occurs to this method
      * @param level       record level
      * @param messages    given message array
      * @return one log record of given message array and specified level
-     * @see GekTrace#findCallerTrace(String, String, int)
+     * @see JieTrace#findCallerTrace(String, String, int)
      */
     protected Record buildRecord(int traceOffset, Level level, Object... messages) {
         Instant now = Instant.now();
         Thread thread = Thread.currentThread();
-        StackTraceElement trace = GekTrace.findCallerTrace(
+        StackTraceElement trace = JieTrace.findCallerTrace(
             GekLog.class.getName(), "buildRecord", traceOffset);
         return new Record() {
 

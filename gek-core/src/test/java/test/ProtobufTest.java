@@ -71,29 +71,29 @@ public class ProtobufTest {
             .setStr("888")
             .setNum(999)
             .addAllText(Arrays.asList("2", "4", "6"))
-            .putAllEntry(Jie.mapOf("1", "1", "3", "3"));
+            .putAllEntry(Jie.newMap("1", "1", "3", "3"));
         Data data = dataBuilder.build();
         Assert.assertEquals(propertyMap.get("em").getValue(data), Enum.E2);
         Assert.assertEquals(propertyMap.get("str").getValue(data), "888");
         Assert.assertEquals(propertyMap.get("num").getValue(data), 999L);
         Assert.assertEquals(propertyMap.get("textList").getValue(data), Arrays.asList("2", "4", "6"));
-        Assert.assertEquals(propertyMap.get("entryMap").getValue(data), Jie.mapOf("1", "1", "3", "3"));
+        Assert.assertEquals(propertyMap.get("entryMap").getValue(data), Jie.newMap("1", "1", "3", "3"));
         Assert.assertEquals(builderPropertyMap.get("em").getValue(dataBuilder), Enum.E2);
         Assert.assertEquals(builderPropertyMap.get("str").getValue(dataBuilder), "888");
         Assert.assertEquals(builderPropertyMap.get("num").getValue(dataBuilder), 999L);
         Assert.assertEquals(builderPropertyMap.get("textList").getValue(dataBuilder), Arrays.asList("2", "4", "6"));
-        Assert.assertEquals(builderPropertyMap.get("entryMap").getValue(dataBuilder), Jie.mapOf("1", "1", "3", "3"));
+        Assert.assertEquals(builderPropertyMap.get("entryMap").getValue(dataBuilder), Jie.newMap("1", "1", "3", "3"));
         builderPropertyMap.get("em").setValue(dataBuilder, Enum.E1);
         builderPropertyMap.get("str").setValue(dataBuilder, "777");
         builderPropertyMap.get("num").setValue(dataBuilder, 888L);
         builderPropertyMap.get("textList").setValue(dataBuilder, Arrays.asList("3", "5", "7"));
-        builderPropertyMap.get("entryMap").setValue(dataBuilder, Jie.mapOf("8", "8", "9", "9"));
+        builderPropertyMap.get("entryMap").setValue(dataBuilder, Jie.newMap("8", "8", "9", "9"));
         Data data2 = dataBuilder.build();
         Assert.assertEquals(propertyMap.get("em").getValue(data2), Enum.E1);
         Assert.assertEquals(propertyMap.get("str").getValue(data2), "777");
         Assert.assertEquals(propertyMap.get("num").getValue(data2), 888L);
         Assert.assertEquals(propertyMap.get("textList").getValue(data2), Arrays.asList("3", "5", "7"));
-        Assert.assertEquals(propertyMap.get("entryMap").getValue(data2), Jie.mapOf("8", "8", "9", "9"));
+        Assert.assertEquals(propertyMap.get("entryMap").getValue(data2), Jie.newMap("8", "8", "9", "9"));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ProtobufTest {
         dataDto.setTextList(Arrays.asList("11", "22", "33"));
         dataDto.setNum(777);
         dataDto.setBytes("123".getBytes());
-        dataDto.setEntryMap(Jie.mapOf("88", "99"));
+        dataDto.setEntryMap(Jie.newMap("88", "99"));
         dataDto.setFixed32(132);
         dataDto.setFixed64(164);
         dataDto.setSfixed32(232);

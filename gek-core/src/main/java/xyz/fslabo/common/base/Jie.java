@@ -1,11 +1,12 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.collect.CollBuilder;
 import xyz.fslabo.common.collect.JieArray;
 import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.mapper.BeanMapper;
 import xyz.fslabo.common.mapper.Mapper;
+import xyz.fslabo.common.mapper.MappingOptions;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.io.IOException;
@@ -355,16 +356,18 @@ public class Jie {
         JieCheck.checkArgument(enumClass.isEnum(), "Not an enum class.");
         if (!ignoreCase) {
             try {
-                return Enum.valueOf((Class<T>) enumClass, name);
+                return Enum.valueOf(as(enumClass), name);
             } catch (IllegalArgumentException e) {
                 return null;
             }
         }
         Object[] enums = enumClass.getEnumConstants();
-        JieCheck.checkArgument(enums != null, "Not an enum class.");
+        if (JieArray.isEmpty(enums)) {
+            return null;
+        }
         for (Object anEnum : enums) {
             if (name.equalsIgnoreCase(anEnum.toString())) {
-                return (T) anEnum;
+                return as(anEnum);
             }
         }
         return null;
@@ -383,11 +386,10 @@ public class Jie {
         JieCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
         JieCheck.checkArgument(index >= 0, "index must >= 0.");
         Object[] enums = enumClass.getEnumConstants();
-        JieCheck.checkArgument(enums != null, enumClass + " is not an enum.");
-        if (index >= enums.length) {
+        if (JieArray.isEmpty(enums) || index >= enums.length) {
             return null;
         }
-        return (T) enums[index];
+        return as(enums[index]);
     }
 
     /**
@@ -411,6 +413,9 @@ public class Jie {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         try {
             Enumeration<URL> urls = classLoader.getResources(JieString.removeStart(resPath, "/"));
+            if (!urls.hasMoreElements()) {
+                return Collections.emptySet();
+            }
             Set<URL> result = new LinkedHashSet<>();
             while (urls.hasMoreElements()) {
                 result.add(urls.nextElement());
@@ -422,261 +427,107 @@ public class Jie {
     }
 
     /**
-     * Converts source object from source type to target type,
-     * return null if conversion is unsupported or the result itself is null.
+     * Maps source object from source type to target type, return null if mapping is unsupported or the result itself is
+     * null. This method is equivalent to:
+     * <pre>
+     *     return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
+     * </pre>
+     * Using {@link Mapper} for more mapping operations.
      *
      * @param source     source object
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see Mapper#convert(Object, Class)
+     * @see Mapper#defaultMapper()
+     * @see Mapper#map(Object, Class, MappingOptions)
      */
     @Nullable
-    public static <T> T convert(@Nullable Object source, Class<T> targetType) {
-        return Mapper.defaultMapper().map(source, targetType);
+    public static <T> T map(@Nullable Object source, Class<T> targetType) {
+        return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
     }
 
     /**
-     * Converts source object from source type to target type,
-     * return null if conversion is unsupported or the result itself is null.
+     * Maps source object from source type to target type, return null if mapping is unsupported or the result itself is
+     * null. This method is equivalent to:
+     * <pre>
+     *     return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
+     * </pre>
+     * Using {@link Mapper} for more mapping operations.
      *
      * @param source     source object
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see Mapper#convert(Object, TypeRef)
+     * @see Mapper#defaultMapper()
+     * @see Mapper#map(Object, Type, MappingOptions)
      */
     @Nullable
-    public static <T> T convert(@Nullable Object source, TypeRef<T> targetType) {
-        return Mapper.defaultMapper().map(source, targetType);
+    public static <T> T map(@Nullable Object source, Type targetType) {
+        return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
     }
 
     /**
-     * Converts source object from source type to target type,
-     * return null if conversion is unsupported or the result itself is null.
+     * Maps source object from source type to target type, return null if mapping is unsupported or the result itself is
+     * null. This method is equivalent to:
+     * <pre>
+     *     return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
+     * </pre>
+     * Using {@link Mapper} for more mapping operations.
      *
      * @param source     source object
      * @param targetType target type
      * @param <T>        target type
      * @return converted object or null
-     * @see Mapper#convert(Object, Type)
+     * @see Mapper#defaultMapper()
+     * @see Mapper#map(Object, TypeRef, MappingOptions)
      */
     @Nullable
-    public static <T> T convert(@Nullable Object source, Type targetType) {
-        return Mapper.defaultMapper().map(source, targetType);
+    public static <T> T map(@Nullable Object source, TypeRef<T> targetType) {
+        return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
     }
 
     /**
-     * Converts source object from source type to target type.
-     * The result of this method in 3 types: {@code null}, {@link GekObject} and others:
-     * <ul>
-     *     <li>
-     *         {@code null}: means this converter can not do this conversion;
-     *     </li>
-     *     <li>
-     *         {@link GekObject}: wrapped object (from {@link GekObject#getValue()}) is actual result of conversion,
-     *         including {@code null} and {@link GekObject} itself;
-     *     </li>
-     *     <li>
-     *         Others: any other type of returned object is the actual result of conversion.
-     *     </li>
-     * </ul>
-     * Using {@link Mapper#resolveResult(Object)} can get actual result object from wrapper.
-     *
-     * @param source     source object
-     * @param sourceType source type
-     * @param targetType target type
-     * @return converted object or null
-     * @see Mapper#convertType(Object, Type, Type)
-     */
-    @Nullable
-    public static Object convertType(@Nullable Object source, Type sourceType, Type targetType) {
-        return Mapper.defaultMapper().convertType(source, sourceType, targetType);
-    }
-
-    /**
-     * Resolves given object to {@link BeanInfo}.
-     * If the object is an instance of {@link Map}, call {@link BeanInfo#wrap(Map)},
-     * otherwise call {@link BeanInfo#get(Type)}.
-     *
-     * @param obj given object
-     * @return {@link BeanInfo} of given object
-     */
-    public static BeanInfo toBean(Object obj) {
-        if (obj instanceof Map) {
-            return BeanInfo.wrap(Jie.as(obj));
-        }
-        return BeanInfo.get(obj.getClass());
-    }
-
-    /**
-     * Copies properties from source object to dest object by {@link GekBeanCopier#defaultCopier()}.
+     * Copies properties from source object to dest object, return the dest object. This method is equivalent to:
+     * <pre>
+     *     BeanMapper.defaultMapper().copyProperties(source, dest, MappingOptions.defaultOptions());
+     *     return dest;
+     * </pre>
+     * Using {@link BeanMapper} for more mapping operations.
      *
      * @param source source object
      * @param dest   dest object
      * @param <T>    dest type
      * @return dest object
-     * @see GekBeanCopier
+     * @see BeanMapper#defaultMapper()
+     * @see BeanMapper#copyProperties(Object, Object, MappingOptions)
      */
     public static <T> T copyProperties(Object source, T dest) {
-        return GekBeanCopier.defaultCopier().copyProperties(source, dest);
+        BeanMapper.defaultMapper().copyProperties(source, dest, MappingOptions.defaultOptions());
+        return dest;
     }
 
     /**
-     * Copies properties from source object to dest object by {@link GekBeanCopier}.
-     * The properties with null value will not be copied if {@code copyNull} is true.
-     * Otherwise, the null will not be copied.
-     *
-     * @param source   source object
-     * @param dest     dest object
-     * @param copyNull whether copy null properties
-     * @param <T>      dest type
-     * @return dest object
-     * @see GekBeanCopier
-     */
-    public static <T> T copyProperties(Object source, T dest, boolean copyNull) {
-        if (copyNull) {
-            return GekBeanCopier.defaultCopier().copyProperties(source, dest);
-        }
-        return GekBeanCopier.defaultCopier().toBuilder()
-            .sourcePropertyFilter((name, value) -> value != null)
-            .build()
-            .copyProperties(source, dest);
-
-    }
-
-    /**
-     * Copies properties from source object to dest object by {@link GekBeanCopier#defaultCopier()}.
-     * The properties that are specified to ignore will not be copied.
+     * Copies properties from source object to dest object (specified ignored properties will be excluded), return the
+     * dest object. This method is equivalent to:
+     * <pre>
+     *     BeanMapper.defaultMapper().copyProperties(source, dest,
+     *         MappingOptions.builder().ignored(JieArray.asList(ignoredProperties)).build());
+     *     return dest;
+     * </pre>
+     * Using {@link BeanMapper} for more mapping operations.
      *
      * @param source            source object
      * @param dest              dest object
-     * @param ignoredProperties property names that are specified to ignore
+     * @param ignoredProperties ignored properties
      * @param <T>               dest type
      * @return dest object
-     * @see GekBeanCopier
+     * @see BeanMapper#defaultMapper()
+     * @see BeanMapper#copyProperties(Object, Object, MappingOptions)
      */
-    public static <T> T copyProperties(Object source, T dest, String... ignoredProperties) {
-        if (JieArray.isEmpty(ignoredProperties)) {
-            return GekBeanCopier.defaultCopier().copyProperties(source, dest);
-        }
-        return GekBeanCopier.defaultCopier().toBuilder()
-            .propertyNameMapper(name -> JieArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build()
-            .copyProperties(source, dest);
-    }
-
-    /**
-     * Copies properties from source object to dest object by {@link GekBeanCopier#defaultCopier()}.
-     * The properties with null value will not be copied if {@code copyNull} is true,
-     * and the properties that are specified to ignore will not be copied.
-     *
-     * @param source            source object
-     * @param dest              dest object
-     * @param copyNull          whether copy null properties
-     * @param ignoredProperties property names that are specified to ignore
-     * @param <T>               dest type
-     * @return dest object
-     * @see GekBeanCopier
-     */
-    public static <T> T copyProperties(Object source, T dest, boolean copyNull, String... ignoredProperties) {
-        if (copyNull && JieArray.isEmpty(ignoredProperties)) {
-            return GekBeanCopier.defaultCopier().copyProperties(source, dest);
-        }
-        return GekBeanCopier.defaultCopier().toBuilder()
-            .sourcePropertyFilter((name, value) -> value != null)
-            .propertyNameMapper(name -> JieArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build()
-            .copyProperties(source, dest);
-    }
-
-    /**
-     * Copies properties from source object to dest object with specified types by {@link GekBeanCopier#defaultCopier()}.
-     *
-     * @param source     source object
-     * @param sourceType specified type of source object
-     * @param dest       dest object
-     * @param destType   specified type of dest type
-     * @param <T>        dest type
-     * @return dest object
-     * @see GekBeanCopier
-     */
-    public static <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) {
-        return GekBeanCopier.defaultCopier().copyProperties(source, sourceType, dest, destType);
-    }
-
-    /**
-     * Copies properties from source object to dest object with specified types by {@link GekBeanCopier}.
-     * The properties with null value will not be copied if {@code copyNull} is true.
-     *
-     * @param source     source object
-     * @param sourceType specified type of source object
-     * @param dest       dest object
-     * @param destType   specified type of dest type
-     * @param copyNull   whether copy null properties
-     * @param <T>        dest type
-     * @return dest object
-     * @see GekBeanCopier
-     */
-    public static <T> T copyProperties(Object source, Type sourceType, T dest, Type destType, boolean copyNull) {
-        if (copyNull) {
-            return GekBeanCopier.defaultCopier().copyProperties(source, dest);
-        }
-        return GekBeanCopier.defaultCopier().toBuilder()
-            .sourcePropertyFilter((name, value) -> value != null)
-            .build()
-            .copyProperties(source, sourceType, dest, destType);
-    }
-
-    /**
-     * Copies properties from source object to dest object with specified types by {@link GekBeanCopier#defaultCopier()}.
-     * The properties that are specified to ignore will not be copied.
-     *
-     * @param source            source object
-     * @param sourceType        specified type of source object
-     * @param dest              dest object
-     * @param destType          specified type of dest type
-     * @param ignoredProperties property names that are specified to ignore
-     * @param <T>               dest type
-     * @return dest object
-     * @see GekBeanCopier
-     */
-    public static <T> T copyProperties(
-        Object source, Type sourceType, T dest, Type destType, String... ignoredProperties) {
-        if (JieArray.isEmpty(ignoredProperties)) {
-            return GekBeanCopier.defaultCopier().copyProperties(source, dest);
-        }
-        return GekBeanCopier.defaultCopier().toBuilder()
-            .propertyNameMapper(name -> JieArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build()
-            .copyProperties(source, sourceType, dest, destType);
-    }
-
-    /**
-     * Copies properties from source object to dest object with specified types by {@link GekBeanCopier#defaultCopier()}.
-     * The properties with null value will not be copied if {@code copyNull} is true,
-     * and the properties that are specified to ignore will not be copied.
-     *
-     * @param source            source object
-     * @param sourceType        specified type of source object
-     * @param dest              dest object
-     * @param destType          specified type of dest type
-     * @param copyNull          whether copy null properties
-     * @param ignoredProperties property names that are specified to ignore
-     * @param <T>               dest type
-     * @return dest object
-     * @see GekBeanCopier
-     */
-    public static <T> T copyProperties(
-        Object source, Type sourceType, T dest, Type destType, boolean copyNull, String... ignoredProperties) {
-        if (copyNull && JieArray.isEmpty(ignoredProperties)) {
-            return GekBeanCopier.defaultCopier().copyProperties(source, dest);
-        }
-        return GekBeanCopier.defaultCopier().toBuilder()
-            .sourcePropertyFilter((name, value) -> value != null)
-            .propertyNameMapper(name -> JieArray.indexOf(ignoredProperties, name) >= 0 ? null : name)
-            .build()
-            .copyProperties(source, sourceType, dest, destType);
+    public static <T> T copyProperties(Object source, T dest, Object... ignoredProperties) {
+        BeanMapper.defaultMapper().copyProperties(source, dest,
+            MappingOptions.builder().ignored(JieArray.asList(ignoredProperties)).build());
+        return dest;
     }
 
     /**
@@ -781,7 +632,7 @@ public class Jie {
     /**
      * Returns given elements itself as array.
      * <p>
-     * This method directly invoke {@link JieArray#asArray(Object[])}.
+     * This method directly invokes {@link JieArray#asArray(Object[])}.
      *
      * @param elements given elements
      * @param <T>      component type
@@ -793,93 +644,86 @@ public class Jie {
     }
 
     /**
-     * Returns given elements as immutable list, any change for the elements will reflect to the list.
+     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
+     * modification will reflect each other.
      * <p>
-     * This method directly invoke {@link JieColl#asList(Object[])}.
+     * This method directly invokes {@link JieArray#asList(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
-     * @return given elements as immutable list
-     * @see JieColl#asList(Object[])
+     * @return a mutable and size-fixed list
+     * @see JieArray#asList(Object[])
      */
     @SafeVarargs
     public static <T> List<T> asList(T... elements) {
-        return JieColl.asList(elements);
+        return JieArray.asList(elements);
     }
 
     /**
-     * Returns given elements as immutable set, any change for the elements will reflect to the set.
+     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
+     * will reflect returned list.
      * <p>
-     * This method directly invoke {@link JieColl#asSet(Object[])}.
+     * This method directly invokes {@link JieArray#listOf(Object[])}.
      *
      * @param elements given elements
      * @param <T>      type of element
-     * @return given elements as immutable set
-     * @see JieColl#asSet(Object[])
-     */
-    @SafeVarargs
-    public static <T> Set<T> asSet(T... elements) {
-        return JieColl.asSet(elements);
-    }
-
-    /**
-     * Returns an immutable list contains given elements.
-     * <p>
-     * This method directly invoke {@link JieColl#toList(Object[])}.
-     *
-     * @param elements given elements
-     * @param <T>      type of element
-     * @return an immutable list contains given elements
-     * @see JieColl#toList(Object[])
+     * @return an immutable list
+     * @see JieArray#listOf(Object[])
      */
     @SafeVarargs
     public static <T> List<T> listOf(T... elements) {
-        return JieColl.toList(elements);
+        return JieArray.listOf(elements);
     }
 
     /**
-     * Returns an immutable set contains given elements.
-     * <p>
-     * This method directly invoke {@link JieColl#toSet(Object[])}.
+     * Returns a new {@link ArrayList} and add all given elements.
      *
      * @param elements given elements
      * @param <T>      type of element
-     * @return an immutable set contains given elements
-     * @see JieColl#toSet(Object[])
+     * @return a new {@link ArrayList} and add all given elements
      */
     @SafeVarargs
-    public static <T> Set<T> setOf(T... elements) {
-        return JieColl.toSet(elements);
+    public static <T> ArrayList<T> newList(T... elements) {
+        return JieColl.addAll(new ArrayList<>(elements.length), elements);
     }
 
     /**
-     * Returns an immutable map contains given elements.
+     * Returns a new {@link LinkedHashSet} and add all given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return a new {@link LinkedHashSet} and add all given elements
+     */
+    @SafeVarargs
+    public static <T> LinkedHashSet<T> newSet(T... elements) {
+        return JieColl.addAll(new LinkedHashSet<>(elements.length), elements);
+    }
+
+    /**
+     * Returns a new {@link LinkedHashMap} and add all given elements.
+     * <p>
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
      * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
-     * <p>
-     * This method directly invoke {@link JieColl#toMap(Object...)}.
      *
      * @param elements given elements
      * @param <K>      type of keys
      * @param <V>      type of values
      * @param <T>      type of element
-     * @return an immutable map contains given elements
+     * @return a new {@link LinkedHashMap} and add all given elements
      * @see JieColl#toMap(Object...)
      */
     @SafeVarargs
-    public static <K, V, T> Map<K, V> mapOf(T... elements) {
-        return JieColl.toMap(elements);
+    public static <K, V, T> LinkedHashMap<K, V> newMap(T... elements) {
+        return JieColl.addAll(new LinkedHashMap<>(), elements);
     }
 
     /**
-     * Returns a new collection configurer to create a collection.
-     * <p>
-     * This method directly invoke {@link JieColl#collector()}.
+     * Returns a new collection builder.
      *
-     * @return a new collection configurer to create a collection
-     * @see JieColl#collector()
+     * @return a new collection builder
+     * @see CollBuilder#newBuilder()
      */
-    public static CollBuilder collector() {
-        return JieColl.collector();
+    public static CollBuilder collBuilder() {
+        return CollBuilder.newBuilder();
     }
 }

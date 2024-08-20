@@ -19,15 +19,15 @@ public class CollTest {
         Assert.assertEquals(Jie.asSet(1, 2, 2).size(), new HashSet<>(Arrays.asList(1, 2)).size());
         Map<Integer, Integer> map = new LinkedHashMap<>();
         map.put(1, 2);
-        Assert.assertEquals(Jie.mapOf(1, 2, 3), map);
+        Assert.assertEquals(Jie.newMap(1, 2, 3), map);
         map.put(3, 4);
-        Assert.assertEquals(Jie.mapOf(1, 2, 3, 4), map);
+        Assert.assertEquals(Jie.newMap(1, 2, 3, 4), map);
         Assert.expectThrows(UnsupportedOperationException.class, () -> Jie.asList(1, 2, 3).set(0, 5));
     }
 
     @Test
     public void testCollector() {
-        CollBuilder collector = Jie.collector();
+        CollBuilder collector = Jie.collBuilder();
         Assert.assertEquals(
             collector.reset().initialElements(1, 2, 3).toList(),
             Arrays.asList(1, 2, 3)
@@ -121,19 +121,19 @@ public class CollTest {
         );
         Assert.assertEquals(
             collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(i, i)).initialSize(4).toMap(),
-            Jie.mapOf(0, 0, 1, 1, 2, 2, 3, 3)
+            Jie.newMap(0, 0, 1, 1, 2, 2, 3, 3)
         );
         Assert.assertEquals(
             collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(i, i)).initialSize(4).immutable().toMap(),
-            Jie.mapOf(0, 0, 1, 1, 2, 2, 3, 3)
+            Jie.newMap(0, 0, 1, 1, 2, 2, 3, 3)
         );
         Assert.assertEquals(
             collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(1, i)).initialSize(4).toMap(),
-            Jie.mapOf(1, 3)
+            Jie.newMap(1, 3)
         );
         Assert.assertEquals(
             collector.reset().initialFunction(i -> new AbstractMap.SimpleImmutableEntry<>(1, i)).initialSize(4).immutable().toMap(),
-            Jie.mapOf(1, 3)
+            Jie.newMap(1, 3)
         );
         map.remove(3);
         Assert.assertEquals(collector.reset().initialElements(1, 2, 3).toMap(), map);
@@ -166,7 +166,7 @@ public class CollTest {
         Assert.assertEquals(JieColl.get(set, 8, 9), 9);
         Assert.assertEquals(JieColl.compute(set, 1, i -> i * 2), 1);
         Assert.assertEquals(JieColl.compute(set, 8, i -> i * 2), 16);
-        Map<Integer, Integer> map = Jie.mapOf(1, 2, 3, 4);
+        Map<Integer, Integer> map = Jie.newMap(1, 2, 3, 4);
         Assert.assertEquals(JieColl.get(map, 1), 2);
         Assert.assertEquals(JieColl.get(map, 1, 9), 2);
         Assert.assertEquals(JieColl.get(map, 8, 9), 9);
@@ -178,39 +178,39 @@ public class CollTest {
     public void testCollect() {
         Assert.assertEquals(
             JieColl.toMap(Jie.asList(1, 2, 3, 4)),
-            Jie.mapOf(1, 2, 3, 4)
+            Jie.newMap(1, 2, 3, 4)
         );
         Assert.assertEquals(
             JieColl.toMap(Jie.asList(1, 2, 3, 4), String::valueOf, String::valueOf),
-            Jie.mapOf("1", "1", "2", "2", "3", "3", "4", "4")
+            Jie.newMap("1", "1", "2", "2", "3", "3", "4", "4")
         );
         Assert.assertEquals(
-            JieColl.toMap(Jie.mapOf(1, 2, 3, 4), String::valueOf, String::valueOf),
-            Jie.mapOf("1", "2", "3", "4")
+            JieColl.toMap(Jie.newMap(1, 2, 3, 4), String::valueOf, String::valueOf),
+            Jie.newMap("1", "2", "3", "4")
         );
         Assert.assertEquals(
             JieColl.addAll(new LinkedHashMap<>(), 1, 2, 3),
-            Jie.mapOf(1, 2, 3)
+            Jie.newMap(1, 2, 3)
         );
         Assert.assertEquals(
             JieColl.addAll(new LinkedHashMap<>(), 1, 2, 3, 4),
-            Jie.mapOf(1, 2, 3, 4)
+            Jie.newMap(1, 2, 3, 4)
         );
         Assert.assertEquals(
             JieColl.addAll(new LinkedHashMap<>(), Jie.asList(1, 2, 3)),
-            Jie.mapOf(1, 2, 3)
+            Jie.newMap(1, 2, 3)
         );
         Assert.assertEquals(
             JieColl.addAll(new LinkedHashMap<>(), Jie.asList(1, 2, 3, 4)),
-            Jie.mapOf(1, 2, 3, 4)
+            Jie.newMap(1, 2, 3, 4)
         );
         Assert.assertEquals(
             JieColl.addAll(new LinkedHashMap<>(), Jie.asList(1, 2, 3, 4), String::valueOf),
-            Jie.mapOf("1", "2", "3", "4")
+            Jie.newMap("1", "2", "3", "4")
         );
         Assert.assertEquals(
-            JieColl.addAll(new LinkedHashMap<>(), Jie.mapOf(1, 2, 3, 4), String::valueOf, String::valueOf),
-            Jie.mapOf("1", "2", "3", "4")
+            JieColl.addAll(new LinkedHashMap<>(), Jie.newMap(1, 2, 3, 4), String::valueOf, String::valueOf),
+            Jie.newMap("1", "2", "3", "4")
         );
         Assert.assertEquals(
             JieColl.toList(Jie.asList(1, 2, 3, 4)),

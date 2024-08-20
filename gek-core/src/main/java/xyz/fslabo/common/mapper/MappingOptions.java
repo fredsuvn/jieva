@@ -25,6 +25,17 @@ import java.util.function.Function;
 @Getter
 public class MappingOptions {
 
+    private static final MappingOptions DEFAULT_OPTIONS = MappingOptions.builder().build();
+
+    /**
+     * Returns default options.
+     *
+     * @return default options
+     */
+    public static MappingOptions defaultOptions() {
+        return DEFAULT_OPTIONS;
+    }
+
     /**
      * Copy level: {@code ASSIGNABLE}.
      * <p>
