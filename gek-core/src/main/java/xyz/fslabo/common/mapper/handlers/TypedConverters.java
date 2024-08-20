@@ -171,7 +171,7 @@ public class TypedConverters {
      *         For {@link ByteBuffer}, this converter use {@link JieIO#readReset(ByteBuffer)} to read and reset;
      *     </li>
      *     <li>
-     *         If charset option is not found, use {@link JieChars#UTF_8};
+     *         If charset option is not found, use {@link JieChars#defaultCharset()};
      *     </li>
      * </ul>
      */
@@ -206,7 +206,7 @@ public class TypedConverters {
                 if (charset != null) {
                     return new String((byte[]) source, charset);
                 }
-                return new String((byte[]) source, JieChars.UTF_8);
+                return new String((byte[]) source, JieChars.defaultCharset());
             }
             if (source instanceof ByteBuffer) {
                 Charset charset = options.getCharset(targetProperty);
@@ -214,7 +214,7 @@ public class TypedConverters {
                 if (charset != null) {
                     return new String(bytes, charset);
                 }
-                return new String(bytes, JieChars.UTF_8);
+                return new String(bytes, JieChars.defaultCharset());
             }
             if (source instanceof char[]) {
                 return new String((char[]) source);
@@ -236,7 +236,7 @@ public class TypedConverters {
      *         reset for {@link InputStream};
      *     </li>
      *     <li>
-     *         If charset option is not found, use {@link JieChars#UTF_8};
+     *         If charset option is not found, use {@link JieChars#defaultCharset()};
      *     </li>
      * </ul>
      */
@@ -250,7 +250,7 @@ public class TypedConverters {
                 if (charset != null) {
                     return source.toString().getBytes(charset);
                 }
-                return source.toString().getBytes(JieChars.UTF_8);
+                return source.toString().getBytes(JieChars.defaultCharset());
             }
             if (source instanceof byte[]) {
                 return ((byte[]) source).clone();

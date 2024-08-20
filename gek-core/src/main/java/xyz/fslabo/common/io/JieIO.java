@@ -1,7 +1,6 @@
 package xyz.fslabo.common.io;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekBytes;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieCheck;
 
@@ -26,8 +25,6 @@ public class JieIO {
      * Default IO buffer size: 1024 * 8 = 8192.
      */
     public static final int IO_BUFFER_SIZE = 1024 * 8;
-
-    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(GekBytes.emptyBytes());
 
     // Common IO methods:
 
@@ -840,15 +837,6 @@ public class JieIO {
     }
 
     // Buffer methods:
-
-    /**
-     * Returns an empty byte buffer.
-     *
-     * @return an empty byte buffer
-     */
-    public static ByteBuffer emptyBuffer() {
-        return EMPTY_BUFFER;
-    }
 
     /**
      * Reads all bytes from source buffer into an array.

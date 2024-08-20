@@ -60,15 +60,15 @@ public class JieTest {
 
     @Test
     public void testSystem() {
-        GekLog.getInstance().info(GekSystem.getJavaVersion());
-        GekLog.getInstance().info(GekSystem.javaMajorVersion());
+        GekLog.getInstance().info(JieSystem.getJavaVersion());
+        GekLog.getInstance().info(JieSystem.javaMajorVersion());
         GekLog.getInstance().info(JieChars.nativeCharset());
-        GekLog.getInstance().info(GekSystem.getOsName());
-        GekLog.getInstance().info(GekSystem.isWindows());
-        GekLog.getInstance().info(GekSystem.isLinux());
-        GekLog.getInstance().info(GekSystem.isBsd());
-        GekLog.getInstance().info(GekSystem.isMac());
-        GekLog.getInstance().info(GekSystem.isJdk9OrHigher());
+        GekLog.getInstance().info(JieSystem.getOsName());
+        GekLog.getInstance().info(JieSystem.isWindows());
+        GekLog.getInstance().info(JieSystem.isLinux());
+        GekLog.getInstance().info(JieSystem.isBsd());
+        GekLog.getInstance().info(JieSystem.isMac());
+        GekLog.getInstance().info(JieSystem.isJdk9OrHigher());
     }
 
     @Test

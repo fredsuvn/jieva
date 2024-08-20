@@ -1,22 +1,20 @@
-package xyz.fslabo.common.base;
-
-import xyz.fslabo.common.io.JieIO;
+package xyz.fslabo.common.io;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
 /**
- * Builder for building bytes, extension of {@link ByteArrayOutputStream}.
- * Just like {@link StringBuilder} but it is used for byte-string.
+ * Builder for building bytes, extension of {@link ByteArrayOutputStream}. Just like {@link StringBuilder} but it is
+ * used for bytes.
  *
  * @author fredsuvn
  */
-public class GekBytesBuilder extends ByteArrayOutputStream {
+public class BytesBuilder extends ByteArrayOutputStream {
 
     /**
      * Constructs with default settings.
      */
-    public GekBytesBuilder() {
+    public BytesBuilder() {
         super();
     }
 
@@ -25,7 +23,7 @@ public class GekBytesBuilder extends ByteArrayOutputStream {
      *
      * @param size specified initialized size
      */
-    public GekBytesBuilder(int size) {
+    public BytesBuilder(int size) {
         super(size);
     }
 
@@ -35,7 +33,7 @@ public class GekBytesBuilder extends ByteArrayOutputStream {
      * @param b a byte
      * @return this builder
      */
-    public GekBytesBuilder append(byte b) {
+    public BytesBuilder append(byte b) {
         write(b);
         return this;
     }
@@ -46,7 +44,7 @@ public class GekBytesBuilder extends ByteArrayOutputStream {
      * @param bytes given bytes
      * @return this builder
      */
-    public GekBytesBuilder append(byte[] bytes) {
+    public BytesBuilder append(byte[] bytes) {
         write(bytes, 0, bytes.length);
         return this;
     }
@@ -59,7 +57,7 @@ public class GekBytesBuilder extends ByteArrayOutputStream {
      * @param length specified length
      * @return this builder
      */
-    public GekBytesBuilder append(byte[] bytes, int offset, int length) {
+    public BytesBuilder append(byte[] bytes, int offset, int length) {
         write(bytes, offset, length);
         return this;
     }
@@ -70,7 +68,7 @@ public class GekBytesBuilder extends ByteArrayOutputStream {
      * @param bytes given byte buffer
      * @return this builder
      */
-    public GekBytesBuilder append(ByteBuffer bytes) {
+    public BytesBuilder append(ByteBuffer bytes) {
         if (!bytes.hasRemaining()) {
             return this;
         }

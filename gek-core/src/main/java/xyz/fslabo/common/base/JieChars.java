@@ -81,7 +81,7 @@ public class JieChars {
      */
     @Nullable
     private static Charset nativeCharset0() {
-        String encoding = GekSystem.getNativeEncoding();
+        String encoding = JieSystem.getNativeEncoding();
         if (encoding != null) {
             try {
                 return Charset.forName(encoding);
@@ -97,7 +97,7 @@ public class JieChars {
                 //do nothing
             }
         }
-        encoding = GekSystem.getFileEncoding();
+        encoding = JieSystem.getFileEncoding();
         if (encoding != null) {
             try {
                 return Charset.forName(encoding);

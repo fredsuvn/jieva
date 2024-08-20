@@ -13,10 +13,10 @@ public class ProcessTest {
 
     @Test
     public void testEcho() throws InterruptedException {
-        if (GekSystem.isLinux() || GekSystem.isMac() || GekSystem.isBsd()) {
+        if (JieSystem.isLinux() || JieSystem.isMac() || JieSystem.isBsd()) {
             testEcho("echo " + ECHO_CONTENT);
         }
-        if (GekSystem.isWindows()) {
+        if (JieSystem.isWindows()) {
             testEcho("cmd.exe /c echo " + ECHO_CONTENT);
         }
     }

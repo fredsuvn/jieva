@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @author fredsuvn
  */
-public class GekSystem {
+public class JieSystem {
 
     /**
      * Key of system property: java.version.

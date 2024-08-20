@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.GekBytesBuilder;
+import xyz.fslabo.common.io.BytesBuilder;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.io.JieIO;
 
@@ -55,7 +55,7 @@ public class BufferTest {
 
     @Test
     public void testBytesBuilder() {
-        GekBytesBuilder builder = new GekBytesBuilder();
+        BytesBuilder builder = new BytesBuilder();
         builder.append((byte) 'a');
         builder.append(JieString.encode("123456789"));
         builder.append(JieString.encode("123456789"), 2, 5);

@@ -133,7 +133,7 @@ public class MappingOptions {
 
     /**
      * Charset option to determine which charset to use for character conversion. If it is {@code null}, the mapper
-     * should use {@link JieChars#UTF_8}.
+     * should use {@link JieChars#defaultCharset()}.
      * <p>
      * Default is {@code null}.
      */
@@ -228,9 +228,9 @@ public class MappingOptions {
         if (targetProperty != null) {
             Function<PropertyInfo, Charset> func = getPropertyCharset();
             if (func != null) {
-                return Jie.orDefault(func.apply(targetProperty), JieChars.UTF_8);
+                return Jie.orDefault(func.apply(targetProperty), JieChars.defaultCharset());
             }
         }
-        return Jie.orDefault(getCharset(), JieChars.UTF_8);
+        return Jie.orDefault(getCharset(), JieChars.defaultCharset());
     }
 }
