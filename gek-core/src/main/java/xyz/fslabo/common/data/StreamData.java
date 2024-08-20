@@ -1,6 +1,6 @@
 package xyz.fslabo.common.data;
 
-import xyz.fslabo.common.base.GekCheck;
+import xyz.fslabo.common.base.JieCheck;
 import xyz.fslabo.common.io.JieIO;
 
 import java.io.InputStream;
@@ -52,7 +52,7 @@ final class StreamData implements GekData.OfStream {
 
     @Override
     public int write(byte[] dest, int offset, int length) {
-        GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+        JieCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
         byte[] buffer = JieIO.read(stream, length);
         if (buffer == null) {
             return -1;

@@ -1,6 +1,6 @@
 package xyz.fslabo.common.data;
 
-import xyz.fslabo.common.base.GekCheck;
+import xyz.fslabo.common.base.JieCheck;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -68,7 +68,7 @@ final class ArrayData implements GekData.OfArray {
 
     @Override
     public int write(byte[] dest, int offset, int length) {
-        GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+        JieCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
         if (arrayLength == 0) {
             return -1;
         }

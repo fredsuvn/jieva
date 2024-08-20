@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
  *
  * @author fredsuvn
  */
-public class GekCheck {
+public class JieCheck {
 
     /**
      * Checks whether given object is null, if it is, throw a {@link NullPointerException}.

@@ -1,6 +1,6 @@
 package xyz.fslabo.common.io;
 
-import xyz.fslabo.common.base.GekCheck;
+import xyz.fslabo.common.base.JieCheck;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,7 +20,7 @@ final class ByteArrayAsOutputStream extends OutputStream {
     @Override
     public synchronized void write(byte[] b, int off, int len) throws IOException {
         try {
-            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            JieCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (end - pos < len) {
                 throw new IOException("Backed byte array has been full.");
             }

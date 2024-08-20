@@ -1,6 +1,6 @@
 package xyz.fslabo.common.io;
 
-import xyz.fslabo.common.base.GekCheck;
+import xyz.fslabo.common.base.JieCheck;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,7 +16,7 @@ final class RandomOutputStream extends OutputStream {
     RandomOutputStream(RandomAccessFile random, long offset, long length) {
         try {
             if (length != -1) {
-                GekCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
+                JieCheck.checkArgument(offset >= 0 && length >= 0, "offset and length must >= 0.");
                 this.limit = offset + length;
             } else {
                 this.limit = length;
@@ -32,12 +32,12 @@ final class RandomOutputStream extends OutputStream {
     @Override
     public synchronized void write(byte[] b, int off, int len) throws IOException {
         try {
-            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            JieCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (len == 0) {
                 return;
             }
             if (limit != -1) {
-                GekCheck.checkInBounds(pos + len - 1, pos, limit);
+                JieCheck.checkInBounds(pos + len - 1, pos, limit);
             }
             FileLock lock = random.getChannel().tryLock(pos, len, false);
             if (lock == null || !lock.isValid()) {
@@ -60,7 +60,7 @@ final class RandomOutputStream extends OutputStream {
     public synchronized void write(int b) throws IOException {
         try {
             if (limit != -1) {
-                GekCheck.checkInBounds(pos, pos, limit);
+                JieCheck.checkInBounds(pos, pos, limit);
             }
             FileLock lock = random.getChannel().tryLock(pos, 1, false);
             if (lock == null || !lock.isValid()) {

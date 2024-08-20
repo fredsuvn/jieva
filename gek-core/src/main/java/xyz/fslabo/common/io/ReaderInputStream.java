@@ -1,7 +1,7 @@
 package xyz.fslabo.common.io;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekCheck;
+import xyz.fslabo.common.base.JieCheck;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +46,7 @@ final class ReaderInputStream extends InputStream {
     @Override
     public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
-            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            JieCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (len == 0) {
                 return 0;
             }

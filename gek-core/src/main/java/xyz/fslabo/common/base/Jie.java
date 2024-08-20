@@ -103,13 +103,20 @@ public class Jie {
     /**
      * Returns hash code follows:
      * <ul>
-     * <li>returns Objects.hashCode for given object if it is not an array;</li>
-     * <li>if given object is primitive array, returns Arrays.hashCode for it;</li>
-     * <li>if given object is Object[], returns Arrays.deepHashCode for it;</li>
-     * <li>else returns Objects.hashCode for given object</li>
+     *     <li>
+     *         returns {@code Objects.hashCode} for given object if it is not an array;
+     *     </li>
+     *     <li>
+     *         if given object is primitive array, returns {@code Arrays.hashCode} for it;
+     *     </li>
+     *     <li>
+     *         if given object is Object[], returns {@code Arrays.deepHashCode} for it;
+     *     </li>
+     *     <li>
+     *         else returns {@code Objects.hashCode} for given object;
+     *     </li>
      * </ul>
-     * <p>
-     * This method is same as: hash(obj, true, true)
+     * This method is equivalent to: {@code hash(obj, true, true)}.
      *
      * @param obj given object
      * @return the hash code
@@ -131,12 +138,21 @@ public class Jie {
     /**
      * Returns hash code follows:
      * <ul>
-     * <li>if given object is primitive array and array-check is true, returns Arrays.hashCode for it;</li>
-     * <li>if given object is Object[] and both array-check and deep-to-string are true,
-     * returns Arrays.deepHashCode for it;</li>
-     * <li>if given object is Object[] and array-check is true and deep-to-string is false,
-     * returns Arrays.hashCode for it;</li>
-     * <li>else returns Objects.hashCode for given object</li>
+     *     <li>
+     *         if given object is primitive array and {@code arrayCheck} is {@code true}, returns
+     *         {@code Arrays.hashCode} for it;
+     *     </li>
+     *     <li>
+     *         if given object is Object[] and both {@code arrayCheck} and {@code deepHash} are {@code true},
+     *         returns {@code Arrays.deepHashCode} for it;
+     *     </li>
+     *     <li>
+     *         if given object is Object[] and {@code arrayCheck} is {@code true} and {@code deepHash} is {@code false},
+     *         returns {@code Arrays.hashCode} for it;
+     *     </li>
+     *     <li>
+     *         else returns {@code Objects.hashCode} for given object;
+     *     </li>
      * </ul>
      *
      * @param obj        given object
@@ -147,10 +163,6 @@ public class Jie {
     public static int hashWith(@Nullable Object obj, boolean arrayCheck, boolean deepHash) {
         if (obj == null || !arrayCheck) {
             return Objects.hashCode(obj);
-        }
-        Class<?> type = obj.getClass();
-        if (!type.isArray()) {
-            return obj.hashCode();
         }
         if (obj instanceof Object[]) {
             return deepHash ? Arrays.deepHashCode((Object[]) obj) : Arrays.hashCode((Object[]) obj);
@@ -195,13 +207,20 @@ public class Jie {
     /**
      * Returns result of equaling follows:
      * <ul>
-     * <li>returns Objects.equals for given objects if they are not arrays;</li>
-     * <li>if given objects are arrays of which types are same primitive type, returns Arrays.equals for them;</li>
-     * <li>if given objects are object array, returns Arrays.deepEquals for them;</li>
-     * <li>else returns Objects.equals for given objects</li>
+     *     <li>
+     *         returns {@code Objects.equals} for given objects if they are not arrays;
+     *     </li>
+     *     <li>
+     *         if given objects are arrays of which types are same primitive type, returns {@code Arrays.equals} for them;
+     *     </li>
+     *     <li>
+     *         if given objects are object array, returns {@code Arrays.deepEquals} for them;
+     *     </li>
+     *     <li>
+     *         else returns {@code Objects.equals} for given objects;
+     *     </li>
      * </ul>
-     * <p>
-     * This method is same as: equals(a, b, true, true)
+     * This method is same as: {@code equals(a, b, true, true)}.
      *
      * @param a given object a
      * @param b given object b
@@ -212,7 +231,15 @@ public class Jie {
     }
 
     /**
-     * Returns deep-equals for given objects.
+     * Returns whether given objects are equals each other by {@link #equals(Object, Object)}. It is equivalent to:
+     * <pre>
+     *     for (int i = 0; i < objs.length - 2; i++) {
+     *         if (!equals(objs[i], objs[i + 1])) {
+     *             return false;
+     *         }
+     *     }
+     *     return true;
+     * </pre>
      *
      * @param objs given objects
      * @return the result of equaling
@@ -224,7 +251,7 @@ public class Jie {
         if (objs.length == 2) {
             return equals(objs[0], objs[1]);
         }
-        for (int i = 0; i < objs.length - 2; i++) {
+        for (int i = 0; i < objs.length - 1; i++) {
             if (!equals(objs[i], objs[i + 1])) {
                 return false;
             }
@@ -235,13 +262,20 @@ public class Jie {
     /**
      * Returns result of equaling follows:
      * <ul>
-     * <li>if given objects are arrays of which types are same primitive type and array-check is true,
-     * returns Arrays.equals for them;</li>
-     * <li>if given objects are object array and both array-check and deep-equals are true,
-     * returns Arrays.deepEquals for them;</li>
-     * <li>if given objects are object array and array-check is true and deep-equals is false,
-     * returns Arrays.equals for them;</li>
-     * <li>else returns Objects.equals for given objects</li>
+     *     <li>
+     *         if given objects are arrays of which types are same primitive type and {@code arrayCheck} is {@code true},
+     *         returns {@code Arrays.equals} for them;
+     *     </li>
+     *     <li>if given objects are object array and both {@code arrayCheck} and {@code deepEquals} are {@code true},
+     *     returns {@code Arrays.deepEquals} for them;
+     *     </li>
+     *     <li>
+     *         if given objects are object array and {@code arrayCheck} is {@code true} and {@code deepEquals} is
+     *         {@code false}, returns {@code Arrays.equals} for them;
+     *     </li>
+     *     <li>
+     *         else returns {@code Objects.equals} for given objects,
+     *     </li>
      * </ul>
      *
      * @param a          given object a
@@ -263,6 +297,9 @@ public class Jie {
         Class<?> typeA = a.getClass();
         Class<?> typeB = b.getClass();
         if (typeA.isArray() && typeB.isArray()) {
+            if (a instanceof Object[] && b instanceof Object[]) {
+                return deepEquals ? Arrays.deepEquals((Object[]) a, (Object[]) b) : Arrays.equals((Object[]) a, (Object[]) b);
+            }
             if (a instanceof boolean[] && b instanceof boolean[]) {
                 return Arrays.equals((boolean[]) a, (boolean[]) b);
             }
@@ -287,7 +324,6 @@ public class Jie {
             if (a instanceof double[] && b instanceof double[]) {
                 return Arrays.equals((double[]) a, (double[]) b);
             }
-            return deepEquals ? Arrays.deepEquals((Object[]) a, (Object[]) b) : Arrays.equals((Object[]) a, (Object[]) b);
         }
         return Objects.equals(a, b);
     }
@@ -316,7 +352,7 @@ public class Jie {
      */
     @Nullable
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, String name, boolean ignoreCase) {
-        GekCheck.checkArgument(enumClass.isEnum(), "Not an enum class.");
+        JieCheck.checkArgument(enumClass.isEnum(), "Not an enum class.");
         if (!ignoreCase) {
             try {
                 return Enum.valueOf((Class<T>) enumClass, name);
@@ -325,7 +361,7 @@ public class Jie {
             }
         }
         Object[] enums = enumClass.getEnumConstants();
-        GekCheck.checkArgument(enums != null, "Not an enum class.");
+        JieCheck.checkArgument(enums != null, "Not an enum class.");
         for (Object anEnum : enums) {
             if (name.equalsIgnoreCase(anEnum.toString())) {
                 return (T) anEnum;
@@ -344,10 +380,10 @@ public class Jie {
      */
     @Nullable
     public static <T extends Enum<T>> T findEnum(Class<?> enumClass, int index) {
-        GekCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
-        GekCheck.checkArgument(index >= 0, "index must >= 0.");
+        JieCheck.checkArgument(enumClass.isEnum(), enumClass + " is not an enum.");
+        JieCheck.checkArgument(index >= 0, "index must >= 0.");
         Object[] enums = enumClass.getEnumConstants();
-        GekCheck.checkArgument(enums != null, enumClass + " is not an enum.");
+        JieCheck.checkArgument(enums != null, enumClass + " is not an enum.");
         if (index >= enums.length) {
             return null;
         }

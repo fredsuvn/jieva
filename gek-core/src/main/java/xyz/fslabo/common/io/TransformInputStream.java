@@ -1,6 +1,6 @@
 package xyz.fslabo.common.io;
 
-import xyz.fslabo.common.base.GekCheck;
+import xyz.fslabo.common.base.JieCheck;
 import xyz.fslabo.common.collect.JieArray;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class TransformInputStream extends InputStream {
     @Override
     public synchronized int read(byte[] b, int off, int len) throws IOException {
         try {
-            GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
+            JieCheck.checkRangeInBounds(off, off + len, 0, b.length);
             if (end) {
                 return -1;
             }

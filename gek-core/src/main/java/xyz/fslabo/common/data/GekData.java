@@ -1,8 +1,8 @@
 package xyz.fslabo.common.data;
 
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.GekCheck;
 import xyz.fslabo.common.base.JieChars;
+import xyz.fslabo.common.base.JieCheck;
 import xyz.fslabo.common.base.JieString;
 
 import java.io.InputStream;
@@ -49,7 +49,7 @@ public interface GekData extends GekDataOutput {
      * @return the {@link OfArray}
      */
     static GekData.OfArray wrap(byte[] array, int offset, int length) {
-        GekCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
+        JieCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
         return new ArrayData(array, offset, length);
     }
 

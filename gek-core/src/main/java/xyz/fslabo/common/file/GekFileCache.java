@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.base.GekCheck;
+import xyz.fslabo.common.base.JieCheck;
 import xyz.fslabo.common.cache.Cache;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.ref.BooleanVar;
@@ -275,7 +275,7 @@ public interface GekFileCache {
          * @return this builder
          */
         public Builder chunkSize(int chunkSize) {
-            GekCheck.checkArgument(chunkSize > 0, "chunkSize must > 0.");
+            JieCheck.checkArgument(chunkSize > 0, "chunkSize must > 0.");
             this.chunkSize = chunkSize;
             return this;
         }
@@ -287,7 +287,7 @@ public interface GekFileCache {
          * @return this builder
          */
         public Builder bufferSize(int bufferSize) {
-            GekCheck.checkArgument(bufferSize > 0, "bufferSize must > 0.");
+            JieCheck.checkArgument(bufferSize > 0, "bufferSize must > 0.");
             this.bufferSize = bufferSize;
             return this;
         }
@@ -489,7 +489,7 @@ public interface GekFileCache {
 
                 CacheInputStream(Path path, long offset) {
                     try {
-                        GekCheck.checkArgument(offset >= 0, "offset must >= 0.");
+                        JieCheck.checkArgument(offset >= 0, "offset must >= 0.");
                         this.path = path;
                         this.underlying = fileAccessGenerator.generate(path);
                         this.pos = offset;
@@ -501,7 +501,7 @@ public interface GekFileCache {
                 @Override
                 public synchronized int read(byte[] b, int off, int len) throws IOException {
                     try {
-                        GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
+                        JieCheck.checkRangeInBounds(off, off + len, 0, b.length);
                         if (pos == -1) {
                             return -1;
                         }
@@ -633,7 +633,7 @@ public interface GekFileCache {
 
                 CacheOutputStream(Path path, long offset) {
                     try {
-                        GekCheck.checkArgument(offset >= 0, "offset must >= 0.");
+                        JieCheck.checkArgument(offset >= 0, "offset must >= 0.");
                         this.path = path;
                         this.underlying = fileAccessGenerator.generate(path);
                         this.pos = offset;
@@ -645,7 +645,7 @@ public interface GekFileCache {
                 @Override
                 public synchronized void write(byte[] b, int off, int len) throws IOException {
                     try {
-                        GekCheck.checkRangeInBounds(off, off + len, 0, b.length);
+                        JieCheck.checkRangeInBounds(off, off + len, 0, b.length);
                         if (len == 0) {
                             return;
                         }

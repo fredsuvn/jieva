@@ -555,8 +555,8 @@ public class JieString {
         if (isEmpty(chars) || chars.length() < search.length()) {
             return -1;
         }
-        GekCheck.checkArgument(!isEmpty(search), "search string is empty.");
-        GekCheck.checkInBounds(from, 0, chars.length());
+        JieCheck.checkArgument(!isEmpty(search), "search string is empty.");
+        JieCheck.checkInBounds(from, 0, chars.length());
         if (chars.length() - from < search.length()) {
             return -1;
         }
@@ -608,8 +608,8 @@ public class JieString {
         if (isEmpty(chars) || chars.length() < search.length()) {
             return -1;
         }
-        GekCheck.checkArgument(!isEmpty(search), "search string is empty.");
-        GekCheck.checkInBounds(from, 0, chars.length());
+        JieCheck.checkArgument(!isEmpty(search), "search string is empty.");
+        JieCheck.checkInBounds(from, 0, chars.length());
         if (from + 1 < search.length()) {
             return -1;
         }
@@ -759,8 +759,8 @@ public class JieString {
         if (chars instanceof String) {
             ((String) chars).getChars(start, end, dest, offset);
         } else {
-            GekCheck.checkRangeInBounds(start, end, 0, chars.length());
-            GekCheck.checkRangeInBounds(offset, end - start, 0, dest.length);
+            JieCheck.checkRangeInBounds(start, end, 0, chars.length());
+            JieCheck.checkRangeInBounds(offset, end - start, 0, dest.length);
             if (start == end) {
                 return;
             }
@@ -1024,7 +1024,7 @@ public class JieString {
      * @return a {@link CharSequence} of which contents are shared with given char array
      */
     public static CharSequence chars(char[] array, int start, int end) {
-        GekCheck.checkRangeInBounds(start, end, 0, array.length);
+        JieCheck.checkRangeInBounds(start, end, 0, array.length);
         return new Chars(array, start, end);
     }
 
@@ -1069,7 +1069,7 @@ public class JieString {
      * @return sub-range view of given chars
      */
     public static CharSequence subChars(CharSequence chars, int start, int end) {
-        GekCheck.checkRangeInBounds(start, end, 0, chars.length());
+        JieCheck.checkRangeInBounds(start, end, 0, chars.length());
         return new SubChars(chars, start, end);
     }
 

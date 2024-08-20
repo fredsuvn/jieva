@@ -2,8 +2,8 @@ package xyz.fslabo.common.io;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.GekBytes;
-import xyz.fslabo.common.base.GekCheck;
 import xyz.fslabo.common.base.JieChars;
+import xyz.fslabo.common.base.JieCheck;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -157,7 +157,7 @@ public class JieIO {
      */
     public static int readTo(InputStream source, byte[] dest, int offset, int length) throws JieIOException {
         try {
-            GekCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
+            JieCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
             if (length < 0) {
                 throw new IllegalArgumentException("length < 0: " + length + ".");
             }
@@ -776,7 +776,7 @@ public class JieIO {
      * @throws JieIOException IO exception
      */
     public static OutputStream toOutputStream(byte[] array, int offset, int length) throws JieIOException {
-        GekCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
+        JieCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
         return new ByteArrayAsOutputStream(array, offset, length);
     }
 
@@ -1040,7 +1040,7 @@ public class JieIO {
      */
     public static int readTo(ByteBuffer source, byte[] dest, int offset) throws JieIOException {
         try {
-            GekCheck.checkInBounds(offset, 0, dest.length);
+            JieCheck.checkInBounds(offset, 0, dest.length);
             int minLen = Math.min(source.remaining(), dest.length - offset);
             if (minLen <= 0) {
                 return 0;
@@ -1172,7 +1172,7 @@ public class JieIO {
      */
     public static ByteBuffer subBuffer(ByteBuffer buffer, int offset) throws JieIOException {
         try {
-            GekCheck.checkInBounds(offset, 0, buffer.limit());
+            JieCheck.checkInBounds(offset, 0, buffer.limit());
             int pos = buffer.position();
             buffer.position(offset);
             ByteBuffer slice = buffer.slice();
@@ -1197,7 +1197,7 @@ public class JieIO {
      */
     public static ByteBuffer subBuffer(ByteBuffer buffer, int offset, int length) throws JieIOException {
         try {
-            GekCheck.checkRangeInBounds(offset, offset + length, 0, buffer.limit());
+            JieCheck.checkRangeInBounds(offset, offset + length, 0, buffer.limit());
             int pos = buffer.position();
             buffer.position(offset);
             ByteBuffer slice = slice(buffer, length);
