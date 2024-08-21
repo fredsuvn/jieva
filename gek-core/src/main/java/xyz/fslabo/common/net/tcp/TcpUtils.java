@@ -1,7 +1,7 @@
 package xyz.fslabo.common.net.tcp;
 
 import xyz.fslabo.common.base.JieBytes;
-import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.coll.JieArray;
 
 import java.nio.ByteBuffer;
 import java.util.function.IntFunction;

@@ -3,7 +3,7 @@ package xyz.fslabo.common.proxy;
 import org.springframework.cglib.core.SpringNamingPolicy;
 import org.springframework.cglib.proxy.*;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

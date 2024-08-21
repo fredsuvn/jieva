@@ -7,7 +7,7 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.base.JieString;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.data.GekData;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.GekNetException;

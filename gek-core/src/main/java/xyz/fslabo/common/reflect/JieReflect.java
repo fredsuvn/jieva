@@ -6,8 +6,8 @@ import xyz.fslabo.annotations.OutParam;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.cache.Cache;
-import xyz.fslabo.common.collect.JieArray;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieArray;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.lang.reflect.*;
 import java.util.*;

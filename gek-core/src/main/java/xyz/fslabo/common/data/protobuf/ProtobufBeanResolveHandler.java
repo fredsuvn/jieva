@@ -8,7 +8,7 @@ import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.bean.BasePropertyInfo;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolver;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.invoke.Invoker;
 import xyz.fslabo.common.mapper.MapperException;
 import xyz.fslabo.common.reflect.JieReflect;

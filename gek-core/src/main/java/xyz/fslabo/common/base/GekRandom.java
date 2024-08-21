@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

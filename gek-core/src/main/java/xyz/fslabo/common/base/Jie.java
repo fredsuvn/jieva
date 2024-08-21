@@ -1,9 +1,9 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.CollBuilder;
-import xyz.fslabo.common.collect.JieArray;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.CollBuilder;
+import xyz.fslabo.common.coll.JieArray;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.mapper.BeanMapper;
 import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.mapper.MappingOptions;

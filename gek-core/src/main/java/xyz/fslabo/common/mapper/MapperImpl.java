@@ -3,7 +3,7 @@ package xyz.fslabo.common.mapper;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.PropertyInfo;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.mapper.handlers.*;
 
 import java.lang.reflect.Type;

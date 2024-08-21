@@ -7,7 +7,7 @@ import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.bean.BeanProvider;
 import xyz.fslabo.common.bean.PropertyInfo;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.JieReflect;
 

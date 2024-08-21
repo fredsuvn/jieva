@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekLog;
 import xyz.fslabo.common.base.obj.GekObj;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.JieType;
 import xyz.fslabo.common.reflect.TypeRef;

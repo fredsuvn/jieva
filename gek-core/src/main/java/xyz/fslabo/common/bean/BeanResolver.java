@@ -7,7 +7,7 @@ import xyz.fslabo.common.bean.handlers.AbstractBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonPrefixResolverHandler;
-import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.coll.JieArray;
 
 import java.lang.reflect.Type;
 import java.util.List;

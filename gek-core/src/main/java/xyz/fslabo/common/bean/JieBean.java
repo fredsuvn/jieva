@@ -185,7 +185,7 @@ public class JieBean {
      * @param beanInfo bean info to be string description
      * @return a string description for given descriptor
      */
-    static String toString(BeanInfo beanInfo) {
+    public static String toString(BeanInfo beanInfo) {
         return beanInfo.getType().getTypeName();
     }
 }

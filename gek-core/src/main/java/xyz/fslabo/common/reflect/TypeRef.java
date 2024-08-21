@@ -1,6 +1,6 @@
 package xyz.fslabo.common.reflect;
 
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

@@ -1,7 +1,7 @@
 package xyz.fslabo.common.net.http;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;

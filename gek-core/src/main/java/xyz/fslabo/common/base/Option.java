@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.coll.JieArray;
 
 import java.util.Objects;
 

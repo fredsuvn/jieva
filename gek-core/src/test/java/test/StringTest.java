@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.JieString;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.util.Arrays;
 import java.util.Collections;

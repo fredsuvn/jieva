@@ -1,6 +1,6 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.collect.CollBuilder;
+import xyz.fslabo.common.coll.CollBuilder;
 import xyz.fslabo.common.io.GekIOConfigurer;
 
 /**

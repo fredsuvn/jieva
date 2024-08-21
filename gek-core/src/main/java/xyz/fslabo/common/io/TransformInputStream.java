@@ -1,7 +1,7 @@
 package xyz.fslabo.common.io;
 
 import xyz.fslabo.common.base.JieCheck;
-import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.coll.JieArray;
 
 import java.io.IOException;
 import java.io.InputStream;

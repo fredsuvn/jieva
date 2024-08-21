@@ -1,8 +1,8 @@
 package xyz.fslabo.common.reflect;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.collect.JieArray;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieArray;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;

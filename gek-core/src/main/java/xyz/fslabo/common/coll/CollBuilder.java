@@ -1,4 +1,4 @@
-package xyz.fslabo.common.collect;
+package xyz.fslabo.common.coll;
 
 import xyz.fslabo.common.base.Jie;
 

@@ -4,7 +4,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.PropertyInfo;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.mapper.MapperException;
 import xyz.fslabo.common.mapper.MappingOptions;

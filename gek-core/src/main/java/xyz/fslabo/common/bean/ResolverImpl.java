@@ -3,7 +3,7 @@ package xyz.fslabo.common.bean;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

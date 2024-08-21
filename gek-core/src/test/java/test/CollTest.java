@@ -3,8 +3,8 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.collect.JieColl;
-import xyz.fslabo.common.collect.CollBuilder;
+import xyz.fslabo.common.coll.JieColl;
+import xyz.fslabo.common.coll.CollBuilder;
 
 import java.util.*;
 

@@ -3,7 +3,7 @@ package xyz.fslabo.common.net.udp;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.GekNetException;
 import xyz.fslabo.common.net.GekServerStates;

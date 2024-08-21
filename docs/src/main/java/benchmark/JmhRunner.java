@@ -6,7 +6,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieString;
-import xyz.fslabo.common.collect.JieArray;
+import xyz.fslabo.common.coll.JieArray;
 
 import java.io.File;
 import java.io.IOException;

@@ -3,7 +3,7 @@ package xyz.fslabo.common.net.http;
 import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieColl;
 
 import java.util.*;
 import java.util.stream.Collectors;

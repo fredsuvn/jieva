@@ -1,8 +1,8 @@
 package xyz.fslabo.common.base;
 
-import xyz.fslabo.common.collect.JieColl;
-import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.io.GekIOConfigurer;
+import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.io.JieIOException;
 
 import java.io.File;

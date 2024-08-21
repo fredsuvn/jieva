@@ -3,8 +3,8 @@ package xyz.fslabo.common.bean.handlers;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.*;
-import xyz.fslabo.common.collect.JieArray;
-import xyz.fslabo.common.collect.JieColl;
+import xyz.fslabo.common.coll.JieArray;
+import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.invoke.Invoker;
 import xyz.fslabo.common.reflect.JieReflect;
 
