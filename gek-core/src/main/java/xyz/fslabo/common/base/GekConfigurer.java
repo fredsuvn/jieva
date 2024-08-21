@@ -1,7 +1,10 @@
 package xyz.fslabo.common.base;
 
 import xyz.fslabo.common.coll.CollBuilder;
-import xyz.fslabo.common.io.GekIOConfigurer;
+import xyz.fslabo.common.exec.ProcessExecBuilder;
+import xyz.fslabo.common.exec.ThreadExecBuilder;
+import xyz.fslabo.common.exec.ThreadPoolBuilder;
+import xyz.fslabo.common.io.IOChainConfigurator;
 
 /**
  * This is base interface for method chaining of {@code build}-{@code process}:
@@ -22,8 +25,8 @@ import xyz.fslabo.common.io.GekIOConfigurer;
  * <pre>
  *     myProcess.setThis(a).setThat(b).process();
  * </pre>
- * Here are some implementations: {@link GekThread}, {@link GekThreadPool}, {@link GekProcess}, {@link CollBuilder},
- * {@link GekIOConfigurer}.
+ * Here are some implementations: {@link ThreadExecBuilder}, {@link ThreadPoolBuilder}, {@link ProcessExecBuilder}, {@link CollBuilder},
+ * {@link IOChainConfigurator}.
  *
  * @param <T> subtype of this interface, and is subtype itself
  * @author fredsuvn

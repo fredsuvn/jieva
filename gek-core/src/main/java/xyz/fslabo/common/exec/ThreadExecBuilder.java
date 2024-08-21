@@ -1,20 +1,17 @@
-package xyz.fslabo.common.base;
+package xyz.fslabo.common.exec;
 
-import xyz.fslabo.common.io.JieIOException;
+import xyz.fslabo.common.base.BaseBuilder;
+import xyz.fslabo.common.base.Jie;
 
 /**
- * This class is used to configure and start a {@link Thread} in method chaining:
- * <pre>
- *     thread.name(name).priority(5).start();
- * </pre>
- * Its instance is reusable, re-set and re-start are permitted.
+ * {@link Thread}-based Builder of {@link ExecUnit}, to build instance of {@link ExecUnit} of thread.
  *
  * @author fredsuvn
  */
-public abstract class GekThread implements GekConfigurer<GekThread> {
+public abstract class ThreadExecBuilder implements BaseBuilder<ThreadExecUnit, ThreadExecBuilder> {
 
-    static GekThread newInstance() {
-        return new GekThread.OfJdk8();
+    static ThreadExecBuilder newInstance() {
+        return new ThreadExecBuilder.OfJdk8();
     }
 
     private static int threadInitNumber;
@@ -31,7 +28,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
     private ClassLoader contextClassLoader;
     private long stackSize;
 
-    GekThread() {
+    ThreadExecBuilder() {
         reset();
     }
 
@@ -41,7 +38,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * @param name thread name
      * @return this
      */
-    public GekThread name(String name) {
+    public ThreadExecBuilder name(String name) {
         this.name = name;
         return this;
     }
@@ -52,7 +49,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * @param priority thread priority
      * @return this
      */
-    public GekThread priority(int priority) {
+    public ThreadExecBuilder priority(int priority) {
         this.priority = priority;
         return this;
     }
@@ -63,7 +60,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * @param daemon whether the thread is daemon
      * @return this
      */
-    public GekThread daemon(boolean daemon) {
+    public ThreadExecBuilder daemon(boolean daemon) {
         this.daemon = daemon;
         return this;
     }
@@ -74,7 +71,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * @param task runnable task
      * @return this
      */
-    public GekThread task(Runnable task) {
+    public ThreadExecBuilder task(Runnable task) {
         this.task = task;
         return this;
     }
@@ -85,7 +82,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * @param contextClassLoader context class loader
      * @return this
      */
-    public GekThread contextClassLoader(ClassLoader contextClassLoader) {
+    public ThreadExecBuilder contextClassLoader(ClassLoader contextClassLoader) {
         this.contextClassLoader = contextClassLoader;
         return this;
     }
@@ -96,7 +93,7 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * @param group thread group
      * @return this
      */
-    public GekThread group(ThreadGroup group) {
+    public ThreadExecBuilder group(ThreadGroup group) {
         this.group = group;
         return this;
     }
@@ -107,13 +104,13 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
      * @param stackSize stack size
      * @return this
      */
-    public GekThread stackSize(long stackSize) {
+    public ThreadExecBuilder stackSize(long stackSize) {
         this.stackSize = stackSize;
         return this;
     }
 
     @Override
-    public GekThread reset() {
+    public ThreadExecBuilder reset() {
         this.name = null;
         this.priority = -1;
         this.daemon = false;
@@ -125,14 +122,14 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
     }
 
     /**
-     * Returns thread which is configured by this, not started.
+     * Returns a new {@link ThreadExecUnit} which is not started.
      *
      * @return thread which is configured by this, not started
-     * @throws JieIOException IO exception
+     * @throws ExecException execution exception
      */
-    public Thread build() throws JieIOException {
+    public ThreadExecUnit build() throws ExecException {
         try {
-            String threadName = Jie.orDefault(name, () -> "GekThread-" + nextThreadNum());
+            String threadName = Jie.orDefault(name, () -> ThreadExecUnit.class.getSimpleName() + "-" + nextThreadNum());
             Thread thread;
             if (stackSize != -1) {
                 thread = new Thread(group, task, threadName, stackSize);
@@ -146,30 +143,12 @@ public abstract class GekThread implements GekConfigurer<GekThread> {
             if (contextClassLoader != null) {
                 thread.setContextClassLoader(contextClassLoader);
             }
-            return thread;
+            return new ThreadExecUnit(thread);
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new ExecException(e);
         }
     }
 
-    /**
-     * Starts and returns new thread which is configured by this.
-     *
-     * @return the thread which is started
-     * @throws JieIOException IO exception
-     */
-    public Thread start() throws JieIOException {
-        try {
-            Thread thread = build();
-            thread.start();
-            return thread;
-        } catch (JieIOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    private static final class OfJdk8 extends GekThread {
+    private static final class OfJdk8 extends ThreadExecBuilder {
     }
 }

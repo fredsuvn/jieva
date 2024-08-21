@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * This is sub-interface of {@link GekIOConfigurer} for IO process in method chaining.
+ * This is sub-interface of {@link IOChainConfigurator} for IO process in method chaining.
  * Subtype needs to play the role of {@link T}, which represents subtype itself.
  * For example:
  * <pre>
@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
  * @param <T> subtype of this interface, and is subtype itself
  * @author fredsuvn
  */
-public interface GekIOProcess<T extends GekIOProcess<T>> extends GekIOConfigurer<T> {
+public interface GekIOProcess<T extends GekIOProcess<T>> extends IOChainConfigurator<T> {
 
     /**
      * Starts and does final process, returns number of bytes written in output.

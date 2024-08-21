@@ -4,6 +4,10 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.coll.CollBuilder;
 import xyz.fslabo.common.coll.JieArray;
 import xyz.fslabo.common.coll.JieColl;
+import xyz.fslabo.common.exec.ProcessExecBuilder;
+import xyz.fslabo.common.exec.ScheduledPoolBuilder;
+import xyz.fslabo.common.exec.ThreadExecBuilder;
+import xyz.fslabo.common.exec.ThreadPoolBuilder;
 import xyz.fslabo.common.mapper.BeanMapper;
 import xyz.fslabo.common.mapper.Mapper;
 import xyz.fslabo.common.mapper.MappingOptions;
@@ -563,8 +567,8 @@ public class Jie {
      *
      * @return a new {@link Process} configurer to start a sub-process
      */
-    public static GekProcess process() {
-        return GekProcess.newInstance();
+    public static ProcessExecBuilder process() {
+        return ProcessExecBuilder.newInstance();
     }
 
     /**
@@ -598,8 +602,8 @@ public class Jie {
      *
      * @return a new {@link Thread} configurer to build or start a thread
      */
-    public static GekThread thread() {
-        return GekThread.newInstance();
+    public static ThreadExecBuilder thread() {
+        return ThreadExecBuilder.newInstance();
     }
 
     /**
@@ -607,8 +611,8 @@ public class Jie {
      *
      * @return a new {@link ExecutorService} configurer to build a thread pool
      */
-    public static GekThreadPool threadPool() {
-        return GekThreadPool.newInstance();
+    public static ThreadPoolBuilder threadPool() {
+        return ThreadPoolBuilder.newInstance();
     }
 
     /**
@@ -616,8 +620,8 @@ public class Jie {
      *
      * @return a new {@link ScheduledExecutorService} configurer to build a scheduled thread pool
      */
-    public static GekScheduledPool scheduledPool() {
-        return GekScheduledPool.newInstance();
+    public static ScheduledPoolBuilder scheduledPool() {
+        return ScheduledPoolBuilder.newInstance();
     }
 
     /**

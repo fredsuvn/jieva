@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
  * @param <T> subtype of this interface, and is subtype itself
  * @author fredsuvn
  */
-public interface GekIOConfigurer<T extends GekIOConfigurer<T>> extends GekConfigurer<T> {
+public interface IOChainConfigurator<T extends IOChainConfigurator<T>> extends GekConfigurer<T> {
 
     /**
      * Sets input to given array.

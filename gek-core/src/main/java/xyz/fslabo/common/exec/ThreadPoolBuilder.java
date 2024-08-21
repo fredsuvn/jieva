@@ -1,23 +1,21 @@
-package xyz.fslabo.common.base;
+package xyz.fslabo.common.exec;
 
+import xyz.fslabo.common.base.BaseBuilder;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.io.JieIOException;
 
 import java.time.Duration;
 import java.util.concurrent.*;
 
 /**
- * This class is used to configure a {@link ExecutorService} in method chaining:
- * <pre>
- *     pool.corePoolSize(10).maxPoolSize(20).build();
- * </pre>
- * Its instance is reusable, re-set and re-build are permitted.
+ * Thread pool builder for {@link ExecutorService}.
  *
  * @author fredsuvn
  */
-public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
+public abstract class ThreadPoolBuilder implements BaseBuilder<ExecutorService, ThreadPoolBuilder> {
 
-    static GekThreadPool newInstance() {
-        return new GekThreadPool.OfJdk8();
+    static ThreadPoolBuilder newInstance() {
+        return new ThreadPoolBuilder.OfJdk8();
     }
 
     private int corePoolSize;
@@ -28,7 +26,7 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
     private RejectedExecutionHandler rejectHandler;
     private boolean allowCoreThreadTimeOut;
 
-    GekThreadPool() {
+    ThreadPoolBuilder() {
         reset();
     }
 
@@ -38,7 +36,7 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      * @param corePoolSize core pool size
      * @return this
      */
-    public GekThreadPool corePoolSize(int corePoolSize) {
+    public ThreadPoolBuilder corePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
         return this;
     }
@@ -49,7 +47,7 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      * @param maxPoolSize max pool size
      * @return this
      */
-    public GekThreadPool maxPoolSize(int maxPoolSize) {
+    public ThreadPoolBuilder maxPoolSize(int maxPoolSize) {
         this.maxPoolSize = maxPoolSize;
         return this;
     }
@@ -60,7 +58,7 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      * @param keepAliveTime keep alive time for threads which are created exceed core threads
      * @return this
      */
-    public GekThreadPool keepAliveTime(Duration keepAliveTime) {
+    public ThreadPoolBuilder keepAliveTime(Duration keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
         return this;
     }
@@ -71,7 +69,7 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      * @param workQueue the queue to use for holding tasks before they are executed
      * @return this
      */
-    public GekThreadPool workQueue(BlockingQueue<Runnable> workQueue) {
+    public ThreadPoolBuilder workQueue(BlockingQueue<Runnable> workQueue) {
         this.workQueue = workQueue;
         return this;
     }
@@ -82,7 +80,7 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      * @param threadFactory thread factory
      * @return this
      */
-    public GekThreadPool threadFactory(ThreadFactory threadFactory) {
+    public ThreadPoolBuilder threadFactory(ThreadFactory threadFactory) {
         this.threadFactory = threadFactory;
         return this;
     }
@@ -93,7 +91,7 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      * @param rejectHandler the handler to use when execution is rejected
      * @return this
      */
-    public GekThreadPool rejectHandler(RejectedExecutionHandler rejectHandler) {
+    public ThreadPoolBuilder rejectHandler(RejectedExecutionHandler rejectHandler) {
         this.rejectHandler = rejectHandler;
         return this;
     }
@@ -105,13 +103,13 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      *                               keep-alive time
      * @return this
      */
-    public GekThreadPool allowCoreThreadTimeOut(boolean allowCoreThreadTimeOut) {
+    public ThreadPoolBuilder allowCoreThreadTimeOut(boolean allowCoreThreadTimeOut) {
         this.allowCoreThreadTimeOut = allowCoreThreadTimeOut;
         return this;
     }
 
     @Override
-    public GekThreadPool reset() {
+    public ThreadPoolBuilder reset() {
         this.corePoolSize = 0;
         this.maxPoolSize = 0;
         this.keepAliveTime = null;
@@ -126,9 +124,9 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
      * Returns new thread pool which is configured by this.
      *
      * @return thread pool which is configured by this
-     * @throws JieIOException IO exception
+     * @throws ExecException execution exception
      */
-    public ExecutorService build() throws JieIOException {
+    public ExecutorService build() throws ExecException {
         try {
             Duration keepTime = Jie.orDefault(keepAliveTime, Duration.ZERO);
             BlockingQueue<Runnable> queue = Jie.orDefault(workQueue, LinkedBlockingQueue::new);
@@ -179,6 +177,6 @@ public abstract class GekThreadPool implements GekConfigurer<GekThreadPool> {
         }
     }
 
-    private static final class OfJdk8 extends GekThreadPool {
+    private static final class OfJdk8 extends ThreadPoolBuilder {
     }
 }

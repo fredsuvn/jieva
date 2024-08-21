@@ -1,22 +1,21 @@
-package xyz.fslabo.common.base;
+package xyz.fslabo.common.exec;
 
+import xyz.fslabo.common.base.BaseBuilder;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.io.JieIOException;
 
 import java.time.Duration;
 import java.util.concurrent.*;
 
 /**
- * This class is used to configure a {@link ScheduledExecutorService} in method chaining:
- * <pre>
- *     pool.corePoolSize(10).build();
- * </pre>
+ * Thread pool builder for {@link ScheduledExecutorService}.
  *
  * @author fredsuvn
  */
-public abstract class GekScheduledPool {
+public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecutorService, ScheduledPoolBuilder> {
 
-    static GekScheduledPool newInstance() {
-        return new GekScheduledPool.OfJdk8();
+    static ScheduledPoolBuilder newInstance() {
+        return new ScheduledPoolBuilder.OfJdk8();
     }
 
     private int corePoolSize;
@@ -25,7 +24,8 @@ public abstract class GekScheduledPool {
     private boolean allowCoreThreadTimeOut = false;
     private Duration keepAliveTime;
 
-    GekScheduledPool() {
+    ScheduledPoolBuilder() {
+        reset();
     }
 
     /**
@@ -34,7 +34,7 @@ public abstract class GekScheduledPool {
      * @param corePoolSize core pool size
      * @return this
      */
-    public GekScheduledPool corePoolSize(int corePoolSize) {
+    public ScheduledPoolBuilder corePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
         return this;
     }
@@ -45,7 +45,7 @@ public abstract class GekScheduledPool {
      * @param threadFactory thread factory
      * @return this
      */
-    public GekScheduledPool threadFactory(ThreadFactory threadFactory) {
+    public ScheduledPoolBuilder threadFactory(ThreadFactory threadFactory) {
         this.threadFactory = threadFactory;
         return this;
     }
@@ -56,7 +56,7 @@ public abstract class GekScheduledPool {
      * @param rejectHandler the handler to use when execution is rejected
      * @return this
      */
-    public GekScheduledPool rejectHandler(RejectedExecutionHandler rejectHandler) {
+    public ScheduledPoolBuilder rejectHandler(RejectedExecutionHandler rejectHandler) {
         this.rejectHandler = rejectHandler;
         return this;
     }
@@ -68,7 +68,7 @@ public abstract class GekScheduledPool {
      *                               keep-alive time
      * @return this
      */
-    public GekScheduledPool allowCoreThreadTimeOut(boolean allowCoreThreadTimeOut) {
+    public ScheduledPoolBuilder allowCoreThreadTimeOut(boolean allowCoreThreadTimeOut) {
         this.allowCoreThreadTimeOut = allowCoreThreadTimeOut;
         return this;
     }
@@ -79,8 +79,18 @@ public abstract class GekScheduledPool {
      * @param keepAliveTime keep alive time for threads which are created exceed core threads
      * @return this
      */
-    public GekScheduledPool keepAliveTime(Duration keepAliveTime) {
+    public ScheduledPoolBuilder keepAliveTime(Duration keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
+        return this;
+    }
+
+    @Override
+    public ScheduledPoolBuilder reset() {
+        this.corePoolSize = 0;
+        this.keepAliveTime = null;
+        this.threadFactory = null;
+        this.rejectHandler = null;
+        this.allowCoreThreadTimeOut = false;
         return this;
     }
 
@@ -118,6 +128,6 @@ public abstract class GekScheduledPool {
         return pool;
     }
 
-    private static final class OfJdk8 extends GekScheduledPool {
+    private static final class OfJdk8 extends ScheduledPoolBuilder {
     }
 }
