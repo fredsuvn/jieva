@@ -179,7 +179,7 @@ public abstract class GekLog {
      */
     protected void writeRecord(Record record) {
         StringBuilder message = new StringBuilder();
-        message.append(GekDate.format(Date.from(record.time())))
+        message.append(JieDate.format(Date.from(record.time())))
             .append("[")
             .append(record.level().description())
             .append("]");
