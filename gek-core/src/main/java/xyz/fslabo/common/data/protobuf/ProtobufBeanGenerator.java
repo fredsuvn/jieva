@@ -2,8 +2,8 @@ package xyz.fslabo.common.data.protobuf;
 
 import com.google.protobuf.Message;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.mapper.MapperException;
-import xyz.fslabo.common.mapper.handlers.BeanMapperHandler;
+import xyz.fslabo.common.mapping.MappingException;
+import xyz.fslabo.common.mapping.handlers.BeanMapperHandler;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Method;
@@ -40,10 +40,10 @@ public class ProtobufBeanGenerator implements BeanMapperHandler.BeanGenerator {
         }
         try {
             return getProtobufBuilder(rawType, isBuilder);
-        } catch (MapperException e) {
+        } catch (MappingException e) {
             throw e;
         } catch (Exception e) {
-            throw new MapperException(e);
+            throw new MappingException(e);
         }
     }
 
@@ -53,7 +53,7 @@ public class ProtobufBeanGenerator implements BeanMapperHandler.BeanGenerator {
         try {
             return build(builder, isBuilder);
         } catch (Exception e) {
-            throw new MapperException(e);
+            throw new MappingException(e);
         }
     }
 

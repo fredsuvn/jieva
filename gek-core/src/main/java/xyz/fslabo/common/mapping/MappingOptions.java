@@ -1,4 +1,4 @@
-package xyz.fslabo.common.mapper;
+package xyz.fslabo.common.mapping;
 
 import lombok.Builder;
 import lombok.Getter;

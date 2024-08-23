@@ -2,9 +2,9 @@ package xyz.fslabo.common.data.protobuf;
 
 import xyz.fslabo.common.bean.BeanProvider;
 import xyz.fslabo.common.bean.BeanResolver;
-import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.mapper.handlers.AssignableMapperHandler;
-import xyz.fslabo.common.mapper.handlers.BeanMapperHandler;
+import xyz.fslabo.common.mapping.Mapper;
+import xyz.fslabo.common.mapping.handlers.AssignableMapperHandler;
+import xyz.fslabo.common.mapping.handlers.BeanMapperHandler;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.Flag;
-import xyz.fslabo.common.mapper.Mapper;
+import xyz.fslabo.common.mapping.Mapper;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;

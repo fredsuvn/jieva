@@ -1,4 +1,4 @@
-package xyz.fslabo.common.mapper;
+package xyz.fslabo.common.mapping;
 
 import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.bean.BeanProvider;
@@ -33,9 +33,9 @@ public interface BeanMapper {
      * @param source  source object
      * @param dest    dest object
      * @param options mapper options
-     * @throws MapperException exception when copying
+     * @throws MappingException exception when copying
      */
-    default void copyProperties(Object source, Object dest, MappingOptions options) throws MapperException {
+    default void copyProperties(Object source, Object dest, MappingOptions options) throws MappingException {
         copyProperties(source, source.getClass(), dest, dest.getClass(), options);
     }
 
@@ -61,11 +61,11 @@ public interface BeanMapper {
      * @param dest       dest object
      * @param destType   type of dest object
      * @param options    mapper options
-     * @throws MapperException exception when copying
+     * @throws MappingException exception when copying
      */
     void copyProperties(
         Object source, Type sourceType,
         Object dest, Type destType,
         MappingOptions options
-    ) throws MapperException;
+    ) throws MappingException;
 }

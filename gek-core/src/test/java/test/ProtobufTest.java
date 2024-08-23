@@ -11,7 +11,7 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.bean.PropertyInfo;
-import xyz.fslabo.common.mapper.Mapper;
+import xyz.fslabo.common.mapping.Mapper;
 import xyz.fslabo.common.data.protobuf.JieProtobuf;
 import xyz.fslabo.common.reflect.TypeRef;
 

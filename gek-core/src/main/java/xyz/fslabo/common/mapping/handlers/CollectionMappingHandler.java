@@ -1,13 +1,13 @@
-package xyz.fslabo.common.mapper.handlers;
+package xyz.fslabo.common.mapping.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.coll.JieColl;
-import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.mapper.MapperException;
-import xyz.fslabo.common.mapper.MappingOptions;
+import xyz.fslabo.common.mapping.Mapper;
+import xyz.fslabo.common.mapping.MappingException;
+import xyz.fslabo.common.mapping.MappingOptions;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Array;
@@ -248,7 +248,7 @@ public class CollectionMappingHandler implements Mapper.Handler {
             if (options.isIgnoreError()) {
                 targetComponent = null;
             } else {
-                throw new MapperException(sourceComponentType, targetComponentType);
+                throw new MappingException(sourceComponentType, targetComponentType);
             }
         } else {
             targetComponent = Mapper.resolveResult(targetResult);

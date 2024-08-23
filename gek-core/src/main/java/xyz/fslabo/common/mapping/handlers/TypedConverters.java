@@ -1,4 +1,4 @@
-package xyz.fslabo.common.mapper.handlers;
+package xyz.fslabo.common.mapping.handlers;
 
 import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Immutable;
@@ -7,8 +7,8 @@ import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieDate;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.io.JieIO;
-import xyz.fslabo.common.mapper.MapperException;
-import xyz.fslabo.common.mapper.MappingOptions;
+import xyz.fslabo.common.mapping.MappingException;
+import xyz.fslabo.common.mapping.MappingOptions;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -461,7 +461,7 @@ public class TypedConverters {
                     try {
                         return DateFormat.getInstance().parse(source.toString());
                     } catch (ParseException e) {
-                        throw new MapperException(e);
+                        throw new MappingException(e);
                     }
                 }
                 return Date.from(Instant.from(formatter.parse(source.toString())));

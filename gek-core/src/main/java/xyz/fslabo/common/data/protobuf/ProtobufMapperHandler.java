@@ -6,8 +6,8 @@ import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.bean.PropertyInfo;
-import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.mapper.MappingOptions;
+import xyz.fslabo.common.mapping.Mapper;
+import xyz.fslabo.common.mapping.MappingOptions;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;

@@ -1,4 +1,4 @@
-package xyz.fslabo.common.mapper;
+package xyz.fslabo.common.mapping;
 
 import java.lang.reflect.Type;
 
@@ -7,12 +7,12 @@ import java.lang.reflect.Type;
  *
  * @author fredsuvn
  */
-public class MapperException extends RuntimeException {
+public class MappingException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public MapperException() {
+    public MappingException() {
     }
 
     /**
@@ -20,7 +20,7 @@ public class MapperException extends RuntimeException {
      *
      * @param message exception message
      */
-    public MapperException(String message) {
+    public MappingException(String message) {
         super(message);
     }
 
@@ -30,7 +30,7 @@ public class MapperException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public MapperException(String message, Throwable cause) {
+    public MappingException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -39,7 +39,7 @@ public class MapperException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public MapperException(Throwable cause) {
+    public MappingException(Throwable cause) {
         super(cause);
     }
 
@@ -49,7 +49,7 @@ public class MapperException extends RuntimeException {
      * @param sourceType source type
      * @param targetType target type
      */
-    public MapperException(Type sourceType, Type targetType) {
+    public MappingException(Type sourceType, Type targetType) {
         this("Failed to map " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".");
     }
 
@@ -60,7 +60,7 @@ public class MapperException extends RuntimeException {
      * @param targetType target type
      * @param cause      exception cause
      */
-    public MapperException(Type sourceType, Type targetType, Throwable cause) {
+    public MappingException(Type sourceType, Type targetType, Throwable cause) {
         this("Failed to map " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".", cause);
     }
 }

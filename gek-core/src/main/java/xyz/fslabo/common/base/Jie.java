@@ -8,9 +8,9 @@ import xyz.fslabo.common.exec.ProcessExecBuilder;
 import xyz.fslabo.common.exec.ScheduledPoolBuilder;
 import xyz.fslabo.common.exec.ThreadExecBuilder;
 import xyz.fslabo.common.exec.ThreadPoolBuilder;
-import xyz.fslabo.common.mapper.BeanMapper;
-import xyz.fslabo.common.mapper.Mapper;
-import xyz.fslabo.common.mapper.MappingOptions;
+import xyz.fslabo.common.mapping.BeanMapper;
+import xyz.fslabo.common.mapping.Mapper;
+import xyz.fslabo.common.mapping.MappingOptions;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.io.IOException;

@@ -1,10 +1,10 @@
-package xyz.fslabo.common.mapper;
+package xyz.fslabo.common.mapping;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.coll.JieColl;
-import xyz.fslabo.common.mapper.handlers.*;
+import xyz.fslabo.common.mapping.handlers.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

@@ -10,7 +10,7 @@ import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.invoke.Invoker;
-import xyz.fslabo.common.mapper.MapperException;
+import xyz.fslabo.common.mapping.MappingException;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.annotation.Annotation;
@@ -59,10 +59,10 @@ public class ProtobufBeanResolveHandler implements BeanResolver.Handler {
                 context.getProperties().put(basePropertyInfo.getName(), basePropertyInfo);
             }
             return Flag.BREAK;
-        } catch (MapperException e) {
+        } catch (MappingException e) {
             throw e;
         } catch (Exception e) {
-            throw new MapperException(e);
+            throw new MappingException(e);
         }
     }
 

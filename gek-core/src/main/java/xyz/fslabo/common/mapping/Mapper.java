@@ -1,4 +1,4 @@
-package xyz.fslabo.common.mapper;
+package xyz.fslabo.common.mapping;
 
 import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
@@ -6,7 +6,7 @@ import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.PropertyInfo;
-import xyz.fslabo.common.mapper.handlers.*;
+import xyz.fslabo.common.mapping.handlers.*;
 import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.TypeRef;
 

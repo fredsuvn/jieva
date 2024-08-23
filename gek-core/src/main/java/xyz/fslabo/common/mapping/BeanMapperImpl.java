@@ -1,4 +1,4 @@
-package xyz.fslabo.common.mapper;
+package xyz.fslabo.common.mapping;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
@@ -22,7 +22,7 @@ final class BeanMapperImpl implements BeanMapper {
     @Override
     public void copyProperties(
         Object source, Type sourceType, Object dest, Type destType, MappingOptions options
-    ) throws MapperException {
+    ) throws MappingException {
         try {
             if (source instanceof Map) {
                 if (dest instanceof Map) {
@@ -37,10 +37,10 @@ final class BeanMapperImpl implements BeanMapper {
                     beanToBean(source, sourceType, dest, destType, options);
                 }
             }
-        } catch (MapperException e) {
+        } catch (MappingException e) {
             throw e;
         } catch (Exception e) {
-            throw new MapperException(e);
+            throw new MappingException(e);
         }
     }
 
@@ -207,12 +207,12 @@ final class BeanMapperImpl implements BeanMapper {
                 if (ignoreError) {
                     return;
                 }
-                throw new MapperException(sourceKeyType, destKeyType);
+                throw new MappingException(sourceKeyType, destKeyType);
             }
             if (destValue instanceof Val) {
                 destValue = ((Val<?>) destValue).get();
             }
-        } catch (MapperException e) {
+        } catch (MappingException e) {
             if (ignoreError) {
                 return;
             }
@@ -221,7 +221,7 @@ final class BeanMapperImpl implements BeanMapper {
             if (ignoreError) {
                 return;
             }
-            throw new MapperException(e);
+            throw new MappingException(e);
         }
         if (destValue == null) {
             if (options.isIgnoreNull()) {
@@ -265,12 +265,12 @@ final class BeanMapperImpl implements BeanMapper {
                 if (ignoreError) {
                     return;
                 }
-                throw new MapperException(sourceKeyType, String.class);
+                throw new MappingException(sourceKeyType, String.class);
             }
             if (destValue instanceof Val) {
                 destValue = ((Val<?>) destValue).get();
             }
-        } catch (MapperException e) {
+        } catch (MappingException e) {
             if (ignoreError) {
                 return;
             }
@@ -279,7 +279,7 @@ final class BeanMapperImpl implements BeanMapper {
             if (ignoreError) {
                 return;
             }
-            throw new MapperException(e);
+            throw new MappingException(e);
         }
         if (destValue == null) {
             if (options.isIgnoreNull()) {
@@ -300,12 +300,12 @@ final class BeanMapperImpl implements BeanMapper {
                 if (ignoreError) {
                     return F.RETURN;
                 }
-                throw new MapperException(sourceKeyType, destKeyType);
+                throw new MappingException(sourceKeyType, destKeyType);
             }
             if (destKey instanceof Val) {
                 destKey = ((Val<?>) destKey).get();
             }
-        } catch (MapperException e) {
+        } catch (MappingException e) {
             if (ignoreError) {
                 return F.RETURN;
             }
@@ -314,7 +314,7 @@ final class BeanMapperImpl implements BeanMapper {
             if (ignoreError) {
                 return F.RETURN;
             }
-            throw new MapperException(e);
+            throw new MappingException(e);
         }
         if (destKey == null) {
             if (options.isIgnoreNull()) {
