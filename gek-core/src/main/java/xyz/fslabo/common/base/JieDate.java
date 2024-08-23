@@ -7,7 +7,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
@@ -162,39 +161,40 @@ public class JieDate {
     }
 
     /**
-     * Returns {@link Instant} from given temporal, or null if failed.
+     * Returns {@link Instant} from given temporal. If the given temporal lacks a zone offset, use {@link #zoneOffset()}.
      *
      * @param temporal given temporal
-     * @return {@link Instant} from given temporal, or null if failed
+     * @return {@link Instant} from given temporal
      */
     @Nullable
     public static Instant toInstant(TemporalAccessor temporal) {
         if (temporal instanceof Instant) {
             return (Instant) temporal;
         }
-        long seconds;
-        if (temporal.isSupported(ChronoField.INSTANT_SECONDS)) {
-            seconds = temporal.getLong(ChronoField.INSTANT_SECONDS);
-        } else {
-            return null;
+        if (temporal instanceof LocalDateTime) {
+            return ((LocalDateTime) temporal).toInstant(zoneOffset());
         }
-        long nanos = 0;
-        if (temporal.isSupported(ChronoField.NANO_OF_SECOND)) {
-            nanos = temporal.getLong(ChronoField.NANO_OF_SECOND);
-        } else if (temporal.isSupported(ChronoField.MICRO_OF_SECOND)) {
-            nanos = temporal.getLong(ChronoField.MICRO_OF_SECOND) * 1000;
-        } else if (temporal.isSupported(ChronoField.MILLI_OF_SECOND)) {
-            nanos = temporal.getLong(ChronoField.MILLI_OF_SECOND) * 1000_000;
+        if (temporal instanceof ZonedDateTime) {
+            return ((ZonedDateTime) temporal).toInstant();
         }
-        return Instant.ofEpochSecond(seconds, nanos);
+        if (temporal instanceof OffsetDateTime) {
+            return ((OffsetDateTime) temporal).toInstant();
+        }
+        if (temporal instanceof LocalDate) {
+            return LocalDateTime.of((LocalDate) temporal, LocalTime.MIN).toInstant(zoneOffset());
+        }
+        if (temporal instanceof LocalTime) {
+            return LocalDateTime.of(LocalDate.MIN, (LocalTime) temporal).toInstant(zoneOffset());
+        }
+        return Instant.from(temporal);
     }
 
     /**
-     * Returns {@link Instant} from given temporal with specified zone offset.
+     * Returns {@link Instant} from given temporal. If the given temporal lacks a zone offset, use specified zone offset.
      *
      * @param temporal given temporal
-     * @param offset specified zone offset
-     * @return {@link Instant} from given temporal with specified zone offset.
+     * @param offset   specified zone offset
+     * @return {@link Instant} from given temporal
      */
     public static Instant toInstant(TemporalAccessor temporal, ZoneOffset offset) {
         if (temporal instanceof Instant) {
@@ -204,10 +204,10 @@ public class JieDate {
             return ((LocalDateTime) temporal).toInstant(offset);
         }
         if (temporal instanceof ZonedDateTime) {
-            return ((ZonedDateTime) temporal).toLocalDateTime().toInstant(offset);
+            return ((ZonedDateTime) temporal).toInstant();
         }
         if (temporal instanceof OffsetDateTime) {
-            return ((OffsetDateTime) temporal).toLocalDateTime().toInstant(offset);
+            return ((OffsetDateTime) temporal).toInstant();
         }
         if (temporal instanceof LocalDate) {
             return LocalDateTime.of((LocalDate) temporal, LocalTime.MIN).toInstant(offset);
@@ -216,5 +216,197 @@ public class JieDate {
             return LocalDateTime.of(LocalDate.MIN, (LocalTime) temporal).toInstant(offset);
         }
         return LocalDateTime.from(temporal).toInstant(offset);
+    }
+
+    /**
+     * Returns {@link LocalDateTime} from given temporal. If the given temporal lacks a zone offset, use
+     * {@link #zoneOffset()}.
+     *
+     * @param temporal given temporal
+     * @return {@link LocalDateTime} from given temporal
+     */
+    @Nullable
+    public static LocalDateTime toLocalDateTime(TemporalAccessor temporal) {
+        if (temporal instanceof Instant) {
+            return LocalDateTime.ofInstant((Instant) temporal, zoneOffset());
+        }
+        if (temporal instanceof LocalDateTime) {
+            return (LocalDateTime) temporal;
+        }
+        if (temporal instanceof ZonedDateTime) {
+            return ((ZonedDateTime) temporal).toLocalDateTime();
+        }
+        if (temporal instanceof OffsetDateTime) {
+            return ((OffsetDateTime) temporal).toLocalDateTime();
+        }
+        if (temporal instanceof LocalDate) {
+            return LocalDateTime.of((LocalDate) temporal, LocalTime.MIN);
+        }
+        if (temporal instanceof LocalTime) {
+            return LocalDateTime.of(LocalDate.MIN, (LocalTime) temporal);
+        }
+        return LocalDateTime.from(temporal);
+    }
+
+    /**
+     * Returns {@link LocalDateTime} from given temporal. If the given temporal lacks a zone offset, use specified zone
+     * offset.
+     *
+     * @param temporal given temporal
+     * @param offset   specified zone offset
+     * @return {@link LocalDateTime} from given temporal
+     */
+    public static LocalDateTime toLocalDateTime(TemporalAccessor temporal, ZoneOffset offset) {
+        if (temporal instanceof Instant) {
+            return LocalDateTime.ofInstant((Instant) temporal, offset);
+        }
+        if (temporal instanceof LocalDateTime) {
+            return (LocalDateTime) temporal;
+        }
+        if (temporal instanceof ZonedDateTime) {
+            return ((ZonedDateTime) temporal).toLocalDateTime();
+        }
+        if (temporal instanceof OffsetDateTime) {
+            return ((OffsetDateTime) temporal).toLocalDateTime();
+        }
+        if (temporal instanceof LocalDate) {
+            return LocalDateTime.of((LocalDate) temporal, LocalTime.MIN);
+        }
+        if (temporal instanceof LocalTime) {
+            return LocalDateTime.of(LocalDate.MIN, (LocalTime) temporal);
+        }
+        return LocalDateTime.from(temporal);
+    }
+
+    /**
+     * Returns {@link ZonedDateTime} from given temporal. If the given temporal lacks a zone offset, use
+     * {@link #zoneOffset()}.
+     *
+     * @param temporal given temporal
+     * @return {@link ZonedDateTime} from given temporal
+     */
+    @Nullable
+    public static ZonedDateTime toZonedDateTime(TemporalAccessor temporal) {
+        return toZonedDateTime(temporal, zoneOffset());
+    }
+
+    /**
+     * Returns {@link ZonedDateTime} from given temporal. If the given temporal lacks a zone offset, use specified zone
+     * offset.
+     *
+     * @param temporal given temporal
+     * @param offset   specified zone offset
+     * @return {@link ZonedDateTime} from given temporal
+     */
+    public static ZonedDateTime toZonedDateTime(TemporalAccessor temporal, ZoneOffset offset) {
+        if (temporal instanceof Instant) {
+            return ZonedDateTime.ofInstant((Instant) temporal, offset);
+        }
+        if (temporal instanceof LocalDateTime) {
+            return ((LocalDateTime) temporal).atZone(offset);
+        }
+        if (temporal instanceof ZonedDateTime) {
+            return ((ZonedDateTime) temporal).withZoneSameInstant(offset);
+        }
+        if (temporal instanceof OffsetDateTime) {
+            return ((OffsetDateTime) temporal).withOffsetSameInstant(offset).toZonedDateTime();
+        }
+        if (temporal instanceof LocalDate) {
+            return LocalDateTime.of((LocalDate) temporal, LocalTime.MIN).atZone(offset);
+        }
+        if (temporal instanceof LocalTime) {
+            return LocalDateTime.of(LocalDate.MIN, (LocalTime) temporal).atZone(offset);
+        }
+        return ZonedDateTime.from(temporal).withZoneSameInstant(offset);
+    }
+
+    /**
+     * Returns {@link OffsetDateTime} from given temporal. If the given temporal lacks a zone offset, use
+     * {@link #zoneOffset()}.
+     *
+     * @param temporal given temporal
+     * @return {@link OffsetDateTime} from given temporal
+     */
+    @Nullable
+    public static OffsetDateTime toOffsetDateTime(TemporalAccessor temporal) {
+        return toOffsetDateTime(temporal, zoneOffset());
+    }
+
+    /**
+     * Returns {@link OffsetDateTime} from given temporal. If the given temporal lacks a zone offset, use specified zone
+     * offset.
+     *
+     * @param temporal given temporal
+     * @param offset   specified zone offset
+     * @return {@link OffsetDateTime} from given temporal
+     */
+    public static OffsetDateTime toOffsetDateTime(TemporalAccessor temporal, ZoneOffset offset) {
+        if (temporal instanceof Instant) {
+            return OffsetDateTime.ofInstant((Instant) temporal, offset);
+        }
+        if (temporal instanceof LocalDateTime) {
+            return ((LocalDateTime) temporal).atOffset(offset);
+        }
+        if (temporal instanceof ZonedDateTime) {
+            return ((ZonedDateTime) temporal).toOffsetDateTime().withOffsetSameInstant(offset);
+        }
+        if (temporal instanceof OffsetDateTime) {
+            return ((OffsetDateTime) temporal).withOffsetSameInstant(offset);
+        }
+        if (temporal instanceof LocalDate) {
+            return LocalDateTime.of((LocalDate) temporal, LocalTime.MIN).atOffset(offset);
+        }
+        if (temporal instanceof LocalTime) {
+            return LocalDateTime.of(LocalDate.MIN, (LocalTime) temporal).atOffset(offset);
+        }
+        return OffsetDateTime.from(temporal).withOffsetSameInstant(offset);
+    }
+
+    /**
+     * Returns {@link LocalDate} from given temporal. If the given temporal lacks a zone offset, use
+     * {@link #zoneOffset()}.
+     *
+     * @param temporal given temporal
+     * @return {@link LocalDate} from given temporal
+     */
+    @Nullable
+    public static LocalDate toLocalDate(TemporalAccessor temporal) {
+        return toLocalDateTime(temporal).toLocalDate();
+    }
+
+    /**
+     * Returns {@link LocalDate} from given temporal. If the given temporal lacks a zone offset, use specified zone
+     * offset.
+     *
+     * @param temporal given temporal
+     * @param offset   specified zone offset
+     * @return {@link LocalDate} from given temporal
+     */
+    public static LocalDate toLocalDate(TemporalAccessor temporal, ZoneOffset offset) {
+        return toLocalDateTime(temporal, offset).toLocalDate();
+    }
+
+    /**
+     * Returns {@link LocalTime} from given temporal. If the given temporal lacks a zone offset, use
+     * {@link #zoneOffset()}.
+     *
+     * @param temporal given temporal
+     * @return {@link LocalTime} from given temporal
+     */
+    @Nullable
+    public static LocalTime toLocalTime(TemporalAccessor temporal) {
+        return toLocalDateTime(temporal).toLocalTime();
+    }
+
+    /**
+     * Returns {@link LocalTime} from given temporal. If the given temporal lacks a zone offset, use specified zone
+     * offset.
+     *
+     * @param temporal given temporal
+     * @param offset   specified zone offset
+     * @return {@link LocalTime} from given temporal
+     */
+    public static LocalTime toLocalTime(TemporalAccessor temporal, ZoneOffset offset) {
+        return toLocalDateTime(temporal, offset).toLocalTime();
     }
 }

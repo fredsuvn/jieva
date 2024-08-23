@@ -11,6 +11,7 @@ import xyz.fslabo.common.bean.PropertyInfo;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.text.NumberFormat;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.function.BiFunction;
@@ -132,29 +133,36 @@ public class MappingOptions {
     private int copyLevel;
 
     /**
-     * Charset option to determine which charset to use for character conversion. If it is {@code null}, the mapper
-     * should use {@link JieChars#defaultCharset()}.
+     * Option to determine which charset to use for character conversion. If it is {@code null}, the mapper should use
+     * {@link JieChars#defaultCharset()}.
      * <p>
      * Default is {@code null}.
      */
     private @Nullable Charset charset;
 
     /**
-     * Charset option to determine which format to use for number conversion.
+     * Option to determine which format to use for number conversion.
      * <p>
      * Default is {@code null}.
      */
     private @Nullable NumberFormat numberFormat;
 
     /**
-     * Charset option to determine which format to use for date conversion.
+     * Option to determine which format to use for date conversion.
      * <p>
      * Default is {@code null}.
      */
     private @Nullable DateTimeFormatter dateFormat;
 
     /**
-     * Charset function to determine which charset to use for character conversion. This option is typically used in
+     * Option to determine which zone offset to use for date conversion.
+     * <p>
+     * Default is {@code null}.
+     */
+    private @Nullable ZoneOffset zoneOffset;
+
+    /**
+     * Function to determine which charset to use for character conversion. This option is typically used in
      * {@link BeanMapper}, and if this option is {@code null}, the mapper should try to use {@link #getCharset()}.
      * <p>
      * Default is {@code null}.
@@ -162,7 +170,7 @@ public class MappingOptions {
     private @Nullable Function<PropertyInfo, Charset> propertyCharset;
 
     /**
-     * Charset function to determine which format to use for number conversion. This option is typically used in
+     * Function to determine which format to use for number conversion. This option is typically used in
      * {@link BeanMapper}, and if this option is {@code null}, the mapper should try to use {@link #getNumberFormat()}.
      * <p>
      * Default is {@code null}.
@@ -170,7 +178,7 @@ public class MappingOptions {
     private @Nullable Function<PropertyInfo, NumberFormat> propertyNumberFormat;
 
     /**
-     * Charset function to determine which format to use for date conversion. This option is typically used in
+     * Function to determine which format to use for date conversion. This option is typically used in
      * {@link BeanMapper}, and if this option is {@code null}, the mapper should try to use {@link #getDateFormat()}.
      * <p>
      * Default is {@code null}.
@@ -178,12 +186,43 @@ public class MappingOptions {
     private @Nullable Function<PropertyInfo, DateTimeFormatter> propertyDateFormat;
 
     /**
+     * Function to determine which zone offset to use for date conversion. This option is typically used in
+     * {@link BeanMapper}, and if this option is {@code null}, the mapper should try to use {@link #getDateFormat()}.
+     * <p>
+     * Default is {@code null}.
+     */
+    private @Nullable Function<PropertyInfo, ZoneOffset> propertyZoneOffset;
+
+    /**
+     * Returns {@link Charset} option from given property info and this options. If property info is not null and
+     * {@link #getPropertyCharset()} is not null, obtains result of {@link #getPropertyCharset()}. Otherwise, obtains
+     * result of {@link #getCharset()}. If the result is not null, returns the result, else returns
+     * {@link JieChars#UTF_8}.
+     *
+     * @param targetProperty given property info
+     * @return {@link Charset} option
+     */
+    public Charset getCharset(@Nullable PropertyInfo targetProperty) {
+        if (targetProperty != null) {
+            Function<PropertyInfo, Charset> func = getPropertyCharset();
+            if (func != null) {
+                return Jie.orDefault(func.apply(targetProperty), JieChars.defaultCharset());
+            }
+        }
+        return Jie.orDefault(getCharset(), JieChars.defaultCharset());
+    }
+
+    /**
      * Returns {@link DateTimeFormatter} option from given property info and this options, may be {@code null}. If
      * property info is not null and {@link #getPropertyDateFormat()} is not null, returns result of
      * {@link #getPropertyDateFormat()}. Otherwise, it returns {@link #getDateFormat()}.
+     * <p>
+     * Note the returned formatter does not include zone offset from {@link #getZoneOffset(PropertyInfo)} or
+     * {@link #getZoneOffset()}. Using {@link #getDateTimeFormatterWithZone(PropertyInfo)} to get that.
      *
      * @param targetProperty given property info
      * @return {@link DateTimeFormatter} option, may be {@code null}
+     * @see #getDateTimeFormatterWithZone(PropertyInfo)
      */
     @Nullable
     public DateTimeFormatter getDateTimeFormatter(@Nullable PropertyInfo targetProperty) {
@@ -216,21 +255,53 @@ public class MappingOptions {
     }
 
     /**
-     * Returns {@link Charset} option from given property info and this options. If property info is not null and
-     * {@link #getPropertyCharset()} is not null, obtains result of {@link #getPropertyCharset()}. Otherwise, obtains
-     * result of {@link #getCharset()}. If the result is not null, returns the result, else returns
-     * {@link JieChars#UTF_8}.
+     * Returns {@link ZoneOffset} option from given property info and this options. If property info is not null and
+     * {@link #getPropertyZoneOffset()} is not null, obtains result of {@link #getPropertyZoneOffset()}. Otherwise, it
+     * returns {@link #getZoneOffset()}.
      *
      * @param targetProperty given property info
-     * @return {@link Charset} option
+     * @return {@link ZoneOffset} option
      */
-    public Charset getCharset(@Nullable PropertyInfo targetProperty) {
+    @Nullable
+    public ZoneOffset getZoneOffset(@Nullable PropertyInfo targetProperty) {
         if (targetProperty != null) {
-            Function<PropertyInfo, Charset> func = getPropertyCharset();
+            Function<PropertyInfo, ZoneOffset> func = getPropertyZoneOffset();
             if (func != null) {
-                return Jie.orDefault(func.apply(targetProperty), JieChars.defaultCharset());
+                return func.apply(targetProperty);
             }
         }
-        return Jie.orDefault(getCharset(), JieChars.defaultCharset());
+        return getZoneOffset();
+    }
+
+    /**
+     * Returns a combined {@link DateTimeFormatter} with {@link #getDateTimeFormatter(PropertyInfo)} and
+     * {@link #getZoneOffset()}, may be {@code null} if result of {@link #getDateTimeFormatter(PropertyInfo)} is
+     * {@code null}. It is equivalent to:
+     * <pre>
+     *     DateTimeFormatter formatter = getDateTimeFormatter(targetProperty);
+     *     if (formatter == null) {
+     *         return null;
+     *     }
+     *     ZoneOffset offset = getZoneOffset(targetProperty);
+     *     if (offset == null) {
+     *         return formatter;
+     *     }
+     *     return formatter.withZone(offset);
+     * </pre>
+     *
+     * @param targetProperty given property info
+     * @return {@link DateTimeFormatter} option, may be {@code null}
+     */
+    @Nullable
+    public DateTimeFormatter getDateTimeFormatterWithZone(@Nullable PropertyInfo targetProperty) {
+        DateTimeFormatter formatter = getDateTimeFormatter(targetProperty);
+        if (formatter == null) {
+            return null;
+        }
+        ZoneOffset offset = getZoneOffset(targetProperty);
+        if (offset == null) {
+            return formatter;
+        }
+        return formatter.withZone(offset);
     }
 }
