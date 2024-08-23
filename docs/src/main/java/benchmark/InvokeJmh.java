@@ -26,10 +26,10 @@ public class InvokeJmh {
         try {
             helloStatic = TT.class.getDeclaredMethod("helloStatic", String.class, String.class);
             helloMember = TT.class.getDeclaredMethod("helloMember", String.class, String.class);
-            reflectStaticInvoker = Invoker.reflectMethod(helloStatic);
-            reflectMemberInvoker = Invoker.reflectMethod(helloMember);
-            unreflectStaticInvoker = Invoker.unreflectMethod(helloStatic);
-            unreflectMemberInvoker = Invoker.unreflectMethod(helloMember);
+            reflectStaticInvoker = Invoker.reflect(helloStatic);
+            reflectMemberInvoker = Invoker.reflect(helloMember);
+            unreflectStaticInvoker = Invoker.unreflect(helloStatic);
+            unreflectMemberInvoker = Invoker.unreflect(helloMember);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

@@ -23,16 +23,16 @@ public class InvokeTest {
         constructor.setAccessible(true);
         helloStatic.setAccessible(true);
         helloVirtual.setAccessible(true);
-        TT tt = (TT) (reflect ? Invoker.reflectConstructor(constructor) : Invoker.unreflectConstructor(constructor)).invoke(null);
+        TT tt = (TT) (reflect ? Invoker.reflect(constructor) : Invoker.unreflect(constructor)).invoke(null);
         GekLog.getInstance().info(tt);
         Assert.assertNotNull(tt);
         Assert.assertEquals(
-            (reflect ? Invoker.reflectMethod(helloStatic) : Invoker.unreflectMethod(helloStatic))
+            (reflect ? Invoker.reflect(helloStatic) : Invoker.unreflect(helloStatic))
                 .invoke(null, "a", "b"),
             "helloStatic: a, b"
         );
         Assert.assertEquals(
-            (reflect ? Invoker.reflectMethod(helloVirtual) : Invoker.unreflectMethod(helloVirtual))
+            (reflect ? Invoker.reflect(helloVirtual) : Invoker.unreflect(helloVirtual))
                 .invoke(tt, "a", "b"),
             "helloVirtual: a, b"
         );

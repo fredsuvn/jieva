@@ -337,6 +337,6 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
     }
 
     private static Invoker buildMethodInvoker(Method method) {
-        return Invoker.reflectMethod(method);
+        return Invoker.reflect(method);
     }
 }

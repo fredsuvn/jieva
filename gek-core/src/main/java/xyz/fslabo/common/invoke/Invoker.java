@@ -21,7 +21,7 @@ public interface Invoker {
      * @param method given method
      * @return {@link Invoker} instance
      */
-    static Invoker reflectMethod(Method method) {
+    static Invoker reflect(Method method) {
         return new InvokerImpls.OfMethod(method);
     }
 
@@ -31,7 +31,7 @@ public interface Invoker {
      * @param constructor given constructor
      * @return {@link Invoker} instance
      */
-    static Invoker reflectConstructor(Constructor<?> constructor) {
+    static Invoker reflect(Constructor<?> constructor) {
         return new InvokerImpls.OfConstructor(constructor);
     }
 
@@ -41,7 +41,7 @@ public interface Invoker {
      * @param method given method
      * @return {@link Invoker} instance
      */
-    static Invoker unreflectMethod(Method method) {
+    static Invoker unreflect(Method method) {
         return new InvokerImpls.OfMethodHandle(method);
     }
 
@@ -52,7 +52,7 @@ public interface Invoker {
      * @param constructor given constructor
      * @return {@link Invoker} instance
      */
-    static Invoker unreflectConstructor(Constructor<?> constructor) {
+    static Invoker unreflect(Constructor<?> constructor) {
         return new InvokerImpls.OfMethodHandle(constructor);
     }
 
