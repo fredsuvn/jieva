@@ -2,9 +2,8 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.GekLog;
-import xyz.fslabo.common.base.obj.GekObj;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.JieType;
@@ -13,7 +12,10 @@ import xyz.fslabo.common.reflect.TypeRef;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 
 public class ReflectTest {
@@ -44,75 +46,6 @@ public class ReflectTest {
             JieReflect.arrayClass(new TypeRef<List<? extends String>[][]>() {
             }.getType()),
             List[][][].class
-        );
-    }
-
-    @Test
-    public void testGekObj() {
-        Assert.assertEquals(
-            GekObj.wrap(null, new TypeRef<List<?>>() {
-            }),
-            GekObj.wrap(null, new TypeRef<List<?>>() {
-            })
-        );
-        GekObj<?> cType = GekObj.wrap(null, String.class);
-        Assert.assertEquals(
-            cType.toClassObj().getType(),
-            String.class
-        );
-        GekObj<?> pType = GekObj.wrap(null, new TypeRef<Map<String, Integer>>() {
-        }.getType());
-        Assert.assertEquals(
-            pType.toParameterizedObj().getType(),
-            new TypeRef<Map<String, Integer>>() {
-            }.getType()
-        );
-        Assert.assertEquals(
-            pType.toParameterizedObj().getActualTypeArgument(0),
-            String.class
-        );
-        Assert.assertEquals(
-            pType.toParameterizedObj().getActualTypeArgument(1),
-            Integer.class
-        );
-        GekObj<?> wType = GekObj.wrap(null,
-            JieType.wildcard(Collections.singletonList(String.class), null));
-        Assert.assertEquals(
-            wType.toWildcardObj().getType(),
-            JieType.wildcard(Collections.singletonList(String.class), null)
-        );
-        Assert.assertEquals(
-            wType.toWildcardObj().getUpperBound(),
-            String.class
-        );
-        wType = GekObj.wrap(null,
-            JieType.wildcard(null, Collections.singletonList(Integer.class)));
-        Assert.assertEquals(
-            wType.toWildcardObj().getLowerBound(),
-            Integer.class
-        );
-        GekObj<?> gType = GekObj.wrap(null, new TypeRef<Map<String, Integer>[]>() {
-        }.getType());
-        Assert.assertEquals(
-            gType.toGenericArrayObj().getType(),
-            new TypeRef<Map<String, Integer>[]>() {
-            }.getType()
-        );
-        Assert.assertEquals(
-            gType.toGenericArrayObj().getType().getGenericComponentType(),
-            new TypeRef<Map<String, Integer>>() {
-            }.getType()
-        );
-        class OT<OTP extends Float> {
-        }
-        GekObj<?> tType = GekObj.wrap(null, OT.class.getTypeParameters()[0]);
-        Assert.assertEquals(
-            tType.toTypeVariableObj().getType(),
-            OT.class.getTypeParameters()[0]
-        );
-        Assert.assertEquals(
-            tType.toTypeVariableObj().getBound(0),
-            Float.class
         );
     }
 
