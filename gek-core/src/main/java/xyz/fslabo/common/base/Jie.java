@@ -4,9 +4,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.coll.CollBuilder;
 import xyz.fslabo.common.coll.JieArray;
 import xyz.fslabo.common.coll.JieColl;
-import xyz.fslabo.common.exec.ProcessExecBuilder;
 import xyz.fslabo.common.exec.ScheduledPoolBuilder;
-import xyz.fslabo.common.exec.ThreadExecBuilder;
 import xyz.fslabo.common.exec.ThreadPoolBuilder;
 import xyz.fslabo.common.mapping.BeanMapper;
 import xyz.fslabo.common.mapping.Mapper;
@@ -563,12 +561,12 @@ public class Jie {
     }
 
     /**
-     * Returns a new {@link Process} configurer to start a sub-process.
+     * Returns a new starter to build and start a {@link Process}.
      *
-     * @return a new {@link Process} configurer to start a sub-process
+     * @return a new starter to build and start a {@link Process}
      */
-    public static ProcessExecBuilder process() {
-        return ProcessExecBuilder.newInstance();
+    public static ProcessStarter process() {
+        return ProcessStarter.newInstance();
     }
 
     /**
@@ -598,12 +596,12 @@ public class Jie {
     }
 
     /**
-     * Returns a new {@link Thread} configurer to build or start a thread.
+     * Returns a new starter to build and start a {@link Thread}.
      *
-     * @return a new {@link Thread} configurer to build or start a thread
+     * @return a new starter to build and start a {@link Thread}
      */
-    public static ThreadExecBuilder thread() {
-        return ThreadExecBuilder.newInstance();
+    public static ThreadStarter thread() {
+        return ThreadStarter.newInstance();
     }
 
     /**

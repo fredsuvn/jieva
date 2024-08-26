@@ -1,8 +1,5 @@
-package xyz.fslabo.common.exec;
+package xyz.fslabo.common.base;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import xyz.fslabo.common.base.BaseBuilder;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.io.JieIO;
 
@@ -19,13 +16,13 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * {@link Process}-based Builder of {@link ExecUnit}, to build instance of {@link ExecUnit} of thread.
+ * This interface represents starter to build and start a {@link Process}.
  *
  * @author fredsuvn
  */
-public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit, ProcessExecBuilder> {
+public abstract class ProcessStarter implements BaseStarter<Process, ProcessStarter> {
 
-    static ProcessExecBuilder newInstance() {
+    static ProcessStarter newInstance() {
         return new OfJdk8();
     }
 
@@ -36,7 +33,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
     private File directory;
     private Consumer<Map<String, String>> envConfigurator;
 
-    ProcessExecBuilder() {
+    ProcessStarter() {
         reset();
     }
 
@@ -50,7 +47,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param command command
      * @return this
      */
-    public ProcessExecBuilder command(String command) {
+    public ProcessStarter command(String command) {
         return command(Arrays.asList(command.split(" +")));
     }
 
@@ -60,7 +57,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param command command
      * @return this
      */
-    public ProcessExecBuilder command(String... command) {
+    public ProcessStarter command(String... command) {
         return command(Arrays.asList(command));
     }
 
@@ -70,7 +67,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param command command
      * @return this
      */
-    public ProcessExecBuilder command(List<String> command) {
+    public ProcessStarter command(List<String> command) {
         this.command = command;
         return this;
     }
@@ -81,7 +78,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param array given array
      * @return this
      */
-    public ProcessExecBuilder input(byte[] array) {
+    public ProcessStarter input(byte[] array) {
         this.input = array;
         return this;
     }
@@ -92,7 +89,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param buffer given buffer
      * @return this
      */
-    public ProcessExecBuilder input(ByteBuffer buffer) {
+    public ProcessStarter input(ByteBuffer buffer) {
         this.input = buffer;
         return this;
     }
@@ -103,7 +100,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param in given input stream
      * @return this
      */
-    public ProcessExecBuilder input(InputStream in) {
+    public ProcessStarter input(InputStream in) {
         this.input = in;
         return this;
     }
@@ -114,7 +111,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param file given file
      * @return this
      */
-    public ProcessExecBuilder input(File file) {
+    public ProcessStarter input(File file) {
         this.input = file;
         return this;
     }
@@ -125,7 +122,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param file given file
      * @return this
      */
-    public ProcessExecBuilder input(Path file) {
+    public ProcessStarter input(Path file) {
         this.input = file;
         return this;
     }
@@ -136,7 +133,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param redirect given redirect
      * @return this
      */
-    public ProcessExecBuilder input(ProcessBuilder.Redirect redirect) {
+    public ProcessStarter input(ProcessBuilder.Redirect redirect) {
         this.input = redirect;
         return this;
     }
@@ -147,7 +144,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param array given array
      * @return this
      */
-    public ProcessExecBuilder output(byte[] array) {
+    public ProcessStarter output(byte[] array) {
         this.output = array;
         return this;
     }
@@ -158,7 +155,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param buffer given buffer
      * @return this
      */
-    public ProcessExecBuilder output(ByteBuffer buffer) {
+    public ProcessStarter output(ByteBuffer buffer) {
         this.output = buffer;
         return this;
     }
@@ -169,7 +166,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param out given out put stream
      * @return this
      */
-    public ProcessExecBuilder output(OutputStream out) {
+    public ProcessStarter output(OutputStream out) {
         this.output = out;
         return this;
     }
@@ -180,7 +177,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param file given file
      * @return this
      */
-    public ProcessExecBuilder output(File file) {
+    public ProcessStarter output(File file) {
         this.output = file;
         return this;
     }
@@ -191,7 +188,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param file given file
      * @return this
      */
-    public ProcessExecBuilder output(Path file) {
+    public ProcessStarter output(Path file) {
         this.output = file;
         return this;
     }
@@ -202,7 +199,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param redirect given redirect
      * @return this
      */
-    public ProcessExecBuilder output(ProcessBuilder.Redirect redirect) {
+    public ProcessStarter output(ProcessBuilder.Redirect redirect) {
         this.output = redirect;
         return this;
     }
@@ -214,7 +211,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param array given array
      * @return this
      */
-    public ProcessExecBuilder errorOutput(byte[] array) {
+    public ProcessStarter errorOutput(byte[] array) {
         this.errorOutput = array;
         return this;
     }
@@ -226,7 +223,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param buffer given buffer
      * @return this
      */
-    public ProcessExecBuilder errorOutput(ByteBuffer buffer) {
+    public ProcessStarter errorOutput(ByteBuffer buffer) {
         this.errorOutput = buffer;
         return this;
     }
@@ -238,7 +235,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param out given output stream
      * @return this
      */
-    public ProcessExecBuilder errorOutput(OutputStream out) {
+    public ProcessStarter errorOutput(OutputStream out) {
         this.errorOutput = out;
         return this;
     }
@@ -250,7 +247,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param file given file
      * @return this
      */
-    public ProcessExecBuilder errorOutput(File file) {
+    public ProcessStarter errorOutput(File file) {
         this.errorOutput = file;
         return this;
     }
@@ -262,7 +259,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param file given file
      * @return this
      */
-    public ProcessExecBuilder errorOutput(Path file) {
+    public ProcessStarter errorOutput(Path file) {
         this.errorOutput = file;
         return this;
     }
@@ -274,7 +271,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param redirect given redirect
      * @return this
      */
-    public ProcessExecBuilder errorOutput(ProcessBuilder.Redirect redirect) {
+    public ProcessStarter errorOutput(ProcessBuilder.Redirect redirect) {
         this.errorOutput = redirect;
         return this;
     }
@@ -285,7 +282,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param directory directory where the process works
      * @return this
      */
-    public ProcessExecBuilder directory(String directory) {
+    public ProcessStarter directory(String directory) {
         return directory(new File(directory));
     }
 
@@ -295,7 +292,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param directory directory where the process works
      * @return this
      */
-    public ProcessExecBuilder directory(Path directory) {
+    public ProcessStarter directory(Path directory) {
         return directory(directory.toFile());
     }
 
@@ -305,7 +302,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param directory directory where the process works
      * @return this
      */
-    public ProcessExecBuilder directory(File directory) {
+    public ProcessStarter directory(File directory) {
         this.directory = directory;
         return this;
     }
@@ -319,13 +316,13 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
      * @param envConfigurator specified environment configurator
      * @return this
      */
-    public ProcessExecBuilder environment(Consumer<Map<String, String>> envConfigurator) {
+    public ProcessStarter environment(Consumer<Map<String, String>> envConfigurator) {
         this.envConfigurator = envConfigurator;
         return this;
     }
 
     @Override
-    public ProcessExecBuilder reset() {
+    public ProcessStarter reset() {
         this.input = null;
         this.output = null;
         this.errorOutput = null;
@@ -335,75 +332,73 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
         return this;
     }
 
+    /**
+     * Builds and starts a new {@link Process}.
+     *
+     * @return a new {@link Process}
+     */
     @Override
-    public ProcessExecUnit build() {
-        return new ProcessExecUnit(() -> {
-            Args args = new Args(command, input, output, errorOutput, directory, envConfigurator);
-            return start(args);
-        });
-    }
-
-    private Process start(Args args) throws ExecException {
+    public Process start() {
         if (JieColl.isEmpty(command)) {
-            throw new ExecException("Command is empty.");
+            throw new IllegalArgumentException("Command is empty.");
         }
         try {
-            return startWithProcessBuilder(args);
+            return startWithProcessBuilder();
         } catch (Exception e) {
-            throw new ExecException(e);
+            throw new IllegalStateException(e);
         }
     }
 
-    private Process startWithProcessBuilder(Args args) throws IOException {
+    private Process startWithProcessBuilder() throws IOException {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command(args.getCommand());
-        if (args.getDirectory() != null) {
-            builder.directory(args.getDirectory());
+        builder.command(command);
+        if (directory != null) {
+            builder.directory(directory);
         }
         InputStream in = null;
-        if (args.getInput() != null) {
-            if (args.getInput() instanceof ProcessBuilder.Redirect) {
-                builder.redirectInput((ProcessBuilder.Redirect) args.getInput());
-            } else if (args.getInput() instanceof File) {
-                builder.redirectInput((File) args.getInput());
-            } else if (args.getInput() instanceof Path) {
-                builder.redirectInput(((Path) args.getInput()).toFile());
+        if (input != null) {
+            if (input instanceof ProcessBuilder.Redirect) {
+                builder.redirectInput((ProcessBuilder.Redirect) input);
+            } else if (input instanceof File) {
+                builder.redirectInput((File) input);
+            } else if (input instanceof Path) {
+                builder.redirectInput(((Path) input).toFile());
             } else {
-                in = inputToStream(args.getInput());
+                in = inputToStream(input);
                 builder.redirectInput(ProcessBuilder.Redirect.PIPE);
             }
         }
         OutputStream out = null;
-        if (args.getOutput() != null) {
-            if (args.getOutput() instanceof ProcessBuilder.Redirect) {
-                builder.redirectOutput((ProcessBuilder.Redirect) args.getOutput());
-            } else if (args.getOutput() instanceof File) {
-                builder.redirectOutput((File) args.getOutput());
-            } else if (args.getOutput() instanceof Path) {
-                builder.redirectOutput(((Path) args.getOutput()).toFile());
+        if (output != null) {
+            if (output instanceof ProcessBuilder.Redirect) {
+                builder.redirectOutput((ProcessBuilder.Redirect) output);
+            } else if (output instanceof File) {
+                builder.redirectOutput((File) output);
+            } else if (output instanceof Path) {
+                builder.redirectOutput(((Path) output).toFile());
             } else {
-                out = outputToStream(args.getOutput());
+                out = outputToStream(output);
                 builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
             }
         }
         OutputStream err = null;
-        if (args.getErrorOutput() != null) {
-            if (Objects.equals(args.getErrorOutput(), args.getOutput())) {
+        if (errorOutput != null) {
+            if (Objects.equals(errorOutput, out)) {
                 builder.redirectErrorStream(true);
             }
-            if (args.getErrorOutput() instanceof ProcessBuilder.Redirect) {
-                builder.redirectError((ProcessBuilder.Redirect) args.getErrorOutput());
-            } else if (args.getErrorOutput() instanceof File) {
-                builder.redirectError((File) args.getErrorOutput());
-            } else if (args.getErrorOutput() instanceof Path) {
-                builder.redirectError(((Path) args.getErrorOutput()).toFile());
+            if (errorOutput instanceof ProcessBuilder.Redirect) {
+                builder.redirectError((ProcessBuilder.Redirect) errorOutput);
+            } else if (errorOutput instanceof File) {
+                builder.redirectError((File) errorOutput);
+            } else if (errorOutput instanceof Path) {
+                builder.redirectError(((Path) errorOutput).toFile());
             } else {
-                err = outputToStream(args.getErrorOutput());
-                builder.redirectError(ProcessBuilder.Redirect.PIPE);
+                err = outputToStream(errorOutput);
+                builder.redirectError(ProcessBuilder.Redirect.INHERIT);
             }
         }
-        if (args.getEnvConfigurator() != null) {
-            args.getEnvConfigurator().accept(builder.environment());
+        if (envConfigurator != null) {
+            envConfigurator.accept(builder.environment());
         }
         Process process = builder.start();
         if (in != null) {
@@ -418,7 +413,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
         return process;
     }
 
-    private InputStream inputToStream(Object in) {
+    private static InputStream inputToStream(Object in) {
         if (in instanceof byte[]) {
             return JieIO.toInputStream((byte[]) in);
         }
@@ -431,7 +426,7 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
         throw new IllegalArgumentException("Error input type: " + in.getClass());
     }
 
-    private OutputStream outputToStream(Object out) {
+    private static OutputStream outputToStream(Object out) {
         if (out instanceof byte[]) {
             return JieIO.toOutputStream((byte[]) out);
         }
@@ -444,17 +439,6 @@ public abstract class ProcessExecBuilder implements BaseBuilder<ProcessExecUnit,
         throw new IllegalArgumentException("Error output type: " + out.getClass());
     }
 
-    @Data
-    @AllArgsConstructor
-    private static final class Args {
-        private final List<String> command;
-        private final Object input;
-        private final Object output;
-        private final Object errorOutput;
-        private final File directory;
-        private final Consumer<Map<String, String>> envConfigurator;
-    }
-
-    private static final class OfJdk8 extends ProcessExecBuilder {
+    private static final class OfJdk8 extends ProcessStarter {
     }
 }

@@ -10,7 +10,7 @@ package xyz.fslabo.common.base;
 public interface BaseBuilder<T, B extends BaseBuilder<T, B>> {
 
     /**
-     * Build a new instance.
+     * Builds a new instance.
      *
      * @return new instance
      */

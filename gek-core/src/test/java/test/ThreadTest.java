@@ -13,7 +13,7 @@ public class ThreadTest {
 
     @Test
     public void testThread() throws InterruptedException {
-        Thread thread = Jie.thread().name("hahaha").task(() -> {
+        Thread thread = Jie.thread().name("hahaha").runnable(() -> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -32,7 +32,7 @@ public class ThreadTest {
         ExecutorService executorService = Jie.threadPool().corePoolSize(10)
             .threadFactory(r -> {
                 ai.incrementAndGet();
-                return Jie.thread().task(r).build();
+                return Jie.thread().runnable(r).build();
             })
             .keepAliveTime(Duration.ofMillis(10000)).allowCoreThreadTimeOut(false).build();
         for (int i = 0; i < 10; i++) {
@@ -47,7 +47,7 @@ public class ThreadTest {
         ScheduledExecutorService executorService = Jie.scheduledPool().corePoolSize(10)
             .threadFactory(r -> {
                 ai.incrementAndGet();
-                return Jie.thread().task(r).build();
+                return Jie.thread().runnable(r).build();
             })
             .keepAliveTime(Duration.ofMillis(10000)).allowCoreThreadTimeOut(true).build();
         for (int i = 0; i < 10; i++) {

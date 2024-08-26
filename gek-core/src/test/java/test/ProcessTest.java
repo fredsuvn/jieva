@@ -34,7 +34,7 @@ public class ProcessTest {
         Process process = Jie.process().command("ping", "-n", "5", "127.0.0.1").start();
         Semaphore semaphore = new Semaphore(1);
         semaphore.acquire();
-        Jie.thread().task(() -> {
+        Jie.thread().runnable(() -> {
             while (true) {
                 String output = JieIO.avalaibleString(process.getInputStream(), JieChars.nativeCharset());
                 if (output == null) {
