@@ -4,8 +4,6 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.coll.CollBuilder;
 import xyz.fslabo.common.coll.JieArray;
 import xyz.fslabo.common.coll.JieColl;
-import xyz.fslabo.common.exec.ScheduledPoolBuilder;
-import xyz.fslabo.common.exec.ThreadPoolBuilder;
 import xyz.fslabo.common.mapping.BeanMapper;
 import xyz.fslabo.common.mapping.Mapper;
 import xyz.fslabo.common.mapping.MappingOptions;
@@ -561,15 +559,6 @@ public class Jie {
     }
 
     /**
-     * Returns a new starter to build and start a {@link Process}.
-     *
-     * @return a new starter to build and start a {@link Process}
-     */
-    public static ProcessStarter process() {
-        return ProcessStarter.newInstance();
-    }
-
-    /**
      * Sleeps current thread for specified milliseconds.
      *
      * @param millis specified milliseconds
@@ -600,26 +589,35 @@ public class Jie {
      *
      * @return a new starter to build and start a {@link Thread}
      */
-    public static ThreadStarter thread() {
+    public static ThreadStarter threadStarter() {
         return ThreadStarter.newInstance();
     }
 
     /**
-     * Returns a new {@link ExecutorService} configurer to build a thread pool.
+     * Returns a new starter to build and start a {@link Process}.
      *
-     * @return a new {@link ExecutorService} configurer to build a thread pool
+     * @return a new starter to build and start a {@link Process}
      */
-    public static ThreadPoolBuilder threadPool() {
-        return ThreadPoolBuilder.newInstance();
+    public static ProcessStarter processStarter() {
+        return ProcessStarter.newInstance();
     }
 
     /**
-     * Returns a new {@link ScheduledExecutorService} configurer to build a scheduled thread pool.
+     * Returns a new builder to build a {@link ExecutorService}.
      *
-     * @return a new {@link ScheduledExecutorService} configurer to build a scheduled thread pool
+     * @return a new builder to build a {@link ExecutorService}
      */
-    public static ScheduledPoolBuilder scheduledPool() {
-        return ScheduledPoolBuilder.newInstance();
+    public static ExecutorBuilder executorBuilder() {
+        return ExecutorBuilder.newInstance();
+    }
+
+    /**
+     * Returns a new builder to build a {@link ScheduledExecutorService}.
+     *
+     * @return a new builder to build a {@link ScheduledExecutorService}
+     */
+    public static ScheduledBuilder scheduledBuilder() {
+        return ScheduledBuilder.newInstance();
     }
 
     /**

@@ -1,21 +1,17 @@
-package xyz.fslabo.common.exec;
-
-import xyz.fslabo.common.base.BaseBuilder;
-import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.io.JieIOException;
+package xyz.fslabo.common.base;
 
 import java.time.Duration;
 import java.util.concurrent.*;
 
 /**
- * Thread pool builder for {@link ScheduledExecutorService}.
+ * Builder for {@link ScheduledExecutorService}.
  *
  * @author fredsuvn
  */
-public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecutorService, ScheduledPoolBuilder> {
+public abstract class ScheduledBuilder implements BaseBuilder<ScheduledExecutorService, ScheduledBuilder> {
 
-    static ScheduledPoolBuilder newInstance() {
-        return new ScheduledPoolBuilder.OfJdk8();
+    static ScheduledBuilder newInstance() {
+        return new ScheduledBuilder.OfJdk8();
     }
 
     private int corePoolSize;
@@ -24,7 +20,7 @@ public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecu
     private boolean allowCoreThreadTimeOut = false;
     private Duration keepAliveTime;
 
-    ScheduledPoolBuilder() {
+    ScheduledBuilder() {
         reset();
     }
 
@@ -34,7 +30,7 @@ public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecu
      * @param corePoolSize core pool size
      * @return this
      */
-    public ScheduledPoolBuilder corePoolSize(int corePoolSize) {
+    public ScheduledBuilder corePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
         return this;
     }
@@ -45,7 +41,7 @@ public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecu
      * @param threadFactory thread factory
      * @return this
      */
-    public ScheduledPoolBuilder threadFactory(ThreadFactory threadFactory) {
+    public ScheduledBuilder threadFactory(ThreadFactory threadFactory) {
         this.threadFactory = threadFactory;
         return this;
     }
@@ -56,7 +52,7 @@ public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecu
      * @param rejectHandler the handler to use when execution is rejected
      * @return this
      */
-    public ScheduledPoolBuilder rejectHandler(RejectedExecutionHandler rejectHandler) {
+    public ScheduledBuilder rejectHandler(RejectedExecutionHandler rejectHandler) {
         this.rejectHandler = rejectHandler;
         return this;
     }
@@ -68,7 +64,7 @@ public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecu
      *                               keep-alive time
      * @return this
      */
-    public ScheduledPoolBuilder allowCoreThreadTimeOut(boolean allowCoreThreadTimeOut) {
+    public ScheduledBuilder allowCoreThreadTimeOut(boolean allowCoreThreadTimeOut) {
         this.allowCoreThreadTimeOut = allowCoreThreadTimeOut;
         return this;
     }
@@ -79,13 +75,13 @@ public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecu
      * @param keepAliveTime keep alive time for threads which are created exceed core threads
      * @return this
      */
-    public ScheduledPoolBuilder keepAliveTime(Duration keepAliveTime) {
+    public ScheduledBuilder keepAliveTime(Duration keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
         return this;
     }
 
     @Override
-    public ScheduledPoolBuilder reset() {
+    public ScheduledBuilder reset() {
         this.corePoolSize = 0;
         this.keepAliveTime = null;
         this.threadFactory = null;
@@ -98,20 +94,15 @@ public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecu
      * Returns scheduled thread pool which is configured by this.
      *
      * @return scheduled thread pool which is configured by this
-     * @throws JieIOException IO exception
      */
-    public ScheduledExecutorService build() throws JieIOException {
-        try {
-            ScheduledThreadPoolExecutor pool = buildExecutor();
-            if (allowCoreThreadTimeOut) {
-                Duration keepTime = Jie.orDefault(keepAliveTime, Duration.ZERO);
-                pool.setKeepAliveTime(keepTime.toNanos(), TimeUnit.NANOSECONDS);
-                pool.allowCoreThreadTimeOut(true);
-            }
-            return pool;
-        } catch (Exception e) {
-            throw new JieIOException(e);
+    public ScheduledExecutorService build() {
+        ScheduledThreadPoolExecutor pool = buildExecutor();
+        if (allowCoreThreadTimeOut) {
+            Duration keepTime = Jie.orDefault(keepAliveTime, Duration.ZERO);
+            pool.setKeepAliveTime(keepTime.toNanos(), TimeUnit.NANOSECONDS);
+            pool.allowCoreThreadTimeOut(true);
         }
+        return pool;
     }
 
     private ScheduledThreadPoolExecutor buildExecutor() {
@@ -128,6 +119,6 @@ public abstract class ScheduledPoolBuilder implements BaseBuilder<ScheduledExecu
         return pool;
     }
 
-    private static final class OfJdk8 extends ScheduledPoolBuilder {
+    private static final class OfJdk8 extends ScheduledBuilder {
     }
 }
