@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 public abstract class ScheduledBuilder implements BaseBuilder<ScheduledExecutorService, ScheduledBuilder> {
 
     static ScheduledBuilder newInstance() {
-        return new ScheduledBuilder.OfJdk8();
+        return new OfJdk8();
     }
 
     private int corePoolSize;

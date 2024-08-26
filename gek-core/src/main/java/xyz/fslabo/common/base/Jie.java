@@ -621,6 +621,16 @@ public class Jie {
     }
 
     /**
+     * Returns a new {@link RandomBuilder} to build a Random {@link Supplier}.
+     *
+     * @param <T> type of random object to be built
+     * @return a new {@link RandomBuilder} to build a Random {@link Supplier}
+     */
+    public static <T> RandomBuilder<T> randomBuilder() {
+        return RandomBuilder.newInstance();
+    }
+
+    /**
      * Logs message with level of {@link GekLog.Level#INFO} with {@link GekLog#getInstance()}.
      *
      * @param message message

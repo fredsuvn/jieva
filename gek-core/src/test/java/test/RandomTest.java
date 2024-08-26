@@ -3,13 +3,16 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.GekLog;
-import xyz.fslabo.common.base.GekRandom;
+import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.base.RandomBuilder;
+
+import java.util.function.Supplier;
 
 public class RandomTest {
 
     @Test
     public void testRandom() {
-        GekRandom<String> gekRandom = GekRandom.newBuilder()
+        Supplier<String> gekRandom = Jie.randomBuilder()
             .score(20, "A")
             .score(20, "B")
             .score(60, () -> "C")

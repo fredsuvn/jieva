@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 public abstract class ExecutorBuilder implements BaseBuilder<ExecutorService, ExecutorBuilder> {
 
     static ExecutorBuilder newInstance() {
-        return new ExecutorBuilder.OfJdk8();
+        return new OfJdk8();
     }
 
     private int corePoolSize;

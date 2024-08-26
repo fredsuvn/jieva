@@ -8,7 +8,7 @@ package xyz.fslabo.common.base;
 public abstract class ThreadStarter implements BaseStarter<Thread, ThreadStarter> {
 
     static ThreadStarter newInstance() {
-        return new ThreadStarter.OfJdk8();
+        return new OfJdk8();
     }
 
     private static long threadInitNumber;
