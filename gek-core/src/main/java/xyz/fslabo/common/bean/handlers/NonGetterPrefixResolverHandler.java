@@ -1,7 +1,7 @@
 package xyz.fslabo.common.bean.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekCase;
+import xyz.fslabo.common.base.CaseFormatter;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.bean.BeanResolver;
 
@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class NonGetterPrefixResolverHandler extends NonPrefixResolverHandler {
 
-    private final GekCase namingCase = GekCase.LOWER_CAMEL;
+    private final CaseFormatter namingCase = CaseFormatter.LOWER_CAMEL;
 
     @Nullable
     protected Setter resolveSetter(Method method) {
@@ -40,9 +40,9 @@ public class NonGetterPrefixResolverHandler extends NonPrefixResolverHandler {
         if (!isSetter) {
             return null;
         }
-        List<GekCase.Token> tokens = namingCase.tokenize(methodName);
-        if (tokens.size() > 1 && JieString.charEquals(tokens.get(0).toChars(), "set")) {
-            return buildSetter(namingCase.join(tokens.subList(1, tokens.size())), method);
+        List<CharSequence> wordList = namingCase.resolve(methodName);
+        if (wordList.size() > 1 && JieString.charEquals(wordList.get(0), "set")) {
+            return buildSetter(namingCase.format(wordList.subList(1, wordList.size())), method);
         }
         return null;
     }

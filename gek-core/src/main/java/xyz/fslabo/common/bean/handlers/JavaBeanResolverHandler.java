@@ -1,7 +1,7 @@
 package xyz.fslabo.common.bean.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.GekCase;
+import xyz.fslabo.common.base.CaseFormatter;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.bean.BeanResolver;
 
@@ -21,7 +21,7 @@ import java.util.Objects;
  */
 public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
 
-    private final GekCase namingCase = GekCase.LOWER_CAMEL;
+    private final CaseFormatter caseFormatter = CaseFormatter.LOWER_CAMEL;
 
     @Nullable
     protected Getter resolveGetter(Method method) {
@@ -44,12 +44,11 @@ public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
         if (!isGetter) {
             return null;
         }
-        List<GekCase.Token> tokens = namingCase.tokenize(methodName);
-        if (tokens.size() > 1 && (
-            JieString.charEquals(tokens.get(0).toChars(), "get")
-                || JieString.charEquals(tokens.get(0).toChars(), "is")
+        List<CharSequence> wordList = caseFormatter.resolve(methodName);
+        if (wordList.size() > 1 && (
+            JieString.charEquals(wordList.get(0), "get") || JieString.charEquals(wordList.get(0), "is")
         )) {
-            return buildGetter(namingCase.join(tokens.subList(1, tokens.size())), method);
+            return buildGetter(caseFormatter.format(wordList.subList(1, wordList.size())), method);
         }
         return null;
     }
@@ -65,9 +64,9 @@ public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
         if (!isSetter) {
             return null;
         }
-        List<GekCase.Token> tokens = namingCase.tokenize(methodName);
-        if (tokens.size() > 1 && JieString.charEquals(tokens.get(0).toChars(), "set")) {
-            return buildSetter(namingCase.join(tokens.subList(1, tokens.size())), method);
+        List<CharSequence> wordList = caseFormatter.resolve(methodName);
+        if (wordList.size() > 1 && JieString.charEquals(wordList.get(0), "set")) {
+            return buildSetter(caseFormatter.format(wordList.subList(1, wordList.size())), method);
         }
         return null;
     }

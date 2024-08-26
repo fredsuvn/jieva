@@ -3,7 +3,7 @@ package benchmark;
 import com.google.common.base.CaseFormat;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-import xyz.fslabo.common.base.GekCase;
+import xyz.fslabo.common.base.CaseFormatter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,12 +19,12 @@ public class CaseJmh {
     private static final String TEST_UNDERSCORE = "get_Simple_Name_Options_Builder";
     private static final String TEST_HYPHEN = "get-Simple-Name-Options-Builder";
 
-    private GekCase fsUpperCamel = GekCase.UPPER_CAMEL;
-    private GekCase fsLowerCamel = GekCase.LOWER_CAMEL;
-    private GekCase fsUpperUnderscore = GekCase.UPPER_UNDERSCORE;
-    private GekCase fsLowerUnderscore = GekCase.LOWER_UNDERSCORE;
-    private GekCase fsHyphen = GekCase.HYPHEN;
-    private GekCase fsUnderscore = GekCase.UNDERSCORE;
+    private CaseFormatter fsUpperCamel = CaseFormatter.UPPER_CAMEL;
+    private CaseFormatter fsLowerCamel = CaseFormatter.LOWER_CAMEL;
+    private CaseFormatter fsUpperUnderscore = CaseFormatter.UPPER_UNDERSCORE;
+    private CaseFormatter fsLowerUnderscore = CaseFormatter.LOWER_UNDERSCORE;
+    private CaseFormatter fsHyphen = CaseFormatter.HYPHEN;
+    private CaseFormatter fsUnderscore = CaseFormatter.UNDERSCORE;
     private CaseFormat guavaUpperCamel = CaseFormat.UPPER_CAMEL;
     private CaseFormat guavaLowerCamel = CaseFormat.LOWER_CAMEL;
     private CaseFormat guavaUpperUnderscore = CaseFormat.UPPER_UNDERSCORE;
@@ -37,26 +37,26 @@ public class CaseJmh {
 
     @Benchmark
     public void fsCamel(Blackhole bh) {
-        bh.consume(fsUpperCamel.toCase(TEST_CAMEL, fsLowerCamel));
-        bh.consume(fsLowerCamel.toCase(TEST_CAMEL, fsUpperCamel));
+        bh.consume(fsUpperCamel.to(fsLowerCamel, TEST_CAMEL));
+        bh.consume(fsLowerCamel.to(fsUpperCamel, TEST_CAMEL));
     }
 
     @Benchmark
     public void fsUnderscore(Blackhole bh) {
-        bh.consume(fsUpperUnderscore.toCase(TEST_UNDERSCORE, fsLowerUnderscore));
-        bh.consume(fsLowerUnderscore.toCase(TEST_UNDERSCORE, fsUpperUnderscore));
+        bh.consume(fsUpperUnderscore.to(fsLowerUnderscore, TEST_UNDERSCORE));
+        bh.consume(fsLowerUnderscore.to(fsUpperUnderscore, TEST_UNDERSCORE));
     }
 
     @Benchmark
     public void fsMix(Blackhole bh) {
-        bh.consume(fsUpperCamel.toCase(TEST_CAMEL, fsLowerUnderscore));
-        bh.consume(fsUpperUnderscore.toCase(TEST_UNDERSCORE, fsLowerCamel));
+        bh.consume(fsUpperCamel.to(fsLowerUnderscore, TEST_CAMEL));
+        bh.consume(fsUpperUnderscore.to(fsLowerCamel, TEST_UNDERSCORE));
     }
 
     @Benchmark
     public void fsMix2(Blackhole bh) {
-        bh.consume(fsHyphen.toCase(TEST_HYPHEN, fsUnderscore));
-        bh.consume(fsUnderscore.toCase(TEST_UNDERSCORE, fsHyphen));
+        bh.consume(fsHyphen.to(fsUnderscore, TEST_HYPHEN));
+        bh.consume(fsUnderscore.to(fsHyphen, TEST_UNDERSCORE));
     }
 
     @Benchmark
