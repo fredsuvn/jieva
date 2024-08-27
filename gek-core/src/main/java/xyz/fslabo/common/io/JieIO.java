@@ -760,7 +760,7 @@ public class JieIO {
      * @throws JieIOException IO exception
      */
     public static OutputStream toOutputStream(byte[] array) throws JieIOException {
-        return new ByteArrayAsOutputStream(array, 0, array.length);
+        return new BytesWrapperOutputStream(array, 0, array.length);
     }
 
     /**
@@ -774,7 +774,7 @@ public class JieIO {
      */
     public static OutputStream toOutputStream(byte[] array, int offset, int length) throws JieIOException {
         JieCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
-        return new ByteArrayAsOutputStream(array, offset, length);
+        return new BytesWrapperOutputStream(array, offset, length);
     }
 
     /**

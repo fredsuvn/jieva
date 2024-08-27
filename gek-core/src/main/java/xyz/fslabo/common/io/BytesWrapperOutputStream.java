@@ -5,13 +5,13 @@ import xyz.fslabo.common.base.JieCheck;
 import java.io.IOException;
 import java.io.OutputStream;
 
-final class ByteArrayAsOutputStream extends OutputStream {
+final class BytesWrapperOutputStream extends OutputStream {
 
     private final byte[] array;
     private final int end;
     private int pos;
 
-    ByteArrayAsOutputStream(byte[] array, int offset, int length) {
+    BytesWrapperOutputStream(byte[] array, int offset, int length) {
         this.array = array;
         this.end = offset + length;
         this.pos = offset;
