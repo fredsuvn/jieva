@@ -3,25 +3,22 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.GekLog;
-import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.base.RandomBuilder;
-
-import java.util.function.Supplier;
+import xyz.fslabo.common.base.RandomSupplier;
 
 public class RandomTest {
 
     @Test
     public void testRandom() {
-        Supplier<String> gekRandom = Jie.randomBuilder()
-            .score(20, "A")
-            .score(20, "B")
-            .score(60, () -> "C")
-            .build();
+        RandomSupplier<String> strRandom = RandomSupplier.of(
+            RandomSupplier.pair(20, "A"),
+            RandomSupplier.pair(20, "B"),
+            RandomSupplier.pair(60, () -> "C")
+        );
         int countA = 0;
         int countB = 0;
         int countC = 0;
         for (int i = 0; i < 1000; i++) {
-            Object result = gekRandom.next();
+            Object result = strRandom.get();
             if (result.equals("A")) {
                 countA++;
             } else if (result.equals("B")) {
@@ -34,7 +31,7 @@ public class RandomTest {
         Assert.assertEquals(total, 1000);
         GekLog.getInstance().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
 
-        String randomStr = String.join("", gekRandom.nextList(100));
+        String randomStr = String.join("", strRandom.get(100));
         GekLog.getInstance().info("randomStr: ", randomStr);
         Assert.assertEquals(randomStr.length(), 100);
     }
