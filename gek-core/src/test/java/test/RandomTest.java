@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.GekLog;
+import xyz.fslabo.common.base.JieLog;
 import xyz.fslabo.common.base.RandomSupplier;
 
 public class RandomTest {
@@ -29,10 +29,10 @@ public class RandomTest {
         }
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
-        GekLog.getInstance().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
+        JieLog.of().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
 
         String randomStr = String.join("", strRandom.get(100));
-        GekLog.getInstance().info("randomStr: ", randomStr);
+        JieLog.of().info("randomStr: ", randomStr);
         Assert.assertEquals(randomStr.length(), 100);
     }
 }

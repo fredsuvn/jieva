@@ -8,7 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
-import xyz.fslabo.common.base.GekLog;
+import xyz.fslabo.common.base.JieLog;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.bean.BeanResolver;
@@ -33,7 +33,7 @@ public class BeanPropertyTest {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
         BeanInfo ccBean = BeanInfo.get(ccType);
-        GekLog.getInstance().info("ccBean: ", ccBean);
+        JieLog.of().info("ccBean: ", ccBean);
         PropertyInfo cc = ccBean.getProperty("cc");
         PropertyInfo c1 = ccBean.getProperty("c1");
         PropertyInfo c2 = ccBean.getProperty("c2");
@@ -69,7 +69,7 @@ public class BeanPropertyTest {
     public void testClassBean() throws Exception {
         Type ccType = Cc.class;
         BeanInfo ccBean = BeanInfo.get(ccType);
-        GekLog.getInstance().info("ccBean: ", ccBean);
+        JieLog.of().info("ccBean: ", ccBean);
         PropertyInfo cc = ccBean.getProperty("cc");
         PropertyInfo c1 = ccBean.getProperty("c1");
         PropertyInfo c2 = ccBean.getProperty("c2");
@@ -114,7 +114,7 @@ public class BeanPropertyTest {
         map.put("2", 10010L);
         map.put("3", 10000L);
         BeanInfo mapBean = BeanInfo.wrap(map, mapType);
-        GekLog.getInstance().info("mapBean: ", mapBean);
+        JieLog.of().info("mapBean: ", mapBean);
         PropertyInfo p1 = mapBean.getProperty("1");
         PropertyInfo p2 = mapBean.getProperty("2");
         PropertyInfo p3 = mapBean.getProperty("3");
@@ -134,7 +134,7 @@ public class BeanPropertyTest {
         Assert.assertEquals(p1, mapBean.getProperty("1"));
         map.remove("2");
         Assert.assertNull(mapBean.getProperty("2"));
-        GekLog.getInstance().info("mapBean: ", mapBean);
+        JieLog.of().info("mapBean: ", mapBean);
 
         BeanInfo mapObjBean = BeanInfo.wrap(map);
         PropertyInfo p1Obj = mapObjBean.getProperty("1");

@@ -110,7 +110,7 @@ public interface RandomSupplier<T> extends Supplier<T> {
      */
     @SafeVarargs
     static <T> RandomSupplier<T> of(Random random, Pair<T>... pairs) {
-        return new RandomImpls.RandomSupplierImpl<>(random, pairs);
+        return new RandomSupplierImpls.RandomSupplierImpl<>(random, pairs);
     }
 
     /**
@@ -138,7 +138,7 @@ public interface RandomSupplier<T> extends Supplier<T> {
      * @see #pair(int, Supplier)
      */
     static <T> RandomSupplier<T> of(Random random, Iterable<Pair<T>> pairs) {
-        return new RandomImpls.RandomSupplierImpl<>(random, pairs);
+        return new RandomSupplierImpls.RandomSupplierImpl<>(random, pairs);
     }
 
     /**

@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.GekLog;
+import xyz.fslabo.common.base.JieLog;
 import xyz.fslabo.common.cache.Cache;
 import xyz.fslabo.common.ref.Var;
 import xyz.fslabo.common.ref.IntVar;
@@ -30,7 +30,7 @@ public class CacheTest {
                 collected[0]++;
             }
         }), detected, "weak-cache");
-        GekLog.getInstance().info("Collected: ", collected[0]);
+        JieLog.of().info("Collected: ", collected[0]);
     }
 
     private void testCache(Cache<Integer, String> cache, int[] detected, String name) {
@@ -51,7 +51,7 @@ public class CacheTest {
                 //Assert.assertEquals(map.get(i), fsValue);
             }
         }
-        GekLog.getInstance().info(name + "---> total: " + times +
+        JieLog.of().info(name + "---> total: " + times +
             ", removed: " + removed +
             ", detected: " + detected[0] +
             ", cached: " + (times - removed) +
@@ -69,7 +69,7 @@ public class CacheTest {
         Assert.assertNull(cache.get(1));
         Assert.assertEquals(cache.compute(1, String::valueOf), "1");
         Assert.assertEquals(cache.compute(1, String::valueOf), "1");
-        GekLog.getInstance().info("cacheLoader: 1=", cache.get(1));
+        JieLog.of().info("cacheLoader: 1=", cache.get(1));
         cache.compute(1, k -> null);
         Assert.assertEquals(cache.get(1), "1");
         cache.remove(1);

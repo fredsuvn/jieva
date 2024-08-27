@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
-final class RandomImpls {
+final class RandomSupplierImpls {
 
     static final class RandomSupplierImpl<T> implements RandomSupplier<T> {
 

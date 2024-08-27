@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.GekLog;
+import xyz.fslabo.common.base.JieLog;
 import xyz.fslabo.common.invoke.Invoker;
 
 import java.lang.reflect.Constructor;
@@ -24,7 +24,7 @@ public class InvokeTest {
         helloStatic.setAccessible(true);
         helloVirtual.setAccessible(true);
         TT tt = (TT) (reflect ? Invoker.reflect(constructor) : Invoker.unreflect(constructor)).invoke(null);
-        GekLog.getInstance().info(tt);
+        JieLog.of().info(tt);
         Assert.assertNotNull(tt);
         Assert.assertEquals(
             (reflect ? Invoker.reflect(helloStatic) : Invoker.unreflect(helloStatic))

@@ -15,10 +15,10 @@ public class JieTest {
     @Test
     public void testThrow() {
         BeanUtils.copyProperties(null, null);
-        GekLog.getInstance().info(JieTrace.toString(
+        JieLog.of().info(JieTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())))
         );
-        GekLog.getInstance().info(JieTrace.toString(
+        JieLog.of().info(JieTrace.toString(
             new IllegalArgumentException(new IllegalStateException(new NullPointerException())),
             " : ")
         );
@@ -60,15 +60,15 @@ public class JieTest {
 
     @Test
     public void testSystem() {
-        GekLog.getInstance().info(JieSystem.getJavaVersion());
-        GekLog.getInstance().info(JieSystem.javaMajorVersion());
-        GekLog.getInstance().info(JieChars.nativeCharset());
-        GekLog.getInstance().info(JieSystem.getOsName());
-        GekLog.getInstance().info(JieSystem.isWindows());
-        GekLog.getInstance().info(JieSystem.isLinux());
-        GekLog.getInstance().info(JieSystem.isBsd());
-        GekLog.getInstance().info(JieSystem.isMac());
-        GekLog.getInstance().info(JieSystem.isJdk9OrHigher());
+        JieLog.of().info(JieSystem.getJavaVersion());
+        JieLog.of().info(JieSystem.javaMajorVersion());
+        JieLog.of().info(JieChars.nativeCharset());
+        JieLog.of().info(JieSystem.getOsName());
+        JieLog.of().info(JieSystem.isWindows());
+        JieLog.of().info(JieSystem.isLinux());
+        JieLog.of().info(JieSystem.isBsd());
+        JieLog.of().info(JieSystem.isMac());
+        JieLog.of().info(JieSystem.isJdk9OrHigher());
     }
 
     @Test

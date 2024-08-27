@@ -42,7 +42,7 @@ public class ProcessTest {
                     return;
                 }
                 if (JieString.isNotEmpty(output)) {
-                    GekLog.getInstance().info(output);
+                    JieLog.of().info(output);
                 }
                 Jie.sleep(1);
             }

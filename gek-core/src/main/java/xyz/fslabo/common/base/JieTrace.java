@@ -6,6 +6,7 @@ import xyz.fslabo.common.coll.JieArray;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * Utilities for trace and throwable info.
@@ -16,52 +17,27 @@ public class JieTrace {
 
     /**
      * Returns caller stack trace of given class name and method name, or null if failed.
-     * This method is equivalent to {@link #findCallerTrace(String, String, int)}:
-     * <pre>
-     *     findCallerStackTrace(className, methodName, 0)
-     * </pre>
      * <p>
-     * This method searches the result of {@link Thread#getStackTrace()} of current thread,
-     * to find first {@link StackTraceElement} of which class name and method name are match given names.
-     * Let the next of found element be the {@code caller}, the {@code caller} will be returned.
+     * This method searches the result of {@link Thread#getStackTrace()} of current thread, to find first
+     * {@link StackTraceElement} which can pass the given predicate. Let the next found element be the {@code caller},
+     * if given {@code offset} is 0, the {@code caller} will be returned. Otherwise, the element at index of
+     * {@code (caller's index + offset)} will be returned.
      * <p>
      * If stack trace element is null or empty, or the final index is out of bound, return null.
      *
-     * @param className  given class name
-     * @param methodName given method name
+     * @param offset    given offset
+     * @param predicate given predicate
      * @return caller stack trace
      */
     @Nullable
-    public static StackTraceElement findCallerTrace(String className, String methodName) {
-        return findCallerTrace(className, methodName, 0);
-    }
-
-    /**
-     * Returns caller stack trace of given class name and method name, or null if failed.
-     * <p>
-     * This method searches the result of {@link Thread#getStackTrace()} of current thread,
-     * to find first {@link StackTraceElement} of which class name and method name are match given names.
-     * Let the next of found element be the {@code caller},
-     * if given {@code offset} is 0, the {@code caller} will be returned.
-     * Otherwise, the element at index of {@code (caller's index + offset)} will be returned.
-     * <p>
-     * If stack trace element is null or empty, or the final index is out of bound, return null.
-     *
-     * @param className  given class name
-     * @param methodName given method name
-     * @param offset     given offset
-     * @return caller stack trace
-     */
-    @Nullable
-    public static StackTraceElement findCallerTrace(String className, String methodName, int offset) {
+    public static StackTraceElement findCallerTrace(int offset, Predicate<StackTraceElement> predicate) {
         StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
         if (JieArray.isEmpty(stackTraces)) {
             return null;
         }
         for (int i = 0; i < stackTraces.length; i++) {
             StackTraceElement stackTraceElement = stackTraces[i];
-            if (Jie.equals(stackTraceElement.getClassName(), className)
-                && Jie.equals(stackTraceElement.getMethodName(), methodName)) {
+            if (predicate.test(stackTraceElement)) {
                 int targetIndex = i + 1 + offset;
                 if (JieCheck.isInBounds(targetIndex, 0, stackTraces.length)) {
                     return stackTraces[targetIndex];

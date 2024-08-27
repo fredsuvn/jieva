@@ -621,12 +621,12 @@ public class Jie {
     }
 
     /**
-     * Logs message with level of {@link GekLog.Level#INFO} with {@link GekLog#getInstance()}.
+     * Logs given message by {@link JieLog#system()}.
      *
-     * @param message message
+     * @param message given message
      */
     public static void log(Object... message) {
-        GekLog.getInstance().logOffset(GekLog.Level.INFO, 2, message);
+        JieLog.system().info(message);
     }
 
     /**

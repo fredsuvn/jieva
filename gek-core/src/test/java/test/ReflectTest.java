@@ -2,7 +2,7 @@ package test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.GekLog;
+import xyz.fslabo.common.base.JieLog;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieReflect;
@@ -415,7 +415,7 @@ public class ReflectTest {
         // A(844996153)=A(726237730)
         // B(1498084403)=A(844996153)
         // V(23805079)=class java.lang.Long(746023354)
-        GekLog.getInstance().info(JieColl.toMap(
+        JieLog.of().info(JieColl.toMap(
             map.entrySet(),
             it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
             it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
@@ -429,7 +429,7 @@ public class ReflectTest {
         // A(844996153)=A(726237730)
         // B(1498084403)=A(844996153)
         // V(23805079)=class java.lang.Long(746023354)
-        GekLog.getInstance().info(JieColl.toMap(
+        JieLog.of().info(JieColl.toMap(
             map2.entrySet(),
             it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
             it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
@@ -439,12 +439,12 @@ public class ReflectTest {
     @Test
     public void testGetGenericSuperType() {
         ParameterizedType generic = JieReflect.getActualTypeArguments(ZS.class, Z.class);
-        GekLog.getInstance().info(generic);
+        JieLog.of().info(generic);
         Assert.assertEquals(generic, new TypeRef<Z<String, Integer, Long, Boolean>>() {
         }.getType());
         generic = JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
         }.getType(), Z.class);
-        GekLog.getInstance().info(generic);
+        JieLog.of().info(generic);
         Assert.assertEquals(generic, new TypeRef<Z<String, String, Long, Boolean>>() {
         }.getType());
         Assert.assertEquals(
