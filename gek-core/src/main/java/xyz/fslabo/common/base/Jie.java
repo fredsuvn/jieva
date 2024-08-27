@@ -531,34 +531,6 @@ public class Jie {
     }
 
     /**
-     * Returns block count of total value and block size:
-     * <pre>
-     *     return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
-     * </pre>
-     *
-     * @param totalSize total size
-     * @param blockSize block size
-     * @return block count
-     */
-    public static int countBlock(int totalSize, int blockSize) {
-        return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
-    }
-
-    /**
-     * Returns block count of total value and block size:
-     * <pre>
-     *     return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
-     * </pre>
-     *
-     * @param totalSize total size
-     * @param blockSize block size
-     * @return block count
-     */
-    public static long countBlock(long totalSize, long blockSize) {
-        return totalSize % blockSize == 0 ? totalSize / blockSize : totalSize / blockSize + 1;
-    }
-
-    /**
      * Sleeps current thread for specified milliseconds.
      *
      * @param millis specified milliseconds
@@ -627,52 +599,6 @@ public class Jie {
      */
     public static void log(Object... message) {
         JieLog.system().info(message);
-    }
-
-    /**
-     * Returns given elements itself as array.
-     * <p>
-     * This method directly invokes {@link JieArray#asArray(Object[])}.
-     *
-     * @param elements given elements
-     * @param <T>      component type
-     * @return given elements itself as array
-     */
-    @SafeVarargs
-    public static <T> T[] asArray(T... elements) {
-        return JieArray.asArray(elements);
-    }
-
-    /**
-     * Wraps and returns given array as a mutable and size-fixed list, the elements directly come from given array, any
-     * modification will reflect each other.
-     * <p>
-     * This method directly invokes {@link JieArray#asList(Object[])}.
-     *
-     * @param elements given elements
-     * @param <T>      type of element
-     * @return a mutable and size-fixed list
-     * @see JieArray#asList(Object[])
-     */
-    @SafeVarargs
-    public static <T> List<T> asList(T... elements) {
-        return JieArray.asList(elements);
-    }
-
-    /**
-     * Wraps and returns given array as an immutable list, the elements directly come from given array, any modification
-     * will reflect returned list.
-     * <p>
-     * This method directly invokes {@link JieArray#listOf(Object[])}.
-     *
-     * @param elements given elements
-     * @param <T>      type of element
-     * @return an immutable list
-     * @see JieArray#listOf(Object[])
-     */
-    @SafeVarargs
-    public static <T> List<T> listOf(T... elements) {
-        return JieArray.listOf(elements);
     }
 
     /**
