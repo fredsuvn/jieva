@@ -11,18 +11,23 @@ import java.util.function.Function;
 /**
  * This input stream is used to transform data from {@code source} stream by specified transformer. For example:
  * <pre>
+ *     // "12345678" -&gt; "1234"
+ *     // "1234567887654321" -&gt; "12348765"
  *     TransformInputStream trans = new TransformInputStream(source, 8, bytes-&gt;
  *         Arrays.copyOf(bytes, bytes.length / 2)
  *     );
  * </pre>
- * Example shows how to remove half of the data every 8-bytes:
- * <pre>
- *     "12345678" -&gt; "1234"
- *     "1234567887654321" -&gt; "12348765"
- * </pre>
- * This stream doesn't support mark/reset methods.
+ * This stream consists a source stream, block size and a transformer.
+ * <p>
+ * The block size specifies how much data is read each time from source stream, and the read data will be pass to
+ * given transformer and the transformer return transformed result. If remaining bytes is less than block size, all
+ * remaining bytes will be read and pass to transform. Transformer may return empty or null, in this case the passed
+ * read data is not enough to transform and need next more read data.
+ * <p>
+ * Note this stream doesn't support mark/reset methods.
  *
  * @author fredsuvn
+ * @see #TransformInputStream(InputStream, int, Function)
  */
 public class TransformInputStream extends InputStream {
 
@@ -35,11 +40,6 @@ public class TransformInputStream extends InputStream {
 
     /**
      * Constructs with source stream, block size and transformer.
-     * The block size specifies how much data is read each time from source stream, and the read data will be pass to
-     * given transformer and the transformer return transformed result.
-     * If remaining bytes is less than block size, all remaining bytes will be read and pass to transform.
-     * Transformer may return empty or null, in this case the passed read data is not enough to transform and need next
-     * more read data.
      *
      * @param source      source stream
      * @param blockSize   block size
