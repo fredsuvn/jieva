@@ -3,20 +3,19 @@ package xyz.fslabo.common.proxy;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.function.Predicate;
 
-final class JdkProxyImpl<T> implements GekProxy<T> {
+final class JdkTypeProxy<T> implements TypeProxy<T> {
 
     private final Class<?>[] superInterfaces;
-    private final Map<MethodSignature, GekProxyMethod> methodMap;
+    private final Map<MethodSignature, TypeProxyMethod> methodMap;
 
-    JdkProxyImpl(Iterable<Class<?>> superInterfaces, Map<Predicate<Method>, GekProxyMethod> proxyMap) {
+    JdkTypeProxy(Iterable<Class<?>> superInterfaces, Map<Predicate<Method>, TypeProxyMethod> proxyMap) {
         if (JieColl.isEmpty(superInterfaces)) {
-            throw new GekProxyException("No super interface to be proxied.");
+            throw new TypeProxyException("No super interface to be proxied.");
         }
         this.superInterfaces = JieColl.toArray(superInterfaces, Class.class);
         if (JieColl.isEmpty(proxyMap)) {
@@ -49,17 +48,17 @@ final class JdkProxyImpl<T> implements GekProxy<T> {
                 this.getClass().getClassLoader(),
                 superInterfaces,
                 (proxy, method, args) -> {
-                    GekProxyMethod proxyMethod = methodMap.get(new MethodSignature(method));
+                    TypeProxyMethod proxyMethod = methodMap.get(new MethodSignature(method));
                     if (proxyMethod == null) {
                         return method.invoke(proxy, args);
                     }
-                    return proxyMethod.invokeProxy(args, method, objs -> {
+                    return proxyMethod.invokeProxy(proxy, method, (p, as) -> {
                         try {
-                            return method.invoke(proxy, objs);
-                        } catch (InvocationTargetException e) {
-                            throw e.getCause();
+                            return method.invoke(p, as);
+                        } catch (Exception e) {
+                            throw new TypeProxyException(e);
                         }
-                    });
+                    }, args);
                 });
         }
         return Jie.as(inst);
@@ -68,32 +67,31 @@ final class JdkProxyImpl<T> implements GekProxy<T> {
     private static final class MethodSignature {
 
         private final String name;
-        private final List<Class<?>> paramTypes;
-
-        private int hash = 0;
+        private final Class<?>[] paramTypes;
 
         private MethodSignature(Method method) {
             this.name = method.getName();
-            this.paramTypes = Arrays.asList(method.getParameterTypes());
+            this.paramTypes = method.getParameterTypes();
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            MethodSignature that = (MethodSignature) o;
-            return Objects.equals(name, that.name) && Objects.equals(paramTypes, that.paramTypes);
+            if (o == null) {
+                return false;
+            }
+            if (this == o) {
+                return true;
+            }
+            if (o instanceof MethodSignature) {
+                MethodSignature om = (MethodSignature) o;
+                return Objects.equals(this.name, om.name) && Arrays.equals(this.paramTypes, om.paramTypes);
+            }
+            return false;
         }
 
         @Override
         public int hashCode() {
-            if (hash == 0) {
-                hash = Objects.hash(name, paramTypes);
-                if (hash == 0) {
-                    hash = 1;
-                }
-            }
-            return hash;
+            return Objects.hash(name, Arrays.hashCode(paramTypes));
         }
     }
 }

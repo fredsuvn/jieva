@@ -1,7 +1,9 @@
 package xyz.fslabo.common.proxy;
 
-import net.sf.cglib.proxy.*;
+import org.springframework.cglib.core.SpringNamingPolicy;
+import org.springframework.cglib.proxy.*;
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
 
 import java.lang.reflect.Method;
@@ -10,14 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-final class CglibProxyImpl<T> implements GekProxy<T> {
+final class SpringTypeProxy<T> implements TypeProxy<T> {
 
     private final Enhancer enhancer;
 
-    CglibProxyImpl(
+    SpringTypeProxy(
         @Nullable Class<?> superClass,
         @Nullable Iterable<Class<?>> superInterfaces,
-        Map<Predicate<Method>, GekProxyMethod> proxyMap
+        Map<Predicate<Method>, TypeProxyMethod> proxyMap
     ) {
         Enhancer enhancer = new Enhancer();
         boolean inherited = false;
@@ -30,13 +32,13 @@ final class CglibProxyImpl<T> implements GekProxy<T> {
             inherited = true;
         }
         if (!inherited) {
-            throw new GekProxyException("No super class or interface to be proxied.");
+            throw new TypeProxyException("No super class or interface to be proxied.");
         }
         List<MethodInterceptor> interceptorList = new ArrayList<>();
         interceptorList.add((obj, method, args, proxy) -> proxy.invokeSuper(obj, args));
         Predicate<Method>[] predicates = proxyMap.keySet().toArray(new Predicate[0]);
         for (Predicate<Method> predicate : predicates) {
-            GekProxyMethod proxy = proxyMap.get(predicate);
+            TypeProxyMethod proxy = proxyMap.get(predicate);
             MethodInterceptor interceptor = new MethodInterceptorImpl(proxy);
             interceptorList.add(interceptor);
         }
@@ -50,25 +52,32 @@ final class CglibProxyImpl<T> implements GekProxy<T> {
         };
         enhancer.setCallbackFilter(callbackFilter);
         enhancer.setCallbacks(interceptorList.toArray(new Callback[0]));
+        enhancer.setNamingPolicy(new SpringNamingPolicy());
         this.enhancer = enhancer;
     }
 
     @Override
     public T newInstance() {
-        return (T) enhancer.create();
+        return Jie.as(enhancer.create());
     }
 
     private static final class MethodInterceptorImpl implements MethodInterceptor {
 
-        private final GekProxyMethod gekProxyMethod;
+        private final TypeProxyMethod typeProxyMethod;
 
-        private MethodInterceptorImpl(GekProxyMethod gekProxyMethod) {
-            this.gekProxyMethod = gekProxyMethod;
+        private MethodInterceptorImpl(TypeProxyMethod typeProxyMethod) {
+            this.typeProxyMethod = typeProxyMethod;
         }
 
         @Override
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
-            return gekProxyMethod.invokeProxy(args, method, args1 -> proxy.invokeSuper(obj, args1));
+            return typeProxyMethod.invokeProxy(obj, method, (p, as) -> {
+                try {
+                    return proxy.invokeSuper(p, as);
+                } catch (Throwable e) {
+                    throw new TypeProxyException(e);
+                }
+            }, args);
         }
     }
 }

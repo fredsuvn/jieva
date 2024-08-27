@@ -5,20 +5,23 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * Proxy for java type, to create new proxy instance.
+ * Type proxy, to create proxy instance of proxied type.
  *
  * @param <T> proxied type
  * @author fredsuvn
  */
 @ThreadSafe
-public interface GekProxy<T> {
+public interface TypeProxy<T> {
 
     /**
-     * Returns new builder of {@link GekProxy}.
+     * Returns a new {@link TypeProxy}.
      *
      * @param <T> proxied type
      * @return new builder
@@ -35,35 +38,36 @@ public interface GekProxy<T> {
     T newInstance();
 
     /**
-     * Builder for {@link GekProxy}.
-     * The instance built by this builder only supports the proxy of methods in {@link Class#getMethods()},
-     * and supports using JDK proxy or cglib to proxy.
+     * Builder for {@link TypeProxy}.
      * <p>
-     * Note JDK proxy only supports proxying interfaces.
+     * The instance built by this builder only supports the proxy of methods in {@link Class#getMethods()}, and supports
+     * using {@code JDK proxy} or {@code cglib} to proxy.
+     * <p>
+     * Note {@code JDK proxy} only supports proxying interfaces.
      *
      * @param <T> proxied type
      */
     class Builder<T> {
 
         /**
-         * JDK proxy.
+         * Use engine of JDK proxy.
          */
-        public static final int JDK_PROXY = 1;
+        public static final int ENGINE_JDK = 0;
 
         /**
-         * Cglib proxy.
+         * Use engine of cglib proxy.
          */
-        public static final int CGLIB_PROXY = 2;
+        public static final int ENGINE_CGLIB = 1;
 
         /**
-         * Spring proxy.
+         * Use engine of spring proxy.
          */
-        public static final int SPRING_PROXY = 3;
+        public static final int ENGINE_SPRING = 2;
 
         private Class<?> superClass;
         private Iterable<Class<?>> superInterfaces;
-        private final Map<Predicate<Method>, GekProxyMethod> proxyMap = new HashMap<>();
-        private int proxyGenerator = 0;
+        private final Map<Predicate<Method>, TypeProxyMethod> proxyMap = new HashMap<>();
+        private int engine = 0;
 
         /**
          * Sets super class of proxy class.
@@ -101,14 +105,14 @@ public interface GekProxy<T> {
         }
 
         /**
-         * Sets methods to be proxied, the methods pass given predicate should be proxied by given proxy method.
+         * Sets methods to be proxied, the methods which can pass given predicate will be proxied by given proxy method.
          *
          * @param predicate   given predicate
          * @param proxyMethod proxy method
          * @param <T1>        proxied type
          * @return this builder
          */
-        public <T1 extends T> Builder<T1> proxyMethod(Predicate<Method> predicate, GekProxyMethod proxyMethod) {
+        public <T1 extends T> Builder<T1> proxyMethod(Predicate<Method> predicate, TypeProxyMethod proxyMethod) {
             proxyMap.put(predicate, proxyMethod);
             return Jie.as(this);
         }
@@ -123,68 +127,58 @@ public interface GekProxy<T> {
          * @param <T1>        proxied type
          * @return this builder
          */
-        public <T1 extends T> Builder<T1> proxyMethod(String methodName, List<Class<?>> paramTypes, GekProxyMethod proxyMethod) {
-            return proxyMethod(methodName, paramTypes.toArray(new Class[0]), proxyMethod);
-        }
-
-        /**
-         * Sets method of which name is given method name and parameter types are given parameter types
-         * should be proxied by given proxy method.
-         *
-         * @param methodName  given method name
-         * @param paramTypes  given parameter types
-         * @param proxyMethod proxy method
-         * @param <T1>        proxied type
-         * @return this builder
-         */
-        public <T1 extends T> Builder<T1> proxyMethod(String methodName, Class<?>[] paramTypes, GekProxyMethod proxyMethod) {
-            return proxyMethod(
-                method -> Objects.equals(method.getName(), methodName) && Arrays.equals(method.getParameterTypes(), paramTypes),
+        public <T1 extends T> Builder<T1> proxyMethod(
+            String methodName, Class<?>[] paramTypes, TypeProxyMethod proxyMethod) {
+            return proxyMethod(method ->
+                    Objects.equals(method.getName(), methodName)
+                        && Arrays.equals(method.getParameterTypes(), paramTypes),
                 proxyMethod
             );
         }
 
         /**
-         * Sets proxy generator:
+         * Sets proxy engine:
          * <ul>
-         *     <li>{@link #JDK_PROXY}: using jdk proxy;</li>
-         *     <li>{@link #CGLIB_PROXY}: using cglib proxy;</li>
-         *     <li>{@link #SPRING_PROXY}: using spring proxy;</li>
+         *     <li>{@link #ENGINE_JDK};</li>
+         *     <li>{@link #ENGINE_CGLIB};</li>
+         *     <li>{@link #ENGINE_SPRING};</li>
          * </ul>
-         * By default, the builder will check the required libs in current runtime to choose a generator in priority:
+         * By default, the builder will check the required libs in current runtime to choose an engine in priority:
          * spring &gt; cglib &gt; JDK.
          * <p>
          * Note the required libs need to be present in the runtime environment.
          *
-         * @param proxyGenerator proxy generator
-         * @param <T1>           proxied type
+         * @param engine proxy engine
+         * @param <T1>   proxied type
          * @return this builder
          */
-        public <T1 extends T> Builder<T1> proxyGenerator(int proxyGenerator) {
-            this.proxyGenerator = proxyGenerator;
+        public <T1 extends T> Builder<T1> engine(int engine) {
+            this.engine = engine;
             return Jie.as(this);
         }
 
         /**
-         * Builds {@link GekProxy}.
+         * Builds a new {@link TypeProxy}.
          *
          * @param <T1> proxied type
-         * @return built {@link GekProxy}
+         * @return a new {@link TypeProxy}
          */
-        public <T1 extends T> GekProxy<T1> build() {
-            if (proxyGenerator == JDK_PROXY) {
-                return new JdkProxyImpl<>(superInterfaces, proxyMap);
-            }
-            if (proxyGenerator == CGLIB_PROXY) {
-                return new CglibProxyImpl<>(superClass, superInterfaces, proxyMap);
+        public <T1 extends T> TypeProxy<T1> build() {
+            switch (engine) {
+                case ENGINE_JDK:
+                    return new JdkTypeProxy<>(superInterfaces, proxyMap);
+                case ENGINE_CGLIB:
+                    return new CglibTypeProxy<>(superClass, superInterfaces, proxyMap);
+                case ENGINE_SPRING:
+                    return new SpringTypeProxy<>(superClass, superInterfaces, proxyMap);
             }
             if (hasSpring()) {
-                return new SpringProxyImpl<>(superClass, superInterfaces, proxyMap);
+                return new SpringTypeProxy<>(superClass, superInterfaces, proxyMap);
             }
             if (hasCglib()) {
-                return new CglibProxyImpl<>(superClass, superInterfaces, proxyMap);
+                return new CglibTypeProxy<>(superClass, superInterfaces, proxyMap);
             }
-            return new JdkProxyImpl<>(superInterfaces, proxyMap);
+            return new JdkTypeProxy<>(superInterfaces, proxyMap);
         }
 
         private boolean hasSpring() {

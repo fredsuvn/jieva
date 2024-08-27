@@ -1,16 +1,16 @@
 package xyz.fslabo.common.proxy;
 
 /**
- * Exception for Jie proxy.
+ * Exception for type proxy.
  *
  * @author fredsuvn
  */
-public class GekProxyException extends RuntimeException {
+public class TypeProxyException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekProxyException() {
+    public TypeProxyException() {
     }
 
     /**
@@ -18,7 +18,7 @@ public class GekProxyException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekProxyException(String message) {
+    public TypeProxyException(String message) {
         super(message);
     }
 
@@ -28,7 +28,7 @@ public class GekProxyException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekProxyException(String message, Throwable cause) {
+    public TypeProxyException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +37,7 @@ public class GekProxyException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekProxyException(Throwable cause) {
+    public TypeProxyException(Throwable cause) {
         super(cause);
     }
 }
