@@ -5,12 +5,12 @@ package xyz.fslabo.common.file;
  *
  * @author fredsuvn
  */
-public class GekFileException extends RuntimeException {
+public class FileException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekFileException() {
+    public FileException() {
     }
 
     /**
@@ -18,7 +18,7 @@ public class GekFileException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekFileException(String message) {
+    public FileException(String message) {
         super(message);
     }
 
@@ -28,7 +28,7 @@ public class GekFileException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekFileException(String message, Throwable cause) {
+    public FileException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +37,7 @@ public class GekFileException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekFileException(Throwable cause) {
+    public FileException(Throwable cause) {
         super(cause);
     }
 }

@@ -3,6 +3,7 @@ package test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.JieChars;
+import xyz.fslabo.common.file.JieFile;
 import xyz.fslabo.common.io.JieIO;
 
 import java.io.*;
@@ -273,11 +274,11 @@ public class IOTest {
         testOutStream(-1, JieIO.toOutputStream(sb), (off, len) ->
             Arrays.copyOfRange(sb.toString().getBytes(JieChars.defaultCharset()), off, off + len));
         testOutStream(-1, JieIO.toOutputStream(random), (off, len) ->
-            JieIO.readBytes(file.toPath(), off, len));
+            JieFile.readBytes(file.toPath(), off, len));
         testOutStream(188, JieIO.toOutputStream(random, 8, 188), (off, len) ->
-            JieIO.readBytes(file.toPath(), off + 8, len));
+            JieFile.readBytes(file.toPath(), off + 8, len));
         testOutStream(-1, JieIO.toOutputStream(random, 8, -1), (off, len) ->
-            JieIO.readBytes(file.toPath(), off + 8, len));
+            JieFile.readBytes(file.toPath(), off + 8, len));
         byte[] back = new byte[2048];
         testOutStream(bytes.length, JieIO.toOutputStream(back, 111, 1024), (off, len) ->
             Arrays.copyOfRange(back, off + 111, off + 111 + len));
@@ -367,9 +368,9 @@ public class IOTest {
     public void testReadFile() throws IOException {
         String data = DATA;
         File file = FileTest.createFile("IOTest-testReadFile.txt", data);
-        Assert.assertEquals(JieIO.readString(file.toPath()), data);
+        Assert.assertEquals(JieFile.readString(file.toPath()), data);
         Assert.assertEquals(
-            JieIO.readString(file.toPath(), 18, 36),
+            JieFile.readString(file.toPath(), 18, 36),
             new String(data.getBytes(JieChars.defaultCharset()), 18, 36)
         );
         file.delete();
@@ -381,13 +382,13 @@ public class IOTest {
         if (!file.exists()) {
             file.createNewFile();
         }
-        JieIO.writeString(file.toPath(), "lalala");
-        JieIO.writeString(file.toPath(), 6, 18, "222");
-        Assert.assertEquals(JieIO.readString(file.toPath()), "lalala222");
-        JieIO.writeString(file.toPath(), 6, 7, "1");
-        Assert.assertEquals(JieIO.readString(file.toPath()), "lalala122");
-        JieIO.writeString(file.toPath(), 7, 100, "3333中文中文");
-        Assert.assertEquals(JieIO.readString(file.toPath()), "lalala13333中文中文");
+        JieFile.writeString(file.toPath(), "lalala");
+        JieFile.writeString(file.toPath(), 6, 18, "222");
+        Assert.assertEquals(JieFile.readString(file.toPath()), "lalala222");
+        JieFile.writeString(file.toPath(), 6, 7, "1");
+        Assert.assertEquals(JieFile.readString(file.toPath()), "lalala122");
+        JieFile.writeString(file.toPath(), 7, 100, "3333中文中文");
+        Assert.assertEquals(JieFile.readString(file.toPath()), "lalala13333中文中文");
         file.delete();
     }
 
