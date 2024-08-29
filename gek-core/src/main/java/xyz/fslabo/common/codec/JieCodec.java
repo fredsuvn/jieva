@@ -16,7 +16,7 @@ import java.security.*;
  *
  * @author fredsuvn
  */
-public class GekCodec {
+public class JieCodec {
 
     /**
      * Returns a base64 codec process.
@@ -50,13 +50,13 @@ public class GekCodec {
      *
      * @param algorithm specified algorithm
      * @return key factory with specified algorithm
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static KeyFactory keyFactory(String algorithm) throws GekCodecException {
+    public static KeyFactory keyFactory(String algorithm) throws CodecException {
         try {
             return KeyFactory.getInstance(algorithm);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -66,13 +66,13 @@ public class GekCodec {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      * @return key factory with specified algorithm and provider
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static KeyFactory keyFactory(String algorithm, @Nullable Provider provider) throws GekCodecException {
+    public static KeyFactory keyFactory(String algorithm, @Nullable Provider provider) throws CodecException {
         try {
             return provider == null ? KeyFactory.getInstance(algorithm) : KeyFactory.getInstance(algorithm, provider);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -81,13 +81,13 @@ public class GekCodec {
      *
      * @param algorithm specified algorithm
      * @return key generator with specified algorithm
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static KeyGenerator keyGenerator(String algorithm) throws GekCodecException {
+    public static KeyGenerator keyGenerator(String algorithm) throws CodecException {
         try {
             return KeyGenerator.getInstance(algorithm);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -97,13 +97,13 @@ public class GekCodec {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      * @return key generator with specified algorithm and provider
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static KeyGenerator keyGenerator(String algorithm, @Nullable Provider provider) throws GekCodecException {
+    public static KeyGenerator keyGenerator(String algorithm, @Nullable Provider provider) throws CodecException {
         try {
             return provider == null ? KeyGenerator.getInstance(algorithm) : KeyGenerator.getInstance(algorithm, provider);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -112,13 +112,13 @@ public class GekCodec {
      *
      * @param algorithm specified algorithm
      * @return key pair generator with specified algorithm
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static KeyPairGenerator keyPairGenerator(String algorithm) throws GekCodecException {
+    public static KeyPairGenerator keyPairGenerator(String algorithm) throws CodecException {
         try {
             return KeyPairGenerator.getInstance(algorithm);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -128,13 +128,13 @@ public class GekCodec {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      * @return key pair generator with specified algorithm and provider
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static KeyPairGenerator keyPairGenerator(String algorithm, @Nullable Provider provider) throws GekCodecException {
+    public static KeyPairGenerator keyPairGenerator(String algorithm, @Nullable Provider provider) throws CodecException {
         try {
             return provider == null ? KeyPairGenerator.getInstance(algorithm) : KeyPairGenerator.getInstance(algorithm, provider);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -143,13 +143,13 @@ public class GekCodec {
      *
      * @param algorithm specified algorithm
      * @return cipher with specified algorithm
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static Cipher cipher(String algorithm) throws GekCodecException {
+    public static Cipher cipher(String algorithm) throws CodecException {
         try {
             return Cipher.getInstance(algorithm);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -159,13 +159,13 @@ public class GekCodec {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      * @return cipher with specified algorithm and provider
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static Cipher cipher(String algorithm, @Nullable Provider provider) throws GekCodecException {
+    public static Cipher cipher(String algorithm, @Nullable Provider provider) throws CodecException {
         try {
             return provider == null ? Cipher.getInstance(algorithm) : Cipher.getInstance(algorithm, provider);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -174,13 +174,13 @@ public class GekCodec {
      *
      * @param algorithm specified algorithm
      * @return message digest with specified algorithm
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static MessageDigest messageDigest(String algorithm) throws GekCodecException {
+    public static MessageDigest messageDigest(String algorithm) throws CodecException {
         try {
             return MessageDigest.getInstance(algorithm);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -190,13 +190,13 @@ public class GekCodec {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      * @return message digest with specified algorithm and provider
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static MessageDigest messageDigest(String algorithm, @Nullable Provider provider) throws GekCodecException {
+    public static MessageDigest messageDigest(String algorithm, @Nullable Provider provider) throws CodecException {
         try {
             return provider == null ? MessageDigest.getInstance(algorithm) : MessageDigest.getInstance(algorithm, provider);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -205,13 +205,13 @@ public class GekCodec {
      *
      * @param algorithm specified algorithm
      * @return MAC with specified algorithm
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static Mac mac(String algorithm) throws GekCodecException {
+    public static Mac mac(String algorithm) throws CodecException {
         try {
             return Mac.getInstance(algorithm);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -221,13 +221,13 @@ public class GekCodec {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      * @return MAC with specified algorithm and provider
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static Mac mac(String algorithm, @Nullable Provider provider) throws GekCodecException {
+    public static Mac mac(String algorithm, @Nullable Provider provider) throws CodecException {
         try {
             return provider == null ? Mac.getInstance(algorithm) : Mac.getInstance(algorithm, provider);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -236,13 +236,13 @@ public class GekCodec {
      *
      * @param algorithm specified algorithm
      * @return signature with specified algorithm
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static Signature signature(String algorithm) throws GekCodecException {
+    public static Signature signature(String algorithm) throws CodecException {
         try {
             return Signature.getInstance(algorithm);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -252,13 +252,13 @@ public class GekCodec {
      * @param algorithm specified algorithm
      * @param provider  specified provider
      * @return signature with specified algorithm and provider
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static Signature signature(String algorithm, @Nullable Provider provider) throws GekCodecException {
+    public static Signature signature(String algorithm, @Nullable Provider provider) throws CodecException {
         try {
             return provider == null ? Signature.getInstance(algorithm) : Signature.getInstance(algorithm, provider);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -271,9 +271,9 @@ public class GekCodec {
      * @param out       output buffer
      * @param blockSize block size of input data, maybe 0 if computing without dividing in blocks
      * @return the number of bytes stored in output
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static int doCipher(Cipher cipher, ByteBuffer in, ByteBuffer out, int blockSize) throws GekCodecException {
+    public static int doCipher(Cipher cipher, ByteBuffer in, ByteBuffer out, int blockSize) throws CodecException {
         try {
             if (blockSize <= 0) {
                 return cipher.doFinal(in, out);
@@ -288,7 +288,7 @@ public class GekCodec {
             }
             return outSize;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -301,9 +301,9 @@ public class GekCodec {
      * @param out       output stream
      * @param blockSize block size of input data, maybe 0 if computing without dividing in blocks
      * @return the number of bytes stored in output
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static long doCipher(Cipher cipher, ByteBuffer in, OutputStream out, int blockSize) throws GekCodecException {
+    public static long doCipher(Cipher cipher, ByteBuffer in, OutputStream out, int blockSize) throws CodecException {
         try {
             if (blockSize <= 0) {
                 byte[] result = doCipher(cipher, in);
@@ -327,7 +327,7 @@ public class GekCodec {
             }
             return outSize;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -340,9 +340,9 @@ public class GekCodec {
      * @param out       output buffer
      * @param blockSize block size of input data, maybe 0 if computing without dividing in blocks
      * @return the number of bytes stored in output
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static int doCipher(Cipher cipher, InputStream in, ByteBuffer out, int blockSize) throws GekCodecException {
+    public static int doCipher(Cipher cipher, InputStream in, ByteBuffer out, int blockSize) throws CodecException {
         try {
             if (blockSize <= 0) {
                 byte[] inBytes = JieIO.read(in);
@@ -369,7 +369,7 @@ public class GekCodec {
             }
             return outSize;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -382,9 +382,9 @@ public class GekCodec {
      * @param out       output stream
      * @param blockSize block size of input data, maybe 0 if computing without dividing in blocks
      * @return the number of bytes stored in output
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static long doCipher(Cipher cipher, InputStream in, OutputStream out, int blockSize) throws GekCodecException {
+    public static long doCipher(Cipher cipher, InputStream in, OutputStream out, int blockSize) throws CodecException {
         try {
             if (blockSize <= 0) {
                 byte[] inBytes = JieIO.read(in);
@@ -414,7 +414,7 @@ public class GekCodec {
             }
             return outSize;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -427,10 +427,10 @@ public class GekCodec {
      * @param cipher given {@link Cipher}
      * @param in     input buffer
      * @return an array, or null if input is ended without any byte read
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
     @Nullable
-    public static byte[] doCipher(Cipher cipher, ByteBuffer in) throws GekCodecException {
+    public static byte[] doCipher(Cipher cipher, ByteBuffer in) throws CodecException {
         try {
             if (!in.hasRemaining()) {
                 return null;
@@ -441,7 +441,7 @@ public class GekCodec {
             byte[] inBytes = JieIO.read(in);
             return cipher.doFinal(inBytes);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -454,10 +454,10 @@ public class GekCodec {
      * @param cipher given {@link Cipher}
      * @param in     input stream
      * @return an array, or null if input is ended without any byte read
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
     @Nullable
-    public static byte[] doCipher(Cipher cipher, InputStream in) throws GekCodecException {
+    public static byte[] doCipher(Cipher cipher, InputStream in) throws CodecException {
         try {
             byte[] inBytes = JieIO.read(in);
             if (inBytes == null) {
@@ -465,7 +465,7 @@ public class GekCodec {
             }
             return cipher.doFinal(inBytes);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -476,14 +476,14 @@ public class GekCodec {
      * @param digest given {@link MessageDigest}
      * @param in     input buffer
      * @return digest result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doDigest(MessageDigest digest, ByteBuffer in) throws GekCodecException {
+    public static byte[] doDigest(MessageDigest digest, ByteBuffer in) throws CodecException {
         try {
             digest.update(in);
             return digest.digest();
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -494,9 +494,9 @@ public class GekCodec {
      * @param digest given {@link MessageDigest}
      * @param in     input stream
      * @return digest result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doDigest(MessageDigest digest, InputStream in) throws GekCodecException {
+    public static byte[] doDigest(MessageDigest digest, InputStream in) throws CodecException {
         return doDigest(digest, in, JieIO.IO_BUFFER_SIZE);
     }
 
@@ -508,9 +508,9 @@ public class GekCodec {
      * @param in         input stream
      * @param bufferSize buffer size, may &lt;= 0 to read all bytes at once
      * @return digest result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doDigest(MessageDigest digest, InputStream in, int bufferSize) throws GekCodecException {
+    public static byte[] doDigest(MessageDigest digest, InputStream in, int bufferSize) throws CodecException {
         try {
             if (bufferSize <= 0) {
                 byte[] input = JieIO.read(in);
@@ -532,7 +532,7 @@ public class GekCodec {
             }
             return digest.digest();
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -543,14 +543,14 @@ public class GekCodec {
      * @param mac given {@link Mac}
      * @param in  input buffer
      * @return MAC result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doMac(Mac mac, ByteBuffer in) throws GekCodecException {
+    public static byte[] doMac(Mac mac, ByteBuffer in) throws CodecException {
         try {
             mac.update(in);
             return mac.doFinal();
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -561,9 +561,9 @@ public class GekCodec {
      * @param mac given {@link Mac}
      * @param in  input stream
      * @return MAC result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doMac(Mac mac, InputStream in) throws GekCodecException {
+    public static byte[] doMac(Mac mac, InputStream in) throws CodecException {
         return doMac(mac, in, JieIO.IO_BUFFER_SIZE);
     }
 
@@ -575,9 +575,9 @@ public class GekCodec {
      * @param in         input stream
      * @param bufferSize buffer size, may &lt;= 0 to read all bytes at once
      * @return MAC result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doMac(Mac mac, InputStream in, int bufferSize) throws GekCodecException {
+    public static byte[] doMac(Mac mac, InputStream in, int bufferSize) throws CodecException {
         try {
             if (bufferSize <= 0) {
                 byte[] input = JieIO.read(in);
@@ -599,7 +599,7 @@ public class GekCodec {
             }
             return mac.doFinal();
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -610,14 +610,14 @@ public class GekCodec {
      * @param sign given {@link Signature}
      * @param in   input buffer
      * @return signature result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doSign(Signature sign, ByteBuffer in) throws GekCodecException {
+    public static byte[] doSign(Signature sign, ByteBuffer in) throws CodecException {
         try {
             sign.update(in);
             return sign.sign();
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -628,9 +628,9 @@ public class GekCodec {
      * @param sign given {@link Signature}
      * @param in   input stream
      * @return signature result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doSign(Signature sign, InputStream in) throws GekCodecException {
+    public static byte[] doSign(Signature sign, InputStream in) throws CodecException {
         return doSign(sign, in, JieIO.IO_BUFFER_SIZE);
     }
 
@@ -642,9 +642,9 @@ public class GekCodec {
      * @param in         input stream
      * @param bufferSize buffer size, may &lt;= 0 to read all bytes at once
      * @return signature result
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static byte[] doSign(Signature sign, InputStream in, int bufferSize) throws GekCodecException {
+    public static byte[] doSign(Signature sign, InputStream in, int bufferSize) throws CodecException {
         try {
             if (bufferSize <= 0) {
                 byte[] input = JieIO.read(in);
@@ -667,7 +667,7 @@ public class GekCodec {
             }
             return sign.sign();
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -679,14 +679,14 @@ public class GekCodec {
      * @param in        input buffer
      * @param signature signature
      * @return result of verifying
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static boolean doVerify(Signature sign, ByteBuffer in, byte[] signature) throws GekCodecException {
+    public static boolean doVerify(Signature sign, ByteBuffer in, byte[] signature) throws CodecException {
         try {
             sign.update(in);
             return sign.verify(signature);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -698,9 +698,9 @@ public class GekCodec {
      * @param in        input stream
      * @param signature signature
      * @return result of verifying
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static boolean doVerify(Signature sign, InputStream in, byte[] signature) throws GekCodecException {
+    public static boolean doVerify(Signature sign, InputStream in, byte[] signature) throws CodecException {
         return doVerify(sign, in, JieIO.IO_BUFFER_SIZE, signature);
     }
 
@@ -713,9 +713,9 @@ public class GekCodec {
      * @param bufferSize buffer size, may &lt;= 0 to read all bytes at once
      * @param signature  signature
      * @return result of verifying
-     * @throws GekCodecException codec exception
+     * @throws CodecException codec exception
      */
-    public static boolean doVerify(Signature sign, InputStream in, int bufferSize, byte[] signature) throws GekCodecException {
+    public static boolean doVerify(Signature sign, InputStream in, int bufferSize, byte[] signature) throws CodecException {
         try {
             if (bufferSize <= 0) {
                 byte[] input = JieIO.read(in);
@@ -738,7 +738,7 @@ public class GekCodec {
             }
             return sign.verify(signature);
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 }

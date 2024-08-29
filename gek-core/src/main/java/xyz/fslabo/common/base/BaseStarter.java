@@ -1,7 +1,15 @@
 package xyz.fslabo.common.base;
 
 /**
- * Base interface for {@code Starter}.
+ * Base interface for {@code Starter}. The {@code Starter} is used to set then start in method chaining like following:
+ * <pre>
+ *     Process p = Jie.processStarter()
+ *         .command(commands)
+ *         .input(input)
+ *         .output(output)
+ *         .errorOutput(error)
+ *         .start();
+ * </pre>
  *
  * @param <T> type of started object
  * @param <S> type of starter

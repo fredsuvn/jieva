@@ -1,7 +1,6 @@
 package xyz.fslabo.common.codec;
 
 import lombok.Data;
-import org.springframework.core.codec.CodecException;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.io.JieIO;
@@ -14,11 +13,11 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 /**
- * Base64 implementation of {@link CodecProcess} to encode/decode base64 with {@link Base64}.
+ * Base64 implementation of {@link CodecConfigurator} to encode/decode base64 with {@link Base64}.
  *
  * @author fredsuvn
  */
-public class Base64Codec implements CodecProcess<Base64Codec> {
+public class Base64Codec implements CodecConfigurator<Base64Codec> {
 
     private static final int ENCODE_MODE = 0;
     private static final int DECODE_MODE = 1;
@@ -283,7 +282,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
         } catch (CodecException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -382,7 +381,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
         } catch (CodecException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -398,7 +397,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
     }
 
     @Override
-    public String finalLatinString() {
+    public String finalLatin() {
         switch (mode) {
             case ENCODE_MODE:
                 return getEncoder().encodeToString(inputToBytes());
@@ -412,18 +411,18 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
      * For base64:
      * <ul>
      *     <li>
-     *         If it is encode mode, same with {@link #finalLatinString()};
+     *         If it is encode mode, same with {@link #finalLatin()};
      *     </li>
      *     <li>
      *         Otherwise with {@link JieChars#defaultCharset()}.
      *     </li>
      * </ul>
      *
-     * @return encode mode same with {@link #finalLatinString()}, otherwise {@link JieChars#defaultCharset()}
+     * @return encode mode same with {@link #finalLatin()}, otherwise {@link JieChars#defaultCharset()}
      */
     @Override
     public String finalString() {
-        return mode == ENCODE_MODE ? finalLatinString() : finalString(JieChars.defaultCharset());
+        return mode == ENCODE_MODE ? finalLatin() : finalString(JieChars.defaultCharset());
     }
 
     @Override
@@ -442,7 +441,7 @@ public class Base64Codec implements CodecProcess<Base64Codec> {
                         }
                         return bsOut.toByteArray();
                     } catch (IOException e) {
-                        throw new GekCodecException(e);
+                        throw new CodecException(e);
                     }
                 });
 

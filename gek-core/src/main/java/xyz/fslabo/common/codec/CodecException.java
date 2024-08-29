@@ -5,12 +5,12 @@ package xyz.fslabo.common.codec;
  *
  * @author fredsuvn
  */
-public class GekCodecException extends RuntimeException {
+public class CodecException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public GekCodecException() {
+    public CodecException() {
     }
 
     /**
@@ -18,7 +18,7 @@ public class GekCodecException extends RuntimeException {
      *
      * @param message exception message
      */
-    public GekCodecException(String message) {
+    public CodecException(String message) {
         super(message);
     }
 
@@ -28,7 +28,7 @@ public class GekCodecException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public GekCodecException(String message, Throwable cause) {
+    public CodecException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +37,7 @@ public class GekCodecException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public GekCodecException(Throwable cause) {
+    public CodecException(Throwable cause) {
         super(cause);
     }
 }

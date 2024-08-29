@@ -1,6 +1,6 @@
 package xyz.fslabo.common.io;
 
-import xyz.fslabo.common.base.GekConfigurer;
+import xyz.fslabo.common.base.BaseConfigurator;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieString;
 
@@ -10,26 +10,12 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * This is base interface for IO version of {@link GekConfigurer}, provides input/output methods configurations:
- * <pre>
- *     configurer.input(in).output(out);
- * </pre>
- * Subtype needs to play the role of {@link T}, which represents subtype itself. For example, here is a subtype:
- * <pre>
- *     interface MyProcess extends GekIOConfigurer&lt;MyProcess&gt; {
+ * {@link BaseConfigurator} for IO operations.
  *
- *         void start();
- *     }
- * </pre>
- * Then this subtype can start its process in method chaining:
- * <pre>
- *     myProcess.input(in).output(out).start();
- * </pre>
- *
- * @param <T> subtype of this interface, and is subtype itself
+ * @param <T> actual type of this {@code IOConfigurator}
  * @author fredsuvn
  */
-public interface IOChainConfigurator<T extends IOChainConfigurator<T>> extends GekConfigurer<T> {
+public interface IOConfigurator<T extends IOConfigurator<T>> extends BaseConfigurator<T> {
 
     /**
      * Sets input to given array.
@@ -133,4 +119,59 @@ public interface IOChainConfigurator<T extends IOChainConfigurator<T>> extends G
      * @return this
      */
     T output(OutputStream out);
+
+    /**
+     * Starts and does final process, returns number of bytes written in output.
+     *
+     * @return number of bytes written in output
+     */
+    long doFinal();
+
+    /**
+     * Starts and does final process, returns int number of bytes written in output, or {@link Integer#MAX_VALUE}
+     * if the number is greater than {@link Integer#MAX_VALUE}.
+     *
+     * @return int number of bytes written in output or {@link Integer#MAX_VALUE} if the number is greater than
+     * {@link Integer#MAX_VALUE}.
+     */
+    default int doFinalInt() {
+        long num = doFinal();
+        return (int) (num > Integer.MAX_VALUE ? Integer.MAX_VALUE : num);
+    }
+
+    /**
+     * Starts and does final process, writes result into an array and returns.
+     *
+     * @return result array
+     */
+    default byte[] finalBytes() {
+        return JieIO.read(finalStream());
+    }
+
+    /**
+     * Returns an input stream which contains all configurations of current process,
+     * and will start and do final data process when read methods are called.
+     *
+     * @return an input stream which contains all configurations of current process
+     */
+    InputStream finalStream();
+
+    /**
+     * Starts and does final process, builds result as string with {@link JieChars#defaultCharset()} and returns.
+     *
+     * @return result as string with specified charset
+     */
+    default String finalString() {
+        return finalString(JieChars.defaultCharset());
+    }
+
+    /**
+     * Starts and does final process, builds result as string with specified charset and returns.
+     *
+     * @param charset specified charset
+     * @return result as string with specified charset
+     */
+    default String finalString(Charset charset) {
+        return JieString.of(finalBytes(), charset);
+    }
 }

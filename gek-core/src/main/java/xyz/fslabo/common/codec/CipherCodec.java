@@ -1,6 +1,5 @@
 package xyz.fslabo.common.codec;
 
-import org.springframework.core.codec.CodecException;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.io.JieIO;
 
@@ -13,11 +12,11 @@ import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
- * Cipher implementation of {@link CodecProcess} to encrypt/decrypt with {@link Cipher}.
+ * Cipher implementation of {@link CodecConfigurator} to encrypt/decrypt with {@link Cipher}.
  *
  * @author fredsuvn
  */
-public class CipherCodec implements CodecProcess<CipherCodec> {
+public class CipherCodec implements CodecConfigurator<CipherCodec> {
 
     private Cipher cipher;
     private Object input;
@@ -116,7 +115,7 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
             this.cipher = provider == null ? Cipher.getInstance(algorithm) : Cipher.getInstance(algorithm, provider);
             return this;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -210,22 +209,22 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
     public long doFinal() {
         try {
             if (cipher == null) {
-                throw new GekCodecException("Cipher algorithm is not set.");
+                throw new CodecException("Cipher algorithm is not set.");
             }
             initCipher(cipher);
             if (input instanceof ByteBuffer) {
                 if (output instanceof ByteBuffer) {
-                    return GekCodec.doCipher(cipher, (ByteBuffer) input, (ByteBuffer) output, blockSize);
+                    return JieCodec.doCipher(cipher, (ByteBuffer) input, (ByteBuffer) output, blockSize);
                 } else if (output instanceof OutputStream) {
-                    return GekCodec.doCipher(cipher, (ByteBuffer) input, (OutputStream) output, blockSize);
+                    return JieCodec.doCipher(cipher, (ByteBuffer) input, (OutputStream) output, blockSize);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
             } else if (input instanceof InputStream) {
                 if (output instanceof ByteBuffer) {
-                    return GekCodec.doCipher(cipher, (InputStream) input, (ByteBuffer) output, blockSize);
+                    return JieCodec.doCipher(cipher, (InputStream) input, (ByteBuffer) output, blockSize);
                 } else if (output instanceof OutputStream) {
-                    return GekCodec.doCipher(cipher, (InputStream) input, (OutputStream) output, blockSize);
+                    return JieCodec.doCipher(cipher, (InputStream) input, (OutputStream) output, blockSize);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -235,7 +234,7 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
         } catch (CodecException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
@@ -243,7 +242,7 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
     public InputStream finalStream() {
         try {
             if (cipher == null) {
-                throw new GekCodecException("Cipher algorithm is not set.");
+                throw new CodecException("Cipher algorithm is not set.");
             }
             initCipher(cipher);
             InputStream source;
@@ -254,11 +253,11 @@ public class CipherCodec implements CodecProcess<CipherCodec> {
             } else {
                 throw new CodecException("Unknown input type: " + input.getClass());
             }
-            return JieIO.transform(source, blockSize, bytes -> GekCodec.doCipher(cipher, ByteBuffer.wrap(bytes)));
+            return JieIO.transform(source, blockSize, bytes -> JieCodec.doCipher(cipher, ByteBuffer.wrap(bytes)));
         } catch (CodecException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 

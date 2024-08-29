@@ -3,21 +3,18 @@ package xyz.fslabo.common.codec;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieString;
-import xyz.fslabo.common.io.GekIOProcess;
+import xyz.fslabo.common.io.IOConfigurator;
 
 /**
- * This interface represents a {@link GekIOProcess} of codec process,
- * supports configure and do final in method chaining.
- * Generally its instance is reusable, re-set and re-codec are permitted.
- * See {@link CipherCodec}, {@link Base64Codec} and {@link HexCodec}.
+ * {@link IOConfigurator} for codec operations.
  *
- * @param <T> subtype
+ * @param <T> actual type of this {@code CodecConfigurator}
  * @author fredsuvn
  * @see CipherCodec
  * @see Base64Codec
  * @see HexCodec
  */
-public interface CodecProcess<T extends CodecProcess<T>> extends GekIOProcess<T> {
+public interface CodecConfigurator<T extends CodecConfigurator<T>> extends IOConfigurator<T> {
 
     /**
      * Sets input to given string with {@link JieChars#latinCharset()}.
@@ -34,7 +31,7 @@ public interface CodecProcess<T extends CodecProcess<T>> extends GekIOProcess<T>
      *
      * @return result as string with ISO_8859_1 charset
      */
-    default String finalLatinString() {
+    default String finalLatin() {
         return finalString(JieChars.latinCharset());
     }
 }

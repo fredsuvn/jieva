@@ -6,8 +6,8 @@ import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.codec.CipherCodec;
-import xyz.fslabo.common.codec.CodecProcess;
-import xyz.fslabo.common.codec.GekCodec;
+import xyz.fslabo.common.codec.CodecConfigurator;
+import xyz.fslabo.common.codec.JieCodec;
 import xyz.fslabo.common.io.JieIO;
 
 import javax.crypto.Cipher;
@@ -72,13 +72,13 @@ public class CodecTest {
         System.out.println(cipher.getOutputSize(enBlockSize) + ", " + cipher.getBlockSize());
         ByteBuffer inBuffer = ByteBuffer.wrap(data);
         ByteBuffer outBuffer = ByteBuffer.allocate(decodeSize(cipher, data.length, deBlockSize));
-        long enResultSize = GekCodec.doCipher(cipher, inBuffer, outBuffer, enBlockSize);
+        long enResultSize = JieCodec.doCipher(cipher, inBuffer, outBuffer, enBlockSize);
         Assert.assertEquals(enResultSize, enOutSize);
         outBuffer.flip();
         cipher.init(Cipher.DECRYPT_MODE, decryptKey);
         System.out.println(cipher.getOutputSize(deBlockSize) + ", " + cipher.getBlockSize());
         ByteBuffer comBuffer = ByteBuffer.allocate(decodeSize(cipher, data.length, deBlockSize));
-        long deResultSize = GekCodec.doCipher(cipher, outBuffer, comBuffer, deBlockSize);
+        long deResultSize = JieCodec.doCipher(cipher, outBuffer, comBuffer, deBlockSize);
         Assert.assertEquals(deResultSize, dataSize);
         comBuffer.flip();
         Assert.assertEquals(JieIO.read(comBuffer), data);
@@ -87,11 +87,11 @@ public class CodecTest {
         cipher.init(Cipher.ENCRYPT_MODE, encryptKey);
         inBuffer = ByteBuffer.wrap(data);
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        enResultSize = GekCodec.doCipher(cipher, inBuffer, outStream, enBlockSize);
+        enResultSize = JieCodec.doCipher(cipher, inBuffer, outStream, enBlockSize);
         Assert.assertEquals(enResultSize, enOutSize);
         cipher.init(Cipher.DECRYPT_MODE, decryptKey);
         ByteArrayOutputStream comStream = new ByteArrayOutputStream();
-        deResultSize = GekCodec.doCipher(cipher, ByteBuffer.wrap(outStream.toByteArray()), comStream, deBlockSize);
+        deResultSize = JieCodec.doCipher(cipher, ByteBuffer.wrap(outStream.toByteArray()), comStream, deBlockSize);
         Assert.assertEquals(deResultSize, dataSize);
         Assert.assertEquals(comStream.toByteArray(), data);
 
@@ -99,12 +99,12 @@ public class CodecTest {
         cipher.init(Cipher.ENCRYPT_MODE, encryptKey);
         ByteArrayInputStream inStream = new ByteArrayInputStream(data);
         outBuffer.clear();
-        enResultSize = GekCodec.doCipher(cipher, inStream, outBuffer, enBlockSize);
+        enResultSize = JieCodec.doCipher(cipher, inStream, outBuffer, enBlockSize);
         Assert.assertEquals(enResultSize, enOutSize);
         outBuffer.flip();
         cipher.init(Cipher.DECRYPT_MODE, decryptKey);
         comBuffer.clear();
-        deResultSize = GekCodec.doCipher(cipher, new ByteArrayInputStream(JieIO.read(outBuffer)), comBuffer, deBlockSize);
+        deResultSize = JieCodec.doCipher(cipher, new ByteArrayInputStream(JieIO.read(outBuffer)), comBuffer, deBlockSize);
         Assert.assertEquals(deResultSize, dataSize);
         comBuffer.flip();
         Assert.assertEquals(JieIO.read(comBuffer), data);
@@ -113,11 +113,11 @@ public class CodecTest {
         cipher.init(Cipher.ENCRYPT_MODE, encryptKey);
         inStream = new ByteArrayInputStream(data);
         outStream.reset();
-        enResultSize = GekCodec.doCipher(cipher, inStream, outStream, enBlockSize);
+        enResultSize = JieCodec.doCipher(cipher, inStream, outStream, enBlockSize);
         Assert.assertEquals(enResultSize, enOutSize);
         cipher.init(Cipher.DECRYPT_MODE, decryptKey);
         comStream.reset();
-        deResultSize = GekCodec.doCipher(cipher, ByteBuffer.wrap(outStream.toByteArray()), comStream, deBlockSize);
+        deResultSize = JieCodec.doCipher(cipher, ByteBuffer.wrap(outStream.toByteArray()), comStream, deBlockSize);
         Assert.assertEquals(deResultSize, dataSize);
         Assert.assertEquals(comStream.toByteArray(), data);
     }
@@ -145,11 +145,11 @@ public class CodecTest {
     private void testCipherAsymmetric(
         int dataSize, int enBlockSize, int deBlockSize, String keyAlgorithm, String cryptoAlgorithm, @Nullable Provider provider) throws Exception {
         byte[] data = TestUtil.buildRandomBytes(dataSize);
-        KeyPairGenerator keyPairGenerator = GekCodec.keyPairGenerator(keyAlgorithm, provider);
+        KeyPairGenerator keyPairGenerator = JieCodec.keyPairGenerator(keyAlgorithm, provider);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
-        CipherCodec cipher = GekCodec.cipher().algorithm(cryptoAlgorithm, provider);
+        CipherCodec cipher = JieCodec.cipher().algorithm(cryptoAlgorithm, provider);
         byte[] enBytes = cipher.input(data).blockSize(enBlockSize).key(publicKey).encrypt().finalBytes();
         byte[] deBytes = cipher.input(enBytes).blockSize(deBlockSize).key(privateKey).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
@@ -174,9 +174,9 @@ public class CodecTest {
     private void testCipherSymmetric(
         int dataSize, int enBlockSize, int deBlockSize, String keyAlgorithm, String cryptoAlgorithm, @Nullable Provider provider) throws Exception {
         byte[] data = TestUtil.buildRandomBytes(dataSize);
-        KeyGenerator keyGenerator = GekCodec.keyGenerator(keyAlgorithm, provider);
+        KeyGenerator keyGenerator = JieCodec.keyGenerator(keyAlgorithm, provider);
         SecretKey key = keyGenerator.generateKey();
-        CipherCodec cipher = GekCodec.cipher().algorithm(cryptoAlgorithm, provider);
+        CipherCodec cipher = JieCodec.cipher().algorithm(cryptoAlgorithm, provider);
         byte[] enBytes = cipher.input(data).blockSize(enBlockSize).key(key).encrypt().finalBytes();
         byte[] deBytes = cipher.input(enBytes).blockSize(deBlockSize).key(key).decrypt().finalBytes();
         Assert.assertEquals(data, deBytes);
@@ -210,12 +210,12 @@ public class CodecTest {
 
     private void testDigest(String algorithm, int size, @Nullable Provider provider) {
         byte[] data = TestUtil.buildRandomBytes(size);
-        MessageDigest md = GekCodec.messageDigest(algorithm, provider);
+        MessageDigest md = JieCodec.messageDigest(algorithm, provider);
         byte[] mdBytes = md.digest(data);
         System.out.println(mdBytes.length + ", " + md.getDigestLength());
-        byte[] bfBytes = GekCodec.doDigest(md, ByteBuffer.wrap(data));
+        byte[] bfBytes = JieCodec.doDigest(md, ByteBuffer.wrap(data));
         Assert.assertEquals(mdBytes, bfBytes);
-        byte[] inBytes = GekCodec.doDigest(md, new ByteArrayInputStream(data));
+        byte[] inBytes = JieCodec.doDigest(md, new ByteArrayInputStream(data));
         Assert.assertEquals(mdBytes, inBytes);
     }
 
@@ -231,15 +231,15 @@ public class CodecTest {
 
     private void testMac(String algorithm, int size, @Nullable Provider provider) throws InvalidKeyException {
         byte[] data = TestUtil.buildRandomBytes(size);
-        KeyGenerator keyGenerator = GekCodec.keyGenerator(algorithm, provider);
+        KeyGenerator keyGenerator = JieCodec.keyGenerator(algorithm, provider);
         SecretKey secretKey = keyGenerator.generateKey();
-        Mac md = GekCodec.mac(algorithm, provider);
+        Mac md = JieCodec.mac(algorithm, provider);
         md.init(secretKey);
         byte[] mdBytes = md.doFinal(data);
         System.out.println(mdBytes.length + ", " + md.getMacLength());
-        byte[] bfBytes = GekCodec.doMac(md, ByteBuffer.wrap(data));
+        byte[] bfBytes = JieCodec.doMac(md, ByteBuffer.wrap(data));
         Assert.assertEquals(mdBytes, bfBytes);
-        byte[] inBytes = GekCodec.doMac(md, new ByteArrayInputStream(data));
+        byte[] inBytes = JieCodec.doMac(md, new ByteArrayInputStream(data));
         Assert.assertEquals(mdBytes, inBytes);
     }
 
@@ -255,22 +255,22 @@ public class CodecTest {
 
     private void testSign(String keyAlgorithm, String signAlgorithm, int size, @Nullable Provider provider) throws Exception {
         byte[] data = TestUtil.buildRandomBytes(size);
-        KeyPairGenerator keyPairGenerator = GekCodec.keyPairGenerator(keyAlgorithm, provider);
+        KeyPairGenerator keyPairGenerator = JieCodec.keyPairGenerator(keyAlgorithm, provider);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
 
         //sign
-        Signature signature = GekCodec.signature(signAlgorithm, provider);
+        Signature signature = JieCodec.signature(signAlgorithm, provider);
         signature.initSign(privateKey);
         signature.update(data);
         byte[] signBytes = signature.sign();
         System.out.println(signBytes.length);
         signature.initSign(privateKey);
-        byte[] bfBytes = GekCodec.doSign(signature, ByteBuffer.wrap(data));
+        byte[] bfBytes = JieCodec.doSign(signature, ByteBuffer.wrap(data));
         Assert.assertEquals(signBytes, bfBytes);
         signature.initSign(privateKey);
-        byte[] inBytes = GekCodec.doSign(signature, new ByteArrayInputStream(data));
+        byte[] inBytes = JieCodec.doSign(signature, new ByteArrayInputStream(data));
         Assert.assertEquals(signBytes, inBytes);
 
         //verify
@@ -278,21 +278,21 @@ public class CodecTest {
         signature.update(data);
         Assert.assertTrue(signature.verify(signBytes));
         signature.initVerify(publicKey);
-        Assert.assertTrue(GekCodec.doVerify(signature, ByteBuffer.wrap(data), signBytes));
+        Assert.assertTrue(JieCodec.doVerify(signature, ByteBuffer.wrap(data), signBytes));
         signature.initVerify(publicKey);
-        Assert.assertTrue(GekCodec.doVerify(signature, new ByteArrayInputStream(data), signBytes));
+        Assert.assertTrue(JieCodec.doVerify(signature, new ByteArrayInputStream(data), signBytes));
     }
 
     @Test
     public void testEncodeCodec() {
-        testEncodeCodec(GekCodec.base64(), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH", true);
-        testEncodeCodec(GekCodec.base64().decode(), "MTIzNDU25Lit5paH5Lit5paH", "123456中文中文", false);
-        testEncodeCodec(GekCodec.hex(), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687", true);
-        testEncodeCodec(GekCodec.hex().decode(), "313233343536E4B8ADE69687E4B8ADE69687", "123456中文中文", false);
+        testEncodeCodec(JieCodec.base64(), "123456中文中文", "MTIzNDU25Lit5paH5Lit5paH", true);
+        testEncodeCodec(JieCodec.base64().decode(), "MTIzNDU25Lit5paH5Lit5paH", "123456中文中文", false);
+        testEncodeCodec(JieCodec.hex(), "123456中文中文", "313233343536E4B8ADE69687E4B8ADE69687", true);
+        testEncodeCodec(JieCodec.hex().decode(), "313233343536E4B8ADE69687E4B8ADE69687", "123456中文中文", false);
     }
 
     private void testEncodeCodec(
-        CodecProcess<?> codec, String source, String dest, boolean encode) {
+        CodecConfigurator<?> codec, String source, String dest, boolean encode) {
         byte[] srcBytes = encode ? JieString.encode(source) : JieString.encode(source, StandardCharsets.ISO_8859_1);
         byte[] destBytes = encode ? JieString.encode(dest, StandardCharsets.ISO_8859_1) : JieString.encode(dest);
         byte[] srcBytesPadding = padBytes(srcBytes, 10);
@@ -445,7 +445,7 @@ public class CodecTest {
         );
         if (encode) {
             Assert.assertEquals(
-                codec.input(srcBytes).finalLatinString(),
+                codec.input(srcBytes).finalLatin(),
                 dest
             );
         }

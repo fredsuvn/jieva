@@ -1,6 +1,5 @@
 package xyz.fslabo.common.codec;
 
-import org.springframework.core.codec.CodecException;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.io.JieIO;
 
@@ -11,11 +10,11 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 /**
- * Hex implementation of {@link CodecProcess} to encode/decode HEX.
+ * Hex implementation of {@link CodecConfigurator} to encode/decode HEX.
  *
  * @author fredsuvn
  */
-public class HexCodec implements CodecProcess<HexCodec> {
+public class HexCodec implements CodecConfigurator<HexCodec> {
 
     private static final int ENCODE_MODE = 0;
     private static final int DECODE_MODE = 1;
@@ -166,14 +165,14 @@ public class HexCodec implements CodecProcess<HexCodec> {
         } catch (CodecException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
     private int doEncode(ByteBuffer src, ByteBuffer dest) {
         int srcRemaining = src.remaining();
         if (dest.remaining() < srcRemaining * 2) {
-            throw new GekCodecException("Dest remaining space not enough.");
+            throw new CodecException("Dest remaining space not enough.");
         }
         while (src.hasRemaining()) {
             byte b = src.get();
@@ -247,17 +246,17 @@ public class HexCodec implements CodecProcess<HexCodec> {
         } catch (CodecException e) {
             throw e;
         } catch (Exception e) {
-            throw new GekCodecException(e);
+            throw new CodecException(e);
         }
     }
 
     private int doDecode(ByteBuffer src, ByteBuffer dest) {
         int srcRemaining = src.remaining();
         if (srcRemaining % 2 != 0) {
-            throw new GekCodecException("Source may not hex data: srcRemaining % 2 != 0");
+            throw new CodecException("Source may not hex data: srcRemaining % 2 != 0");
         }
         if (dest.remaining() < srcRemaining / 2) {
-            throw new GekCodecException("Dest remaining space not enough.");
+            throw new CodecException("Dest remaining space not enough.");
         }
         while (src.hasRemaining()) {
             byte b1 = src.get();
@@ -276,7 +275,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
             }
             int i2 = src.read();
             if (i2 == -1) {
-                throw new GekCodecException("Source may not hex data: srcRemaining % 2 != 0");
+                throw new CodecException("Source may not hex data: srcRemaining % 2 != 0");
             }
             dest.write(mergeByte(decodeByte(i1), decodeByte(i2)));
             writeNum++;
@@ -296,7 +295,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
             case DECODE_MODE: {
                 byte[] src = inputToBytes();
                 if (src.length % 2 != 0) {
-                    throw new GekCodecException("Source may not hex data: src.length % 2 != 0");
+                    throw new CodecException("Source may not hex data: src.length % 2 != 0");
                 }
                 byte[] dest = new byte[src.length / 2];
                 doDecode(ByteBuffer.wrap(src), ByteBuffer.wrap(dest));
@@ -310,18 +309,18 @@ public class HexCodec implements CodecProcess<HexCodec> {
      * For hex:
      * <ul>
      *     <li>
-     *         If it is encode mode, same with {@link #finalLatinString()};
+     *         If it is encode mode, same with {@link #finalLatin()};
      *     </li>
      *     <li>
      *         Otherwise with {@link JieChars#defaultCharset()}.
      *     </li>
      * </ul>
      *
-     * @return encode mode same with {@link #finalLatinString()}, otherwise {@link JieChars#defaultCharset()}
+     * @return encode mode same with {@link #finalLatin()}, otherwise {@link JieChars#defaultCharset()}
      */
     @Override
     public String finalString() {
-        return mode == ENCODE_MODE ? finalLatinString() : finalString(JieChars.defaultCharset());
+        return mode == ENCODE_MODE ? finalLatin() : finalString(JieChars.defaultCharset());
     }
 
     @Override
@@ -336,7 +335,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
             case DECODE_MODE:
                 return JieIO.transform(inputToInputStream(), blockSize, bytes -> {
                     if (bytes.length % 2 != 0) {
-                        throw new GekCodecException("Source may not hex data: bytes.length % 2 != 0");
+                        throw new CodecException("Source may not hex data: bytes.length % 2 != 0");
                     }
                     byte[] dest = new byte[bytes.length / 2];
                     doDecode(ByteBuffer.wrap(bytes), ByteBuffer.wrap(dest));
@@ -408,7 +407,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
             case 15:
                 return 'F';
         }
-        throw new GekCodecException("Illegal byte: 0x" + Integer.toBinaryString(s));
+        throw new CodecException("Illegal byte: 0x" + Integer.toBinaryString(s));
     }
 
     private int decodeByte(int b) {
@@ -453,7 +452,7 @@ public class HexCodec implements CodecProcess<HexCodec> {
             case 'f':
                 return 15;
         }
-        throw new GekCodecException("Illegal byte: " + (char) c);
+        throw new CodecException("Illegal byte: " + (char) c);
     }
 
     private byte mergeByte(int i1, int i2) {
