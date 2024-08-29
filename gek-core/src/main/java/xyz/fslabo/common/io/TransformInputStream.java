@@ -40,6 +40,9 @@ public class TransformInputStream extends InputStream {
 
     /**
      * Constructs with source stream, block size and transformer.
+     * <p>
+     * Note the block size could be negative or {@code 0}, in this case all bytes would be read once from source stream
+     * to transform.
      *
      * @param source      source stream
      * @param blockSize   block size
@@ -138,7 +141,7 @@ public class TransformInputStream extends InputStream {
 
     private void refreshBuffer() {
         while (buffer == null || !buffer.hasRemaining()) {
-            byte[] sourceBytes = JieIO.read(source, blockSize);
+            byte[] sourceBytes = blockSize <= 0 ? JieIO.read(source) : JieIO.read(source, blockSize);
             if (sourceBytes == null) {
                 end = true;
                 return;

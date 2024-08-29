@@ -820,7 +820,26 @@ public class JieIO {
     }
 
     /**
-     * Returns a {@link TransformInputStream} from source stream, block size and transformer.
+     * Returns a {@link TransformInputStream} with source stream and transformer. This method is equivalent to:
+     * <pre>
+     *     return transform(source, 0, transformer);
+     * </pre>
+     *
+     * @param source      source stream
+     * @param transformer given transformer
+     * @return a {@link TransformInputStream}
+     * @see #transform(InputStream, int, Function)
+     */
+    public static TransformInputStream transform(InputStream source, Function<byte[], byte[]> transformer) {
+        return transform(source, 0, transformer);
+    }
+
+    /**
+     * Returns a {@link TransformInputStream} with source stream, block size and transformer.
+     * <p>
+     * Note the block size could be negative or {@code 0}, in this case all bytes would be read once from source stream
+     * to transform.
+     * <p>
      * See {@link TransformInputStream} and
      * {@link TransformInputStream#TransformInputStream(InputStream, int, Function)}.
      *
