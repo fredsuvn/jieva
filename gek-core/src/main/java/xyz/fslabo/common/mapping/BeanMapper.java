@@ -24,8 +24,25 @@ public interface BeanMapper {
     }
 
     /**
-     * Copies properties from source object to dest object. Supports both bean object and {@link Map} object.
-     * This method is equivalent to {@link #copyProperties(Object, Type, Object, Type, MappingOptions)}:
+     * Copies properties from source object to dest object, then returns dest object. Supports both bean object and
+     * {@link Map} object. This method is equivalent to {@link #copyProperties(Object, Object, MappingOptions)}:
+     * <pre>
+     *     copyProperties(source, dest, MappingOptions.defaultOptions());
+     * </pre>
+     *
+     * @param source source object
+     * @param dest   dest object
+     * @param <T>    type of dest object
+     * @throws MappingException exception when copying
+     */
+    default <T> T copyProperties(Object source, T dest) throws MappingException {
+        return copyProperties(source, dest, MappingOptions.defaultOptions());
+    }
+
+    /**
+     * Copies properties from source object to dest object, then returns dest object. Supports both bean object and
+     * {@link Map} object. This method is equivalent to
+     * {@link #copyProperties(Object, Type, Object, Type, MappingOptions)}:
      * <pre>
      *     copyProperties(source, source.getClass(), dest, dest.getClass(), options);
      * </pre>
@@ -33,14 +50,15 @@ public interface BeanMapper {
      * @param source  source object
      * @param dest    dest object
      * @param options mapper options
+     * @param <T>     type of dest object
      * @throws MappingException exception when copying
      */
-    default void copyProperties(Object source, Object dest, MappingOptions options) throws MappingException {
-        copyProperties(source, source.getClass(), dest, dest.getClass(), options);
+    default <T> T copyProperties(Object source, T dest, MappingOptions options) throws MappingException {
+        return copyProperties(source, source.getClass(), dest, dest.getClass(), options);
     }
 
     /**
-     * Copies properties from source object to dest object.
+     * Copies properties from source object to dest object, then returns dest object.
      * <p>
      * In default implementation:
      * <ul>
@@ -61,11 +79,12 @@ public interface BeanMapper {
      * @param dest       dest object
      * @param destType   type of dest object
      * @param options    mapper options
+     * @param <T>        type of dest object
      * @throws MappingException exception when copying
      */
-    void copyProperties(
+    <T> T copyProperties(
         Object source, Type sourceType,
-        Object dest, Type destType,
+        T dest, Type destType,
         MappingOptions options
     ) throws MappingException;
 }

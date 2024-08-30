@@ -7,18 +7,20 @@ import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.Flag;
+import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.base.JieDate;
+import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapping.Mapper;
+import xyz.fslabo.common.mapping.MappingOptions;
+import xyz.fslabo.common.mapping.handlers.*;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class ConvertTest {
 
@@ -36,84 +38,93 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList("1", "2", "3"),
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<String>>() {
                 }.getType(),
                 new TypeRef<List<String>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? extends String>>() {
                 }.getType(),
                 new TypeRef<List<Integer>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super Integer>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertEquals(
             Arrays.asList(1, 2, 3),
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 Arrays.asList("1", "2", "3"), new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? extends Integer>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         List<String> strList = Arrays.asList("1", "2", "3");
         Assert.assertSame(
             strList,
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 strList, new TypeRef<List<? super CharSequence>>() {
                 }.getType(),
                 new TypeRef<List<? super String>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertNotSame(
             strList,
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 strList, new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super CharSequence>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertEquals(
             strList,
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 strList, new TypeRef<List<? super String>>() {
                 }.getType(),
                 new TypeRef<List<? super CharSequence>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertEquals(
@@ -132,22 +143,24 @@ public class ConvertTest {
         );
         Assert.assertEquals(
             Arrays.asList(new T1("1"), new T1("2")),
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 Arrays.asList(new T2("1"), new T2("2")),
                 new TypeRef<List<T2>>() {
                 }.getType(),
                 new TypeRef<List<? super T1>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertNotEquals(
             Arrays.asList(new T1("1"), new T1("2")),
-            Jie.convertType(
+            Mapper.defaultMapper().map(
                 Arrays.asList(new T2("1"), new T2("2")),
                 new TypeRef<List<T2>>() {
                 }.getType(),
                 new TypeRef<List<? extends T1>>() {
-                }.getType()
+                }.getType(),
+                MappingOptions.defaultOptions()
             )
         );
         Assert.assertEquals(
@@ -185,8 +198,8 @@ public class ConvertTest {
         byte[] low = {1, 2, 3};
         ByteBuffer buffer = ByteBuffer.wrap(new byte[]{1, 2, 3});
         Mapper converter = Mapper.defaultMapper();
-        Mapper newConverter = converter.withOptions(
-            converter.getOptions().replaceReusePolicy(Mapper.Options.NO_REUSE));
+        Mapper newConverter = converter.replaceOptions(MappingOptions.builder()
+            .copyLevel(MappingOptions.COPY_LEVEL_DEEP).build());
         Assert.assertEquals(
             converter.map(low, byte[].class),
             low
@@ -226,12 +239,23 @@ public class ConvertTest {
         Object x = new Object();
         Mapper.Handler handler = new Mapper.Handler() {
             @Override
-            public @Nullable Object map(
-                @Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
+            public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {
+                return x;
+            }
+
+            @Override
+            public Object mapProperty(@Nullable Object source, Type sourceType, Type targetType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options) {
                 return x;
             }
         };
-        Mapper converter = Mapper.defaultMapper().insertFirstMiddleHandler(handler);
+        Mapper converter = Mapper.newMapper(Arrays.asList(
+            new AssignableMapperHandler(),
+            handler,
+            new EnumMapperHandler(),
+            new TypedMapperHandler(),
+            new CollectionMappingHandler(),
+            new BeanMapperHandler()
+        ));
         Assert.assertSame(
             x,
             converter.map(
@@ -240,26 +264,21 @@ public class ConvertTest {
                 }.getType()
             )
         );
-        Mapper converter2 = converter.withOptions(converter.getOptions());
-        Assert.assertSame(converter, converter2);
-        converter2 = converter.withOptions(converter.getOptions()
-            .replaceReusePolicy(converter.getOptions().reusePolicy()));
-        Assert.assertSame(converter, converter2);
-        int reusePolicy = converter.getOptions().reusePolicy();
-        converter2 = converter.withOptions(converter.getOptions()
-            .replaceReusePolicy(reusePolicy + 1));
-        Assert.assertNotSame(converter, converter2);
-        converter2 = converter.withOptions(converter.getOptions()
-            .replaceReusePolicy(reusePolicy));
-        Assert.assertSame(converter, converter2);
+        Assert.assertSame(converter, converter.replaceFirstHandler(converter.getHandlers().get(0)));
+        Assert.assertSame(converter, converter.replaceLastHandler(converter.getHandlers().get(converter.getHandlers().size() - 1)));
+        Assert.assertNotSame(converter, converter.replaceFirstHandler(handler));
+        Assert.assertNotSame(converter, converter.replaceLastHandler(handler));
+        Assert.assertSame(converter, converter.replaceOptions(converter.getOptions()));
+        Assert.assertNotSame(converter, converter.replaceOptions(converter.getOptions().toBuilder().copyLevel(999).build()));
     }
 
     @Test
     public void testConvertAsHandler() {
-        Mapper.Handler handler = Mapper.defaultMapper()
-            .insertFirstMiddleHandler(new Mapper.Handler() {
+        List<Mapper.Handler> handlers = Arrays.asList(
+            new AssignableMapperHandler(),
+            new Mapper.Handler() {
                 @Override
-                public @Nullable Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
+                public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {
                     if (Objects.equals(source, "1")) {
                         return "2";
                     }
@@ -267,20 +286,54 @@ public class ConvertTest {
                         return "1";
                     }
                     if (Objects.equals(source, "3")) {
-                        return null;
+                        return Flag.CONTINUE;
                     }
                     return Flag.BREAK;
                 }
-            })
-            .asHandler();
+
+                @Override
+                public Object mapProperty(@Nullable Object source, Type sourceType, Type targetType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options) {
+                    return map(source, sourceType, targetType, mapper, options);
+                }
+            },
+            new EnumMapperHandler(),
+            new TypedMapperHandler(),
+            new CollectionMappingHandler(),
+            new BeanMapperHandler()
+        );
+        Mapper mapper = Mapper.newMapper(handlers);
+        Mapper.Handler handler = mapper.asHandler();
         Assert.assertEquals(
-            handler.map("1", String.class, Integer.class, Mapper.defaultMapper()), "2");
+            handler.map("1", String.class, Integer.class, Mapper.defaultMapper(), mapper.getOptions()), "2");
         Assert.assertEquals(
-            handler.map("2", String.class, Integer.class, Mapper.defaultMapper()), "1");
+            handler.map("2", String.class, Integer.class, Mapper.defaultMapper(), mapper.getOptions()), "1");
         Assert.assertEquals(
-            handler.map("3", String.class, Integer.class, Mapper.defaultMapper()), 3);
+            handler.map("3", String.class, Integer.class, Mapper.defaultMapper(), mapper.getOptions()), 3);
         Assert.assertEquals(
-            handler.map("4", String.class, Integer.class, Mapper.defaultMapper()), Flag.BREAK);
+            handler.map("4", String.class, Integer.class, Mapper.defaultMapper(), mapper.getOptions()), Flag.BREAK);
+    }
+
+    @Test
+    public void testFormat() throws Exception {
+    }
+
+    private void testDateFormat(@Nullable ZoneOffset offset) throws Exception {
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        String time = "2222-12-22 12:22:22";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        Date date = JieDate.parse(time, pattern);
+        Mapper mapper = Mapper.defaultMapper();
+        mapper = mapper.replaceOptions(mapper.getOptions().toBuilder()
+            .dateFormat(formatter)
+            .zoneOffset(offset)
+            .build()
+        );
+        ZoneOffset zoneOffset = offset == null ? JieDate.zoneOffset() : offset;
+        Assert.assertEquals(mapper.map(date, Date.class), date);
+        Assert.assertEquals(mapper.map(date, String.class), time);
+        //Assert.assertEquals(mapper.map(now, Instant.class), now.toInstant());
+        //Assert.assertEquals(mapper.map(now, LocalDateTime.class), LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault()));
+
     }
 
     public enum E1 {
@@ -311,5 +364,17 @@ public class ConvertTest {
         public T2(String value) {
             super(value);
         }
+    }
+
+    @Data
+    public static class D1 {
+        private ZonedDateTime d1;
+        private LocalDateTime d2;
+    }
+
+    @Data
+    public static class D2 {
+        private String d1;
+        private String d2;
     }
 }

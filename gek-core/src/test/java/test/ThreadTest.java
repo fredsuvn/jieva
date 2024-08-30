@@ -32,7 +32,7 @@ public class ThreadTest {
         ExecutorService executorService = Jie.executorBuilder().corePoolSize(10)
             .threadFactory(r -> {
                 ai.incrementAndGet();
-                return Jie.threadStarter().runnable(r).build();
+                return new Thread(r);
             })
             .keepAliveTime(Duration.ofMillis(10000)).allowCoreThreadTimeOut(false).build();
         for (int i = 0; i < 10; i++) {
@@ -47,7 +47,7 @@ public class ThreadTest {
         ScheduledExecutorService executorService = Jie.scheduledBuilder().corePoolSize(10)
             .threadFactory(r -> {
                 ai.incrementAndGet();
-                return Jie.threadStarter().runnable(r).build();
+                return new Thread(r);
             })
             .keepAliveTime(Duration.ofMillis(10000)).allowCoreThreadTimeOut(true).build();
         for (int i = 0; i < 10; i++) {

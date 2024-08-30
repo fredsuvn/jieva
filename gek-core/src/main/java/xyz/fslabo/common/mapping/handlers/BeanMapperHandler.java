@@ -2,12 +2,14 @@ package xyz.fslabo.common.mapping.handlers;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapping.BeanMapper;
 import xyz.fslabo.common.mapping.Mapper;
 import xyz.fslabo.common.mapping.MappingOptions;
 import xyz.fslabo.common.reflect.JieReflect;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,6 +86,10 @@ public class BeanMapperHandler implements Mapper.Handler {
             if (rawType == null) {
                 return null;
             }
+            Supplier<Object> rawSupplier = NEW_INSTANCE_MAP.get(rawType);
+            if (rawSupplier != null) {
+                return rawSupplier.get();
+            }
             return JieReflect.newInstance(rawType);
         }
 
@@ -116,11 +122,14 @@ public class BeanMapperHandler implements Mapper.Handler {
         if (source == null) {
             return Flag.CONTINUE;
         }
+        if (!(sourceType instanceof Class<?>) && !(sourceType instanceof ParameterizedType)) {
+            return Flag.CONTINUE;
+        }
         Object targetObject = generator.generate(targetType);
         if (targetObject == null) {
             return Flag.CONTINUE;
         }
-        BeanMapper beanMapper = options.getBeanMapper();
+        BeanMapper beanMapper = Jie.orDefault(options.getBeanMapper(), BeanMapper.defaultMapper());
         beanMapper.copyProperties(source, sourceType, targetObject, targetType, options);
         return wrapResult(generator.build(targetObject));
     }

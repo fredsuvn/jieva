@@ -34,7 +34,7 @@ public interface BeanResolver {
      * @return default bean resolver
      */
     static BeanResolver defaultResolver() {
-        return ResolverImpl.DEFAULT_RESOLVER;
+        return BeanResolverImpl.DEFAULT_RESOLVER;
     }
 
     /**
@@ -54,7 +54,7 @@ public interface BeanResolver {
      * @return new bean resolver
      */
     static BeanResolver withHandlers(Iterable<Handler> handlers) {
-        return new ResolverImpl(handlers);
+        return new BeanResolverImpl(handlers);
     }
 
     /**
@@ -81,7 +81,7 @@ public interface BeanResolver {
      * @return a new {@link BeanResolver} of which handler list consists of given handler as first element, followed by
      * {@link #getHandlers()} of current resolver
      */
-    BeanResolver withFirstHandler(Handler handler);
+    BeanResolver addFirstHandler(Handler handler);
 
     /**
      * Returns a new {@link BeanResolver} of which handler list consists of {@link #getHandlers()} of current resolver,
@@ -89,27 +89,31 @@ public interface BeanResolver {
      *
      * @param handler given handler
      * @return a {@link BeanResolver} of which handler list consists of {@link #getHandlers()} of current resolver,
-     * followed by given handler as last element.
+     * followed by given handler as last element
      */
-    BeanResolver withLastHandler(Handler handler);
+    BeanResolver addLastHandler(Handler handler);
 
     /**
      * Returns a new {@link BeanResolver} of which handler list comes from a copy of {@link #getHandlers()} of current
      * resolver but the first element is replaced by given handler.
+     * <p>
+     * Note if replaced handler equals given handler, return this-self.
      *
      * @param handler given handler
      * @return a new {@link BeanResolver} of which handler list comes from a copy of {@link #getHandlers()} of current
-     * resolver but the first element is replaced by given handler.
+     * resolver but the first element is replaced by given handler
      */
     BeanResolver replaceFirstHandler(Handler handler);
 
     /**
      * Returns a new {@link BeanResolver} of which handler list comes from a copy of {@link #getHandlers()} of current
      * resolver but the last element is replaced by given handler.
+     * <p>
+     * Note if replaced handler equals given handler, return this-self.
      *
      * @param handler given handler
      * @return a new {@link BeanResolver} of which handler list comes from a copy of {@link #getHandlers()} of current
-     * resolver but the last element is replaced by given handler.
+     * resolver but the last element is replaced by given handler
      */
     BeanResolver replaceLastHandler(Handler handler);
 

@@ -29,10 +29,10 @@ public class RandomTest {
         }
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
-        JieLog.of().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
+        JieLog.system().info("countA: ", countA, " countB: ", countB, ", countC: ", countC, ", total: ", total);
 
         String randomStr = String.join("", strRandom.get(100));
-        JieLog.of().info("randomStr: ", randomStr);
+        JieLog.system().info("randomStr: ", randomStr);
         Assert.assertEquals(randomStr.length(), 100);
     }
 }

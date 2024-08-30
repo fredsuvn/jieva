@@ -10,10 +10,7 @@ import xyz.fslabo.common.mapping.MappingException;
 import xyz.fslabo.common.mapping.MappingOptions;
 import xyz.fslabo.common.reflect.JieReflect;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -84,6 +81,22 @@ public class CollectionMappingHandler implements Mapper.Handler {
                 return Array.newInstance(((Class<?>) type).getComponentType(), size);
             }
         }
+        if (type instanceof GenericArrayType) {
+            Type componentType = ((GenericArrayType) type).getGenericComponentType();
+            Class<?> componentClass = JieReflect.getRawType(componentType);
+            if (componentClass == null && componentType instanceof TypeVariable<?>) {
+                componentClass = Object.class;
+            }
+            return Array.newInstance(componentClass, size);
+        }
+        Class<?> rawType = JieReflect.getRawType(type);
+        if (rawType == null) {
+            return null;
+        }
+        IntFunction<Object> rawFunc = NEW_INSTANCE_MAP.get(rawType);
+        if (rawFunc != null) {
+            return rawFunc.apply(size);
+        }
         return null;
     };
 
@@ -123,11 +136,7 @@ public class CollectionMappingHandler implements Mapper.Handler {
         if (sourceComponentType == null) {
             return Flag.CONTINUE;
         }
-        Class<?> targetRawClass = JieReflect.getRawType(targetType);
-        if (targetRawClass == null) {
-            return Flag.CONTINUE;
-        }
-        Object targetCollection = generator.generate(targetRawClass, getSourceSize(source));
+        Object targetCollection = generator.generate(targetType, getSourceSize(source));
         if (targetCollection == null) {
             return Flag.CONTINUE;
         }
@@ -248,7 +257,7 @@ public class CollectionMappingHandler implements Mapper.Handler {
             if (options.isIgnoreError()) {
                 targetComponent = null;
             } else {
-                throw new MappingException(sourceComponentType, targetComponentType);
+                throw new MappingException(sourceComponent, sourceComponentType, targetComponentType);
             }
         } else {
             targetComponent = Mapper.resolveResult(targetResult);

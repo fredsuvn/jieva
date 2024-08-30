@@ -11,8 +11,8 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.BeanInfo;
 import xyz.fslabo.common.bean.BeanResolver;
 import xyz.fslabo.common.bean.PropertyInfo;
-import xyz.fslabo.common.mapping.Mapper;
 import xyz.fslabo.common.data.protobuf.JieProtobuf;
+import xyz.fslabo.common.mapping.Mapper;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.nio.ByteBuffer;
@@ -154,7 +154,7 @@ public class ProtobufTest {
         Assert.assertEquals(dataBuilder.getSint64(), dataDto.getSint64());
 
         //protobuf -> dto
-        DataDto dataDto1 = JieProtobuf.defaultMapper().convert(data, DataDto.class);
+        DataDto dataDto1 = JieProtobuf.defaultMapper().map(data, DataDto.class);
         Assert.assertEquals(data.getEm(), Enum.E2);
         Assert.assertEquals(data.getStr(), dataDto.getStr());
         Assert.assertEquals(data.getTextList(), dataDto.getTextList());
@@ -170,7 +170,7 @@ public class ProtobufTest {
         Assert.assertEquals(data.getSint64(), dataDto.getSint64());
 
         //protobuf builder -> dto
-        DataDto dataDto2 = JieProtobuf.defaultMapper().convert(dataBuilder, DataDto.class);
+        DataDto dataDto2 = JieProtobuf.defaultMapper().map(dataBuilder, DataDto.class);
         Assert.assertEquals(dataBuilder.getEm(), Enum.E2);
         Assert.assertEquals(dataBuilder.getStr(), dataDto.getStr());
         Assert.assertEquals(dataBuilder.getTextList(), dataDto.getTextList());
@@ -186,14 +186,14 @@ public class ProtobufTest {
         Assert.assertEquals(dataBuilder.getSint64(), dataDto.getSint64());
 
         //protobuf -> protobuf
-        Data.Builder dataBuilder1 = JieProtobuf.defaultMapper().convert(data, Data.Builder.class);
+        Data.Builder dataBuilder1 = JieProtobuf.defaultMapper().map(data, Data.Builder.class);
         Assert.assertEquals(dataBuilder1.build(), dataBuilder.build());
-        Data data1 = JieProtobuf.defaultMapper().convert(dataBuilder1, Data.class);
+        Data data1 = JieProtobuf.defaultMapper().map(dataBuilder1, Data.class);
         Assert.assertEquals(data1, dataBuilder1.build());
 
         Request request = Request.newBuilder()
             .setCode(3).setMessage(ByteString.copyFromUtf8("xxxx")).setData(data).build();
-        RequestDto requestDto1 = JieProtobuf.defaultMapper().convert(request, RequestDto.class);
+        RequestDto requestDto1 = JieProtobuf.defaultMapper().map(request, RequestDto.class);
         Assert.assertEquals(requestDto1.getCode(), request.getCode());
         Assert.assertEquals(requestDto1.getMessage(), request.getMessage().toStringUtf8());
         Assert.assertEquals(requestDto1.getData(), dataDto);

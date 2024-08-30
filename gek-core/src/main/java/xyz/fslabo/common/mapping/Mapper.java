@@ -27,7 +27,7 @@ import java.util.List;
 public interface Mapper {
 
     /**
-     * Returns default mapper, of which handlers are:
+     * Returns default mapper with {@link MappingOptions#defaultOptions()}, and of which handlers are:
      * <ul>
      *     <li>{@link AssignableMapperHandler};</li>
      *     <li>{@link EnumMapperHandler};</li>
@@ -43,13 +43,24 @@ public interface Mapper {
     }
 
     /**
-     * Returns new mapper with given handlers.
+     * Returns new {@link Mapper} with given handlers.
      *
-     * @param middleHandlers handlers
-     * @return new mapper
+     * @param handlers given handlers
+     * @return new {@link Mapper}
      */
-    static Mapper withHandlers(Iterable<Handler> middleHandlers) {
-        return new MapperImpl(middleHandlers);
+    static Mapper newMapper(Iterable<Handler> handlers) {
+        return newMapper(handlers, MappingOptions.defaultOptions());
+    }
+
+    /**
+     * Returns new {@link Mapper} with given handlers and default options.
+     *
+     * @param handlers given handlers
+     * @param options  default options
+     * @return new {@link Mapper}
+     */
+    static Mapper newMapper(Iterable<Handler> handlers, MappingOptions options) {
+        return new MapperImpl(handlers, options);
     }
 
     /**
@@ -78,6 +89,123 @@ public interface Mapper {
             return Jie.as(((Val<?>) result).get());
         }
         return Jie.as(result);
+    }
+
+    /**
+     * Maps source object from source type to target with {@link #getOptions()}, returns null if mapping failed or the
+     * result itself is null. This method is equivalent to {@link #map(Object, Class, MappingOptions)}:
+     * <pre>
+     *     return map(source, (Type) targetType, defaultOptions());
+     * </pre>
+     *
+     * @param source     source object
+     * @param targetType target type
+     * @param <T>        target type
+     * @return mapped object or null
+     */
+    @Nullable
+    default <T> T map(@Nullable Object source, Class<T> targetType) {
+        return map(source, (Type) targetType, getOptions());
+    }
+
+    /**
+     * Maps source object from source type to target type ref with {@link #getOptions()}, returns null if mapping failed
+     * or the result itself is null. This method is equivalent to {@link #map(Object, TypeRef, MappingOptions)}:
+     * <pre>
+     *     return map(source, targetTypeRef, defaultOptions());
+     * </pre>
+     *
+     * @param source        source object
+     * @param targetTypeRef type reference target type
+     * @param <T>           target type
+     * @return mapped object or null
+     */
+    @Nullable
+    default <T> T map(@Nullable Object source, TypeRef<T> targetTypeRef) {
+        return map(source, targetTypeRef, getOptions());
+    }
+
+    /**
+     * Maps source object from source type to target type with {@link #getOptions()}, returns null if mapping failed or
+     * the result itself is null. This method is equivalent to {@link #map(Object, Type, MappingOptions)}:
+     * <pre>
+     *     return map(source, targetType, defaultOptions());
+     * </pre>
+     *
+     * @param source     source object
+     * @param targetType target type
+     * @param <T>        target type
+     * @return mapped object or null
+     */
+    @Nullable
+    default <T> T map(@Nullable Object source, Type targetType) {
+        return map(source, targetType, getOptions());
+    }
+
+    /**
+     * Maps source object from source type to target type with {@link #getOptions()}. The result of this method in 3
+     * types:
+     * <ul>
+     *     <li>
+     *         {@code null}: mapping failed;
+     *     </li>
+     *     <li>
+     *         {@link Val}: mapping successful, the result is {@link Val#get()};
+     *     </li>
+     *     <li>
+     *         {@code others}: mapping successful, the result is returned object;
+     *     </li>
+     * </ul>
+     * This method is equivalent to {@link #map(Object, Type, Type, MappingOptions)}:
+     * <pre>
+     *     return map(source, sourceType, targetType, defaultOptions());
+     * </pre>
+     *
+     * @param source     source object
+     * @param sourceType source type
+     * @param targetType target type
+     * @return mapped object or null
+     */
+    @Nullable
+    default Object map(@Nullable Object source, Type sourceType, Type targetType) {
+        return map(source, sourceType, targetType, getOptions());
+    }
+
+
+    /**
+     * Maps source object from source type to target property with {@link #getOptions()}. The target type is specified
+     * in current context, may not equal to {@link PropertyInfo#getType()} of target property.
+     * The result of this method in 3 types:
+     * <ul>
+     *     <li>
+     *         {@code null}: mapping failed;
+     *     </li>
+     *     <li>
+     *         {@link Val}: mapping successful, the result is {@link Val#get()};
+     *     </li>
+     *     <li>
+     *         {@code others}: mapping successful, the result is returned object;
+     *     </li>
+     * </ul>
+     * This method is equivalent to {@link #mapProperty(Object, Type, Type, PropertyInfo, MappingOptions)}:
+     * <pre>
+     *     return mapProperty(source, sourceType, targetType, targetProperty, defaultOptions());
+     * </pre>
+     *
+     * @param source         source object
+     * @param sourceType     source type
+     * @param targetProperty target property
+     * @param targetType     target type
+     * @return mapped object or null
+     */
+    @Nullable
+    default Object mapProperty(
+        @Nullable Object source,
+        Type sourceType,
+        Type targetType,
+        PropertyInfo targetProperty
+    ) {
+        return mapProperty(source, sourceType, targetType, targetProperty, getOptions());
     }
 
     /**
@@ -164,9 +292,6 @@ public interface Mapper {
      *         if (value == Flag.BREAK) {
      *             return null;
      *         }
-     *         if (value instanceof Val) {
-     *             return ((Val<?>) value).get();
-     *         }
      *         return value;
      *     }
      *     return null;
@@ -187,9 +312,6 @@ public interface Mapper {
             }
             if (value == Flag.BREAK) {
                 return null;
-            }
-            if (value instanceof Val) {
-                return ((Val<?>) value).get();
             }
             return value;
         }
@@ -223,9 +345,6 @@ public interface Mapper {
      *         if (value == Flag.BREAK) {
      *             return null;
      *         }
-     *         if (value instanceof Val) {
-     *             return ((Val<?>) value).get();
-     *         }
      *         return value;
      *     }
      *     return null;
@@ -254,9 +373,6 @@ public interface Mapper {
             if (value == Flag.BREAK) {
                 return null;
             }
-            if (value instanceof Val) {
-                return ((Val<?>) value).get();
-            }
             return value;
         }
         return null;
@@ -278,7 +394,7 @@ public interface Mapper {
      * @return a new {@link Mapper} of which handler list consists of given handler as first element, followed by
      * {@link #getHandlers()} of current mapper
      */
-    Mapper withFirstHandler(Handler handler);
+    Mapper addFirstHandler(Handler handler);
 
     /**
      * Returns a new {@link Mapper} of which handler list consists of {@link #getHandlers()} of current mapper, followed
@@ -286,29 +402,50 @@ public interface Mapper {
      *
      * @param handler given handler
      * @return a {@link Mapper} of which handler list consists of {@link #getHandlers()} of current mapper, followed by
-     * given handler as last element.
+     * given handler as last element
      */
-    Mapper withLastHandler(Handler handler);
+    Mapper addLastHandler(Handler handler);
 
     /**
      * Returns a new {@link Mapper} of which handler list comes from a copy of {@link #getHandlers()} of current mapper
      * but the first element is replaced by given handler.
+     * <p>
+     * Note if replaced handler equals given handler, return this-self.
      *
      * @param handler given handler
      * @return a new {@link Mapper} of which handler list comes from a copy of {@link #getHandlers()} of current mapper
-     * but the first element is replaced by given handler.
+     * but the first element is replaced by given handler
      */
     Mapper replaceFirstHandler(Handler handler);
 
     /**
      * Returns a new {@link Mapper} of which handler list comes from a copy of {@link #getHandlers()} of current mapper
      * but the last element is replaced by given handler.
+     * <p>
+     * Note if replaced handler equals given handler, return this-self.
      *
      * @param handler given handler
      * @return a new {@link Mapper} of which handler list comes from a copy of {@link #getHandlers()} of current mapper
-     * but the last element is replaced by given handler.
+     * but the last element is replaced by given handler
      */
     Mapper replaceLastHandler(Handler handler);
+
+    /**
+     * Returns default options of this {@link Mapper}.
+     *
+     * @return default options of this {@link Mapper}
+     */
+    MappingOptions getOptions();
+
+    /**
+     * Returns a new {@link Mapper} of which default options is replaced by given options.
+     * <p>
+     * Note if replaced options equals given options, return this-self.
+     *
+     * @param options given options
+     * @return a new {@link Mapper} of which default options is replaced by given options
+     */
+    Mapper replaceOptions(MappingOptions options);
 
     /**
      * Returns this mapper as {@link Handler}.

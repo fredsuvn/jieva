@@ -52,7 +52,7 @@ public interface MemberInfo {
     @Nullable
     default <A extends Annotation> A getAnnotation(Class<A> annotationType) {
         for (Annotation annotation : getAnnotations()) {
-            if (Objects.equals(annotationType, annotation.getClass())) {
+            if (Objects.equals(annotationType, annotation.annotationType())) {
                 return Jie.as(annotation);
             }
         }

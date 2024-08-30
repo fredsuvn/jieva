@@ -20,7 +20,7 @@ public class JieProtobuf {
     private static final Mapper MAPPER;
 
     static {
-        BEAN_RESOLVER = BeanResolver.defaultResolver().withFirstHandler(new ProtobufBeanResolveHandler());
+        BEAN_RESOLVER = BeanResolver.defaultResolver().addFirstHandler(new ProtobufBeanResolveHandler());
         BEAN_PROVIDER = BeanProvider.withResolver(BEAN_RESOLVER);
         List<Mapper.Handler> defaultHandlers = Mapper.defaultMapper().getHandlers();
         List<Mapper.Handler> handlers = new ArrayList<>(defaultHandlers.size() + 1);
@@ -32,7 +32,7 @@ public class JieProtobuf {
             }
         }
         handlers.add(1, new ProtobufMapperHandler());
-        MAPPER = Mapper.withHandlers(handlers);
+        MAPPER = Mapper.newMapper(handlers);
     }
 
     /**

@@ -10,14 +10,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.*;
 
-final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
+final class BeanResolverImpl implements BeanResolver, BeanResolver.Handler {
 
-    static ResolverImpl DEFAULT_RESOLVER =
-        new ResolverImpl(Collections.singletonList(new JavaBeanResolverHandler()));
+    static BeanResolverImpl DEFAULT_RESOLVER =
+        new BeanResolverImpl(Collections.singletonList(new JavaBeanResolverHandler()));
 
     private final List<BeanResolver.Handler> handlers;
 
-    ResolverImpl(Iterable<BeanResolver.Handler> handlers) {
+    BeanResolverImpl(Iterable<BeanResolver.Handler> handlers) {
         this.handlers = JieColl.toList(handlers);
     }
 
@@ -45,35 +45,41 @@ final class ResolverImpl implements BeanResolver, BeanResolver.Handler {
     }
 
     @Override
-    public BeanResolver withFirstHandler(Handler handler) {
+    public BeanResolver addFirstHandler(Handler handler) {
         List<BeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
         newHandlers.add(handler);
         newHandlers.addAll(handlers);
-        return new ResolverImpl(newHandlers);
+        return new BeanResolverImpl(newHandlers);
     }
 
     @Override
-    public BeanResolver withLastHandler(Handler handler) {
+    public BeanResolver addLastHandler(Handler handler) {
         List<BeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size() + 1);
         newHandlers.addAll(handlers);
         newHandlers.add(handler);
-        return new ResolverImpl(newHandlers);
+        return new BeanResolverImpl(newHandlers);
     }
 
     @Override
     public BeanResolver replaceFirstHandler(Handler handler) {
+        if (Objects.equals(handlers.get(0), handler)) {
+            return this;
+        }
         List<BeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size());
         newHandlers.addAll(handlers);
         newHandlers.set(0, handler);
-        return new ResolverImpl(newHandlers);
+        return new BeanResolverImpl(newHandlers);
     }
 
     @Override
     public BeanResolver replaceLastHandler(Handler handler) {
+        if (Objects.equals(handlers.get(handlers.size() - 1), handler)) {
+            return this;
+        }
         List<BeanResolver.Handler> newHandlers = new ArrayList<>(handlers.size());
         newHandlers.addAll(handlers);
         newHandlers.set(newHandlers.size() - 1, handler);
-        return new ResolverImpl(newHandlers);
+        return new BeanResolverImpl(newHandlers);
     }
 
     @Override

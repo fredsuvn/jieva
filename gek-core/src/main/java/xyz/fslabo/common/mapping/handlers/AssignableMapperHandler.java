@@ -5,6 +5,7 @@ import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.mapping.Mapper;
 import xyz.fslabo.common.mapping.MappingOptions;
+import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
@@ -16,18 +17,24 @@ import java.util.Objects;
  * Default first {@link Mapper.Handler} of {@link Mapper#getHandlers()}, to check assignable relationship between source
  * and target types.
  * <p>
- * In this handler, if value of {@link MappingOptions#getCopyLevel()} equals to {@link MappingOptions#COPY_LEVEL_EQUAL}
- * and the source type equals to target type, return source object wrapped by {@link #wrapResult(Object)}
- * ({@code return wrapResult(source)}).
+ * In this handler, if {@code source} is {@code null}, return {@link Val#ofNull()}.
  * <p>
- * Else if target type is {@link WildcardType} and has a lower bound (represents {@code ? super T}), return
+ * Else if value of {@link MappingOptions#getCopyLevel()} equals to {@link MappingOptions#COPY_LEVEL_EQUAL} and
+ * {@code targetType} equals to {@code targetType}, return {@code wrapResult(source)}.
+ * <p>
+ * Else if value of {@link MappingOptions#getCopyLevel()} equals to {@link MappingOptions#COPY_LEVEL_ASSIGNABLE}, and (
+ * {@code targetType} equals to {@code Object.class} or {@code targetType} is assignable from {@code sourceType}),
+ * return {@code wrapResult(source)}.
+ * <p>
+ * Else if {@code targetType} is {@link WildcardType} and has a lower bound (represents {@code ? super T}), return
  * {@code new Object()}.
  * <p>
- * Else if target type is {@link WildcardType} and has an upper bound (represents {@code ? extends T}), let the upper
- * bound be {@code upperBound}, return {@code mapper.asHandler().map(source, sourceType, upperBound, mapper, options)}
+ * Else if {@code targetType} is {@link WildcardType} and has an upper bound (represents {@code ? extends T}), let the
+ * upper bound be {@code upperBound}, return
+ * {@code mapper.asHandler().map(source, sourceType, upperBound, mapper, options)}
  * or {@code mapper.asHandler().mapProperty(source, sourceType, upper, targetProperty, mapper, options)}.
  * <p>
- * Else if target type is {@link TypeVariable} and has only one bound (represents {@code T extends X}, excludes
+ * Else if {@code targetType} is {@link TypeVariable} and has only one bound (represents {@code T extends X}, excludes
  * {@code T extends X & Y}), let the bound be {@code bound}, return
  * {@code mapper.asHandler().map(source, sourceType, bound, mapper, options)} or
  * {@code mapper.asHandler().mapProperty(source, sourceType, bound, targetProperty, mapper, options)}.
@@ -44,12 +51,16 @@ public class AssignableMapperHandler implements Mapper.Handler {
     @Override
     public Object map(
         @Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {
+        if (source == null) {
+            return Val.ofNull();
+        }
         if (options.getCopyLevel() == MappingOptions.COPY_LEVEL_EQUAL && Objects.equals(source, targetType)) {
             return wrapResult(source);
         }
-        if (options.getCopyLevel() == MappingOptions.COPY_LEVEL_ASSIGNABLE
-            && JieReflect.isAssignable(targetType, sourceType)) {
-            return wrapResult(source);
+        if (options.getCopyLevel() == MappingOptions.COPY_LEVEL_ASSIGNABLE) {
+            if (Objects.equals(targetType, Object.class) || JieReflect.isAssignable(targetType, sourceType)) {
+                return wrapResult(source);
+            }
         }
         if (targetType instanceof WildcardType) {
             WildcardType targetWildcard = (WildcardType) targetType;
@@ -76,12 +87,16 @@ public class AssignableMapperHandler implements Mapper.Handler {
     @Override
     public Object mapProperty(
         @Nullable Object source, Type sourceType, Type targetType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options) {
+        if (source == null) {
+            return Val.ofNull();
+        }
         if (options.getCopyLevel() == MappingOptions.COPY_LEVEL_EQUAL && Objects.equals(source, targetType)) {
             return wrapResult(source);
         }
-        if (options.getCopyLevel() == MappingOptions.COPY_LEVEL_ASSIGNABLE
-            && JieReflect.isAssignable(targetType, sourceType)) {
-            return wrapResult(source);
+        if (options.getCopyLevel() == MappingOptions.COPY_LEVEL_ASSIGNABLE) {
+            if (Objects.equals(targetType, Object.class) || JieReflect.isAssignable(targetType, sourceType)) {
+                return wrapResult(source);
+            }
         }
         if (targetType instanceof WildcardType) {
             WildcardType targetWildcard = (WildcardType) targetType;

@@ -1,5 +1,7 @@
 package xyz.fslabo.common.mapping;
 
+import xyz.fslabo.annotations.Nullable;
+
 import java.lang.reflect.Type;
 
 /**
@@ -46,11 +48,12 @@ public class MappingException extends RuntimeException {
     /**
      * Constructs with source type and target type.
      *
+     * @param obj        object to be mapped
      * @param sourceType source type
      * @param targetType target type
      */
-    public MappingException(Type sourceType, Type targetType) {
-        this("Failed to map " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ".");
+    public MappingException(@Nullable Object obj, Type sourceType, Type targetType) {
+        this("Failed to map object from " + sourceType.getTypeName() + " to " + targetType.getTypeName() + ": " + obj + ".");
     }
 
     /**

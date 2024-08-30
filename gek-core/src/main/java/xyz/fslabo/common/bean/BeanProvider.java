@@ -18,7 +18,7 @@ public interface BeanProvider {
      * @return default bean provider
      */
     static BeanProvider defaultProvider() {
-        return ProviderImpl.DEFAULT_PROVIDER;
+        return BeanProviderImpl.DEFAULT_PROVIDER;
     }
 
     /**
@@ -27,7 +27,7 @@ public interface BeanProvider {
      * @return specified resolver
      */
     static BeanProvider withResolver(BeanResolver resolver) {
-        return new ProviderImpl(resolver);
+        return new BeanProviderImpl(resolver);
     }
 
     /**

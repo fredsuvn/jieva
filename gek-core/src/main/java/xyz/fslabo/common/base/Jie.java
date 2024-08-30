@@ -489,8 +489,7 @@ public class Jie {
     /**
      * Copies properties from source object to dest object, return the dest object. This method is equivalent to:
      * <pre>
-     *     BeanMapper.defaultMapper().copyProperties(source, dest, MappingOptions.defaultOptions());
-     *     return dest;
+     *     return BeanMapper.defaultMapper().copyProperties(source, dest);
      * </pre>
      * Using {@link BeanMapper} for more mapping operations.
      *
@@ -499,20 +498,18 @@ public class Jie {
      * @param <T>    dest type
      * @return dest object
      * @see BeanMapper#defaultMapper()
-     * @see BeanMapper#copyProperties(Object, Object, MappingOptions)
+     * @see BeanMapper#copyProperties(Object, Object)
      */
     public static <T> T copyProperties(Object source, T dest) {
-        BeanMapper.defaultMapper().copyProperties(source, dest, MappingOptions.defaultOptions());
-        return dest;
+        return BeanMapper.defaultMapper().copyProperties(source, dest);
     }
 
     /**
      * Copies properties from source object to dest object (specified ignored properties will be excluded), return the
      * dest object. This method is equivalent to:
      * <pre>
-     *     BeanMapper.defaultMapper().copyProperties(source, dest,
+     *     return BeanMapper.defaultMapper().copyProperties(source, dest,
      *         MappingOptions.builder().ignored(JieArray.asList(ignoredProperties)).build());
-     *     return dest;
      * </pre>
      * Using {@link BeanMapper} for more mapping operations.
      *
@@ -525,9 +522,27 @@ public class Jie {
      * @see BeanMapper#copyProperties(Object, Object, MappingOptions)
      */
     public static <T> T copyProperties(Object source, T dest, Object... ignoredProperties) {
-        BeanMapper.defaultMapper().copyProperties(source, dest,
+        return BeanMapper.defaultMapper().copyProperties(source, dest,
             MappingOptions.builder().ignored(JieArray.asList(ignoredProperties)).build());
-        return dest;
+    }
+
+    /**
+     * Copies properties from source object to dest object, return the dest object. This method is equivalent to:
+     * <pre>
+     *     return BeanMapper.defaultMapper().copyProperties(source, dest, options);
+     * </pre>
+     * Using {@link BeanMapper} for more mapping operations.
+     *
+     * @param source  source object
+     * @param dest    dest object
+     * @param options mapping options
+     * @param <T>     dest type
+     * @return dest object
+     * @see BeanMapper#defaultMapper()
+     * @see BeanMapper#copyProperties(Object, Object, MappingOptions)
+     */
+    public static <T> T copyProperties(Object source, T dest, MappingOptions options) {
+        return BeanMapper.defaultMapper().copyProperties(source, dest, options);
     }
 
     /**

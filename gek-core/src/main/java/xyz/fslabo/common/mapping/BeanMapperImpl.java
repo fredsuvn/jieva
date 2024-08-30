@@ -1,7 +1,6 @@
 package xyz.fslabo.common.mapping;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanInfo;
@@ -12,7 +11,10 @@ import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 final class BeanMapperImpl implements BeanMapper {
@@ -20,8 +22,8 @@ final class BeanMapperImpl implements BeanMapper {
     static BeanMapperImpl DEFAULT_MAPPER = new BeanMapperImpl();
 
     @Override
-    public void copyProperties(
-        Object source, Type sourceType, Object dest, Type destType, MappingOptions options
+    public <T> T copyProperties(
+        Object source, Type sourceType, T dest, Type destType, MappingOptions options
     ) throws MappingException {
         try {
             if (source instanceof Map) {
@@ -42,6 +44,7 @@ final class BeanMapperImpl implements BeanMapper {
         } catch (Exception e) {
             throw new MappingException(e);
         }
+        return dest;
     }
 
     private void mapToMap(Object source, Type sourceType, Object dest, Type destType, MappingOptions options) {
@@ -126,7 +129,11 @@ final class BeanMapperImpl implements BeanMapper {
         Mapper mapper = Jie.orDefault(options.getMapper(), Mapper.defaultMapper());
         boolean ignoreError = options.isIgnoreError();
         sourceProperties.forEach((name, property) -> {
-            if (ignored.contains(name)) {
+            if (ignored.contains(name) || !property.isReadable()) {
+                return;
+            }
+            Object sourceValue = property.getValue(source);
+            if (sourceValue == null && ignoreNull) {
                 return;
             }
             Object mappedKey = nameMapper.apply(name, String.class);
@@ -135,7 +142,7 @@ final class BeanMapperImpl implements BeanMapper {
             }
             putToMap(
                 mappedKey, String.class, destKeyType,
-                property.getValue(source), property.getType(), destValueType,
+                sourceValue, property.getType(), destValueType,
                 destMap, mapper, options
             );
         });
@@ -153,7 +160,11 @@ final class BeanMapperImpl implements BeanMapper {
         Mapper mapper = Jie.orDefault(options.getMapper(), Mapper.defaultMapper());
         boolean ignoreError = options.isIgnoreError();
         sourceProperties.forEach((name, property) -> {
-            if (ignored.contains(name)) {
+            if (ignored.contains(name) || !property.isReadable()) {
+                return;
+            }
+            Object sourceValue = property.getValue(source);
+            if (sourceValue == null && ignoreNull) {
                 return;
             }
             Object mappedKey = nameMapper.apply(name, String.class);
@@ -161,7 +172,7 @@ final class BeanMapperImpl implements BeanMapper {
                 return;
             }
             putToBean(
-                mappedKey, String.class, property.getValue(source), property.getType(),
+                mappedKey, String.class, sourceValue, property.getType(),
                 dest, destProperties, mapper, options
             );
         });
@@ -203,11 +214,11 @@ final class BeanMapperImpl implements BeanMapper {
         Object destValue;
         try {
             destValue = mapper.map(sourceValue, sourceValueType, destValueType, options);
-            if (Objects.equals(destValue, Flag.UNSUPPORTED)) {
+            if (destValue == null) {
                 if (ignoreError) {
                     return;
                 }
-                throw new MappingException(sourceKeyType, destKeyType);
+                throw new MappingException(sourceValue, sourceValueType, destValueType);
             }
             if (destValue instanceof Val) {
                 destValue = ((Val<?>) destValue).get();
@@ -255,17 +266,17 @@ final class BeanMapperImpl implements BeanMapper {
         }
         String destName = String.valueOf(destKey);
         PropertyInfo destProperty = destProperties.get(destName);
-        if (destProperty == null) {
+        if (destProperty == null || !destProperty.isWriteable()) {
             return;
         }
         Object destValue;
         try {
             destValue = mapper.mapProperty(sourceValue, sourceValueType, destProperty.getType(), destProperty, options);
-            if (Objects.equals(destValue, Flag.UNSUPPORTED)) {
+            if (destValue == null) {
                 if (ignoreError) {
                     return;
                 }
-                throw new MappingException(sourceKeyType, String.class);
+                throw new MappingException(sourceValue, sourceValueType, destProperty.getType());
             }
             if (destValue instanceof Val) {
                 destValue = ((Val<?>) destValue).get();
@@ -296,11 +307,11 @@ final class BeanMapperImpl implements BeanMapper {
         Object destKey;
         try {
             destKey = mapper.map(mappedKey, sourceKeyType, destKeyType, options);
-            if (Objects.equals(destKey, Flag.UNSUPPORTED)) {
+            if (destKey == null) {
                 if (ignoreError) {
                     return F.RETURN;
                 }
-                throw new MappingException(sourceKeyType, destKeyType);
+                throw new MappingException(mappedKey, sourceKeyType, destKeyType);
             }
             if (destKey instanceof Val) {
                 destKey = ((Val<?>) destKey).get();

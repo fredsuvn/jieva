@@ -7,33 +7,31 @@ import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.base.Flag;
-import xyz.fslabo.common.base.JieLog;
-import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.bean.BeanInfo;
-import xyz.fslabo.common.bean.BeanResolver;
-import xyz.fslabo.common.bean.PropertyBase;
-import xyz.fslabo.common.bean.PropertyInfo;
+import xyz.fslabo.common.base.*;
+import xyz.fslabo.common.bean.*;
 import xyz.fslabo.common.bean.handlers.JavaBeanResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
+import xyz.fslabo.common.mapping.BeanMapper;
 import xyz.fslabo.common.mapping.Mapper;
+import xyz.fslabo.common.mapping.MappingOptions;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class BeanPropertyTest {
+public class BeanTest {
 
     @Test
     public void testTypeBean() throws Exception {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
         BeanInfo ccBean = BeanInfo.get(ccType);
-        JieLog.of().info("ccBean: ", ccBean);
+        JieLog.system().info("ccBean: ", ccBean);
         PropertyInfo cc = ccBean.getProperty("cc");
         PropertyInfo c1 = ccBean.getProperty("c1");
         PropertyInfo c2 = ccBean.getProperty("c2");
@@ -69,7 +67,7 @@ public class BeanPropertyTest {
     public void testClassBean() throws Exception {
         Type ccType = Cc.class;
         BeanInfo ccBean = BeanInfo.get(ccType);
-        JieLog.of().info("ccBean: ", ccBean);
+        JieLog.system().info("ccBean: ", ccBean);
         PropertyInfo cc = ccBean.getProperty("cc");
         PropertyInfo c1 = ccBean.getProperty("c1");
         PropertyInfo c2 = ccBean.getProperty("c2");
@@ -106,51 +104,6 @@ public class BeanPropertyTest {
     }
 
     @Test
-    public void testMapBean() {
-        Type mapType = new TypeRef<Map<String, Long>>() {
-        }.getType();
-        Map<String, Long> map = new LinkedHashMap<>();
-        map.put("1", 10086L);
-        map.put("2", 10010L);
-        map.put("3", 10000L);
-        BeanInfo mapBean = BeanInfo.wrap(map, mapType);
-        JieLog.of().info("mapBean: ", mapBean);
-        PropertyInfo p1 = mapBean.getProperty("1");
-        PropertyInfo p2 = mapBean.getProperty("2");
-        PropertyInfo p3 = mapBean.getProperty("3");
-        PropertyInfo p4 = mapBean.getProperty("4");
-        Assert.assertEquals(p1.getType(), Long.class);
-        Assert.assertEquals(p2.getType(), Long.class);
-        Assert.assertEquals(p3.getType(), Long.class);
-        Assert.assertNull(p4);
-        Map<String, PropertyInfo> properties = mapBean.getProperties();
-        Assert.assertSame(properties, mapBean.getProperties());
-        map.put("4", 12345L);
-        Assert.assertEquals(properties, mapBean.getProperties());
-        Assert.assertNull(p4);
-        PropertyInfo p42 = mapBean.getProperty("4");
-        Assert.assertEquals(p42.getType(), Long.class);
-        Assert.assertEquals(p1, mapBean.getProperties().get("1"));
-        Assert.assertEquals(p1, mapBean.getProperty("1"));
-        map.remove("2");
-        Assert.assertNull(mapBean.getProperty("2"));
-        JieLog.of().info("mapBean: ", mapBean);
-
-        BeanInfo mapObjBean = BeanInfo.wrap(map);
-        PropertyInfo p1Obj = mapObjBean.getProperty("1");
-        Assert.assertEquals(p1Obj.getType(), Object.class);
-        Assert.assertEquals(
-            p1.getValue(map),
-            p1Obj.getValue(map)
-        );
-
-        Assert.assertThrows(IllegalArgumentException.class, () -> {
-            BeanInfo.wrap(map, new TypeRef<Map<Object, Long>>() {
-            }.getType());
-        });
-    }
-
-    @Test
     public void testBeanResolver() {
         Type ccType = new TypeRef<Cc<Double>>() {
         }.getType();
@@ -158,8 +111,7 @@ public class BeanPropertyTest {
         BeanInfo ccBean2 = BeanInfo.get(ccType);
         Assert.assertSame(ccBean1, ccBean2);
         BeanResolver resolver = BeanResolver.withHandlers(
-            Collections.singletonList(new JavaBeanResolverHandler()),
-            null
+            new JavaBeanResolverHandler()
         );
         BeanInfo ccBean3 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean1, ccBean3);
@@ -167,10 +119,7 @@ public class BeanPropertyTest {
         BeanInfo ccBean4 = resolver.resolve(ccType);
         Assert.assertNotSame(ccBean4, ccBean3);
         Assert.assertEquals(ccBean4, ccBean3);
-    }
 
-    @Test
-    public void testBeanResolveHandler() {
         BeanInfo aaa = BeanInfo.get(TestHandler.class);
         Assert.assertEquals(aaa.getProperties().size(), 3);
         Assert.assertNotNull(aaa.getProperty("aaa"));
@@ -179,7 +128,7 @@ public class BeanPropertyTest {
         Assert.assertTrue(aaa.getProperty("aaa").isWriteable());
         Assert.assertFalse(aaa.getProperty("bbb").isReadable());
         Assert.assertTrue(aaa.getProperty("bbb").isWriteable());
-        BeanInfo bbb = BeanResolver.withHandlers(NonGetterPrefixResolverHandler.INSTANCE).resolve(TestHandler.class);
+        BeanInfo bbb = BeanResolver.withHandlers(new NonGetterPrefixResolverHandler()).resolve(TestHandler.class);
         Assert.assertEquals(bbb.getProperties().size(), 3);
         Assert.assertNotNull(bbb.getProperty("aaa"));
         Assert.assertNotNull(bbb.getProperty("bbb"));
@@ -193,7 +142,23 @@ public class BeanPropertyTest {
     }
 
     @Test
+    public void testBeanResolveHandler() {
+        BeanResolver resolver = BeanResolver.defaultResolver();
+        Assert.assertSame(resolver, resolver.replaceFirstHandler(resolver.getHandlers().get(0)));
+        Assert.assertSame(resolver, resolver.replaceLastHandler(resolver.getHandlers().get(resolver.getHandlers().size() - 1)));
+        BeanResolver.Handler handler = new BeanResolver.Handler() {
+            @Override
+            public @Nullable Flag resolve(BeanResolver.Context context) throws BeanResolvingException {
+                return null;
+            }
+        };
+        Assert.assertNotSame(resolver, resolver.replaceFirstHandler(handler));
+        Assert.assertNotSame(resolver, resolver.replaceLastHandler(handler));
+    }
+
+    @Test
     public void testCopyProperties() {
+        MappingOptions ignoreNull = MappingOptions.builder().ignoreNull(true).build();
         //bean -> bean
         Cc<Long> cc1 = new Cc<>();
         cc1.setI1("i1");
@@ -213,7 +178,7 @@ public class BeanPropertyTest {
         Assert.assertSame(cc2.getE1(), E1.E2);
         Assert.assertSame(cc2.getE2(), E2.E3);
         cc2.setI1("888");
-        Jie.copyProperties(cc1, cc2, false);
+        Jie.copyProperties(cc1, cc2, ignoreNull);
         Assert.assertEquals("888", cc2.getI1());
         cc1.setI1("aaaa");
         cc2 = Jie.copyProperties(cc1, new Cc<>());
@@ -225,9 +190,9 @@ public class BeanPropertyTest {
         Assert.assertNull(cc2.getC2());
         Assert.assertEquals(cc1.getC2().longValue(), 22);
         cc1.setI1(null);
-        cc2 = Jie.copyProperties(cc1, new Cc<>(), false, "c2");
+        cc2 = Jie.copyProperties(cc1, new Cc<>(), "c2");
         cc2.setI1("qqqq");
-        Jie.copyProperties(cc1, new Cc<>(), false, "c2");
+        Jie.copyProperties(cc1, new Cc<>(), "c2");
         Assert.assertEquals("qqqq", cc2.getI1());
         Assert.assertEquals(cc1.getI2(), cc2.getI2());
         Assert.assertEquals(cc1.getCc(), cc2.getCc());
@@ -235,42 +200,59 @@ public class BeanPropertyTest {
         Assert.assertEquals(cc1.getC2().longValue(), 22);
         Assert.expectThrows(ClassCastException.class, () -> {
             Cc<Long> ccl = new Cc<>();
-            Jie.copyProperties(cc1, new TypeRef<Cc<Double>>() {
+            BeanMapper.defaultMapper().copyProperties(cc1, new TypeRef<Cc<Double>>() {
                 }.getType(),
                 ccl, new TypeRef<Cc<String>>() {
-                }.getType());
+                }.getType(),
+                MappingOptions.defaultOptions()
+            );
             Long l = ccl.getCc();
             System.out.println(l);
         });
-        Cc<String> ccs = Jie.copyProperties(cc1, new TypeRef<Cc<Double>>() {
+        Cc<String> ccs = BeanMapper.defaultMapper().copyProperties(cc1, new TypeRef<Cc<Double>>() {
             }.getType(),
             new Cc<>(), new TypeRef<Cc<String>>() {
-            }.getType());
+            }.getType(), MappingOptions.defaultOptions());
         Assert.assertEquals(ccs.getCc(), cc1.getCc().toString());
 
-        Mapper kConverter = Mapper.defaultMapper().insertFirstMiddleHandler(new Mapper.Handler() {
+        Mapper kConverter = Mapper.defaultMapper().addFirstHandler(new Mapper.Handler() {
             @Override
-            public @Nullable Object map(
-                @Nullable Object source, Type sourceType, Type targetType, Mapper mapper) {
+            public Object map(@Nullable Object source, Type sourceType, Type targetType, Mapper mapper, MappingOptions options) {
                 if (Objects.equals(targetType, Kk.class)) {
                     return new Kk(String.valueOf(source));
                 }
-                return null;
+                return Flag.CONTINUE;
+            }
+
+            @Override
+            public Object mapProperty(@Nullable Object source, Type sourceType, Type targetType, PropertyInfo targetProperty, Mapper mapper, MappingOptions options) {
+                if (Objects.equals(targetType, Kk.class)) {
+                    return new Kk(source + "Property");
+                }
+                Ann ann = targetProperty.getAnnotation(Ann.class);
+                if (ann == null) {
+                    return Flag.CONTINUE;
+                }
+                String format = ann.value();
+                if (JieString.isNotEmpty(format) && source instanceof Instant && Objects.equals(targetType, String.class)) {
+                    Instant instant = (Instant) source;
+                    return JieDate.format(Date.from(instant), format);
+                }
+                return Flag.CONTINUE;
             }
         });
-        GekBeanCopier copier = GekBeanCopier.defaultCopier();
+        BeanMapper copier = BeanMapper.defaultMapper();
 
         //bean -> map
-        Map<Kk, String> map1 = copier.toBuilder()
-            .converter(kConverter)
-            .build().copyProperties(
-                cc1,
-                new TypeRef<Cc<Long>>() {
-                }.getType(),
-                new HashMap<>(),
-                new TypeRef<Map<Kk, String>>() {
-                }.getType()
-            );
+        Map<Kk, String> map1 = copier.copyProperties(
+            cc1,
+            new TypeRef<Cc<Long>>() {
+            }.getType(),
+            new HashMap<>(),
+            new TypeRef<Map<Kk, String>>() {
+            }.getType(),
+            MappingOptions.builder().ignoreNull(true).mapper(kConverter).build()
+        );
         Assert.assertEquals(map1.get(new Kk("i1")), Jie.orNull(cc1.getI1(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Jie.orNull(cc1.getI2(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("cc")), Jie.orNull(cc1.getCc(), String::valueOf));
@@ -278,36 +260,47 @@ public class BeanPropertyTest {
 
         // map -> bean
         map1.put(new Kk("i1"), "88888");
-        Cc<String> cs2 = copier.toBuilder()
-            .converter(kConverter)
-            .build().copyProperties(
-                map1,
-                new TypeRef<Map<Kk, String>>() {
-                }.getType(),
-                new Cc<>(),
-                new TypeRef<Cc<String>>() {
-                }.getType()
-            );
+        Cc<String> cs2 = copier.copyProperties(
+            map1,
+            new TypeRef<Map<Kk, String>>() {
+            }.getType(),
+            new Cc<>(),
+            new TypeRef<Cc<String>>() {
+            }.getType(),
+            MappingOptions.builder().mapper(kConverter).build()
+        );
         Assert.assertEquals(map1.get(new Kk("i1")), Jie.orNull(cs2.getI1(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Jie.orNull(cs2.getI2(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("cc")), Jie.orNull(cs2.getCc(), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("c2")), Jie.orNull(cs2.getC2(), String::valueOf));
 
         // map -> map
-        Map<String, Kk> map2 = copier.toBuilder()
-            .converter(kConverter)
-            .build().copyProperties(
-                map1,
-                new TypeRef<Map<Kk, String>>() {
-                }.getType(),
-                new HashMap<>(),
-                new TypeRef<Map<String, Kk>>() {
-                }.getType()
-            );
+        Map<String, Kk> map2 = copier.copyProperties(
+            map1,
+            new TypeRef<Map<Kk, String>>() {
+            }.getType(),
+            new HashMap<>(),
+            new TypeRef<Map<String, Kk>>() {
+            }.getType(),
+            MappingOptions.builder().mapper(kConverter).build()
+        );
         Assert.assertEquals(map1.get(new Kk("i1")), Jie.orNull(map2.get("i1"), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("i2")), Jie.orNull(map2.get("i2"), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("cc")), Jie.orNull(map2.get("cc"), String::valueOf));
         Assert.assertEquals(map1.get(new Kk("c2")), Jie.orNull(map2.get("c2"), String::valueOf));
+
+        //test mapProperty
+        Date now = new Date();
+        cc1.setD(now.toInstant());
+        Dd dd = copier.copyProperties(
+            cc1,
+            new TypeRef<Cc<Long>>() {
+            }.getType(),
+            new Dd(),
+            Dd.class,
+            MappingOptions.builder().mapper(kConverter).build()
+        );
+        Assert.assertEquals(dd.getD(), JieDate.format(now, "yyyy-MM-dd"));
     }
 
     @Test
@@ -335,12 +328,12 @@ public class BeanPropertyTest {
     public void testResolverAsHandler() {
         int[] x = {0};
         BeanResolver.Handler handler = BeanResolver.defaultResolver()
-            .withFirstHandler(new BeanResolver.Handler() {
+            .addFirstHandler(new BeanResolver.Handler() {
                 @Override
                 public @Nullable Flag resolve(BeanResolver.Context context) {
                     if (Objects.equals(context.getType(), Integer.class)) {
                         x[0]++;
-                        return null;
+                        return Flag.CONTINUE;
                     }
                     return Flag.BREAK;
                 }
@@ -354,8 +347,13 @@ public class BeanPropertyTest {
             }
 
             @Override
-            public Map<String, PropertyBase> getProperties() {
+            public Map<String, BasePropertyInfo> getProperties() {
                 return new HashMap<>();
+            }
+
+            @Override
+            public List<BaseMethodInfo> getMethods() {
+                return new LinkedList<>();
             }
         };
         handler.resolve(context1);
@@ -368,8 +366,13 @@ public class BeanPropertyTest {
             }
 
             @Override
-            public Map<String, PropertyBase> getProperties() {
+            public Map<String, BasePropertyInfo> getProperties() {
                 return new HashMap<>();
+            }
+
+            @Override
+            public List<BaseMethodInfo> getMethods() {
+                return new LinkedList<>();
             }
         };
         handler.resolve(context2);
@@ -416,6 +419,7 @@ public class BeanPropertyTest {
         private Integer i2;
         private E1 e1;
         private E2 e2;
+        private Instant d;
 
         @Override
         public String getI1() {
@@ -451,6 +455,12 @@ public class BeanPropertyTest {
     }
 
     @Data
+    public static class Dd {
+        @Ann("yyyy-MM-dd")
+        private String d;
+    }
+
+    @Data
     @EqualsAndHashCode
     @AllArgsConstructor
     @NoArgsConstructor
@@ -479,7 +489,7 @@ public class BeanPropertyTest {
     @EqualsAndHashCode
     public static class CopyP2 {
         private Long p;
-        private List<Map<? super BigDecimal, ? super BigInteger>>[] list;
+        private List<Map<? extends BigDecimal, ? extends BigInteger>>[] list;
         private E2 e;
     }
 
@@ -499,7 +509,7 @@ public class BeanPropertyTest {
     public static class CopyB {
         private Long s;
         private List<int[]> list;
-        private Map<Integer, ? super CopyP2> map;
+        private Map<Integer, ? extends CopyP2> map;
         private CopyP2 p;
     }
 

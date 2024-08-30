@@ -1,6 +1,7 @@
 package xyz.fslabo.common.mapping;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
@@ -22,8 +23,9 @@ import java.util.function.Function;
  *
  * @author sunqian
  */
-@Builder
+@Builder(toBuilder = true)
 @Getter
+@EqualsAndHashCode
 public class MappingOptions {
 
     private static final MappingOptions DEFAULT_OPTIONS = MappingOptions.builder().build();
@@ -103,21 +105,24 @@ public class MappingOptions {
      * <p>
      * Default is false.
      */
-    private boolean ignoreNull;
+    @Builder.Default
+    private boolean ignoreNull = false;
 
     /**
      * Whether ignore error when mapping.
      * <p>
      * Default is false.
      */
-    private boolean ignoreError;
+    @Builder.Default
+    private boolean ignoreError = false;
 
     /**
      * Whether put the value into dest map if the dest map doesn't contain the value.
      * <p>
      * Default is true.
      */
-    private boolean putNew;
+    @Builder.Default
+    private boolean putNew = true;
 
     /**
      * Copy level option. This option determines whether a new instance must be created during the mapping process,
@@ -130,7 +135,8 @@ public class MappingOptions {
      * <p>
      * Default is {@link #COPY_LEVEL_ASSIGNABLE}.
      */
-    private int copyLevel;
+    @Builder.Default
+    private int copyLevel = COPY_LEVEL_ASSIGNABLE;
 
     /**
      * Option to determine which charset to use for character conversion. If it is {@code null}, the mapper should use
