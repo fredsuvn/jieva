@@ -86,7 +86,7 @@ final class JieLogImpls {
                 }
                 appendable.append(System.lineSeparator());
             } catch (Exception e) {
-                //Do nothing!
+                throw new IllegalStateException(e);
             }
         }
 
