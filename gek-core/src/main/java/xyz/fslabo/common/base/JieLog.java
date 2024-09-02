@@ -57,45 +57,35 @@ public interface JieLog {
      *
      * @param message given message
      */
-    default void trace(Object... message) {
-        log(LEVEL_TRACE, message);
-    }
+    void trace(Object... message);
 
     /**
      * Logs given message with {@link #LEVEL_TRACE}. The message will be output in order of the array.
      *
      * @param message given message
      */
-    default void debug(Object... message) {
-        log(LEVEL_DEBUG, message);
-    }
+    void debug(Object... message);
 
     /**
      * Logs given message with {@link #LEVEL_TRACE}. The message will be output in order of the array.
      *
      * @param message given message
      */
-    default void info(Object... message) {
-        log(LEVEL_INFO, message);
-    }
+    void info(Object... message);
 
     /**
      * Logs given message with {@link #LEVEL_TRACE}. The message will be output in order of the array.
      *
      * @param message given message
      */
-    default void warn(Object... message) {
-        log(LEVEL_WARN, message);
-    }
+    void warn(Object... message);
 
     /**
      * Logs given message with {@link #LEVEL_TRACE}. The message will be output in order of the array.
      *
      * @param message given message
      */
-    default void error(Object... message) {
-        log(LEVEL_ERROR, message);
-    }
+    void error(Object... message);
 
     /**
      * Logs given message with specified level. The message will be output in order of the array.

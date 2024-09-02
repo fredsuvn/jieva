@@ -18,7 +18,36 @@ final class JieLogImpls {
         }
 
         @Override
+        public void trace(Object... message) {
+            log0(LEVEL_TRACE, message);
+        }
+
+        @Override
+        public void debug(Object... message) {
+            log0(LEVEL_DEBUG, message);
+        }
+
+        @Override
+        public void info(Object... message) {
+            log0(LEVEL_INFO, message);
+        }
+
+        @Override
+        public void warn(Object... message) {
+            log0(LEVEL_WARN, message);
+        }
+
+        @Override
+        public void error(Object... message) {
+            log0(LEVEL_ERROR, message);
+        }
+
+        @Override
         public void log(int level, Object... message) {
+            log0(level, message);
+        }
+
+        private void log0(int level, Object... message) {
             if (level < this.level) {
                 return;
             }
@@ -55,6 +84,7 @@ final class JieLogImpls {
                 for (Object o : message) {
                     appendable.append(String.valueOf(o));
                 }
+                appendable.append(System.lineSeparator());
             } catch (Exception e) {
                 //Do nothing!
             }
