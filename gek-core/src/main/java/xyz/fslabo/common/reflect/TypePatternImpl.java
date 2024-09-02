@@ -1,227 +1,12 @@
 package xyz.fslabo.common.reflect;
 
-import xyz.fslabo.common.base.Jie;
-
 import java.lang.reflect.*;
 import java.util.Objects;
 
-final class TypePatternImpl<T extends CharSequence> implements TypePattern {
+final class TypePatternImpl implements TypePattern {
 
-    private static final Type[] EMPTY_TYPE_ARRAY = {};
     static final TypePatternImpl INSTANCE = new TypePatternImpl();
 
-    @Override
-    public boolean matchesClassToClass(Class<?> pattern, Class<?> matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesClassToParameterized(Class<?> pattern, ParameterizedType matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesClassToWildcard(Class<?> pattern, WildcardType matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesClassToTypeVariable(Class<?> pattern, TypeVariable<?> matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesClassToGenericArray(Class<?> pattern, GenericArrayType matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesParameterizedToClass(ParameterizedType pattern, Class<?> matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesParameterizedToParameterized(ParameterizedType pattern, ParameterizedType matched) {
-        Class<?> pRaw = (Class<?>) pattern.getRawType();
-        Class<?> mRaw = (Class<?>) matched.getRawType();
-        if (!Objects.equals(pRaw, mRaw)) {
-            return false;
-        }
-        Type[] pArgs = Jie.orDefault(pattern.getActualTypeArguments(), EMPTY_TYPE_ARRAY);
-        Type[] mArgs = Jie.orDefault(matched.getActualTypeArguments(), EMPTY_TYPE_ARRAY);
-        return matchesTypeArgs(pArgs, mArgs);
-    }
-
-    @Override
-    public boolean matchesParameterizedToWildcard(ParameterizedType pattern, WildcardType matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesParameterizedToTypeVariable(ParameterizedType pattern, TypeVariable<?> matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesParameterizedToGenericArray(ParameterizedType pattern, GenericArrayType matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesWildcardToClass(WildcardType pattern, Class<?> matched) {
-        return matchesWildcardType(pattern, matched);
-    }
-
-    @Override
-    public boolean matchesWildcardToParameterized(WildcardType pattern, ParameterizedType matched) {
-        return matchesWildcardType(pattern, matched);
-    }
-
-    @Override
-    public boolean matchesWildcardToWildcard(WildcardType pattern, WildcardType matched) {
-        Type pUpper = JieReflect.getUpperBound(pattern);
-        Type mUpper = JieReflect.getUpperBound(matched);
-        if (!isAssignable(pUpper, mUpper)) {
-            return false;
-        }
-        Type pLower = JieReflect.getLowerBound(pattern);
-        if (pLower == null) {
-            return true;
-        }
-        Type mLower = JieReflect.getLowerBound(matched);
-        if (mLower == null) {
-            return false;
-        }
-        return isAssignable(mLower, pLower);
-    }
-
-    @Override
-    public boolean matchesWildcardToTypeVariable(WildcardType pattern, TypeVariable<?> matched) {
-        Type pLower = JieReflect.getLowerBound(pattern);
-        if (pLower != null) {
-            return false;
-        }
-        Type[] mUppers = matched.getBounds();
-        Type pUpper = JieReflect.getUpperBound(pattern);
-        for (Type mu : mUppers) {
-            if (isAssignable(pUpper, mu)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean matchesWildcardToGenericArray(WildcardType pattern, GenericArrayType matched) {
-        return matchesWildcardType(pattern, matched);
-    }
-
-    @Override
-    public boolean matchesTypeVariableToClass(TypeVariable<?> pattern, Class<?> matched) {
-        return matchesTypeVariable(pattern, matched);
-    }
-
-    @Override
-    public boolean matchesTypeVariableToParameterized(TypeVariable<?> pattern, ParameterizedType matched) {
-        return matchesTypeVariable(pattern, matched);
-    }
-
-    @Override
-    public boolean matchesTypeVariableToWildcard(TypeVariable<?> pattern, WildcardType matched) {
-        Type[] pUppers = pattern.getBounds();
-        Type mUpper = JieReflect.getUpperBound(matched);
-        for (Type pu : pUppers) {
-            if (!isAssignable(pu, mUpper)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean matchesTypeVariableToTypeVariable(TypeVariable<?> pattern, TypeVariable<?> matched) {
-        Type[] pUppers = pattern.getBounds();
-        Type[] mUppers = matched.getBounds();
-        for (Type pu : pUppers) {
-            boolean ok = false;
-            for (Type mu : mUppers) {
-                if (isAssignable(pu, mu)) {
-                    ok = true;
-                    break;
-                }
-            }
-            if (!ok) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean matchesTypeVariableToGenericArray(TypeVariable<?> pattern, GenericArrayType matched) {
-        return matchesTypeVariable(pattern, matched);
-    }
-
-    @Override
-    public boolean matchesGenericArrayToClass(GenericArrayType pattern, Class<?> matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesGenericArrayToParameterized(GenericArrayType pattern, ParameterizedType matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesGenericArrayToWildcard(GenericArrayType pattern, WildcardType matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesGenericArrayToTypeVariable(GenericArrayType pattern, TypeVariable<?> matched) {
-        return false;
-    }
-
-    @Override
-    public boolean matchesGenericArrayToGenericArray(GenericArrayType pattern, GenericArrayType matched) {
-        Type pComponent = pattern.getGenericComponentType();
-        Type mComponent = matched.getGenericComponentType();
-        return matches(pComponent, mComponent);
-    }
-
-    private boolean matchesTypeArgs(Type[] pArgs, Type[] mArgs) {
-        int size = Math.max(pArgs.length, mArgs.length);
-        for (int i = 0; i < size; i++) {
-            Type p = i < pArgs.length ? pArgs[i] : JieType.questionMark();
-            Type m = i < mArgs.length ? mArgs[i] : JieType.questionMark();
-            if (!matches(p, m)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean matchesWildcardType(WildcardType pattern, Type type) {
-        Type upper = JieReflect.getUpperBound(pattern);
-        if (!isAssignable(upper, type)) {
-            return false;
-        }
-        Type lower = JieReflect.getLowerBound(pattern);
-        if (lower == null) {
-            return true;
-        }
-        return isAssignable(type, lower);
-    }
-
-    private boolean matchesTypeVariable(TypeVariable<?> pattern, Type type) {
-        Type[] pUppers = pattern.getBounds();
-        for (Type ub : pUppers) {
-            if (!isAssignable(ub, type)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     @Override
     public boolean isAssignableClassToClass(Class<?> assigned, Class<?> assignee) {
@@ -236,19 +21,12 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     @Override
     public boolean isAssignableClassToWildcard(Class<?> assigned, WildcardType assignee) {
-        Type assigneeUpper = JieReflect.getUpperBound(assignee);
-        return isAssignable(assigned, assigneeUpper);
+        return isAssignableToWildcard(assigned, assignee);
     }
 
     @Override
     public boolean isAssignableClassToTypeVariable(Class<?> assigned, TypeVariable<?> assignee) {
-        Type[] assigneeUppers = assignee.getBounds();
-        for (Type assigneeUpper : assigneeUppers) {
-            if (!isAssignable(assigned, assigneeUpper)) {
-                return false;
-            }
-        }
-        return true;
+        return isAssignableToTypeVariable(assigned, assignee);
     }
 
     @Override
@@ -280,26 +58,35 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
         if (!assignedRaw.isAssignableFrom(assigneeRaw)) {
             return false;
         }
-        Type[] assignedArgs = Jie.orDefault(assigned.getActualTypeArguments(), EMPTY_TYPE_ARRAY);
-        Type[] assigneeArgs = Jie.orDefault(assignee.getActualTypeArguments(), EMPTY_TYPE_ARRAY);
-        return isAssignableTypeArgs(assignedArgs, assigneeArgs);
-    }
-
-    @Override
-    public boolean isAssignableParameterizedToWildcard(ParameterizedType assigned, WildcardType assignee) {
-        Type assigneeUpper = JieReflect.getUpperBound(assignee);
-        return isAssignable(assigned, assigneeUpper);
-    }
-
-    @Override
-    public boolean isAssignableParameterizedToTypeVariable(ParameterizedType assigned, TypeVariable<?> assignee) {
-        Type[] assigneeUppers = assignee.getBounds();
-        for (Type assigneeUpper : assigneeUppers) {
-            if (!isAssignable(assigned, assigneeUpper)) {
+        Type[] assignedArgs = assigned.getActualTypeArguments();
+        Type[] assigneeArgs = assignee.getActualTypeArguments();
+        if (assignedArgs.length != assigneeArgs.length) {
+            return false;
+        }
+        for (int i = 0; i < assignedArgs.length; i++) {
+            Type assignedArg = assignedArgs[i];
+            Type assigneeArg = assigneeArgs[i];
+            if (assignedArg instanceof WildcardType) {
+                if (!isAssignable(assignedArg, assigneeArg)) {
+                    return false;
+                }
+                continue;
+            }
+            if (!Objects.equals(assignedArg, assigneeArg)) {
                 return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean isAssignableParameterizedToWildcard(ParameterizedType assigned, WildcardType assignee) {
+        return isAssignableToWildcard(assigned, assignee);
+    }
+
+    @Override
+    public boolean isAssignableParameterizedToTypeVariable(ParameterizedType assigned, TypeVariable<?> assignee) {
+        return isAssignableToTypeVariable(assigned, assignee);
     }
 
     @Override
@@ -309,52 +96,102 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     @Override
     public boolean isAssignableWildcardToClass(WildcardType assigned, Class<?> assignee) {
-        return matchesWildcardToClass(assigned, assignee);
+        return false;
     }
 
     @Override
     public boolean isAssignableWildcardToParameterized(WildcardType assigned, ParameterizedType assignee) {
-        return matchesWildcardToParameterized(assigned, assignee);
+        return false;
     }
 
     @Override
     public boolean isAssignableWildcardToWildcard(WildcardType assigned, WildcardType assignee) {
-        return matchesWildcardToWildcard(assigned, assignee);
+        Type assignedUpper = JieReflect.getUpperBound(assigned);
+        Type assigneeUpper = JieReflect.getUpperBound(assignee);
+        if (!isAssignable(assignedUpper, assigneeUpper)) {
+            return false;
+        }
+        Type assignedLower = JieReflect.getLowerBound(assigned);
+        if (assignedLower == null) {
+            return true;
+        }
+        Type assigneeLower = JieReflect.getLowerBound(assignee);
+        if (assigneeLower == null) {
+            return false;
+        }
+        return isAssignable(assigneeLower, assignedLower);
     }
 
     @Override
     public boolean isAssignableWildcardToTypeVariable(WildcardType assigned, TypeVariable<?> assignee) {
-        return matchesWildcardToTypeVariable(assigned, assignee);
+        Type assignedLower = JieReflect.getLowerBound(assigned);
+        if (assignedLower != null) {
+            return false;
+        }
+        Type assignedUpper = JieReflect.getUpperBound(assigned);
+        if (isAssignable(assignedUpper, assignee)) {
+            return true;
+        }
+        Type[] assigneeUppers = assignee.getBounds();
+        for (Type assigneeUpper : assigneeUppers) {
+            if (isAssignable(assignedUpper, assigneeUpper)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean isAssignableWildcardToGenericArray(WildcardType assigned, GenericArrayType assignee) {
-        return matchesWildcardToGenericArray(assigned, assignee);
+        return isAssignableWildcard(assigned, assignee);
+    }
+
+    private boolean isAssignableWildcard(WildcardType assigned, Type assignee) {
+        Type upper = JieReflect.getUpperBound(assigned);
+        if (!isAssignable(upper, assignee)) {
+            return false;
+        }
+        Type lower = JieReflect.getLowerBound(assigned);
+        if (lower == null) {
+            return true;
+        }
+        return isAssignable(assignee, lower);
     }
 
     @Override
     public boolean isAssignableTypeVariableToClass(TypeVariable<?> assigned, Class<?> assignee) {
-        return matchesTypeVariableToClass(assigned, assignee);
+        return false;
     }
 
     @Override
     public boolean isAssignableTypeVariableToParameterized(TypeVariable<?> assigned, ParameterizedType assignee) {
-        return matchesTypeVariableToParameterized(assigned, assignee);
+        return false;
     }
 
     @Override
     public boolean isAssignableTypeVariableToWildcard(TypeVariable<?> assigned, WildcardType assignee) {
-        return matchesTypeVariableToWildcard(assigned, assignee);
+        return false;
     }
 
     @Override
     public boolean isAssignableTypeVariableToTypeVariable(TypeVariable<?> assigned, TypeVariable<?> assignee) {
-        return matchesTypeVariableToTypeVariable(assigned, assignee);
+        Type[] assigneeUppers = assignee.getBounds();
+        for (Type assigneeUpper : assigneeUppers) {
+            if (Objects.equals(assigneeUpper, assigned)) {
+                return true;
+            }
+            if (assigneeUpper instanceof TypeVariable<?>) {
+                if (isAssignableTypeVariableToTypeVariable(assigned, (TypeVariable<?>) assigneeUpper)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean isAssignableTypeVariableToGenericArray(TypeVariable<?> assigned, GenericArrayType assignee) {
-        return matchesTypeVariableToGenericArray(assigned, assignee);
+        return false;
     }
 
     @Override
@@ -380,19 +217,12 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
 
     @Override
     public boolean isAssignableGenericArrayToWildcard(GenericArrayType assigned, WildcardType assignee) {
-        Type assigneeUpper = JieReflect.getUpperBound(assignee);
-        return isAssignable(assigned, assigneeUpper);
+        return isAssignableToWildcard(assigned, assignee);
     }
 
     @Override
     public boolean isAssignableGenericArrayToTypeVariable(GenericArrayType assigned, TypeVariable<?> assignee) {
-        Type[] assigneeUppers = assignee.getBounds();
-        for (Type assigneeUpper : assigneeUppers) {
-            if (!isAssignable(assigned, assigneeUpper)) {
-                return false;
-            }
-        }
-        return true;
+        return isAssignableToTypeVariable(assigned, assignee);
     }
 
     @Override
@@ -402,24 +232,17 @@ final class TypePatternImpl<T extends CharSequence> implements TypePattern {
         return isAssignable(assignedComponent, assigneeComponent);
     }
 
-    private boolean isAssignableTypeArgs(Type[] pArgs, Type[] mArgs) {
-        int size = Math.max(pArgs.length, mArgs.length);
-        for (int i = 0; i < size; i++) {
-            Type p = i < pArgs.length ? pArgs[i] : JieType.questionMark();
-            Type m = i < mArgs.length ? mArgs[i] : JieType.questionMark();
-            if (!isAssignableParameterized(p, m)) {
-                return false;
-            }
-        }
-        return true;
+    public boolean isAssignableToWildcard(Type assigned, WildcardType assignee) {
+        Type assigneeUpper = JieReflect.getUpperBound(assignee);
+        return isAssignable(assigned, assigneeUpper);
     }
 
-    private boolean isAssignableParameterized(Type assigned, Type assignee) {
-        if (Objects.equals(assigned, assignee)) {
-            return true;
-        }
-        if (assigned instanceof WildcardType) {
-            return isAssignable(assigned, assignee);
+    public boolean isAssignableToTypeVariable(Type assigned, TypeVariable<?> assignee) {
+        Type[] assigneeUppers = assignee.getBounds();
+        for (Type assigneeUpper : assigneeUppers) {
+            if (isAssignable(assigned, assigneeUpper)) {
+                return true;
+            }
         }
         return false;
     }

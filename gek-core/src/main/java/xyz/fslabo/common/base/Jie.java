@@ -608,15 +608,6 @@ public class Jie {
     }
 
     /**
-     * Logs given message by {@link JieLog#system()}.
-     *
-     * @param message given message
-     */
-    public static void log(Object... message) {
-        JieLog.system().info(message);
-    }
-
-    /**
      * Returns a new {@link ArrayList} and add all given elements.
      *
      * @param elements given elements

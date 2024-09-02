@@ -51,4 +51,13 @@ public abstract class TypeRef<T> {
     public Type getType() {
         return type;
     }
+
+    /**
+     * Returns actual type of this reference as {@link ParameterizedType}.
+     *
+     * @return actual type of this reference as {@link ParameterizedType}
+     */
+    public ParameterizedType getParameterized() {
+        return (ParameterizedType) type;
+    }
 }

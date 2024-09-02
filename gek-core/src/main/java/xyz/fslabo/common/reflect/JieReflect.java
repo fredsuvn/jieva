@@ -331,49 +331,6 @@ public class JieReflect {
     }
 
     /**
-     * Returns whether the give matched type matches the specified pattern.
-     * <p>
-     * If given matched type and specified pattern are equal, return true. Otherwise, it returns true if and only if
-     * upper and lower bounds of given type within the bounds of specified pattern.
-     * <p>
-     * Not if given type is not {@link WildcardType} or {@link TypeVariable}, the upper and lower bounds are commonly
-     * same with its raw class type.
-     * For examples:
-     * <pre>
-     *     matches(Object.class, Object.class);// true
-     *     matches(Object.class, String.class);// false: String is lower than Object
-     *     matches(Integer.class, Long.class);// false: they have no inheritance relationship
-     *     matches(int.class, int.class);// true
-     *     matches(int.class, long.class);// false: they have no inheritance relationship
-     *     matches(
-     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType()
-     *     );// true
-     *     matches(
-     *         new TypeRef&lt;List&lt;? super Object&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType()
-     *     );// false: String out of bounds of "? super Object"
-     *     matches(
-     *         new TypeRef&lt;List&lt;? extends String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;Collection&lt;String&gt;&gt;() {}.getType()
-     *     );// false: Collection is upper than List;
-     *       // upper bound: List&lt;String&gt;, lower bound: List&lt;no--lower&gt;
-     *     matches(
-     *         new TypeRef&lt;Collection&lt;? extends String&gt;&gt;() {}.getType(),
-     *         new TypeRef&lt;List&lt;String&gt;&gt;() {}.getType()
-     *     );// false: List is lower than Collection;
-     *       // upper bound: Collection&lt;String&gt;, lower bound: Collection&lt;no--lower&gt;
-     * </pre>
-     *
-     * @param matched given type to be matched
-     * @param pattern specified pattern
-     * @return whether the give matched type matches the specified pattern
-     */
-    public static boolean matches(Type pattern, Type matched) {
-        return TypePattern.defaultPattern().matches(pattern, matched);
-    }
-
-    /**
      * Returns whether a type can be assigned by another type.
      * This method is {@link Type} version of {@link Class#isAssignableFrom(Class)}, supporting {@link Class},
      * {@link ParameterizedType}, {@link WildcardType}, {@link TypeVariable} and {@link GenericArrayType}.
