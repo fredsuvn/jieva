@@ -150,26 +150,16 @@ public class JieReflect {
                 if (!searchSuper) {
                     return null;
                 }
-                while (true) {
-                    Type curType = rawType.getGenericSuperclass();
-                    if (curType == null) {
-                        break;
-                    }
-                    Field f = getField(curType, name, true);
-                    if (f != null) {
-                        return f;
-                    }
+                Type superClass = rawType.getGenericSuperclass();
+                Field f = getField(superClass, name, true);
+                if (f != null) {
+                    return f;
                 }
-                while (true) {
-                    Type[] curTypes = rawType.getGenericInterfaces();
-                    if (JieArray.isEmpty(curTypes)) {
-                        break;
-                    }
-                    for (Type curType : curTypes) {
-                        Field f = getField(curType, name, true);
-                        if (f != null) {
-                            return f;
-                        }
+                Type[] superInters = rawType.getGenericInterfaces();
+                for (Type superInter : superInters) {
+                    Field sf = getField(superInter, name, true);
+                    if (sf != null) {
+                        return sf;
                     }
                 }
             }
@@ -225,26 +215,16 @@ public class JieReflect {
                 if (!searchSuper) {
                     return null;
                 }
-                while (true) {
-                    Type curType = rawType.getGenericSuperclass();
-                    if (curType == null) {
-                        break;
-                    }
-                    Method m = getMethod(curType, name, parameterTypes, true);
+                Type superClass = rawType.getGenericSuperclass();
+                Method m = getMethod(superClass, name, parameterTypes, true);
+                if (m != null) {
+                    return m;
+                }
+                Type[] superInters = rawType.getGenericInterfaces();
+                for (Type superInter : superInters) {
+                    m = getMethod(superInter, name, parameterTypes, true);
                     if (m != null) {
                         return m;
-                    }
-                }
-                while (true) {
-                    Type[] curTypes = rawType.getGenericInterfaces();
-                    if (JieArray.isEmpty(curTypes)) {
-                        break;
-                    }
-                    for (Type curType : curTypes) {
-                        Method m = getMethod(curType, name, parameterTypes, true);
-                        if (m != null) {
-                            return m;
-                        }
                     }
                 }
             }
@@ -311,11 +291,7 @@ public class JieReflect {
     public static Class<?> arrayClass(Type componentType, ClassLoader classLoader) {
         if (componentType instanceof Class) {
             String name = arrayClassName((Class<?>) componentType);
-            try {
-                return Class.forName(name, true, classLoader);
-            } catch (ClassNotFoundException e) {
-                throw new IllegalStateException(e);
-            }
+            return classForName(name, classLoader);
         }
         if (componentType instanceof ParameterizedType) {
             return arrayClass(((ParameterizedType) componentType).getRawType(), classLoader);
@@ -334,16 +310,20 @@ public class JieReflect {
                     name.append("L").append(((Class<?>) ((ParameterizedType) cur).getRawType()).getName()).append(";");
                     break;
                 } else {
-                    throw new IllegalArgumentException("Unsupported component type: " + componentType);
+                    throw new IllegalArgumentException("Illegal component type: " + componentType);
                 }
             } while (true);
-            try {
-                return Class.forName(name.toString(), true, classLoader);
-            } catch (ClassNotFoundException e) {
-                throw new IllegalStateException(e);
-            }
+            return classForName(name.toString(), classLoader);
         }
-        throw new UnsupportedOperationException("Unsupported component type: " + componentType);
+        throw new IllegalArgumentException("Illegal component type: " + componentType);
+    }
+
+    private static Class<?> classForName(String name, ClassLoader classLoader) {
+        try {
+            return Class.forName(name, true, classLoader);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     private static String arrayClassName(Class<?> componentType) {
@@ -367,7 +347,8 @@ public class JieReflect {
         } else if (Objects.equals(double.class, componentType)) {
             name = "[D";
         } else if (Objects.equals(void.class, componentType)) {
-            name = "[V";
+            //name = "[V";
+            throw new IllegalArgumentException("Class doesn't exists: void[].");
         } else {
             name = "[L" + componentType.getName() + ";";
         }
@@ -575,13 +556,26 @@ public class JieReflect {
         Class<?> rawClass = (Class<?>) parameterizedType.getRawType();
         TypeVariable<?>[] typeParameters = rawClass.getTypeParameters();
         for (int i = 0; i < typeParameters.length; i++) {
-            if (i >= actualTypeArguments.length) {
-                continue;
-            }
             TypeVariable<?> typeVariable = typeParameters[i];
             Type actualTypeArgument = actualTypeArguments[i];
             mapping.put(typeVariable, actualTypeArgument);
         }
+    }
+
+    /**
+     * Replaces the types in given {@code type} (including itself) which equals to {@code matcher} with
+     * {@code replacement}. This method is equivalent to {@link #replaceType(Type, Type, Type, boolean)}:
+     * <pre>
+     *     return replaceType(type, matcher, replacement, true);
+     * </pre>
+     *
+     * @param type        type to be replaced
+     * @param matcher     matcher type
+     * @param replacement replacement type
+     * @return type after replacing
+     */
+    public static Type replaceType(Type type, Type matcher, Type replacement) {
+        return replaceType(type, matcher, replacement, true);
     }
 
     /**
@@ -619,22 +613,18 @@ public class JieReflect {
             if (Objects.equals(rawType, matcher)) {
                 matched = true;
                 rawType = (Class<?>) replacement;
-            } else if (deep) {
-                Type newRawType = replaceType(rawType, matcher, replacement, true);
-                if (!Objects.equals(rawType, newRawType)) {
-                    matched = true;
-                    rawType = (Class<?>) newRawType;
-                }
             }
             Type ownerType = parameterizedType.getOwnerType();
-            if (Objects.equals(ownerType, matcher)) {
-                matched = true;
-                ownerType = replacement;
-            } else if (ownerType != null && deep) {
-                Type newOwnerType = replaceType(ownerType, matcher, replacement, true);
-                if (!Objects.equals(ownerType, newOwnerType)) {
+            if (ownerType != null) {
+                if (Objects.equals(ownerType, matcher)) {
                     matched = true;
-                    ownerType = newOwnerType;
+                    ownerType = replacement;
+                } else if (deep) {
+                    Type newOwnerType = replaceType(ownerType, matcher, replacement, true);
+                    if (!Objects.equals(ownerType, newOwnerType)) {
+                        matched = true;
+                        ownerType = newOwnerType;
+                    }
                 }
             }
             Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();

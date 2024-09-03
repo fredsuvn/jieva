@@ -1,16 +1,15 @@
 package test.reflect;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.JieType;
 import xyz.fslabo.common.reflect.TypeRef;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.*;
 
 
 public class ReflectTest {
@@ -22,12 +21,14 @@ public class ReflectTest {
             JieReflect.getLastName(Inner.class),
             ReflectTest.class.getSimpleName() + "$" + Inner.class.getSimpleName()
         );
+        System.out.println();
     }
 
     @Test
     public void testRawName() {
         Assert.assertEquals(JieReflect.getRawType(String.class), String.class);
         Assert.assertEquals(JieReflect.getRawType(JieType.parameterized(List.class, new Type[]{String.class})), List.class);
+        Assert.assertNull(JieReflect.getRawType(Inner.class.getTypeParameters()[0]));
     }
 
     @Test
@@ -37,6 +38,53 @@ public class ReflectTest {
         Assert.assertEquals(JieReflect.getLowerBound(JieType.lowerBound(String.class)), String.class);
         Assert.assertNull(JieReflect.getLowerBound(JieType.upperBound(String.class)));
         Assert.assertEquals(JieReflect.getFirstBound(Inner.class.getTypeParameters()[0]), Number.class);
+        Assert.assertEquals(JieReflect.getUpperBound(new WildcardType() {
+            @Override
+            public Type[] getUpperBounds() {
+                return new Type[0];
+            }
+
+            @Override
+            public Type[] getLowerBounds() {
+                return new Type[0];
+            }
+        }), Object.class);
+        Assert.assertEquals(JieReflect.getFirstBound(new TypeVariable<GenericDeclaration>() {
+            @Override
+            public Type[] getBounds() {
+                return new Type[0];
+            }
+
+            @Override
+            public GenericDeclaration getGenericDeclaration() {
+                return null;
+            }
+
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public AnnotatedType[] getAnnotatedBounds() {
+                return new AnnotatedType[0];
+            }
+
+            @Override
+            public <T extends Annotation> T getAnnotation(@NotNull Class<T> annotationClass) {
+                return null;
+            }
+
+            @Override
+            public Annotation[] getAnnotations() {
+                return new Annotation[0];
+            }
+
+            @Override
+            public Annotation[] getDeclaredAnnotations() {
+                return new Annotation[0];
+            }
+        }), Object.class);
     }
 
     @Test
@@ -75,11 +123,20 @@ public class ReflectTest {
         Assert.assertEquals(JieReflect.getMethod(Inner.class, "scm2", new Class[]{}), scm2);
         Assert.assertEquals(JieReflect.getMethod(Inner.class, "m1", new Class[]{}), m1);
         Assert.assertEquals(JieReflect.getMethod(Inner.class, "m2", new Class[]{}), m2);
+
+        Assert.assertNull(JieReflect.getField(JieType.other(), "1"));
+        Assert.assertNull(JieReflect.getField(Inner.class, "1"));
+        Assert.assertNull(JieReflect.getField(Inner.class, "1", false));
+        Assert.assertNull(JieReflect.getMethod(JieType.other(), "1", new Class[]{}));
+        Assert.assertNull(JieReflect.getMethod(Inner.class, "1", new Class[]{}));
+        Assert.assertNull(JieReflect.getMethod(Inner.class, "1", new Class[]{}, false));
     }
 
     @Test
     public void testNewInstance() {
         Assert.assertEquals(JieReflect.newInstance(String.class.getName()), "");
+        Assert.assertNull(JieReflect.newInstance("123"));
+        Assert.assertNull(JieReflect.newInstance(List.class));
     }
 
     @Test
@@ -87,6 +144,10 @@ public class ReflectTest {
         Assert.assertEquals(
             JieReflect.arrayClass(Object.class),
             Object[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(Object[].class),
+            Object[][].class
         );
         Assert.assertEquals(
             JieReflect.arrayClass(boolean.class),
@@ -120,22 +181,25 @@ public class ReflectTest {
             JieReflect.arrayClass(double.class),
             double[].class
         );
+        Assert.expectThrows(IllegalArgumentException.class, () -> JieReflect.arrayClass(void.class));
         Assert.assertEquals(
-            JieReflect.arrayClass(new TypeRef<List<? extends String>>() {
-            }.getType()),
+            JieReflect.arrayClass(JieType.parameterized(List.class, new Type[]{JieType.upperBound(String.class)})),
             List[].class
         );
         Assert.assertEquals(
-            JieReflect.arrayClass(new TypeRef<List<? extends String>[]>() {
-            }.getType()),
+            JieReflect.arrayClass(JieType.array(JieType.parameterized(List.class, new Type[]{JieType.upperBound(String.class)}))),
             List[][].class
         );
         Assert.assertEquals(
-            JieReflect.arrayClass(new TypeRef<List<? extends String>[][]>() {
-            }.getType()),
+            JieReflect.arrayClass(JieType.array(JieType.array(JieType.parameterized(List.class, new Type[]{JieType.upperBound(String.class)})))),
             List[][][].class
         );
-        Assert.expectThrows(UnsupportedOperationException.class, () -> JieReflect.arrayClass(Inner.class.getTypeParameters()[0]));
+        Assert.assertEquals(
+            JieReflect.arrayClass(JieType.array(String.class)),
+            String[][].class
+        );
+        Assert.expectThrows(IllegalArgumentException.class, () -> JieReflect.arrayClass(JieType.array(JieType.other())));
+        Assert.expectThrows(IllegalArgumentException.class, () -> JieReflect.arrayClass(Inner.class.getTypeParameters()[0]));
     }
 
     @Test
@@ -148,6 +212,7 @@ public class ReflectTest {
         Assert.assertEquals(JieReflect.wrapper(long.class), Long.class);
         Assert.assertEquals(JieReflect.wrapper(float.class), Float.class);
         Assert.assertEquals(JieReflect.wrapper(double.class), Double.class);
+        Assert.assertEquals(JieReflect.wrapper(void.class), Void.class);
         Assert.assertEquals(JieReflect.wrapper(Object.class), Object.class);
     }
 
@@ -159,14 +224,47 @@ public class ReflectTest {
 
     @Test
     public void testActualTypeArgs() {
-        List<Type> args = JieReflect.getActualTypeArguments(Inner.class, SuperSuperInter1.class);
-        Assert.assertEquals(args.size(), 2);
-        Assert.assertEquals(args.get(0), Short.class);
-        Assert.assertEquals(args.get(1), Integer.class);
+        doTestActualTypeArgs(Inner.class, SuperSuperInter1.class, Short.class, Integer.class);
+        doTestActualTypeArgs(
+            JieType.parameterized(Inner.class, new Type[]{NumberString.class}), SuperSuperInter1.class,
+            Short.class, Integer.class
+        );
+        doTestActualTypeArgs(SuperInter1.class, SuperSuperInter1.class, SuperInter1.class.getTypeParameters()[0], Integer.class);
+        doTestActualTypeArgs(List.class, ArrayList.class);
+        doTestActualTypeArgs(JieType.parameterized(List.class, new Type[]{String.class}), ArrayList.class);
+        doTestActualTypeArgs(JieType.other(), ArrayList.class);
+        doTestActualTypeArgs(String.class, String.class);
+        doTestActualTypeArgs(
+            SuperSuperInter1.class, SuperSuperInter1.class,
+            SuperSuperInter1.class.getTypeParameters()[0], SuperSuperInter1.class.getTypeParameters()[1]
+        );
     }
 
-    private void doTestActualTypeArgs() {
+    private void doTestActualTypeArgs(Type type, Class<?> rawType, Type... args) {
+        List<Type> argsList = JieReflect.getActualTypeArguments(type, rawType);
+        Assert.assertEquals(argsList.size(), args.length);
+        for (int i = 0; i < argsList.size(); i++) {
+            Assert.assertEquals(argsList.get(i), args[i]);
+        }
+    }
 
+    @Test
+    public void testTypeParameterMapping() {
+        Map<TypeVariable<?>, Type> map = JieReflect.getTypeParameterMapping(new TypeRef<Inner<NumberString>>() {
+        }.getType());
+        Assert.assertEquals(map.get(Inner.class.getTypeParameters()[0]), NumberString.class);
+        Assert.assertEquals(map.get(SuperClass1.class.getTypeParameters()[0]), Inner.class.getTypeParameters()[0]);
+        Assert.assertEquals(map.get(SuperClass1.class.getTypeParameters()[1]), String.class);
+        Assert.assertEquals(map.get(SuperInter1.class.getTypeParameters()[0]), Short.class);
+        Assert.assertEquals(map.get(SuperInter1.class.getTypeParameters()[1]), Character.class);
+        Assert.assertEquals(map.get(SuperInter2.class.getTypeParameters()[0]), Float.class);
+        Assert.assertEquals(map.get(SuperInter2.class.getTypeParameters()[1]), Double.class);
+        Assert.assertEquals(map.get(SuperSuperInter1.class.getTypeParameters()[0]), SuperInter1.class.getTypeParameters()[0]);
+        Assert.assertEquals(map.get(SuperSuperInter1.class.getTypeParameters()[1]), Integer.class);
+        Assert.assertEquals(map.get(SuperSuperInter2.class.getTypeParameters()[0]), Long.class);
+        Assert.assertEquals(map.get(SuperSuperInter2.class.getTypeParameters()[1]), SuperInter1.class.getTypeParameters()[1]);
+
+        Assert.assertEquals(JieReflect.getTypeParameterMapping(CharSequence.class), Collections.emptyMap());
     }
 
     @Test
@@ -176,14 +274,14 @@ public class ReflectTest {
         Type tl = new TypeRef<List<String>>() {
         }.getType();
         Assert.assertEquals(
-            JieReflect.replaceType(t, tl, Integer.class, true),
+            JieReflect.replaceType(t, tl, Integer.class),
             new TypeRef<List<Map<String, Integer>>>() {
             }.getType()
         );
         Type tm = new TypeRef<Map<String, List<String>>>() {
         }.getType();
         Assert.assertEquals(
-            JieReflect.replaceType(tm, String.class, Integer.class, true),
+            JieReflect.replaceType(tm, String.class, Integer.class),
             new TypeRef<Map<Integer, List<Integer>>>() {
             }.getType()
         );
@@ -200,7 +298,7 @@ public class ReflectTest {
         Type tw = new TypeRef<Map<String, ? extends List<String>>>() {
         }.getType();
         Assert.assertEquals(
-            JieReflect.replaceType(tw, String.class, Integer.class, true),
+            JieReflect.replaceType(tw, String.class, Integer.class),
             new TypeRef<Map<Integer, ? extends List<Integer>>>() {
             }.getType()
         );
@@ -208,7 +306,7 @@ public class ReflectTest {
         Type tg = new TypeRef<Map<String, ? extends List<String>>[]>() {
         }.getType();
         Assert.assertEquals(
-            JieReflect.replaceType(tg, String.class, Integer.class, true),
+            JieReflect.replaceType(tg, String.class, Integer.class),
             new TypeRef<Map<Integer, ? extends List<Integer>>[]>() {
             }.getType()
         );
@@ -216,69 +314,69 @@ public class ReflectTest {
         Type ts = new TypeRef<Map<String, ? extends List<String>>[]>() {
         }.getType();
         Assert.assertSame(
-            JieReflect.replaceType(ts, Integer.class, Integer.class, true),
+            JieReflect.replaceType(ts, Integer.class, Integer.class),
             ts
         );
-    }
 
-//    @Test
-//    public void testGetTypeParameterMapping() throws NoSuchFieldException {
-//        Map<TypeVariable<?>, Type> map = JieReflect.getTypeParameterMapping(new TypeRef<X<String>>() {
-//        }.getType());
-//        // R(1661070039)=V(23805079)
-//        // K(532385198)=class java.lang.Integer(33524623)
-//        // U(1028083665)=class java.lang.Double(1703953258)
-//        // T(261012453)=class java.lang.Float(1367097467)
-//        // A(844996153)=A(726237730)
-//        // B(1498084403)=A(844996153)
-//        // V(23805079)=class java.lang.Long(746023354)
-//        JieLog.system().info(JieColl.toMap(
-//            map.entrySet(),
-//            it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
-//            it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
-//        ));
-//        Map<TypeVariable<?>, Type> map2 = JieReflect.getTypeParameterMapping(
-//            Inner.class.getDeclaredField("x").getGenericType());
-//        // R(1661070039)=V(23805079)
-//        // K(532385198)=class java.lang.Integer(33524623)
-//        // U(1028083665)=class java.lang.Double(1703953258)
-//        // T(261012453)=class java.lang.Float(1367097467)
-//        // A(844996153)=A(726237730)
-//        // B(1498084403)=A(844996153)
-//        // V(23805079)=class java.lang.Long(746023354)
-//        JieLog.system().info(JieColl.toMap(
-//            map2.entrySet(),
-//            it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
-//            it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
-//        ));
-//    }
-//
-//    @Test
-//    public void testGetGenericSuperType() {
-//        List<Type> actualArguments = JieReflect.getActualTypeArguments(ZS.class, Z.class);
-//        JieLog.system().info(actualArguments);
-//        Assert.assertEquals(actualArguments, Arrays.asList(new TypeRef<Z<String, Integer, Long, Boolean>>() {
-//        }.getParameterized()));
-//        actualArguments = JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
-//        }.getType(), Z.class);
-//        JieLog.system().info(actualArguments);
-//        Assert.assertEquals(actualArguments, Arrays.asList(new TypeRef<Z<String, String, Long, Boolean>>() {
-//        }.getParameterized()));
-//        Assert.assertEquals(
-//            JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
-//            }.getType(), ZB.class),
-//            new TypeRef<ZB<String>>() {
-//            }.getType()
-//        );
-//
-//        Assert.assertNull(JieReflect.getActualTypeArguments(Z.class, ZS.class));
-//        Assert.assertNull(JieReflect.getActualTypeArguments(ZB.class, ZS.class));
-//
-//        Assert.assertEquals(
-//            JieReflect.getActualTypeArguments(Iterable.class, Iterable.class),
-//            JieType.parameterized(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
-//        );
-//    }
+        Assert.assertEquals(
+            JieReflect.replaceType(new TypeRef<List<List<String>>>() {
+            }.getType(), List.class, ArrayList.class),
+            new TypeRef<ArrayList<ArrayList<String>>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(new TypeRef<List<ArrayList<String>>>() {
+            }.getType(), ArrayList.class, LinkedList.class),
+            new TypeRef<List<LinkedList<String>>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(new TypeRef<List<List<? extends String>>>() {
+            }.getType(), String.class, Integer.class),
+            new TypeRef<List<List<? extends Integer>>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(new TypeRef<List<List<? extends String>>>() {
+            }.getType(), String.class, Integer.class, false),
+            new TypeRef<List<List<? extends String>>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(new TypeRef<List<List<? super String>>>() {
+            }.getType(), String.class, Integer.class),
+            new TypeRef<List<List<? super Integer>>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(JieType.array(String.class), String.class, Integer.class),
+            JieType.array(Integer.class)
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(JieType.array(JieType.array(String.class)), String.class, Integer.class, false),
+            JieType.array(JieType.array(String.class))
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(JieType.upperBound(Integer.class), String.class, Integer.class, false),
+            JieType.upperBound(Integer.class)
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(JieType.lowerBound(JieType.lowerBound(String.class)), String.class, Integer.class),
+            JieType.lowerBound(JieType.lowerBound(Integer.class))
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(JieType.lowerBound(JieType.lowerBound(String.class)), String.class, String.class),
+            JieType.lowerBound(JieType.lowerBound(String.class))
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(JieType.lowerBound(JieType.lowerBound(String.class)), String.class, Integer.class, false),
+            JieType.lowerBound(JieType.lowerBound(String.class))
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(JieType.lowerBound(Integer.class), String.class, Integer.class, false),
+            JieType.lowerBound(Integer.class)
+        );
+    }
 
     public interface SuperSuperInter1<SSI11, SSI12> {
         String ssif1 = null;
@@ -294,7 +392,7 @@ public class ReflectTest {
         }
     }
 
-    public interface SuperInter1<SI11, SSI12> extends SuperSuperInter1<SI11, Integer>, SuperSuperInter2<Long, SSI12> {
+    public interface SuperInter1<SI11, SI12> extends SuperSuperInter1<SI11, Integer>, SuperSuperInter2<Long, SI12> {
         String sif1 = null;
 
         default void sim1() {
@@ -329,6 +427,45 @@ public class ReflectTest {
         }
 
         private static void m2() {
+        }
+    }
+
+    public static class NumberString extends Number implements CharSequence {
+
+        @Override
+        public int length() {
+            return 0;
+        }
+
+        @Override
+        public char charAt(int index) {
+            return 0;
+        }
+
+        @NotNull
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            return null;
+        }
+
+        @Override
+        public int intValue() {
+            return 0;
+        }
+
+        @Override
+        public long longValue() {
+            return 0;
+        }
+
+        @Override
+        public float floatValue() {
+            return 0;
+        }
+
+        @Override
+        public double doubleValue() {
+            return 0;
         }
     }
 }
