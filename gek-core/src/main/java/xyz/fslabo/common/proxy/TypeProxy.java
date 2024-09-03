@@ -182,11 +182,11 @@ public interface TypeProxy<T> {
         }
 
         private boolean hasSpring() {
-            return JieReflect.hasClass("org.springframework.cglib.proxy.Enhancer");
+            return JieReflect.classExists("org.springframework.cglib.proxy.Enhancer");
         }
 
         private boolean hasCglib() {
-            return JieReflect.hasClass("net.sf.cglib.proxy.Enhancer");
+            return JieReflect.classExists("net.sf.cglib.proxy.Enhancer");
         }
     }
 }

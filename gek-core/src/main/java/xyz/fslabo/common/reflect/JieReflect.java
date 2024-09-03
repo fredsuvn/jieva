@@ -96,7 +96,7 @@ public class JieReflect {
      * @param type given type variable
      * @return first upper bound type of given type variable
      */
-    public static Type getBound(TypeVariable<?> type) {
+    public static Type getFirstBound(TypeVariable<?> type) {
         Type[] bounds = type.getBounds();
         if (JieArray.isNotEmpty(bounds)) {
             return bounds[0];
@@ -105,15 +105,38 @@ public class JieReflect {
     }
 
     /**
-     * Returns field of specified name from given type (first getField then getDeclaredField).
-     * Returns null if not found.
+     * Searches and returns field of specified name from given type, returns {@code null} for searching failed. This
+     * method is equivalent to {@link #getField(Type, String, boolean)}:
+     * <pre>
+     *     return getField(type, name, true);
+     * </pre>
      *
      * @param type given type
      * @param name specified field name
-     * @return field of specified name from given type or null
+     * @return field of specified name from given type
      */
     @Nullable
     public static Field getField(Type type, String name) {
+        return getField(type, name, true);
+    }
+
+    /**
+     * Searches and returns field of specified name from given type.
+     * <p>
+     * The searching in order of {@link Class#getField(String)} then {@link Class#getDeclaredField(String)}. if
+     * {@code searchSuper} is true, and if searching failed in current type, this method will recursively call
+     * {@link Class#getGenericSuperclass()} to search super types, if still not found, recursively call
+     * {@link Class#getGenericInterfaces()}.
+     * <p>
+     * Returns {@code null} for searching failed.
+     *
+     * @param type        given type
+     * @param name        specified field name
+     * @param searchSuper whether recursively searches super types
+     * @return field of specified name from given type
+     */
+    @Nullable
+    public static Field getField(Type type, String name, boolean searchSuper) {
         Class<?> rawType = getRawType(type);
         if (rawType == null) {
             return null;
@@ -124,22 +147,71 @@ public class JieReflect {
             try {
                 return rawType.getDeclaredField(name);
             } catch (NoSuchFieldException ex) {
-                return null;
+                if (!searchSuper) {
+                    return null;
+                }
+                while (true) {
+                    Type curType = rawType.getGenericSuperclass();
+                    if (curType == null) {
+                        break;
+                    }
+                    Field f = getField(curType, name, true);
+                    if (f != null) {
+                        return f;
+                    }
+                }
+                while (true) {
+                    Type[] curTypes = rawType.getGenericInterfaces();
+                    if (JieArray.isEmpty(curTypes)) {
+                        break;
+                    }
+                    for (Type curType : curTypes) {
+                        Field f = getField(curType, name, true);
+                        if (f != null) {
+                            return f;
+                        }
+                    }
+                }
             }
         }
+        return null;
     }
 
     /**
-     * Returns method of specified name from given type (first getField then getDeclaredField).
-     * Returns null if not found.
+     * Searches and returns method of specified name and parameter types from given type. returns {@code null} for
+     * searching failed. This method is equivalent to {@link #getMethod(Type, String, Class[], boolean)}:
+     * <pre>
+     *     return getMethod(type, name, parameterTypes, true);
+     * </pre>
      *
      * @param type           given type
-     * @param name           specified method name
-     * @param parameterTypes parameter types
-     * @return method of specified name from given type or null
+     * @param name           specified field name
+     * @param parameterTypes specified parameter types
+     * @return method of specified name and parameter types from given type
      */
     @Nullable
-    public static Method getMethod(Type type, String name, Class<?>... parameterTypes) {
+    public static Method getMethod(Type type, String name, Class<?>[] parameterTypes) {
+        return getMethod(type, name, parameterTypes, true);
+    }
+
+    /**
+     * Searches and returns method of specified name and parameter types from given type.
+     * <p>
+     * The searching in order of {@link Class#getMethod(String, Class[])} then
+     * {@link Class#getDeclaredMethod(String, Class[])}.if {@code searchSuper} is true, and if searching failed in
+     * current type, this method will recursively call {@link Class#getGenericSuperclass()} to search super types, if
+     * still not found, recursively call {@link Class#getGenericInterfaces()}.
+     * <p>
+     * Returns {@code null} for searching failed.
+     *
+     * @param type           given type
+     * @param name           specified field name
+     * @param parameterTypes specified parameter types
+     * @param searchSuper    whether recursively searches super types
+     * @return method of specified name and parameter types from given type
+     */
+    @Nullable
+    public static Method getMethod(Type type, String name, Class<?>[] parameterTypes, boolean searchSuper) {
         Class<?> rawType = getRawType(type);
         if (rawType == null) {
             return null;
@@ -150,16 +222,43 @@ public class JieReflect {
             try {
                 return rawType.getDeclaredMethod(name, parameterTypes);
             } catch (NoSuchMethodException ex) {
-                return null;
+                if (!searchSuper) {
+                    return null;
+                }
+                while (true) {
+                    Type curType = rawType.getGenericSuperclass();
+                    if (curType == null) {
+                        break;
+                    }
+                    Method m = getMethod(curType, name, parameterTypes, true);
+                    if (m != null) {
+                        return m;
+                    }
+                }
+                while (true) {
+                    Type[] curTypes = rawType.getGenericInterfaces();
+                    if (JieArray.isEmpty(curTypes)) {
+                        break;
+                    }
+                    for (Type curType : curTypes) {
+                        Method m = getMethod(curType, name, parameterTypes, true);
+                        if (m != null) {
+                            return m;
+                        }
+                    }
+                }
             }
         }
+        return null;
     }
 
     /**
      * Returns new instance for given class name.
-     * This method first uses {@link Class#forName(String)} to load given class,
-     * then call {@link #newInstance(Class)} to create instance.
-     * Return null if failed.
+     * <p>
+     * This method first uses {@link Class#forName(String)} to load given class, then call {@link #newInstance(Class)}
+     * to create instance.
+     * <p>
+     * Returns {@code null} if failed.
      *
      * @param className given class name
      * @param <T>       type of result
@@ -176,8 +275,7 @@ public class JieReflect {
     }
 
     /**
-     * Creates a new instance of given type with empty constructor.
-     * Return null if failed.
+     * Creates a new instance of given type with empty constructor, may be {@code null} if failed.
      *
      * @param type given type
      * @param <T>  type of instance
@@ -204,10 +302,10 @@ public class JieReflect {
     }
 
     /**
-     * Returns array class of given component type.
+     * Returns array class of given component type with specified class loader.
      *
      * @param componentType given component type
-     * @param classLoader   class loader
+     * @param classLoader   specified class loader
      * @return array class of given component type
      */
     public static Class<?> arrayClass(Type componentType, ClassLoader classLoader) {
@@ -245,7 +343,7 @@ public class JieReflect {
                 throw new IllegalStateException(e);
             }
         }
-        throw new IllegalArgumentException("Unsupported component type: " + componentType);
+        throw new UnsupportedOperationException("Unsupported component type: " + componentType);
     }
 
     private static String arrayClassName(Class<?> componentType) {
@@ -282,7 +380,7 @@ public class JieReflect {
      * @param cls given class
      * @return wrapper class if given class is primitive, else return itself
      */
-    public static Class<?> toWrapperClass(Class<?> cls) {
+    public static Class<?> wrapper(Class<?> cls) {
         if (cls.isPrimitive()) {
             if (Objects.equals(cls, boolean.class)) {
                 return Boolean.class;
@@ -316,12 +414,12 @@ public class JieReflect {
     }
 
     /**
-     * Returns whether current runtime has specified class.
+     * Returns whether current runtime exists the class specified by given class name.
      *
-     * @param className specified class name
-     * @return whether current runtime has specified class
+     * @param className given class name
+     * @return whether current runtime exists the class specified by given class name
      */
-    public static boolean hasClass(String className) {
+    public static boolean classExists(String className) {
         try {
             Class.forName(className);
         } catch (ClassNotFoundException e) {

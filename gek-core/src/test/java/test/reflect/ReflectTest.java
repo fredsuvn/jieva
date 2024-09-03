@@ -2,30 +2,84 @@ package test.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.base.JieLog;
-import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.JieType;
 import xyz.fslabo.common.reflect.TypeRef;
 
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 
 public class ReflectTest {
 
-    private static final JieLog logger = JieLog.system();
-
     @Test
     public void testLastName() {
-        Assert.assertEquals(JieReflect.getLastName(ReflectTest.class), "ReflectTest");
-        Assert.assertEquals(JieReflect.getLastName(T.class), "ReflectTest$T");
+        Assert.assertEquals(JieReflect.getLastName(ReflectTest.class), ReflectTest.class.getSimpleName());
+        Assert.assertEquals(
+            JieReflect.getLastName(Inner.class),
+            ReflectTest.class.getSimpleName() + "$" + Inner.class.getSimpleName()
+        );
+    }
+
+    @Test
+    public void testRawName() {
+        Assert.assertEquals(JieReflect.getRawType(String.class), String.class);
+        Assert.assertEquals(JieReflect.getRawType(JieType.parameterized(List.class, new Type[]{String.class})), List.class);
+    }
+
+    @Test
+    public void testBounds() {
+        Assert.assertEquals(JieReflect.getUpperBound(JieType.upperBound(String.class)), String.class);
+        Assert.assertEquals(JieReflect.getUpperBound(JieType.questionMark()), Object.class);
+        Assert.assertEquals(JieReflect.getLowerBound(JieType.lowerBound(String.class)), String.class);
+        Assert.assertNull(JieReflect.getLowerBound(JieType.upperBound(String.class)));
+        Assert.assertEquals(JieReflect.getFirstBound(Inner.class.getTypeParameters()[0]), Number.class);
+    }
+
+    @Test
+    public void testSearching() throws Exception {
+        Field ssif1 = SuperSuperInter1.class.getDeclaredField("ssif1");
+        Field ssif2 = SuperSuperInter2.class.getDeclaredField("ssif2");
+        Field sif1 = SuperInter1.class.getDeclaredField("sif1");
+        Field sif2 = SuperInter2.class.getDeclaredField("sif2");
+        Field scf1 = SuperClass1.class.getDeclaredField("scf1");
+        Field scf2 = SuperClass1.class.getDeclaredField("scf2");
+        Field f1 = Inner.class.getDeclaredField("f1");
+        Field f2 = Inner.class.getDeclaredField("f2");
+        Assert.assertEquals(JieReflect.getField(Inner.class, "ssif1"), ssif1);
+        Assert.assertEquals(JieReflect.getField(Inner.class, "ssif2"), ssif2);
+        Assert.assertEquals(JieReflect.getField(Inner.class, "sif1"), sif1);
+        Assert.assertEquals(JieReflect.getField(Inner.class, "sif2"), sif2);
+        Assert.assertEquals(JieReflect.getField(Inner.class, "scf1"), scf1);
+        Assert.assertEquals(JieReflect.getField(Inner.class, "scf2"), scf2);
+        Assert.assertEquals(JieReflect.getField(Inner.class, "f1"), f1);
+        Assert.assertEquals(JieReflect.getField(Inner.class, "f2"), f2);
+
+
+        Method ssim1 = SuperSuperInter1.class.getDeclaredMethod("ssim1");
+        Method ssim2 = SuperSuperInter2.class.getDeclaredMethod("ssim2");
+        Method sim1 = SuperInter1.class.getDeclaredMethod("sim1");
+        Method sim2 = SuperInter2.class.getDeclaredMethod("sim2");
+        Method scm1 = SuperClass1.class.getDeclaredMethod("scm1");
+        Method scm2 = SuperClass1.class.getDeclaredMethod("scm2");
+        Method m1 = Inner.class.getDeclaredMethod("m1");
+        Method m2 = Inner.class.getDeclaredMethod("m2");
+        Assert.assertEquals(JieReflect.getMethod(Inner.class, "ssim1", new Class[]{}), ssim1);
+        Assert.assertEquals(JieReflect.getMethod(Inner.class, "ssim2", new Class[]{}), ssim2);
+        Assert.assertEquals(JieReflect.getMethod(Inner.class, "sim1", new Class[]{}), sim1);
+        Assert.assertEquals(JieReflect.getMethod(Inner.class, "sim2", new Class[]{}), sim2);
+        Assert.assertEquals(JieReflect.getMethod(Inner.class, "scm1", new Class[]{}), scm1);
+        Assert.assertEquals(JieReflect.getMethod(Inner.class, "scm2", new Class[]{}), scm2);
+        Assert.assertEquals(JieReflect.getMethod(Inner.class, "m1", new Class[]{}), m1);
+        Assert.assertEquals(JieReflect.getMethod(Inner.class, "m2", new Class[]{}), m2);
+    }
+
+    @Test
+    public void testNewInstance() {
+        Assert.assertEquals(JieReflect.newInstance(String.class.getName()), "");
     }
 
     @Test
@@ -33,6 +87,38 @@ public class ReflectTest {
         Assert.assertEquals(
             JieReflect.arrayClass(Object.class),
             Object[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(boolean.class),
+            boolean[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(byte.class),
+            byte[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(short.class),
+            short[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(char.class),
+            char[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(int.class),
+            int[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(long.class),
+            long[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(float.class),
+            float[].class
+        );
+        Assert.assertEquals(
+            JieReflect.arrayClass(double.class),
+            double[].class
         );
         Assert.assertEquals(
             JieReflect.arrayClass(new TypeRef<List<? extends String>>() {
@@ -49,309 +135,38 @@ public class ReflectTest {
             }.getType()),
             List[][][].class
         );
+        Assert.expectThrows(UnsupportedOperationException.class, () -> JieReflect.arrayClass(Inner.class.getTypeParameters()[0]));
     }
 
     @Test
-    public void testTypeRef() {
-        //parametrized
-        Type t1 = new TypeRef<T<Integer>>() {
-        }.getType();
-        Assert.assertEquals(
-            t1.toString(),
-            "test.reflect.ReflectTest$T<java.lang.Integer>"
-        );
-        Type t2 = new TypeRef<T<Integer>.V<String>>() {
-        }.getType();
-        Assert.assertEquals(
-            t2.toString(),
-            "test.reflect.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
-        );
-        ParameterizedType p1 = JieType.parameterized(T.class, Arrays.asList(Integer.class));
-        Assert.assertEquals(
-            p1.toString(),
-            "test.reflect.ReflectTest$T<java.lang.Integer>"
-        );
-        Assert.assertEquals(
-            t1,
-            p1
-        );
-        ParameterizedType p2 = JieType.parameterized(T.V.class, Arrays.asList(String.class), p1);
-        Assert.assertEquals(
-            p2.toString(),
-            "test.reflect.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
-        );
-        Assert.assertEquals(
-            t2,
-            p2
-        );
-
-        //wildcard
-        Type t3 = new TypeRef<List<? super Integer>>() {
-        }.getParameterized().getActualTypeArguments()[0];
-        Assert.assertEquals(
-            t3.toString(),
-            "? super java.lang.Integer"
-        );
-        Type w1 = JieType.lowerBound(Integer.class);
-        Assert.assertEquals(
-            w1.toString(),
-            "? super java.lang.Integer"
-        );
-        Assert.assertEquals(
-            t3,
-            w1
-        );
-        Type t4 = new TypeRef<List<? extends Integer>>() {
-        }.getParameterized().getActualTypeArguments()[0];
-        Assert.assertEquals(
-            t4.toString(),
-            "? extends java.lang.Integer"
-        );
-        Type w2 = JieType.upperBound(Integer.class);
-        Assert.assertEquals(
-            w2.toString(),
-            "? extends java.lang.Integer"
-        );
-        Assert.assertEquals(
-            t4,
-            w2
-        );
-
-        //generic array
-        Type t5 = new TypeRef<List<? extends Integer>[]>() {
-        }.getType();
-        Assert.assertEquals(
-            t5.toString(),
-            "java.util.List<? extends java.lang.Integer>[]"
-        );
-        Type g1 = JieType.array(
-            JieType.parameterized(List.class, Arrays.asList(
-                JieType.upperBound(Integer.class))));
-        Assert.assertEquals(
-            g1.toString(),
-            "java.util.List<? extends java.lang.Integer>[]"
-        );
-        Assert.assertEquals(
-            t5,
-            g1
-        );
-
-        //R
-        Assert.assertEquals(
-            new R1().getType(),
-            String.class
-        );
-        Assert.assertEquals(
-            new R2<Integer>() {
-            }.getType(),
-            Integer.class
-        );
+    public void testWrapper() {
+        Assert.assertEquals(JieReflect.wrapper(boolean.class), Boolean.class);
+        Assert.assertEquals(JieReflect.wrapper(byte.class), Byte.class);
+        Assert.assertEquals(JieReflect.wrapper(short.class), Short.class);
+        Assert.assertEquals(JieReflect.wrapper(char.class), Character.class);
+        Assert.assertEquals(JieReflect.wrapper(int.class), Integer.class);
+        Assert.assertEquals(JieReflect.wrapper(long.class), Long.class);
+        Assert.assertEquals(JieReflect.wrapper(float.class), Float.class);
+        Assert.assertEquals(JieReflect.wrapper(double.class), Double.class);
+        Assert.assertEquals(JieReflect.wrapper(Object.class), Object.class);
     }
 
     @Test
-    public void testAssignableFrom() {
-        Assert.assertTrue(JieReflect.isAssignable(int.class, Integer.class));
-        Assert.assertTrue(JieReflect.isAssignable(int.class, int.class));
-        Assert.assertFalse(JieReflect.isAssignable(int.class, Double.class));
+    public void testClassExists() {
+        Assert.assertTrue(JieReflect.classExists(String.class.getName()));
+        Assert.assertFalse(JieReflect.classExists("123"));
+    }
 
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<List<String>>() {
-            }.getType(),
-            new TypeRef<List<String>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<List<? extends CharSequence>>() {
-            }.getType(),
-            new TypeRef<List<String>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<List<? extends CharSequence>>() {
-            }.getType(),
-            new TypeRef<List<? extends String>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<List<? super String>>() {
-            }.getType(),
-            new TypeRef<List<CharSequence>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<List<? super String>>() {
-            }.getType(),
-            new TypeRef<List<? super CharSequence>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<List<List<List<List<? super String>>>>>() {
-            }.getType(),
-            new TypeRef<List<List<List<List<? super CharSequence>>>>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<List<? super String>>() {
-            }.getType(),
-            new TypeRef<List<? extends CharSequence>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<List<CharSequence>>() {
-            }.getType(),
-            new TypeRef<List<String>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<Collection<?>>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<Collection<?>>() {
-            }.getType(),
-            new TypeRef<Collection<?>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<Collection<Object>>() {
-            }.getType(),
-            new TypeRef<Collection<?>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<List<? extends List<? extends List<? extends CharSequence>>>>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends CharSequence>>>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<List<? extends List<? extends List<CharSequence>>>>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<Collection[]>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<Collection<? extends Object>[]>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<Collection<Object>[]>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>[]>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<Collection[]>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<Collection<Object>[]>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            new TypeRef<Collection<?>[][]>() {
-            }.getType(),
-            new TypeRef<List<? extends List<? extends List<? extends String>>>[][]>() {
-            }.getType()
-        ));
-        //        List<? extends List<? extends List<? extends String>>>[][] l = null;
-        //        Collection<? extends Object>[][] c = l;
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<Map<String, String>>() {
-            }.getType(),
-            Map.class
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            Object[].class,
-            new TypeRef<Map<String, String>[]>() {
-            }.getType()
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            Object[].class,
-            Object[][].class
-        ));
-        class TAF<
-            F1,
-            F2 extends F1,
-            F3 extends CharSequence,
-            F4 extends Number & CharSequence,
-            F5 extends Collection<String>,
-            F6 extends Collection<? extends CharSequence>,
-            F7 extends Collection<? super String>,
-            F8 extends F2
-            > {
+    @Test
+    public void testActualTypeArgs() {
+        List<Type> args = JieReflect.getActualTypeArguments(Inner.class, SuperSuperInter1.class);
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), Short.class);
+        Assert.assertEquals(args.get(1), Integer.class);
+    }
 
-            private F1 f1 = null;
-            private F2 f2 = null;
-            private F3 f3 = null;
-            private F4 f4 = null;
-            private F5 f5 = null;
-            private F6 f6 = null;
-            private F7 f7 = null;
-            private F2[] f2s = null;
-            private F1[] f1s = f2s;
-            private F8 f8 = null;
-            private F1 f11 = f2;
-            private F1 f12 = f8;
-            private List<? super CharSequence> ll = null;
-            private List<? super String> list = ll;
-        }
-        TypeVariable<?>[] tvs = TAF.class.getTypeParameters();
-        Assert.assertTrue(JieReflect.isAssignable(
-            tvs[0],
-            tvs[1]
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            tvs[0],
-            tvs[2]
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            tvs[0],
-            tvs[7]
-        ));
-        Assert.assertTrue(JieReflect.isAssignable(
-            JieReflect.getField(TAF.class, "f1s").getGenericType(),
-            JieReflect.getField(TAF.class, "f2s").getGenericType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            JieReflect.getField(TAF.class, "f2s").getGenericType(),
-            JieReflect.getField(TAF.class, "f1s").getGenericType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            tvs[5],
-            new TypeRef<List<String>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            tvs[5],
-            new TypeRef<List<Integer>>() {
-            }.getType()
-        ));
-        Assert.assertFalse(JieReflect.isAssignable(
-            new TypeRef<Collection<CharSequence>>() {
-            }.getType(),
-            tvs[6]
-        ));
+    private void doTestActualTypeArgs() {
+
     }
 
     @Test
@@ -406,94 +221,114 @@ public class ReflectTest {
         );
     }
 
-    @Test
-    public void testGetTypeParameterMapping() throws NoSuchFieldException {
-        Map<TypeVariable<?>, Type> map = JieReflect.getTypeParameterMapping(new TypeRef<X<String>>() {
-        }.getType());
-        // R(1661070039)=V(23805079)
-        // K(532385198)=class java.lang.Integer(33524623)
-        // U(1028083665)=class java.lang.Double(1703953258)
-        // T(261012453)=class java.lang.Float(1367097467)
-        // A(844996153)=A(726237730)
-        // B(1498084403)=A(844996153)
-        // V(23805079)=class java.lang.Long(746023354)
-        JieLog.system().info(JieColl.toMap(
-            map.entrySet(),
-            it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
-            it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
-        ));
-        Map<TypeVariable<?>, Type> map2 = JieReflect.getTypeParameterMapping(
-            T.class.getDeclaredField("x").getGenericType());
-        // R(1661070039)=V(23805079)
-        // K(532385198)=class java.lang.Integer(33524623)
-        // U(1028083665)=class java.lang.Double(1703953258)
-        // T(261012453)=class java.lang.Float(1367097467)
-        // A(844996153)=A(726237730)
-        // B(1498084403)=A(844996153)
-        // V(23805079)=class java.lang.Long(746023354)
-        JieLog.system().info(JieColl.toMap(
-            map2.entrySet(),
-            it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
-            it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
-        ));
-    }
+//    @Test
+//    public void testGetTypeParameterMapping() throws NoSuchFieldException {
+//        Map<TypeVariable<?>, Type> map = JieReflect.getTypeParameterMapping(new TypeRef<X<String>>() {
+//        }.getType());
+//        // R(1661070039)=V(23805079)
+//        // K(532385198)=class java.lang.Integer(33524623)
+//        // U(1028083665)=class java.lang.Double(1703953258)
+//        // T(261012453)=class java.lang.Float(1367097467)
+//        // A(844996153)=A(726237730)
+//        // B(1498084403)=A(844996153)
+//        // V(23805079)=class java.lang.Long(746023354)
+//        JieLog.system().info(JieColl.toMap(
+//            map.entrySet(),
+//            it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
+//            it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
+//        ));
+//        Map<TypeVariable<?>, Type> map2 = JieReflect.getTypeParameterMapping(
+//            Inner.class.getDeclaredField("x").getGenericType());
+//        // R(1661070039)=V(23805079)
+//        // K(532385198)=class java.lang.Integer(33524623)
+//        // U(1028083665)=class java.lang.Double(1703953258)
+//        // T(261012453)=class java.lang.Float(1367097467)
+//        // A(844996153)=A(726237730)
+//        // B(1498084403)=A(844996153)
+//        // V(23805079)=class java.lang.Long(746023354)
+//        JieLog.system().info(JieColl.toMap(
+//            map2.entrySet(),
+//            it -> it.getKey() + "(" + Jie.systemHash(it.getKey()) + ")",
+//            it -> it.getValue() + "(" + Jie.systemHash(it.getValue()) + ")"
+//        ));
+//    }
+//
+//    @Test
+//    public void testGetGenericSuperType() {
+//        List<Type> actualArguments = JieReflect.getActualTypeArguments(ZS.class, Z.class);
+//        JieLog.system().info(actualArguments);
+//        Assert.assertEquals(actualArguments, Arrays.asList(new TypeRef<Z<String, Integer, Long, Boolean>>() {
+//        }.getParameterized()));
+//        actualArguments = JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
+//        }.getType(), Z.class);
+//        JieLog.system().info(actualArguments);
+//        Assert.assertEquals(actualArguments, Arrays.asList(new TypeRef<Z<String, String, Long, Boolean>>() {
+//        }.getParameterized()));
+//        Assert.assertEquals(
+//            JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
+//            }.getType(), ZB.class),
+//            new TypeRef<ZB<String>>() {
+//            }.getType()
+//        );
+//
+//        Assert.assertNull(JieReflect.getActualTypeArguments(Z.class, ZS.class));
+//        Assert.assertNull(JieReflect.getActualTypeArguments(ZB.class, ZS.class));
+//
+//        Assert.assertEquals(
+//            JieReflect.getActualTypeArguments(Iterable.class, Iterable.class),
+//            JieType.parameterized(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
+//        );
+//    }
 
-    @Test
-    public void testGetGenericSuperType() {
-        List<Type> actualArguments = JieReflect.getActualTypeArguments(ZS.class, Z.class);
-        JieLog.system().info(actualArguments);
-        Assert.assertEquals(actualArguments, Arrays.asList(new TypeRef<Z<String, Integer, Long, Boolean>>() {
-        }.getParameterized()));
-        actualArguments = JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
-        }.getType(), Z.class);
-        JieLog.system().info(actualArguments);
-        Assert.assertEquals(actualArguments, Arrays.asList(new TypeRef<Z<String, String, Long, Boolean>>() {
-        }.getParameterized()));
-        Assert.assertEquals(
-            JieReflect.getActualTypeArguments(new TypeRef<ZB<String>>() {
-            }.getType(), ZB.class),
-            new TypeRef<ZB<String>>() {
-            }.getType()
-        );
+    public interface SuperSuperInter1<SSI11, SSI12> {
+        String ssif1 = null;
 
-        Assert.assertNull(JieReflect.getActualTypeArguments(Z.class, ZS.class));
-        Assert.assertNull(JieReflect.getActualTypeArguments(ZB.class, ZS.class));
-
-        Assert.assertEquals(
-            JieReflect.getActualTypeArguments(Iterable.class, Iterable.class),
-            JieType.parameterized(Iterable.class, Arrays.asList(Iterable.class.getTypeParameters()[0]))
-        );
-    }
-
-
-    private static final class T<W> {
-        private final X<W> x = null;
-
-        public class V<U> {
+        default void ssim1() {
         }
     }
 
-    private static class X<A> extends Y<A, Integer, Long> {
+    public interface SuperSuperInter2<SSI21, SSI22> {
+        String ssif2 = null;
+
+        default void ssim2() {
+        }
     }
 
-    private static class Y<A, K, V extends Long> implements Z<A, Float, Double, V> {
+    public interface SuperInter1<SI11, SSI12> extends SuperSuperInter1<SI11, Integer>, SuperSuperInter2<Long, SSI12> {
+        String sif1 = null;
+
+        default void sim1() {
+        }
     }
 
-    private static interface Z<B, T, U, R> {
+    public interface SuperInter2<SI21, SSI22> {
+        String sif2 = null;
+
+        default void sim2() {
+        }
     }
 
-    private static class ZS implements Z<String, Integer, Long, Boolean> {
+    public static class SuperClass1<SC11, SC12> {
+        public static String scf1;
+        private static String scf2;
+
+        public static void scm1() {
+        }
+
+        private static void scm2() {
+        }
     }
 
-    private static class ZB<M> implements Z<M, M, Long, Boolean> {
-    }
+    public static class Inner<T extends Number & CharSequence>
+        extends SuperClass1<T, String> implements SuperInter1<Short, Character>, SuperInter2<Float, Double> {
 
-    private static class R1 extends R2<String> {
-    }
+        public static String f1;
+        private static String f2;
 
-    private static class R2<Tx> extends R3<Tx> {
-    }
+        public static void m1() {
+        }
 
-    private static class R3<Tx> extends TypeRef<Tx> {
+        private static void m2() {
+        }
     }
 }
