@@ -1,0 +1,367 @@
+package test;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import xyz.fslabo.common.reflect.JieReflect;
+import xyz.fslabo.common.reflect.JieType;
+
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AssignableTest {
+
+    @Test
+    public void testAssignableOther() {
+        Type other = JieType.other();
+        Class<?> classType = String.class;
+        ParameterizedType parameterized = JieType.parameterized(List.class, new Type[]{String.class});
+        WildcardType wildcard = JieType.upperBound(CharSequence.class);
+        GenericArrayType arrayType = JieType.array(String.class);
+        TypeVariable<?> typeVariable = AssignableTester.class.getTypeParameters()[0];
+
+        Assert.assertFalse(JieReflect.isAssignable(other, other));
+        Assert.assertFalse(JieReflect.isAssignable(other, classType));
+        Assert.assertFalse(JieReflect.isAssignable(other, parameterized));
+        Assert.assertFalse(JieReflect.isAssignable(other, wildcard));
+        Assert.assertFalse(JieReflect.isAssignable(other, arrayType));
+        Assert.assertFalse(JieReflect.isAssignable(other, typeVariable));
+
+        Assert.assertFalse(JieReflect.isAssignable(classType, other));
+        Assert.assertTrue(JieReflect.isAssignable(classType, classType));
+        Assert.assertFalse(JieReflect.isAssignable(classType, parameterized));
+        Assert.assertFalse(JieReflect.isAssignable(classType, wildcard));
+        Assert.assertFalse(JieReflect.isAssignable(classType, arrayType));
+        Assert.assertFalse(JieReflect.isAssignable(classType, typeVariable));
+
+        Assert.assertFalse(JieReflect.isAssignable(parameterized, other));
+        Assert.assertFalse(JieReflect.isAssignable(parameterized, classType));
+        Assert.assertTrue(JieReflect.isAssignable(parameterized, parameterized));
+        Assert.assertFalse(JieReflect.isAssignable(parameterized, wildcard));
+        Assert.assertFalse(JieReflect.isAssignable(parameterized, arrayType));
+        Assert.assertFalse(JieReflect.isAssignable(parameterized, typeVariable));
+
+        Assert.assertFalse(JieReflect.isAssignable(wildcard, other));
+        Assert.assertFalse(JieReflect.isAssignable(wildcard, classType));
+        Assert.assertFalse(JieReflect.isAssignable(wildcard, parameterized));
+        Assert.assertFalse(JieReflect.isAssignable(wildcard, wildcard));
+        Assert.assertFalse(JieReflect.isAssignable(wildcard, arrayType));
+        Assert.assertFalse(JieReflect.isAssignable(wildcard, typeVariable));
+
+        Assert.assertFalse(JieReflect.isAssignable(arrayType, other));
+        Assert.assertFalse(JieReflect.isAssignable(arrayType, classType));
+        Assert.assertFalse(JieReflect.isAssignable(arrayType, parameterized));
+        Assert.assertFalse(JieReflect.isAssignable(arrayType, wildcard));
+        Assert.assertTrue(JieReflect.isAssignable(arrayType, arrayType));
+        Assert.assertFalse(JieReflect.isAssignable(arrayType, typeVariable));
+
+        Assert.assertFalse(JieReflect.isAssignable(typeVariable, other));
+        Assert.assertFalse(JieReflect.isAssignable(typeVariable, classType));
+        Assert.assertFalse(JieReflect.isAssignable(typeVariable, parameterized));
+        Assert.assertFalse(JieReflect.isAssignable(typeVariable, wildcard));
+        Assert.assertFalse(JieReflect.isAssignable(typeVariable, arrayType));
+        Assert.assertTrue(JieReflect.isAssignable(typeVariable, typeVariable));
+    }
+
+    @Test
+    public void testAssignable() {
+        AssignableTester test = new AssignableTester();
+        test.doTest();
+    }
+
+    public static class AssignableTester<
+        T0,
+        T1 extends Number & CharSequence,
+        T2 extends T1,
+        T3 extends T2,
+        T4 extends String,
+        T5 extends List<CharSequence>,
+        T6 extends CharSequence,
+        T7 extends T6
+        > {
+
+        // Class
+        private Object f0 = null;
+        private CharSequence f1 = null;
+        private String f2 = null;
+        private List f3 = null;
+        // Parameterized
+        private List<CharSequence> f4 = null;
+        private List<String> f5 = null;
+        private List<? extends CharSequence> f6 = null;
+        private List<? extends String> f7 = null;
+        private List<? super CharSequence> f8 = null;
+        private List<? super String> f9 = null;
+        private List<T1> f10 = null;
+        private List<T3> f11 = null;
+        private List<? extends T1> f12 = null;
+        private List<? extends T3> f13 = null;
+        private List<? super T1> f14 = null;
+        private List<? extends T4> f15 = null;
+        private List<? extends CharSequence[]> f34 = null;
+        private List<? super CharSequence[]> f35 = null;
+        private List<? extends List<? super CharSequence>[]> f36 = null;
+        private List<? super List<? super CharSequence>[]> f37 = null;
+        private List<? extends List<? extends CharSequence>[]> f38 = null;
+        private List<? super List<? extends CharSequence>[]> f39 = null;
+        private List<? extends List<String>> f40 = null;
+        private List<? super List<String>> f41 = null;
+        private ArrayList<String> f42 = null;
+        private List<List<? super CharSequence>[]> f43 = null;
+        private List<List<CharSequence>[]> f45 = null;
+        private List<? extends List<CharSequence>[]> f46 = null;
+        private List<? super List<CharSequence>[]> f47 = null;
+        private List<Object> f48 = null;
+        private List<List<String>> f49 = null;
+        private List<? extends T6> f51 = null;
+        private List<? super T6> f52 = null;
+        private List<T6> f53 = null;
+        private List<? extends T7> f54 = null;
+        private List<? super T7> f55 = null;
+        private List<T7> f56 = null;
+        // TypeVariable
+        private T0 f16 = null;
+        private T1 f17 = null;
+        private T2 f18 = null;
+        private T3 f19 = null;
+        private T4 f20 = null;
+        private T5 f44 = null;
+        private T6 f50;
+        // Array
+        private CharSequence[] f21 = null;
+        private String[] f22 = null;
+        private List<CharSequence>[] f23 = null;
+        private List<String>[] f24 = null;
+        private List<? extends CharSequence>[] f25 = null;
+        private List<? extends String>[] f26 = null;
+        private List<? super CharSequence>[] f27 = null;
+        private List<? super String>[] f28 = null;
+        private T1[] f29 = null;
+        private T3[] f30 = null;
+        private List[] f31 = null;
+        private T4[] f32 = null;
+        private List<T4>[] f33 = null;
+        private T6[] f57;
+
+
+        public void doTest() {
+            // Class
+            doTest("f1", "f1", true);
+            doTest("f1", "f2", true);
+            doTest("f1", "f3", false);
+            doTest("f0", "f4", true);
+            doTest("f1", "f4", false);
+            doTest("f0", "f16", true);
+            doTest("f1", "f16", false);
+            doTest("f0", "f21", true);
+            doTest("f1", "f21", false);
+            doTest("f2", "f20", true);
+            doTest("f0", "f25", true);
+            doTest("f1", "f25", false);
+
+            // Parameterized
+            doTest("f4", "f5", false);
+            doTest("f5", "f4", false);
+            doTest("f4", "f6", false);
+            doTest("f6", "f4", true);
+            doTest("f6", "f7", true);
+            doTest("f7", "f6", false);
+            doTest("f4", "f8", false);
+            doTest("f8", "f4", true);
+            doTest("f10", "f11", false);
+            doTest("f10", "f12", false);
+            doTest("f12", "f10", true);
+            doTest("f12", "f13", true);
+            doTest("f13", "f12", false);
+            doTest("f10", "f14", false);
+            doTest("f14", "f10", true);
+            doTest("f4", "f0", false);
+            doTest("f4", "f16", false);
+            doTest("f4", "f21", false);
+            doTest("f4", "f25", false);
+            doTest("f15", "f9", false);
+            doTest("f9", "f15", false);
+            doTest("f9", "f14", false);
+            doTest("f5", "f42", true);
+            doTest("f7", "f42", true);
+            doTest("f8", "f42", false);
+            doTest("f9", "f42", true);
+            doTest("f4", "f44", true);
+            doTest("f44", "f4", false);
+            doTest("f6", "f51", true);
+            doTest("f6", "f52", false);
+            doTest("f6", "f53", true);
+            doTest("f8", "f51", false);
+            doTest("f8", "f52", false);
+            doTest("f8", "f53", false);
+            doTest("f6", "f54", true);
+            doTest("f6", "f55", false);
+            doTest("f6", "f56", true);
+            doTest("f8", "f54", false);
+            doTest("f8", "f55", false);
+            doTest("f8", "f56", false);
+            doTest("f6", "f48", false);
+            doTest("f42", "f5", false);
+            doTestAdd("f45", "f23", true);
+            doTestAdd("f46", "f23", false);
+            doTestAdd("f47", "f23", true);
+            doTestAdd("f48", "f16", true);
+            doTestAdd("f34", "f50", false);
+            doTestAdd("f35", "f50", false);
+            doTestParam("f48", "f6", true);
+            doTestParam("f48", "f8", true);
+            doTestParam("f48", "f10", true);
+            doTestParam("f48", "f12", true);
+            doTestParam("f48", "f14", true);
+            doTestParam("f49", "f40", true);
+            doTestParam("f49", "f41", false);
+            doTestParam("f6", "f51", false);
+            doTestParam("f6", "f52", false);
+            doTestParam("f6", "f53", false);
+            doTestParam("f8", "f51", true);
+            doTestParam("f8", "f52", false);
+            doTestParam("f8", "f53", true);
+            ParameterizedType p1 = JieType.parameterized(List.class, new Type[]{String.class});
+            ParameterizedType p2 = JieType.parameterized(List.class, new Type[]{String.class, String.class});
+            Assert.assertFalse(JieReflect.isAssignable(p1, p2));
+
+            // TypeVariable
+            doTest("f16", "f16", true);
+            doTest("f17", "f19", true);
+            doTest("f19", "f17", false);
+            doTest("f20", "f2", false);
+            doTest("f20", "f4", false);
+            doTest("f16", "f23", false);
+
+            // Array
+            doTest("f21", "f0", false);
+            doTest("f21", "f4", false);
+            doTest("f21", "f16", false);
+            doTest("f21", "f22", true);
+            doTest("f22", "f21", false);
+            doTest("f23", "f31", true);
+            doTest("f31", "f23", true);
+            doTest("f23", "f24", false);
+            doTest("f25", "f26", true);
+            doTest("f26", "f25", false);
+            doTest("f27", "f28", false);
+            doTest("f28", "f27", true);
+            doTest("f25", "f27", false);
+            doTest("f27", "f25", false);
+            doTest("f29", "f30", true);
+            doTest("f30", "f29", false);
+            doTest("f32", "f24", false);
+            doTest("f26", "f32", false);
+            doTest("f27", "f33", false);
+            doTest("f23", "f44", false);
+            doTest("f23", "f4", false);
+            doTest("f23", "f4", false);
+            doTest("f57", "f21", false);
+            doTest("f21", "f57", true);
+            GenericArrayType a1 = JieType.array(String.class);
+            Assert.assertTrue(JieReflect.isAssignable(a1, String[].class));
+            Assert.assertTrue(JieReflect.isAssignable(String[].class, a1));
+
+            // Wildcard
+            //add
+            doTestAdd("f6", "f1", false);
+            doTestAdd("f6", "f2", false);
+            doTestAdd("f7", "f2", false);
+            doTestAdd("f8", "f1", true);
+            doTestAdd("f8", "f2", true);
+            doTestAdd("f9", "f1", false);
+            doTestAdd("f9", "f2", true);
+            doTestAdd("f6", "f17", false);
+            doTestAdd("f7", "f20", false);
+            doTestAdd("f10", "f17", true);
+            doTestAdd("f14", "f17", true);
+            doTestAdd("f12", "f17", false);
+            doTestAdd("f14", "f0", false);
+            doTestAdd("f6", "f21", false);
+            doTestAdd("f34", "f21", false);
+            doTestAdd("f35", "f21", true);
+            doTestAdd("f36", "f27", false);
+            doTestAdd("f37", "f27", true);
+            doTestAdd("f38", "f25", false);
+            doTestAdd("f39", "f25", true);
+            doTestAdd("f40", "f42", false);
+            doTestAdd("f41", "f42", true);
+            //add(get)
+            doTestParam("f4", "f6", true);
+            doTestParam("f4", "f7", true);
+            doTestParam("f4", "f8", false);
+            doTestParam("f4", "f9", false);
+            doTestParam("f5", "f6", false);
+            doTestParam("f5", "f7", true);
+            doTestParam("f5", "f8", false);
+            doTestParam("f5", "f9", false);
+            doTestParam("f10", "f12", true);
+            doTestParam("f10", "f13", true);
+            doTestParam("f10", "f14", false);
+            doTestParam("f10", "f15", false);
+            doTestParam("f11", "f12", false);
+            doTestParam("f11", "f13", true);
+            doTestParam("f11", "f14", false);
+            doTestParam("f11", "f15", false);
+            doTestParam("f43", "f36", true);
+            doTestParam("f43", "f37", false);
+            doTestParam("f6", "f6", false);
+            doTestParam("f6", "f7", false);
+            doTestParam("f6", "f8", false);
+            doTestParam("f6", "f9", false);
+            doTestParam("f7", "f6", false);
+            doTestParam("f7", "f7", false);
+            doTestParam("f7", "f8", false);
+            doTestParam("f7", "f9", false);
+            doTestParam("f8", "f6", true);
+            doTestParam("f8", "f7", true);
+            doTestParam("f8", "f8", false);
+            doTestParam("f8", "f9", false);
+            doTestParam("f9", "f6", false);
+            doTestParam("f9", "f7", true);
+            doTestParam("f9", "f8", false);
+            doTestParam("f9", "f9", false);
+        }
+
+        private void doTest(String target, String source, boolean isAssignable) {
+            try {
+                Field targetField = AssignableTester.class.getDeclaredField(target);
+                Type targetType = targetField.getGenericType();
+                Field sourceField = AssignableTester.class.getDeclaredField(source);
+                Type sourceType = sourceField.getGenericType();
+                Assert.assertEquals(JieReflect.isAssignable(targetType, sourceType), isAssignable,
+                    "Assignable error: " + target + " = " + source);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void doTestAdd(String target, String source, boolean isAssignable) {
+            try {
+                Field targetField = AssignableTester.class.getDeclaredField(target);
+                ParameterizedType targetType = (ParameterizedType) targetField.getGenericType();
+                Field sourceField = AssignableTester.class.getDeclaredField(source);
+                Type sourceType = sourceField.getGenericType();
+                Assert.assertEquals(JieReflect.isAssignable(
+                        targetType.getActualTypeArguments()[0], sourceType), isAssignable,
+                    "Assignable error: " + target + ".add(" + source + ")");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void doTestParam(String target, String source, boolean isAssignable) {
+            try {
+                Field targetField = AssignableTester.class.getDeclaredField(target);
+                ParameterizedType targetType = (ParameterizedType) targetField.getGenericType();
+                Field sourceField = AssignableTester.class.getDeclaredField(source);
+                ParameterizedType sourceType = (ParameterizedType) sourceField.getGenericType();
+                Assert.assertEquals(JieReflect.isAssignable(
+                        targetType.getActualTypeArguments()[0], sourceType.getActualTypeArguments()[0]), isAssignable,
+                    "Assignable error: " + target + ".add(" + source + ".get(0))");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}

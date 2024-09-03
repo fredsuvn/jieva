@@ -1,13 +1,11 @@
 package xyz.fslabo.common.reflect;
 
+import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.coll.JieArray;
 import xyz.fslabo.common.coll.JieColl;
 
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -127,6 +125,16 @@ public class JieType {
      */
     public static GenericArrayType array(Type componentType) {
         return new GenericArrayTypeImpl(componentType);
+    }
+
+    /**
+     * Returns a new instance of {@link Type}. The instance is <b>NOT</b> type of {@link Class},
+     * {@link ParameterizedType}, {@link WildcardType}, {@link TypeVariable} or {@link GenericArrayType}.
+     *
+     * @return a new instance of {@link Type}
+     */
+    public static Type other() {
+        return new JievaType();
     }
 
     private static final class ParameterizedTypeImpl implements ParameterizedType {
@@ -351,6 +359,15 @@ public class JieType {
             }
             builder.append("[]");
             return builder.toString();
+        }
+    }
+
+    @EqualsAndHashCode
+    private static final class JievaType implements Type {
+
+        @Override
+        public String getTypeName() {
+            return "Hello, Jieva!";
         }
     }
 }

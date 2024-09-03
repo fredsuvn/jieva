@@ -10,10 +10,10 @@ interface TypePattern {
     }
 
     default boolean isAssignable(Type assigned, Type assignee) {
-        if (Objects.equals(assigned, assignee)) {
-            return true;
-        }
         if (assigned instanceof Class<?>) {
+            if (Objects.equals(assigned, assignee)) {
+                return true;
+            }
             if (assignee instanceof Class<?>) {
                 return isAssignableClassToClass((Class<?>) assigned, (Class<?>) assignee);
             }
@@ -32,6 +32,9 @@ interface TypePattern {
             return false;
         }
         if (assigned instanceof ParameterizedType) {
+            if (Objects.equals(assigned, assignee)) {
+                return true;
+            }
             if (assignee instanceof Class<?>) {
                 return isAssignableParameterizedToClass((ParameterizedType) assigned, (Class<?>) assignee);
             }
@@ -68,6 +71,9 @@ interface TypePattern {
             return false;
         }
         if (assigned instanceof TypeVariable<?>) {
+            if (Objects.equals(assigned, assignee)) {
+                return true;
+            }
             if (assignee instanceof Class<?>) {
                 return isAssignableTypeVariableToClass((TypeVariable<?>) assigned, (Class<?>) assignee);
             }
@@ -86,6 +92,9 @@ interface TypePattern {
             return false;
         }
         if (assigned instanceof GenericArrayType) {
+            if (Objects.equals(assigned, assignee)) {
+                return true;
+            }
             if (assignee instanceof Class<?>) {
                 return isAssignableGenericArrayToClass((GenericArrayType) assigned, (Class<?>) assignee);
             }

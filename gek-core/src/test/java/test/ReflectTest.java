@@ -9,11 +9,13 @@ import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.JieType;
 import xyz.fslabo.common.reflect.TypeRef;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 
 public class ReflectTest {
@@ -463,98 +465,6 @@ public class ReflectTest {
         );
     }
 
-    @Test
-    public void testAssignable() {
-        AssignableTest test = new AssignableTest();
-        test.doTest();
-    }
-
-    static class AssignableTest<
-        T0,
-        T1 extends Number & CharSequence,
-        T2 extends T1,
-        T3 extends T2,
-        T4 extends String
-        > {
-
-        private String f0 = null;
-        private CharSequence f1 = null;
-        private List f2 = null;
-        private List<String> f3 = null;
-        private List<CharSequence> f4 = null;
-        private List<? extends CharSequence> f5 = null;
-        private List<? extends String> f6 = null;
-        private List<? super CharSequence> f7 = null;
-        private List<? super String> f8 = null;
-        private String[] f9 = null;
-        private CharSequence[] f10 = null;
-        private List[] f11 = null;
-        private List<String>[] f12 = null;
-        private List<? extends CharSequence>[] f13 = null;
-        private List<? extends String>[] f14 = null;
-        private T0 f15 = null;
-        private T1 f16 = null;
-        private T2 f17 = null;
-        private T3 f18 = null;
-        private T4 f19 = null;
-        private List<T0> f20 = null;
-        private List<T1> f21 = null;
-        private List<T2> f22 = null;
-        private List<T3> f23 = null;
-        private List<String> f24 = null;
-        private ArrayList<? extends CharSequence> f25 = null;
-        private List<List<String>> f26 = null;
-        private List<? extends List<String>> f27 = null;
-        private List<? extends T0> f28 = null;
-
-        public void doTest() {
-            doTest("f0", "f0", true);
-            doTest("f1", "f0", true);
-            doTest("f0", "f2", false);
-            doTest("f2", "f3", true);
-            doTest("f3", "f2", true);
-            doTest("f4", "f3", false);
-            doTest("f4", "f5", false);
-            doTest("f5", "f6", true);
-            doTestParam("f4", "f5", true);
-            doTest("f1", "f16", true);
-            doTest("f11", "f12", true);
-            doTest("f25", "f24", false);
-            doTest("f24", "f25", false);
-            doTestParam("f26", "f27", true);
-            doTestParam("f27", "f26", false);
-            doTestParam("f27", "f27", false);
-            doTestParam("f20", "f28", true);
-            doTestParam("f28", "f20", false);
-        }
-
-        private void doTest(String target, String source, boolean isAssignable) {
-            try {
-                Field targetField = AssignableTest.class.getDeclaredField(target);
-                Type targetType = targetField.getGenericType();
-                Field sourceField = AssignableTest.class.getDeclaredField(source);
-                Type sourceType = sourceField.getGenericType();
-                Assert.assertEquals(JieReflect.isAssignable(targetType, sourceType), isAssignable,
-                    "Assignable error: " + target + " = " + source);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private void doTestParam(String target, String source, boolean isAssignable) {
-            try {
-                Field targetField = AssignableTest.class.getDeclaredField(target);
-                ParameterizedType targetType = (ParameterizedType) targetField.getGenericType();
-                Field sourceField = AssignableTest.class.getDeclaredField(source);
-                ParameterizedType sourceType = (ParameterizedType) sourceField.getGenericType();
-                Assert.assertEquals(JieReflect.isAssignable(
-                    targetType.getActualTypeArguments()[0], sourceType.getActualTypeArguments()[0]), isAssignable,
-                    "Assignable param error: " + target + " = " + source);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     private static final class T<W> {
         private final X<W> x = null;
