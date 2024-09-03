@@ -1,4 +1,4 @@
-package test;
+package test.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -58,18 +58,18 @@ public class ReflectTest {
         }.getType();
         Assert.assertEquals(
             t1.toString(),
-            "test.ReflectTest$T<java.lang.Integer>"
+            "test.reflect.ReflectTest$T<java.lang.Integer>"
         );
         Type t2 = new TypeRef<T<Integer>.V<String>>() {
         }.getType();
         Assert.assertEquals(
             t2.toString(),
-            "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
+            "test.reflect.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
         );
         ParameterizedType p1 = JieType.parameterized(T.class, Arrays.asList(Integer.class));
         Assert.assertEquals(
             p1.toString(),
-            "test.ReflectTest$T<java.lang.Integer>"
+            "test.reflect.ReflectTest$T<java.lang.Integer>"
         );
         Assert.assertEquals(
             t1,
@@ -78,7 +78,7 @@ public class ReflectTest {
         ParameterizedType p2 = JieType.parameterized(T.V.class, Arrays.asList(String.class), p1);
         Assert.assertEquals(
             p2.toString(),
-            "test.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
+            "test.reflect.ReflectTest$T<java.lang.Integer>$V<java.lang.String>"
         );
         Assert.assertEquals(
             t2,
