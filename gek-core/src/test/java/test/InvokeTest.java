@@ -30,7 +30,7 @@ public class InvokeTest {
     }
 
     @Test
-    public void testInvokingException() {
+    public void testMisc() {
         Assert.expectThrows(InvokingException.class, () -> {
             throw new InvokingException();
         });
@@ -42,8 +42,10 @@ public class InvokeTest {
         });
     }
 
-    private void testInvoke0(Constructor<?> constructor, Method method, boolean isStatic, boolean reflect) {
-        Invoked tt = (Invoked) (reflect ? Invoker.reflect(constructor) : Invoker.unreflect(constructor)).invoke(null);
+    private void testInvoke0(
+        Constructor<?> constructor, Method method, boolean isStatic, boolean reflect) throws Exception {
+        Invoker cons = reflect ? Invoker.reflect(constructor) : Invoker.unreflect(constructor);
+        Invoked tt = (Invoked) cons.invoke(null);
         Assert.assertNotNull(tt);
         String[] args = new String[method.getParameterCount()];
         for (int i = 0; i < args.length; i++) {
@@ -51,9 +53,10 @@ public class InvokeTest {
         }
         Assert.expectThrows(InvokingException.class, () -> (reflect ? Invoker.reflect(method) : Invoker.unreflect(method))
             .invoke(null, 1, 2, 3));
+        Invoker invoker = reflect ? Invoker.reflect(method) : Invoker.unreflect(method);
+        Assert.assertNotNull(invoker);
         Assert.assertEquals(
-            (reflect ? Invoker.reflect(method) : Invoker.unreflect(method))
-                .invoke(isStatic ? null : tt, (Object[]) args),
+            invoker.invoke(isStatic ? null : tt, (Object[]) args),
             buildString(method.getName(), args)
         );
     }
