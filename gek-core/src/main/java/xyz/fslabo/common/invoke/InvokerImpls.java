@@ -23,7 +23,7 @@ final class InvokerImpls {
             try {
                 return method.invoke(inst, args);
             } catch (Exception e) {
-                throw new InvokerException(e);
+                throw new InvokingException(e);
             }
         }
     }
@@ -41,7 +41,7 @@ final class InvokerImpls {
             try {
                 return constructor.newInstance(args);
             } catch (Exception e) {
-                throw new InvokerException(e);
+                throw new InvokingException(e);
             }
         }
     }
@@ -56,7 +56,7 @@ final class InvokerImpls {
                 this.methodHandle = MethodHandles.lookup().unreflect(method);
                 this.isStatic = Modifier.isStatic(method.getModifiers());
             } catch (IllegalAccessException e) {
-                throw new InvokerException(e);
+                throw new InvokingException(e);
             }
         }
 
@@ -65,7 +65,7 @@ final class InvokerImpls {
                 this.methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
                 this.isStatic = true;
             } catch (IllegalAccessException e) {
-                throw new InvokerException(e);
+                throw new InvokingException(e);
             }
         }
 
@@ -74,7 +74,7 @@ final class InvokerImpls {
             try {
                 return isStatic ? invokeStatic(args) : invokeVirtual(inst, args);
             } catch (Throwable e) {
-                throw new InvokerException(e);
+                throw new InvokingException(e);
             }
         }
 

@@ -5,12 +5,12 @@ package xyz.fslabo.common.invoke;
  *
  * @author fredsuvn
  */
-public class InvokerException extends RuntimeException {
+public class InvokingException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public InvokerException() {
+    public InvokingException() {
     }
 
     /**
@@ -18,7 +18,7 @@ public class InvokerException extends RuntimeException {
      *
      * @param message exception message
      */
-    public InvokerException(String message) {
+    public InvokingException(String message) {
         super(message);
     }
 
@@ -28,7 +28,7 @@ public class InvokerException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public InvokerException(String message, Throwable cause) {
+    public InvokingException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +37,7 @@ public class InvokerException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public InvokerException(Throwable cause) {
+    public InvokingException(Throwable cause) {
         super(cause);
     }
 }

@@ -66,10 +66,10 @@ public interface Invoker {
      * @param obj  specified object
      * @param args specified arguments
      * @return result of invoking
-     * @throws InvokerException if any exception occurs
+     * @throws InvokingException if any exception occurs
      */
     @Nullable
-    Object invoke(@Nullable Object obj, Object... args) throws InvokerException;
+    Object invoke(@Nullable Object obj, Object... args) throws InvokingException;
 }
 
 
