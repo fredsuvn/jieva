@@ -150,16 +150,11 @@ public class JieReflect {
                 if (!searchSuper) {
                     return null;
                 }
-                Type superClass = rawType.getGenericSuperclass();
-                Field f = getField(superClass, name, true);
-                if (f != null) {
-                    return f;
-                }
-                Type[] superInters = rawType.getGenericInterfaces();
-                for (Type superInter : superInters) {
-                    Field sf = getField(superInter, name, true);
-                    if (sf != null) {
-                        return sf;
+                Iterator<Type> superTypes = getSuperTypes(rawType);
+                while (superTypes.hasNext()) {
+                    Field f = getField(superTypes.next(), name, true);
+                    if (f != null) {
+                        return f;
                     }
                 }
             }
@@ -215,14 +210,9 @@ public class JieReflect {
                 if (!searchSuper) {
                     return null;
                 }
-                Type superClass = rawType.getGenericSuperclass();
-                Method m = getMethod(superClass, name, parameterTypes, true);
-                if (m != null) {
-                    return m;
-                }
-                Type[] superInters = rawType.getGenericInterfaces();
-                for (Type superInter : superInters) {
-                    m = getMethod(superInter, name, parameterTypes, true);
+                Iterator<Type> superTypes = getSuperTypes(rawType);
+                while (superTypes.hasNext()) {
+                    Method m = getMethod(superTypes.next(), name, parameterTypes, true);
                     if (m != null) {
                         return m;
                     }
@@ -232,11 +222,55 @@ public class JieReflect {
         return null;
     }
 
+    @Nullable
+    private static Iterator<Type> getSuperTypes(Class<?> rawType) {
+        return new Iterator<Type>() {
+
+            private Type[] superInters = null;
+            private int cur = -2;
+            private Type next = getNext();
+
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public Type next() {
+                Type result = next;
+                next = getNext();
+                return result;
+            }
+
+            @Nullable
+            private Type getNext() {
+                if (cur == -2) {
+                    cur++;
+                    Type superClass = rawType.getGenericSuperclass();
+                    if (superClass != null) {
+                        return superClass;
+                    }
+                }
+                if (cur == -1) {
+                    superInters = rawType.getGenericInterfaces();
+                    if (JieArray.isEmpty(superInters)) {
+                        return null;
+                    }
+                    cur++;
+                }
+                if (cur < superInters.length) {
+                    return superInters[cur++];
+                }
+                return null;
+            }
+        };
+    }
+
     /**
      * Returns new instance for given class name.
      * <p>
-     * This method first uses {@link Class#forName(String)} to load given class, then call {@link #newInstance(Class)}
-     * to create instance.
+     * This method first uses {@link #classForName(String, ClassLoader)} to load given class, then call
+     * {@link #newInstance(Class)} to create instance.
      * <p>
      * Returns {@code null} if failed.
      *
@@ -246,12 +280,29 @@ public class JieReflect {
      */
     @Nullable
     public static <T> T newInstance(String className) {
-        try {
-            Class<?> cls = Class.forName(className);
-            return newInstance(cls);
-        } catch (ClassNotFoundException e) {
+        return newInstance(className, null);
+    }
+
+    /**
+     * Returns new instance for given class name.
+     * <p>
+     * This method first uses {@link #classForName(String, ClassLoader)} to load given class, then call
+     * {@link #newInstance(Class)} to create instance.
+     * <p>
+     * Returns {@code null} if failed.
+     *
+     * @param className given class name
+     * @param loader    given class loader, may be {@code null} if loaded by default loader
+     * @param <T>       type of result
+     * @return a new instance of given class name with empty constructor or null
+     */
+    @Nullable
+    public static <T> T newInstance(String className, @Nullable ClassLoader loader) {
+        Class<?> cls = classForName(className, loader);
+        if (cls == null) {
             return null;
         }
+        return newInstance(cls);
     }
 
     /**
@@ -278,7 +329,7 @@ public class JieReflect {
      * @return array class of given component type
      */
     public static Class<?> arrayClass(Type componentType) {
-        return arrayClass(componentType, componentType.getClass().getClassLoader());
+        return arrayClass(componentType, null);
     }
 
     /**
@@ -288,7 +339,7 @@ public class JieReflect {
      * @param classLoader   specified class loader
      * @return array class of given component type
      */
-    public static Class<?> arrayClass(Type componentType, ClassLoader classLoader) {
+    public static Class<?> arrayClass(Type componentType, @Nullable ClassLoader classLoader) {
         if (componentType instanceof Class) {
             String name = arrayClassName((Class<?>) componentType);
             return classForName(name, classLoader);
@@ -318,15 +369,13 @@ public class JieReflect {
         throw new IllegalArgumentException("Illegal component type: " + componentType);
     }
 
-    private static Class<?> classForName(String name, ClassLoader classLoader) {
-        try {
-            return Class.forName(name, true, classLoader);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private static String arrayClassName(Class<?> componentType) {
+    /**
+     * Returns array class name of which component type is specified type.
+     *
+     * @param componentType specified component type
+     * @return array class name of which component type is specified type
+     */
+    public static String arrayClassName(Class<?> componentType) {
         String name;
         if (componentType.isArray()) {
             name = "[" + componentType.getName();
@@ -401,12 +450,36 @@ public class JieReflect {
      * @return whether current runtime exists the class specified by given class name
      */
     public static boolean classExists(String className) {
+        return classExists(className, null);
+    }
+
+    /**
+     * Returns whether current runtime exists the class specified by given class name and loaded by given class loader.
+     *
+     * @param className given class name
+     * @param loader    given class loader, may be {@code null} if loaded by default loader
+     * @return whether current runtime exists the class specified by given class name and loaded by given class loader
+     */
+    public static boolean classExists(String className, @Nullable ClassLoader loader) {
+        return classForName(className, loader) != null;
+    }
+
+    /**
+     * Returns the Class object associated with the class or interface with the given string name. This method calls
+     * {@link Class#forName(String)} if given class loader is {@code null}, or
+     * {@link Class#forName(String, boolean, ClassLoader)} if it is not {@code null}.
+     *
+     * @param name   name of class or interface
+     * @param loader given class loader, may be {@code null} if loaded by default loader
+     * @return the Class object associated with the class or interface with the given string name
+     */
+    @Nullable
+    public static Class<?> classForName(String name, @Nullable ClassLoader loader) {
         try {
-            Class.forName(className);
+            return loader == null ? Class.forName(name) : Class.forName(name, true, loader);
         } catch (ClassNotFoundException e) {
-            return false;
+            return null;
         }
-        return true;
     }
 
     /**

@@ -1,7 +1,5 @@
 package xyz.fslabo.common.reflect;
 
-import xyz.fslabo.common.coll.JieColl;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -37,9 +35,6 @@ public abstract class TypeRef<T> {
             }
         }
         List<Type> typeArgs = JieReflect.getActualTypeArguments(genericSuper, TypeRef.class);
-        if (JieColl.isEmpty(typeArgs)) {
-            throw new IllegalStateException("Not subtype of TypeRef: " + getClass().getName() + "!");
-        }
         return typeArgs.get(0);
     }
 

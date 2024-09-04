@@ -226,7 +226,7 @@ public class ReflectTest {
     public void testActualTypeArgs() {
         doTestActualTypeArgs(Inner.class, SuperSuperInter1.class, Short.class, Integer.class);
         doTestActualTypeArgs(
-            JieType.parameterized(Inner.class, new Type[]{NumberString.class}), SuperSuperInter1.class,
+            JieType.parameterized(Inner.class, new Type[]{NumberString1.class}), SuperSuperInter1.class,
             Short.class, Integer.class
         );
         doTestActualTypeArgs(SuperInter1.class, SuperSuperInter1.class, SuperInter1.class.getTypeParameters()[0], Integer.class);
@@ -250,9 +250,9 @@ public class ReflectTest {
 
     @Test
     public void testTypeParameterMapping() {
-        Map<TypeVariable<?>, Type> map = JieReflect.getTypeParameterMapping(new TypeRef<Inner<NumberString>>() {
+        Map<TypeVariable<?>, Type> map = JieReflect.getTypeParameterMapping(new TypeRef<Inner<NumberString1>>() {
         }.getType());
-        Assert.assertEquals(map.get(Inner.class.getTypeParameters()[0]), NumberString.class);
+        Assert.assertEquals(map.get(Inner.class.getTypeParameters()[0]), NumberString1.class);
         Assert.assertEquals(map.get(SuperClass1.class.getTypeParameters()[0]), Inner.class.getTypeParameters()[0]);
         Assert.assertEquals(map.get(SuperClass1.class.getTypeParameters()[1]), String.class);
         Assert.assertEquals(map.get(SuperInter1.class.getTypeParameters()[0]), Short.class);
@@ -263,7 +263,6 @@ public class ReflectTest {
         Assert.assertEquals(map.get(SuperSuperInter1.class.getTypeParameters()[1]), Integer.class);
         Assert.assertEquals(map.get(SuperSuperInter2.class.getTypeParameters()[0]), Long.class);
         Assert.assertEquals(map.get(SuperSuperInter2.class.getTypeParameters()[1]), SuperInter1.class.getTypeParameters()[1]);
-
         Assert.assertEquals(JieReflect.getTypeParameterMapping(CharSequence.class), Collections.emptyMap());
     }
 
@@ -376,6 +375,119 @@ public class ReflectTest {
             JieReflect.replaceType(JieType.lowerBound(Integer.class), String.class, Integer.class, false),
             JieType.lowerBound(Integer.class)
         );
+
+        Assert.assertEquals(
+            JieReflect.replaceType(new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {
+            }.getType(), NumberString1.class, NumberString2.class),
+            new TypeRef<Inner<NumberString2>.SubInner<String, String>>() {
+            }.getType()
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {
+            }.getType(), JieType.parameterized(Inner.class, new Type[]{NumberString1.class}), String.class),
+            JieType.parameterized(
+                Inner.SubInner.class,
+                new Type[]{String.class, String.class},
+                String.class
+            )
+        );
+        Assert.assertEquals(
+            JieReflect.replaceType(new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {
+            }.getType(), NumberString1.class, NumberString2.class, false),
+            new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {
+            }.getType()
+        );
+    }
+
+    @Test
+    public void testTypeRef() {
+        ParameterizedType parameterizedType = new TypeRef<List<String>>() {
+        }.getParameterized();
+        Assert.assertEquals(parameterizedType, JieType.parameterized(List.class, new Type[]{String.class}));
+
+        class TestRef extends TypeRef<String> {
+        }
+        TestRef testRef = new TestRef();
+        Assert.assertEquals(testRef.getType(), String.class);
+        class TestRef2 extends TestRef {
+        }
+        TestRef2 testRef2 = new TestRef2();
+        Assert.assertEquals(testRef2.getType(), String.class);
+    }
+
+    @Test
+    public void testType() {
+        ParameterizedType p1 = JieType.parameterized(Map.class, Arrays.asList(String.class, String.class));
+        Assert.assertEquals(p1, new TypeRef<Map<String, String>>() {
+        }.getType());
+        ParameterizedType p2 = JieType.parameterized(
+            Inner.SubInner.class,
+            Arrays.asList(String.class, String.class),
+            JieType.parameterized(Inner.class, new Type[]{NumberString1.class})
+        );
+        Assert.assertEquals(p2, new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {
+        }.getType());
+        Assert.assertTrue(p1.equals(p1));
+        Assert.assertFalse(p1.equals(null));
+        Assert.assertNotEquals(p1, p2);
+        Assert.assertNotEquals(p1, String.class);
+        Assert.assertEquals(p1.toString(), new TypeRef<Map<String, String>>() {
+        }.getType().toString());
+        Assert.assertEquals(p2.toString(), new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {
+        }.getType().toString());
+        Assert.assertEquals(p1.hashCode(), new TypeRef<Map<String, String>>() {
+        }.getType().hashCode());
+        Assert.assertEquals(p2.hashCode(), new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {
+        }.getType().hashCode());
+
+        WildcardType w1 = JieType.upperBound(String.class);
+        Assert.assertEquals(w1, new TypeRef<List<? extends String>>() {
+        }.getParameterized().getActualTypeArguments()[0]);
+        WildcardType w2 = JieType.lowerBound(String.class);
+        Assert.assertEquals(w2, new TypeRef<List<? super String>>() {
+        }.getParameterized().getActualTypeArguments()[0]);
+        Assert.assertTrue(w1.equals(w1));
+        Assert.assertFalse(w1.equals(null));
+        Assert.assertNotEquals(w1, w2);
+        Assert.assertNotEquals(w1, String.class);
+        Assert.assertEquals(w1.toString(), new TypeRef<List<? extends String>>() {
+        }.getParameterized().getActualTypeArguments()[0].toString());
+        Assert.assertEquals(w2.toString(), new TypeRef<List<? super String>>() {
+        }.getParameterized().getActualTypeArguments()[0].toString());
+        Assert.assertEquals(w1.hashCode(), new TypeRef<List<? extends String>>() {
+        }.getParameterized().getActualTypeArguments()[0].hashCode());
+        Assert.assertEquals(w2.hashCode(), new TypeRef<List<? super String>>() {
+        }.getParameterized().getActualTypeArguments()[0].hashCode());
+        WildcardType w3 = JieType.wildcard(new Type[]{}, new Type[]{});
+        Assert.assertEquals(w3.toString(), "?");
+        WildcardType w4 = JieType.upperBound(Object.class);
+        Assert.assertEquals(w4, new TypeRef<List<? extends Object>>() {
+        }.getParameterized().getActualTypeArguments()[0]);
+        Assert.assertEquals(w4.toString(), new TypeRef<List<? extends Object>>() {
+        }.getParameterized().getActualTypeArguments()[0].toString());
+        WildcardType w5 = JieType.wildcard(new Type[]{String.class, Integer.class}, new Type[]{});
+        Assert.assertEquals(w5.toString(), "? extends " + String.class.getName() + " & " + Integer.class.getName());
+
+        GenericArrayType g1 = JieType.array(JieType.parameterized(List.class, new Type[]{String.class}));
+        Assert.assertEquals(g1, new TypeRef<List<String>[]>() {
+        }.getType());
+        Assert.assertTrue(g1.equals(g1));
+        Assert.assertFalse(g1.equals(null));
+        Assert.assertNotEquals(g1, w2);
+        Assert.assertNotEquals(g1, String.class);
+        Assert.assertEquals(g1.toString(), new TypeRef<List<String>[]>() {
+        }.getType().toString());
+        Assert.assertEquals(g1.hashCode(), new TypeRef<List<String>[]>() {
+        }.getType().hashCode());
+        Assert.assertEquals(JieType.array(String.class).toString(), String.class.getName() + "[]");
+
+        Type other = JieType.other();
+        Assert.assertEquals(other.getTypeName(), "Hello, Jieva!");
+        Assert.assertTrue(other.equals(other));
+        Assert.assertFalse(other.equals(null));
+        Assert.assertNotEquals(other, w2);
+        Assert.assertNotEquals(other, String.class);
+        Assert.assertEquals(other.hashCode(), 1);
     }
 
     public interface SuperSuperInter1<SSI11, SSI12> {
@@ -428,9 +540,14 @@ public class ReflectTest {
 
         private static void m2() {
         }
+
+        public class SubInner<SI1, SI2> {
+        }
+
+        public T[] tArray;
     }
 
-    public static class NumberString extends Number implements CharSequence {
+    public static class NumberString1 extends Number implements CharSequence {
 
         @Override
         public int length() {
@@ -467,5 +584,8 @@ public class ReflectTest {
         public double doubleValue() {
             return 0;
         }
+    }
+
+    public static class NumberString2 extends NumberString1 {
     }
 }

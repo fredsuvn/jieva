@@ -1,6 +1,5 @@
 package xyz.fslabo.common.reflect;
 
-import lombok.EqualsAndHashCode;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.coll.JieArray;
 import xyz.fslabo.common.coll.JieColl;
@@ -362,12 +361,21 @@ public class JieType {
         }
     }
 
-    @EqualsAndHashCode
     private static final class JievaType implements Type {
 
         @Override
         public String getTypeName() {
             return "Hello, Jieva!";
+        }
+
+        @Override
+        public int hashCode() {
+            return 1;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return super.equals(obj);
         }
     }
 }
