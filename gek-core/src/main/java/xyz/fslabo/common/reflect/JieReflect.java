@@ -106,7 +106,7 @@ public class JieReflect {
 
     /**
      * Searches and returns field of specified name from given type, returns {@code null} for searching failed. This
-     * method is equivalent to {@link #getField(Type, String, boolean)}:
+     * method is equivalent to ({@link #getField(Type, String, boolean)}):
      * <pre>
      *     return getField(type, name, true);
      * </pre>
@@ -164,7 +164,7 @@ public class JieReflect {
 
     /**
      * Searches and returns method of specified name and parameter types from given type. returns {@code null} for
-     * searching failed. This method is equivalent to {@link #getMethod(Type, String, Class[], boolean)}:
+     * searching failed. This method is equivalent to ({@link #getMethod(Type, String, Class[], boolean)}):
      * <pre>
      *     return getMethod(type, name, parameterTypes, true);
      * </pre>
@@ -571,6 +571,8 @@ public class JieReflect {
      *     K -&gt; Integer
      *     V -&gt; Long
      * </pre>
+     * It is recommended using {@link JieColl#getNested(Map, Object, Set)} to get actual type of type variable in the
+     * result.
      *
      * @param type given type
      * @return a mapping of type parameters for given type
@@ -637,7 +639,7 @@ public class JieReflect {
 
     /**
      * Replaces the types in given {@code type} (including itself) which equals to {@code matcher} with
-     * {@code replacement}. This method is equivalent to {@link #replaceType(Type, Type, Type, boolean)}:
+     * {@code replacement}. This method is equivalent to ({@link #replaceType(Type, Type, Type, boolean)}):
      * <pre>
      *     return replaceType(type, matcher, replacement, true);
      * </pre>

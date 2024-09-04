@@ -83,7 +83,7 @@ public class BytesBuilder extends ByteArrayOutputStream {
     }
 
     /**
-     * Builds to byte array and wraps as byte buffer. It is equivalent to:
+     * Builds to byte array and wraps as byte buffer. It is equivalent to ({@link ByteBuffer#wrap(byte[])}):
      * <pre>
      *     return ByteBuffer.wrap(toByteArray());
      * </pre>

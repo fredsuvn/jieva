@@ -8,7 +8,8 @@ package xyz.fslabo.common.base;
 public class JieMath {
 
     /**
-     * Returns the least portion number that {@code total} can be divided into specified {@code size}. It is equivalent to:
+     * Returns the least portion number that {@code total} can be divided into specified {@code size}. It is equivalent
+     * to:
      * <pre>
      *     return total % size == 0 ? total / size : total / size + 1;
      * </pre>
@@ -22,7 +23,8 @@ public class JieMath {
     }
 
     /**
-     * Returns the least portion number that {@code total} can be divided into specified {@code size}. It is equivalent to:
+     * Returns the least portion number that {@code total} can be divided into specified {@code size}. It is equivalent
+     * to:
      * <pre>
      *     return total % size == 0 ? total / size : total / size + 1;
      * </pre>

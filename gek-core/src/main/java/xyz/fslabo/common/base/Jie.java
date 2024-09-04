@@ -117,7 +117,10 @@ public class Jie {
      *         else returns {@code Objects.hashCode} for given object;
      *     </li>
      * </ul>
-     * This method is equivalent to: {@code hash(obj, true, true)}.
+     * This method is equivalent to ({@link #hashWith(Object, boolean, boolean)}):
+     * <pre>
+     *     return hashWith(obj, true, true);
+     * </pre>
      *
      * @param obj given object
      * @return the hash code
@@ -428,7 +431,7 @@ public class Jie {
 
     /**
      * Maps source object from source type to target type, return null if mapping is unsupported or the result itself is
-     * null. This method is equivalent to:
+     * null. This method is equivalent to ({@link Mapper#map(Object, Class, MappingOptions)}):
      * <pre>
      *     return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
      * </pre>
@@ -448,7 +451,7 @@ public class Jie {
 
     /**
      * Maps source object from source type to target type, return null if mapping is unsupported or the result itself is
-     * null. This method is equivalent to:
+     * null. This method is equivalent to ({@link Mapper#map(Object, Type, MappingOptions)}):
      * <pre>
      *     return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
      * </pre>
@@ -468,7 +471,7 @@ public class Jie {
 
     /**
      * Maps source object from source type to target type, return null if mapping is unsupported or the result itself is
-     * null. This method is equivalent to:
+     * null. This method is equivalent to ({@link Mapper#map(Object, TypeRef, MappingOptions)}):
      * <pre>
      *     return Mapper.defaultMapper().map(source, targetType, MappingOptions.defaultOptions());
      * </pre>
@@ -487,7 +490,8 @@ public class Jie {
     }
 
     /**
-     * Copies properties from source object to dest object, return the dest object. This method is equivalent to:
+     * Copies properties from source object to dest object, return the dest object. This method is equivalent to
+     * ({@link BeanMapper#copyProperties(Object, Object)}):
      * <pre>
      *     return BeanMapper.defaultMapper().copyProperties(source, dest);
      * </pre>
@@ -506,7 +510,7 @@ public class Jie {
 
     /**
      * Copies properties from source object to dest object (specified ignored properties will be excluded), return the
-     * dest object. This method is equivalent to:
+     * dest object. This method is equivalent to ({@link BeanMapper#copyProperties(Object, Object, MappingOptions)}):
      * <pre>
      *     return BeanMapper.defaultMapper().copyProperties(source, dest,
      *         MappingOptions.builder().ignored(JieArray.asList(ignoredProperties)).build());
@@ -527,7 +531,8 @@ public class Jie {
     }
 
     /**
-     * Copies properties from source object to dest object, return the dest object. This method is equivalent to:
+     * Copies properties from source object to dest object, return the dest object. This method is equivalent to
+     * ({@link BeanMapper#copyProperties(Object, Object, MappingOptions)}):
      * <pre>
      *     return BeanMapper.defaultMapper().copyProperties(source, dest, options);
      * </pre>

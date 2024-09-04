@@ -14,7 +14,7 @@ import java.util.function.Function;
 public interface CaseFormatter {
 
     /**
-     * Upper Camel Case from {@link #camelCase(boolean)}. It is equivalent to:
+     * Upper Camel Case from {@link #camelCase(boolean)}. It is equivalent to ({@link #camelCase(boolean)}):
      * <pre>
      *     camelCase(true);
      * </pre>
@@ -22,7 +22,7 @@ public interface CaseFormatter {
     CaseFormatter UPPER_CAMEL = camelCase(true);
 
     /**
-     * Lower Camel Case from {@link #camelCase(boolean)}. It is equivalent to:
+     * Lower Camel Case from {@link #camelCase(boolean)}. It is equivalent to ({@link #camelCase(boolean)}):
      * <pre>
      *     camelCase(true);
      * </pre>
@@ -30,7 +30,8 @@ public interface CaseFormatter {
     CaseFormatter LOWER_CAMEL = camelCase(false);
 
     /**
-     * Underscore Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to:
+     * Underscore Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to
+     * ({@link #delimiterCase(CharSequence, Function)}):
      * <pre>
      *     delimiterCase("_", null);
      * </pre>
@@ -38,7 +39,8 @@ public interface CaseFormatter {
     CaseFormatter UNDERSCORE = delimiterCase("_", null);
 
     /**
-     * Upper Underscore Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to:
+     * Upper Underscore Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to
+     * ({@link #delimiterCase(CharSequence, Function)}):
      * <pre>
      *     delimiterCase("_", JieString::upperCase);
      * </pre>
@@ -46,7 +48,8 @@ public interface CaseFormatter {
     CaseFormatter UPPER_UNDERSCORE = delimiterCase("_", JieString::upperCase);
 
     /**
-     * Lower Underscore Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to:
+     * Lower Underscore Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to
+     * ({@link #delimiterCase(CharSequence, Function)}):
      * <pre>
      *     delimiterCase("_", JieString::lowerCase);
      * </pre>
@@ -54,7 +57,8 @@ public interface CaseFormatter {
     CaseFormatter LOWER_UNDERSCORE = delimiterCase("_", JieString::lowerCase);
 
     /**
-     * Hyphen Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to:
+     * Hyphen Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to
+     * ({@link #delimiterCase(CharSequence, Function)}):
      * <pre>
      *     delimiterCase("-", null);
      * </pre>
@@ -62,7 +66,8 @@ public interface CaseFormatter {
     CaseFormatter HYPHEN = delimiterCase("-", null);
 
     /**
-     * Upper Hyphen Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to:
+     * Upper Hyphen Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to
+     * ({@link #delimiterCase(CharSequence, Function)}):
      * <pre>
      *     delimiterCase("-", JieString::upperCase);
      * </pre>
@@ -70,7 +75,8 @@ public interface CaseFormatter {
     CaseFormatter UPPER_HYPHEN = delimiterCase("-", JieString::upperCase);
 
     /**
-     * Lower Hyphen Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to:
+     * Lower Hyphen Delimiter Case from {@link #delimiterCase(CharSequence, Function)}. It is equivalent to
+     * ({@link #delimiterCase(CharSequence, Function)}):
      * <pre>
      *     delimiterCase("-", JieString::lowerCase);
      * </pre>

@@ -467,7 +467,7 @@ public class JieString {
      * if given limit = 0, do nothing and return given chars to string;
      * If given limit &gt; 0, this method will replace given limit times.
      * <p>
-     * FOr example, replaceFirst is equivalent to
+     * FOr example, replaceFirst is equivalent to:
      * <pre>
      *     replace(chars, matcher, replacement, 1);
      * </pre>

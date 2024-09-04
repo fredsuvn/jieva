@@ -819,7 +819,8 @@ public class JieIO {
     }
 
     /**
-     * Returns a {@link TransformInputStream} with source stream and transformer. This method is equivalent to:
+     * Returns a {@link TransformInputStream} with source stream and transformer. This method is equivalent to
+     * ({@link #transform(InputStream, int, Function)}):
      * <pre>
      *     return transform(source, 0, transformer);
      * </pre>

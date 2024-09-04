@@ -25,7 +25,7 @@ public interface BeanMapper {
 
     /**
      * Copies properties from source object to dest object, then returns dest object. Supports both bean object and
-     * {@link Map} object. This method is equivalent to {@link #copyProperties(Object, Object, MappingOptions)}:
+     * {@link Map} object. This method is equivalent to ({@link #copyProperties(Object, Object, MappingOptions)}):
      * <pre>
      *     copyProperties(source, dest, MappingOptions.defaultOptions());
      * </pre>
@@ -42,7 +42,7 @@ public interface BeanMapper {
     /**
      * Copies properties from source object to dest object, then returns dest object. Supports both bean object and
      * {@link Map} object. This method is equivalent to
-     * {@link #copyProperties(Object, Type, Object, Type, MappingOptions)}:
+     * ({@link #copyProperties(Object, Type, Object, Type, MappingOptions)}):
      * <pre>
      *     copyProperties(source, source.getClass(), dest, dest.getClass(), options);
      * </pre>

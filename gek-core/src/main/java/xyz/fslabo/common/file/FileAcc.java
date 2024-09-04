@@ -117,7 +117,7 @@ public interface FileAcc {
     FileDescriptor getDescriptor() throws FileException;
 
     /**
-     * Returns an {@link InputStream} of this file accessor. This method is equivalent to:
+     * Returns an {@link InputStream} of this file accessor. This method is equivalent to ({@link #inputStream(long)}):
      * <pre>
      *     return inputStream(0);
      * </pre>
@@ -145,7 +145,7 @@ public interface FileAcc {
     InputStream inputStream(long position) throws FileException;
 
     /**
-     * Returns an {@link OutputStream} of this file accessor. This method is equivalent to:
+     * Returns an {@link OutputStream} of this file accessor. This method is equivalent to ({@link #outputStream(long)}):
      * <pre>
      *     return outputStream(0);
      * </pre>
@@ -163,7 +163,7 @@ public interface FileAcc {
      * Returns an {@link OutputStream} of this file accessor.
      * <p>
      * The stream starts at specified position (0-based) in bytes. If the position is &gt;= file length, the file will
-     * be auto extend. This method is equivalent to:
+     * be auto extend. This method is equivalent to ({@link #outputStream(long, boolean)}):
      * <pre>
      *     return outputStream(position, true);
      * </pre>

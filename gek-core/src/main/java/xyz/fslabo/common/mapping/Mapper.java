@@ -93,7 +93,7 @@ public interface Mapper {
 
     /**
      * Maps source object from source type to target with {@link #getOptions()}, returns null if mapping failed or the
-     * result itself is null. This method is equivalent to {@link #map(Object, Class, MappingOptions)}:
+     * result itself is null. This method is equivalent to ({@link #map(Object, Class, MappingOptions)}):
      * <pre>
      *     return map(source, (Type) targetType, defaultOptions());
      * </pre>
@@ -110,7 +110,7 @@ public interface Mapper {
 
     /**
      * Maps source object from source type to target type ref with {@link #getOptions()}, returns null if mapping failed
-     * or the result itself is null. This method is equivalent to {@link #map(Object, TypeRef, MappingOptions)}:
+     * or the result itself is null. This method is equivalent to ({@link #map(Object, TypeRef, MappingOptions)}):
      * <pre>
      *     return map(source, targetTypeRef, defaultOptions());
      * </pre>
@@ -127,7 +127,7 @@ public interface Mapper {
 
     /**
      * Maps source object from source type to target type with {@link #getOptions()}, returns null if mapping failed or
-     * the result itself is null. This method is equivalent to {@link #map(Object, Type, MappingOptions)}:
+     * the result itself is null. This method is equivalent to ({@link #map(Object, Type, MappingOptions)}):
      * <pre>
      *     return map(source, targetType, defaultOptions());
      * </pre>
@@ -156,7 +156,7 @@ public interface Mapper {
      *         {@code others}: mapping successful, the result is returned object;
      *     </li>
      * </ul>
-     * This method is equivalent to {@link #map(Object, Type, Type, MappingOptions)}:
+     * This method is equivalent to ({@link #map(Object, Type, Type, MappingOptions)}):
      * <pre>
      *     return map(source, sourceType, targetType, defaultOptions());
      * </pre>
@@ -187,7 +187,7 @@ public interface Mapper {
      *         {@code others}: mapping successful, the result is returned object;
      *     </li>
      * </ul>
-     * This method is equivalent to {@link #mapProperty(Object, Type, Type, PropertyInfo, MappingOptions)}:
+     * This method is equivalent to ({@link #mapProperty(Object, Type, Type, PropertyInfo, MappingOptions)}):
      * <pre>
      *     return mapProperty(source, sourceType, targetType, targetProperty, defaultOptions());
      * </pre>
@@ -210,7 +210,7 @@ public interface Mapper {
 
     /**
      * Maps source object from source type to target, returns null if mapping failed or the result itself is null.
-     * This method is equivalent to:
+     * This method is equivalent to ({@link #map(Object, Type, MappingOptions)}):
      * <pre>
      *     return map(source, (Type) targetType, options);
      * </pre>
@@ -227,8 +227,8 @@ public interface Mapper {
     }
 
     /**
-     * Maps source object from source type to target type ref, returns null if mapping failed or the result itself is null.
-     * This method is equivalent to:
+     * Maps source object from source type to target type ref, returns null if mapping failed or the result itself is
+     * null. This method is equivalent to:
      * <pre>
      *     Object result = map(source, source == null ? Object.class : source.getClass(), targetTypeRef.getType(), options);
      *     return resolveResult(result);
