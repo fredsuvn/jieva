@@ -27,7 +27,7 @@ public class JieBean {
      * @param o        object to be compared
      * @return true if equals false otherwise
      */
-    static boolean equals(BeanInfo beanInfo, @Nullable Object o) {
+    public static boolean equals(BeanInfo beanInfo, @Nullable Object o) {
         if (beanInfo == o) {
             return true;
         }
@@ -103,7 +103,7 @@ public class JieBean {
      * @param beanInfo bean info to be hashed
      * @return hash code of given bean
      */
-    static int hashCode(BeanInfo beanInfo) {
+    public static int hashCode(BeanInfo beanInfo) {
         return beanInfo.getType().hashCode();
     }
 

@@ -31,10 +31,10 @@ public interface BeanProvider {
     }
 
     /**
-     * Returns bean info of given type.
+     * Returns {@link BeanInfo} of given type.
      *
      * @param type given type
-     * @return bean info of given type
+     * @return {@link BeanInfo} of given type
      */
     BeanInfo getBeanInfo(Type type);
 }

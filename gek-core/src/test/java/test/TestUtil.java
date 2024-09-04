@@ -1,5 +1,8 @@
 package test;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,5 +37,9 @@ public class TestUtil {
     public static void count(String key, Map<String, AtomicInteger> map) {
         AtomicInteger c = map.computeIfAbsent(key, k -> new AtomicInteger(0));
         c.incrementAndGet();
+    }
+
+    public static List<Method> getMethods(Class<?> type) {
+        return Arrays.asList(type.getMethods());
     }
 }

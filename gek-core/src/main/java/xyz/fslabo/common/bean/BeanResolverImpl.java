@@ -32,8 +32,6 @@ final class BeanResolverImpl implements BeanResolver, BeanResolver.Handler {
                 }
             }
             return builder.build();
-        } catch (BeanResolvingException e) {
-            throw e;
         } catch (Exception e) {
             throw new BeanResolvingException(type, e);
         }
@@ -89,7 +87,7 @@ final class BeanResolverImpl implements BeanResolver, BeanResolver.Handler {
 
     @Override
     public @Nullable Flag resolve(BeanResolver.Context builder) {
-        for (BeanResolver.Handler handler : handlers) {
+        for (BeanResolver.Handler handler : getHandlers()) {
             Flag flag = handler.resolve(builder);
             if (Objects.equals(flag, Flag.BREAK)) {
                 return Flag.BREAK;
@@ -256,8 +254,7 @@ final class BeanResolverImpl implements BeanResolver, BeanResolver.Handler {
 
             @Override
             public boolean equals(Object o) {
-                return o != null && Objects.equals(getClass(), o.getClass())
-                    && JieBean.equals(this, o);
+                return JieBean.equals(this, o);
             }
 
             @Override
@@ -302,6 +299,21 @@ final class BeanResolverImpl implements BeanResolver, BeanResolver.Handler {
             @Override
             public List<Annotation> getAnnotations() {
                 return base.getAnnotations();
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return JieBean.equals(this, o);
+            }
+
+            @Override
+            public int hashCode() {
+                return JieBean.hashCode(this);
+            }
+
+            @Override
+            public String toString() {
+                return JieBean.toString(this);
             }
         }
     }

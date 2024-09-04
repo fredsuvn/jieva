@@ -1,5 +1,6 @@
 package xyz.fslabo.common.bean;
 
+import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Flag;
@@ -10,8 +11,6 @@ import xyz.fslabo.common.bean.handlers.NonPrefixResolverHandler;
 import xyz.fslabo.common.coll.JieArray;
 
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -60,33 +59,20 @@ public interface BeanResolver {
     }
 
     /**
-     * Resolves given type to {@link BeanInfo}. This method is equivalent to ({@link #resolve(Type, Map)}):
-     * <pre>
-     *     return resolve(type, Collections.emptyMap());
-     * </pre>
-     *
-     * @param type given type
-     * @return resolved {@link BeanInfo}
-     * @throws BeanResolvingException if any problem occurs when resolving
-     */
-    default BeanInfo resolve(Type type) throws BeanResolvingException {
-        return resolve(type, Collections.emptyMap());
-    }
-
-    /**
      * Resolves given type to {@link BeanInfo}.
      *
      * @param type given type
      * @return resolved {@link BeanInfo}
      * @throws BeanResolvingException if any problem occurs when resolving
      */
-    BeanInfo resolve(Type type, Map<TypeVariable<?>, Type> extraTypeVariableMapping) throws BeanResolvingException;
+    BeanInfo resolve(Type type) throws BeanResolvingException;
 
     /**
      * Returns handlers of this resolver.
      *
      * @return handlers of this resolver
      */
+    @Immutable
     List<Handler> getHandlers();
 
     /**

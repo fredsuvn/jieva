@@ -142,10 +142,10 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         }
         stack.clear();
         Type result = JieColl.getNested(typeParameterMapping, type, stack);
-        if (result == null) {
-            return type;
+        if (result != null) {
+            return result;
         }
-        return result;
+        return type;
     }
 
     /**
