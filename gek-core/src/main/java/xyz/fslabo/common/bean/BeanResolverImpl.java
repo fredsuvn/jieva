@@ -7,6 +7,7 @@ import xyz.fslabo.common.coll.JieColl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -208,12 +209,12 @@ final class BeanResolverImpl implements BeanResolver, BeanResolver.Handler {
             }
 
             @Override
-            public @Nullable java.lang.reflect.Method getGetter() {
+            public @Nullable Method getGetter() {
                 return base.getGetter();
             }
 
             @Override
-            public @Nullable java.lang.reflect.Method getSetter() {
+            public @Nullable Method getSetter() {
                 return base.getSetter();
             }
 
@@ -292,7 +293,7 @@ final class BeanResolverImpl implements BeanResolver, BeanResolver.Handler {
             }
 
             @Override
-            public java.lang.reflect.Method getMethod() {
+            public Method getMethod() {
                 return base.getMethod();
             }
 

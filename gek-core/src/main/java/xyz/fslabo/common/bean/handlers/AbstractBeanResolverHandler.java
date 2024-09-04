@@ -60,8 +60,6 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
                 mergeAccessors(context, getters, setters, rawType);
             }
             return null;
-        } catch (BeanResolvingException e) {
-            throw e;
         } catch (Exception e) {
             throw new BeanResolvingException(type, e);
         }

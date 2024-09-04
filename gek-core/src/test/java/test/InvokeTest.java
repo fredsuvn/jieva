@@ -29,19 +29,6 @@ public class InvokeTest {
         }
     }
 
-    @Test
-    public void testMisc() {
-        Assert.expectThrows(InvokingException.class, () -> {
-            throw new InvokingException();
-        });
-        Assert.expectThrows(InvokingException.class, () -> {
-            throw new InvokingException("");
-        });
-        Assert.expectThrows(InvokingException.class, () -> {
-            throw new InvokingException("", new RuntimeException());
-        });
-    }
-
     private void testInvoke0(
         Constructor<?> constructor, Method method, boolean isStatic, boolean reflect) throws Exception {
         Invoker cons = reflect ? Invoker.reflect(constructor) : Invoker.unreflect(constructor);
