@@ -7,8 +7,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * {@link BeanResolver.Handler} for non-prefix style, of which getters' and setters' names are themselves.
- * For example:
+ * {@link BeanResolver.Handler} for non-prefix style, of which getters' and setters' names are themselves. For example:
  * <pre>
  *     // Getter of "foo"
  *     someData.foo();

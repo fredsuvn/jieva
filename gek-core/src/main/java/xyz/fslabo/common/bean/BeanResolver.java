@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Resolver for {@link BeanInfo}, usually consists of a {@link Handler} list.
- * There are 3 built-in resolvers:
+ * Resolver for {@link BeanInfo}, usually consists of a {@link Handler} list. There are 3 built-in resolvers:
  * <ul>
  *     <li>{@link JavaBeanResolverHandler} (default handler);</li>
  *     <li>{@link NonGetterPrefixResolverHandler};</li>
@@ -175,8 +174,8 @@ public interface BeanResolver {
         /**
          * Returns properties map in current resolving context.
          * <p>
-         * The map through whole resolving process, store and share all base property info for all handlers.
-         * Each handler can add or remove or modify base property info which is resolved by previous handlers in this map.
+         * The map through whole resolving process, store and share all base property info for all handlers. Each
+         * handler can add or remove or modify base property info which is resolved by previous handlers in this map.
          *
          * @return properties map in current resolving context
          */
@@ -185,8 +184,8 @@ public interface BeanResolver {
         /**
          * Returns methods list in current resolving context.
          * <p>
-         * The list through whole resolving process, store and share all base method info for all handlers.
-         * Each handler can add or remove or modify base method info which is resolved by previous handlers in this list.
+         * The list through whole resolving process, store and share all base method info for all handlers. Each handler
+         * can add or remove or modify base method info which is resolved by previous handlers in this list.
          *
          * @return methods map in current resolving context
          */

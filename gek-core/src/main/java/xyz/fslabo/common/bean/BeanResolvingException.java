@@ -49,7 +49,7 @@ public class BeanResolvingException extends BeanException {
      * @param type bean type
      */
     public BeanResolvingException(Type type) {
-        this("Failed to resolve bean " + type.getTypeName() + ".");
+        this("Failed to resolve type to bean: " + type.getTypeName() + ".");
     }
 
     /**
@@ -59,6 +59,6 @@ public class BeanResolvingException extends BeanException {
      * @param cause exception cause
      */
     public BeanResolvingException(Type type, Throwable cause) {
-        this("Failed to resolve bean " + type.getTypeName() + "[" + type.getClass().getName() + "].", cause);
+        this("Failed to resolve type to bean: " + type.getTypeName() + "[" + type.getClass().getName() + "].", cause);
     }
 }

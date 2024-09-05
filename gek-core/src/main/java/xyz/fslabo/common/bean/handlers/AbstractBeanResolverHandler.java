@@ -34,7 +34,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         try {
             Class<?> rawType = JieReflect.getRawType(type);
             if (rawType == null) {
-                throw new BeanResolvingException("The type to be resolved must be Class or ParameterizedType: " + type + ".");
+                throw new BeanResolvingException("Not a Class or ParameterizedType: " + type + ".");
             }
             Method[] methods = rawType.getMethods();
             Map<String, Method> getters = new LinkedHashMap<>();

@@ -70,13 +70,18 @@ public class BeanTest {
                 , "class", JieType.parameterized(Class.class, new Type[]{JieType.questionMark()})
                 , "c1", Short.class
                 , "bb", boolean.class
-                , "bb2", Boolean.class)
+                , "bb2", Boolean.class
+                , "bb3", Boolean.class)
         );
-        Set<Method> mSet = new HashSet<>(new ArrayList<>(TestUtil.getMethods(Inner.class)));
+        Set<Method> mSet = new HashSet<>(Arrays.asList(Inner.class.getMethods()));
         mSet.removeIf(m ->
-            (((m.getName().startsWith("get") || m.getName().startsWith("set")) && m.getName().length() > 3)
-                || (m.getName().startsWith("is") && m.getName().length() > 2))
-                && (!m.getName().equals("gett") && !m.getName().equals("sett") && !m.getName().equals("iss") && !m.getName().equals("getMm") && !m.getName().equals("setMm")));
+            (
+                ((m.getName().startsWith("get") || m.getName().startsWith("set")) && m.getName().length() > 3)
+                    || (m.getName().startsWith("is") && m.getName().length() > 2)
+            ) && (
+                !Arrays.asList("gett", "sett", "iss", "isss", "getMm", "setMm", "gettAa", "issAa", "settAa").contains(m.getName())
+            )
+        );
         Assert.assertEquals(
             JieColl.addAll(new HashSet<>(), b1.getMethods(), BaseMethodInfo::getMethod),
             mSet
@@ -97,8 +102,24 @@ public class BeanTest {
                 , "class", JieType.parameterized(Class.class, new Type[]{JieType.questionMark()})
                 , "c1", Inner.class.getTypeParameters()[0]
                 , "bb", boolean.class
-                , "bb2", Boolean.class)
+                , "bb2", Boolean.class
+                , "bb3", Boolean.class)
         );
+
+        BeanInfo bo1 = BeanInfo.get(Object.class);
+        Assert.assertEquals(bo1.getProperties().size(), 1);
+        BeanInfo bo2 = BeanResolver.withHandlers(new NonPrefixResolverHandler()).resolve(Object.class);
+        Assert.assertEquals(bo2.getProperties().size(), 0);
+        Assert.assertNotNull(bo1.getProperty("class"));
+        BeanInfo bc = BeanInfo.get(InnerSuperChild.class);
+        PropertyInfo pc = bc.getProperty("c1");
+        Assert.assertEquals(pc.getType(), String.class);
+        BeanInfo bs3 = BeanResolver.withHandlers(new NonPrefixResolverHandler()).resolve(Simple3.class);
+        PropertyInfo ps3 = bs3.getProperty("c1");
+        Assert.assertEquals(ps3.getType(), String.class);
+        BeanInfo s1 = BeanResolver.withHandlers(new NonGetterPrefixResolverHandler()).resolve(Simple1.class);
+        Assert.assertEquals(s1.getProperties().size(), 1);
+        Assert.assertNotNull(s1.getProperty("aa"));
     }
 
     @Test
@@ -171,7 +192,7 @@ public class BeanTest {
         Assert.assertEquals(p2.getGetter(), Inner.class.getMethod("getFfFf2"));
         Assert.assertEquals(p2.getSetter(), Inner.class.getMethod("setFfFf2", Object.class));
         Assert.assertEquals(p2.getField(), Inner.class.getDeclaredField("ffFf2"));
-        Assert.assertEquals(c1.getField(), InnerChild.class.getDeclaredField("c1"));
+        Assert.assertEquals(c1.getField(), InnerSuper.class.getDeclaredField("c1"));
         Assert.assertFalse(p1.equals(c1));
         Assert.assertNull(p1.getAnnotation(NonNull.class));
 
@@ -318,7 +339,7 @@ public class BeanTest {
         }
     }
 
-    public static class Inner<T1, T2> extends InnerChild<T1> {
+    public static class Inner<T1, T2> extends InnerSuper<T1> {
         private String ffFf1;
         @Getter
         @Setter
@@ -336,6 +357,8 @@ public class BeanTest {
         @Getter
         @Setter
         private Boolean bb2;
+        @Setter
+        private Boolean bb3;
 
         @Nullable
         public T1 m1() {
@@ -350,6 +373,10 @@ public class BeanTest {
         @Nullable
         public void setFfFf4(List<String> ffFf4) {
             this.ffFf4 = ffFf4;
+        }
+
+        public Boolean isBb3() {
+            return bb3;
         }
 
         public String get() {
@@ -377,6 +404,10 @@ public class BeanTest {
             return false;
         }
 
+        public String isss() {
+            return null;
+        }
+
         public String getMm() {
             return null;
         }
@@ -384,12 +415,38 @@ public class BeanTest {
         public void setMm(int mm) {
             //
         }
+
+        public String gettAa() {
+            return null;
+        }
+
+        public String issAa() {
+            return null;
+        }
+
+        public void settAa(String aa) {
+        }
     }
 
     @Data
-    public static class InnerChild<C> {
+    public static class InnerSuper<C> {
         @Nullable
         private C c1;
+    }
+
+    public static class InnerSuperChild extends InnerSuper<String> {
+        @Override
+        public @Nullable String getC1() {
+            return super.getC1();
+        }
+
+        @Override
+        public void setC1(@Nullable String c1) {
+            super.setC1(c1);
+        }
+
+        public void setC2(String c2) {
+        }
     }
 
     public static class Simple1 {
@@ -411,6 +468,9 @@ public class BeanTest {
 
         public void sett(Object obj) {
         }
+
+        public void settAa(Object aa) {
+        }
     }
 
     public static class Simple2 {
@@ -426,6 +486,11 @@ public class BeanTest {
 
         public void aa(String aa, String bb) {
             this.aa = aa;
+        }
+    }
+
+    public static class Simple3 {
+        public void c1(String c1) {
         }
     }
 }

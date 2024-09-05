@@ -60,8 +60,8 @@ public interface Invoker {
      * Invokes with specified object and arguments.
      * <p>
      * If this invoker references a {@link Method} or {@link Constructor}, this method and usage of its parameters are
-     * equivalent to {@link Method#invoke(Object, Object...)} and {@link Constructor#newInstance(Object...)}.
-     * Otherwise, usage of the parameters is up to the implementation.
+     * equivalent to {@link Method#invoke(Object, Object...)} and {@link Constructor#newInstance(Object...)}. Otherwise,
+     * usage of the parameters is up to the implementation.
      *
      * @param obj  specified object
      * @param args specified arguments

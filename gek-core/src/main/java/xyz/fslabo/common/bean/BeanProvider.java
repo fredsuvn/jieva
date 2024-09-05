@@ -12,8 +12,7 @@ import java.lang.reflect.Type;
 public interface BeanProvider {
 
     /**
-     * Returns default bean provider.
-     * Note the default provider has a cache to cache resolved bean info.
+     * Returns default bean provider. Note the default provider has a cache to cache resolved bean info.
      *
      * @return default bean provider
      */
