@@ -1,11 +1,13 @@
 package xyz.fslabo.common.invoke;
 
+import xyz.fslabo.common.base.JieException;
+
 /**
  * Exception for invocation.
  *
  * @author fredsuvn
  */
-public class InvokingException extends RuntimeException {
+public class InvokingException extends JieException {
 
     /**
      * Empty constructor.

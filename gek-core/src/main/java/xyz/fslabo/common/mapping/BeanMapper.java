@@ -57,6 +57,25 @@ public interface BeanMapper {
         return copyProperties(source, source.getClass(), dest, dest.getClass(), options);
     }
 
+
+    /**
+     * Copies properties from source object to dest object, then returns dest object. Thie method is equivalent to
+     * ({@link #copyProperties(Object, Type, Object, Type, MappingOptions)}):
+     * <pre>
+     *     return copyProperties(source, sourceType, dest, destType, MappingOptions.defaultOptions());
+     * </pre>
+     *
+     * @param source     source object
+     * @param sourceType type of source object
+     * @param dest       dest object
+     * @param destType   type of dest object
+     * @param <T>        type of dest object
+     * @throws MappingException exception when copying
+     */
+    default <T> T copyProperties(Object source, Type sourceType, T dest, Type destType) throws MappingException {
+        return copyProperties(source, sourceType, dest, destType, MappingOptions.defaultOptions());
+    }
+
     /**
      * Copies properties from source object to dest object, then returns dest object.
      * <p>

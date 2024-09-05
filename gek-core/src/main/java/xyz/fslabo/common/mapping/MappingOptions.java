@@ -125,6 +125,16 @@ public class MappingOptions {
     private boolean putNew = true;
 
     /**
+     * Whether ignores {@code class} property when mapping.
+     * <p>
+     * Note the {@code class} property exists in all object (from {@link Object#getClass()}).
+     * <p>
+     * Default is true.
+     */
+    @Builder.Default
+    private boolean ignoreClass = true;
+
+    /**
      * Copy level option. This option determines whether a new instance must be created during the mapping process,
      * similar to shallow copy and deep copy. Here are levels:
      * <ul>

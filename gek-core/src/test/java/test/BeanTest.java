@@ -80,6 +80,19 @@ public class BeanTest {
             b1.getType(), new TypeRef<Inner<Short, Long>>() {
             }.getType()
         );
+
+        BeanInfo b3 = BeanInfo.get(Inner.class);
+        Assert.assertEquals(
+            JieColl.addAll(new HashMap<>(), b3.getProperties(), k -> k, BasePropertyInfo::getType),
+            JieColl.addAll(new HashMap<>(), "ffFf1", String.class
+                , "ffFf2", Inner.class.getTypeParameters()[0]
+                , "ffFf3", Inner.class.getTypeParameters()[1]
+                , "ffFf4", JieType.parameterized(List.class, new Type[]{String.class})
+                , "ffFf5", JieType.array(JieType.parameterized(List.class, new Type[]{String.class}))
+                , "class", JieType.parameterized(Class.class, new Type[]{JieType.questionMark()})
+                , "c1", Inner.class.getTypeParameters()[0]
+                , "bb", boolean.class)
+        );
     }
 
     @Test

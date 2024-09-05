@@ -11,10 +11,7 @@ import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 
 final class BeanMapperImpl implements BeanMapper {
@@ -128,8 +125,12 @@ final class BeanMapperImpl implements BeanMapper {
         BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.orDefault(options.getNameMapper(), (o1, o2) -> o1);
         Mapper mapper = Jie.orDefault(options.getMapper(), Mapper.defaultMapper());
         boolean ignoreError = options.isIgnoreError();
+        boolean ignoreClass = options.isIgnoreClass();
         sourceProperties.forEach((name, property) -> {
             if (ignored.contains(name) || !property.isReadable()) {
+                return;
+            }
+            if (ignoreClass && Objects.equals(name, "class")) {
                 return;
             }
             Object sourceValue = property.getValue(source);
@@ -159,8 +160,12 @@ final class BeanMapperImpl implements BeanMapper {
         BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.orDefault(options.getNameMapper(), (o1, o2) -> o1);
         Mapper mapper = Jie.orDefault(options.getMapper(), Mapper.defaultMapper());
         boolean ignoreError = options.isIgnoreError();
+        boolean ignoreClass = options.isIgnoreClass();
         sourceProperties.forEach((name, property) -> {
             if (ignored.contains(name) || !property.isReadable()) {
+                return;
+            }
+            if (ignoreClass && Objects.equals(name, "class")) {
                 return;
             }
             Object sourceValue = property.getValue(source);

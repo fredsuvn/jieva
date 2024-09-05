@@ -1,11 +1,13 @@
 package xyz.fslabo.common.bean;
 
+import xyz.fslabo.common.base.JieException;
+
 /**
  * Exception for bean.
  *
  * @author fredsuvn
  */
-public class BeanException extends RuntimeException {
+public class BeanException extends JieException {
 
     /**
      * Empty constructor.

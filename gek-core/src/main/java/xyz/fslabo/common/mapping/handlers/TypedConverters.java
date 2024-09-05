@@ -5,6 +5,7 @@ import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieDate;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.mapping.MappingException;
@@ -381,11 +382,19 @@ public class TypedConverters {
 
             @Override
             public int intValue() {
+                if (JieString.indexOf(string, ".") > 0) {
+                    double d = Double.parseDouble(string.toString());
+                    return (int) d;
+                }
                 return Integer.parseInt(string.toString());
             }
 
             @Override
             public long longValue() {
+                if (JieString.indexOf(string, ".") > 0) {
+                    double d = Double.parseDouble(string.toString());
+                    return (long) d;
+                }
                 return Long.parseLong(string.toString());
             }
 
