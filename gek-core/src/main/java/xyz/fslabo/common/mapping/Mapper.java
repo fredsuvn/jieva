@@ -11,6 +11,7 @@ import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,6 +41,16 @@ public interface Mapper {
      */
     static Mapper defaultMapper() {
         return MapperImpl.DEFAULT_MAPPER;
+    }
+
+    /**
+     * Returns new {@link Mapper} with given handlers.
+     *
+     * @param handlers given handlers
+     * @return new {@link Mapper}
+     */
+    static Mapper newMapper(Handler... handlers) {
+        return newMapper(Arrays.asList(handlers));
     }
 
     /**
