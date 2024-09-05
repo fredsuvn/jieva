@@ -36,8 +36,6 @@ final class BeanMapperImpl implements BeanMapper {
                     beanToBean(source, sourceType, dest, destType, options);
                 }
             }
-        } catch (MappingException e) {
-            throw e;
         } catch (Exception e) {
             throw new MappingException(e);
         }
@@ -219,25 +217,20 @@ final class BeanMapperImpl implements BeanMapper {
         Object destValue;
         try {
             destValue = mapper.map(sourceValue, sourceValueType, destValueType, options);
-            if (destValue == null) {
-                if (ignoreError) {
-                    return;
-                }
-                throw new MappingException(sourceValue, sourceValueType, destValueType);
-            }
-            if (destValue instanceof Val) {
-                destValue = ((Val<?>) destValue).get();
-            }
-        } catch (MappingException e) {
-            if (ignoreError) {
-                return;
-            }
-            throw e;
         } catch (Exception e) {
             if (ignoreError) {
                 return;
             }
             throw new MappingException(e);
+        }
+        if (destValue == null) {
+            if (ignoreError) {
+                return;
+            }
+            throw new MappingException(sourceValue, sourceValueType, destValueType);
+        }
+        if (destValue instanceof Val) {
+            destValue = ((Val<?>) destValue).get();
         }
         if (destValue == null) {
             if (options.isIgnoreNull()) {
@@ -277,25 +270,20 @@ final class BeanMapperImpl implements BeanMapper {
         Object destValue;
         try {
             destValue = mapper.mapProperty(sourceValue, sourceValueType, destProperty.getType(), destProperty, options);
-            if (destValue == null) {
-                if (ignoreError) {
-                    return;
-                }
-                throw new MappingException(sourceValue, sourceValueType, destProperty.getType());
-            }
-            if (destValue instanceof Val) {
-                destValue = ((Val<?>) destValue).get();
-            }
-        } catch (MappingException e) {
-            if (ignoreError) {
-                return;
-            }
-            throw e;
         } catch (Exception e) {
             if (ignoreError) {
                 return;
             }
             throw new MappingException(e);
+        }
+        if (destValue == null) {
+            if (ignoreError) {
+                return;
+            }
+            throw new MappingException(sourceValue, sourceValueType, destProperty.getType());
+        }
+        if (destValue instanceof Val) {
+            destValue = ((Val<?>) destValue).get();
         }
         if (destValue == null) {
             if (options.isIgnoreNull()) {
@@ -312,25 +300,20 @@ final class BeanMapperImpl implements BeanMapper {
         Object destKey;
         try {
             destKey = mapper.map(mappedKey, sourceKeyType, destKeyType, options);
-            if (destKey == null) {
-                if (ignoreError) {
-                    return F.RETURN;
-                }
-                throw new MappingException(mappedKey, sourceKeyType, destKeyType);
-            }
-            if (destKey instanceof Val) {
-                destKey = ((Val<?>) destKey).get();
-            }
-        } catch (MappingException e) {
-            if (ignoreError) {
-                return F.RETURN;
-            }
-            throw e;
         } catch (Exception e) {
             if (ignoreError) {
                 return F.RETURN;
             }
             throw new MappingException(e);
+        }
+        if (destKey == null) {
+            if (ignoreError) {
+                return F.RETURN;
+            }
+            throw new MappingException(mappedKey, sourceKeyType, destKeyType);
+        }
+        if (destKey instanceof Val) {
+            destKey = ((Val<?>) destKey).get();
         }
         if (destKey == null) {
             if (options.isIgnoreNull()) {

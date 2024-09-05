@@ -48,7 +48,7 @@ public class GekHttpHeaders {
      */
     public static GekHttpHeaders of(String... keyValues) {
         GekHttpHeaders headers = new GekHttpHeaders();
-        headers.addHeaders(Jie.newMap(keyValues));
+        headers.addHeaders(Jie.linkedHashMap(keyValues));
         return headers;
     }
 

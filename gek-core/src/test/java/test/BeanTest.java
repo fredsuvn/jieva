@@ -7,6 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.*;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonPrefixResolverHandler;
@@ -58,7 +59,7 @@ public class BeanTest {
         Assert.assertFalse(b1.equals(""));
         Assert.assertEquals(
             JieColl.addAll(new HashMap<>(), b1.getProperties(), k -> k, BasePropertyInfo::getType),
-            JieColl.addAll(new HashMap<>(), "ffFf1", String.class
+            Jie.hashMap("ffFf1", String.class
                 , "ffFf2", Short.class
                 , "ffFf3", Long.class
                 , "ffFf4", JieType.parameterized(List.class, new Type[]{String.class})
@@ -84,7 +85,7 @@ public class BeanTest {
         BeanInfo b3 = BeanInfo.get(Inner.class);
         Assert.assertEquals(
             JieColl.addAll(new HashMap<>(), b3.getProperties(), k -> k, BasePropertyInfo::getType),
-            JieColl.addAll(new HashMap<>(), "ffFf1", String.class
+            Jie.hashMap("ffFf1", String.class
                 , "ffFf2", Inner.class.getTypeParameters()[0]
                 , "ffFf3", Inner.class.getTypeParameters()[1]
                 , "ffFf4", JieType.parameterized(List.class, new Type[]{String.class})

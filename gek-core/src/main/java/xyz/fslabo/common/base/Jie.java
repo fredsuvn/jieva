@@ -620,8 +620,32 @@ public class Jie {
      * @return a new {@link ArrayList} and add all given elements
      */
     @SafeVarargs
-    public static <T> ArrayList<T> newList(T... elements) {
+    public static <T> ArrayList<T> arrayList(T... elements) {
         return JieColl.addAll(new ArrayList<>(elements.length), elements);
+    }
+
+    /**
+     * Returns a new {@link LinkedList} and add all given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return a new {@link LinkedList} and add all given elements
+     */
+    @SafeVarargs
+    public static <T> LinkedList<T> linkedList(T... elements) {
+        return JieColl.addAll(new LinkedList<>(), elements);
+    }
+
+    /**
+     * Returns a new {@link HashSet} and add all given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return a new {@link HashSet} and add all given elements
+     */
+    @SafeVarargs
+    public static <T> HashSet<T> hashSet(T... elements) {
+        return JieColl.addAll(new HashSet<>(elements.length), elements);
     }
 
     /**
@@ -632,8 +656,26 @@ public class Jie {
      * @return a new {@link LinkedHashSet} and add all given elements
      */
     @SafeVarargs
-    public static <T> LinkedHashSet<T> newSet(T... elements) {
+    public static <T> LinkedHashSet<T> linkedHashSet(T... elements) {
         return JieColl.addAll(new LinkedHashSet<>(elements.length), elements);
+    }
+
+    /**
+     * Returns a new {@link HashMap} and add all given elements.
+     * <p>
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
+     * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param elements given elements
+     * @param <K>      type of keys
+     * @param <V>      type of values
+     * @param <T>      type of element
+     * @return a new {@link HashMap} and add all given elements
+     * @see JieColl#toMap(Object...)
+     */
+    @SafeVarargs
+    public static <K, V, T> HashMap<K, V> hashMap(T... elements) {
+        return JieColl.addAll(new HashMap<>(), elements);
     }
 
     /**
@@ -650,7 +692,7 @@ public class Jie {
      * @see JieColl#toMap(Object...)
      */
     @SafeVarargs
-    public static <K, V, T> LinkedHashMap<K, V> newMap(T... elements) {
+    public static <K, V, T> LinkedHashMap<K, V> linkedHashMap(T... elements) {
         return JieColl.addAll(new LinkedHashMap<>(), elements);
     }
 
