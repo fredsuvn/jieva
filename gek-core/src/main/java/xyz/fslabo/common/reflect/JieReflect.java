@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  */
 public class JieReflect {
 
-    private static final Type[] SINGLETON_OBJECT_CLASS_ARRAY = {Object.class};
     private static final Cache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = Cache.softCache();
 
     /**
@@ -41,8 +40,8 @@ public class JieReflect {
     }
 
     /**
-     * Returns raw type of given type, the given type must be a Class or ParameterizedType.
-     * Returns null if given type neither be Class nor ParameterizedType.
+     * Returns raw type of given type, the given type must be a Class or ParameterizedType. Returns null if given type
+     * neither be Class nor ParameterizedType.
      *
      * @param type given type
      * @return raw type of given type or null
@@ -59,8 +58,8 @@ public class JieReflect {
     }
 
     /**
-     * Returns first upper bound type of given wildcard type (? extends).
-     * Note that if no upper bound is explicitly declared, return {@code Object.class}.
+     * Returns first upper bound type of given wildcard type (? extends). Note that if no upper bound is explicitly
+     * declared, return {@code Object.class}.
      *
      * @param type given wildcard type
      * @return first upper bound type of given wildcard type
@@ -74,8 +73,7 @@ public class JieReflect {
     }
 
     /**
-     * Returns first lower bound type of given wildcard type (? super).
-     * If given type has no lower bound, return null.
+     * Returns first lower bound type of given wildcard type (? super). If given type has no lower bound, return null.
      *
      * @param type given wildcard type
      * @return first lower bound type of given wildcard type or null
@@ -90,8 +88,8 @@ public class JieReflect {
     }
 
     /**
-     * Returns first bound type of given type variable (T extends).
-     * Note that if no upper bound is explicitly declared, return {@code Object.class}.
+     * Returns first bound type of given type variable (T extends). Note that if no upper bound is explicitly declared,
+     * return {@code Object.class}.
      *
      * @param type given type variable
      * @return first upper bound type of given type variable
@@ -396,7 +394,7 @@ public class JieReflect {
         } else if (Objects.equals(double.class, componentType)) {
             name = "[D";
         } else if (Objects.equals(void.class, componentType)) {
-            //name = "[V";
+            // name = "[V";
             throw new IllegalArgumentException("Class doesn't exists: void[].");
         } else {
             name = "[L" + componentType.getName() + ";";
@@ -483,9 +481,9 @@ public class JieReflect {
     }
 
     /**
-     * Returns whether a type can be assigned by another type.
-     * This method is {@link Type} version of {@link Class#isAssignableFrom(Class)}, supporting {@link Class},
-     * {@link ParameterizedType}, {@link WildcardType}, {@link TypeVariable} and {@link GenericArrayType}.
+     * Returns whether a type can be assigned by another type. This method is {@link Type} version of
+     * {@link Class#isAssignableFrom(Class)}, supporting {@link Class}, {@link ParameterizedType}, {@link WildcardType},
+     * {@link TypeVariable} and {@link GenericArrayType}.
      *
      * @param assigned the type to be assigned
      * @param assignee the assignee type

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.fslabo.annotations.NonNull;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
 import xyz.fslabo.common.base.Jie;
@@ -57,6 +58,8 @@ public class BeanTest {
         Assert.assertTrue(b1.equals(b1));
         Assert.assertFalse(b1.equals(null));
         Assert.assertFalse(b1.equals(""));
+        Assert.assertFalse(b1.equals(BeanInfo.get(new TypeRef<Inner<Long, Long>>() {
+        }.getType())));
         Assert.assertEquals(
             JieColl.addAll(new HashMap<>(), b1.getProperties(), k -> k, BasePropertyInfo::getType),
             Jie.hashMap("ffFf1", String.class
@@ -66,16 +69,17 @@ public class BeanTest {
                 , "ffFf5", JieType.array(JieType.parameterized(List.class, new Type[]{String.class}))
                 , "class", JieType.parameterized(Class.class, new Type[]{JieType.questionMark()})
                 , "c1", Short.class
-                , "bb", boolean.class)
+                , "bb", boolean.class
+                , "bb2", Boolean.class)
         );
-        List<Method> mList = new ArrayList<>(TestUtil.getMethods(Inner.class));
-        mList.removeIf(m ->
+        Set<Method> mSet = new HashSet<>(new ArrayList<>(TestUtil.getMethods(Inner.class)));
+        mSet.removeIf(m ->
             (((m.getName().startsWith("get") || m.getName().startsWith("set")) && m.getName().length() > 3)
                 || (m.getName().startsWith("is") && m.getName().length() > 2))
-                && (!m.getName().equals("gett") && !m.getName().equals("sett") && !m.getName().equals("iss")));
+                && (!m.getName().equals("gett") && !m.getName().equals("sett") && !m.getName().equals("iss") && !m.getName().equals("getMm") && !m.getName().equals("setMm")));
         Assert.assertEquals(
-            JieColl.addAll(new ArrayList<>(), b1.getMethods(), BaseMethodInfo::getMethod),
-            mList
+            JieColl.addAll(new HashSet<>(), b1.getMethods(), BaseMethodInfo::getMethod),
+            mSet
         );
         Assert.assertEquals(
             b1.getType(), new TypeRef<Inner<Short, Long>>() {
@@ -92,7 +96,8 @@ public class BeanTest {
                 , "ffFf5", JieType.array(JieType.parameterized(List.class, new Type[]{String.class}))
                 , "class", JieType.parameterized(Class.class, new Type[]{JieType.questionMark()})
                 , "c1", Inner.class.getTypeParameters()[0]
-                , "bb", boolean.class)
+                , "bb", boolean.class
+                , "bb2", Boolean.class)
         );
     }
 
@@ -167,6 +172,8 @@ public class BeanTest {
         Assert.assertEquals(p2.getSetter(), Inner.class.getMethod("setFfFf2", Object.class));
         Assert.assertEquals(p2.getField(), Inner.class.getDeclaredField("ffFf2"));
         Assert.assertEquals(c1.getField(), InnerChild.class.getDeclaredField("c1"));
+        Assert.assertFalse(p1.equals(c1));
+        Assert.assertNull(p1.getAnnotation(NonNull.class));
 
         Inner<Short, Long> inner = new Inner<>();
         inner.setFfFf2((short) 22);
@@ -178,6 +185,7 @@ public class BeanTest {
         Assert.expectThrows(BeanException.class, () -> p1.setValue(inner, 111));
         Assert.assertNull(b1.getMethod("m1", Object.class));
         Assert.assertNull(b1.getMethod("m11"));
+        Assert.assertFalse(m1.equals(b1.getMethod("get")));
     }
 
     @Test
@@ -224,10 +232,10 @@ public class BeanTest {
         Assert.assertEquals(h1.times, 6);
         Assert.assertEquals(h2.times, 3);
         Assert.assertEquals(h3.times, 4);
-        //h3 -> h1 -> h2
-        //h4 = h3 -> h1 -> h2
+        // h3 -> h1 -> h2
+        // h4 = h3 -> h1 -> h2
         BeanResolver.Handler h4 = r1.asHandler();
-        //h3 -> h1 -> h2 -> h4
+        // h3 -> h1 -> h2 -> h4
         r1 = r1.addLastHandler(h4);
         b1 = r1.resolve(Inner.class);
         Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
@@ -236,7 +244,7 @@ public class BeanTest {
         Assert.assertEquals(h2.times, 5);
         Assert.assertEquals(h3.times, 6);
         BreakHandler h5 = new BreakHandler();
-        //h5 -> h3 -> h1 -> h2 -> h4
+        // h5 -> h3 -> h1 -> h2 -> h4
         r1 = r1.addFirstHandler(h5);
         b1 = r1.resolve(Inner.class);
         Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
@@ -246,7 +254,7 @@ public class BeanTest {
         Assert.assertEquals(h3.times, 6);
 
         BeanResolver r4 = (BeanResolver) h4;
-        //h5 -> h4
+        // h5 -> h4
         r4 = r4.addFirstHandler(h5);
         h4 = r4.asHandler();
         BeanResolver r5 = BeanResolver.withHandlers(h4);
@@ -258,7 +266,7 @@ public class BeanTest {
         Assert.assertEquals(h3.times, 6);
 
         ThrowHandler h6 = new ThrowHandler();
-        //h6 -> h5 -> h4
+        // h6 -> h5 -> h4
         BeanResolver r6 = r5.addFirstHandler(h6);
         Assert.expectThrows(BeanResolvingException.class, () -> r6.resolve(Inner.class));
     }
@@ -325,6 +333,9 @@ public class BeanTest {
         @Getter
         @Setter
         private boolean bb;
+        @Getter
+        @Setter
+        private Boolean bb2;
 
         @Nullable
         public T1 m1() {
@@ -364,6 +375,14 @@ public class BeanTest {
 
         public boolean iss() {
             return false;
+        }
+
+        public String getMm() {
+            return null;
+        }
+
+        public void setMm(int mm) {
+            //
         }
     }
 

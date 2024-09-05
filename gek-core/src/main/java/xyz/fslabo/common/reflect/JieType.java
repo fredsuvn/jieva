@@ -201,14 +201,14 @@ public class JieType {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             if (ownerType != null) {
-                //test.A<T>
+                // test.A<T>
                 sb.append(ownerType.getTypeName());
-                //test.A<T>$
+                // test.A<T>$
                 sb.append("$");
-                //test.A<T>$B
+                // test.A<T>$B
                 sb.append(rawType.getSimpleName());
             } else {
-                //test.B
+                // test.B
                 sb.append(rawType.getName());
             }
             if (JieArray.isNotEmpty(actualTypeArguments)) {

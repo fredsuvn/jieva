@@ -16,14 +16,13 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 /**
- * Base abstract gek bean resolving handler, provides a skeletal implementation of the {@link BeanResolver.Handler}
- * to minimize the effort required to implement the interface backed by "method-based" getters/setters.
+ * Base abstract gek bean resolving handler, provides a skeletal implementation of the {@link BeanResolver.Handler} to
+ * minimize the effort required to implement the interface backed by "method-based" getters/setters.
  * <p>
  * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
  * {@link #resolveGetter(Method)} and {@link #resolveSetter(Method)} method to determine whether it is a getter/setter.
- * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link MethodInfo}.
- * Subtypes can use {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create
- * getter/setter.
+ * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link MethodInfo}. Subtypes
+ * can use {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create getter/setter.
  *
  * @author fredsuvn
  */
@@ -40,6 +39,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
             Method[] methods = rawType.getMethods();
             Map<String, Method> getters = new LinkedHashMap<>();
             Map<String, Method> setters = new LinkedHashMap<>();
+            List<Method> extraMethods = new LinkedList<>();
             for (Method method : methods) {
                 if (method.isBridge()) {
                     continue;
@@ -57,7 +57,12 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
                 context.getMethods().add(new BaseMethodInfoImpl(method));
             }
             if (JieColl.isNotEmpty(getters) || JieColl.isNotEmpty(setters)) {
-                mergeAccessors(context, getters, setters, rawType);
+                mergeAccessors(context, getters, setters, rawType, extraMethods);
+            }
+            if (JieColl.isNotEmpty(extraMethods)) {
+                for (Method extraMethod : extraMethods) {
+                    context.getMethods().add(new BaseMethodInfoImpl(extraMethod));
+                }
             }
             return null;
         } catch (Exception e) {
@@ -66,7 +71,12 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
     }
 
     private void mergeAccessors(
-        BeanResolver.Context context, Map<String, Method> getters, Map<String, Method> setters, Class<?> rawType) {
+        BeanResolver.Context context,
+        Map<String, Method> getters,
+        Map<String, Method> setters,
+        Class<?> rawType,
+        List<Method> extraMethods
+    ) {
         Map<TypeVariable<?>, Type> typeParameterMapping = JieReflect.getTypeParameterMapping(context.getType());
         Set<Type> stack = new HashSet<>();
         getters.forEach((name, getter) -> {
@@ -81,6 +91,9 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
                 setType = getActualType(setType, typeParameterMapping, stack);
                 if (!Objects.equals(returnType, setType)) {
                     // Different returned type and set type.
+                    setters.remove(name);
+                    extraMethods.add(getter);
+                    extraMethods.add(setter);
                     return;
                 }
             }

@@ -32,8 +32,7 @@ public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
         Class<?> returnType = method.getReturnType();
         boolean isGetter = false;
         // getXxx
-        if (methodName.length() > 3 && methodName.startsWith("get")
-            && !Objects.equals(returnType, boolean.class) && !Objects.equals(returnType, Boolean.class)) {
+        if (methodName.length() > 3 && methodName.startsWith("get")) {
             isGetter = true;
         }
         // isXxx

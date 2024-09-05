@@ -416,6 +416,10 @@ public class ReflectTest {
         }
         TestRef2 testRef2 = new TestRef2();
         Assert.assertEquals(testRef2.getType(), String.class);
+        class TestRef3<T> extends TypeRef<T> {
+        }
+        Assert.assertEquals(new TestRef3<String>() {
+        }.getType(), String.class);
     }
 
     @Test
@@ -448,6 +452,20 @@ public class ReflectTest {
         Assert.assertEquals(p2.hashCode(), new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {
         }.getType().hashCode());
         Assert.assertEquals(JieType.parameterized(List.class, new Type[]{}).toString(), List.class.getName());
+        Assert.assertFalse(
+            JieType.parameterized(List.class, new Type[]{String.class}, List.class).equals(
+                JieType.parameterized(List.class, new Type[]{String.class}))
+        );
+        Assert.assertFalse(
+            JieType.parameterized(List.class, new Type[]{String.class}, List.class).equals(
+                new TypeRef<List<String>>() {
+                }.getType()
+            ));
+        Assert.assertFalse(
+            JieType.parameterized(List.class, new Type[]{String.class}, List.class).equals(
+                new TypeRef<ArrayList<String>>() {
+                }.getType()
+            ));
 
         WildcardType w1 = JieType.upperBound(String.class);
         Assert.assertEquals(w1, new TypeRef<List<? extends String>>() {
@@ -478,6 +496,8 @@ public class ReflectTest {
         Assert.assertEquals(w5.toString(), "? extends " + String.class.getName() + " & " + Integer.class.getName());
         WildcardType w6 = JieType.lowerBound(null);
         Assert.assertEquals(w6.toString(), "? super java.lang.Object");
+        Assert.assertFalse(JieType.questionMark().equals(new TypeRef<List<? extends String>>() {
+        }.getParameterized().getActualTypeArguments()[0]));
 
         GenericArrayType g1 = JieType.array(JieType.parameterized(List.class, new Type[]{String.class}));
         Assert.assertEquals(g1, new TypeRef<List<String>[]>() {

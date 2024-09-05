@@ -15,9 +15,8 @@ import java.util.stream.Collectors;
 public class JieBean {
 
     /**
-     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link BeanInfo}.
-     * This method uses result of {@link BeanInfo#getType()} to compare.
-     * The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link BeanInfo}. This method
+     * uses result of {@link BeanInfo#getType()} to compare. The code is similar to the following:
      * <pre>
      *     return Objects.equals(bean.getType(), other.getType());
      * </pre>
@@ -39,8 +38,8 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link PropertyInfo}.
-     * This method compares result of {@link Object#getClass()}, {@link PropertyInfo#getName()} and
+     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link PropertyInfo}. This
+     * method compares result of {@link Object#getClass()}, {@link PropertyInfo#getName()} and
      * {@link PropertyInfo#getOwner()}. The code is similar to the following:
      * <pre>
      *     return Objects.equals(info.getClass(), other.getClass())
@@ -66,9 +65,9 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link MethodInfo}.
-     * This method compares result of {@link Object#getClass()} and {@link MethodInfo#getMethod()}.
-     * The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#equals(Object)} for {@link MethodInfo}. This
+     * method compares result of {@link Object#getClass()} and {@link MethodInfo#getMethod()}. The code is similar to
+     * the following:
      * <pre>
      *     return Objects.equals(info.getMethod(), other.getMethod())
      *         && Objects.equals(info.getName(), other.getName());
@@ -92,9 +91,8 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link BeanInfo}.
-     * This method uses {@link Object#hashCode()} of {@link BeanInfo#getType()} to compute.
-     * The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link BeanInfo}. This method uses
+     * {@link Object#hashCode()} of {@link BeanInfo#getType()} to compute. The code is similar to the following:
      * <pre>
      *     return bean.getType().hashCode();
      * </pre>
@@ -108,9 +106,9 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link PropertyInfo}.
-     * This method uses {@link Object#hashCode()} of {@link PropertyInfo#getName()} to compute.
-     * The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link PropertyInfo}. This method
+     * uses {@link Object#hashCode()} of {@link PropertyInfo#getName()} to compute. The code is similar to the
+     * following:
      * <pre>
      *     return info.getName().hashCode();
      * </pre>
@@ -124,9 +122,9 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link MethodInfo}.
-     * This method uses {@link Object#hashCode()} of {@link MethodInfo#getMethod()} to compute.
-     * The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#hashCode()} for {@link MethodInfo}. This method
+     * uses {@link Object#hashCode()} of {@link MethodInfo#getMethod()} to compute. The code is similar to the
+     * following:
      * <pre>
      *     return info.getMethod().hashCode();
      * </pre>
@@ -140,8 +138,8 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#toString()} for {@link PropertyInfo}.
-     * The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#toString()} for {@link PropertyInfo}. The code is
+     * similar to the following:
      * <pre>
      *     return info.getOwner().getType().getTypeName() + "." + info.getName()
      *         + "[" + info.getType().getTypeName() + "]";
@@ -156,8 +154,8 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#toString()} for {@link MethodInfo}.
-     * The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#toString()} for {@link MethodInfo}. The code is
+     * similar to the following:
      * <pre>
      *     return info.getOwner().getType().getTypeName() + "." + info.getName()
      *         + "(" + Arrays.stream(info.getMethod().getGenericParameterTypes())
@@ -176,8 +174,8 @@ public class JieBean {
     }
 
     /**
-     * Utility method which is a simple implementing of {@link Object#toString()} for {@link BeanInfo}.
-     * The code is similar to the following:
+     * Utility method which is a simple implementing of {@link Object#toString()} for {@link BeanInfo}. The code is
+     * similar to the following:
      * <pre>
      *     return beanInfo.getType().getTypeName();
      * </pre>
