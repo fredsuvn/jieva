@@ -29,7 +29,7 @@ public class JieReflect {
         long.class, Long.class,
         float.class, Float.class,
         double.class, Double.class,
-        void.class, Void.class
+        void.class, Void.class,
     };
 
     private static final Cache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = Cache.softCache();

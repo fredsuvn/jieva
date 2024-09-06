@@ -129,7 +129,7 @@ public class JieSystem {
      */
     public static final String KEY_OF_FILE_ENCODING = "file.encoding";
 
-    //Add on JDK17:
+    // Add on JDK17:
     /**
      * Key of system property: native.encoding.
      */
@@ -487,9 +487,8 @@ public class JieSystem {
     /**
      * Gets java major version.
      * <p>
-     * If java version &lt;= 1.8, return second version number such as
-     * {@code 6} for {@code 1.6.x}, {@code 8} for {@code 1.8.x}.
-     * Else return first number such as {@code 9} for {@code 9.0}.
+     * If java version &lt;= 1.8, return second version number such as {@code 6} for {@code 1.6.x}, {@code 8} for
+     * {@code 1.8.x}. Else return first number such as {@code 9} for {@code 9.0}.
      * <p>
      * Return -1 if obtain failed.
      *
@@ -519,11 +518,11 @@ public class JieSystem {
     }
 
     /**
-     * Returns whether current JDK version &gt;= 9.
+     * Returns whether current JDK version &gt; 8 (exclusive).
      *
-     * @return whether current JDK version &gt;= 9
+     * @return whether current JDK version &gt; 8 (exclusive)
      */
-    public static boolean isJdk9OrHigher() {
-        return javaMajorVersion() >= 9;
+    public static boolean isJava8Higher() {
+        return javaMajorVersion() > 8;
     }
 }

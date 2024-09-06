@@ -4,6 +4,7 @@ import net.sf.cglib.proxy.*;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
+import xyz.fslabo.common.invoke.InvokingException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ final class CglibTypeProxy<T> implements TypeProxy<T> {
     private final Enhancer enhancer;
 
     CglibTypeProxy(
+        ClassLoader loader,
         @Nullable Class<?> superClass,
         @Nullable Iterable<Class<?>> superInterfaces,
         Map<Predicate<Method>, TypeProxyMethod> proxyMap
@@ -73,7 +75,7 @@ final class CglibTypeProxy<T> implements TypeProxy<T> {
                 try {
                     return proxy.invokeSuper(p, as);
                 } catch (Throwable e) {
-                    throw new TypeProxyException(e);
+                    throw new InvokingException(e);
                 }
             }, args);
         }
