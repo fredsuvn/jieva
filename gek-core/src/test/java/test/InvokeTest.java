@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 import xyz.fslabo.common.invoke.Invoker;
 import xyz.fslabo.common.invoke.InvokingException;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -44,6 +45,12 @@ public class InvokeTest {
         Assert.assertNotNull(invoker);
         Assert.assertEquals(
             invoker.invoke(isStatic ? null : tt, (Object[]) args),
+            buildString(method.getName(), args)
+        );
+        Invoker handle = Invoker.methodHandle(MethodHandles.lookup().unreflect(method), isStatic);
+        Assert.assertNotNull(handle);
+        Assert.assertEquals(
+            handle.invoke(isStatic ? null : tt, (Object[]) args),
             buildString(method.getName(), args)
         );
     }

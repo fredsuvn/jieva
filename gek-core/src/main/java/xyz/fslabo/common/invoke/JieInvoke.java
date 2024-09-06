@@ -3,83 +3,24 @@ package xyz.fslabo.common.invoke;
 import xyz.fslabo.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
-final class InvokerImpls {
+/**
+ * Utilities for invoking operation.
+ *
+ * @author fredsuvn
+ */
+public class JieInvoke {
 
-    static final class OfMethod implements Invoker {
-
-        private final Method method;
-
-        OfMethod(Method method) {
-            this.method = method;
-        }
-
-        @Override
-        public @Nullable Object invoke(@Nullable Object inst, Object... args) {
-            try {
-                return method.invoke(inst, args);
-            } catch (Exception e) {
-                throw new InvokingException(e);
-            }
-        }
-    }
-
-    static final class OfConstructor implements Invoker {
-
-        private final Constructor<?> constructor;
-
-        OfConstructor(Constructor<?> constructor) {
-            this.constructor = constructor;
-        }
-
-        @Override
-        public @Nullable Object invoke(@Nullable Object inst, Object... args) {
-            try {
-                return constructor.newInstance(args);
-            } catch (Exception e) {
-                throw new InvokingException(e);
-            }
-        }
-    }
-
-    static final class OfMethodHandle implements Invoker {
-
-        private final MethodHandle methodHandle;
-        private final boolean isStatic;
-
-        OfMethodHandle(Method method) {
-            try {
-                this.methodHandle = MethodHandles.lookup().unreflect(method);
-                this.isStatic = Modifier.isStatic(method.getModifiers());
-            } catch (IllegalAccessException e) {
-                throw new InvokingException(e);
-            }
-        }
-
-        OfMethodHandle(Constructor<?> constructor) {
-            try {
-                this.methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
-                this.isStatic = true;
-            } catch (IllegalAccessException e) {
-                throw new InvokingException(e);
-            }
-        }
-
-        @Override
-        public @Nullable Object invoke(@Nullable Object inst, Object... args) {
-            try {
-                return isStatic ? invokeStatic(methodHandle, args) : invokeVirtual(methodHandle, inst, args);
-            } catch (Throwable e) {
-                throw new InvokingException(e);
-            }
-        }
-    }
-
-    private static @Nullable Object invokeVirtual(MethodHandle methodHandle, @Nullable Object inst, Object... args) throws Throwable {
+    /**
+     * Invokes {@link MethodHandle} of virtual with given instance and arguments.
+     *
+     * @param methodHandle method handle to be invoked
+     * @param inst         given instance
+     * @param args         given arguments
+     * @return result of invocation
+     * @throws Throwable anything thrown by the target method invocation
+     */
+    public static @Nullable Object invokeVirtual(MethodHandle methodHandle, @Nullable Object inst, Object... args) throws Throwable {
         switch (args.length) {
             case 0:
                 return methodHandle.invoke(inst);
@@ -111,7 +52,15 @@ final class InvokerImpls {
         }
     }
 
-    private static @Nullable Object invokeStatic(MethodHandle methodHandle, Object... args) throws Throwable {
+    /**
+     * Invokes {@link MethodHandle} of static with given arguments.
+     *
+     * @param methodHandle method handle to be invoked
+     * @param args         given arguments
+     * @return result of invocation
+     * @throws Throwable anything thrown by the target method invocation
+     */
+    public static @Nullable Object invokeStatic(MethodHandle methodHandle, Object... args) throws Throwable {
         switch (args.length) {
             case 0:
                 return methodHandle.invoke();

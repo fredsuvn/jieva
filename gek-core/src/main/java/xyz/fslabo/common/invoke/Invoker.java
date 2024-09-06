@@ -2,13 +2,14 @@ package xyz.fslabo.common.invoke;
 
 import xyz.fslabo.annotations.Nullable;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
- * This interface represents a reference to executable content, which can be a method, a constructor, a block of code,
- * or any other executable object.
+ * This interface represents an invocation handle to executable content, which can be a method, a constructor, a block
+ * of code, or any other executable object.
  *
  * @author fredsuvn
  */
@@ -22,7 +23,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker reflect(Method method) {
-        return new InvokerImpls.OfMethod(method);
+        return new MethodInvoker(method);
     }
 
     /**
@@ -32,7 +33,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker reflect(Constructor<?> constructor) {
-        return new InvokerImpls.OfConstructor(constructor);
+        return new ConstructorInvoker(constructor);
     }
 
     /**
@@ -42,7 +43,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker unreflect(Method method) {
-        return new InvokerImpls.OfMethodHandle(method);
+        return new MethodHandleInvoker(method);
     }
 
     /**
@@ -53,20 +54,35 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker unreflect(Constructor<?> constructor) {
-        return new InvokerImpls.OfMethodHandle(constructor);
+        return new MethodHandleInvoker(constructor);
+    }
+
+    /**
+     * Returns {@link Invoker} instance with specified {@link MethodHandle}.
+     *
+     * @param handle   specified {@link MethodHandle}
+     * @param isStatic whether treats the handle as static when invoking
+     * @return {@link Invoker} instance
+     */
+    static Invoker methodHandle(MethodHandle handle, boolean isStatic) {
+        return new MethodHandleInvoker(handle, isStatic);
     }
 
     /**
      * Invokes with specified object and arguments.
      * <p>
-     * If this invoker references a {@link Method} or {@link Constructor}, this method and usage of its parameters are
-     * equivalent to {@link Method#invoke(Object, Object...)} and {@link Constructor#newInstance(Object...)}. Otherwise,
-     * usage of the parameters is up to the implementation.
+     * If this invoker references a {@link Method}, {@link Constructor} or {@link MethodHandle}, the usage of its
+     * parameters are equivalent to {@link Method#invoke(Object, Object...)}, {@link Constructor#newInstance(Object...)}
+     * or {@link MethodHandle#invokeWithArguments(Object...)}. Otherwise, usage of the parameters is up to the
+     * implementation.
+     * <p>
+     * This method only throws {@link InvokingException} if any problem occurs, use {@link InvokingException#getCause()}
+     * to get underlying reason.
      *
      * @param obj  specified object
      * @param args specified arguments
      * @return result of invoking
-     * @throws InvokingException if any exception occurs
+     * @throws InvokingException if any problem occurs
      */
     @Nullable
     Object invoke(@Nullable Object obj, Object... args) throws InvokingException;

@@ -4,7 +4,6 @@ import net.sf.cglib.proxy.*;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
-import xyz.fslabo.common.invoke.InvokingException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ final class CglibTypeProxy<T> implements TypeProxy<T> {
         ClassLoader loader,
         @Nullable Class<?> superClass,
         @Nullable Iterable<Class<?>> superInterfaces,
-        Map<Predicate<Method>, TypeProxyMethod> proxyMap
+        Map<Predicate<Method>, ProxyInvoker> proxyMap
     ) {
         Enhancer enhancer = new Enhancer();
         boolean inherited = false;
@@ -33,13 +32,13 @@ final class CglibTypeProxy<T> implements TypeProxy<T> {
             inherited = true;
         }
         if (!inherited) {
-            throw new TypeProxyException("No super class or interface to be proxied.");
+            throw new ProxyException("No super class or interface.");
         }
         List<MethodInterceptor> interceptorList = new ArrayList<>();
         interceptorList.add((obj, method, args, proxy) -> proxy.invokeSuper(obj, args));
         Predicate<Method>[] predicates = proxyMap.keySet().toArray(new Predicate[0]);
         for (Predicate<Method> predicate : predicates) {
-            TypeProxyMethod proxy = proxyMap.get(predicate);
+            ProxyInvoker proxy = proxyMap.get(predicate);
             MethodInterceptor interceptor = new MethodInterceptorImpl(proxy);
             interceptorList.add(interceptor);
         }
@@ -63,21 +62,15 @@ final class CglibTypeProxy<T> implements TypeProxy<T> {
 
     private static final class MethodInterceptorImpl implements MethodInterceptor {
 
-        private final TypeProxyMethod typeProxyMethod;
+        private final ProxyInvoker typeProxyMethod;
 
-        private MethodInterceptorImpl(TypeProxyMethod typeProxyMethod) {
+        private MethodInterceptorImpl(ProxyInvoker typeProxyMethod) {
             this.typeProxyMethod = typeProxyMethod;
         }
 
         @Override
-        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
-            return typeProxyMethod.invokeProxy(obj, method, (p, as) -> {
-                try {
-                    return proxy.invokeSuper(p, as);
-                } catch (Throwable e) {
-                    throw new InvokingException(e);
-                }
-            }, args);
+        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+            return typeProxyMethod.invoke(obj, method, proxy::invokeSuper, args);
         }
     }
 }

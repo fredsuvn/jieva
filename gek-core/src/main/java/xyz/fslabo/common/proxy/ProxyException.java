@@ -1,16 +1,18 @@
 package xyz.fslabo.common.proxy;
 
+import xyz.fslabo.common.base.JieException;
+
 /**
- * Exception for type proxy.
+ * Exception for proxy.
  *
  * @author fredsuvn
  */
-public class TypeProxyException extends RuntimeException {
+public class ProxyException extends JieException {
 
     /**
      * Empty constructor.
      */
-    public TypeProxyException() {
+    public ProxyException() {
     }
 
     /**
@@ -18,7 +20,7 @@ public class TypeProxyException extends RuntimeException {
      *
      * @param message exception message
      */
-    public TypeProxyException(String message) {
+    public ProxyException(String message) {
         super(message);
     }
 
@@ -28,7 +30,7 @@ public class TypeProxyException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public TypeProxyException(String message, Throwable cause) {
+    public ProxyException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +39,7 @@ public class TypeProxyException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public TypeProxyException(Throwable cause) {
+    public ProxyException(Throwable cause) {
         super(cause);
     }
 }

@@ -21,12 +21,13 @@ import java.util.function.Predicate;
  *
  * @param <T> proxied type
  */
-public class TypeProxyBuilder<T> {
+public class ProxyBuilder<T> {
 
     private Class<?> superClass;
     private Iterable<Class<?>> superInterfaces;
+    private ClassLoader classLoader;
     private Engine engine;
-    private final Map<Predicate<Method>, TypeProxyMethod> proxyMap = new HashMap<>();
+    private final Map<Predicate<Method>, ProxyInvoker> proxyMap = new HashMap<>();
 
     /**
      * Sets super class of proxy class.
@@ -35,7 +36,7 @@ public class TypeProxyBuilder<T> {
      * @param <T1>       proxied type
      * @return this builder
      */
-    public <T1 extends T> TypeProxyBuilder<T1> superClass(Class<?> superClass) {
+    public <T1 extends T> ProxyBuilder<T1> superClass(Class<?> superClass) {
         this.superClass = superClass;
         return Jie.as(this);
     }
@@ -47,7 +48,7 @@ public class TypeProxyBuilder<T> {
      * @param <T1>            proxied type
      * @return this builder
      */
-    public <T1 extends T> TypeProxyBuilder<T1> superInterfaces(Class<?>... superInterfaces) {
+    public <T1 extends T> ProxyBuilder<T1> superInterfaces(Class<?>... superInterfaces) {
         return superInterfaces(Arrays.asList(superInterfaces));
     }
 
@@ -58,7 +59,7 @@ public class TypeProxyBuilder<T> {
      * @param <T1>            proxied type
      * @return this builder
      */
-    public <T1 extends T> TypeProxyBuilder<T1> superInterfaces(Iterable<Class<?>> superInterfaces) {
+    public <T1 extends T> ProxyBuilder<T1> superInterfaces(Iterable<Class<?>> superInterfaces) {
         this.superInterfaces = superInterfaces;
         return Jie.as(this);
     }
@@ -71,7 +72,7 @@ public class TypeProxyBuilder<T> {
      * @param <T1>        proxied type
      * @return this builder
      */
-    public <T1 extends T> TypeProxyBuilder<T1> proxyMethod(Predicate<Method> predicate, TypeProxyMethod proxyMethod) {
+    public <T1 extends T> ProxyBuilder<T1> proxyMethod(Predicate<Method> predicate, ProxyInvoker proxyMethod) {
         proxyMap.put(predicate, proxyMethod);
         return Jie.as(this);
     }
@@ -86,13 +87,25 @@ public class TypeProxyBuilder<T> {
      * @param <T1>        proxied type
      * @return this builder
      */
-    public <T1 extends T> TypeProxyBuilder<T1> proxyMethod(
-        String methodName, Class<?>[] paramTypes, TypeProxyMethod proxyMethod) {
+    public <T1 extends T> ProxyBuilder<T1> proxyMethod(
+        String methodName, Class<?>[] paramTypes, ProxyInvoker proxyMethod) {
         return proxyMethod(method ->
                 Objects.equals(method.getName(), methodName)
                     && Arrays.equals(method.getParameterTypes(), paramTypes),
             proxyMethod
         );
+    }
+
+    /**
+     * Sets class loader of proxy class.
+     *
+     * @param classLoader class loader
+     * @param <T1>        proxied type
+     * @return this builder
+     */
+    public <T1 extends T> ProxyBuilder<T1> classLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+        return Jie.as(this);
     }
 
     /**
@@ -107,35 +120,21 @@ public class TypeProxyBuilder<T> {
      * @param <T1>   proxied type
      * @return this builder
      */
-    public <T1 extends T> TypeProxyBuilder<T1> engine(Engine engine) {
+    public <T1 extends T> ProxyBuilder<T1> engine(Engine engine) {
         this.engine = engine;
         return Jie.as(this);
     }
 
     /**
-     * Builds a new {@link TypeProxy}. This method is equivalent to ({@link #build(ClassLoader)}):
-     * <pre>
-     *     return build(null);
-     * </pre>
+     * Builds a new {@link TypeProxy}.
      *
      * @param <T1> proxied type
      * @return a new {@link TypeProxy}
      */
     public <T1 extends T> TypeProxy<T1> build() {
-        return build(null);
-    }
-
-    /**
-     * Builds a new {@link TypeProxy} with specified class loader.
-     *
-     * @param <T1>   proxied type
-     * @param loader specified class loader
-     * @return a new {@link TypeProxy}
-     */
-    public <T1 extends T> TypeProxy<T1> build(@Nullable ClassLoader loader) {
-        Engine actualEngine = engine == null ? Engine.getEngine(loader) : engine;
+        Engine actualEngine = engine == null ? Engine.getEngine(classLoader) : engine;
         return Jie.as(
-            actualEngine.getProxySupplier().getTypeProxy(loader, superClass, superInterfaces, proxyMap)
+            actualEngine.getProxySupplier().getTypeProxy(classLoader, superClass, superInterfaces, proxyMap)
         );
     }
 
@@ -233,7 +232,7 @@ public class TypeProxyBuilder<T> {
             ClassLoader loader,
             @Nullable Class<?> superClass,
             @Nullable Iterable<Class<?>> superInterfaces, Map<Predicate<Method>,
-            TypeProxyMethod> proxyMap
+            ProxyInvoker> proxyMap
         );
     }
 }

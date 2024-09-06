@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolvingException;
 import xyz.fslabo.common.invoke.InvokingException;
+import xyz.fslabo.common.proxy.ProxyException;
 
 public class MiscTest {
 
@@ -35,6 +36,15 @@ public class MiscTest {
         });
         Assert.expectThrows(BeanException.class, () -> {
             throw new BeanException(new RuntimeException());
+        });
+        Assert.expectThrows(ProxyException.class, () -> {
+            throw new ProxyException();
+        });
+        Assert.expectThrows(ProxyException.class, () -> {
+            throw new ProxyException(new RuntimeException());
+        });
+        Assert.expectThrows(ProxyException.class, () -> {
+            throw new ProxyException("", new RuntimeException());
         });
     }
 }

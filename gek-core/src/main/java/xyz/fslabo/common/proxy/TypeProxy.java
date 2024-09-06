@@ -16,16 +16,16 @@ public interface TypeProxy<T> {
      *
      * @param <T> proxied type
      * @return new builder of {@link TypeProxy}.
-     * @see TypeProxyBuilder
+     * @see ProxyBuilder
      */
-    static <T> TypeProxyBuilder<T> newBuilder() {
-        return new TypeProxyBuilder<>();
+    static <T> ProxyBuilder<T> newBuilder() {
+        return new ProxyBuilder<>();
     }
 
     /**
-     * Constructs and returns new instance of this proxy class.
+     * Constructs and returns a new proxy instance.
      *
-     * @return new instance of this proxy class
+     * @return a new proxy instance
      */
     T newInstance();
 }
