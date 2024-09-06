@@ -27,20 +27,20 @@ public interface IntVar extends IntVal {
     }
 
     /**
-     * Sets and returns specified value.
+     * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return specified value
+     * @return this ref itself
      */
-    int set(int value);
+    IntVar set(int value);
 
     /**
-     * Adds current value by specified value, and returns the result.
+     * Adds specified value on current value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return the result
+     * @return this ref itself
      */
-    int add(int value);
+    IntVar add(int value);
 
     /**
      * Increments current value by one, and returns the result.

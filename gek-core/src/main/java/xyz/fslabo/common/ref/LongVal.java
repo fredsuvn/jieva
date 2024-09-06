@@ -13,7 +13,7 @@ public interface LongVal {
      * @return an instance of {@link LongVal} of 0 initialized value
      */
     static LongVal ofZero() {
-        return of(0);
+        return ValImpls.OF_ZERO_LONG;
     }
 
     /**

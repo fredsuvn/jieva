@@ -27,12 +27,12 @@ public interface BooleanVar extends BooleanVal {
     }
 
     /**
-     * Sets and returns specified value.
+     * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return specified value
+     * @return this ref itself
      */
-    boolean set(boolean value);
+    BooleanVar set(boolean value);
 
     /**
      * Toggles current value, and returns the result.

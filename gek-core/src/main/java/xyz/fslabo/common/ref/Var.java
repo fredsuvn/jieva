@@ -3,8 +3,8 @@ package xyz.fslabo.common.ref;
 import xyz.fslabo.annotations.Nullable;
 
 /**
- * This interface represents a mutable variable reference which references a value.
- * It is typically used in places where variables cannot be reassigned, for example:
+ * This interface represents a mutable variable reference which references a value. It is typically used in places where
+ * variables cannot be reassigned, for example:
  * <pre>
  *     String str = "a";
  *     Var&lt;String&gt; ref = Var.of("a");
@@ -14,9 +14,8 @@ import xyz.fslabo.annotations.Nullable;
  *         //...
  *     });
  * </pre>
- * It also has versions for primitive types:
- * {@link BooleanVar}, {@link ByteVar}, {@link CharVar}, {@link ShortVar}, {@link IntVar}, {@link LongVar},
- * {@link DoubleVar} and {@link FloatVar}.
+ * It also has versions for primitive types: {@link BooleanVar}, {@link ByteVar}, {@link CharVar}, {@link ShortVar},
+ * {@link IntVar}, {@link LongVar}, {@link DoubleVar} and {@link FloatVar}.
  *
  * @param <T> type of referenced value
  * @author fredsuvn
@@ -45,10 +44,10 @@ public interface Var<T> extends Val<T> {
     }
 
     /**
-     * Sets and returns specified value.
+     * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return specified value
+     * @return this ref itself
      */
-    T set(@Nullable T value);
+    Var<T> set(@Nullable T value);
 }

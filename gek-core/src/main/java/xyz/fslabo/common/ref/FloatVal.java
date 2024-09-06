@@ -13,7 +13,7 @@ public interface FloatVal {
      * @return an instance of {@link FloatVal} of 0 initialized value
      */
     static FloatVal ofZero() {
-        return of(0);
+        return ValImpls.OF_ZERO_FLOAT;
     }
 
     /**

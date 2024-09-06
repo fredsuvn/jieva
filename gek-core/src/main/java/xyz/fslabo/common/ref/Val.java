@@ -4,10 +4,9 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 
 /**
- * This interface represents an immutable value reference.
- * It also has versions for primitive types:
- * {@link BooleanVal}, {@link ByteVal}, {@link CharVal}, {@link ShortVal}, {@link IntVal}, {@link LongVal},
- * {@link DoubleVal} and {@link FloatVal}.
+ * This interface represents an immutable value reference. It also has versions for primitive types: {@link BooleanVal},
+ * {@link ByteVal}, {@link CharVal}, {@link ShortVal}, {@link IntVal}, {@link LongVal}, {@link DoubleVal} and
+ * {@link FloatVal}.
  *
  * @param <T> type of referenced value
  * @author fredsuvn

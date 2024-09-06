@@ -20,6 +20,18 @@ import java.util.stream.Collectors;
  */
 public class JieReflect {
 
+    private static final Class<?>[] PRIMITIVES = {
+        boolean.class, Boolean.class,
+        byte.class, Byte.class,
+        short.class, Short.class,
+        char.class, Character.class,
+        int.class, Integer.class,
+        long.class, Long.class,
+        float.class, Float.class,
+        double.class, Double.class,
+        void.class, Void.class
+    };
+
     private static final Cache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = Cache.softCache();
 
     /**
@@ -409,34 +421,11 @@ public class JieReflect {
      * @return wrapper class if given class is primitive, else return itself
      */
     public static Class<?> wrapper(Class<?> cls) {
-        if (cls.isPrimitive()) {
-            if (Objects.equals(cls, boolean.class)) {
-                return Boolean.class;
+        for (int i = 0; i < PRIMITIVES.length; ) {
+            if (Objects.equals(cls, PRIMITIVES[i])) {
+                return PRIMITIVES[i + 1];
             }
-            if (Objects.equals(cls, byte.class)) {
-                return Byte.class;
-            }
-            if (Objects.equals(cls, short.class)) {
-                return Short.class;
-            }
-            if (Objects.equals(cls, char.class)) {
-                return Character.class;
-            }
-            if (Objects.equals(cls, int.class)) {
-                return Integer.class;
-            }
-            if (Objects.equals(cls, long.class)) {
-                return Long.class;
-            }
-            if (Objects.equals(cls, float.class)) {
-                return Float.class;
-            }
-            if (Objects.equals(cls, double.class)) {
-                return Double.class;
-            }
-            if (Objects.equals(cls, void.class)) {
-                return Void.class;
-            }
+            i += 2;
         }
         return cls;
     }
@@ -590,10 +579,9 @@ public class JieReflect {
             while (true) {
                 Type superType = cur.getGenericSuperclass();
                 if (superType != null) {
-                    mappingActualTypeArgument(superType, mapping);
+                    mappingTypeVariables(superType, mapping);
                 }
-                Type[] superTypes = cur.getGenericInterfaces();
-                mappingInterfaceActualTypeArguments(superTypes, mapping);
+                mappingGenericInterfacesTypeArgs(cur, mapping);
                 cur = cur.getSuperclass();
                 if (cur == null) {
                     return;
@@ -601,26 +589,25 @@ public class JieReflect {
             }
         }
         if (type instanceof ParameterizedType) {
-            mappingActualTypeArgument(type, mapping);
+            mappingTypeVariables(type, mapping);
             getTypeParameterMapping(((ParameterizedType) type).getRawType(), mapping);
         }
     }
 
-    private static void mappingInterfaceActualTypeArguments(Type[] interfaceTypes, @OutParam Map<TypeVariable<?>, Type> mapping) {
-        if (JieArray.isEmpty(interfaceTypes)) {
+    private static void mappingGenericInterfacesTypeArgs(Class<?> cls, @OutParam Map<TypeVariable<?>, Type> mapping) {
+        Type[] genericInterfaces = cls.getGenericInterfaces();
+        if (JieArray.isEmpty(genericInterfaces)) {
             return;
         }
-        for (Type interfaceType : interfaceTypes) {
-            mappingActualTypeArgument(interfaceType, mapping);
-            Class<?> interfaceClass = getRawType(interfaceType);
-            if (interfaceClass != null) {
-                Type[] superInterfaces = interfaceClass.getGenericInterfaces();
-                mappingInterfaceActualTypeArguments(superInterfaces, mapping);
-            }
+        for (Type genericInterface : genericInterfaces) {
+            mappingTypeVariables(genericInterface, mapping);
+            Class<?> interfaceClass = getRawType(genericInterface);
+            // Never null for interfaceClass
+            mappingGenericInterfacesTypeArgs(interfaceClass, mapping);
         }
     }
 
-    private static void mappingActualTypeArgument(Type type, @OutParam Map<TypeVariable<?>, Type> mapping) {
+    private static void mappingTypeVariables(Type type, @OutParam Map<TypeVariable<?>, Type> mapping) {
         if (!(type instanceof ParameterizedType)) {
             return;
         }

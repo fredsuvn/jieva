@@ -6,6 +6,14 @@ import xyz.fslabo.annotations.Nullable;
 final class ValImpls {
 
     static Val<?> OF_NULL = of(null);
+    static BooleanVal OF_FALSE = ofBoolean(false);
+    static ByteVal OF_ZERO_BYTE = ofByte((byte) 0);
+    static ShortVal OF_ZERO_SHORT = ofShort((short) 0);
+    static CharVal OF_ZERO_CHAR = ofChar('0');
+    static IntVal OF_ZERO_INT = ofInt(0);
+    static LongVal OF_ZERO_LONG = ofLong(0);
+    static FloatVal OF_ZERO_FLOAT = ofFloat(0);
+    static DoubleVal OF_ZERO_DOUBLE = ofDouble(0);
 
     static <T> Val<T> of(@Nullable T value) {
         return new ValImpl<>(value);

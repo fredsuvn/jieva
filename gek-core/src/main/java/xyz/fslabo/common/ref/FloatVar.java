@@ -27,20 +27,20 @@ public interface FloatVar extends FloatVal {
     }
 
     /**
-     * Sets and returns specified value.
+     * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return specified value
+     * @return this ref itself
      */
-    float set(float value);
+    FloatVar set(float value);
 
     /**
-     * Adds current value by specified value, and returns the result.
+     * Adds specified value on current value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return the result
+     * @return this ref itself
      */
-    float add(float value);
+    FloatVar add(float value);
 
     /**
      * Returns {@link Var} version with current value.

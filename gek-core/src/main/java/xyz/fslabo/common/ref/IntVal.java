@@ -13,7 +13,7 @@ public interface IntVal {
      * @return an instance of {@link IntVal} of 0 initialized value
      */
     static IntVal ofZero() {
-        return of(0);
+        return ValImpls.OF_ZERO_INT;
     }
 
     /**

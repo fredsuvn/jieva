@@ -27,20 +27,20 @@ public interface LongVar extends LongVal {
     }
 
     /**
-     * Sets and returns specified value.
+     * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return specified value
+     * @return this ref itself
      */
-    long set(long value);
+    LongVar set(long value);
 
     /**
-     * Adds current value by specified value, and returns the result.
+     * Sets specified value on current value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return the result
+     * @return this ref itself
      */
-    long add(long value);
+    LongVar add(long value);
 
     /**
      * Increments current value by one, and returns the result.

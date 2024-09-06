@@ -52,9 +52,9 @@ final class VarImpls {
         }
 
         @Override
-        public T set(@Nullable T value) {
+        public Var<T> set(@Nullable T value) {
             this.value = value;
-            return value;
+            return this;
         }
     }
 
@@ -69,9 +69,9 @@ final class VarImpls {
         }
 
         @Override
-        public boolean set(boolean value) {
+        public BooleanVar set(boolean value) {
             this.value = value;
-            return value;
+            return this;
         }
 
         @Override
@@ -98,9 +98,9 @@ final class VarImpls {
         }
 
         @Override
-        public int set(int value) {
+        public IntVar set(int value) {
             this.value = value;
-            return value;
+            return this;
         }
 
         @Override
@@ -114,9 +114,9 @@ final class VarImpls {
         }
 
         @Override
-        public int add(int value) {
+        public IntVar add(int value) {
             this.value += value;
-            return this.value;
+            return this;
         }
     }
 
@@ -131,9 +131,9 @@ final class VarImpls {
         }
 
         @Override
-        public long set(long value) {
+        public LongVar set(long value) {
             this.value = value;
-            return value;
+            return this;
         }
 
         @Override
@@ -147,9 +147,9 @@ final class VarImpls {
         }
 
         @Override
-        public long add(long value) {
+        public LongVar add(long value) {
             this.value += value;
-            return this.value;
+            return this;
         }
     }
 
@@ -164,9 +164,9 @@ final class VarImpls {
         }
 
         @Override
-        public short set(short value) {
+        public ShortVar set(short value) {
             this.value = value;
-            return value;
+            return this;
         }
 
         @Override
@@ -180,9 +180,9 @@ final class VarImpls {
         }
 
         @Override
-        public short add(short value) {
-            this.value += value;
-            return this.value;
+        public ShortVar add(int value) {
+            this.value += (short) value;
+            return this;
         }
     }
 
@@ -197,15 +197,15 @@ final class VarImpls {
         }
 
         @Override
-        public float set(float value) {
+        public FloatVar set(float value) {
             this.value = value;
-            return value;
+            return this;
         }
 
         @Override
-        public float add(float value) {
+        public FloatVar add(float value) {
             this.value += value;
-            return this.value;
+            return this;
         }
     }
 
@@ -220,15 +220,15 @@ final class VarImpls {
         }
 
         @Override
-        public double set(double value) {
+        public DoubleVar set(double value) {
             this.value = value;
-            return value;
+            return this;
         }
 
         @Override
-        public double add(double value) {
+        public DoubleVar add(double value) {
             this.value += value;
-            return this.value;
+            return this;
         }
     }
 
@@ -243,9 +243,9 @@ final class VarImpls {
         }
 
         @Override
-        public byte set(byte value) {
+        public ByteVar set(byte value) {
             this.value = value;
-            return value;
+            return this;
         }
 
         @Override
@@ -259,9 +259,9 @@ final class VarImpls {
         }
 
         @Override
-        public byte add(byte value) {
-            this.value += value;
-            return this.value;
+        public ByteVar add(int value) {
+            this.value += (byte) value;
+            return this;
         }
     }
 
@@ -276,9 +276,25 @@ final class VarImpls {
         }
 
         @Override
-        public char set(char value) {
+        public CharVar set(char value) {
             this.value = value;
-            return value;
+            return this;
+        }
+
+        @Override
+        public CharVar add(int value) {
+            this.value += (char) value;
+            return this;
+        }
+
+        @Override
+        public char incrementAndGet() {
+            return ++value;
+        }
+
+        @Override
+        public char getAndIncrement() {
+            return value++;
         }
     }
 }

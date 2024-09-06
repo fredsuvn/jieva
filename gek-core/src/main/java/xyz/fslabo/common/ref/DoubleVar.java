@@ -27,20 +27,20 @@ public interface DoubleVar extends DoubleVal {
     }
 
     /**
-     * Sets and returns specified value.
+     * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return specified value
+     * @return this ref itself
      */
-    double set(double value);
+    DoubleVar set(double value);
 
     /**
-     * Adds current value by specified value, and returns the result.
+     * Adds specified value on current value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return the result
+     * @return this ref itself
      */
-    double add(double value);
+    DoubleVar add(double value);
 
     /**
      * Returns {@link Var} version with current value.

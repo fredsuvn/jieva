@@ -27,20 +27,20 @@ public interface ShortVar extends ShortVal {
     }
 
     /**
-     * Sets and returns specified value.
+     * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return specified value
+     * @return this ref itself
      */
-    short set(short value);
+    ShortVar set(short value);
 
     /**
-     * Adds current value by specified value, and returns the result.
+     * Adds specified value on current value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return the result
+     * @return this ref itself
      */
-    short add(short value);
+    ShortVar add(int value);
 
     /**
      * Increments current value by one, and returns the result.

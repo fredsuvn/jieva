@@ -13,7 +13,7 @@ public interface DoubleVal {
      * @return an instance of {@link DoubleVal} of 0 initialized value
      */
     static DoubleVal ofZero() {
-        return of(0);
+        return ValImpls.OF_ZERO_DOUBLE;
     }
 
     /**

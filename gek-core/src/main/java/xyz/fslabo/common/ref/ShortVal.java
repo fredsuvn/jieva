@@ -13,7 +13,7 @@ public interface ShortVal {
      * @return an instance of {@link ShortVal} of 0 initialized value
      */
     static ShortVal ofZero() {
-        return of((short) 0);
+        return ValImpls.OF_ZERO_SHORT;
     }
 
     /**

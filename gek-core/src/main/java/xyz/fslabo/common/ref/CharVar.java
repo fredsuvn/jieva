@@ -27,12 +27,34 @@ public interface CharVar extends CharVal {
     }
 
     /**
-     * Sets and returns specified value.
+     * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
-     * @return specified value
+     * @return this ref itself
      */
-    char set(char value);
+    CharVar set(char value);
+
+    /**
+     * Adds specified value on current value for this ref and returns this ref itself.
+     *
+     * @param value specified value
+     * @return this ref itself
+     */
+    CharVar add(int value);
+
+    /**
+     * Increments current value by one, and returns the result.
+     *
+     * @return toggle result
+     */
+    char incrementAndGet();
+
+    /**
+     * Increments current value by one, and returns the old value before increment.
+     *
+     * @return old value before increment
+     */
+    char getAndIncrement();
 
     /**
      * Returns {@link Var} version with current value.

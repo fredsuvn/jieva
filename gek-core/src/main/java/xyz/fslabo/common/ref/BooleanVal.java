@@ -13,7 +13,7 @@ public interface BooleanVal {
      * @return an instance of {@link BooleanVal} of false initialized value
      */
     static BooleanVal ofFalse() {
-        return of(false);
+        return ValImpls.OF_FALSE;
     }
 
     /**

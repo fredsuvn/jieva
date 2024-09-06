@@ -13,7 +13,7 @@ public interface CharVal {
      * @return an instance of {@link CharVal} of 0 initialized value
      */
     static CharVal ofZero() {
-        return of((char) 0);
+        return ValImpls.OF_ZERO_CHAR;
     }
 
     /**

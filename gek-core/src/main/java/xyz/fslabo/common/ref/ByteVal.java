@@ -13,7 +13,7 @@ public interface ByteVal {
      * @return an instance of {@link ByteVal} of 0 initialized value
      */
     static ByteVal ofZero() {
-        return of((byte) 0);
+        return ValImpls.OF_ZERO_BYTE;
     }
 
     /**
