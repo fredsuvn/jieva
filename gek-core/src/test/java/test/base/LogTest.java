@@ -1,4 +1,4 @@
-package test;
+package test.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -10,25 +10,25 @@ public class LogTest {
 
     @Test
     public void testLogger() {
-        //system
+        // system
         JieLog sysLog = JieLog.system();
         doLog(sysLog, JieLog.LEVEL_INFO);
-        //custom1
+        // custom1
         StringBuilder sb = new StringBuilder();
         JieLog cusLog1 = JieLog.of(JieLog.LEVEL_DEBUG, sb);
         doLog(cusLog1, JieLog.LEVEL_DEBUG);
         System.out.println(sb);
-        //custom2
+        // custom2
         sb.delete(0, sb.length());
         JieLog cusLog2 = JieLog.of(JieLog.LEVEL_TRACE, sb);
         doLog(cusLog2, JieLog.LEVEL_TRACE);
         System.out.println(sb);
-        //custom3
+        // custom3
         sb.delete(0, sb.length());
         JieLog cusLog3 = JieLog.of(JieLog.LEVEL_TRACE + 1, sb);
         doLog(cusLog3, JieLog.LEVEL_TRACE + 1);
         System.out.println(sb);
-        //custom4
+        // custom4
         sb.delete(0, sb.length());
         JieLog cusLog4 = JieLog.of(JieLog.LEVEL_TRACE, new Appendable() {
             @Override

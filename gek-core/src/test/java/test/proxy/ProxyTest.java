@@ -1,11 +1,17 @@
-package test;
+package test.proxy;
 
+import org.objectweb.asm.Type;
+import org.objectweb.asm.signature.SignatureWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.proxy.*;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ProxyTest {
 
@@ -35,10 +41,12 @@ public class ProxyTest {
         ProxyBuilder<FooClass> b1 = TypeProxy.newBuilder().engine(engine);
         Assert.expectThrows(ProxyException.class, b1::build);
         b1.superClass(FooClass.class);
-        b1.build().newInstance();
-        ProxyBuilder<FooInter> b2 = TypeProxy.newBuilder();
+        FooClass f1 = b1.build().newInstance();
+        Assert.assertEquals(f1.fi0(""), "fi0");
+        ProxyBuilder<FooInter> b2 = TypeProxy.newBuilder().engine(engine);
         b2.superInterfaces(FooInter.class);
-        b2.build().newInstance();
+        FooInter f2 = b2.build().newInstance();
+        Assert.assertEquals(f2.fi0(""), "fi0");
     }
 
     @Test
@@ -82,6 +90,86 @@ public class ProxyTest {
             Assert.expectThrows(ProxyException.class, () -> fi.fi1(""));
             Assert.expectThrows(IllegalStateException.class, fi::fi2);
         }
+    }
+
+    @Test
+    public void ss() throws Exception{
+        Type ot = Type.getType(List.class);
+        System.out.println(ot.getInternalName());
+        System.out.println(ot.getDescriptor());
+        Type it = Type.getType(int.class);
+        System.out.println(it.getInternalName());
+        System.out.println(it.getDescriptor());
+        Type vt = Type.getType(void.class);
+        System.out.println(vt.getInternalName());
+        System.out.println(vt.getDescriptor());
+        Type mt = Type.getType(ProxyTest.class.getMethod("sss", List.class));
+        System.out.println(mt.getInternalName());
+        System.out.println(mt.getDescriptor());
+        System.out.println(Arrays.toString(mt.getArgumentTypes()));
+        System.out.println(mt.getReturnType());
+        SignatureWriter sw = new SignatureWriter();
+        sw.visitClassType(ot.getInternalName());
+        // sw.visitFormalTypeParameter("T");
+        sw.visitTypeVariable("T");
+        //sw.visitArrayType();
+        sw.visitEnd();
+        System.out.println(sw);
+        System.out.println(K.class);
+    }
+
+    public static abstract class X<T>{
+
+    }
+
+    public static abstract class K<T, U extends String & CharSequence, F extends T> extends X<Number> implements List<String>, Serializable {
+        private int i = 0;
+        private int[] ia = null;
+        private List<? extends T> list1;
+        private List<? super String> list2 = new ArrayList<>();
+        private List<String> list6;
+        private List<U> list3 = new ArrayList<>();
+        private List<? extends T>[] lista;
+        private List[] lista2;
+
+        private K k1;
+        private K<T,U,F> k2;
+
+        public K() {
+        }
+
+        public K(String a) {
+        }
+
+        public K(T t, U u) {
+        }
+
+        public int ii(int i) {
+            return 0;
+        }
+
+        public String ss(U u) throws Exception {
+            super.toString();
+            return null;
+        }
+
+        public void sss(U u) throws Exception {
+        }
+
+        public String sss(U u, T t) throws Exception {
+            return null;
+        }
+
+        public void sss() throws Exception {
+        }
+
+        public String sss(List<? extends U> u, List<? super T> t) throws Exception {
+            return null;
+        }
+    }
+
+    public List<? extends String> sss(List<? extends String> s) {
+        return null;
     }
 
     public interface FooInter {

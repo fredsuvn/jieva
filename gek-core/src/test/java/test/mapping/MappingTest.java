@@ -1,4 +1,4 @@
-package test;
+package test.mapping;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -171,7 +171,7 @@ public class MappingTest {
         Assert.assertNotEquals(m41, m42);
         Assert.assertEquals(m42, new M3("f1", null, "f33"));
 
-        //one -> more
+        // one -> more
         M3 m5 = new M3();
         m5.setF1("f1");
         Assert.assertEquals(
@@ -185,7 +185,7 @@ public class MappingTest {
             new M4("f1", "f1")
         );
 
-        //error
+        // error
         M3 m6 = new M3();
         m6.setF1("d1");
         Assert.expectThrows(MappingException.class, () ->
