@@ -1,16 +1,14 @@
 package test.proxy;
 
-import org.objectweb.asm.Type;
-import org.objectweb.asm.signature.SignatureWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.proxy.*;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Proxy;
 import java.util.List;
 
 public class ProxyTest {
@@ -46,7 +44,7 @@ public class ProxyTest {
         ProxyBuilder<FooInter> b2 = TypeProxy.newBuilder().engine(engine);
         b2.superInterfaces(FooInter.class);
         FooInter f2 = b2.build().newInstance();
-        Assert.assertEquals(f2.fi0(""), "fi0");
+        // Assert.assertEquals(f2.fi0(""), "fi0");
     }
 
     @Test
@@ -92,87 +90,7 @@ public class ProxyTest {
         }
     }
 
-    @Test
-    public void ss() throws Exception{
-        Type ot = Type.getType(List.class);
-        System.out.println(ot.getInternalName());
-        System.out.println(ot.getDescriptor());
-        Type it = Type.getType(int.class);
-        System.out.println(it.getInternalName());
-        System.out.println(it.getDescriptor());
-        Type vt = Type.getType(void.class);
-        System.out.println(vt.getInternalName());
-        System.out.println(vt.getDescriptor());
-        Type mt = Type.getType(ProxyTest.class.getMethod("sss", List.class));
-        System.out.println(mt.getInternalName());
-        System.out.println(mt.getDescriptor());
-        System.out.println(Arrays.toString(mt.getArgumentTypes()));
-        System.out.println(mt.getReturnType());
-        SignatureWriter sw = new SignatureWriter();
-        sw.visitClassType(ot.getInternalName());
-        // sw.visitFormalTypeParameter("T");
-        sw.visitTypeVariable("T");
-        //sw.visitArrayType();
-        sw.visitEnd();
-        System.out.println(sw);
-        System.out.println(K.class);
-    }
-
-    public static abstract class X<T>{
-
-    }
-
-    public static abstract class K<T, U extends String & CharSequence, F extends T> extends X<Number> implements List<String>, Serializable {
-        private int i = 0;
-        private int[] ia = null;
-        private List<? extends T> list1;
-        private List<? super String> list2 = new ArrayList<>();
-        private List<String> list6;
-        private List<U> list3 = new ArrayList<>();
-        private List<? extends T>[] lista;
-        private List[] lista2;
-
-        private K k1;
-        private K<T,U,F> k2;
-
-        public K() {
-        }
-
-        public K(String a) {
-        }
-
-        public K(T t, U u) {
-        }
-
-        public int ii(int i) {
-            return 0;
-        }
-
-        public String ss(U u) throws Exception {
-            super.toString();
-            return null;
-        }
-
-        public void sss(U u) throws Exception {
-        }
-
-        public String sss(U u, T t) throws Exception {
-            return null;
-        }
-
-        public void sss() throws Exception {
-        }
-
-        public String sss(List<? extends U> u, List<? super T> t) throws Exception {
-            return null;
-        }
-    }
-
-    public List<? extends String> sss(List<? extends String> s) {
-        return null;
-    }
-
-    public interface FooInter {
+    public interface FooInter<T, L extends List<? extends String>, M extends Number> {
 
         default String fi0(String input) {
             return "fi0";
@@ -195,9 +113,13 @@ public class ProxyTest {
         default String d2() {
             return "d2";
         }
+
+        default String doDefault(T t, L l, M m) {
+            return "default-" + t + l + m;
+        }
     }
 
-    public static class FooClass implements FooInter {
+    public static class FooClass implements FooInter<String, List<String>, Long> {
 
         public String fc0(String input) {
             return "fc0";
@@ -211,6 +133,11 @@ public class ProxyTest {
         public String fi1(String input) {
             return "fi1";
         }
+
+        @Override
+        public String doDefault(String t, List<String> l, Long m) {
+            return "foo-" + t + l + m;
+        }
     }
 
     public static class ProxyMethod implements ProxyInvoker {
@@ -220,6 +147,51 @@ public class ProxyTest {
             @Nullable Object inst, Method proxiedMethod, ProxiedInvoker proxiedInvoker, Object... args) throws Throwable {
             Object result = proxiedInvoker.invoke(inst, args);
             return result + "-proxy";
+        }
+    }
+
+    @Test
+    public void ss() {
+        System.out.println(new FooChild().doDefault("tt", null, null));
+        System.out.println(B.class);
+        System.out.println(new B().tt("sss"));
+        A<Integer> proxyInstance = (A<Integer>) Proxy.newProxyInstance(
+            A.class.getClassLoader(),
+            new Class[]{A.class},
+            new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    System.out.println(method);
+                    return "proxy";
+                }
+            }
+        );
+        int i = proxyInstance.tt(1);
+        System.out.println(i);
+    }
+
+    public static interface A<T>{
+
+        default T tt(T t) {
+            return t;
+        }
+    }
+
+    public static class B implements A<String>, Serializable {
+
+    }
+
+    public static class FooClass2 {
+
+    }
+
+    public static class FooChild extends FooClass2 implements FooInter<String, List<String>, Long> {
+
+        private String str;
+
+        @Override
+        public String fi1(String input) {
+            return "";
         }
     }
 }

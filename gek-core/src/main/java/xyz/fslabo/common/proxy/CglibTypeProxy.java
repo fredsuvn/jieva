@@ -6,6 +6,7 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,20 @@ final class CglibTypeProxy<T> implements TypeProxy<T> {
         if (!inherited) {
             throw new ProxyException("No super class or interface.");
         }
+        // if (superClass == null) {
+        //     Object interfaceProxy = JdkTypeProxy.createInterfaceProxy(
+        //         Jie.orDefault(loader, getClass().getClassLoader()),
+        //         superInterfaces,
+        //         proxyMap
+        //     );
+        //     System.out.println(">>>>>" + interfaceProxy.getClass());
+        //     System.out.println(">>>>>" + Modifier.isFinal(interfaceProxy.getClass().getModifiers()));
+        //     enhancer.setSuperclass(interfaceProxy.getClass());
+        // }
         List<MethodInterceptor> interceptorList = new ArrayList<>();
-        interceptorList.add((obj, method, args, proxy) -> proxy.invokeSuper(obj, args));
+        interceptorList.add((obj, method, args, proxy) -> {
+            return  proxy.invokeSuper(obj, args);
+        });
         Predicate<Method>[] predicates = proxyMap.keySet().toArray(new Predicate[0]);
         for (Predicate<Method> predicate : predicates) {
             ProxyInvoker proxy = proxyMap.get(predicate);
@@ -52,6 +65,7 @@ final class CglibTypeProxy<T> implements TypeProxy<T> {
         };
         enhancer.setCallbackFilter(callbackFilter);
         enhancer.setCallbacks(interceptorList.toArray(new Callback[0]));
+        enhancer.setClassLoader(loader);
         this.enhancer = enhancer;
     }
 
@@ -60,7 +74,7 @@ final class CglibTypeProxy<T> implements TypeProxy<T> {
         return Jie.as(enhancer.create());
     }
 
-    private static final class MethodInterceptorImpl implements MethodInterceptor {
+    private static final class MethodInterceptorImpl<T> implements MethodInterceptor {
 
         private final ProxyInvoker typeProxyMethod;
 

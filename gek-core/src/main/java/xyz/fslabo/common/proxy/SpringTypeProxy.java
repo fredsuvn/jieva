@@ -35,6 +35,14 @@ final class SpringTypeProxy<T> implements TypeProxy<T> {
         if (!inherited) {
             throw new ProxyException("No super class or interface.");
         }
+        // if (superClass == null) {
+        //     Object interfaceProxy = JdkTypeProxy.createInterfaceProxy(
+        //         Jie.orDefault(loader, getClass().getClassLoader()),
+        //         superInterfaces,
+        //         proxyMap
+        //     );
+        //     enhancer.setSuperclass(interfaceProxy.getClass());
+        // }
         List<MethodInterceptor> interceptorList = new ArrayList<>();
         interceptorList.add((obj, method, args, proxy) -> proxy.invokeSuper(obj, args));
         Predicate<Method>[] predicates = proxyMap.keySet().toArray(new Predicate[0]);
@@ -54,6 +62,7 @@ final class SpringTypeProxy<T> implements TypeProxy<T> {
         enhancer.setCallbackFilter(callbackFilter);
         enhancer.setCallbacks(interceptorList.toArray(new Callback[0]));
         enhancer.setNamingPolicy(new SpringNamingPolicy());
+        enhancer.setClassLoader(loader);
         this.enhancer = enhancer;
     }
 
