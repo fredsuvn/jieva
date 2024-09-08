@@ -421,11 +421,14 @@ public class JieReflect {
      * @return wrapper class if given class is primitive, else return itself
      */
     public static Class<?> wrapper(Class<?> cls) {
-        for (int i = 0; i < PRIMITIVES.length; ) {
-            if (Objects.equals(cls, PRIMITIVES[i])) {
-                return PRIMITIVES[i + 1];
+        if (cls.isPrimitive()) {
+            for (int i = 0; i < PRIMITIVES.length; ) {
+                if (Objects.equals(cls, PRIMITIVES[i])) {
+                    return PRIMITIVES[i + 1];
+                }
+                i += 2;
             }
-            i += 2;
+            throw new IllegalArgumentException("Unknown primitive class: " + cls.getName());
         }
         return cls;
     }

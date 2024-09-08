@@ -141,46 +141,16 @@ public class ReflectTest {
 
     @Test
     public void testArrayClass() {
-        Assert.assertEquals(
-            JieReflect.arrayClass(Object.class),
-            Object[].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(Object[].class),
-            Object[][].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(boolean.class),
-            boolean[].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(byte.class),
-            byte[].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(short.class),
-            short[].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(char.class),
-            char[].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(int.class),
-            int[].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(long.class),
-            long[].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(float.class),
-            float[].class
-        );
-        Assert.assertEquals(
-            JieReflect.arrayClass(double.class),
-            double[].class
-        );
+        Assert.assertEquals(JieReflect.arrayClass(Object.class), Object[].class);
+        Assert.assertEquals(JieReflect.arrayClass(Object[].class), Object[][].class);
+        Assert.assertEquals(JieReflect.arrayClass(boolean.class), boolean[].class);
+        Assert.assertEquals(JieReflect.arrayClass(byte.class), byte[].class);
+        Assert.assertEquals(JieReflect.arrayClass(short.class), short[].class);
+        Assert.assertEquals(JieReflect.arrayClass(char.class), char[].class);
+        Assert.assertEquals(JieReflect.arrayClass(int.class), int[].class);
+        Assert.assertEquals(JieReflect.arrayClass(long.class), long[].class);
+        Assert.assertEquals(JieReflect.arrayClass(float.class), float[].class);
+        Assert.assertEquals(JieReflect.arrayClass(double.class), double[].class);
         Assert.expectThrows(IllegalArgumentException.class, () -> JieReflect.arrayClass(void.class));
         Assert.assertEquals(
             JieReflect.arrayClass(JieType.parameterized(List.class, new Type[]{JieType.upperBound(String.class)})),
