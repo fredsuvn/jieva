@@ -27,14 +27,17 @@ import java.util.function.Function;
 public class AsmProxyProvider implements ProxyProvider {
 
     private static final AtomicLong counter = new AtomicLong();
-    private static final String PROXY_INVOKER_DESCRIPTOR = JieJvm.getDescriptor(ProxyInvoker.class);
+
+    private static final String PROXY_INVOKER_INTERNAL_NAME = JieJvm.getInternalName(ProxyInvoker.class);
+    private static final String PROXIED_INVOKER_INTERNAL_NAME = JieJvm.getDescriptor(ProxiedInvoker.class);
     private static final String PROXY_INVOKER_ARRAY_DESCRIPTOR = JieJvm.getDescriptor(ProxyInvoker[].class);
     private static final String METHOD_ARRAY_DESCRIPTOR = JieJvm.getDescriptor(Method[].class);
+    private static final String PROXIED_INVOKER_ARRAY_DESCRIPTOR = JieJvm.getDescriptor(ProxiedInvoker[].class);
+
+    private static final String PROXY_INVOKER_DESCRIPTOR = JieJvm.getDescriptor(ProxyInvoker.class);
     private static final String OBJECT_INTERNAL_NAME = JieJvm.getInternalName(Object.class);
     private static final String INIT_DESCRIPTOR = "(" + PROXY_INVOKER_ARRAY_DESCRIPTOR + METHOD_ARRAY_DESCRIPTOR + ")V";
     private static final String INVOKE_METHOD_DESCRIPTOR;
-    private static final String PROXY_INVOKER_INTERNAL_NAME = JieJvm.getInternalName(ProxyInvoker.class);
-    private static final String PROXIED_INVOKER_INTERNAL_NAME = JieJvm.getDescriptor(ProxiedInvoker.class);
 
     static {
         try {
@@ -135,14 +138,18 @@ public class AsmProxyProvider implements ProxyProvider {
     private void generateProxyMethods(
         ClassWriter cw, String newInternalName, String superInternalName, Map<ProxyInvoker, List<Method>> invokerMap) {
         // Generates fields
-        //   private ProxyInvoker[] invokers
+        // private ProxyInvoker[] invokers
         FieldVisitor invokersVisitor = cw.visitField(
             Opcodes.ACC_PRIVATE, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR, null, null);
         invokersVisitor.visitEnd();
-        //   private Method[] methods
+        // private Method[] methods
         FieldVisitor methodsVisitor = cw.visitField(
             Opcodes.ACC_PRIVATE, "methods", METHOD_ARRAY_DESCRIPTOR, null, null);
         methodsVisitor.visitEnd();
+        // private ProxiedInvoker[] proxiedInvokers
+        FieldVisitor proxiedInvokersVisitor = cw.visitField(
+            Opcodes.ACC_PRIVATE, "proxiedInvokers", PROXIED_INVOKER_ARRAY_DESCRIPTOR, null, null);
+        proxiedInvokersVisitor.visitEnd();
 
         // Generates constructor: (ProxyInvoker[] invokers, Method[] methods)
         MethodVisitor constructor = cw.visitMethod(
@@ -155,6 +162,11 @@ public class AsmProxyProvider implements ProxyProvider {
         constructor.visitVarInsn(Opcodes.ALOAD, 0);
         constructor.visitVarInsn(Opcodes.ALOAD, 2);
         constructor.visitFieldInsn(Opcodes.PUTFIELD, newInternalName, "methods", METHOD_ARRAY_DESCRIPTOR);
+        // visitPushNumber(proxyMethod, paramsCount);
+        // proxyMethod.visitTypeInsn(Opcodes.ANEWARRAY, OBJECT_INTERNAL_NAME);
+        // constructor.visitVarInsn(Opcodes.ALOAD, 0);
+        // constructor.visitVarInsn(Opcodes.ALOAD, 2);
+        // constructor.visitFieldInsn(Opcodes.PUTFIELD, newInternalName, "methods", METHOD_ARRAY_DESCRIPTOR);
         constructor.visitInsn(Opcodes.RETURN);
         constructor.visitMaxs(2, 3);
         constructor.visitEnd();

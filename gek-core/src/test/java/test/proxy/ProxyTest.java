@@ -167,6 +167,8 @@ public class ProxyTest {
         System.out.println(xx.sss());
         System.out.println(xx.sss2("q", "w"));
         // System.out.println(xx.ssss(false));
+
+        XXX xxx = new XXX();
     }
 
     public static class XX {
@@ -195,6 +197,46 @@ public class ProxyTest {
 
         public boolean ssss3(boolean b) {
             return b;
+        }
+    }
+
+    public static class XXX extends XX {
+
+        private ProxiedInvoker[] proxiedInvokers;
+
+        public XXX() {
+            proxiedInvokers = new ProxiedInvoker[10];
+            proxiedInvokers[0] = new XXXP(20);
+        }
+
+        public Boolean ssss(boolean b) {
+            return b;
+        }
+
+        public Boolean ssssSuper(boolean b) {
+            return super.ssss(b);
+        }
+
+        public Object sw(int i,  Object inst, Object... args) {
+            switch (i) {
+                case 0:
+                    return ssssSuper((Boolean)args[0]);
+                case 1:
+                    return ssssSuper((Boolean)args[0]);
+            }
+            return null;
+        }
+
+        private class XXXP implements ProxiedInvoker {
+
+            private final int i;
+
+            private XXXP(int i) {this.i = i;}
+
+            @Override
+            public @Nullable Object invoke(@Nullable Object inst, Object... args) throws Throwable {
+                return sw(i, inst, args);
+            }
         }
     }
 
