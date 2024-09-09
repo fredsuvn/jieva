@@ -24,7 +24,7 @@ import java.util.function.Function;
  *
  * @author fredsuvn
  */
-public class AsmTypeProxy implements ProxyProvider {
+public class AsmProxyProvider implements ProxyProvider {
 
     private static final AtomicLong counter = new AtomicLong();
     private static final String PROXY_INVOKER_DESCRIPTOR = JieJvm.getDescriptor(ProxyInvoker.class);
@@ -34,6 +34,7 @@ public class AsmTypeProxy implements ProxyProvider {
     private static final String INIT_DESCRIPTOR = "(" + PROXY_INVOKER_ARRAY_DESCRIPTOR + METHOD_ARRAY_DESCRIPTOR + ")V";
     private static final String INVOKE_METHOD_DESCRIPTOR;
     private static final String PROXY_INVOKER_INTERNAL_NAME = JieJvm.getInternalName(ProxyInvoker.class);
+    private static final String PROXIED_INVOKER_INTERNAL_NAME = JieJvm.getDescriptor(ProxiedInvoker.class);
 
     static {
         try {
@@ -207,7 +208,49 @@ public class AsmTypeProxy implements ProxyProvider {
             }
             invokerCount[0]++;
         });
+    }
 
+    private byte[] generateProxiedInvokerBytecode(String newInternalName, Iterable<Class<?>> uppers) {
+        ClassWriter cw = new ClassWriter(0);
+        String superInternalName = JieJvm.getInternalName(Object.class);
+        List<String> interfaceInternalNames = new LinkedList<>();
+        interfaceInternalNames.add(PROXIED_INVOKER_INTERNAL_NAME);
+        int i = 0;
+        for (Class<?> upper : uppers) {
+            if (i == 0) {
+                if (!upper.isInterface()) {
+                    superInternalName = JieJvm.getInternalName(upper);
+                    continue;
+                }
+            }
+            interfaceInternalNames.add(JieJvm.getInternalName(upper));
+            i++;
+        }
+        cw.visit(
+            Opcodes.V1_8,
+            Opcodes.ACC_PUBLIC,
+            newInternalName,
+            generateSignature(uppers),
+            superInternalName,
+            interfaceInternalNames.toArray(new String[0])
+        );
+
+        // Generates constructor: (String internalName, String methodName, methodDescriptor)
+        MethodVisitor constructor = cw.visitMethod(
+            Opcodes.ACC_PUBLIC, "<init>", INIT_DESCRIPTOR, null, null);
+        constructor.visitVarInsn(Opcodes.ALOAD, 0);
+        constructor.visitMethodInsn(Opcodes.INVOKESPECIAL, superInternalName, "<init>", "()V", false);
+        constructor.visitVarInsn(Opcodes.ALOAD, 0);
+        constructor.visitVarInsn(Opcodes.ALOAD, 1);
+        constructor.visitFieldInsn(Opcodes.PUTFIELD, newInternalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
+        constructor.visitVarInsn(Opcodes.ALOAD, 0);
+        constructor.visitVarInsn(Opcodes.ALOAD, 2);
+        constructor.visitFieldInsn(Opcodes.PUTFIELD, newInternalName, "methods", METHOD_ARRAY_DESCRIPTOR);
+        constructor.visitInsn(Opcodes.RETURN);
+        constructor.visitMaxs(2, 3);
+        constructor.visitEnd();
+
+        return cw.toByteArray();
     }
 
     private void visitLoad(MethodVisitor visitor, Class<?> type, int i) {

@@ -151,8 +151,8 @@ public class ProxyTest {
 
     @Test
     public void ss() throws Exception {
-        AsmTypeProxy asmTypeProxy = new AsmTypeProxy();
-        XX xx = asmTypeProxy.newProxyInstance(null, Arrays.asList(XX.class), m -> {
+        AsmProxyProvider asmProxyProvider = new AsmProxyProvider();
+        XX xx = asmProxyProvider.newProxyInstance(null, Arrays.asList(XX.class), m -> {
             if (!m.getName().startsWith("s")) {
                 return null;
             }
