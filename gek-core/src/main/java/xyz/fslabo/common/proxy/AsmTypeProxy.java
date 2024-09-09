@@ -320,10 +320,10 @@ public class AsmTypeProxy implements ProxyProvider {
             visitor.visitInsn(Opcodes.IRETURN);
             return;
         }
-        if (Objects.equals(type, boolean.class)) {
+        if (Objects.equals(type, double.class)) {
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Double");
             visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()Z", false);
+                Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false);
             visitor.visitInsn(Opcodes.IRETURN);
             return;
         }
