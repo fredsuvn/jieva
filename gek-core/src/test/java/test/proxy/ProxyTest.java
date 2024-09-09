@@ -6,9 +6,8 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.proxy.*;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProxyTest {
@@ -151,34 +150,101 @@ public class ProxyTest {
     }
 
     @Test
-    public void ss() {
-        System.out.println(new FooChild().doDefault("tt", null, null));
-        System.out.println(B.class);
-        System.out.println(new B().tt("sss"));
-        A<Integer> proxyInstance = (A<Integer>) Proxy.newProxyInstance(
-            A.class.getClassLoader(),
-            new Class[]{A.class},
-            new InvocationHandler() {
-                @Override
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    System.out.println(method);
-                    return "proxy";
-                }
+    public void ss() throws Exception {
+        AsmTypeProxy asmTypeProxy = new AsmTypeProxy();
+        XX xx = asmTypeProxy.newProxyInstance(null, Arrays.asList(XX.class), m -> {
+            if (!m.getName().startsWith("s")) {
+                return null;
             }
-        );
-        int i = proxyInstance.tt(1);
-        System.out.println(i);
+            return new ProxyInvoker() {
+                @Override
+                public @Nullable Object invoke(@Nullable Object inst, Method proxiedMethod, ProxiedInvoker proxiedInvoker, Object... args) throws Throwable {
+                    return "proxy-" + Arrays.toString(args);
+                }
+            };
+        });
+        System.out.println(xx.getClass());
+        System.out.println(xx.sss());
+        System.out.println(xx.sss2("q", "w"));
+        // System.out.println(xx.ssss(false));
     }
 
-    public static interface A<T>{
+    public static class XX {
+
+        private final String s = "ss";
+
+        public XX() {
+        }
+
+        public String sss() {
+            return "sss";
+        }
+
+        public String sss2(String a, String b) {
+            Object obj = "sss2";
+            return (String) obj;
+        }
+
+        public Boolean ssss(boolean b) {
+            return b;
+        }
+
+        public boolean ssss2(Boolean b) {
+            return b;
+        }
+
+        public boolean ssss3(boolean b) {
+            return b;
+        }
+    }
+
+    public static interface A<T> {
 
         default T tt(T t) {
             return t;
         }
     }
 
-    public static class B implements A<String>, Serializable {
+    public static class B extends Number implements A<String>, Serializable {
 
+        private ProxyInvoker[] invokers;
+        private Method[] methods;
+
+        public B() throws NoSuchMethodException {
+
+        }
+
+        public B(ProxyInvoker[] invokers, Method[] methods) throws NoSuchMethodException {
+            this.invokers = invokers;
+            this.methods = methods;
+        }
+
+        @Override
+        public int intValue() {
+            return 0;
+        }
+
+        @Override
+        public long longValue() {
+            return 0;
+        }
+
+        @Override
+        public float floatValue() {
+            return 0;
+        }
+
+        @Override
+        public double doubleValue() {
+            return 0;
+        }
+
+        public Object getTt(Object a, Object b) throws Throwable {
+            ProxyInvoker invoker = invokers[6];
+            Method method = methods[8];
+            Object[] args = new Object[]{a, b};
+            return invoker.invoke(this, method, null, args);
+        }
     }
 
     public static class FooClass2 {

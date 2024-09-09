@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class JieReflect {
 
-    private static final Class<?>[] PRIMITIVES = {
+    private static final Map<Class<?>, Class<?>> CLASS_WRAPPERS = Jie.map(
         boolean.class, Boolean.class,
         byte.class, Byte.class,
         short.class, Short.class,
@@ -29,8 +29,8 @@ public class JieReflect {
         long.class, Long.class,
         float.class, Float.class,
         double.class, Double.class,
-        void.class, Void.class,
-    };
+        void.class, Void.class
+    );
 
     private static final Cache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = Cache.softCache();
 
@@ -421,16 +421,7 @@ public class JieReflect {
      * @return wrapper class if given class is primitive, else return itself
      */
     public static Class<?> wrapper(Class<?> cls) {
-        if (cls.isPrimitive()) {
-            for (int i = 0; i < PRIMITIVES.length; ) {
-                if (Objects.equals(cls, PRIMITIVES[i])) {
-                    return PRIMITIVES[i + 1];
-                }
-                i += 2;
-            }
-            throw new IllegalArgumentException("Unknown primitive class: " + cls.getName());
-        }
-        return cls;
+        return Jie.orDefault(CLASS_WRAPPERS.get(cls), cls);
     }
 
     /**

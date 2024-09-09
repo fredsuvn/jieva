@@ -613,11 +613,25 @@ public class Jie {
     }
 
     /**
+     * Returns an immutable {@link List} which is added all given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return an immutable {@link List} which is added all given elements
+     * @see JieColl#toList(Object[])
+     */
+    @SafeVarargs
+    public static <T> List<T> list(T... elements) {
+        return JieColl.toList(elements);
+    }
+
+    /**
      * Returns a new {@link ArrayList} and add all given elements.
      *
      * @param elements given elements
      * @param <T>      type of element
      * @return a new {@link ArrayList} and add all given elements
+     * @see JieColl#addAll(Collection, Object[])
      */
     @SafeVarargs
     public static <T> ArrayList<T> arrayList(T... elements) {
@@ -630,10 +644,24 @@ public class Jie {
      * @param elements given elements
      * @param <T>      type of element
      * @return a new {@link LinkedList} and add all given elements
+     * @see JieColl#addAll(Collection, Object[])
      */
     @SafeVarargs
     public static <T> LinkedList<T> linkedList(T... elements) {
         return JieColl.addAll(new LinkedList<>(), elements);
+    }
+
+    /**
+     * Returns an immutable {@link Set} which is added all given elements.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return an immutable {@link Set} which is added all given elements
+     * @see JieColl#toSet(Object[])
+     */
+    @SafeVarargs
+    public static <T> Set<T> set(T... elements) {
+        return JieColl.toSet(elements);
     }
 
     /**
@@ -642,6 +670,7 @@ public class Jie {
      * @param elements given elements
      * @param <T>      type of element
      * @return a new {@link HashSet} and add all given elements
+     * @see JieColl#addAll(Collection, Object[])
      */
     @SafeVarargs
     public static <T> HashSet<T> hashSet(T... elements) {
@@ -654,24 +683,44 @@ public class Jie {
      * @param elements given elements
      * @param <T>      type of element
      * @return a new {@link LinkedHashSet} and add all given elements
+     * @see JieColl#addAll(Collection, Object[])
      */
     @SafeVarargs
     public static <T> LinkedHashSet<T> linkedHashSet(T... elements) {
         return JieColl.addAll(new LinkedHashSet<>(elements.length), elements);
     }
 
+
+    /**
+     * Returns an immutable {@link Map} which is added all given elements.
+     * <p>
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
+     * is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param elements given elements
+     * @param <K>      type of keys
+     * @param <V>      type of values
+     * @param <T>      type of element
+     * @return an immutable {@link Map} which is added all given elements
+     * @see JieColl#toMap(Object...)
+     */
+    @SafeVarargs
+    public static <K, V, T> Map<K, V> map(T... elements) {
+        return JieColl.toMap(elements);
+    }
+
     /**
      * Returns a new {@link HashMap} and add all given elements.
      * <p>
-     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
-     * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
+     * is not followed by a value-{@code n}, it will be ignored.
      *
      * @param elements given elements
      * @param <K>      type of keys
      * @param <V>      type of values
      * @param <T>      type of element
      * @return a new {@link HashMap} and add all given elements
-     * @see JieColl#toMap(Object...)
+     * @see JieColl#addAll(Map, Object[])
      */
     @SafeVarargs
     public static <K, V, T> HashMap<K, V> hashMap(T... elements) {
@@ -681,15 +730,15 @@ public class Jie {
     /**
      * Returns a new {@link LinkedHashMap} and add all given elements.
      * <p>
-     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on.
-     * If last key-{@code n} is not followed by a value-{@code n}, it will be ignored.
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
+     * is not followed by a value-{@code n}, it will be ignored.
      *
      * @param elements given elements
      * @param <K>      type of keys
      * @param <V>      type of values
      * @param <T>      type of element
      * @return a new {@link LinkedHashMap} and add all given elements
-     * @see JieColl#toMap(Object...)
+     * @see JieColl#addAll(Map, Object[])
      */
     @SafeVarargs
     public static <K, V, T> LinkedHashMap<K, V> linkedHashMap(T... elements) {

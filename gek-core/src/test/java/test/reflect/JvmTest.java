@@ -14,15 +14,15 @@ public class JvmTest {
 
     @Test
     public void testName() throws Exception {
-        Assert.assertEquals(JieJvm.getInternalName(boolean.class), "Z");
-        Assert.assertEquals(JieJvm.getInternalName(byte.class), "B");
-        Assert.assertEquals(JieJvm.getInternalName(short.class), "S");
-        Assert.assertEquals(JieJvm.getInternalName(char.class), "C");
-        Assert.assertEquals(JieJvm.getInternalName(int.class), "I");
-        Assert.assertEquals(JieJvm.getInternalName(long.class), "J");
-        Assert.assertEquals(JieJvm.getInternalName(float.class), "F");
-        Assert.assertEquals(JieJvm.getInternalName(double.class), "D");
-        Assert.assertEquals(JieJvm.getInternalName(void.class), "V");
+        Assert.assertEquals(JieJvm.getInternalName(boolean.class), org.objectweb.asm.Type.getInternalName(boolean.class));
+        Assert.assertEquals(JieJvm.getInternalName(byte.class), org.objectweb.asm.Type.getInternalName(byte.class));
+        Assert.assertEquals(JieJvm.getInternalName(short.class), org.objectweb.asm.Type.getInternalName(short.class));
+        Assert.assertEquals(JieJvm.getInternalName(char.class), org.objectweb.asm.Type.getInternalName(char.class));
+        Assert.assertEquals(JieJvm.getInternalName(int.class), org.objectweb.asm.Type.getInternalName(int.class));
+        Assert.assertEquals(JieJvm.getInternalName(long.class), org.objectweb.asm.Type.getInternalName(long.class));
+        Assert.assertEquals(JieJvm.getInternalName(float.class), org.objectweb.asm.Type.getInternalName(float.class));
+        Assert.assertEquals(JieJvm.getInternalName(double.class), org.objectweb.asm.Type.getInternalName(double.class));
+        Assert.assertEquals(JieJvm.getInternalName(void.class), org.objectweb.asm.Type.getInternalName(void.class));
         Assert.assertEquals(
             JieJvm.getInternalName(Object.class),
             org.objectweb.asm.Type.getInternalName(Object.class)
@@ -31,15 +31,15 @@ public class JvmTest {
 
     @Test
     public void testDescriptor() throws Exception {
-        Assert.assertEquals(JieJvm.getDescriptor(boolean.class), "Z");
-        Assert.assertEquals(JieJvm.getDescriptor(byte.class), "B");
-        Assert.assertEquals(JieJvm.getDescriptor(short.class), "S");
-        Assert.assertEquals(JieJvm.getDescriptor(char.class), "C");
-        Assert.assertEquals(JieJvm.getDescriptor(int.class), "I");
-        Assert.assertEquals(JieJvm.getDescriptor(long.class), "J");
-        Assert.assertEquals(JieJvm.getDescriptor(float.class), "F");
-        Assert.assertEquals(JieJvm.getDescriptor(double.class), "D");
-        Assert.assertEquals(JieJvm.getDescriptor(void.class), "V");
+        Assert.assertEquals(JieJvm.getDescriptor(boolean.class), org.objectweb.asm.Type.getDescriptor(boolean.class));
+        Assert.assertEquals(JieJvm.getDescriptor(byte.class), org.objectweb.asm.Type.getDescriptor(byte.class));
+        Assert.assertEquals(JieJvm.getDescriptor(short.class), org.objectweb.asm.Type.getDescriptor(short.class));
+        Assert.assertEquals(JieJvm.getDescriptor(char.class), org.objectweb.asm.Type.getDescriptor(char.class));
+        Assert.assertEquals(JieJvm.getDescriptor(int.class), org.objectweb.asm.Type.getDescriptor(int.class));
+        Assert.assertEquals(JieJvm.getDescriptor(long.class), org.objectweb.asm.Type.getDescriptor(long.class));
+        Assert.assertEquals(JieJvm.getDescriptor(float.class), org.objectweb.asm.Type.getDescriptor(float.class));
+        Assert.assertEquals(JieJvm.getDescriptor(double.class), org.objectweb.asm.Type.getDescriptor(double.class));
+        Assert.assertEquals(JieJvm.getDescriptor(void.class), org.objectweb.asm.Type.getDescriptor(void.class));
         Assert.assertEquals(
             JieJvm.getDescriptor(Object.class),
             org.objectweb.asm.Type.getDescriptor(Object.class)

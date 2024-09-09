@@ -1,9 +1,11 @@
 package xyz.fslabo.common.reflect;
 
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.coll.JieArray;
 
 import java.lang.reflect.*;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -13,7 +15,7 @@ import java.util.Objects;
  */
 public class JieJvm {
 
-    private static final Object[] PRIMITIVE_DESCRIPTORS = {
+    private static final Map<Class<?>, String> DESCRIPTORS = Jie.map(
         boolean.class, "Z",
         byte.class, "B",
         short.class, "S",
@@ -22,8 +24,13 @@ public class JieJvm {
         long.class, "J",
         float.class, "F",
         double.class, "D",
-        void.class, "V",
-    };
+        void.class, "V"
+    );
+
+    private static final Map<Class<?>, String> INTERNAL_NAMES = Jie.map(
+        Object.class, "java/lang/Object",
+        String.class, "java/lang/String"
+    );
 
     /**
      * Returns the internal name of the given class.
@@ -35,10 +42,8 @@ public class JieJvm {
      * @return internal name of the given class
      */
     public static String getInternalName(Class<?> cls) {
-        if (cls.isPrimitive()) {
-            return getDescriptor(cls);
-        }
-        return JieString.replace(cls.getName(), ".", "/");
+        String result = INTERNAL_NAMES.get(cls);
+        return result != null ? result : JieString.replace(cls.getName(), ".", "/");
     }
 
     /**
@@ -51,16 +56,8 @@ public class JieJvm {
         if (cls.isArray()) {
             return "[" + getDescriptor(cls.getComponentType());
         }
-        if (cls.isPrimitive()) {
-            for (int i = 0; i < PRIMITIVE_DESCRIPTORS.length; ) {
-                if (cls.equals(PRIMITIVE_DESCRIPTORS[i])) {
-                    return (String) PRIMITIVE_DESCRIPTORS[i + 1];
-                }
-                i += 2;
-            }
-            throw new IllegalArgumentException("Unknown primitive class: " + cls.getName());
-        }
-        return "L" + getInternalName(cls) + ";";
+        String result = DESCRIPTORS.get(cls);
+        return result != null ? result : "L" + getInternalName(cls) + ";";
     }
 
     /**
