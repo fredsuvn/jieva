@@ -169,6 +169,7 @@ public class ProxyTest {
         // System.out.println(xx.ssss(false));
 
         XXX xxx = new XXX();
+        TestA ta = new TestA();
     }
 
     public static class XX {
@@ -206,7 +207,9 @@ public class ProxyTest {
 
         public XXX() {
             proxiedInvokers = new ProxiedInvoker[10];
-            proxiedInvokers[0] = new XXXP(20);
+            for (int i = 0; i < proxiedInvokers.length; i++) {
+                proxiedInvokers[i] = new XXXP(i);
+            }
         }
 
         public Boolean ssss(boolean b) {
@@ -231,10 +234,11 @@ public class ProxyTest {
 
             private final int i;
 
-            private XXXP(int i) {this.i = i;}
+            private XXXP(int i) {
+                this.i = i;
+            }
 
-            @Override
-            public @Nullable Object invoke(@Nullable Object inst, Object... args) throws Throwable {
+            public  Object invoke( Object inst, Object... args) {
                 return sw(i, inst, args);
             }
         }
