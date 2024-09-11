@@ -5,9 +5,9 @@ import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.proxy.*;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ProxyTest {
@@ -149,161 +149,219 @@ public class ProxyTest {
         }
     }
 
+
     @Test
-    public void ss() throws Exception {
-        AsmProxyProvider asmProxyProvider = new AsmProxyProvider();
-        XX xx = asmProxyProvider.newProxyInstance(null, Arrays.asList(XX.class), m -> {
-            if (!m.getName().startsWith("s")) {
-                return null;
-            }
-            return new ProxyInvoker() {
-                @Override
-                public @Nullable Object invoke(@Nullable Object inst, Method proxiedMethod, ProxiedInvoker proxiedInvoker, Object... args) throws Throwable {
-                    return "proxy-" + Arrays.toString(args);
-                }
-            };
-        });
-        System.out.println(xx.getClass());
-        System.out.println(xx.sss());
-        System.out.println(xx.sss2("q", "w"));
-        // System.out.println(xx.ssss(false));
-
-        XXX xxx = new XXX();
-        TestA ta = new TestA();
+    public void testProvider() {
+        testProxyInst(new AsmProxyProvider(), true);
     }
 
-    public static class XX {
-
-        private final String s = "ss";
-
-        public XX() {
+    private void testProxyInst(ProxyProvider provider, boolean supportProxyClass) {
+        Object inst = provider.newProxyInstance(
+            getClass().getClassLoader(),
+            Arrays.asList(Class1.class, Inter1.class, Inter2.class),
+            method -> method.getName().startsWith("pp") ? TestProxyInvoker.SINGLETON : null
+        );
+        if (supportProxyClass) {
+            testClass1((Class1) inst);
         }
-
-        public String sss() {
-            return "sss";
-        }
-
-        public String sss2(String a, String b) {
-            Object obj = "sss2";
-            return (String) obj;
-        }
-
-        public Boolean ssss(boolean b) {
-            return b;
-        }
-
-        public boolean ssss2(Boolean b) {
-            return b;
-        }
-
-        public boolean ssss3(boolean b) {
-            return b;
-        }
+        testInter1((Inter1) inst);
+        testInter2((Inter2) inst);
     }
 
-    public static class XXX extends XX {
+    private void testClass1(Class1 class1) {
+        Assert.assertEquals(class1.ppc_boolean(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_byte(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_short(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_char(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_int(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_long(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_float(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_double(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_String(), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_String(true), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4'), TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5), TestProxyInvoker.stack.get(0));
+        // Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6), TestProxyInvoker.stack.get(0));
+        // Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7), TestProxyInvoker.stack.get(0));
+        // Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8), TestProxyInvoker.stack.get(0));
+        // Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8, "9"), TestProxyInvoker.stack.get(0));
+        class1.ppc_void();
+        Assert.assertEquals("ppc_void", TestProxyInvoker.stack.get(0));
+        Assert.assertEquals(null, TestProxyInvoker.stack.get(1));
+        System.out.println(Class2.class);
+    }
 
-        private ProxiedInvoker[] proxiedInvokers;
+    private void testInter1(Inter1 inter1) {
+        // System.out.println(inter1.ppi10());
+        // System.out.println(inter1.ppi11(1, ""));
+        System.out.println(inter1.ppi12(1, "b"));
+    }
 
-        public XXX() {
-            proxiedInvokers = new ProxiedInvoker[10];
-            for (int i = 0; i < proxiedInvokers.length; i++) {
-                proxiedInvokers[i] = new XXXP(i);
-            }
-        }
+    private void testInter2(Inter2 inter2) {
+        // System.out.println(inter2.ppi20());
+        // System.out.println(inter2.ppi21(1, ""));
+        System.out.println(inter2.ppi22(1, "b"));
+    }
 
-        public Boolean ssss(boolean b) {
-            return b;
-        }
 
-        public Boolean ssssSuper(boolean b) {
-            return super.ssss(b);
-        }
+    public static class TestProxyInvoker implements ProxyInvoker {
 
-        public Object sw(int i,  Object inst, Object... args) {
-            switch (i) {
-                case 0:
-                    return ssssSuper((Boolean)args[0]);
-                case 1:
-                    return ssssSuper((Boolean)args[0]);
-            }
-            return null;
-        }
+        public static final TestProxyInvoker SINGLETON = new TestProxyInvoker();
 
-        private class XXXP implements ProxiedInvoker {
+        public static final List<Object> stack = new LinkedList<>();
 
-            private final int i;
-
-            private XXXP(int i) {
-                this.i = i;
-            }
-
-            public  Object invoke( Object inst, Object... args) {
-                return sw(i, inst, args);
-            }
+        @Override
+        public @Nullable Object invoke(
+            @Nullable Object inst, Method proxiedMethod, ProxiedInvoker proxiedInvoker, Object... args) throws Throwable {
+            stack.clear();
+            Object result = proxiedInvoker.invoke(inst, args);
+            stack.add(result);
+            return result;
         }
     }
 
-    public static interface A<T> {
 
-        default T tt(T t) {
-            return t;
+    public interface Inter1 {
+
+        int ppi10();
+
+        int ppi11(int i, String a);
+
+        default String ppi12(int i, String a) {
+            return a + 1;
         }
     }
 
-    public static class B extends Number implements A<String>, Serializable {
+    public interface Inter2 {
 
-        private ProxyInvoker[] invokers;
-        private Method[] methods;
+        int ppi20();
 
-        public B() throws NoSuchMethodException {
+        int ppi21(int i, String a);
 
+        default String ppi22(int i, String a) {
+            return a + 1;
+        }
+    }
+
+    public static class Class1 {
+
+        public boolean ppc_boolean() {
+            return true;
         }
 
-        public B(ProxyInvoker[] invokers, Method[] methods) throws NoSuchMethodException {
+        public byte ppc_byte() {
+            return 1;
+        }
+
+        public short ppc_short() {
+            return 1;
+        }
+
+        public char ppc_char() {
+            return 1;
+        }
+
+        public int ppc_int() {
+            return 1;
+        }
+
+        public long ppc_long() {
+            return 1;
+        }
+
+        public float ppc_float() {
+            return 1;
+        }
+
+        public double ppc_double() {
+            return 1;
+        }
+
+        public void ppc_void() {
+            TestProxyInvoker.stack.add("ppc_void");
+        }
+
+        public String ppc_String() {
+            return "1";
+        }
+
+        public String ppc_String(boolean a) {
+            return "1" + a;
+        }
+
+        public String ppc_String(boolean a, byte b) {
+            return "" + a + b;
+        }
+
+        public String ppc_String(boolean a, byte b, short c) {
+            return "" + a + b + c;
+        }
+
+        public String ppc_String(boolean a, byte b, short c, char d) {
+            return "" + a + b + c + d;
+        }
+
+        public String ppc_String(boolean a, byte b, short c, char d, int e) {
+            return "" + a + b + c + d + e;
+        }
+
+        public String ppc_String(boolean a, byte b, short c, char d, int e, long f) {
+            return "" + a + b + c + d + e + f;
+        }
+
+        // public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g) {
+        //     return "" + a + b + c + d + e + f + g;
+        // }
+        //
+        // public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g, double h) {
+        //     return "" + a + b + c + d + e + f + g + h;
+        // }
+        //
+        // public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g, double h, String i) {
+        //     return "" + a + b + c + d + e + f + g + h + i;
+        // }
+    }
+
+    public static class Class2 extends Class1 {
+
+        private final ProxyInvoker[] invokers;
+        private final Method[] methods;
+        private final ProxiedInvoker[] proxiedInvokers;
+
+        public Class2(ProxyInvoker[] invokers, Method[] methods, ProxiedInvoker[] proxiedInvokers) {
             this.invokers = invokers;
             this.methods = methods;
+            this.proxiedInvokers = proxiedInvokers;
         }
 
-        @Override
-        public int intValue() {
-            return 0;
+        public String ppc_String(boolean a, byte b, short c, char d, int e, long f) {
+            ProxyInvoker invoker = invokers[0];
+            Method method = methods[0];
+            ProxiedInvoker proxiedInvoker = proxiedInvokers[0];
+            Object[] args = new Object[6];
+            args[0] = a;
+            args[1] = b;
+            args[2] = c;
+            args[3] = d;
+            args[4] = e;
+            args[5] = f;
+            try {
+                return (String) invoker.invoke(this, method, proxiedInvoker, args);
+            } catch (Throwable ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
-        @Override
-        public long longValue() {
-            return 0;
-        }
-
-        @Override
-        public float floatValue() {
-            return 0;
-        }
-
-        @Override
-        public double doubleValue() {
-            return 0;
-        }
-
-        public Object getTt(Object a, Object b) throws Throwable {
-            ProxyInvoker invoker = invokers[6];
-            Method method = methods[8];
-            Object[] args = new Object[]{a, b};
-            return invoker.invoke(this, method, null, args);
-        }
-    }
-
-    public static class FooClass2 {
-
-    }
-
-    public static class FooChild extends FooClass2 implements FooInter<String, List<String>, Long> {
-
-        private String str;
-
-        @Override
-        public String fi1(String input) {
-            return "";
+        public Object callSuper(int i, Object inst, Object[] args) {
+            switch (i) {
+                case 0:
+                    return super.ppc_boolean();
+                case 1:
+                    return null;//super.ppc_String((Boolean) args[0], (Byte) args[1], (Short) args[2], (Character) args[3], (Integer) args[4], (Long) args[5]);
+            }
+            return super.ppc_boolean();
         }
     }
 }

@@ -2,15 +2,15 @@ package test.proxy;
 
 public class TestS {
 
-    public void m1() {
+    public void m1(Object a, Object b) {
 
     }
 
-    public void m2() {
-
-    }
-
-    public int m3() {
+    public int m2() {
         return 0;
+    }
+
+    public String m3(int a) {
+        return a + "";
     }
 }
