@@ -1,30 +1,43 @@
 package xyz.fslabo.common.proxy;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.invoke.Invoker;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * This interface represents a proxy method handle to proxy method of {@link TypeProxy}.
+ * Invoker to invoke proxied method (super) on given proxy or proxied instance.
+ * <p>
+ * Instance of {@link ProxyInvoker} should be generated from {@link ProxyProvider}, and each instance associates a
+ * proxied method.
  *
  * @author fredsuvn
  */
 public interface ProxyInvoker {
 
     /**
-     * Invokes proxy method with given proxy instance, proxied method, {@link Invoker} of proxied method and argument.
+     * Invokes proxied method associated to this invoker with given non-proxy instance.
+     * <p>
+     * Note do not use a proxy instance (such as first parameter of
+     * {@link MethodProxyHandler#invoke(Object, Method, Object[], ProxyInvoker)}), it will cause a recursion error.
      *
-     * @param inst           given proxy instance, the instance of proxied type
-     * @param proxiedMethod  proxied method, usually is the super method
-     * @param proxiedInvoker handle of proxied method
-     * @param args           arguments
+     * @param inst given instance
+     * @param args arguments
      * @return result of invocation
      * @throws Throwable the bare exceptions thrown by the proxied method, without any wrapping such as
      *                   {@link InvocationTargetException}
      */
     @Nullable
-    Object invoke(
-        @Nullable Object inst, Method proxiedMethod, ProxiedInvoker proxiedInvoker, Object... args) throws Throwable;
+    Object invoke(Object inst, Object[] args) throws Throwable;
+
+    /**
+     * Invokes proxied method associated to this invoker, this method is equivalent to call {@code super} method.
+     *
+     * @param args arguments
+     * @return result of invocation
+     * @throws Throwable the bare exceptions thrown by the proxied method, without any wrapping such as
+     *                   {@link InvocationTargetException}
+     */
+    @Nullable
+    Object invokeSuper(Object[] args) throws Throwable;
 }

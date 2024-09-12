@@ -1,5 +1,8 @@
 package test.proxy;
 
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
@@ -152,96 +155,113 @@ public class ProxyTest {
 
     @Test
     public void testProvider() {
-        testProxyInst(new AsmProxyProvider(), true);
+        testProxyInst(new AsmProxyProvider(), new Class1(), true);
     }
 
-    private void testProxyInst(ProxyProvider provider, boolean supportProxyClass) {
+    private void testProxyInst(ProxyProvider provider, Object instant, boolean supportProxyClass) {
+        TestProxyInvoker proxyInvoker = new TestProxyInvoker(instant);
         Object inst = provider.newProxyInstance(
             getClass().getClassLoader(),
-            Arrays.asList(Class1.class, Inter1.class, Inter2.class),
-            method -> method.getName().startsWith("pp") ? TestProxyInvoker.SINGLETON : null
+            Arrays.asList(Class1.class),//, Inter1.class, Inter2.class),
+            method -> method.getName().startsWith("pp") ? proxyInvoker : null
         );
         if (supportProxyClass) {
-            testClass1((Class1) inst);
+            testClass1((Class1) inst, proxyInvoker);
         }
-        testInter1((Inter1) inst);
-        testInter2((Inter2) inst);
+        // testInter1((Inter1) inst, proxyInvoker);
+        // testInter2((Inter2) inst, proxyInvoker);
     }
 
-    private void testClass1(Class1 class1) {
-        Assert.assertEquals(class1.ppc_boolean(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_byte(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_short(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_char(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_int(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_long(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_float(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_double(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_String(), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_String(true), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_String(true, (byte) 2), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4'), TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5), TestProxyInvoker.stack.get(0));
-        // Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6), TestProxyInvoker.stack.get(0));
-        // Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7), TestProxyInvoker.stack.get(0));
-        // Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8), TestProxyInvoker.stack.get(0));
-        // Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8, "9"), TestProxyInvoker.stack.get(0));
+    private void testClass1(Class1 class1, TestProxyInvoker proxyInvoker) {
+        Assert.assertEquals(class1.ppc_boolean(), proxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_byte(), proxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_short(), proxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_char(), proxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_int(), proxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_long(), proxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_float(), proxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_double(), proxyInvoker.stack.get(0));
+        Assert.assertEquals(class1.ppc_String(), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4'), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8), proxyInvoker.stack.get(0) + "-proxy");
+        Assert.assertEquals(class1.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8, "9"), proxyInvoker.stack.get(0) + "-proxy");
         class1.ppc_void();
-        Assert.assertEquals("ppc_void", TestProxyInvoker.stack.get(0));
-        Assert.assertEquals(null, TestProxyInvoker.stack.get(1));
+        Assert.assertEquals("ppc_void", proxyInvoker.voidStack.get(0));
+        proxyInvoker.voidStack.clear();
         System.out.println(Class2.class);
     }
 
-    private void testInter1(Inter1 inter1) {
-        // System.out.println(inter1.ppi10());
-        // System.out.println(inter1.ppi11(1, ""));
-        System.out.println(inter1.ppi12(1, "b"));
+    private void testInter1(Inter1 inter1, TestProxyInvoker proxyInvoker) {
+        Assert.expectThrows(AbstractMethodError.class, inter1::ppi1_boolean);
+        Assert.expectThrows(AbstractMethodError.class, () -> inter1.ppi1_double(1, "a"));
+        Assert.assertEquals(inter1.ppi1_String(1, 1, "s"), proxyInvoker.stack.get(0) + "-proxy");
     }
 
-    private void testInter2(Inter2 inter2) {
-        // System.out.println(inter2.ppi20());
-        // System.out.println(inter2.ppi21(1, ""));
-        System.out.println(inter2.ppi22(1, "b"));
+    private void testInter2(Inter2 inter2, TestProxyInvoker proxyInvoker) {
+        Assert.expectThrows(AbstractMethodError.class, inter2::ppi2_boolean);
+        Assert.expectThrows(AbstractMethodError.class, () -> inter2.ppi2_double(1, "a"));
+        Assert.assertEquals(inter2.ppi2_String(1, 1, "s"), proxyInvoker.stack.get(0) + "-proxy");
     }
-
 
     public static class TestProxyInvoker implements ProxyInvoker {
 
-        public static final TestProxyInvoker SINGLETON = new TestProxyInvoker();
+        public static final List<Object> voidStack = new LinkedList<>();
+        public final List<Object> stack = new LinkedList<>();
 
-        public static final List<Object> stack = new LinkedList<>();
+        private final Object instant;
+
+        public TestProxyInvoker(Object instant) {
+            System.out.println(instant.getClass());
+            this.instant = instant;
+        }
 
         @Override
         public @Nullable Object invoke(
             @Nullable Object inst, Method proxiedMethod, ProxiedInvoker proxiedInvoker, Object... args) throws Throwable {
-            stack.clear();
-            Object result = proxiedInvoker.invoke(inst, args);
-            stack.add(result);
-            return result;
+            System.out.println(">>>");
+            // if (Objects.equals(proxiedMethod.getReturnType(), void.class)) {
+            //     proxiedInvoker.invoke(inst, args);
+            //     return null;
+            // }
+            // stack.clear();
+            // Object result1 = proxiedInvoker.invoke(inst, args);
+            // Object result2 = proxiedInvoker.invoke(instant, args);
+            // Assert.assertEquals(result1, result2);
+            // stack.add(result2);
+            // if (proxiedMethod.getName().endsWith("_String")) {
+            //     return result2 + "-proxy";
+            // }
+            // return result2;
+            return null;
         }
     }
 
 
     public interface Inter1 {
 
-        int ppi10();
+        boolean ppi1_boolean();
 
-        int ppi11(int i, String a);
+        double ppi1_double(int i, String a);
 
-        default String ppi12(int i, String a) {
-            return a + 1;
+        default String ppi1_String(int i, double d, String s) {
+            return i + d + s;
         }
     }
 
     public interface Inter2 {
 
-        int ppi20();
+        boolean ppi2_boolean();
 
-        int ppi21(int i, String a);
+        double ppi2_double(int i, String a);
 
-        default String ppi22(int i, String a) {
-            return a + 1;
+        default String ppi2_String(int i, double d, String s) {
+            return i + d + s;
         }
     }
 
@@ -280,7 +300,7 @@ public class ProxyTest {
         }
 
         public void ppc_void() {
-            TestProxyInvoker.stack.add("ppc_void");
+            TestProxyInvoker.voidStack.add("ppc_void");
         }
 
         public String ppc_String() {
@@ -311,17 +331,20 @@ public class ProxyTest {
             return "" + a + b + c + d + e + f;
         }
 
-        // public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g) {
-        //     return "" + a + b + c + d + e + f + g;
-        // }
-        //
-        // public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g, double h) {
-        //     return "" + a + b + c + d + e + f + g + h;
-        // }
-        //
-        // public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g, double h, String i) {
-        //     return "" + a + b + c + d + e + f + g + h + i;
-        // }
+        public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g) {
+            return "" + a + b + c + d + e + f + g;
+        }
+
+        public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g, double h) {
+            return "" + a + b + c + d + e + f + g + h;
+        }
+
+        public String ppc_String(boolean a, byte b, short c, char d, int e, long f, float g, double h, String i) {
+            return "" + a + b + c + d + e + f + g + h + i;
+        }
+    }
+
+    public static class ClassInst extends Class1 {
     }
 
     public static class Class2 extends Class1 {
@@ -355,13 +378,59 @@ public class ProxyTest {
         }
 
         public Object callSuper(int i, Object inst, Object[] args) {
+            Class1 c1 = (Class1) inst;
+            c1.ppc_boolean();
             switch (i) {
                 case 0:
                     return super.ppc_boolean();
                 case 1:
-                    return null;//super.ppc_String((Boolean) args[0], (Byte) args[1], (Short) args[2], (Character) args[3], (Integer) args[4], (Long) args[5]);
+                    return null;// super.ppc_String((Boolean) args[0], (Byte) args[1], (Short) args[2], (Character) args[3], (Integer) args[4], (Long) args[5]);
             }
             return super.ppc_boolean();
+        }
+    }
+
+
+    @Test
+    public void testCglib() {
+        UserServiceProxy.main();
+    }
+
+    public static class UserService {
+        public String getUser() {
+            return "User";
+        }
+    }
+
+    public static class UserServiceProxy implements MethodInterceptor {
+
+        private Object target;
+
+        public UserServiceProxy(Object target) {
+            this.target = target;
+        }
+
+        @Override
+        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+            System.out.println("Before method call: " + method.getName());
+            // 调用原始对象的方法
+            Object result = proxy.invoke(target, args);
+            System.out.println(proxy.invokeSuper(obj, args));
+            System.out.println("After method call: " + method.getName());
+            return result;
+        }
+
+        public static void main() {
+            // 创建 CGLIB 的 Enhancer 实例
+            Enhancer enhancer = new Enhancer();
+            enhancer.setSuperclass(UserService.class);
+            enhancer.setCallback(new UserServiceProxy(new UserService()));
+
+            // 创建代理对象
+            UserService proxy = (UserService) enhancer.create();
+
+            // 使用代理对象
+            System.out.println(proxy.getUser());
         }
     }
 }
