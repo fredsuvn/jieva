@@ -5,6 +5,7 @@ import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.coll.JieArray;
 
 import java.lang.reflect.*;
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Objects;
 
@@ -233,5 +234,37 @@ public class JieJvm {
             }
         }
         return ":" + getSignature(bound);
+    }
+
+    /**
+     * Loads given bytecode.
+     *
+     * @param bytecode given bytecode
+     * @return class loaded from given bytecode
+     */
+    public static Class<?> loadBytecode(byte[] bytecode) {
+        return loadBytecode(ByteBuffer.wrap(bytecode));
+    }
+
+    /**
+     * Loads given bytecode.
+     *
+     * @param bytecode given bytecode
+     * @return class loaded from given bytecode
+     */
+    public static Class<?> loadBytecode(ByteBuffer bytecode) {
+        return JieClassLoader.SINGLETON.load(bytecode);
+    }
+
+    private static final class JieClassLoader extends ClassLoader {
+
+        private static final JieClassLoader SINGLETON = new JieClassLoader();
+
+        private JieClassLoader() {
+        }
+
+        public Class<?> load(ByteBuffer buffer) {
+            return defineClass(null, buffer, null);
+        }
     }
 }

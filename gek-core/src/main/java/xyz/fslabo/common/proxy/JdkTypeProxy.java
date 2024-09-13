@@ -122,7 +122,7 @@ final class JdkTypeProxy<T> implements TypeProxy<T> {
             if (proxyMethod == null) {
                 return invokeSuper(proxy, method, args);
             }
-            return proxyMethod.invoke(proxy, method, (p, as) -> invokeSuper(p, method, as), args);
+            return null;//proxyMethod.invoke(proxy, method, (p, as) -> invokeSuper(p, method, as), args);
         }
 
         private Object invokeSuper(Object proxy, Method method, Object[] args) throws Throwable {

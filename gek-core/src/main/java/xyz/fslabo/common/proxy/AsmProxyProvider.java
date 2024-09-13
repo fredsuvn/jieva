@@ -3,6 +3,7 @@ package xyz.fslabo.common.proxy;
 import org.objectweb.asm.*;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieJvm;
 
@@ -12,6 +13,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * <a href="https://asm.ow2.io/">ASM</a> implementation for {@link ProxyProvider}. The runtime environment must have
@@ -35,21 +37,13 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
 
     private static final String PROXY_INVOKER_DESCRIPTOR = JieJvm.getDescriptor(ProxyInvoker.class);
     private static final String OBJECT_INTERNAL_NAME = JieJvm.getInternalName(Object.class);
-    private static final String INVOKE_METHOD_DESCRIPTOR;
-    private static final String INVOKER_SUPER_METHOD_DESCRIPTOR;
 
-    static {
-        try {
-            INVOKE_METHOD_DESCRIPTOR = JieJvm.getDescriptor(ProxyInvoker.class.getMethod(
-                "invoke", Object.class, Method.class, ProxiedInvoker.class, Object[].class));
-            INVOKER_SUPER_METHOD_DESCRIPTOR = JieJvm.getDescriptor(ProxiedInvoker.class.getMethod(
-                "invoke", Object.class, Object[].class));
-        } catch (NoSuchMethodException e) {
-            throw new ProxyException(e);
-        }
-    }
+    private static final String PROXY_INVOKER_SIMPLE_NAME = ProxyInvoker.class.getSimpleName();
+    private static final String CALL_SUPER_METHOD_DESCRIPTOR =
+        "(I" + JieJvm.getDescriptor(Object.class) + JieJvm.getDescriptor(Object[].class) + ")"
+            + JieJvm.getDescriptor(Object.class);
 
-    private static final AsmClassLoader asmClassLoader = new AsmClassLoader();
+    private static final String CALL_SUPER_METHOD_NAME = "callSuper";
 
     @Override
     public <T> T newProxyInstance(
@@ -60,79 +54,77 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         if (JieColl.isEmpty(uppers)) {
             throw new ProxyException("No super class or interface to proxy.");
         }
-        String superInternalName = JieJvm.getInternalName(Object.class);
-        List<String> interfaceInternalNames = null;
-        int i = 0;
-        for (Class<?> upper : uppers) {
-            if (i == 0) {
-                if (!upper.isInterface()) {
-                    superInternalName = JieJvm.getInternalName(upper);
-                    continue;
-                }
-            }
-            if (interfaceInternalNames == null) {
-                interfaceInternalNames = new LinkedList<>();
-            }
-            interfaceInternalNames.add(JieJvm.getInternalName(upper));
-            i++;
+        Iterator<Class<?>> classIterator = uppers.iterator();
+        Class<?> firstClass = classIterator.next();
+        String superInternalName;
+        List<String> interfaceInternalNames = new LinkedList<>();
+        if (firstClass.isInterface()) {
+            superInternalName = OBJECT_INTERNAL_NAME;
+            interfaceInternalNames.add(JieJvm.getInternalName(firstClass));
+        } else {
+            superInternalName = JieJvm.getInternalName(firstClass);
         }
-
+        while (classIterator.hasNext()) {
+            Class<?> cls = classIterator.next();
+            if (!cls.isInterface()) {
+                throw new ProxyException("Only one super class:"
+                    + JieColl.stream(uppers).map(Class::getName).collect(Collectors.joining(", "))
+                    + "."
+                );
+            }
+            interfaceInternalNames.add(JieJvm.getInternalName(cls));
+        }
         long count = counter.getAndIncrement();
-        String newProxyClassName = getClass().getName() + "$Proxy$" + count;
-        String newProxyInternalName = newProxyClassName.replaceAll("\\.", "/");
-        String newProxiedInvokerSimpleName = "ProxiedInvoker";
-        String newProxiedInvokerName = newProxyClassName + "$" + newProxiedInvokerSimpleName;
-        String newProxiedInvokerInternalName = newProxyInternalName + "$" + newProxiedInvokerSimpleName;
-        Map<ProxyInvoker, List<Method>> invokerMap = new LinkedHashMap<>();
+        String proxyClassName = getClass().getName() + "$Proxy$" + count;
+        String proxyInternalName = JieString.replace(proxyClassName, ".", "/");
+        String proxyDescriptor = "L" + proxyInternalName + ";";
+        String invokerName = proxyClassName + "$" + PROXY_INVOKER_SIMPLE_NAME;
+        String invokerInternalName = proxyInternalName + "$" + PROXY_INVOKER_SIMPLE_NAME;
+        Map<String, Method> proxiedMethods = new LinkedHashMap<>();
         for (Class<?> upper : uppers) {
             Method[] methods = upper.getMethods();
             for (Method method : methods) {
-                if (Modifier.isFinal(method.getModifiers())) {
+                if (Modifier.isFinal(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
                     continue;
                 }
-                ProxyInvoker invoker = invokerSupplier.apply(method);
-                if (invoker == null) {
+                if (!handler.proxy(method)) {
                     continue;
                 }
-                List<Method> list = invokerMap.computeIfAbsent(invoker, k -> new LinkedList<>());
-                list.add(method);
+                String methodInfo = method.getName() + ":" + JieJvm.getDescriptor(method);
+                if (proxiedMethods.containsKey(methodInfo)) {
+                    continue;
+                }
+                proxiedMethods.put(methodInfo, method);
             }
         }
-
-        byte[] bytecode = generateBytecode(newProxyInternalName, uppers, invokerMap, newProxiedInvokerInternalName, newProxiedInvokerSimpleName);
-        Class<?> cls = asmClassLoader.defineClass(newProxyClassName, bytecode);
-
-        // Generate proxied invoker class
-        byte[] proxiedInvokerByteCode = generateProxiedInvoker(
-            newProxiedInvokerInternalName,
-            newProxiedInvokerSimpleName,
-            newProxyInternalName,
-            "L" + newProxyInternalName.replaceAll("\\.", "/") + ";"
+        List<Method> methodList = new ArrayList<>(proxiedMethods.values());
+        // Generates proxy class
+        ProxyGenerator proxyGenerator = new ProxyGenerator(
+            proxyInternalName,
+            generateSignature(uppers),
+            superInternalName,
+            interfaceInternalNames,
+            invokerInternalName,
+            methodList
         );
-        Class<?> proxiedInvokerCls = asmClassLoader.defineClass(newProxiedInvokerName, proxiedInvokerByteCode);
-
+        byte[] proxyBytecode = proxyGenerator.generateBytecode();
+        Class<?> proxyClass = JieJvm.loadBytecode(proxyBytecode);
+        // Generates invoker class
+        InvokerGenerator invokerGenerator = new InvokerGenerator(
+            proxyInternalName,
+            proxyDescriptor,
+            invokerInternalName
+        );
+        byte[] invokerBytecode = invokerGenerator.generateBytecode();
+        Class<?> invokerClass = JieJvm.loadBytecode(invokerBytecode);
         try {
-            Constructor<?> constructor = cls.getConstructor(ProxyInvoker[].class, Method[].class);
-            List<ProxyInvoker> invokers = new LinkedList<>();
-            List<Method> methods = new LinkedList<>();
-            invokerMap.forEach((invoker, methodList) -> {
-                invokers.add(invoker);
-                methods.addAll(methodList);
-            });
-            Object result = constructor.newInstance(
-                invokers.toArray(new ProxyInvoker[0]),
-                methods.toArray(new Method[0])
-            );
+            Constructor<?> constructor = proxyClass.getConstructor(MethodProxyHandler.class, Method[].class);
+            Object result = constructor.newInstance(handler, methodList.toArray(new Method[0]));
             return Jie.as(result);
         } catch (Exception e) {
             throw new ProxyException(e);
         }
     }
-
-    private static final String PROXY_INVOKER_SIMPLE_NAME = ProxyInvoker.class.getSimpleName();
-    private static final String CALL_SUPER_METHOD_DESCRIPTOR =
-        "(I" + JieJvm.getDescriptor(Object.class) + JieJvm.getDescriptor(Object[].class) + ")"
-            + JieJvm.getDescriptor(Object.class);
 
     private String generateSignature(Iterable<Class<?>> uppers) {
         StringBuilder sb = new StringBuilder();
@@ -143,8 +135,6 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
     }
 
     private static final class ProxyGenerator implements Opcodes {
-
-        // String newInternalName, Iterable<Class<?>> uppers, Map<ProxyInvoker, List<Method>> invokerMap, String newProxiedInvokerInternalName, String proxiedSimpleInternalName
 
         private static final String HANDLER_DESCRIPTOR = JieJvm.getDescriptor(MethodProxyHandler.class);
         private static final String HANDLER_INTERNAL = JieJvm.getInternalName(MethodProxyHandler.class);
@@ -162,29 +152,26 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             }
         }
 
-        private final String internalName;
-        private final String signature;
-        private final String descriptor;
+        private final String proxyInternalName;
+        private final String proxySignature;
         private final String superInternalName;
-        private final List<String> interfaceInternalNames;
-        private final String innerInternalName;
+        private final List<String> superInternalNames;
+        private final String invokerInternalName;
         private final List<Method> methods;
 
         private ProxyGenerator(
-            String internalName,
-            String signature,
-            String descriptor,
+            String proxyInternalName,
+            String proxySignature,
             String superInternalName,
-            List<String> interfaceInternalNames,
-            String innerInternalName,
+            List<String> superInternalNames,
+            String invokerInternalName,
             List<Method> methods
         ) {
-            this.internalName = internalName;
-            this.signature = signature;
-            this.descriptor = descriptor;
+            this.proxyInternalName = proxyInternalName;
+            this.proxySignature = proxySignature;
             this.superInternalName = superInternalName;
-            this.interfaceInternalNames = interfaceInternalNames;
-            this.innerInternalName = innerInternalName;
+            this.superInternalNames = superInternalNames;
+            this.invokerInternalName = invokerInternalName;
             this.methods = methods;
         }
 
@@ -192,162 +179,157 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             ClassWriter cw = new ClassWriter(0);
 
             // Declaring
-            cw.visit(
-                Opcodes.V1_8,
-                Opcodes.ACC_PUBLIC | ACC_SUPER,
-                internalName,
-                signature,
-                superInternalName,
-                interfaceInternalNames == null ? null : interfaceInternalNames.toArray(new String[0])
-            );
-            cw.visitInnerClass(innerInternalName, internalName, PROXY_INVOKER_SIMPLE_NAME, ACC_STATIC | ACC_SYNTHETIC);
+            cw.visit(V1_8, ACC_PUBLIC | ACC_SUPER, proxyInternalName, proxySignature, superInternalName, superInternalNames.isEmpty() ? null : superInternalNames.toArray(new String[0]));
+            cw.visitInnerClass(invokerInternalName, proxyInternalName, PROXY_INVOKER_SIMPLE_NAME, ACC_STATIC | ACC_SYNTHETIC);
 
             // Generates fields
-            // private final MethodProxyHandler handler
-            FieldVisitor handlerVisitor = cw.visitField(
-                Opcodes.ACC_PRIVATE, "handler", HANDLER_DESCRIPTOR, null, null);
-            handlerVisitor.visitEnd();
-            // private Method[] methods
-            FieldVisitor methodsVisitor = cw.visitField(
-                Opcodes.ACC_PRIVATE, "methods", METHOD_ARRAY_DESCRIPTOR, null, null);
-            methodsVisitor.visitEnd();
-            // private ProxyInvoker[] invokers
-            FieldVisitor invokersVisitor = cw.visitField(
-                Opcodes.ACC_PRIVATE, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR, null, null);
-            invokersVisitor.visitEnd();
+            FieldVisitor fieldVisitor;
+            {
+                // private final MethodProxyHandler handler
+                fieldVisitor = cw.visitField(ACC_PRIVATE, "handler", HANDLER_DESCRIPTOR, null, null);
+                fieldVisitor.visitEnd();
+            }
+            {
+                // private Method[] methods
+                fieldVisitor = cw.visitField(ACC_PRIVATE, "methods", METHOD_ARRAY_DESCRIPTOR, null, null);
+                fieldVisitor.visitEnd();
+            }
+            {
+                // private ProxyInvoker[] invokers
+                fieldVisitor = cw.visitField(ACC_PRIVATE, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR, null, null);
+                fieldVisitor.visitEnd();
+            }
 
             // Generates constructor: (MethodProxyHandler handler, Method[] methods)
-            MethodVisitor constructor = cw.visitMethod(
-                Opcodes.ACC_PUBLIC, "<init>", INIT_DESCRIPTOR, null, null);
-            // super();
-            constructor.visitVarInsn(Opcodes.ALOAD, 0);
-            constructor.visitMethodInsn(Opcodes.INVOKESPECIAL, superInternalName, "<init>", "()V", false);
-            // this.handler = handler;
-            constructor.visitVarInsn(Opcodes.ALOAD, 0);
-            constructor.visitVarInsn(Opcodes.ALOAD, 1);
-            constructor.visitFieldInsn(Opcodes.PUTFIELD, internalName, "handler", HANDLER_DESCRIPTOR);
-            // this.methods = methods;
-            constructor.visitVarInsn(Opcodes.ALOAD, 0);
-            constructor.visitVarInsn(Opcodes.ALOAD, 2);
-            constructor.visitFieldInsn(Opcodes.PUTFIELD, internalName, "methods", METHOD_ARRAY_DESCRIPTOR);
-            // this.invokers = new ProxyInvoker[length];
-            constructor.visitVarInsn(ALOAD, 0);
-            constructor.visitVarInsn(Opcodes.ALOAD, 2);
-            constructor.visitInsn(ARRAYLENGTH);
-            constructor.visitTypeInsn(ANEWARRAY, PROXY_INVOKER_INTERNAL_NAME);
-            constructor.visitFieldInsn(PUTFIELD, internalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
-            // int i = 0
-            constructor.visitInsn(ICONST_0);
-            constructor.visitVarInsn(ISTORE, 3);
-            // for-i
-            Label forLabel = new Label();
-            constructor.visitLabel(forLabel);
-            constructor.visitFrame(Opcodes.F_FULL, 4, new Object[]{internalName, HANDLER_DESCRIPTOR, METHOD_ARRAY_INTERNAL, Opcodes.INTEGER}, 0, new Object[]{});
-            constructor.visitVarInsn(ILOAD, 3);
-            constructor.visitVarInsn(ALOAD, 0);
-            constructor.visitFieldInsn(GETFIELD, internalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
-            constructor.visitInsn(ARRAYLENGTH);
-            Label breakLabel = new Label();
-            // if(i >= invokers.length) break;
-            constructor.visitJumpInsn(IF_ICMPGE, breakLabel);
-            constructor.visitVarInsn(ALOAD, 0);
-            constructor.visitFieldInsn(GETFIELD, internalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
-            constructor.visitVarInsn(ILOAD, 3);
-            constructor.visitTypeInsn(NEW, innerInternalName);
-            constructor.visitInsn(DUP);
-            constructor.visitVarInsn(ALOAD, 0);
-            constructor.visitVarInsn(ILOAD, 3);
-            constructor.visitMethodInsn(INVOKESPECIAL, innerInternalName, "<init>", "(L" + internalName + ";I)V", false);
-            constructor.visitInsn(AASTORE);
-            constructor.visitIincInsn(3, 1);
-            constructor.visitJumpInsn(GOTO, forLabel);
-            constructor.visitLabel(breakLabel);
-            constructor.visitFrame(Opcodes.F_CHOP, 1, null, 0, null);
-            constructor.visitInsn(Opcodes.RETURN);
-            constructor.visitMaxs(7, 4);
-            constructor.visitEnd();
+            MethodVisitor constructor;
+            {
+                constructor = cw.visitMethod(ACC_PUBLIC, "<init>", INIT_DESCRIPTOR, null, null);
+                // super();
+                constructor.visitVarInsn(ALOAD, 0);
+                constructor.visitMethodInsn(INVOKESPECIAL, superInternalName, "<init>", "()V", false);
+                // this.handler = handler;
+                constructor.visitVarInsn(ALOAD, 0);
+                constructor.visitVarInsn(ALOAD, 1);
+                constructor.visitFieldInsn(PUTFIELD, proxyInternalName, "handler", HANDLER_DESCRIPTOR);
+                // this.methods = methods;
+                constructor.visitVarInsn(ALOAD, 0);
+                constructor.visitVarInsn(ALOAD, 2);
+                constructor.visitFieldInsn(PUTFIELD, proxyInternalName, "methods", METHOD_ARRAY_DESCRIPTOR);
+                // this.invokers = new ProxyInvoker[length];
+                constructor.visitVarInsn(ALOAD, 0);
+                constructor.visitVarInsn(ALOAD, 2);
+                constructor.visitInsn(ARRAYLENGTH);
+                constructor.visitTypeInsn(ANEWARRAY, PROXY_INVOKER_INTERNAL_NAME);
+                constructor.visitFieldInsn(PUTFIELD, proxyInternalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
+                // int i = 0
+                constructor.visitInsn(ICONST_0);
+                constructor.visitVarInsn(ISTORE, 3);
+                // for-i
+                Label forLabel = new Label();
+                constructor.visitLabel(forLabel);
+                constructor.visitFrame(F_FULL, 4, new Object[]{proxyInternalName, HANDLER_INTERNAL, METHOD_ARRAY_INTERNAL, INTEGER}, 0, new Object[]{});
+                constructor.visitVarInsn(ILOAD, 3);
+                constructor.visitVarInsn(ALOAD, 0);
+                constructor.visitFieldInsn(GETFIELD, proxyInternalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
+                constructor.visitInsn(ARRAYLENGTH);
+                Label breakLabel = new Label();
+                // if(i >= invokers.length) break;
+                constructor.visitJumpInsn(IF_ICMPGE, breakLabel);
+                // invokers[i] = new InvokerImpl(i);
+                constructor.visitVarInsn(ALOAD, 0);
+                constructor.visitFieldInsn(GETFIELD, proxyInternalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
+                constructor.visitVarInsn(ILOAD, 3);
+                System.out.println(invokerInternalName);
+                constructor.visitTypeInsn(NEW, invokerInternalName);
+                constructor.visitInsn(DUP);
+                constructor.visitVarInsn(ALOAD, 0);
+                constructor.visitVarInsn(ILOAD, 3);
+                constructor.visitMethodInsn(INVOKESPECIAL, invokerInternalName, "<init>", "(L" + proxyInternalName + ";I)V", false);
+                constructor.visitInsn(AASTORE);
+                constructor.visitIincInsn(3, 1);
+                constructor.visitJumpInsn(GOTO, forLabel);
+                constructor.visitLabel(breakLabel);
+                constructor.visitFrame(F_CHOP, 1, null, 0, null);
+                constructor.visitInsn(RETURN);
+                constructor.visitMaxs(7, 4);
+                constructor.visitEnd();
+            }
 
             // Generates override methods
             int methodCount = 0;
             for (Method method : methods) {
-                MethodVisitor proxyMethod = cw.visitMethod(
-                    Opcodes.ACC_PUBLIC, method.getName(), JieJvm.getDescriptor(method), null, null);
+                MethodVisitor override = cw.visitMethod(ACC_PUBLIC, method.getName(), JieJvm.getDescriptor(method), null, null);
                 Parameter[] parameters = method.getParameters();
                 int extraLocalIndex = countExtraLocalIndex(parameters);
                 // method = this.methods[j]
-                proxyMethod.visitVarInsn(Opcodes.ALOAD, 0);
-                proxyMethod.visitFieldInsn(Opcodes.GETFIELD, internalName, "methods", METHOD_ARRAY_DESCRIPTOR);
-                visitPushNumber(proxyMethod, methodCount);
-                proxyMethod.visitInsn(Opcodes.AALOAD);
-                proxyMethod.visitVarInsn(Opcodes.ASTORE, extraLocalIndex);
+                override.visitVarInsn(ALOAD, 0);
+                override.visitFieldInsn(GETFIELD, proxyInternalName, "methods", METHOD_ARRAY_DESCRIPTOR);
+                visitPushNumber(override, methodCount);
+                override.visitInsn(AALOAD);
+                override.visitVarInsn(ASTORE, extraLocalIndex);
                 // Object args = new Object[]{};
-                visitPushNumber(proxyMethod, parameters.length);
-                proxyMethod.visitTypeInsn(Opcodes.ANEWARRAY, OBJECT_INTERNAL_NAME);
+                visitPushNumber(override, parameters.length);
+                override.visitTypeInsn(ANEWARRAY, OBJECT_INTERNAL_NAME);
                 int paramIndex = 1;
                 for (int i = 0; i < parameters.length; i++) {
                     Parameter parameter = parameters[i];
-                    proxyMethod.visitInsn(Opcodes.DUP);
-                    visitPushNumber(proxyMethod, i);
-                    visitLoadParamAsObject(proxyMethod, parameter.getType(), paramIndex);
-                    proxyMethod.visitInsn(Opcodes.AASTORE);
+                    override.visitInsn(DUP);
+                    visitPushNumber(override, i);
+                    visitLoadParamAsObject(override, parameter.getType(), paramIndex);
+                    override.visitInsn(AASTORE);
                     if (Objects.equals(parameter.getType(), long.class) || Objects.equals(parameter.getType(), double.class)) {
                         paramIndex += 2;
                     } else {
                         paramIndex++;
                     }
                 }
-                proxyMethod.visitVarInsn(Opcodes.ASTORE, extraLocalIndex + 1);
+                override.visitVarInsn(ASTORE, extraLocalIndex + 1);
                 // invoker = this.invokers[i];
-                proxyMethod.visitVarInsn(Opcodes.ALOAD, 0);
-                proxyMethod.visitFieldInsn(Opcodes.GETFIELD, internalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
-                visitPushNumber(proxyMethod, methodCount);
-                proxyMethod.visitInsn(Opcodes.AALOAD);
-                proxyMethod.visitVarInsn(Opcodes.ASTORE, extraLocalIndex + 2);
+                override.visitVarInsn(ALOAD, 0);
+                override.visitFieldInsn(GETFIELD, proxyInternalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
+                visitPushNumber(override, methodCount);
+                override.visitInsn(AALOAD);
+                override.visitVarInsn(ASTORE, extraLocalIndex + 2);
                 // handler
-                proxyMethod.visitVarInsn(Opcodes.ALOAD, 0);
-                constructor.visitFieldInsn(Opcodes.GETFIELD, internalName, "handler", HANDLER_DESCRIPTOR);
+                override.visitVarInsn(ALOAD, 0);
+                override.visitFieldInsn(GETFIELD, proxyInternalName, "handler", HANDLER_DESCRIPTOR);
                 // this
-                proxyMethod.visitVarInsn(Opcodes.ALOAD, 0);
+                override.visitVarInsn(ALOAD, 0);
                 // method
-                proxyMethod.visitVarInsn(Opcodes.ALOAD, extraLocalIndex);
+                override.visitVarInsn(ALOAD, extraLocalIndex);
                 // args
-                proxyMethod.visitVarInsn(ALOAD, extraLocalIndex + 1);
+                override.visitVarInsn(ALOAD, extraLocalIndex + 1);
                 // invoker
-                proxyMethod.visitVarInsn(ALOAD, extraLocalIndex + 2);
+                override.visitVarInsn(ALOAD, extraLocalIndex + 2);
                 // handler.invoke(this, method, args, invoker)
-                proxyMethod.visitMethodInsn(INVOKEINTERFACE, HANDLER_INTERNAL, "invoke", HANDLER_METHOD_DESCRIPTOR, true);
+                override.visitMethodInsn(INVOKEINTERFACE, HANDLER_INTERNAL, "invoke", HANDLER_METHOD_DESCRIPTOR, true);
                 if (Objects.equals(method.getReturnType(), void.class)) {
-                    proxyMethod.visitInsn(Opcodes.RETURN);
+                    override.visitInsn(RETURN);
                 } else {
-                    visitObjectCast(proxyMethod, method.getReturnType(), true);
+                    visitObjectCast(override, method.getReturnType(), true);
                 }
-                proxyMethod.visitMaxs(5, extraLocalIndex + 3);
-                proxyMethod.visitEnd();
+                override.visitMaxs(5, extraLocalIndex + 3);
+                override.visitEnd();
                 methodCount++;
             }
 
             // Generate callSuper
-            List<Method> methods = new LinkedList<>();
-            invokerMap.forEach((i, l) -> {
-                methods.addAll(l);
-            });
             Label[] caseLabels = methods.stream().map(it -> new Label()).toArray(Label[]::new);
-            MethodVisitor callSuper = cw.visitMethod(ACC_PUBLIC, "callSuper",
-                "(I" + JieJvm.getDescriptor(Object.class) + JieJvm.getDescriptor(Object[].class) + ")" + JieJvm.getDescriptor(Object.class), null, null);
+            MethodVisitor callSuper = cw.visitMethod(ACC_PUBLIC, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, null, null);
             callSuper.visitVarInsn(ILOAD, 1);
             Label switchLabel = new Label();
             callSuper.visitTableSwitchInsn(0, methods.size() - 1, switchLabel, caseLabels);
             int i = 0;
-            int maxSize = 0;
+            int maxParameterCount = 0;
             for (Method method : methods) {
                 callSuper.visitLabel(caseLabels[i]);
                 callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                callSuper.visitVarInsn(ALOAD, 2);
-                // System.out.println(JieJvm.getInternalName(method.getDeclaringClass()));
-                callSuper.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
+                callSuper.visitVarInsn(ALOAD, 0);
+                // System.out.println(method.getDeclaringClass());
+                // callSuper.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
                 Class<?>[] params = method.getParameterTypes();
-                if (maxSize < params.length) {
-                    maxSize = params.length;
+                if (maxParameterCount < params.length) {
+                    maxParameterCount = params.length;
                 }
                 for (int j = 0; j < params.length; j++) {
                     callSuper.visitVarInsn(ALOAD, 3);
@@ -355,7 +337,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                     callSuper.visitInsn(Opcodes.AALOAD);
                     visitObjectCast(callSuper, params[j], false);
                 }
-                callSuper.visitMethodInsn(INVOKEVIRTUAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
+                callSuper.visitMethodInsn(INVOKESPECIAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
                 if (method.getReturnType().equals(void.class)) {
                     callSuper.visitInsn(ACONST_NULL);
                     callSuper.visitInsn(ARETURN);
@@ -368,21 +350,14 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             callSuper.visitInsn(ACONST_NULL);
             callSuper.visitInsn(ARETURN);
-            callSuper.visitMaxs(1 + 3 * maxSize, 4);
+            callSuper.visitMaxs(2 + 2 * maxParameterCount, 4);
             callSuper.visitEnd();
 
             return cw.toByteArray();
         }
-
-
-        private void generateProxyMethods(
-            ClassWriter cw, String newInternalName, String superInternalName, Map<ProxyInvoker, List<Method>> invokerMap, String proxiedInvokerInternalName) {
-
-        }
-
     }
 
-    private static final class ProxyInvokerGenerator implements Opcodes {
+    private static final class InvokerGenerator implements Opcodes {
 
         private static final String INVOKE_METHOD_DESCRIPTOR;
         private static final String INVOKE_SUPER_METHOD_DESCRIPTOR;
@@ -400,75 +375,76 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             }
         }
 
-        private final String outInternalName;
-        private final String outDescriptor;
-        private final String internalName;
-        private final String callSuperMethodName;
+        private final String proxyInternalName;
+        private final String proxyDescriptor;
+        private final String invokerInternalName;
 
-        private ProxyInvokerGenerator(
-            String outInternalName, String outDescriptor, String internalName, String callSuperMethodName) {
-            this.outInternalName = outInternalName;
-            this.outDescriptor = outDescriptor;
-            this.internalName = internalName;
-            this.callSuperMethodName = callSuperMethodName;
+        private InvokerGenerator(
+            String proxyInternalName,
+            String proxyDescriptor,
+            String invokerInternalName
+        ) {
+            this.proxyInternalName = proxyInternalName;
+            this.proxyDescriptor = proxyDescriptor;
+            this.invokerInternalName = invokerInternalName;
         }
 
         public byte[] generateBytecode() {
             ClassWriter cw = new ClassWriter(0);
 
             // Declaring: Inner class: X implements ProxyInvoker
-            cw.visit(V1_8, ACC_SUPER, internalName, null, OBJECT_INTERNAL_NAME, new String[]{PROXIED_INVOKER_INTERNAL_NAME});
-            cw.visitInnerClass(internalName, outInternalName, PROXY_INVOKER_SIMPLE_NAME, ACC_STATIC | ACC_SYNTHETIC);
+            cw.visit(V1_8, ACC_PUBLIC, invokerInternalName, null, OBJECT_INTERNAL_NAME, new String[]{PROXY_INVOKER_INTERNAL_NAME});
+            cw.visitInnerClass(invokerInternalName, proxyInternalName, PROXY_INVOKER_SIMPLE_NAME, ACC_STATIC | ACC_SYNTHETIC);
 
             // Generates fields:
             // private final int i;
             FieldVisitor fv1 = cw.visitField(ACC_PRIVATE | ACC_FINAL, "i", "I", null, null);
             fv1.visitEnd();
             // Out.this
-            FieldVisitor fv2 = cw.visitField(ACC_FINAL | ACC_SYNTHETIC, "this$0", outDescriptor, null, null);
+            FieldVisitor fv2 = cw.visitField(ACC_FINAL | ACC_SYNTHETIC, "this$0", proxyDescriptor, null, null);
             fv2.visitEnd();
 
             // Generates constructor: (int i)
-            MethodVisitor cmv = cw.visitMethod(ACC_SYNTHETIC, "<init>", "(" + outDescriptor + "I)V", null, null);
+            MethodVisitor cmv = cw.visitMethod(ACC_SYNTHETIC, "<init>", "(" + proxyDescriptor + "I)V", null, null);
             // this.this$0 = out;
             cmv.visitVarInsn(ALOAD, 0);
             cmv.visitVarInsn(ALOAD, 1);
-            cmv.visitFieldInsn(PUTFIELD, internalName, "this$0", outDescriptor);
+            cmv.visitFieldInsn(PUTFIELD, invokerInternalName, "this$0", proxyDescriptor);
             // super();
             cmv.visitVarInsn(ALOAD, 0);
             cmv.visitMethodInsn(INVOKESPECIAL, OBJECT_INTERNAL_NAME, "<init>", "()V", false);
             // this.i = i;
             cmv.visitVarInsn(ALOAD, 0);
             cmv.visitVarInsn(ILOAD, 2);
-            cmv.visitFieldInsn(PUTFIELD, internalName, "i", "I");
+            cmv.visitFieldInsn(PUTFIELD, invokerInternalName, "i", "I");
             cmv.visitInsn(RETURN);
             cmv.visitMaxs(2, 3);
             cmv.visitEnd();
 
             // Generates methods:
-            // invoke(Object inst, Object[] args): return callSuper(i, inst, args);
+            // invoke(Object inst, Object[] args): return proxy.callSuper(i, inst, args);
             MethodVisitor invoke = cw.visitMethod(ACC_PUBLIC, "invoke", INVOKE_METHOD_DESCRIPTOR, null, null);
             invoke.visitVarInsn(ALOAD, 0);
-            invoke.visitFieldInsn(GETFIELD, internalName, "this$0", outDescriptor);
+            invoke.visitFieldInsn(GETFIELD, invokerInternalName, "this$0", proxyDescriptor);
             invoke.visitVarInsn(ALOAD, 0);
-            invoke.visitFieldInsn(GETFIELD, internalName, "i", "I");
+            invoke.visitFieldInsn(GETFIELD, invokerInternalName, "i", "I");
             invoke.visitVarInsn(ALOAD, 1);
             invoke.visitVarInsn(ALOAD, 2);
-            invoke.visitMethodInsn(INVOKEVIRTUAL, outInternalName, callSuperMethodName, CALL_SUPER_METHOD_DESCRIPTOR, false);
+            invoke.visitMethodInsn(INVOKEVIRTUAL, proxyInternalName, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, false);
             invoke.visitInsn(ARETURN);
             invoke.visitMaxs(4, 3);
             invoke.visitEnd();
-            // invokeSuper(Object[] args): return callSuper(i, this$0, args);
+            // invokeSuper(Object[] args): return proxy.callSuper(i, proxy, args);
             MethodVisitor invokeSuper = cw.visitMethod(ACC_PUBLIC, "invokeSuper", INVOKE_SUPER_METHOD_DESCRIPTOR, null, null);
             invokeSuper.visitVarInsn(ALOAD, 0);
-            invokeSuper.visitFieldInsn(GETFIELD, internalName, "this$0", outDescriptor);
+            invokeSuper.visitFieldInsn(GETFIELD, invokerInternalName, "this$0", proxyDescriptor);
             invokeSuper.visitInsn(DUP);
             invokeSuper.visitVarInsn(Opcodes.ASTORE, 2);
             invokeSuper.visitVarInsn(ALOAD, 0);
-            invokeSuper.visitFieldInsn(GETFIELD, internalName, "i", "I");
+            invokeSuper.visitFieldInsn(GETFIELD, invokerInternalName, "i", "I");
             invokeSuper.visitVarInsn(ALOAD, 2);
             invokeSuper.visitVarInsn(ALOAD, 1);
-            invokeSuper.visitMethodInsn(INVOKEVIRTUAL, outInternalName, callSuperMethodName, CALL_SUPER_METHOD_DESCRIPTOR, false);
+            invokeSuper.visitMethodInsn(INVOKEVIRTUAL, proxyInternalName, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, false);
             invokeSuper.visitInsn(ARETURN);
             invokeSuper.visitMaxs(4, 3);
             invokeSuper.visitEnd();
@@ -687,11 +663,5 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             }
         }
         return i;
-    }
-
-    private static final class AsmClassLoader extends ClassLoader {
-        public Class<?> defineClass(String name, byte[] bytecode) {
-            return defineClass(name, bytecode, 0, bytecode.length);
-        }
     }
 }

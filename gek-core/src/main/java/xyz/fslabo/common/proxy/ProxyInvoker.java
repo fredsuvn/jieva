@@ -19,7 +19,8 @@ public interface ProxyInvoker {
      * Invokes proxied method associated to this invoker with given non-proxy instance.
      * <p>
      * Note do not use a proxy instance (such as first parameter of
-     * {@link MethodProxyHandler#invoke(Object, Method, Object[], ProxyInvoker)}), it will cause a recursion error.
+     * {@link MethodProxyHandler#invoke(Object, Method, Object[], ProxyInvoker)}), it will cause a recursion error to
+     * stack overflow.
      *
      * @param inst given instance
      * @param args arguments

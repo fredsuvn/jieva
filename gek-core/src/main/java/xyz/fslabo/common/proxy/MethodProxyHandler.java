@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 public interface MethodProxyHandler {
 
     /**
-     * Returns whether specified method should be proxied.
+     * Returns whether specified method should be proxied. This method only invoke once for each method to be checked.
      *
      * @param method specified method
      * @return whether specified method should be proxied

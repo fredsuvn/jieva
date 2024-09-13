@@ -81,7 +81,7 @@ final class SpringTypeProxy<T> implements TypeProxy<T> {
 
         @Override
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-            return typeProxyMethod.invoke(obj, method, proxy::invokeSuper, args);
+            return null;//typeProxyMethod.invoke(obj, method, proxy::invokeSuper, args);
         }
     }
 }
