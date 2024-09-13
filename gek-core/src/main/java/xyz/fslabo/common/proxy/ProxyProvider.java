@@ -5,9 +5,12 @@ import xyz.fslabo.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
- * Provider to generate proxy instance.
+ * Provider to generate proxy instance. There are two implementation: {@link JdkProxyProvider} and
+ * {@link AsmProxyProvider}.
  *
  * @author fredsuvn
+ * @see JdkProxyProvider
+ * @see AsmProxyProvider
  */
 public interface ProxyProvider {
 
@@ -27,6 +30,9 @@ public interface ProxyProvider {
      * The proxy method handler provides the execution body of proxy method. Provider passes each non-final and
      * non-static methods of upper classes (by {@link Class#getMethods()}) to {@link MethodProxyHandler#proxy(Method)},
      * if returns {@code true}, the provider will override the method on generated instance.
+     * <p>
+     * If there are methods with the same name and signature from different declared classes,
+     * {@link ProxyInvoker#invokeSuper(Object[])} will typically invoke the first one.
      *
      * @param loader  specified class loader, may be {@code null}
      * @param uppers  upper classes of proxy type
