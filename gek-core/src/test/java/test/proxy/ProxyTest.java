@@ -19,7 +19,7 @@ public class ProxyTest {
 
     @Test
     public void testAsmProxyProvider() throws Exception {
-        Class1 inst = new Class1();
+        Class1 inst = new Class1(11);
         TestHandler testHandler = new TestHandler(inst);
         Object proxy = JieProxy.asm(Arrays.asList(Class1.class, Inter1.class, Inter2.class), testHandler);
         testClass1((Class1) proxy);
@@ -83,6 +83,7 @@ public class ProxyTest {
         Assert.assertEquals("ppc_void", TestHandler.superStack.get(1));
         Assert.expectThrows(JieTestException.class, proxy::ppc_Throw);
         Assert.assertEquals(Class1.ppc_static(), "non-proxy");
+        Assert.assertEquals(proxy.ppc_i(), 3);
     }
 
     private void testInter1(Inter1<?> inter1) {
@@ -176,6 +177,15 @@ public class ProxyTest {
                 invoker.invokeSuper(args);
                 return null;
             }
+            if (inst instanceof Class1 && Objects.equals(Class1.class.getMethod("ppc_i"), method)) {
+                Object ppci = ((Class1) inst).ppc_i();
+                Object result1 = invoker.invoke(inst, args);
+                Object result2 = invoker.invokeSuper(args);
+                Assert.assertEquals(ppci, 11);
+                Assert.assertEquals(ppci, result1);
+                Assert.assertEquals(result2, 3);
+                return result2;
+            }
             Object result1 = invoker.invoke(inst, args);
             Object result2 = invoker.invokeSuper(args);
             Assert.assertEquals(result1, result2);
@@ -245,6 +255,20 @@ public class ProxyTest {
     }
 
     public static class Class1 {
+
+        private final int i;
+
+        public Class1(int i) {
+            this.i = i;
+        }
+
+        public Class1() {
+            this.i = 3;
+        }
+
+        public int ppc_i() {
+            return i;
+        }
 
         public static String ppc_static() {
             return "non-proxy";
@@ -330,7 +354,31 @@ public class ProxyTest {
             throw new JieTestException();
         }
 
-        public Object callSuper(int i, Object obj, Object[] args) {
+        public Object callSuper(int i, Object obj, Object[] args) throws Throwable {
+            switch (i) {
+                case 0:
+                    return super.hashCode();
+                case 1:
+                    return super.equals(args[0]);
+                case 2:
+                    super.wait((Long) args[0], (Integer) args[1]);
+                case 3:
+                    return super.getClass();
+            }
+            return null;
+        }
+
+        public Object callVirtual(int i, Object obj, Object[] args) {
+            switch (i) {
+                case 0:
+                    return ((Class1) obj).ppc_boolean();
+                case 1:
+                    return ((Class1) obj).ppc_String((Boolean) args[0]);
+                case 2:
+                    return ((Class1) obj).ppc_String((Boolean) args[0], (Byte) args[1]);
+                case 3:
+                    return ((Class1) obj).hashCode();
+            }
             return null;
         }
     }

@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
  * <a href="https://asm.ow2.io/">ASM</a> implementation for {@link ProxyProvider}. The runtime environment must have
  * asm classed such as {@code org.objectweb.asm.ClassWriter}.
  * <p>
- * Note this provider doesn't support custom class loader.
+ * Note this provider doesn't support custom class loader, and the proxied class must have a public constructor with
+ * empty parameters.
  *
  * @author fredsuvn
  */
@@ -38,6 +39,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         "(I" + JieJvm.getDescriptor(Object.class) + JieJvm.getDescriptor(Object[].class) + JieJvm.getDescriptor($X.class) + ")"
             + JieJvm.getDescriptor(Object.class);
     private static final String CALL_SUPER_METHOD_NAME = "callSuper";
+    private static final String CALL_VIRTUAL_METHOD_NAME = "callVirtual";
 
     @Override
     public <T> T newProxyInstance(
@@ -112,7 +114,13 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         byte[] invokerBytecode = invokerGenerator.generateBytecode();
         Class<?> invokerClass = JieJvm.loadBytecode(invokerBytecode);
         Constructor<?> constructor = JieReflect.getConstructor(proxyClass, Jie.array(MethodProxyHandler.class, Method[].class));
-        return JieReflect.newInstance(constructor, handler, methodList.toArray(new Method[0]));
+        try {
+            return Jie.as(
+                constructor.newInstance(handler, methodList.toArray(new Method[0]))
+            );
+        } catch (Exception e) {
+            throw new ProxyException(e);
+        }
     }
 
     private String generateSignature(Iterable<Class<?>> uppers) {
@@ -506,43 +514,87 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             }
 
             // Generate callSuper(i, inst, args, null)
-            Label[] caseLabels = methods.stream().map(it -> new Label()).toArray(Label[]::new);
-            MethodVisitor callSuper = cw.visitMethod(ACC_PUBLIC, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, null, null);
-            callSuper.visitVarInsn(ILOAD, 1);
-            Label switchLabel = new Label();
-            callSuper.visitTableSwitchInsn(0, methods.size() - 1, switchLabel, caseLabels);
-            int i = 0;
-            int maxParameterCount = 0;
-            for (Method method : methods) {
-                callSuper.visitLabel(caseLabels[i]);
+            {
+                Label[] caseLabels = methods.stream().map(it -> new Label()).toArray(Label[]::new);
+                MethodVisitor callSuper = cw.visitMethod(ACC_PUBLIC, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, null, null);
+                callSuper.visitVarInsn(ILOAD, 1);
+                Label switchLabel = new Label();
+                callSuper.visitTableSwitchInsn(0, methods.size() - 1, switchLabel, caseLabels);
+                int i = 0;
+                int maxParameterCount = 0;
+                for (Method method : methods) {
+                    callSuper.visitLabel(caseLabels[i]);
+                    callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                    callSuper.visitVarInsn(ALOAD, 0);
+                    // callSuper.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
+                    Class<?>[] params = method.getParameterTypes();
+                    if (maxParameterCount < params.length) {
+                        maxParameterCount = params.length;
+                    }
+                    for (int j = 0; j < params.length; j++) {
+                        callSuper.visitVarInsn(ALOAD, 3);
+                        visitPushNumber(callSuper, j);
+                        callSuper.visitInsn(Opcodes.AALOAD);
+                        visitObjectCast(callSuper, params[j], false);
+                    }
+                    callSuper.visitMethodInsn(INVOKESPECIAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
+                    if (method.getReturnType().equals(void.class)) {
+                        callSuper.visitInsn(ACONST_NULL);
+                        callSuper.visitInsn(ARETURN);
+                    } else {
+                        returnCastObject(callSuper, method.getReturnType());
+                    }
+                    i++;
+                }
+                callSuper.visitLabel(switchLabel);
                 callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                callSuper.visitVarInsn(ALOAD, 0);
-                // callSuper.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
-                Class<?>[] params = method.getParameterTypes();
-                if (maxParameterCount < params.length) {
-                    maxParameterCount = params.length;
-                }
-                for (int j = 0; j < params.length; j++) {
-                    callSuper.visitVarInsn(ALOAD, 3);
-                    visitPushNumber(callSuper, j);
-                    callSuper.visitInsn(Opcodes.AALOAD);
-                    visitObjectCast(callSuper, params[j], false);
-                }
-                callSuper.visitMethodInsn(INVOKESPECIAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
-                if (method.getReturnType().equals(void.class)) {
-                    callSuper.visitInsn(ACONST_NULL);
-                    callSuper.visitInsn(ARETURN);
-                } else {
-                    returnCastObject(callSuper, method.getReturnType());
-                }
-                i++;
+                callSuper.visitInsn(ACONST_NULL);
+                callSuper.visitInsn(ARETURN);
+                callSuper.visitMaxs(2 + 2 * maxParameterCount, 5);
+                callSuper.visitEnd();
             }
-            callSuper.visitLabel(switchLabel);
-            callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            callSuper.visitInsn(ACONST_NULL);
-            callSuper.visitInsn(ARETURN);
-            callSuper.visitMaxs(2 + 2 * maxParameterCount, 5);
-            callSuper.visitEnd();
+
+            // Generate callVirtual(i, inst, args, null)
+            {
+                Label[] caseLabels = methods.stream().map(it -> new Label()).toArray(Label[]::new);
+                MethodVisitor callVirtual = cw.visitMethod(ACC_PUBLIC, CALL_VIRTUAL_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, null, null);
+                callVirtual.visitVarInsn(ILOAD, 1);
+                Label switchLabel = new Label();
+                callVirtual.visitTableSwitchInsn(0, methods.size() - 1, switchLabel, caseLabels);
+                //callVirtual.visitFrame(Opcodes.F_APPEND, 1, new Object[]{"test/proxy/ProxyTest$Class1"}, 0, null);
+                int i = 0;
+                int maxParameterCount = 0;
+                for (Method method : methods) {
+                    callVirtual.visitLabel(caseLabels[i]);
+                    callVirtual.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                    callVirtual.visitVarInsn(ALOAD, 2);
+                    callVirtual.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
+                    Class<?>[] params = method.getParameterTypes();
+                    if (maxParameterCount < params.length) {
+                        maxParameterCount = params.length;
+                    }
+                    for (int j = 0; j < params.length; j++) {
+                        callVirtual.visitVarInsn(ALOAD, 3);
+                        visitPushNumber(callVirtual, j);
+                        callVirtual.visitInsn(Opcodes.AALOAD);
+                        visitObjectCast(callVirtual, params[j], false);
+                    }
+                    callVirtual.visitMethodInsn(INVOKEVIRTUAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
+                    if (method.getReturnType().equals(void.class)) {
+                        callVirtual.visitInsn(ACONST_NULL);
+                        callVirtual.visitInsn(ARETURN);
+                    } else {
+                        returnCastObject(callVirtual, method.getReturnType());
+                    }
+                    i++;
+                }
+                callVirtual.visitLabel(switchLabel);
+                callVirtual.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                callVirtual.visitInsn(ACONST_NULL);
+                callVirtual.visitInsn(ARETURN);
+                callVirtual.visitMaxs(2 + 2 * maxParameterCount, 5);
+                callVirtual.visitEnd();
+            }
 
             return cw.toByteArray();
         }
@@ -613,7 +665,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             invoke.visitVarInsn(ALOAD, 1);
             invoke.visitVarInsn(ALOAD, 2);
             invoke.visitInsn(ACONST_NULL);
-            invoke.visitMethodInsn(INVOKEVIRTUAL, proxyInternalName, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, false);
+            invoke.visitMethodInsn(INVOKEVIRTUAL, proxyInternalName, CALL_VIRTUAL_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, false);
             invoke.visitInsn(ARETURN);
             invoke.visitMaxs(5, 3);
             invoke.visitEnd();
@@ -637,5 +689,5 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         }
     }
 
-    private static final class $X{}
+    private static final class $X {}
 }
