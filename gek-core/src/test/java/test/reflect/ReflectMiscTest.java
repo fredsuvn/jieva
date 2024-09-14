@@ -23,11 +23,23 @@ public class ReflectMiscTest {
         counter.increment();
         Assert.assertEquals(counter.getDepth(), 2);
         Assert.assertEquals(counter.getMaxDepth(), 2);
+        counter.increment(2);
+        Assert.assertEquals(counter.getDepth(), 4);
+        Assert.assertEquals(counter.getMaxDepth(), 4);
         counter.decrement();
+        Assert.assertEquals(counter.getDepth(), 3);
+        Assert.assertEquals(counter.getMaxDepth(), 4);
+        counter.decrement(2);
         Assert.assertEquals(counter.getDepth(), 1);
-        Assert.assertEquals(counter.getMaxDepth(), 2);
-        counter.increment();
+        Assert.assertEquals(counter.getMaxDepth(), 4);
+        counter.increment(1);
         Assert.assertEquals(counter.getDepth(), 2);
-        Assert.assertEquals(counter.getMaxDepth(), 2);
+        Assert.assertEquals(counter.getMaxDepth(), 4);
+        counter.increment();
+        Assert.assertEquals(counter.getDepth(), 3);
+        Assert.assertEquals(counter.getMaxDepth(), 4);
+        counter.resetDepth();
+        Assert.assertEquals(counter.getDepth(), 0);
+        Assert.assertEquals(counter.getMaxDepth(), 4);
     }
 }

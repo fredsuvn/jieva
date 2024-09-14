@@ -296,10 +296,11 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         } else if (Objects.equals(type, float.class)) {
             visitor.visitMethodInsn(
                 Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
-        } else {
-            // if (Objects.equals(type, double.class))
+        } else if (Objects.equals(type, double.class)) {
             visitor.visitMethodInsn(
                 Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
+        } else {
+            visitor.visitInsn(ACONST_NULL);
         }
         visitor.visitInsn(Opcodes.ARETURN);
     }
@@ -377,7 +378,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         }
 
         public byte[] generateBytecode() {
-            ClassWriter cw = new ClassWriter(0);
+            ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
             // Declaring
             cw.visit(V1_8, ACC_PUBLIC | ACC_SUPER, proxyInternalName, proxySignature, superInternalName, superInternalNames.isEmpty() ? null : superInternalNames.toArray(new String[0]));
@@ -451,7 +452,8 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                 constructor.visitLabel(breakLabel);
                 constructor.visitFrame(F_CHOP, 1, null, 0, null);
                 constructor.visitInsn(RETURN);
-                constructor.visitMaxs(7, 4);
+                // constructor.visitMaxs(6, 4);
+                constructor.visitMaxs(0, 0);
                 constructor.visitEnd();
             }
 
@@ -508,7 +510,8 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                 } else {
                     visitObjectCast(override, method.getReturnType(), true);
                 }
-                override.visitMaxs(5, extraLocalIndex + 3);
+                // override.visitMaxs(5, extraLocalIndex + 3);
+                override.visitMaxs(0, 0);
                 override.visitEnd();
                 methodCount++;
             }
@@ -521,36 +524,29 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                 Label switchLabel = new Label();
                 callSuper.visitTableSwitchInsn(0, methods.size() - 1, switchLabel, caseLabels);
                 int i = 0;
-                int maxParameterCount = 0;
                 for (Method method : methods) {
                     callSuper.visitLabel(caseLabels[i]);
-                    callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                    callSuper.visitFrame(F_SAME, 0, null, 0, null);
                     callSuper.visitVarInsn(ALOAD, 0);
                     // callSuper.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
                     Class<?>[] params = method.getParameterTypes();
-                    if (maxParameterCount < params.length) {
-                        maxParameterCount = params.length;
-                    }
                     for (int j = 0; j < params.length; j++) {
                         callSuper.visitVarInsn(ALOAD, 3);
                         visitPushNumber(callSuper, j);
-                        callSuper.visitInsn(Opcodes.AALOAD);
+                        callSuper.visitInsn(AALOAD);
                         visitObjectCast(callSuper, params[j], false);
                     }
                     callSuper.visitMethodInsn(INVOKESPECIAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
-                    if (method.getReturnType().equals(void.class)) {
-                        callSuper.visitInsn(ACONST_NULL);
-                        callSuper.visitInsn(ARETURN);
-                    } else {
-                        returnCastObject(callSuper, method.getReturnType());
-                    }
+                    returnCastObject(callSuper, method.getReturnType());
                     i++;
                 }
                 callSuper.visitLabel(switchLabel);
-                callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                callSuper.visitFrame(F_SAME, 0, null, 0, null);
                 callSuper.visitInsn(ACONST_NULL);
+                // stackCount.increment();
                 callSuper.visitInsn(ARETURN);
-                callSuper.visitMaxs(2 + 2 * maxParameterCount, 5);
+                // callSuper.visitMaxs(0, 5);
+                callSuper.visitMaxs(0, 0);
                 callSuper.visitEnd();
             }
 
@@ -561,38 +557,33 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                 callVirtual.visitVarInsn(ILOAD, 1);
                 Label switchLabel = new Label();
                 callVirtual.visitTableSwitchInsn(0, methods.size() - 1, switchLabel, caseLabels);
-                //callVirtual.visitFrame(Opcodes.F_APPEND, 1, new Object[]{"test/proxy/ProxyTest$Class1"}, 0, null);
                 int i = 0;
-                int maxParameterCount = 0;
                 for (Method method : methods) {
                     callVirtual.visitLabel(caseLabels[i]);
-                    callVirtual.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                    callVirtual.visitFrame(F_SAME, 0, null, 0, null);
                     callVirtual.visitVarInsn(ALOAD, 2);
-                    callVirtual.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
+                    callVirtual.visitTypeInsn(CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
                     Class<?>[] params = method.getParameterTypes();
-                    if (maxParameterCount < params.length) {
-                        maxParameterCount = params.length;
-                    }
                     for (int j = 0; j < params.length; j++) {
                         callVirtual.visitVarInsn(ALOAD, 3);
                         visitPushNumber(callVirtual, j);
-                        callVirtual.visitInsn(Opcodes.AALOAD);
+                        callVirtual.visitInsn(AALOAD);
                         visitObjectCast(callVirtual, params[j], false);
                     }
-                    callVirtual.visitMethodInsn(INVOKEVIRTUAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
-                    if (method.getReturnType().equals(void.class)) {
-                        callVirtual.visitInsn(ACONST_NULL);
-                        callVirtual.visitInsn(ARETURN);
+                    if (method.getDeclaringClass().isInterface()) {
+                        callVirtual.visitMethodInsn(INVOKEINTERFACE, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), true);
                     } else {
-                        returnCastObject(callVirtual, method.getReturnType());
+                        callVirtual.visitMethodInsn(INVOKEVIRTUAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), false);
                     }
+                    returnCastObject(callVirtual, method.getReturnType());
                     i++;
                 }
                 callVirtual.visitLabel(switchLabel);
-                callVirtual.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                callVirtual.visitFrame(F_SAME, 0, null, 0, null);
                 callVirtual.visitInsn(ACONST_NULL);
                 callVirtual.visitInsn(ARETURN);
-                callVirtual.visitMaxs(2 + 2 * maxParameterCount, 5);
+                // callVirtual.visitMaxs(2 + 2 * maxParameterCount, 5);
+                callVirtual.visitMaxs(0, 0);
                 callVirtual.visitEnd();
             }
 
@@ -624,7 +615,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         }
 
         public byte[] generateBytecode() {
-            ClassWriter cw = new ClassWriter(0);
+            ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
             // Declaring: Inner class: X implements ProxyInvoker
             cw.visit(V1_8, ACC_PUBLIC, invokerInternalName, null, OBJECT_INTERNAL_NAME, new String[]{PROXY_INVOKER_INTERNAL_NAME});
@@ -652,7 +643,8 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             cmv.visitVarInsn(ILOAD, 2);
             cmv.visitFieldInsn(PUTFIELD, invokerInternalName, "i", "I");
             cmv.visitInsn(RETURN);
-            cmv.visitMaxs(2, 3);
+            // cmv.visitMaxs(2, 3);
+            cmv.visitMaxs(0, 0);
             cmv.visitEnd();
 
             // Generates methods:
@@ -667,14 +659,15 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             invoke.visitInsn(ACONST_NULL);
             invoke.visitMethodInsn(INVOKEVIRTUAL, proxyInternalName, CALL_VIRTUAL_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, false);
             invoke.visitInsn(ARETURN);
-            invoke.visitMaxs(5, 3);
+            // invoke.visitMaxs(5, 3);
+            invoke.visitMaxs(0, 0);
             invoke.visitEnd();
             // invokeSuper(Object[] args): return proxy.callSuper(i, proxy, args, null);
             MethodVisitor invokeSuper = cw.visitMethod(ACC_PUBLIC, "invokeSuper", INVOKE_SUPER_METHOD_DESCRIPTOR, null, null);
             invokeSuper.visitVarInsn(ALOAD, 0);
             invokeSuper.visitFieldInsn(GETFIELD, invokerInternalName, "this$0", proxyDescriptor);
             invokeSuper.visitInsn(DUP);
-            invokeSuper.visitVarInsn(Opcodes.ASTORE, 2);
+            invokeSuper.visitVarInsn(ASTORE, 2);
             invokeSuper.visitVarInsn(ALOAD, 0);
             invokeSuper.visitFieldInsn(GETFIELD, invokerInternalName, "i", "I");
             invokeSuper.visitVarInsn(ALOAD, 2);
@@ -682,7 +675,8 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             invokeSuper.visitInsn(ACONST_NULL);
             invokeSuper.visitMethodInsn(INVOKEVIRTUAL, proxyInternalName, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, false);
             invokeSuper.visitInsn(ARETURN);
-            invokeSuper.visitMaxs(5, 3);
+            // invokeSuper.visitMaxs(5, 3);
+            invokeSuper.visitMaxs(0, 0);
             invokeSuper.visitEnd();
 
             return cw.toByteArray();

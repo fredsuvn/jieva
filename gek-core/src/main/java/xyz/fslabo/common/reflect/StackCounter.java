@@ -31,12 +31,37 @@ public class StackCounter {
     }
 
     /**
+     * Increments specified depth, returns this.
+     *
+     * @param d specified depth
+     * @return this
+     */
+    public StackCounter increment(int d) {
+        depth += d;
+        if (depth > maxDepth) {
+            maxDepth = depth;
+        }
+        return this;
+    }
+
+    /**
      * Decrements one depth, returns this.
      *
      * @return this
      */
     public StackCounter decrement() {
         depth--;
+        return this;
+    }
+
+    /**
+     * Decrements specified depth, returns this.
+     *
+     * @param d specified depth
+     * @return this
+     */
+    public StackCounter decrement(int d) {
+        depth -= d;
         return this;
     }
 
@@ -58,9 +83,24 @@ public class StackCounter {
         return maxDepth;
     }
 
+    /**
+     * Resets depth and max depth value.
+     *
+     * @return this
+     */
     public StackCounter reset() {
         this.depth = 0;
         this.maxDepth = 0;
+        return this;
+    }
+
+    /**
+     * Resets depth value, but max depth value will be reserved.
+     *
+     * @return this
+     */
+    public StackCounter resetDepth() {
+        this.depth = 0;
         return this;
     }
 }
