@@ -14,8 +14,7 @@ public class StackCounter {
      * Constructs a new counter.
      */
     public StackCounter() {
-        this.depth = 0;
-        this.maxDepth = 0;
+        reset();
     }
 
     /**
@@ -57,5 +56,11 @@ public class StackCounter {
      */
     public int getMaxDepth() {
         return maxDepth;
+    }
+
+    public StackCounter reset() {
+        this.depth = 0;
+        this.maxDepth = 0;
+        return this;
     }
 }

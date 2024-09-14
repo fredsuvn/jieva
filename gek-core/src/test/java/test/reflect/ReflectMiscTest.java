@@ -9,6 +9,12 @@ public class ReflectMiscTest {
     @Test
     public void testStackCounter() throws Exception {
         StackCounter counter = new StackCounter();
+        testStackCounterValue(counter);
+        counter.reset();
+        testStackCounterValue(counter);
+    }
+
+    private void testStackCounterValue(StackCounter counter) {
         Assert.assertEquals(counter.getDepth(), 0);
         Assert.assertEquals(counter.getMaxDepth(), 0);
         counter.increment();
