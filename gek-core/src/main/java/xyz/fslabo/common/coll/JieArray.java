@@ -196,9 +196,9 @@ public class JieArray {
     }
 
     /**
-     * Maps source array (component type {@code T}) to dest array (component type {@code R}).
-     * If the dest array's length equals to source array, the mapped elements will be put into the dest array,
-     * else create and put into a new array.
+     * Maps source array (component type {@code T}) to dest array (component type {@code R}). If the dest array's length
+     * equals to source array, the mapped elements will be put into the dest array, else create and put into a new
+     * array.
      *
      * @param source the source array
      * @param dest   the dest array
@@ -233,7 +233,8 @@ public class JieArray {
     }
 
     /**
-     * Returns value from given array at specified index, if the value is null or failed to obtain, return default value.
+     * Returns value from given array at specified index, if the value is null or failed to obtain, return default
+     * value.
      *
      * @param array        given array
      * @param index        specified index
@@ -660,14 +661,14 @@ public class JieArray {
     }
 
     /**
-     * Returns given elements itself as array.
+     * Returns given elements itself as as array.
      *
-     * @param elements given arguments
+     * @param elements given elements
      * @param <T>      component type
-     * @return given elements itself as array
+     * @return given elements itself as an array
      */
     @SafeVarargs
-    public static <T> T[] asArray(T... elements) {
+    public static <T> T[] array(T... elements) {
         return elements;
     }
 

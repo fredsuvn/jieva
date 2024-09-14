@@ -193,7 +193,7 @@ public class JieReflect {
      * Searches and returns method of specified name and parameter types from given type.
      * <p>
      * The searching in order of {@link Class#getMethod(String, Class[])} then
-     * {@link Class#getDeclaredMethod(String, Class[])}.if {@code searchSuper} is true, and if searching failed in
+     * {@link Class#getDeclaredMethod(String, Class[])}. if {@code searchSuper} is true, and if searching failed in
      * current type, this method will recursively call {@link Class#getGenericSuperclass()} to search super types, if
      * still not found, recursively call {@link Class#getGenericInterfaces()}.
      * <p>
@@ -277,6 +277,51 @@ public class JieReflect {
     }
 
     /**
+     * Searches and returns constructor of specified parameter types from given type. returns {@code null} for searching
+     * failed. This method is equivalent to ({@link #getConstructor(Class, Class[], boolean)}):
+     * <pre>
+     *     return getConstructor(type, parameterTypes, true);
+     * </pre>
+     *
+     * @param type           given type
+     * @param parameterTypes specified parameter types
+     * @return method of specified name and parameter types from given type
+     */
+    @Nullable
+    public static Constructor<?> getConstructor(Class<?> type, Class<?>[] parameterTypes) {
+        return getConstructor(type, parameterTypes, true);
+    }
+
+    /**
+     * Searches and returns constructor of specified parameter types from given type.
+     * <p>
+     * The method uses {@link Class#getConstructor(Class[])} to find the constructor. If searching failed and
+     * {@code searchDeclared} is true, this method will try {@link Class#getDeclaredConstructor(Class[])}.
+     * <p>
+     * Returns {@code null} for searching failed.
+     *
+     * @param type           given type
+     * @param parameterTypes specified parameter types
+     * @param searchDeclared whether searches declare constructors
+     * @return constructor of specified parameter types from given type
+     */
+    @Nullable
+    public static Constructor<?> getConstructor(Class<?> type, Class<?>[] parameterTypes, boolean searchDeclared) {
+        try {
+            return type.getConstructor(parameterTypes);
+        } catch (NoSuchMethodException e) {
+            if (!searchDeclared) {
+                return null;
+            }
+            try {
+                return type.getDeclaredConstructor(parameterTypes);
+            } catch (NoSuchMethodException ex) {
+                return null;
+            }
+        }
+    }
+
+    /**
      * Returns new instance for given class name.
      * <p>
      * This method first uses {@link #classForName(String, ClassLoader)} to load given class, then call
@@ -326,7 +371,24 @@ public class JieReflect {
     public static <T> T newInstance(Class<?> type) {
         try {
             Constructor<?> constructor = type.getConstructor();
-            return Jie.as(constructor.newInstance());
+            return newInstance(constructor);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Creates a new instance with given constructor and arguments, may be {@code null} if failed.
+     *
+     * @param constructor given constructor
+     * @param args        arguments
+     * @param <T>         type of instance
+     * @return a new instance with given constructor and arguments
+     */
+    @Nullable
+    public static <T> T newInstance(Constructor<?> constructor, Object... args) {
+        try {
+            return Jie.as(constructor.newInstance(args));
         } catch (Exception e) {
             return null;
         }

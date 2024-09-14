@@ -23,6 +23,9 @@ import java.util.*;
  * {@link #resolveGetter(Method)} and {@link #resolveSetter(Method)} method to determine whether it is a getter/setter.
  * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link MethodInfo}. Subtypes
  * can use {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create getter/setter.
+ * <p>
+ * This method uses {@link #buildMethodInvoker(Method)} to generate invokers for getters and setters, it has a default
+ * implementation ({@link Invoker#reflect(Method)}), override it to custom invoker generation.
  *
  * @author fredsuvn
  */
@@ -147,6 +150,16 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         return () -> name;
     }
 
+    /**
+     * Generates invoker for specified method. Default using {@link Invoker#reflect(Method)}.
+     *
+     * @param method specified method
+     * @return invoker for specified method
+     */
+    protected Invoker buildMethodInvoker(Method method) {
+        return Invoker.reflect(method);
+    }
+
     private Type getActualType(Type type, Map<TypeVariable<?>, Type> typeParameterMapping, Set<Type> stack) {
         if (type instanceof Class) {
             return type;
@@ -183,7 +196,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         String getName();
     }
 
-    private static final class BasePropertyInfoImpl implements BasePropertyInfo {
+    private final class BasePropertyInfoImpl implements BasePropertyInfo {
 
         private final String name;
         private final @Nullable Method getter;
@@ -296,7 +309,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         }
     }
 
-    private static final class BaseMethodInfoImpl implements BaseMethodInfo {
+    private final class BaseMethodInfoImpl implements BaseMethodInfo {
 
         private final Method method;
         private final List<Annotation> annotations;
@@ -345,9 +358,5 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
             }
         }
         return null;
-    }
-
-    private static Invoker buildMethodInvoker(Method method) {
-        return Invoker.reflect(method);
     }
 }

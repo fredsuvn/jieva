@@ -40,7 +40,7 @@ public class MethodHandleInvoker implements Invoker {
     public @Nullable Object invoke(@Nullable Object inst, Object... args) {
         try {
             return isStatic ? JieInvoke.invokeStatic(methodHandle, args)
-                : JieInvoke.invokeVirtual(methodHandle, inst, args);
+                : JieInvoke.invoke(methodHandle, inst, args);
         } catch (Throwable e) {
             throw new InvokingException(e);
         }

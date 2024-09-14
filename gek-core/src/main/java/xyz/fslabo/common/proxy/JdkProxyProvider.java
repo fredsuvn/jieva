@@ -22,9 +22,9 @@ public class JdkProxyProvider implements ProxyProvider {
     private static final Object[] EMPTY_ARGS = {};
 
     @Override
-    public <T> T newProxyInstance(@Nullable ClassLoader loader, Iterable<Class<?>> uppers, MethodProxyHandler handler) {
+    public <T> T newProxyInstance(@Nullable ClassLoader loader, Iterable<Class<?>> proxied, MethodProxyHandler handler) {
         ClassLoader actualLoader = loader == null ? getClass().getClassLoader() : loader;
-        Object proxy = Proxy.newProxyInstance(actualLoader, JieColl.toArray(uppers, Class.class), new InvocationHandlerImpl(uppers, handler));
+        Object proxy = Proxy.newProxyInstance(actualLoader, JieColl.toArray(proxied, Class.class), new InvocationHandlerImpl(proxied, handler));
         return Jie.as(proxy);
     }
 
@@ -42,7 +42,7 @@ public class JdkProxyProvider implements ProxyProvider {
                     if (Modifier.isFinal(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
                         continue;
                     }
-                    invokerMap.put(method, Invoker.unreflect(method));
+                    invokerMap.put(method, Invoker.handle(method));
                     if (handler.proxy(method)) {
                         proxiedSet.add(method);
                     }

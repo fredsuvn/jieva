@@ -6,6 +6,7 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieJvm;
+import xyz.fslabo.common.reflect.JieReflect;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -28,33 +29,26 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
     private static final AtomicLong counter = new AtomicLong();
 
     private static final String PROXY_INVOKER_INTERNAL_NAME = JieJvm.getInternalName(ProxyInvoker.class);
-    private static final String PROXIED_INVOKER_INTERNAL_NAME = JieJvm.getInternalName(ProxiedInvoker.class);
     private static final String PROXY_INVOKER_ARRAY_DESCRIPTOR = JieJvm.getDescriptor(ProxyInvoker[].class);
     private static final String METHOD_ARRAY_DESCRIPTOR = JieJvm.getDescriptor(Method[].class);
-    private static final String PROXY_INVOKER_ARRAY_INTERNAL = JieJvm.getInternalName(ProxyInvoker[].class);
     private static final String METHOD_ARRAY_INTERNAL = JieJvm.getInternalName(Method[].class);
-    private static final String PROXIED_INVOKER_ARRAY_DESCRIPTOR = JieJvm.getDescriptor(ProxiedInvoker[].class);
-
-    private static final String PROXY_INVOKER_DESCRIPTOR = JieJvm.getDescriptor(ProxyInvoker.class);
     private static final String OBJECT_INTERNAL_NAME = JieJvm.getInternalName(Object.class);
-
     private static final String PROXY_INVOKER_SIMPLE_NAME = ProxyInvoker.class.getSimpleName();
     private static final String CALL_SUPER_METHOD_DESCRIPTOR =
-        "(I" + JieJvm.getDescriptor(Object.class) + JieJvm.getDescriptor(Object[].class) + ")"
+        "(I" + JieJvm.getDescriptor(Object.class) + JieJvm.getDescriptor(Object[].class) + JieJvm.getDescriptor($X.class) + ")"
             + JieJvm.getDescriptor(Object.class);
-
     private static final String CALL_SUPER_METHOD_NAME = "callSuper";
 
     @Override
     public <T> T newProxyInstance(
         @Nullable ClassLoader loader,
-        Iterable<Class<?>> uppers,
+        Iterable<Class<?>> proxied,
         MethodProxyHandler handler
     ) {
-        if (JieColl.isEmpty(uppers)) {
+        if (JieColl.isEmpty(proxied)) {
             throw new ProxyException("No super class or interface to proxy.");
         }
-        Iterator<Class<?>> classIterator = uppers.iterator();
+        Iterator<Class<?>> classIterator = proxied.iterator();
         Class<?> firstClass = classIterator.next();
         String superInternalName;
         List<String> interfaceInternalNames = new LinkedList<>();
@@ -68,7 +62,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             Class<?> cls = classIterator.next();
             if (!cls.isInterface()) {
                 throw new ProxyException("Only one super class:"
-                    + JieColl.stream(uppers).map(Class::getName).collect(Collectors.joining(", "))
+                    + JieColl.stream(proxied).map(Class::getName).collect(Collectors.joining(", "))
                     + "."
                 );
             }
@@ -78,10 +72,10 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         String proxyClassName = getClass().getName() + "$Proxy$" + count;
         String proxyInternalName = JieString.replace(proxyClassName, ".", "/");
         String proxyDescriptor = "L" + proxyInternalName + ";";
-        String invokerName = proxyClassName + "$" + PROXY_INVOKER_SIMPLE_NAME;
+        // String invokerName = proxyClassName + "$" + PROXY_INVOKER_SIMPLE_NAME;
         String invokerInternalName = proxyInternalName + "$" + PROXY_INVOKER_SIMPLE_NAME;
         Map<String, Method> proxiedMethods = new LinkedHashMap<>();
-        for (Class<?> upper : uppers) {
+        for (Class<?> upper : proxied) {
             Method[] methods = upper.getMethods();
             for (Method method : methods) {
                 if (Modifier.isFinal(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
@@ -101,7 +95,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         // Generates proxy class
         ProxyGenerator proxyGenerator = new ProxyGenerator(
             proxyInternalName,
-            generateSignature(uppers),
+            generateSignature(proxied),
             superInternalName,
             interfaceInternalNames,
             invokerInternalName,
@@ -117,13 +111,8 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         );
         byte[] invokerBytecode = invokerGenerator.generateBytecode();
         Class<?> invokerClass = JieJvm.loadBytecode(invokerBytecode);
-        try {
-            Constructor<?> constructor = proxyClass.getConstructor(MethodProxyHandler.class, Method[].class);
-            Object result = constructor.newInstance(handler, methodList.toArray(new Method[0]));
-            return Jie.as(result);
-        } catch (Exception e) {
-            throw new ProxyException(e);
-        }
+        Constructor<?> constructor = JieReflect.getConstructor(proxyClass, Jie.array(MethodProxyHandler.class, Method[].class));
+        return JieReflect.newInstance(constructor, handler, methodList.toArray(new Method[0]));
     }
 
     private String generateSignature(Iterable<Class<?>> uppers) {
@@ -134,6 +123,217 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         return sb.toString();
     }
 
+    private static void visitLoadParamAsObject(MethodVisitor visitor, Class<?> type, int i) {
+        if (!type.isPrimitive()) {
+            visitor.visitVarInsn(Opcodes.ALOAD, i);
+            return;
+        }
+        if (Objects.equals(type, boolean.class)) {
+            visitor.visitVarInsn(Opcodes.ILOAD, i);
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
+            return;
+        }
+        if (Objects.equals(type, byte.class)) {
+            visitor.visitVarInsn(Opcodes.ILOAD, i);
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;", false);
+            return;
+        }
+        if (Objects.equals(type, short.class)) {
+            visitor.visitVarInsn(Opcodes.ILOAD, i);
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;", false);
+            return;
+        }
+        if (Objects.equals(type, char.class)) {
+            visitor.visitVarInsn(Opcodes.ILOAD, i);
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;", false);
+            return;
+        }
+        if (Objects.equals(type, int.class)) {
+            visitor.visitVarInsn(Opcodes.ILOAD, i);
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+            return;
+        }
+        if (Objects.equals(type, long.class)) {
+            visitor.visitVarInsn(Opcodes.LLOAD, i);
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false);
+            return;
+        }
+        if (Objects.equals(type, float.class)) {
+            visitor.visitVarInsn(Opcodes.FLOAD, i);
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
+            return;
+        }
+        // if (Objects.equals(type, double.class))
+        {
+            visitor.visitVarInsn(Opcodes.DLOAD, i);
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
+            // return;
+        }
+    }
+
+    private static void visitObjectCast(MethodVisitor visitor, Class<?> type, boolean needReturn) {
+        if (!type.isPrimitive()) {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(type));
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.ARETURN);
+            }
+            return;
+        }
+        if (Objects.equals(type, boolean.class)) {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Boolean");
+            visitor.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.IRETURN);
+            }
+            return;
+        }
+        if (Objects.equals(type, byte.class)) {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Byte");
+            visitor.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false);
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.IRETURN);
+            }
+            return;
+        }
+        if (Objects.equals(type, short.class)) {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Short");
+            visitor.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false);
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.IRETURN);
+            }
+            return;
+        }
+        if (Objects.equals(type, char.class)) {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Character");
+            visitor.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false);
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.IRETURN);
+            }
+            return;
+        }
+        if (Objects.equals(type, int.class)) {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Integer");
+            visitor.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.IRETURN);
+            }
+            return;
+        }
+        if (Objects.equals(type, long.class)) {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Long");
+            visitor.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false);
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.LRETURN);
+            }
+            return;
+        }
+        if (Objects.equals(type, float.class)) {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Float");
+            visitor.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false);
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.FRETURN);
+            }
+            return;
+        }
+        // if (Objects.equals(type, double.class))
+        {
+            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Double");
+            visitor.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false);
+            if (needReturn) {
+                visitor.visitInsn(Opcodes.DRETURN);
+            }
+            // return;
+        }
+    }
+
+    private static void returnCastObject(MethodVisitor visitor, Class<?> type) {
+        if (!type.isPrimitive()) {
+            visitor.visitInsn(Opcodes.ARETURN);
+            return;
+        }
+        if (Objects.equals(type, boolean.class)) {
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
+        } else if (Objects.equals(type, byte.class)) {
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;", false);
+        } else if (Objects.equals(type, short.class)) {
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;", false);
+        } else if (Objects.equals(type, char.class)) {
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;", false);
+        } else if (Objects.equals(type, int.class)) {
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+        } else if (Objects.equals(type, long.class)) {
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false);
+        } else if (Objects.equals(type, float.class)) {
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
+        } else {
+            // if (Objects.equals(type, double.class))
+            visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
+        }
+        visitor.visitInsn(Opcodes.ARETURN);
+    }
+
+    private static void visitPushNumber(MethodVisitor visitor, int i) {
+        switch (i) {
+            case 0:
+                visitor.visitInsn(Opcodes.ICONST_0);
+                return;
+            case 1:
+                visitor.visitInsn(Opcodes.ICONST_1);
+                return;
+            case 2:
+                visitor.visitInsn(Opcodes.ICONST_2);
+                return;
+            case 3:
+                visitor.visitInsn(Opcodes.ICONST_3);
+                return;
+            case 4:
+                visitor.visitInsn(Opcodes.ICONST_4);
+                return;
+            case 5:
+                visitor.visitInsn(Opcodes.ICONST_5);
+                return;
+            default:
+                // -127-128
+                visitor.visitIntInsn(Opcodes.BIPUSH, i);
+        }
+    }
+
+    private static int countExtraLocalIndex(Parameter[] parameters) {
+        int i = 1;
+        for (Parameter parameter : parameters) {
+            if (Objects.equals(parameter.getType(), long.class) || Objects.equals(parameter.getType(), double.class)) {
+                i += 2;
+            } else {
+                i++;
+            }
+        }
+        return i;
+    }
+
     private static final class ProxyGenerator implements Opcodes {
 
         private static final String HANDLER_DESCRIPTOR = JieJvm.getDescriptor(MethodProxyHandler.class);
@@ -141,16 +341,9 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         private static final String INIT_DESCRIPTOR =
             "(" + HANDLER_DESCRIPTOR + METHOD_ARRAY_DESCRIPTOR + ")V";
 
-        private static final String HANDLER_METHOD_DESCRIPTOR;
-
-        static {
-            try {
-                HANDLER_METHOD_DESCRIPTOR = JieJvm.getDescriptor(
-                    MethodProxyHandler.class.getMethod("invoke", Object.class, Method.class, Object[].class, ProxyInvoker.class));
-            } catch (NoSuchMethodException e) {
-                throw new ProxyException(e);
-            }
-        }
+        private static final String HANDLER_METHOD_DESCRIPTOR = JieJvm.getDescriptor(JieReflect.getMethod(
+            MethodProxyHandler.class, "invoke", Jie.array(Object.class, Method.class, Object[].class, ProxyInvoker.class))
+        );
 
         private final String proxyInternalName;
         private final String proxySignature;
@@ -239,7 +432,6 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                 constructor.visitVarInsn(ALOAD, 0);
                 constructor.visitFieldInsn(GETFIELD, proxyInternalName, "invokers", PROXY_INVOKER_ARRAY_DESCRIPTOR);
                 constructor.visitVarInsn(ILOAD, 3);
-                System.out.println(invokerInternalName);
                 constructor.visitTypeInsn(NEW, invokerInternalName);
                 constructor.visitInsn(DUP);
                 constructor.visitVarInsn(ALOAD, 0);
@@ -313,7 +505,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                 methodCount++;
             }
 
-            // Generate callSuper
+            // Generate callSuper(i, inst, args, null)
             Label[] caseLabels = methods.stream().map(it -> new Label()).toArray(Label[]::new);
             MethodVisitor callSuper = cw.visitMethod(ACC_PUBLIC, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, null, null);
             callSuper.visitVarInsn(ILOAD, 1);
@@ -325,7 +517,6 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                 callSuper.visitLabel(caseLabels[i]);
                 callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 callSuper.visitVarInsn(ALOAD, 0);
-                // System.out.println(method.getDeclaringClass());
                 // callSuper.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
                 Class<?>[] params = method.getParameterTypes();
                 if (maxParameterCount < params.length) {
@@ -342,7 +533,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                     callSuper.visitInsn(ACONST_NULL);
                     callSuper.visitInsn(ARETURN);
                 } else {
-                    visitCastObject(callSuper, method.getReturnType(), true);
+                    returnCastObject(callSuper, method.getReturnType());
                 }
                 i++;
             }
@@ -350,7 +541,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             callSuper.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             callSuper.visitInsn(ACONST_NULL);
             callSuper.visitInsn(ARETURN);
-            callSuper.visitMaxs(2 + 2 * maxParameterCount, 4);
+            callSuper.visitMaxs(2 + 2 * maxParameterCount, 5);
             callSuper.visitEnd();
 
             return cw.toByteArray();
@@ -359,21 +550,12 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
 
     private static final class InvokerGenerator implements Opcodes {
 
-        private static final String INVOKE_METHOD_DESCRIPTOR;
-        private static final String INVOKE_SUPER_METHOD_DESCRIPTOR;
-
-        static {
-            try {
-                INVOKE_METHOD_DESCRIPTOR = JieJvm.getDescriptor(
-                    ProxyInvoker.class.getDeclaredMethod("invoke", Object.class, Object[].class)
-                );
-                INVOKE_SUPER_METHOD_DESCRIPTOR = JieJvm.getDescriptor(
-                    ProxyInvoker.class.getDeclaredMethod("invokeSuper", Object[].class)
-                );
-            } catch (NoSuchMethodException e) {
-                throw new ProxyException(e);
-            }
-        }
+        private static final String INVOKE_METHOD_DESCRIPTOR = JieJvm.getDescriptor(
+            JieReflect.getMethod(ProxyInvoker.class, "invoke", Jie.array(Object.class, Object[].class))
+        );
+        private static final String INVOKE_SUPER_METHOD_DESCRIPTOR = JieJvm.getDescriptor(
+            JieReflect.getMethod(ProxyInvoker.class, "invokeSuper", Jie.array(Object[].class))
+        );
 
         private final String proxyInternalName;
         private final String proxyDescriptor;
@@ -422,7 +604,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             cmv.visitEnd();
 
             // Generates methods:
-            // invoke(Object inst, Object[] args): return proxy.callSuper(i, inst, args);
+            // invoke(Object inst, Object[] args): return proxy.callSuper(i, inst, args, null);
             MethodVisitor invoke = cw.visitMethod(ACC_PUBLIC, "invoke", INVOKE_METHOD_DESCRIPTOR, null, null);
             invoke.visitVarInsn(ALOAD, 0);
             invoke.visitFieldInsn(GETFIELD, invokerInternalName, "this$0", proxyDescriptor);
@@ -430,11 +612,12 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             invoke.visitFieldInsn(GETFIELD, invokerInternalName, "i", "I");
             invoke.visitVarInsn(ALOAD, 1);
             invoke.visitVarInsn(ALOAD, 2);
+            invoke.visitInsn(ACONST_NULL);
             invoke.visitMethodInsn(INVOKEVIRTUAL, proxyInternalName, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, false);
             invoke.visitInsn(ARETURN);
-            invoke.visitMaxs(4, 3);
+            invoke.visitMaxs(5, 3);
             invoke.visitEnd();
-            // invokeSuper(Object[] args): return proxy.callSuper(i, proxy, args);
+            // invokeSuper(Object[] args): return proxy.callSuper(i, proxy, args, null);
             MethodVisitor invokeSuper = cw.visitMethod(ACC_PUBLIC, "invokeSuper", INVOKE_SUPER_METHOD_DESCRIPTOR, null, null);
             invokeSuper.visitVarInsn(ALOAD, 0);
             invokeSuper.visitFieldInsn(GETFIELD, invokerInternalName, "this$0", proxyDescriptor);
@@ -444,224 +627,15 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             invokeSuper.visitFieldInsn(GETFIELD, invokerInternalName, "i", "I");
             invokeSuper.visitVarInsn(ALOAD, 2);
             invokeSuper.visitVarInsn(ALOAD, 1);
+            invokeSuper.visitInsn(ACONST_NULL);
             invokeSuper.visitMethodInsn(INVOKEVIRTUAL, proxyInternalName, CALL_SUPER_METHOD_NAME, CALL_SUPER_METHOD_DESCRIPTOR, false);
             invokeSuper.visitInsn(ARETURN);
-            invokeSuper.visitMaxs(4, 3);
+            invokeSuper.visitMaxs(5, 3);
             invokeSuper.visitEnd();
 
             return cw.toByteArray();
         }
     }
 
-    private static void visitLoadParamAsObject(MethodVisitor visitor, Class<?> type, int i) {
-        if (!type.isPrimitive()) {
-            visitor.visitVarInsn(Opcodes.ALOAD, i);
-            return;
-        }
-        if (Objects.equals(type, boolean.class)) {
-            visitor.visitVarInsn(Opcodes.ILOAD, i);
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
-            return;
-        }
-        if (Objects.equals(type, byte.class)) {
-            visitor.visitVarInsn(Opcodes.ILOAD, i);
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;", false);
-            return;
-        }
-        if (Objects.equals(type, short.class)) {
-            visitor.visitVarInsn(Opcodes.ILOAD, i);
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;", false);
-            return;
-        }
-        if (Objects.equals(type, char.class)) {
-            visitor.visitVarInsn(Opcodes.ILOAD, i);
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;", false);
-            return;
-        }
-        if (Objects.equals(type, int.class)) {
-            visitor.visitVarInsn(Opcodes.ILOAD, i);
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
-            return;
-        }
-        if (Objects.equals(type, long.class)) {
-            visitor.visitVarInsn(Opcodes.LLOAD, i);
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false);
-            return;
-        }
-        if (Objects.equals(type, float.class)) {
-            visitor.visitVarInsn(Opcodes.FLOAD, i);
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
-            return;
-        }
-        if (Objects.equals(type, double.class)) {
-            visitor.visitVarInsn(Opcodes.DLOAD, i);
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
-            return;
-        }
-    }
-
-    private static void visitObjectCast(MethodVisitor visitor, Class<?> type, boolean needReturn) {
-        if (!type.isPrimitive()) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(type));
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.ARETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, boolean.class)) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Boolean");
-            visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.IRETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, byte.class)) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Byte");
-            visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false);
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.IRETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, short.class)) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Short");
-            visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false);
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.IRETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, char.class)) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Character");
-            visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false);
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.IRETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, int.class)) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Integer");
-            visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.IRETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, long.class)) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Long");
-            visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false);
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.LRETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, float.class)) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Float");
-            visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false);
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.FRETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, double.class)) {
-            visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Double");
-            visitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false);
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.DRETURN);
-            }
-            return;
-        }
-    }
-
-    private static void visitCastObject(MethodVisitor visitor, Class<?> type, boolean needReturn) {
-        if (!type.isPrimitive()) {
-            if (needReturn) {
-                visitor.visitInsn(Opcodes.ARETURN);
-            }
-            return;
-        }
-        if (Objects.equals(type, boolean.class)) {
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
-        } else if (Objects.equals(type, byte.class)) {
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;", false);
-        } else if (Objects.equals(type, short.class)) {
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;", false);
-        } else if (Objects.equals(type, char.class)) {
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;", false);
-        } else if (Objects.equals(type, int.class)) {
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
-        } else if (Objects.equals(type, long.class)) {
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false);
-        } else if (Objects.equals(type, float.class)) {
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
-        } else if (Objects.equals(type, double.class)) {
-            visitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
-        }
-        if (needReturn) {
-            visitor.visitInsn(Opcodes.ARETURN);
-        }
-    }
-
-    private static void visitPushNumber(MethodVisitor visitor, int i) {
-        switch (i) {
-            case 0:
-                visitor.visitInsn(Opcodes.ICONST_0);
-                return;
-            case 1:
-                visitor.visitInsn(Opcodes.ICONST_1);
-                return;
-            case 2:
-                visitor.visitInsn(Opcodes.ICONST_2);
-                return;
-            case 3:
-                visitor.visitInsn(Opcodes.ICONST_3);
-                return;
-            case 4:
-                visitor.visitInsn(Opcodes.ICONST_4);
-                return;
-            case 5:
-                visitor.visitInsn(Opcodes.ICONST_5);
-                return;
-            default:
-                // -127-128
-                visitor.visitIntInsn(Opcodes.BIPUSH, i);
-        }
-    }
-
-    private static int countExtraLocalIndex(Parameter[] parameters) {
-        int i = 1;
-        for (Parameter parameter : parameters) {
-            if (Objects.equals(parameter.getType(), long.class) || Objects.equals(parameter.getType(), double.class)) {
-                i += 2;
-            } else {
-                i++;
-            }
-        }
-        return i;
-    }
+    private static final class $X{}
 }

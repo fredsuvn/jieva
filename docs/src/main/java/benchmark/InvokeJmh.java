@@ -28,8 +28,8 @@ public class InvokeJmh {
             helloMember = TT.class.getDeclaredMethod("helloMember", String.class, String.class);
             reflectStaticInvoker = Invoker.reflect(helloStatic);
             reflectMemberInvoker = Invoker.reflect(helloMember);
-            unreflectStaticInvoker = Invoker.unreflect(helloStatic);
-            unreflectMemberInvoker = Invoker.unreflect(helloMember);
+            unreflectStaticInvoker = Invoker.handle(helloStatic);
+            unreflectMemberInvoker = Invoker.handle(helloMember);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

@@ -16,12 +16,12 @@ public class InvokeTest {
     public void testInvoke() throws Exception {
         Constructor<?> constructor = Invoked.class.getDeclaredConstructor();
         Assert.expectThrows(InvokingException.class, () -> Invoker.reflect(constructor).invoke(null));
-        Assert.expectThrows(InvokingException.class, () -> Invoker.unreflect(constructor).invoke(null));
+        Assert.expectThrows(InvokingException.class, () -> Invoker.handle(constructor).invoke(null));
         constructor.setAccessible(true);
         Method[] methods = Invoked.class.getDeclaredMethods();
         for (Method method : methods) {
             Assert.expectThrows(InvokingException.class, () -> Invoker.reflect(method).invoke(null));
-            Assert.expectThrows(InvokingException.class, () -> Invoker.unreflect(method).invoke(null));
+            Assert.expectThrows(InvokingException.class, () -> Invoker.handle(method).invoke(null));
             method.setAccessible(true);
             if (method.getName().startsWith("sm") || method.getName().startsWith("m")) {
                 testInvoke0(constructor, method, Modifier.isStatic(method.getModifiers()), true);
@@ -32,22 +32,22 @@ public class InvokeTest {
 
     private void testInvoke0(
         Constructor<?> constructor, Method method, boolean isStatic, boolean reflect) throws Exception {
-        Invoker cons = reflect ? Invoker.reflect(constructor) : Invoker.unreflect(constructor);
+        Invoker cons = reflect ? Invoker.reflect(constructor) : Invoker.handle(constructor);
         Invoked tt = (Invoked) cons.invoke(null);
         Assert.assertNotNull(tt);
         String[] args = new String[method.getParameterCount()];
         for (int i = 0; i < args.length; i++) {
             args[i] = "" + i;
         }
-        Assert.expectThrows(InvokingException.class, () -> (reflect ? Invoker.reflect(method) : Invoker.unreflect(method))
+        Assert.expectThrows(InvokingException.class, () -> (reflect ? Invoker.reflect(method) : Invoker.handle(method))
             .invoke(null, 1, 2, 3));
-        Invoker invoker = reflect ? Invoker.reflect(method) : Invoker.unreflect(method);
+        Invoker invoker = reflect ? Invoker.reflect(method) : Invoker.handle(method);
         Assert.assertNotNull(invoker);
         Assert.assertEquals(
             invoker.invoke(isStatic ? null : tt, (Object[]) args),
             buildString(method.getName(), args)
         );
-        Invoker handle = Invoker.methodHandle(MethodHandles.lookup().unreflect(method), isStatic);
+        Invoker handle = Invoker.handle(MethodHandles.lookup().unreflect(method), isStatic);
         Assert.assertNotNull(handle);
         Assert.assertEquals(
             handle.invoke(isStatic ? null : tt, (Object[]) args),

@@ -42,7 +42,7 @@ public interface Invoker {
      * @param method given method
      * @return {@link Invoker} instance
      */
-    static Invoker unreflect(Method method) {
+    static Invoker handle(Method method) {
         return new MethodHandleInvoker(method);
     }
 
@@ -53,7 +53,7 @@ public interface Invoker {
      * @param constructor given constructor
      * @return {@link Invoker} instance
      */
-    static Invoker unreflect(Constructor<?> constructor) {
+    static Invoker handle(Constructor<?> constructor) {
         return new MethodHandleInvoker(constructor);
     }
 
@@ -64,7 +64,7 @@ public interface Invoker {
      * @param isStatic whether treats the handle as static when invoking
      * @return {@link Invoker} instance
      */
-    static Invoker methodHandle(MethodHandle handle, boolean isStatic) {
+    static Invoker handle(MethodHandle handle, boolean isStatic) {
         return new MethodHandleInvoker(handle, isStatic);
     }
 

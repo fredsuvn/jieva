@@ -613,6 +613,19 @@ public class Jie {
     }
 
     /**
+     * Returns given elements as an array.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return given elements as an array
+     * @see JieArray#array(Object[])
+     */
+    @SafeVarargs
+    public static <T> T[] array(T... elements) {
+        return JieArray.array(elements);
+    }
+
+    /**
      * Returns an immutable {@link List} which is added all given elements.
      *
      * @param elements given elements
