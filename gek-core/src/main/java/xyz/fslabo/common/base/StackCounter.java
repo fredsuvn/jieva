@@ -1,4 +1,4 @@
-package xyz.fslabo.common.reflect;
+package xyz.fslabo.common.base;
 
 /**
  * A counter to count stack depth.

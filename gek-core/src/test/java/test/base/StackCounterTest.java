@@ -1,10 +1,10 @@
-package test.reflect;
+package test.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.fslabo.common.reflect.StackCounter;
+import xyz.fslabo.common.base.StackCounter;
 
-public class ReflectMiscTest {
+public class StackCounterTest {
 
     @Test
     public void testStackCounter() throws Exception {
