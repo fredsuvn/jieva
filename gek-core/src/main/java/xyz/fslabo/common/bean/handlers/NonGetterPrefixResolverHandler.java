@@ -26,7 +26,7 @@ public class NonGetterPrefixResolverHandler extends NonPrefixResolverHandler {
     private final CaseFormatter namingCase = CaseFormatter.LOWER_CAMEL;
 
     @Nullable
-    protected Setter resolveSetter(Method method) {
+    protected AbstractBeanResolverHandler.SetterInfo resolveSetter(Method method) {
         if (belongObject(method)) {
             return null;
         }

@@ -24,7 +24,7 @@ public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
     private final CaseFormatter caseFormatter = CaseFormatter.LOWER_CAMEL;
 
     @Nullable
-    protected Getter resolveGetter(Method method) {
+    protected AbstractBeanResolverHandler.GetterInfo resolveGetter(Method method) {
         if (method.getParameterCount() != 0) {
             return null;
         }
@@ -53,7 +53,7 @@ public class JavaBeanResolverHandler extends AbstractBeanResolverHandler {
     }
 
     @Nullable
-    protected Setter resolveSetter(Method method) {
+    protected AbstractBeanResolverHandler.SetterInfo resolveSetter(Method method) {
         if (method.getParameterCount() != 1) {
             return null;
         }

@@ -23,7 +23,7 @@ public class NonPrefixResolverHandler extends AbstractBeanResolverHandler {
     private static final Method[] BELONG_OBJECT = Object.class.getMethods();
 
     @Nullable
-    protected Getter resolveGetter(Method method) {
+    protected AbstractBeanResolverHandler.GetterInfo resolveGetter(Method method) {
         if (belongObject(method)) {
             return null;
         }
@@ -34,7 +34,7 @@ public class NonPrefixResolverHandler extends AbstractBeanResolverHandler {
     }
 
     @Nullable
-    protected Setter resolveSetter(Method method) {
+    protected AbstractBeanResolverHandler.SetterInfo resolveSetter(Method method) {
         if (belongObject(method)) {
             return null;
         }

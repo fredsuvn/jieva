@@ -16,7 +16,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 /**
- * Base abstract gek bean resolving handler, provides a skeletal implementation of the {@link BeanResolver.Handler} to
+ * Base abstract bean resolving handler, provides a skeletal implementation of the {@link BeanResolver.Handler} to
  * minimize the effort required to implement the interface backed by "method-based" getters/setters.
  * <p>
  * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
@@ -24,8 +24,8 @@ import java.util.*;
  * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link MethodInfo}. Subtypes
  * can use {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create getter/setter.
  * <p>
- * This method uses {@link #buildMethodInvoker(Method)} to generate invokers for getters and setters, it has a default
- * implementation ({@link Invoker#reflect(Method)}), override it to custom invoker generation.
+ * This method uses {@link #buildInvoker(Method)} to generate invokers for getters and setters, it has a default
+ * implementation ({@link Invoker#handle(Method)}), override it to custom invoker generation.
  *
  * @author fredsuvn
  */
@@ -47,14 +47,14 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
                 if (method.isBridge()) {
                     continue;
                 }
-                Getter getter = resolveGetter(method);
-                if (getter != null) {
-                    getters.put(getter.getName(), method);
+                GetterInfo getterInfo = resolveGetter(method);
+                if (getterInfo != null) {
+                    getters.put(getterInfo.getName(), method);
                     continue;
                 }
-                Setter setter = resolveSetter(method);
-                if (setter != null) {
-                    setters.put(setter.getName(), method);
+                SetterInfo setterInfo = resolveSetter(method);
+                if (setterInfo != null) {
+                    setters.put(setterInfo.getName(), method);
                     continue;
                 }
                 context.getMethods().add(new BaseMethodInfoImpl(method));
@@ -117,7 +117,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
      * @return given method as a getter
      */
     @Nullable
-    protected abstract Getter resolveGetter(Method method);
+    protected abstract AbstractBeanResolverHandler.GetterInfo resolveGetter(Method method);
 
     /**
      * Resolves and returns given method as a setter, or null if given method is not a setter.
@@ -126,7 +126,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
      * @return given method as a setter
      */
     @Nullable
-    protected abstract Setter resolveSetter(Method method);
+    protected abstract AbstractBeanResolverHandler.SetterInfo resolveSetter(Method method);
 
     /**
      * Builds a getter.
@@ -135,7 +135,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
      * @param method source method
      * @return a getter
      */
-    protected Getter buildGetter(String name, Method method) {
+    protected GetterInfo buildGetter(String name, Method method) {
         return () -> name;
     }
 
@@ -146,18 +146,18 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
      * @param method source method
      * @return a setter
      */
-    protected Setter buildSetter(String name, Method method) {
+    protected SetterInfo buildSetter(String name, Method method) {
         return () -> name;
     }
 
     /**
-     * Generates invoker for specified method. Default using {@link Invoker#reflect(Method)}.
+     * Generates invoker for specified method. Default using {@link Invoker#handle(Method)}.
      *
      * @param method specified method
      * @return invoker for specified method
      */
-    protected Invoker buildMethodInvoker(Method method) {
-        return Invoker.reflect(method);
+    protected Invoker buildInvoker(Method method) {
+        return Invoker.handle(method);
     }
 
     private Type getActualType(Type type, Map<TypeVariable<?>, Type> typeParameterMapping, Set<Type> stack) {
@@ -175,7 +175,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
     /**
      * Getter info.
      */
-    public interface Getter {
+    public interface GetterInfo {
         /**
          * Returns name of this getter.
          *
@@ -187,7 +187,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
     /**
      * Setter info.
      */
-    public interface Setter {
+    public interface SetterInfo {
         /**
          * Returns name of this setter.
          *
@@ -214,9 +214,9 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
             String name, @Nullable Method getter, @Nullable Method setter, Type type, Class<?> rawType) {
             this.name = name;
             this.getter = getter;
-            this.getterInvoker = getter == null ? null : buildMethodInvoker(getter);
+            this.getterInvoker = getter == null ? null : buildInvoker(getter);
             this.setter = setter;
-            this.setterInvoker = setter == null ? null : buildMethodInvoker(setter);
+            this.setterInvoker = setter == null ? null : buildInvoker(setter);
             this.type = type;
             this.field = findField(name, rawType);
             this.getterAnnotations = getter == null ? Collections.emptyList() : JieArray.asList(getter.getAnnotations());
@@ -318,7 +318,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
         private BaseMethodInfoImpl(Method method) {
             this.method = method;
             this.annotations = JieArray.asList(method.getAnnotations());
-            this.invoker = buildMethodInvoker(method);
+            this.invoker = buildInvoker(method);
             ;
         }
 
