@@ -77,12 +77,12 @@ public interface Invoker {
      * implementation.
      * <p>
      * This method only throws {@link InvokingException} if any problem occurs, use {@link InvokingException#getCause()}
-     * to get underlying reason.
+     * to get underlying cause.
      *
      * @param obj  specified object
      * @param args specified arguments
      * @return result of invoking
-     * @throws InvokingException if any problem occurs
+     * @throws InvokingException wraps if any problem occurs
      */
     @Nullable
     Object invoke(@Nullable Object obj, Object... args) throws InvokingException;

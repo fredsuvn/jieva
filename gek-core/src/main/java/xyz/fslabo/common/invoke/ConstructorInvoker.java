@@ -3,6 +3,7 @@ package xyz.fslabo.common.invoke;
 import xyz.fslabo.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 final class ConstructorInvoker implements Invoker {
 
@@ -17,6 +18,9 @@ final class ConstructorInvoker implements Invoker {
         try {
             return constructor.newInstance(args);
         } catch (Exception e) {
+            if (e instanceof InvocationTargetException) {
+                throw new InvokingException(e.getCause());
+            }
             throw new InvokingException(e);
         }
     }

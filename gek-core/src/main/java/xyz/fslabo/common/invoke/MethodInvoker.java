@@ -2,6 +2,7 @@ package xyz.fslabo.common.invoke;
 
 import xyz.fslabo.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 final class MethodInvoker implements Invoker {
@@ -17,6 +18,9 @@ final class MethodInvoker implements Invoker {
         try {
             return method.invoke(inst, args);
         } catch (Exception e) {
+            if (e instanceof InvocationTargetException) {
+                throw new InvokingException(e.getCause());
+            }
             throw new InvokingException(e);
         }
     }
