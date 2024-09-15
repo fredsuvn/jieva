@@ -9,6 +9,7 @@ import xyz.fslabo.common.invoke.InvokingException;
 import xyz.fslabo.common.invoke.JieInvoke;
 import xyz.fslabo.common.reflect.JieReflect;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -232,6 +233,33 @@ public class InvokeTest {
 
         public void ttt() {
             throw new JieTestException();
+        }
+    }
+
+    @Test
+    public void testInvokeSpecial() throws Throwable {
+        Method tt = JieReflect.getMethod(TestInter.class, "tt", Jie.array());
+        TestChild tc = new TestChild();
+        Class<?> caller = tt.getDeclaringClass();
+        MethodHandle handle = MethodHandles.lookup().in(caller).unreflectSpecial(tt, caller);
+        Assert.assertEquals(handle.invoke(tc), "TestInter");
+        // Assert.assertEquals(Invoker.handle(tt).invoke(tc), tc.tt());
+        // Assert.assertEquals(Invoker.handle(tt).invoke(tc), "TestChild");
+        // Assert.assertEquals(Invoker.handle(tt, TestChild.class).invoke(tc), "TestInter");
+    }
+
+    public interface TestInter {
+
+        default String tt() {
+            return "TestInter";
+        }
+    }
+
+    public static class TestChild implements TestInter {
+
+        @Override
+        public String tt() {
+            return "TestChild";
         }
     }
 }

@@ -5,6 +5,7 @@ import xyz.fslabo.annotations.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -17,55 +18,63 @@ import java.lang.reflect.Method;
 public interface Invoker {
 
     /**
-     * Returns {@link Invoker} instance of given method by reflecting.
+     * Returns an {@link Invoker} instance for given method by reflecting.
+     * <p>
+     * Note if underlying exception is wrapped by {@link InvocationTargetException} when calls
+     * {@link #invoke(Object, Object...)}, the {@link InvocationTargetException} will be erased, actual cause from
+     * {@link InvocationTargetException#getCause()} will be wrapped by {@link InvokingException} then thrown.
      *
      * @param method given method
      * @return {@link Invoker} instance
      */
     static Invoker reflect(Method method) {
-        return new MethodInvoker(method);
+        return new JieInvoke.OfMethod(method);
     }
 
     /**
-     * Returns {@link Invoker} instance of given constructor by reflecting.
+     * Returns an {@link Invoker} instance for given constructor by reflecting.
+     * <p>
+     * Note if underlying exception is wrapped by {@link InvocationTargetException} when calls
+     * {@link #invoke(Object, Object...)}, the {@link InvocationTargetException} will be erased, actual cause from
+     * {@link InvocationTargetException#getCause()} will be wrapped by {@link InvokingException} then thrown.
      *
      * @param constructor given constructor
      * @return {@link Invoker} instance
      */
     static Invoker reflect(Constructor<?> constructor) {
-        return new ConstructorInvoker(constructor);
+        return new JieInvoke.OfConstructor(constructor);
     }
 
     /**
-     * Returns {@link Invoker} instance of given method by {@link MethodHandles.Lookup#unreflect(Method)}.
+     * Returns {@link Invoker} instance for given method by {@link MethodHandles.Lookup#unreflect(Method)}.
      *
      * @param method given method
      * @return {@link Invoker} instance
      */
     static Invoker handle(Method method) {
-        return new MethodHandleInvoker(method);
+        return new JieInvoke.OfMethodHandle(method);
     }
 
     /**
-     * Returns {@link Invoker} instance of given constructor by
+     * Returns an {@link Invoker} instance for given constructor by
      * {@link MethodHandles.Lookup#unreflectConstructor(Constructor)}.
      *
      * @param constructor given constructor
      * @return {@link Invoker} instance
      */
     static Invoker handle(Constructor<?> constructor) {
-        return new MethodHandleInvoker(constructor);
+        return new JieInvoke.OfMethodHandle(constructor);
     }
 
     /**
-     * Returns {@link Invoker} instance with specified {@link MethodHandle}.
+     * Returns an {@link Invoker} instance with specified {@link MethodHandle}.
      *
      * @param handle   specified {@link MethodHandle}
      * @param isStatic whether treats the handle as static when invoking
      * @return {@link Invoker} instance
      */
     static Invoker handle(MethodHandle handle, boolean isStatic) {
-        return new MethodHandleInvoker(handle, isStatic);
+        return new JieInvoke.OfMethodHandle(handle, isStatic);
     }
 
     /**

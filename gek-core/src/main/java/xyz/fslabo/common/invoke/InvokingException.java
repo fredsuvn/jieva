@@ -3,7 +3,7 @@ package xyz.fslabo.common.invoke;
 import xyz.fslabo.common.base.JieException;
 
 /**
- * Exception for invocation.
+ * Exception for invoking.
  *
  * @author fredsuvn
  */
