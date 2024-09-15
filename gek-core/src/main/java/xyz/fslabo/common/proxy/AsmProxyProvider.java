@@ -528,6 +528,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                     callSuper.visitLabel(caseLabels[i]);
                     callSuper.visitFrame(F_SAME, 0, null, 0, null);
                     callSuper.visitVarInsn(ALOAD, 0);
+                    //callSuper.visitTypeInsn(CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
                     // callSuper.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
                     Class<?>[] params = method.getParameterTypes();
                     for (int j = 0; j < params.length; j++) {
@@ -536,7 +537,13 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                         callSuper.visitInsn(AALOAD);
                         visitObjectCast(callSuper, params[j], false);
                     }
-                    callSuper.visitMethodInsn(INVOKESPECIAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
+                    String methodOwnerInternalName = JieJvm.getInternalName(method.getDeclaringClass());
+                    boolean hasOwner = Objects.equals(methodOwnerInternalName, superInternalName) || superInternalNames.contains(methodOwnerInternalName);
+                    if (hasOwner) {
+                        callSuper.visitMethodInsn(INVOKESPECIAL, JieJvm.getInternalName(method.getDeclaringClass()), method.getName(), JieJvm.getDescriptor(method), method.getDeclaringClass().isInterface());
+                    } else {
+                        callSuper.visitMethodInsn(INVOKESPECIAL, superInternalName, method.getName(), JieJvm.getDescriptor(method), false);
+                    }
                     returnCastObject(callSuper, method.getReturnType());
                     i++;
                 }

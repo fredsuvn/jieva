@@ -483,7 +483,10 @@ public class JieReflect {
      * @return wrapper class if given class is primitive, else return itself
      */
     public static Class<?> wrapper(Class<?> cls) {
-        return Jie.orDefault(CLASS_WRAPPERS.get(cls), cls);
+        if (cls.isPrimitive()) {
+            return CLASS_WRAPPERS.get(cls);
+        }
+        return cls;
     }
 
     /**

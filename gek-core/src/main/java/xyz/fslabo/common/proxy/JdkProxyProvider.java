@@ -2,15 +2,17 @@ package xyz.fslabo.common.proxy;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.base.JieSystem;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.invoke.Invoker;
 import xyz.fslabo.common.invoke.InvokingException;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * JDK implementation for {@link ProxyProvider}, based on {@link Proxy}, only supports interface proxy.
@@ -31,20 +33,20 @@ public class JdkProxyProvider implements ProxyProvider {
     private static final class InvocationHandlerImpl implements InvocationHandler {
 
         private final MethodProxyHandler handler;
-        private final Set<Method> proxiedSet = new HashSet<>();
-        private final Map<Method, Invoker> invokerMap = new HashMap<>();
+        private final Map<Method, JdkProxyInvoker> invokerMap = new HashMap<>();
 
         private InvocationHandlerImpl(Iterable<Class<?>> uppers, MethodProxyHandler handler) {
             this.handler = handler;
             for (Class<?> upper : uppers) {
                 Method[] methods = upper.getMethods();
                 for (Method method : methods) {
-                    if (Modifier.isFinal(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
+                    if (Modifier.isStatic(method.getModifiers())) {
                         continue;
                     }
-                    invokerMap.put(method, Invoker.handle(method));
                     if (handler.proxy(method)) {
-                        proxiedSet.add(method);
+                        Invoker invoker = Invoker.handle(method);
+                        JdkProxyInvoker jdkInvoker = new JdkProxyInvoker(method, invoker);
+                        invokerMap.put(method, jdkInvoker);
                     }
                 }
             }
@@ -52,21 +54,32 @@ public class JdkProxyProvider implements ProxyProvider {
 
         @Override
         public Object invoke(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
-            Invoker invoker = invokerMap.get(method);
-            if (!proxiedSet.contains(method)) {
-                return invoke0(invoker, proxy, args);
+            JdkProxyInvoker invoker = invokerMap.get(method);
+            if (invoker == null) {
+                return tryUnProxied(method);
             }
-            return handler.invoke(proxy, method, args, new ProxyInvoker() {
-                @Override
-                public @Nullable Object invoke(Object inst, Object[] args) throws Throwable {
-                    return invoke0(invoker, inst, args);
-                }
+            return handler.invoke(proxy, method, args, invoker);
+        }
+    }
 
-                @Override
-                public @Nullable Object invokeSuper(Object[] args) throws Throwable {
-                    throw new AbstractMethodError(method.toString());
-                }
-            });
+    private static final class JdkProxyInvoker implements ProxyInvoker {
+
+        private final Method method;
+        private final Invoker invoker;
+
+        private JdkProxyInvoker(Method method, Invoker invoker) {
+            this.method = method;
+            this.invoker = invoker;
+        }
+
+        @Override
+        public @Nullable Object invoke(Object inst, Object[] args) throws Throwable {
+            return invoke0(invoker, inst, args);
+        }
+
+        @Override
+        public @Nullable Object invokeSuper(Object[] args) throws Throwable {
+            return tryUnProxied(method);
         }
 
         private Object invoke0(Invoker invoker, Object inst, @Nullable Object[] args) throws Throwable {
@@ -74,12 +87,16 @@ public class JdkProxyProvider implements ProxyProvider {
                 Object[] actualArgs = args == null ? EMPTY_ARGS : args;
                 return invoker.invoke(inst, actualArgs);
             } catch (InvokingException e) {
-                Throwable cause = e.getCause();
-                if (cause instanceof InvocationTargetException) {
-                    throw cause.getCause();
-                }
-                throw cause;
+                throw e.getCause();
             }
         }
+    }
+
+    private static Object tryUnProxied(Method method) {
+        if (method.isDefault()) {
+            throw new ProxyException("Cannot invoke default method ("
+                + method + ") in current java version: " + JieSystem.getJavaVersion() + ".");
+        }
+        throw new AbstractMethodError(method.toString());
     }
 }
