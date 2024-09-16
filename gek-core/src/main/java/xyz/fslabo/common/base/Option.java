@@ -74,7 +74,7 @@ public interface Option<K, V> {
      * @return option value of specified key in given options, or default value if not found
      */
     static <K, V> V find(K key, V defaultValue, Option<?, ?>... options) {
-        return Jie.orDefault(find(key, options), defaultValue);
+        return Jie.notNull(find(key, options), defaultValue);
     }
 
     /**

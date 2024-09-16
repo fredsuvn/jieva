@@ -50,8 +50,8 @@ public class MappingOptions {
     /**
      * Copy level: {@code EQUAL}.
      * <p>
-     * In this level, if target type is equal to type of source object, the source object will be returned as
-     * mapping result. This is similar to strict shadow copy.
+     * In this level, if target type is equal to type of source object, the source object will be returned as mapping
+     * result. This is similar to strict shadow copy.
      */
     public static final int COPY_LEVEL_EQUAL = 2;
 
@@ -64,22 +64,21 @@ public class MappingOptions {
     public static final int COPY_LEVEL_DEEP = 3;
 
     /**
-     * Option for {@link Mapper}, to map objects in types if needed.
-     * For {@link BeanMapper}, names of properties and keys of entries will be mapped by this mapper before finding
-     * dest properties or entries.
-     * If this option is null, the mapper will use {@link Mapper#defaultMapper()}.
+     * Option for {@link Mapper}, to map objects in types if needed. For {@link BeanMapper}, names of properties and
+     * keys of entries will be mapped by this mapper before finding dest properties or entries. If this option is null,
+     * the mapper will use {@link Mapper#defaultMapper()}.
      */
     private @Nullable Mapper mapper;
 
     /**
-     * Option for {@link BeanProvider}, to resolve bean infos if needed.
-     * If this option is null, the mapper will use {@link BeanProvider#defaultProvider()}.
+     * Option for {@link BeanProvider}, to resolve bean infos if needed. If this option is null, the mapper will use
+     * {@link BeanProvider#defaultProvider()}.
      */
     private @Nullable BeanProvider beanProvider;
 
     /**
-     * Option for {@link BeanMapper}, to map bean infos if needed.
-     * If this option is null, the mapper will use {@link BeanMapper#defaultMapper()}.
+     * Option for {@link BeanMapper}, to map bean infos if needed. If this option is null, the mapper will use
+     * {@link BeanMapper#defaultMapper()}.
      */
     private @Nullable BeanMapper beanMapper;
 
@@ -222,10 +221,10 @@ public class MappingOptions {
         if (targetProperty != null) {
             Function<PropertyInfo, Charset> func = getPropertyCharset();
             if (func != null) {
-                return Jie.orDefault(func.apply(targetProperty), JieChars.defaultCharset());
+                return Jie.notNull(func.apply(targetProperty), JieChars.defaultCharset());
             }
         }
-        return Jie.orDefault(getCharset(), JieChars.defaultCharset());
+        return Jie.notNull(getCharset(), JieChars.defaultCharset());
     }
 
     /**

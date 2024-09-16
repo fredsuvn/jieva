@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -48,57 +47,23 @@ public class Jie {
      * @param <T>          type of values
      * @return default value if given object is null, or given object itself if it is not null
      */
-    public static <T> T orDefault(@Nullable T obj, T defaultValue) {
+    public static <T> T notNull(@Nullable T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
     }
 
     /**
-     * Returns computed value if given object is null, or given object itself if it is not null:
+     * Returns supplied value if given object is null, or given object itself if it is not null:
      * <pre>
-     *     return obj == null ? computedValue.get() : obj;
+     *     return obj == null ? defaultSupplier.get() : obj;
      * </pre>
      *
-     * @param obj           given object
-     * @param computedValue computed value
-     * @param <T>           type of values
+     * @param obj             given object
+     * @param defaultSupplier computed value
+     * @param <T>             type of values
      * @return computed value if given object is null, or given object itself if it is not null
      */
-    public static <T> T orDefault(@Nullable T obj, Supplier<? extends T> computedValue) {
-        return obj == null ? computedValue.get() : obj;
-    }
-
-    /**
-     * Returns default value if given object is null, or the value computed by given function if it is not null:
-     * <pre>
-     *     return obj == null ? defaultValue : function.apply(obj);
-     * </pre>
-     *
-     * @param obj          given object
-     * @param defaultValue default value
-     * @param function     given function
-     * @param <K>          type of given object
-     * @param <V>          type of result
-     * @return default value if given object is null, or the value computed by given function if it is not null
-     */
-    public static <K, V> V orDefault(@Nullable K obj, V defaultValue, Function<? super K, ? extends V> function) {
-        return obj == null ? defaultValue : function.apply(obj);
-    }
-
-    /**
-     * Returns the value computed by given function if it is not null, or null if it is null:
-     * <pre>
-     *     return obj == null ? null : function.apply(obj);
-     * </pre>
-     *
-     * @param obj      given object
-     * @param function given function
-     * @param <K>      type of given object
-     * @param <V>      type of result
-     * @return the value computed by given function if it is not null, or null if it is null
-     */
-    @Nullable
-    public static <K, V> V orNull(@Nullable K obj, Function<? super K, ? extends V> function) {
-        return obj == null ? null : function.apply(obj);
+    public static <T> T notNull(@Nullable T obj, Supplier<? extends T> defaultSupplier) {
+        return obj == null ? defaultSupplier.get() : obj;
     }
 
     /**

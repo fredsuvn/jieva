@@ -98,7 +98,7 @@ public abstract class ScheduledBuilder implements BaseBuilder<ScheduledExecutorS
     public ScheduledExecutorService build() {
         ScheduledThreadPoolExecutor pool = buildExecutor();
         if (allowCoreThreadTimeOut) {
-            Duration keepTime = Jie.orDefault(keepAliveTime, Duration.ZERO);
+            Duration keepTime = Jie.notNull(keepAliveTime, Duration.ZERO);
             pool.setKeepAliveTime(keepTime.toNanos(), TimeUnit.NANOSECONDS);
             pool.allowCoreThreadTimeOut(true);
         }

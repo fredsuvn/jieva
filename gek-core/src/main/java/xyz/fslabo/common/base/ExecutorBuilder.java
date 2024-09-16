@@ -122,8 +122,8 @@ public abstract class ExecutorBuilder implements BaseBuilder<ExecutorService, Ex
      * @return thread pool which is configured by this
      */
     public ExecutorService build() {
-        Duration keepTime = Jie.orDefault(keepAliveTime, Duration.ZERO);
-        BlockingQueue<Runnable> queue = Jie.orDefault(workQueue, LinkedBlockingQueue::new);
+        Duration keepTime = Jie.notNull(keepAliveTime, Duration.ZERO);
+        BlockingQueue<Runnable> queue = Jie.notNull(workQueue, LinkedBlockingQueue::new);
         int maxPool = Math.max(maxPoolSize, corePoolSize);
         ThreadPoolExecutor pool;
         if (threadFactory == null && rejectHandler == null) {
