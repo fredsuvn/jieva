@@ -32,7 +32,8 @@ public interface ProxyInvoker {
     Object invoke(Object inst, Object[] args) throws Throwable;
 
     /**
-     * Invokes proxied method associated to this invoker, this method is equivalent to call {@code super} method.
+     * Invokes proxied method associated to this invoker (with invoke-special), this method commonly is equivalent to
+     * invoke {@code super} method of proxy instance.
      *
      * @param args arguments
      * @return result of invocation

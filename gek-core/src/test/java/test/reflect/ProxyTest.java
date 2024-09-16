@@ -20,6 +20,7 @@ public class ProxyTest {
         TestHandler testHandler = new TestHandler(inst);
         ClassP proxy = JieProxy.asm(Arrays.asList(ClassP.class, Inter1.class, Inter2.class), testHandler);
         testAsm(proxy, "Inter1-proxy", true);
+
         ClassOO inst2 = new ClassOO(ClassP.DEFAULT_I * 2);
         TestHandler testHandler2 = new TestHandler(inst2);
         ClassP proxy2 = JieProxy.asm(Arrays.asList(ClassPP.class, Inter1.class, Inter2.class), testHandler2);
@@ -27,8 +28,9 @@ public class ProxyTest {
 
         Object proxyP = JieProxy.asm(Arrays.asList(ClassP.class), testHandler);
         testClass1((ClassP) proxyP);
-        Object proxyI1 = JieProxy.asm(Arrays.asList(Inter1.class), testHandler);
-        testInter1((Inter1<?>) proxyI1, true);
+        Inter1<?> proxyI1 = JieProxy.asm(Arrays.asList(Inter1.class), testHandler);
+        testInter1(proxyI1, true);
+
         Object proxyI12 = JieProxy.asm(Arrays.asList(Inter1.class, Inter2.class), testHandler);
         testInter1((Inter1<?>) proxyI12, true);
         testInter2((Inter2<?>) proxyI12, true);
@@ -39,6 +41,22 @@ public class ProxyTest {
         Assert.expectThrows(ProxyException.class, () -> JieProxy.asm(null, testHandler));
         Assert.expectThrows(ProxyException.class, () -> JieProxy.asm(Arrays.asList(ClassP.class, ClassP.class), testHandler));
         Assert.expectThrows(ProxyException.class, () -> JieProxy.asm(Arrays.asList(ClassO.class), testHandler));
+
+        MethodProxyHandler superHandle = new MethodProxyHandler() {
+            @Override
+            public boolean proxy(Method method) {
+                return Objects.equals(method.getName(), "ppi_String");
+            }
+
+            @Override
+            public @Nullable Object invoke(Object proxy, Method method, Object[] args, ProxyInvoker invoker) throws Throwable {
+                return invoker.invokeSuper(args);
+            }
+        };
+        Inter2<?> ppi1 = JieProxy.asm(Arrays.asList(Inter1.class, Inter2.class), superHandle);
+        Assert.assertEquals(ppi1.ppi_String(), "Inter1");
+        Inter1<?> ppi2 = JieProxy.asm(Arrays.asList(Inter2.class, Inter1.class), superHandle);
+        Assert.assertEquals(ppi2.ppi_String(), "Inter2");
     }
 
     private void testAsm(ClassP proxy, String ppi_String, boolean absError) {
@@ -91,6 +109,8 @@ public class ProxyTest {
         Assert.expectThrows(JieTestException.class, proxy::ppc_Throw);
         Assert.assertEquals(ClassP.ppc_static(), "non-proxy");
         Assert.assertEquals(proxy.ppc_i(), 3);
+        Assert.assertEquals(proxy.pp_Proxied("", 2), TestHandler.superStack.get(0));
+        Assert.assertEquals(proxy.ppp_Proxied("", 2), TestHandler.superStack.get(0));
     }
 
     private void testInter1(Inter1<?> inter1, boolean absError) {
@@ -402,6 +422,14 @@ public class ProxyTest {
 
         public void ppc_Throw() {
             throw new JieTestException();
+        }
+
+        public String pp_Proxied(String s1, long s2) {
+            return "ClassP";
+        }
+
+        public String ppp_Proxied(String s1, long s2) {
+            return "ClassP";
         }
 
         public Object callSuper(int i, Object obj, Object[] args) throws Throwable {

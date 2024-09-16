@@ -325,9 +325,11 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             case 5:
                 visitor.visitInsn(Opcodes.ICONST_5);
                 return;
-            default:
-                // -127-128
-                visitor.visitIntInsn(Opcodes.BIPUSH, i);
+        }
+        if (i <= Byte.MAX_VALUE) {
+            visitor.visitIntInsn(Opcodes.BIPUSH, i);
+        } else {
+            visitor.visitIntInsn(Opcodes.SIPUSH, i);
         }
     }
 
