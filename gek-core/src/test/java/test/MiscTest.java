@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolvingException;
 import xyz.fslabo.common.invoke.InvokingException;
-import xyz.fslabo.common.proxy.ProxyException;
+import xyz.fslabo.common.reflect.proxy.ProxyException;
 
 public class MiscTest {
 

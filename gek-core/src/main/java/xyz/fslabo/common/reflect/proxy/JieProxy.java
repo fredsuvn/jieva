@@ -1,4 +1,4 @@
-package xyz.fslabo.common.proxy;
+package xyz.fslabo.common.reflect.proxy;
 
 import xyz.fslabo.annotations.Nullable;
 

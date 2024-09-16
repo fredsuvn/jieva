@@ -1,4 +1,4 @@
-package xyz.fslabo.common.proxy;
+package xyz.fslabo.common.reflect.proxy;
 
 import org.objectweb.asm.*;
 import xyz.fslabo.annotations.Nullable;
@@ -528,7 +528,7 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                     callSuper.visitLabel(caseLabels[i]);
                     callSuper.visitFrame(F_SAME, 0, null, 0, null);
                     callSuper.visitVarInsn(ALOAD, 0);
-                    //callSuper.visitTypeInsn(CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
+                    // callSuper.visitTypeInsn(CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
                     // callSuper.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(method.getDeclaringClass()));
                     Class<?>[] params = method.getParameterTypes();
                     for (int j = 0; j < params.length; j++) {

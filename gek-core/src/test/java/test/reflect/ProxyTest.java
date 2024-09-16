@@ -1,10 +1,10 @@
-package test.proxy;
+package test.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import test.JieTestException;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.proxy.*;
+import xyz.fslabo.common.reflect.proxy.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -122,20 +122,25 @@ public class ProxyTest {
         Object proxy = JieProxy.jdk(null, Arrays.asList(Inter1.class, Inter2.class), testHandler);
         Inter1<?> i1 = (Inter1<?>) proxy;
         Assert.expectThrows(AbstractMethodError.class, i1::ppi1_boolean);
-        Assert.expectThrows(ProxyException.class, i1::ppi_String);
         Assert.expectThrows(JieTestException.class, i1::ppi1_Throw);
-        Assert.assertEquals(Inter1.ppi1_static(), "non-proxy");
-        Assert.expectThrows(ProxyException.class, i1::nonProxied);
+        Assert.expectThrows(ProxyException.class, i1::ppi1_nonProxied);
         Inter2<?> i2 = (Inter2<?>) proxy;
         Assert.expectThrows(AbstractMethodError.class, i2::ppi2_boolean);
-        Assert.expectThrows(ProxyException.class, i2::ppi_String);
         Assert.expectThrows(JieTestException.class, i2::ppi2_Throw);
         Assert.assertEquals(Inter2.ppi2_static(), "non-proxy");
+
+        // test default method
+        Assert.expectThrows(ProxyException.class, i1::ppi_String);
+        Assert.assertEquals(Inter1.ppi1_static(), "non-proxy");
+        Assert.expectThrows(ProxyException.class, i2::ppi_String);
+        Assert.expectThrows(AbstractMethodError.class, i2::ppi2_nonProxied);
+
+        // test ProxyInvoker
         MethodProxyHandler handler = new MethodProxyHandler() {
 
             @Override
             public boolean proxy(Method method) {
-                return method.getName().startsWith("pp");
+                return method.getName().startsWith("pp") && !method.getName().endsWith("_nonProxied");
             }
 
             @Override
@@ -185,7 +190,10 @@ public class ProxyTest {
 
         @Override
         public boolean proxy(Method method) {
-            return method.getName().startsWith("pp") || method.getName().equals("callSuper");
+            return (method.getName().startsWith("pp")
+                || method.getName().equals("callSuper")
+                || method.getName().equals("callVirtual"))
+                && !method.getName().endsWith("nonProxied");
         }
 
         @Override
@@ -249,7 +257,7 @@ public class ProxyTest {
             throw new JieTestException();
         }
 
-        default void nonProxied() {
+        default void ppi1_nonProxied() {
         }
 
         String ppi1_Proxied(String s1, String s2);
@@ -284,6 +292,8 @@ public class ProxyTest {
         default void ppi2_Throw() {
             throw new JieTestException();
         }
+
+        void ppi2_nonProxied();
 
         String ppi2_Proxied(String s1, String s2);
 
@@ -446,6 +456,10 @@ public class ProxyTest {
         }
 
         @Override
+        public void ppi2_nonProxied() {
+        }
+
+        @Override
         public String ppi2_Proxied(String s1, String s2) {
             return s1 + s2;
         }
@@ -509,6 +523,10 @@ public class ProxyTest {
         @Override
         public String ppi_String() {
             return Inter1.super.ppi_String();
+        }
+
+        @Override
+        public void ppi2_nonProxied() {
         }
 
         @Override
@@ -582,6 +600,10 @@ public class ProxyTest {
         @Override
         public String ppi1_Proxied(String s1, String s2) {
             return s1 + s2;
+        }
+
+        @Override
+        public void ppi2_nonProxied() {
         }
 
         @Override
