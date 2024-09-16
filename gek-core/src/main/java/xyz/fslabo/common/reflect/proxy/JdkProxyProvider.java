@@ -2,6 +2,7 @@ package xyz.fslabo.common.reflect.proxy;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.base.JieConfig;
 import xyz.fslabo.common.base.JieSystem;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.invoke.Invoker;
@@ -95,7 +96,9 @@ public class JdkProxyProvider implements ProxyProvider {
     private static Object tryUnProxied(Method method) {
         if (method.isDefault()) {
             throw new ProxyException("Cannot invoke default method ("
-                + method + ") in current java version: " + JieSystem.getJavaVersion() + ".");
+                + method + ") in current versions: [jie: "
+                + JieConfig.version() + ", java: "
+                + JieSystem.getJavaVersion() + "].");
         }
         throw new AbstractMethodError(method.toString());
     }
