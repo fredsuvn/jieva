@@ -31,7 +31,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is null or empty
      */
-    public static <T> boolean isEmpty(@Nullable boolean[] array) {
+    public static boolean isEmpty(@Nullable boolean[] array) {
         return array == null || array.length == 0;
     }
 
@@ -41,7 +41,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is null or empty
      */
-    public static <T> boolean isEmpty(@Nullable byte[] array) {
+    public static boolean isEmpty(@Nullable byte[] array) {
         return array == null || array.length == 0;
     }
 
@@ -51,7 +51,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is null or empty
      */
-    public static <T> boolean isEmpty(@Nullable short[] array) {
+    public static boolean isEmpty(@Nullable short[] array) {
         return array == null || array.length == 0;
     }
 
@@ -61,7 +61,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is null or empty
      */
-    public static <T> boolean isEmpty(@Nullable char[] array) {
+    public static boolean isEmpty(@Nullable char[] array) {
         return array == null || array.length == 0;
     }
 
@@ -71,7 +71,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is null or empty
      */
-    public static <T> boolean isEmpty(@Nullable int[] array) {
+    public static boolean isEmpty(@Nullable int[] array) {
         return array == null || array.length == 0;
     }
 
@@ -81,7 +81,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is null or empty
      */
-    public static <T> boolean isEmpty(@Nullable long[] array) {
+    public static boolean isEmpty(@Nullable long[] array) {
         return array == null || array.length == 0;
     }
 
@@ -91,7 +91,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is null or empty
      */
-    public static <T> boolean isEmpty(@Nullable float[] array) {
+    public static boolean isEmpty(@Nullable float[] array) {
         return array == null || array.length == 0;
     }
 
@@ -101,7 +101,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is null or empty
      */
-    public static <T> boolean isEmpty(@Nullable double[] array) {
+    public static boolean isEmpty(@Nullable double[] array) {
         return array == null || array.length == 0;
     }
 
@@ -121,7 +121,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is not null and empty
      */
-    public static <T> boolean isNotEmpty(@Nullable boolean[] array) {
+    public static boolean isNotEmpty(@Nullable boolean[] array) {
         return !isEmpty(array);
     }
 
@@ -131,7 +131,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is not null and empty
      */
-    public static <T> boolean isNotEmpty(@Nullable byte[] array) {
+    public static boolean isNotEmpty(@Nullable byte[] array) {
         return !isEmpty(array);
     }
 
@@ -141,7 +141,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is not null and empty
      */
-    public static <T> boolean isNotEmpty(@Nullable short[] array) {
+    public static boolean isNotEmpty(@Nullable short[] array) {
         return !isEmpty(array);
     }
 
@@ -151,7 +151,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is not null and empty
      */
-    public static <T> boolean isNotEmpty(@Nullable char[] array) {
+    public static boolean isNotEmpty(@Nullable char[] array) {
         return !isEmpty(array);
     }
 
@@ -161,7 +161,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is not null and empty
      */
-    public static <T> boolean isNotEmpty(@Nullable int[] array) {
+    public static boolean isNotEmpty(@Nullable int[] array) {
         return !isEmpty(array);
     }
 
@@ -171,7 +171,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is not null and empty
      */
-    public static <T> boolean isNotEmpty(@Nullable long[] array) {
+    public static boolean isNotEmpty(@Nullable long[] array) {
         return !isEmpty(array);
     }
 
@@ -181,7 +181,7 @@ public class JieArray {
      * @param array given array
      * @return whether given array is not null and empty
      */
-    public static <T> boolean isNotEmpty(@Nullable float[] array) {
+    public static boolean isNotEmpty(@Nullable float[] array) {
         return !isEmpty(array);
     }
 
@@ -191,37 +191,75 @@ public class JieArray {
      * @param array given array
      * @return whether given array is not null and empty
      */
-    public static <T> boolean isNotEmpty(@Nullable double[] array) {
+    public static boolean isNotEmpty(@Nullable double[] array) {
         return !isEmpty(array);
     }
 
     /**
-     * Maps source array (component type {@code T}) to dest array (component type {@code R}). If the dest array's length
-     * equals to source array, the mapped elements will be put into the dest array, else create and put into a new
-     * array.
+     * Maps source array (component type {@code T}) to dest array (component type {@code R}) by specified mapper.
+     * <p>
+     * If given dest array's length equals to source array, the given dest array will be returned, otherwise, a new
+     * array with same length of source array will be created and returned.
+     * <p>
+     * Each element of source array will be mapped to a new element by specified mapper, then set into the result array
+     * at corresponding index.
      *
      * @param source the source array
      * @param dest   the dest array
-     * @param mapper given mapper
+     * @param mapper specified mapper
      * @param <T>    component type of source array
      * @param <R>    component type of dest array
-     * @return the dest array
+     * @return the given dest or a new result array
      */
-    public static <T, R> R[] map(T[] source, R[] dest, Function<T, R> mapper) {
+    public static <T, R> R[] map(T[] source, R[] dest, Function<? super T, ? extends R> mapper) {
         R[] result;
         if (dest.length == source.length) {
             result = dest;
         } else {
             result = newArray(dest.getClass().getComponentType(), source.length);
         }
-        for (int i = 0; i < source.length; i++) {
-            result[i] = mapper.apply(source[i]);
-        }
+        map0(source, result, 0, mapper);
         return result;
     }
 
     /**
-     * Creates a new array of given component type and length.
+     * Maps source array (component type {@code T}) to dest array (component type {@code R}) by specified mapper.
+     * <p>
+     * This method will try to create a new array as mapping result. The element type of the new array will be
+     * determined by the type of the first non-null value returned by the specified mapper. If returned value of mapper
+     * are null, an {@link UnsupportedOperationException} will be thrown.
+     * <p>
+     * Each element of source array will be mapped to a new element by specified mapper, then set into the result array
+     * at corresponding index.
+     *
+     * @param source the source array
+     * @param mapper specified mapper
+     * @param <T>    component type of source array
+     * @param <R>    component type of dest array
+     * @return a new result array
+     */
+    public static <T, R> R[] map(T[] source, Function<? super T, ? extends R> mapper) {
+        for (int i = 0; i < source.length; i++) {
+            R r = mapper.apply(source[i]);
+            if (r != null) {
+                R[] dest = newArray(r.getClass(), source.length);
+                map0(source, dest, i, mapper);
+                return dest;
+            }
+        }
+        throw new UnsupportedOperationException(
+            "Unable to create a new array because all mapped elements are null, preventing the determination of the new array's type."
+        );
+    }
+
+    private static <T, R> void map0(T[] source, R[] dest, int start, Function<? super T, ? extends R> mapper) {
+        for (int i = start; i < source.length; i++) {
+            dest[i] = mapper.apply(source[i]);
+        }
+    }
+
+    /**
+     * Creates a new array of given component type and length, all elements will be initialized to {@code null}.
      *
      * @param componentType given component type
      * @param length        given length
