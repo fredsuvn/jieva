@@ -57,6 +57,30 @@ public class ProxyTest {
         Assert.assertEquals(ppi1.ppi_String(), "Inter1");
         Inter1<?> ppi2 = JieProxy.asm(Arrays.asList(Inter2.class, Inter1.class), superHandle);
         Assert.assertEquals(ppi2.ppi_String(), "Inter2");
+
+        Object op = JieProxy.asm(Arrays.asList(Object.class), new MethodProxyHandler() {
+            @Override
+            public boolean proxy(Method method) {
+                return true;
+            }
+
+            @Override
+            public @Nullable Object invoke(Object proxy, Method method, Object[] args, ProxyInvoker invoker) throws Throwable {
+                if (method.getName().equals("equals")) {
+                    return true;
+                }
+                if (method.getName().equals("hashCode")) {
+                    return 666;
+                }
+                if (method.getName().equals("toString")) {
+                    return "666";
+                }
+                return invoker.invokeSuper(args);
+            }
+        });
+        Assert.assertEquals(op.equals("anyone"), true);
+        Assert.assertEquals(op.hashCode(), 666);
+        Assert.assertEquals(op.toString(), "666");
     }
 
     private void testAsm(ClassP proxy, String ppi_String, boolean absError) {
