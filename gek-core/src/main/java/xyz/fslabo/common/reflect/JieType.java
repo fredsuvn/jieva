@@ -237,7 +237,7 @@ public class JieType {
         private final Type[] upperBounds;
         private final Type[] lowerBounds;
 
-        private WildcardTypeImpl(boolean isUpperBounds, Type bound) {
+        private WildcardTypeImpl(boolean isUpperBounds, @Nullable Type bound) {
             if (isUpperBounds) {
                 // ? extends String
                 this.upperBounds = bound == null ? OBJECT_ARRAY : new Type[]{bound};

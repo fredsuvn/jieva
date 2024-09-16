@@ -59,7 +59,8 @@ public class JdkProxyProvider implements ProxyProvider {
             if (invoker == null) {
                 return tryUnProxied(method);
             }
-            return handler.invoke(proxy, method, args, invoker);
+            Object[] actualArgs = args == null ? EMPTY_ARGS : args;
+            return handler.invoke(proxy, method, actualArgs, invoker);
         }
     }
 
@@ -83,10 +84,9 @@ public class JdkProxyProvider implements ProxyProvider {
             return tryUnProxied(method);
         }
 
-        private Object invoke0(Invoker invoker, Object inst, @Nullable Object[] args) throws Throwable {
+        private Object invoke0(Invoker invoker, Object inst, Object[] args) throws Throwable {
             try {
-                Object[] actualArgs = args == null ? EMPTY_ARGS : args;
-                return invoker.invoke(inst, actualArgs);
+                return invoker.invoke(inst, args);
             } catch (InvokingException e) {
                 throw e.getCause();
             }

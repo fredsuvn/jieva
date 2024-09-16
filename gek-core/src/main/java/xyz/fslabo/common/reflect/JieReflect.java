@@ -236,9 +236,9 @@ public class JieReflect {
     private static Iterator<Type> getSuperTypes(Class<?> rawType) {
         return new Iterator<Type>() {
 
-            private Type[] superInters = null;
+            private @Nullable Type[] superInters = null;
             private int cur = -2;
-            private Type next = getNext();
+            private @Nullable Type next = getNext();
 
             @Override
             public boolean hasNext() {
