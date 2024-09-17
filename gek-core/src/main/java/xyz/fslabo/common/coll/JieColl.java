@@ -77,8 +77,7 @@ public class JieColl {
      * @return immutable list
      */
     @Immutable
-    @SafeVarargs
-    public static <T> List<T> asList(T... elements) {
+    public static <T> List<T> asImmutableList(T[] elements) {
         return JieArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements);
     }
 
@@ -172,7 +171,7 @@ public class JieColl {
     /**
      * Collects given elements into a new array which is created with specified component type.
      * <p>
-     * This method converts each element from type {@code T} to type {@code R} by specified {@code mapper}. If given
+     * This method maps each element from type {@code T} to type {@code R} by specified {@code mapper}. If given
      * elements is empty, return an empty array.
      *
      * @param elements given elements
@@ -197,8 +196,7 @@ public class JieColl {
      * @return immutable list
      */
     @Immutable
-    @SafeVarargs
-    public static <T> List<T> toList(T... elements) {
+    public static <T> List<T> toList(T[] elements) {
         return JieArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements.clone());
     }
 
@@ -218,7 +216,26 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into a new immutable list, converts each element from type {@code T} to type {@code R} by
+     * Collects given elements into a new immutable list, maps each element from type {@code T} to type {@code R} by
+     * specified {@code mapper}. If given elements is empty, return an empty list.
+     *
+     * @param elements source elements
+     * @param mapper   specified mapper
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @return immutable list
+     */
+    @Immutable
+    public static <T, R> List<R> toList(
+        @Nullable T[] elements, Function<? super T, ? extends R> mapper) {
+        if (JieArray.isEmpty(elements)) {
+            return Collections.emptyList();
+        }
+        return new ImmutableList<>(stream(elements).map(mapper).toArray());
+    }
+
+    /**
+     * Collects given elements into a new immutable list, maps each element from type {@code T} to type {@code R} by
      * specified {@code mapper}. If given elements is empty, return an empty list.
      *
      * @param elements source elements
@@ -237,27 +254,38 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into a new immutable string list, converts each element to string. If given elements is
+     * Collects given elements into a new immutable string list, maps each element to string. If given elements is
      * empty, return an empty list.
      *
-     * @param iterable given elements
+     * @param elements given elements
      * @return immutable string list
      */
     @Immutable
-    public static List<String> toStringList(@Nullable Iterable<?> iterable) {
-        return toList(iterable, String::valueOf);
+    public static List<String> toStringList(@Nullable Object[] elements) {
+        return toList(elements, String::valueOf);
     }
 
     /**
-     * Collects given elements into a new immutable set.
+     * Collects given elements into a new immutable string list, maps each element to string. If given elements is
+     * empty, return an empty list.
+     *
+     * @param elements given elements
+     * @return immutable string list
+     */
+    @Immutable
+    public static List<String> toStringList(@Nullable Iterable<?> elements) {
+        return toList(elements, String::valueOf);
+    }
+
+    /**
+     * Collects given elements into a new immutable set. If given elements is empty, return an empty set.
      *
      * @param elements given elements
      * @param <T>      type of element
      * @return immutable set
      */
     @Immutable
-    @SafeVarargs
-    public static <T> Set<T> toSet(T... elements) {
+    public static <T> Set<T> toSet(T[] elements) {
         if (JieArray.isEmpty(elements)) {
             return Collections.emptySet();
         }
@@ -280,7 +308,26 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into a new immutable set, converts each element from type {@code T} to type {@code R} by
+     * Collects given elements into a new immutable set, maps each element from type {@code T} to type {@code R} by
+     * specified {@code mapper}. If given elements is empty, return an empty set.
+     *
+     * @param elements source elements
+     * @param mapper   specified mapper
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @return immutable set
+     */
+    @Immutable
+    public static <T, R> Set<R> toSet(
+        @Nullable T[] elements, Function<? super T, ? extends R> mapper) {
+        if (JieArray.isEmpty(elements)) {
+            return Collections.emptySet();
+        }
+        return Collections.unmodifiableSet(addAll(new LinkedHashSet<>(), elements, mapper));
+    }
+
+    /**
+     * Collects given elements into a new immutable set, maps each element from type {@code T} to type {@code R} by
      * specified {@code mapper}. If given elements is empty, return an empty set.
      *
      * @param elements source elements
@@ -299,8 +346,20 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements int a new immutable string set, converts each element to string. If given elements is
-     * empty, return an empty set.
+     * Collects given elements int a new immutable string set, maps each element to string. If given elements is empty,
+     * return an empty set.
+     *
+     * @param elements given elements
+     * @return immutable string set
+     */
+    @Immutable
+    public static Set<String> toStringSet(@Nullable Object[] elements) {
+        return toSet(elements, String::valueOf);
+    }
+
+    /**
+     * Collects given elements int a new immutable string set, maps each element to string. If given elements is empty,
+     * return an empty set.
      *
      * @param elements given elements
      * @return immutable string set
@@ -311,7 +370,7 @@ public class JieColl {
     }
 
     /**
-     * Collects given elements into a new immutable map.
+     * Collects given elements into a new immutable map. If given elements is empty, return an empty map.
      * <p>
      * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
      * is not followed by a value-{@code n}, it will be ignored.
@@ -323,10 +382,9 @@ public class JieColl {
      * @return immutable map
      */
     @Immutable
-    @SafeVarargs
-    public static <K, V, T> Map<K, V> toMap(T... elements) {
+    public static <K, V, T> Map<K, V> toMap(T[] elements) {
         return JieArray.isEmpty(elements) ?
-            Collections.emptyMap() : Collections.unmodifiableMap(addAll(new LinkedHashMap<>(), elements));
+            Collections.emptyMap() : Collections.unmodifiableMap(putAll(new LinkedHashMap<>(), elements));
     }
 
     /**
@@ -346,21 +404,7 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(addAll(new LinkedHashMap<>(), elements));
-    }
-
-    /**
-     * Reads all properties into a new {@link LinkedHashMap}.
-     *
-     * @param properties given properties
-     * @return a new {@link LinkedHashMap}
-     */
-    public static LinkedHashMap<String, String> toLinkedHashMap(Properties properties) {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        properties.forEach((k, v) -> {
-            map.put(String.valueOf(k), String.valueOf(v));
-        });
-        return map;
+        return Collections.unmodifiableMap(putAll(new LinkedHashMap<>(), elements));
     }
 
     /**
@@ -386,7 +430,19 @@ public class JieColl {
         if (isEmpty(source)) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(addAll(new LinkedHashMap<>(), source, keyMapper, valueMapper));
+        return Collections.unmodifiableMap(putAll(new LinkedHashMap<>(), source, keyMapper, valueMapper));
+    }
+
+    /**
+     * Collects given elements into a new immutable map of which keys and values are type of string, each entry of
+     * source map will be mapped to string. If given properties is empty, return an empty map.
+     *
+     * @param properties given properties
+     * @return immutable string map
+     */
+    @Immutable
+    public static Map<String, String> toStringMap(Properties properties) {
+        return toMap(properties, String::valueOf, String::valueOf);
     }
 
     /**
@@ -408,7 +464,7 @@ public class JieColl {
      * @return immutable map
      */
     @Immutable
-    public static <T, K, V> Map<K, V> splitToMap(
+    public static <T, K, V> Map<K, V> toPairs(
         @Nullable T[] elements,
         Function<? super T, ? extends K> keyMapper,
         Function<? super T, ? extends V> valueMapper
@@ -416,7 +472,7 @@ public class JieColl {
         if (JieArray.isEmpty(elements)) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(splitAddAll(new LinkedHashMap<>(), elements, keyMapper, valueMapper));
+        return Collections.unmodifiableMap(putAll(new LinkedHashMap<>(), elements, keyMapper, valueMapper));
     }
 
     /**
@@ -438,7 +494,7 @@ public class JieColl {
      * @return immutable map
      */
     @Immutable
-    public static <T, K, V> Map<K, V> splitToMap(
+    public static <T, K, V> Map<K, V> toPairs(
         @Nullable Iterable<? extends T> elements,
         Function<? super T, ? extends K> keyMapper,
         Function<? super T, ? extends V> valueMapper
@@ -446,7 +502,312 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(splitAddAll(new LinkedHashMap<>(), elements, keyMapper, valueMapper));
+        return Collections.unmodifiableMap(putAll(new LinkedHashMap<>(), elements, keyMapper, valueMapper));
+    }
+
+    /**
+     * Adds all given elements into dest collection, and returns the dest collection.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param <T>      type of element
+     * @param <C>      type of dest collection
+     * @return dest collection
+     */
+    public static <T, C extends Collection<? super T>> C addAll(C dest, T[] elements) {
+        if (JieArray.isEmpty(elements)) {
+            return dest;
+        }
+        dest.addAll(JieArray.asList(elements));
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest collection, and returns the dest collection.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param <T>      type of element
+     * @param <C>      type of dest collection
+     * @return dest collection
+     */
+    public static <T, C extends Collection<? super T>> C addAll(C dest, Iterable<T> elements) {
+        if (isEmpty(elements)) {
+            return dest;
+        }
+        if (elements instanceof Collection) {
+            dest.addAll((Collection<T>) elements);
+        } else {
+            for (T element : elements) {
+                dest.add(element);
+            }
+        }
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest collection, maps each element from type {@code T} to type {@code R} by
+     * specified {@code mapper}, and returns the dest collection.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param mapper   specified mapper
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @param <C>      type of dest collection
+     * @return dest collection
+     */
+    public static <T, R, C extends Collection<? super R>> C addAll(
+        C dest, T[] elements, Function<? super T, ? extends R> mapper) {
+        if (JieArray.isEmpty(elements)) {
+            return dest;
+        }
+        for (T element : elements) {
+            dest.add(mapper.apply(element));
+        }
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest collection, maps each element from type {@code T} to type {@code R} by
+     * specified {@code mapper}, and returns the dest collection.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param mapper   specified mapper
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @param <C>      type of dest collection
+     * @return dest collection
+     */
+    public static <T, R, C extends Collection<? super R>> C addAll(
+        C dest, Iterable<T> elements, Function<? super T, ? extends R> mapper) {
+        if (isEmpty(elements)) {
+            return dest;
+        }
+        for (T element : elements) {
+            dest.add(mapper.apply(element));
+        }
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest map, and returns the dest map.
+     * <p>
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
+     * is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param <K>      type of keys
+     * @param <V>      type of values
+     * @param <M>      type of dest map
+     * @param <T>      type of element
+     * @return dest map
+     */
+    public static <K, V, M extends Map<K, V>, T> M putAll(M dest, T[] elements) {
+        if (JieArray.isEmpty(elements)) {
+            return dest;
+        }
+        for (int i = 0; i < elements.length; i += 2) {
+            if (i + 1 >= elements.length) {
+                break;
+            }
+            Object key = elements[i];
+            Object value = elements[i + 1];
+            dest.put(Jie.as(key), Jie.as(value));
+        }
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest map, and returns the dest map.
+     * <p>
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
+     * is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param <K>      type of keys
+     * @param <V>      type of values
+     * @param <M>      type of dest map
+     * @param <T>      type of element
+     * @return dest map
+     */
+    public static <K, V, M extends Map<K, V>, T> M putAll(M dest, Iterable<T> elements) {
+        if (isEmpty(elements)) {
+            return dest;
+        }
+        Iterator<? extends T> iterator = elements.iterator();
+        while (iterator.hasNext()) {
+            K key = Jie.as(iterator.next());
+            if (iterator.hasNext()) {
+                V value = Jie.as(iterator.next());
+                dest.put(key, value);
+            } else {
+                break;
+            }
+        }
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest map, maps each element from type {@code T} to type {@code R} by specified
+     * {@code mapper}, and returns the dest map.
+     * <p>
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
+     * is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param mapper   specified mapper
+     * @param <K>      type of keys
+     * @param <V>      type of values
+     * @param <M>      type of dest map
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @return dest map
+     */
+    public static <K, V, M extends Map<K, V>, T, R> M putAll(
+        M dest, T[] elements, Function<? super T, ? extends R> mapper) {
+        if (JieArray.isEmpty(elements)) {
+            return dest;
+        }
+        for (int i = 0; i < elements.length; i += 2) {
+            if (i + 1 >= elements.length) {
+                break;
+            }
+            Object key = mapper.apply(elements[i]);
+            Object value = mapper.apply(elements[i + 1]);
+            dest.put(Jie.as(key), Jie.as(value));
+        }
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest map, maps each element from type {@code T} to type {@code R} by specified
+     * {@code mapper}, and returns the dest map.
+     * <p>
+     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
+     * is not followed by a value-{@code n}, it will be ignored.
+     *
+     * @param dest     dest collection
+     * @param elements given elements
+     * @param mapper   specified mapper
+     * @param <K>      type of keys
+     * @param <V>      type of values
+     * @param <M>      type of dest map
+     * @param <T>      type of source element
+     * @param <R>      type of target element
+     * @return dest map
+     */
+    public static <K, V, M extends Map<K, V>, T, R> M putAll(
+        M dest, Iterable<? extends T> elements, Function<? super T, ? extends R> mapper) {
+        if (isEmpty(elements)) {
+            return dest;
+        }
+        Iterator<? extends T> iterator = elements.iterator();
+        while (iterator.hasNext()) {
+            K key = Jie.as(mapper.apply(iterator.next()));
+            if (iterator.hasNext()) {
+                V value = Jie.as(mapper.apply(iterator.next()));
+                dest.put(key, value);
+            } else {
+                break;
+            }
+        }
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest map, each entry of source map will be mapped from {@code K1} to {@code K2} and
+     * {@code V1} and {@code V2} by {@code keyMapper} and {@code valueMapper}, and returns the dest map.
+     *
+     * @param dest        dest map
+     * @param source      source map
+     * @param keyMapper   key mapper
+     * @param valueMapper value mapper
+     * @param <K1>        type of source key
+     * @param <V1>        type of source value
+     * @param <K2>        type of target key
+     * @param <V2>        type of target value
+     * @return converted map
+     */
+    public static <K1, V1, K2, V2, M extends Map<K2, V2>> M putAll(
+        M dest,
+        Map<K1, V1> source,
+        Function<? super K1, ? extends K2> keyMapper,
+        Function<? super V1, ? extends V2> valueMapper
+    ) {
+        if (isEmpty(source)) {
+            return dest;
+        }
+        source.forEach((k, v) -> {
+            dest.put(keyMapper.apply(k), valueMapper.apply(v));
+        });
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest map, and returns the dest map. Each element will be mapped by {@code keyMapper}
+     * and {@code valueMapper} to product key and value, then the key and value will be put into the dest map. It is
+     * equivalent to:
+     * <pre>
+     *     for (T element : elements) {
+     *         dest.put(keyMapper.apply(element), valueMapper.apply(element));
+     *     }
+     * </pre>
+     *
+     * @param dest        dest collection
+     * @param elements    given elements
+     * @param keyMapper   key mapper
+     * @param valueMapper value mapper
+     * @param <K>         type of keys
+     * @param <V>         type of values
+     * @param <M>         type of dest map
+     * @param <T>         type of element
+     * @return dest map
+     */
+    public static <K, V, M extends Map<K, V>, T> M putAll(
+        M dest, T[] elements, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
+        if (JieArray.isEmpty(elements)) {
+            return dest;
+        }
+        for (T element : elements) {
+            dest.put(keyMapper.apply(element), valueMapper.apply(element));
+        }
+        return dest;
+    }
+
+    /**
+     * Adds all given elements into dest map, and returns the dest map. Each element will be mapped by {@code keyMapper}
+     * and {@code valueMapper} to product key and value, then the key and value will be put into the dest map. It is
+     * equivalent to:
+     * <pre>
+     *     for (T element : elements) {
+     *         dest.put(keyMapper.apply(element), valueMapper.apply(element));
+     *     }
+     * </pre>
+     *
+     * @param dest        dest collection
+     * @param elements    given elements
+     * @param keyMapper   key mapper
+     * @param valueMapper value mapper
+     * @param <K>         type of keys
+     * @param <V>         type of values
+     * @param <M>         type of dest map
+     * @param <T>         type of element
+     * @return dest map
+     */
+    public static <K, V, M extends Map<K, V>, T> M putAll(
+        M dest, Iterable<T> elements, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
+        if (isEmpty(elements)) {
+            return dest;
+        }
+        for (T element : elements) {
+            dest.put(keyMapper.apply(element), valueMapper.apply(element));
+        }
+        return dest;
     }
 
     /**
@@ -489,257 +850,6 @@ public class JieColl {
             return (Collection<T>) iterable;
         }
         return toSet(iterable);
-    }
-
-    /**
-     * Adds all given elements into dest collection, and returns the dest collection.
-     *
-     * @param dest     dest collection
-     * @param elements given elements
-     * @param <T>      type of element
-     * @param <C>      type of dest collection
-     * @return dest collection
-     */
-    @SafeVarargs
-    public static <T, C extends Collection<? super T>> C addAll(C dest, T... elements) {
-        if (JieArray.isEmpty(elements)) {
-            return dest;
-        }
-        dest.addAll(JieArray.asList(elements));
-        return dest;
-    }
-
-    /**
-     * Adds all given elements into dest collection, and returns the dest collection.
-     *
-     * @param dest     dest collection
-     * @param elements given elements
-     * @param <T>      type of element
-     * @param <C>      type of dest collection
-     * @return dest collection
-     */
-    public static <T, C extends Collection<? super T>> C addAll(C dest, Iterable<T> elements) {
-        if (isEmpty(elements)) {
-            return dest;
-        }
-        if (elements instanceof Collection) {
-            dest.addAll((Collection<T>) elements);
-        } else {
-            for (T element : elements) {
-                dest.add(element);
-            }
-        }
-        return dest;
-    }
-
-    /**
-     * Adds all given elements into dest collection, converts each element from type {@code T} to type {@code R} by
-     * specified {@code mapper}, and returns the dest collection.
-     *
-     * @param dest     dest collection
-     * @param elements given elements
-     * @param mapper   specified mapper
-     * @param <T>      type of source element
-     * @param <R>      type of target element
-     * @param <C>      type of dest collection
-     * @return dest collection
-     */
-    public static <T, R, C extends Collection<? super R>> C addAll(
-        C dest, Iterable<T> elements, Function<? super T, ? extends R> mapper) {
-        if (isEmpty(elements)) {
-            return dest;
-        }
-        for (T element : elements) {
-            dest.add(mapper.apply(element));
-        }
-        return dest;
-    }
-
-    /**
-     * Adds all given elements into dest map, and returns the dest map.
-     * <p>
-     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
-     * is not followed by a value-{@code n}, it will be ignored.
-     *
-     * @param dest     dest collection
-     * @param elements given elements
-     * @param <K>      type of keys
-     * @param <V>      type of values
-     * @param <M>      type of dest map
-     * @param <T>      type of element
-     * @return dest map
-     */
-    @SafeVarargs
-    public static <K, V, M extends Map<K, V>, T> M addAll(M dest, T... elements) {
-        if (JieArray.isEmpty(elements)) {
-            return dest;
-        }
-        for (int i = 0; i < elements.length; i += 2) {
-            if (i + 1 >= elements.length) {
-                break;
-            }
-            Object key = elements[i];
-            Object value = elements[i + 1];
-            dest.put(Jie.as(key), Jie.as(value));
-        }
-        return dest;
-    }
-
-    /**
-     * Adds all given elements into dest map, and returns the dest map.
-     * <p>
-     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
-     * is not followed by a value-{@code n}, it will be ignored.
-     *
-     * @param dest     dest collection
-     * @param elements given elements
-     * @param <K>      type of keys
-     * @param <V>      type of values
-     * @param <M>      type of dest map
-     * @param <T>      type of element
-     * @return dest map
-     */
-    public static <K, V, M extends Map<K, V>, T> M addAll(M dest, Iterable<T> elements) {
-        if (isEmpty(elements)) {
-            return dest;
-        }
-        Iterator<? extends T> iterator = elements.iterator();
-        while (iterator.hasNext()) {
-            K key = Jie.as(iterator.next());
-            if (iterator.hasNext()) {
-                V value = Jie.as(iterator.next());
-                dest.put(key, value);
-            } else {
-                break;
-            }
-        }
-        return dest;
-    }
-
-    /**
-     * Adds all given elements into dest map, converts each element from type {@code T} to type {@code R} by specified
-     * {@code mapper}, and returns the dest map.
-     * <p>
-     * The first element is key-1, second is value-1, third is key-2, fourth is value-2 and so on. If last key-{@code n}
-     * is not followed by a value-{@code n}, it will be ignored.
-     *
-     * @param dest     dest collection
-     * @param elements given elements
-     * @param mapper   specified mapper
-     * @param <K>      type of keys
-     * @param <V>      type of values
-     * @param <M>      type of dest map
-     * @param <T>      type of source element
-     * @param <R>      type of target element
-     * @return dest map
-     */
-    public static <K, V, M extends Map<K, V>, T, R> M addAll(
-        M dest, Iterable<? extends T> elements, Function<? super T, ? extends R> mapper) {
-        if (isEmpty(elements)) {
-            return dest;
-        }
-        Iterator<? extends T> iterator = elements.iterator();
-        while (iterator.hasNext()) {
-            K key = Jie.as(mapper.apply(iterator.next()));
-            if (iterator.hasNext()) {
-                V value = Jie.as(mapper.apply(iterator.next()));
-                dest.put(key, value);
-            } else {
-                break;
-            }
-        }
-        return dest;
-    }
-
-    /**
-     * Adds all given elements into dest map, each entry of source map will be mapped from {@code K1} to {@code K2} and
-     * {@code V1} and {@code V2} by {@code keyMapper} and {@code valueMapper}, and returns the dest map.
-     *
-     * @param dest        dest map
-     * @param source      source map
-     * @param keyMapper   key mapper
-     * @param valueMapper value mapper
-     * @param <K1>        type of source key
-     * @param <V1>        type of source value
-     * @param <K2>        type of target key
-     * @param <V2>        type of target value
-     * @return converted map
-     */
-    public static <K1, V1, K2, V2, M extends Map<K2, V2>> M addAll(
-        M dest,
-        Map<K1, V1> source,
-        Function<? super K1, ? extends K2> keyMapper,
-        Function<? super V1, ? extends V2> valueMapper
-    ) {
-        if (isEmpty(source)) {
-            return dest;
-        }
-        source.forEach((k, v) -> {
-            dest.put(keyMapper.apply(k), valueMapper.apply(v));
-        });
-        return dest;
-    }
-
-    /**
-     * Adds all given elements into dest map, and returns the dest map. Each element will be mapped by {@code keyMapper}
-     * and {@code valueMapper} to product key and value, then the key and value will be put into the dest map. It is
-     * equivalent to:
-     * <pre>
-     *     for (T element : elements) {
-     *         dest.put(keyMapper.apply(element), valueMapper.apply(element));
-     *     }
-     * </pre>
-     *
-     * @param dest        dest collection
-     * @param elements    given elements
-     * @param keyMapper   key mapper
-     * @param valueMapper value mapper
-     * @param <K>         type of keys
-     * @param <V>         type of values
-     * @param <M>         type of dest map
-     * @param <T>         type of element
-     * @return dest map
-     */
-    public static <K, V, M extends Map<K, V>, T> M splitAddAll(
-        M dest, T[] elements, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
-        if (JieArray.isEmpty(elements)) {
-            return dest;
-        }
-        for (T element : elements) {
-            dest.put(keyMapper.apply(element), valueMapper.apply(element));
-        }
-        return dest;
-    }
-
-    /**
-     * Adds all given elements into dest map, and returns the dest map. Each element will be mapped by {@code keyMapper}
-     * and {@code valueMapper} to product key and value, then the key and value will be put into the dest map. It is
-     * equivalent to:
-     * <pre>
-     *     for (T element : elements) {
-     *         dest.put(keyMapper.apply(element), valueMapper.apply(element));
-     *     }
-     * </pre>
-     *
-     * @param dest        dest collection
-     * @param elements    given elements
-     * @param keyMapper   key mapper
-     * @param valueMapper value mapper
-     * @param <K>         type of keys
-     * @param <V>         type of values
-     * @param <M>         type of dest map
-     * @param <T>         type of element
-     * @return dest map
-     */
-    public static <K, V, M extends Map<K, V>, T> M splitAddAll(
-        M dest, Iterable<T> elements, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
-        if (isEmpty(elements)) {
-            return dest;
-        }
-        for (T element : elements) {
-            dest.put(keyMapper.apply(element), valueMapper.apply(element));
-        }
-        return dest;
     }
 
     /**
@@ -886,6 +996,20 @@ public class JieColl {
             return null;
         }
         return cur;
+    }
+
+    /**
+     * Returns a {@link Stream} from given elements, not parallel.
+     *
+     * @param elements given elements
+     * @param <T>      type of element
+     * @return a {@link Stream} from given elements, not parallel
+     */
+    public static <T> Stream<T> stream(T[] elements) {
+        if (JieArray.isEmpty(elements)) {
+            return Stream.empty();
+        }
+        return Arrays.stream(elements);
     }
 
     /**

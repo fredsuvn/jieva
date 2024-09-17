@@ -600,12 +600,12 @@ public class Jie {
      * @param elements given elements
      * @param <T>      type of element
      * @return immutable list
-     * @see JieColl#asList(Object[])
+     * @see JieColl#asImmutableList(Object[])
      */
     @Immutable
     @SafeVarargs
     public static <T> List<T> list(T... elements) {
-        return JieColl.asList(elements);
+        return JieColl.asImmutableList(elements);
     }
 
     /**
@@ -705,11 +705,11 @@ public class Jie {
      * @param <V>      type of values
      * @param <T>      type of element
      * @return a new {@link HashMap} and add all given elements
-     * @see JieColl#addAll(Map, Object[])
+     * @see JieColl#putAll(Map, Object[])
      */
     @SafeVarargs
     public static <K, V, T> HashMap<K, V> hashMap(T... elements) {
-        return JieColl.addAll(new HashMap<>(), elements);
+        return JieColl.putAll(new HashMap<>(), elements);
     }
 
     /**
@@ -723,11 +723,11 @@ public class Jie {
      * @param <V>      type of values
      * @param <T>      type of element
      * @return a new {@link LinkedHashMap} and add all given elements
-     * @see JieColl#addAll(Map, Object[])
+     * @see JieColl#putAll(Map, Object[])
      */
     @SafeVarargs
     public static <K, V, T> LinkedHashMap<K, V> linkedHashMap(T... elements) {
-        return JieColl.addAll(new LinkedHashMap<>(), elements);
+        return JieColl.putAll(new LinkedHashMap<>(), elements);
     }
 
     /**

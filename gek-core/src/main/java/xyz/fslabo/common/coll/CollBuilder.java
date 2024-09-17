@@ -293,11 +293,11 @@ public class CollBuilder {
         Map<Object, Object> dest = Jie.as(map);
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
-                JieColl.addAll(dest, (Object[]) initialElements);
+                JieColl.putAll(dest, (Object[]) initialElements);
                 return;
             }
             if (initialElements instanceof Iterable) {
-                JieColl.addAll(dest, (Iterable<?>) initialElements);
+                JieColl.putAll(dest, (Iterable<?>) initialElements);
                 return;
             }
             throw new IllegalArgumentException("Initial elements must be iterable or array.");
@@ -324,7 +324,7 @@ public class CollBuilder {
         }
         if (initialElements != null) {
             if (initialElements instanceof Object[]) {
-                return Jie.as(JieColl.toList((Object[]) initialElements));
+                return Jie.as(JieColl.asImmutableList((Object[]) initialElements));
             }
             if (initialElements instanceof Iterable) {
                 return Jie.as(JieColl.toList((Iterable<?>) initialElements));

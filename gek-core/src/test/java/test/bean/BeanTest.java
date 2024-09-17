@@ -61,7 +61,7 @@ public class BeanTest {
         Assert.assertFalse(b1.equals(BeanInfo.get(new TypeRef<Inner<Long, Long>>() {
         }.getType())));
         Assert.assertEquals(
-            JieColl.addAll(new HashMap<>(), b1.getProperties(), k -> k, BasePropertyInfo::getType),
+            JieColl.putAll(new HashMap<>(), b1.getProperties(), k -> k, BasePropertyInfo::getType),
             Jie.hashMap("ffFf1", String.class
                 , "ffFf2", Short.class
                 , "ffFf3", Long.class
@@ -93,7 +93,7 @@ public class BeanTest {
 
         BeanInfo b3 = BeanInfo.get(Inner.class);
         Assert.assertEquals(
-            JieColl.addAll(new HashMap<>(), b3.getProperties(), k -> k, BasePropertyInfo::getType),
+            JieColl.putAll(new HashMap<>(), b3.getProperties(), k -> k, BasePropertyInfo::getType),
             Jie.hashMap("ffFf1", String.class
                 , "ffFf2", Inner.class.getTypeParameters()[0]
                 , "ffFf3", Inner.class.getTypeParameters()[1]

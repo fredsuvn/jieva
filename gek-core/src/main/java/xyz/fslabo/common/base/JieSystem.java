@@ -441,7 +441,7 @@ public class JieSystem {
      * @return all system properties
      */
     public static Map<String, String> allProperties() {
-        return JieColl.toLinkedHashMap(System.getProperties());
+        return JieColl.toStringMap(System.getProperties());
     }
 
     /**
