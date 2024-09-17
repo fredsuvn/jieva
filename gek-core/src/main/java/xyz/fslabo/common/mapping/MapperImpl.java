@@ -2,19 +2,19 @@ package xyz.fslabo.common.mapping;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Flag;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.bean.PropertyInfo;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.mapping.handlers.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 final class MapperImpl implements Mapper, Mapper.Handler {
 
-    static final MapperImpl DEFAULT_MAPPER = new MapperImpl(Arrays.asList(
+    static final MapperImpl DEFAULT_MAPPER = new MapperImpl(Jie.list(
         new AssignableMapperHandler(),
         new EnumMapperHandler(),
         new TypedMapperHandler(),

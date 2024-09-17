@@ -3,12 +3,12 @@ package test.reflect;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.reflect.proxy.JieProxy;
 import xyz.fslabo.common.reflect.proxy.MethodProxyHandler;
 import xyz.fslabo.common.reflect.proxy.ProxyInvoker;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class BigMethodTest {
 
@@ -28,7 +28,7 @@ public class BigMethodTest {
                 return invoker.invokeSuper(args);
             }
         };
-        BigInter bigInter = JieProxy.asm(Arrays.asList(BigInter.class), handler);
+        BigInter bigInter = JieProxy.asm(Jie.list(BigInter.class), handler);
         Assert.assertEquals(bigInter.big(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -73,7 +73,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "bigDefault");
-        BigClass bigClass = JieProxy.asm(Arrays.asList(BigClass.class), handler);
+        BigClass bigClass = JieProxy.asm(Jie.list(BigClass.class), handler);
         Assert.assertEquals(bigClass.bigClass(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -96,7 +96,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "BigClass");
-        Object big = JieProxy.asm(Arrays.asList(BigClass.class, BigInter.class), handler);
+        Object big = JieProxy.asm(Jie.list(BigClass.class, BigInter.class), handler);
         Assert.assertEquals(((BigInter) big).big(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"

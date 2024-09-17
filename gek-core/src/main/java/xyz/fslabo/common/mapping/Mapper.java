@@ -11,7 +11,6 @@ import xyz.fslabo.common.ref.Val;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,7 +49,7 @@ public interface Mapper {
      * @return new {@link Mapper}
      */
     static Mapper newMapper(Handler... handlers) {
-        return newMapper(Arrays.asList(handlers));
+        return newMapper(Jie.list(handlers));
     }
 
     /**
@@ -75,8 +74,8 @@ public interface Mapper {
     }
 
     /**
-     * Returns actual result from {@link #map(Object, Type, Type, MappingOptions)}.
-     * The code is similar to the following:
+     * Returns actual result from {@link #map(Object, Type, Type, MappingOptions)}. The code is similar to the
+     * following:
      * <pre>
      *     if (result == null) {
      *         return null;
@@ -185,8 +184,8 @@ public interface Mapper {
 
     /**
      * Maps source object from source type to target property with {@link #getOptions()}. The target type is specified
-     * in current context, may not equal to {@link PropertyInfo#getType()} of target property.
-     * The result of this method in 3 types:
+     * in current context, may not equal to {@link PropertyInfo#getType()} of target property. The result of this method
+     * in 3 types:
      * <ul>
      *     <li>
      *         {@code null}: mapping failed;
@@ -220,8 +219,8 @@ public interface Mapper {
     }
 
     /**
-     * Maps source object from source type to target, returns null if mapping failed or the result itself is null.
-     * This method is equivalent to ({@link #map(Object, Type, MappingOptions)}):
+     * Maps source object from source type to target, returns null if mapping failed or the result itself is null. This
+     * method is equivalent to ({@link #map(Object, Type, MappingOptions)}):
      * <pre>
      *     return map(source, (Type) targetType, options);
      * </pre>
@@ -278,8 +277,7 @@ public interface Mapper {
     }
 
     /**
-     * Maps source object from source type to target type.
-     * The result of this method in 3 types:
+     * Maps source object from source type to target type. The result of this method in 3 types:
      * <ul>
      *     <li>
      *         {@code null}: mapping failed;
@@ -331,8 +329,7 @@ public interface Mapper {
 
     /**
      * Maps source object from source type to target property. The target type is specified in current context, may not
-     * equal to {@link PropertyInfo#getType()} of target property.
-     * The result of this method in 3 types:
+     * equal to {@link PropertyInfo#getType()} of target property. The result of this method in 3 types:
      * <ul>
      *     <li>
      *         {@code null}: mapping failed;
@@ -477,8 +474,7 @@ public interface Mapper {
     interface Handler {
 
         /**
-         * Maps object from source type to target type.
-         * The result of this method in 4 types:
+         * Maps object from source type to target type. The result of this method in 4 types:
          * <ul>
          *     <li>
          *         {@link Flag#CONTINUE}: mapping failed, hands off to next handler;
@@ -511,8 +507,8 @@ public interface Mapper {
 
         /**
          * Maps object from source type to the target type of target property. The target type is specified in current
-         * context, may not equal to {@link PropertyInfo#getType()} of target property.
-         * The result of this method in 4 types:
+         * context, may not equal to {@link PropertyInfo#getType()} of target property. The result of this method in 4
+         * types:
          * <ul>
          *     <li>
          *         {@link Flag#CONTINUE}: mapping failed, hands off to next handler;

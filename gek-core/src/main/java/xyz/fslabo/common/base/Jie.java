@@ -1,5 +1,6 @@
 package xyz.fslabo.common.base;
 
+import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.coll.CollBuilder;
 import xyz.fslabo.common.coll.JieArray;
@@ -578,11 +579,11 @@ public class Jie {
     }
 
     /**
-     * Returns given elements as an array.
+     * Returns given elements directly. This method is used to cast variable arguments to array.
      *
      * @param elements given elements
-     * @param <T>      type of element
-     * @return given elements as an array
+     * @param <T>      component type
+     * @return given elements itself as an array
      * @see JieArray#array(Object[])
      */
     @SafeVarargs
@@ -591,16 +592,20 @@ public class Jie {
     }
 
     /**
-     * Returns an immutable {@link List} which is added all given elements.
+     * Returns give elements as an immutable list.
+     * <p>
+     * Note that although the returned list is immutable, the list directly references the given element array, any
+     * changing for the content of the array will correspondingly change the content of the list.
      *
      * @param elements given elements
      * @param <T>      type of element
-     * @return an immutable {@link List} which is added all given elements
-     * @see JieColl#toList(Object[])
+     * @return immutable list
+     * @see JieColl#asList(Object[])
      */
+    @Immutable
     @SafeVarargs
     public static <T> List<T> list(T... elements) {
-        return JieColl.toList(elements);
+        return JieColl.asList(elements);
     }
 
     /**
@@ -637,6 +642,7 @@ public class Jie {
      * @return an immutable {@link Set} which is added all given elements
      * @see JieColl#toSet(Object[])
      */
+    @Immutable
     @SafeVarargs
     public static <T> Set<T> set(T... elements) {
         return JieColl.toSet(elements);
@@ -682,6 +688,7 @@ public class Jie {
      * @return an immutable {@link Map} which is added all given elements
      * @see JieColl#toMap(Object...)
      */
+    @Immutable
     @SafeVarargs
     public static <K, V, T> Map<K, V> map(T... elements) {
         return JieColl.toMap(elements);

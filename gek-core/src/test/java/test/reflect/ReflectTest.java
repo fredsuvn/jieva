@@ -406,7 +406,7 @@ public class ReflectTest {
 
     @Test
     public void testType() {
-        ParameterizedType p1 = JieType.parameterized(Map.class, Arrays.asList(String.class, String.class));
+        ParameterizedType p1 = JieType.parameterized(Map.class, Jie.list(String.class, String.class));
         Type t1 = new TypeRef<Map<String, String>>() {
         }.getType();
         Assert.assertTrue(p1.equals(t1));
@@ -416,7 +416,7 @@ public class ReflectTest {
         }.getType());
         ParameterizedType p2 = JieType.parameterized(
             Inner.SubInner.class,
-            Arrays.asList(String.class, String.class),
+            Jie.list(String.class, String.class),
             JieType.parameterized(Inner.class, Jie.array(NumberString1.class))
         );
         Assert.assertEquals(p2, new TypeRef<Inner<NumberString1>.SubInner<String, String>>() {

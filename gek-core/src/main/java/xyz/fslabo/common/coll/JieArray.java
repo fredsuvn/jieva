@@ -247,9 +247,7 @@ public class JieArray {
                 return dest;
             }
         }
-        throw new UnsupportedOperationException(
-            "Unable to create a new array because all mapped elements are null, preventing the determination of the new array's type."
-        );
+        throw new UnsupportedOperationException(Constants.UNABLE_NULL_TYPE);
     }
 
     private static <T, R> void map0(T[] source, R[] dest, int start, Function<? super T, ? extends R> mapper) {
@@ -699,7 +697,7 @@ public class JieArray {
     }
 
     /**
-     * Returns given elements itself as as array.
+     * RReturns given elements directly. This method is used to cast variable arguments to array.
      *
      * @param elements given elements
      * @param <T>      component type

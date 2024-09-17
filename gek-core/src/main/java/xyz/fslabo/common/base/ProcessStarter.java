@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,8 +37,7 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
     }
 
     /**
-     * Sets command.
-     * This method will split given command with space chars:
+     * Sets command. This method will split given command with space chars:
      * <pre>
      *     command.split(" +")
      * </pre>
@@ -48,7 +46,7 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
      * @return this
      */
     public ProcessStarter command(String command) {
-        return command(Arrays.asList(command.split(" +")));
+        return command(Jie.list(command.split(" +")));
     }
 
     /**
@@ -58,7 +56,7 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
      * @return this
      */
     public ProcessStarter command(String... command) {
-        return command(Arrays.asList(command));
+        return command(Jie.list(command));
     }
 
     /**
@@ -205,8 +203,8 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
     }
 
     /**
-     * Sets error output to given array.
-     * The error output can be same with output, in this case both output will be written into same destination.
+     * Sets error output to given array. The error output can be same with output, in this case both output will be
+     * written into same destination.
      *
      * @param array given array
      * @return this
@@ -217,8 +215,8 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
     }
 
     /**
-     * Sets error output to given buffer.
-     * The error output can be same with output, in this case both output will be written into same destination.
+     * Sets error output to given buffer. The error output can be same with output, in this case both output will be
+     * written into same destination.
      *
      * @param buffer given buffer
      * @return this
@@ -229,8 +227,8 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
     }
 
     /**
-     * Sets error output to given output stream.
-     * The error output can be same with output, in this case both output will be written into same destination.
+     * Sets error output to given output stream. The error output can be same with output, in this case both output will
+     * be written into same destination.
      *
      * @param out given output stream
      * @return this
@@ -241,8 +239,8 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
     }
 
     /**
-     * Sets error output to given file.
-     * The error output can be same with output, in this case both output will be written into same destination.
+     * Sets error output to given file. The error output can be same with output, in this case both output will be
+     * written into same destination.
      *
      * @param file given file
      * @return this
@@ -253,8 +251,8 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
     }
 
     /**
-     * Sets error output to given file.
-     * The error output can be same with output, in this case both output will be written into same destination.
+     * Sets error output to given file. The error output can be same with output, in this case both output will be
+     * written into same destination.
      *
      * @param file given file
      * @return this
@@ -265,8 +263,8 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
     }
 
     /**
-     * Sets error output to given redirect.
-     * The error output can be same with output, in this case both output will be written into same destination.
+     * Sets error output to given redirect. The error output can be same with output, in this case both output will be
+     * written into same destination.
      *
      * @param redirect given redirect
      * @return this

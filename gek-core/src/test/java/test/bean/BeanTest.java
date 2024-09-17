@@ -73,13 +73,13 @@ public class BeanTest {
                 , "bb2", Boolean.class
                 , "bb3", Boolean.class)
         );
-        Set<Method> mSet = new HashSet<>(Arrays.asList(Inner.class.getMethods()));
+        Set<Method> mSet = new HashSet<>(Jie.list(Inner.class.getMethods()));
         mSet.removeIf(m ->
             (
                 ((m.getName().startsWith("get") || m.getName().startsWith("set")) && m.getName().length() > 3)
                     || (m.getName().startsWith("is") && m.getName().length() > 2)
             ) && (
-                !Arrays.asList("gett", "sett", "iss", "isss", "getMm", "setMm", "gettAa", "issAa", "settAa").contains(m.getName())
+                !Jie.list("gett", "sett", "iss", "isss", "getMm", "setMm", "gettAa", "issAa", "settAa").contains(m.getName())
             )
         );
         Assert.assertEquals(
@@ -219,7 +219,7 @@ public class BeanTest {
         Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
         Assert.assertEquals(b1.getMethods(), Collections.emptyList());
         Assert.assertEquals(h1.times, 1);
-        r1 = BeanResolver.withHandlers(Arrays.asList(h1));
+        r1 = BeanResolver.withHandlers(Jie.list(h1));
         b1 = r1.resolve(Inner.class);
         Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
         Assert.assertEquals(b1.getMethods(), Collections.emptyList());
