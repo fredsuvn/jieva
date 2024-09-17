@@ -5,7 +5,30 @@ import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.Tuple;
 
+import java.util.*;
+
 public class BaseTest {
+
+    @Test
+    public void testConvenient() {
+        Assert.assertEquals(Jie.array(1, 2, 3), new Integer[]{1, 2, 3});
+        Assert.assertEquals(Jie.list(1, 2, 3), Arrays.asList(1, 2, 3));
+        Assert.assertEquals(Jie.list(1, 2, 3).get(1), 2);
+        Assert.expectThrows(UnsupportedOperationException.class, () -> Jie.list(1, 2, 3).set(1, 2));
+        Integer[] is = new Integer[]{1, 2, 3};
+        List<Integer> list = Jie.list(is);
+        Assert.assertEquals(list, Arrays.asList(1, 2, 3));
+        is[1] = 888;
+        Assert.assertEquals(list, Arrays.asList(1, 888, 3));
+        Assert.assertEquals(Jie.set(1, 2, 3), new LinkedHashSet<>(Jie.list(1, 2, 3)));
+        Assert.assertEquals(Jie.set(1, 2, 3, 3, 2), new LinkedHashSet<>(Jie.list(1, 2, 3)));
+        Map<Integer, Integer> map = new LinkedHashMap<>();
+        map.put(1, 2);
+        Map<Integer, Integer> map2 = new LinkedHashMap<>(map);
+        map2.put(3, 4);
+        Assert.assertEquals(Jie.map(1, 2, 3), map);
+        Assert.assertEquals(Jie.map(1, 2, 3, 4), map2);
+    }
 
     @Test
     public void testTuple() {
