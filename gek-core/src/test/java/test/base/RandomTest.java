@@ -5,6 +5,8 @@ import test.Log;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieRandom;
 import xyz.fslabo.common.coll.JieArray;
+import xyz.fslabo.common.invoke.Invoker;
+import xyz.fslabo.common.invoke.InvokingException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -170,13 +172,26 @@ public class RandomTest {
         expectThrows(IllegalArgumentException.class, () -> JieRandom.supplier(new Random(), Jie.list()));
 
         // test unreadable
-        Method method = s1.getClass().getDeclaredMethod("binarySearch", int.class);
-        method.setAccessible(true);
+        Method binarySearch = s1.getClass().getDeclaredMethod("binarySearch", int.class);
+        binarySearch.setAccessible(true);
         Field field = s1.getClass().getDeclaredField("totalScore");
         field.setAccessible(true);
+        Method supply = s1.getClass().getDeclaredMethod("supply", int.class);
+        supply.setAccessible(true);
+        Invoker supplyInvoker = Invoker.reflect(supply);
         int totalScore = (Integer) field.get(s1);
-        for (int i = 0; i < totalScore; i++) {
-            method.invoke(s1, totalScore);
+        for (int i = 0; i < totalScore * 2; i++) {
+            Object node = binarySearch.invoke(s1, i);
+            if (node == null) {
+                int next = i;
+                expectThrows(IllegalStateException.class, () -> {
+                    try {
+                        supplyInvoker.invoke(s1, next);
+                    } catch (InvokingException e) {
+                        throw e.getCause();
+                    }
+                });
+            }
         }
     }
 

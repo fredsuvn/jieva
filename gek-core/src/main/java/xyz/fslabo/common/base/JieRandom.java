@@ -639,6 +639,10 @@ public class JieRandom {
         @Override
         public T get() {
             int next = random.get().nextInt(totalScore);
+            return supply(next);
+        }
+
+        private T supply(int next) {
             Node<T> node = binarySearch(next);
             if (node == null) {
                 throw new IllegalStateException("Score not found!");
