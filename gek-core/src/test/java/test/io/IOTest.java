@@ -3,20 +3,23 @@ package test.io;
 import org.testng.annotations.Test;
 import test.TestUtil;
 import xyz.fslabo.common.base.JieChars;
+import xyz.fslabo.common.base.JieRandom;
 import xyz.fslabo.common.io.JieIO;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.util.Arrays;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class IOTest {
 
     private static final String DATA = TestUtil.buildRandomString(256, 256);
+
+    @Test
+    public void testEmpty() throws Exception {
+        assertEquals(JieIO.emptyInputStream().read(), -1);
+    }
 
     public static void testInputStream(
         String data,
@@ -143,24 +146,49 @@ public class IOTest {
     //
     @Test
     public void testRead() {
-        String str = DATA;
-        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-        assertEquals(JieIO.read(new ByteArrayInputStream(bytes)), bytes);
-        assertEquals(JieIO.read(new ByteArrayInputStream(bytes), 22), Arrays.copyOf(bytes, 22));
-        assertEquals(JieIO.read(new StringReader(str)), str);
-        assertEquals(JieIO.read(new StringReader(str), 11), str.substring(0, 11));
-        assertEquals(JieIO.readString(new ByteArrayInputStream(bytes)), str);
-        assertEquals(JieIO.readString(new ByteArrayInputStream(bytes, 0, 8)), str.substring(0, 8));
-        assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes))), bytes);
-        assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
+        testRead(50);
+        testRead(JieIO.BUFFER_SIZE * 2);
+    }
 
-        byte[] empty = new byte[0];
-        InputStream emptyInput = new ByteArrayInputStream(empty);
-        assertNull(JieIO.read(emptyInput));
-        assertNull(JieIO.available(emptyInput));
-        assertNull(JieIO.readString(emptyInput));
-        assertNull(JieIO.avalaibleString(emptyInput));
-        assertNull(JieIO.read(JieIO.toReader(emptyInput)));
+    private void testRead(int size) {
+        int offset = 22;
+        String str = new String(JieRandom.fill(new char[size], 'a', 'z'));
+        byte[] bytes = str.getBytes(JieChars.UTF_8);
+        assertEquals(JieIO.read(new ByteArrayInputStream(bytes)), bytes);
+        assertEquals(JieIO.read(JieIO.emptyInputStream()), null);
+        assertEquals(JieIO.read(new ByteArrayInputStream(bytes), -1), bytes);
+        assertEquals(JieIO.read(new ByteArrayInputStream(bytes), 0), new byte[0]);
+        assertEquals(JieIO.read(new ByteArrayInputStream(bytes), offset), Arrays.copyOf(bytes, offset));
+        assertEquals(JieIO.read(new ByteArrayInputStream(bytes), size + 1), bytes);
+        if (size > JieIO.BUFFER_SIZE + offset) {
+            assertEquals(JieIO.read(new ByteArrayInputStream(bytes), JieIO.BUFFER_SIZE + offset),
+                Arrays.copyOf(bytes, JieIO.BUFFER_SIZE + offset));
+        }
+        assertEquals(JieIO.read(new StringReader(str)), str);
+        assertEquals(JieIO.read(new InputStreamReader(JieIO.emptyInputStream())), null);
+        assertEquals(JieIO.read(new StringReader(str), offset), str.substring(0, offset));
+        assertEquals(JieIO.read(new StringReader(str),-1), str);
+        assertEquals(JieIO.read(new StringReader(str),0), "");
+        assertEquals(JieIO.read(new StringReader(str), size + 1), str);
+        if (size > JieIO.BUFFER_SIZE + offset) {
+            assertEquals(JieIO.read(new StringReader(str), JieIO.BUFFER_SIZE + offset),
+                str.substring(0, JieIO.BUFFER_SIZE + offset));
+        }
+        assertEquals(JieIO.readString(new ByteArrayInputStream(bytes)), str);
+        if (size > JieIO.BUFFER_SIZE + offset) {
+            assertEquals(JieIO.readString(new ByteArrayInputStream(bytes)), str);
+        }
+        assertEquals(JieIO.readString(JieIO.emptyInputStream()), null);
+        // assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes))), bytes);
+        // assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
+        //
+        // byte[] empty = new byte[0];
+        // InputStream emptyInput = new ByteArrayInputStream(empty);
+        // assertNull(JieIO.read(emptyInput));
+        // assertNull(JieIO.available(emptyInput));
+        // assertNull(JieIO.readString(emptyInput));
+        // assertNull(JieIO.avalaibleString(emptyInput));
+        // assertNull(JieIO.read(JieIO.toReader(emptyInput)));
     }
 
     //

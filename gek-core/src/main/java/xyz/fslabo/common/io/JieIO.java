@@ -899,4 +899,23 @@ public class JieIO {
     public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) throws JieIOException {
         return new RandomOutputStream(random, offset, length);
     }
+
+    /**
+     * Returns an empty input stream.
+     *
+     * @return an empty input stream
+     */
+    public static InputStream emptyInputStream() {
+        return EmptyInputStream.SINGLETON;
+    }
+
+    private static final class EmptyInputStream extends InputStream {
+
+        private static final EmptyInputStream SINGLETON = new EmptyInputStream();
+
+        @Override
+        public int read() throws IOException {
+            return -1;
+        }
+    }
 }
