@@ -1,6 +1,7 @@
 package xyz.fslabo.common.net.tcp.handlers;
 
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.tcp.GekTcpChannel;
 import xyz.fslabo.common.net.tcp.GekTcpChannelHandler;
@@ -15,9 +16,8 @@ import java.util.function.IntFunction;
  * <pre>
  *     buffer -&gt; data|data|data|..
  * </pre>
- * The returned object of {@link #onMessage(GekTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;,
- * each byte buffer is split by {@link JieIO#split(ByteBuffer, byte, IntFunction)}
- * and make returned buffers readonly.
+ * The returned object of {@link #onMessage(GekTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;, each
+ * byte buffer is split by {@link JieIO#split(ByteBuffer, byte, IntFunction)} and make returned buffers readonly.
  *
  * @author fredsuvn
  */
@@ -48,7 +48,7 @@ public class DelimiterBasedTcpChannelHandler implements GekTcpChannelHandler<Byt
 
     @Override
     public @Nullable Object onMessage(GekTcpChannel channel, ByteBuffer message) {
-        List<ByteBuffer> result = JieIO.split(message, delimiter, generator);
+        List<ByteBuffer> result = JieBuffer.split(message, delimiter, generator);
         return result.isEmpty() ? null : asReadOnly(result);
     }
 

@@ -9,12 +9,11 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 
 /**
- * Input/Output utilities.
+ * IO (Input/Output) utilities.
  *
  * @author fresduvn
  */
@@ -23,13 +22,13 @@ public class JieIO {
     /**
      * Default IO buffer size: 1024 * 8 = 8192.
      */
-    public static final int IO_BUFFER_SIZE = 1024 * 8;
+    public static final int BUFFER_SIZE = 1024 * 8;
 
     // Common IO methods:
 
     /**
-     * Reads all bytes from source stream into an array.
-     * Returns the array, or null if no data read out and reaches to the end of stream.
+     * Reads all bytes from source stream into an array. Returns the array, or null if no data read out and reaches to
+     * the end of stream.
      *
      * @param source source stream
      * @return the array, or null if no data read out and reaches to the end of stream
@@ -79,13 +78,12 @@ public class JieIO {
     }
 
     /**
-     * Reads specified number of bytes from source stream into an array.
-     * Returns the array, or null if no data read out and reaches to the end of stream.
+     * Reads specified number of bytes from source stream into an array. Returns the array, or null if no data read out
+     * and reaches to the end of stream.
      * <p>
-     * If the number &lt; 0, read all as {@link #read(InputStream)};
-     * els if the number is 0, no read and return an empty array;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the stream.
+     * If the number &lt; 0, read all as {@link #read(InputStream)}; els if the number is 0, no read and return an empty
+     * array; else this method will keep reading until the read number reaches to the specified number, or the reading
+     * reaches the end of the stream.
      *
      * @param source source stream
      * @param number specified number
@@ -124,10 +122,9 @@ public class JieIO {
     }
 
     /**
-     * Reads bytes from source stream into dest array,
-     * returns actual read number, or -1 if no data read out and reaches to the end of stream.
-     * This method will keep reading until the dest array is filled up,
-     * or the reading reaches the end of the stream.
+     * Reads bytes from source stream into dest array, returns actual read number, or -1 if no data read out and reaches
+     * to the end of stream. This method will keep reading until the dest array is filled up, or the reading reaches the
+     * end of the stream.
      *
      * @param source source stream
      * @param dest   dest array
@@ -139,10 +136,9 @@ public class JieIO {
     }
 
     /**
-     * Reads bytes of specified length from source stream into dest array starting from given offset,
-     * returns actual read number, or -1 if no data read out and reaches to the end of stream.
-     * This method will keep reading until the read number reaches to the specified length,
-     * or the reading reaches the end of the stream.
+     * Reads bytes of specified length from source stream into dest array starting from given offset, returns actual
+     * read number, or -1 if no data read out and reaches to the end of stream. This method will keep reading until the
+     * read number reaches to the specified length, or the reading reaches the end of the stream.
      *
      * @param source source stream
      * @param dest   dest array
@@ -180,10 +176,9 @@ public class JieIO {
     }
 
     /**
-     * Reads bytes from source stream into dest buffer,
-     * returns actual read number, or -1 if no data read out and reaches to the end of stream.
-     * This method will keep reading until the dest buffer is filled up,
-     * or the reading reaches the end of the stream.
+     * Reads bytes from source stream into dest buffer, returns actual read number, or -1 if no data read out and
+     * reaches to the end of stream. This method will keep reading until the dest buffer is filled up, or the reading
+     * reaches the end of the stream.
      *
      * @param source source stream
      * @param dest   dest buffer
@@ -217,9 +212,9 @@ public class JieIO {
     }
 
     /**
-     * Reads all bytes from source stream into dest stream,
-     * returns actual read number, or -1 if no data read out and reaches to the end of source stream.
-     * This method will keep reading until the reading reaches the end of source stream.
+     * Reads all bytes from source stream into dest stream, returns actual read number, or -1 if no data read out and
+     * reaches to the end of source stream. This method will keep reading until the reading reaches the end of source
+     * stream.
      *
      * @param source source stream
      * @param dest   dest stream
@@ -231,13 +226,11 @@ public class JieIO {
     }
 
     /**
-     * Reads specified number of bytes from source stream into dest stream,
-     * returns actual read number, or -1 if no data read out and reaches to the end of source stream.
+     * Reads specified number of bytes from source stream into dest stream, returns actual read number, or -1 if no data
+     * read out and reaches to the end of source stream.
      * <p>
-     * If the number &lt; 0, read all;
-     * els if the number is 0, no read and return 0;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the stream.
+     * If the number &lt; 0, read all; els if the number is 0, no read and return 0; else this method will keep reading
+     * until the read number reaches to the specified number, or the reading reaches the end of the stream.
      *
      * @param source source stream
      * @param dest   dest stream
@@ -246,17 +239,15 @@ public class JieIO {
      * @throws JieIOException IO exception
      */
     public static long readTo(InputStream source, OutputStream dest, long number) throws JieIOException {
-        return readTo(source, dest, number, IO_BUFFER_SIZE);
+        return readTo(source, dest, number, BUFFER_SIZE);
     }
 
     /**
-     * Reads specified number of bytes from source stream into dest stream,
-     * returns actual read number, or -1 if no data read out and reaches to the end of source stream.
+     * Reads specified number of bytes from source stream into dest stream, returns actual read number, or -1 if no data
+     * read out and reaches to the end of source stream.
      * <p>
-     * If the number &lt; 0, read all;
-     * els if the number is 0, no read and return 0;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the stream.
+     * If the number &lt; 0, read all; els if the number is 0, no read and return 0; else this method will keep reading
+     * until the read number reaches to the specified number, or the reading reaches the end of the stream.
      *
      * @param source     source stream
      * @param dest       dest stream
@@ -303,8 +294,8 @@ public class JieIO {
     }
 
     /**
-     * Reads available bytes from source stream into an array.
-     * Returns the array, or null if no data read out and reaches to the end of stream.
+     * Reads available bytes from source stream into an array. Returns the array, or null if no data read out and
+     * reaches to the end of stream.
      *
      * @param source source stream
      * @return the array, or null if no data read out and reaches to the end of stream
@@ -343,8 +334,8 @@ public class JieIO {
     }
 
     /**
-     * Reads available bytes from source stream into dest stream,
-     * returns actual read number, or -1 if no data read out and reaches to the end of source stream.
+     * Reads available bytes from source stream into dest stream, returns actual read number, or -1 if no data read out
+     * and reaches to the end of source stream.
      *
      * @param source source stream
      * @param dest   dest stream
@@ -368,8 +359,8 @@ public class JieIO {
     }
 
     /**
-     * Reads all chars from source reader into a string.
-     * Returns the string, or null if no data read out and reaches to the end of reader.
+     * Reads all chars from source reader into a string. Returns the string, or null if no data read out and reaches to
+     * the end of reader.
      *
      * @param source source reader
      * @return the string, or null if no data read out and reaches to the end of reader
@@ -390,13 +381,12 @@ public class JieIO {
     }
 
     /**
-     * Reads specified number of chars from source reader into a string.
-     * Returns the string, or null if no data read out and reaches to the end of reader.
+     * Reads specified number of chars from source reader into a string. Returns the string, or null if no data read out
+     * and reaches to the end of reader.
      * <p>
-     * If the number &lt; 0, read all as {@link #read(Reader)};
-     * els if the number is 0, no read and return an empty array;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the reader.
+     * If the number &lt; 0, read all as {@link #read(Reader)}; els if the number is 0, no read and return an empty
+     * array; else this method will keep reading until the read number reaches to the specified number, or the reading
+     * reaches the end of the reader.
      *
      * @param source source reader
      * @param number specified number
@@ -418,9 +408,8 @@ public class JieIO {
     }
 
     /**
-     * Reads chars from source reader into dest appendable,
-     * returns actual read number, or -1 if no data read out and reaches to the end of reader.
-     * This method will keep reading until the reading reaches the end of source reader.
+     * Reads chars from source reader into dest appendable, returns actual read number, or -1 if no data read out and
+     * reaches to the end of reader. This method will keep reading until the reading reaches the end of source reader.
      *
      * @param source source reader
      * @param dest   dest appendable
@@ -439,13 +428,11 @@ public class JieIO {
     }
 
     /**
-     * Reads specified number of chars from source reader into dest appendable,
-     * returns actual read number, or -1 if no data read out and reaches to the end of source reader.
+     * Reads specified number of chars from source reader into dest appendable, returns actual read number, or -1 if no
+     * data read out and reaches to the end of source reader.
      * <p>
-     * If the number &lt; 0, read all;
-     * els if the number is 0, no read and return 0;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the reader.
+     * If the number &lt; 0, read all; els if the number is 0, no read and return 0; else this method will keep reading
+     * until the read number reaches to the specified number, or the reading reaches the end of the reader.
      *
      * @param source source reader
      * @param dest   dest appendable
@@ -454,17 +441,15 @@ public class JieIO {
      * @throws JieIOException IO exception
      */
     public static long readTo(Reader source, Appendable dest, int number) throws JieIOException {
-        return readTo(source, dest, number, IO_BUFFER_SIZE);
+        return readTo(source, dest, number, BUFFER_SIZE);
     }
 
     /**
-     * Reads specified number of chars from source reader into dest appendable,
-     * returns actual read number, or -1 if no data read out and reaches to the end of source reader.
+     * Reads specified number of chars from source reader into dest appendable, returns actual read number, or -1 if no
+     * data read out and reaches to the end of source reader.
      * <p>
-     * If the number &lt; 0, read all;
-     * els if the number is 0, no read and return 0;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the reader.
+     * If the number &lt; 0, read all; els if the number is 0, no read and return 0; else this method will keep reading
+     * until the read number reaches to the specified number, or the reading reaches the end of the reader.
      *
      * @param source     source reader
      * @param dest       dest appendable
@@ -525,8 +510,8 @@ public class JieIO {
     }
 
     /**
-     * Reads all bytes from source stream into a string with {@link JieChars#defaultCharset()}.
-     * Returns the string, or null if no data read out and reaches to the end of stream.
+     * Reads all bytes from source stream into a string with {@link JieChars#defaultCharset()}. Returns the string, or
+     * null if no data read out and reaches to the end of stream.
      *
      * @param source source stream
      * @return the string, or null if no data read out and reaches to the end of stream
@@ -538,8 +523,8 @@ public class JieIO {
     }
 
     /**
-     * Reads all bytes from source stream into a string with specified charset.
-     * Returns the string, or null if no data read out and reaches to the end of stream.
+     * Reads all bytes from source stream into a string with specified charset. Returns the string, or null if no data
+     * read out and reaches to the end of stream.
      *
      * @param source  source stream
      * @param charset specified charset
@@ -560,8 +545,8 @@ public class JieIO {
     }
 
     /**
-     * Reads available bytes from source stream into a string with {@link JieChars#defaultCharset()}.
-     * Returns the string, or null if no data read out and reaches to the end of stream.
+     * Reads available bytes from source stream into a string with {@link JieChars#defaultCharset()}. Returns the
+     * string, or null if no data read out and reaches to the end of stream.
      *
      * @param source source stream
      * @return the string, or null if no data read out and reaches to the end of stream
@@ -573,8 +558,8 @@ public class JieIO {
     }
 
     /**
-     * Reads available bytes from source stream into a string with specified charset.
-     * Returns the string, or null if no data read out and reaches to the end of stream.
+     * Reads available bytes from source stream into a string with specified charset. Returns the string, or null if no
+     * data read out and reaches to the end of stream.
      *
      * @param source  source stream
      * @param charset specified charset
@@ -629,8 +614,8 @@ public class JieIO {
     }
 
     /**
-     * Wraps given reader as {@link InputStream} with {@link JieChars#defaultCharset()}.
-     * The returned stream doesn't support mark/reset methods.
+     * Wraps given reader as {@link InputStream} with {@link JieChars#defaultCharset()}. The returned stream doesn't
+     * support mark/reset methods.
      *
      * @param reader given reader
      * @return given reader as {@link InputStream}
@@ -641,8 +626,8 @@ public class JieIO {
     }
 
     /**
-     * Wraps given reader as {@link InputStream} with specified charset.
-     * The returned stream doesn't support mark/reset methods.
+     * Wraps given reader as {@link InputStream} with specified charset. The returned stream doesn't support mark/reset
+     * methods.
      *
      * @param reader  given reader
      * @param charset specified charset
@@ -725,8 +710,8 @@ public class JieIO {
     /**
      * Wraps given appendable as {@link OutputStream} with {@link JieChars#defaultCharset()}.
      * <p>
-     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid
-     * if given appendable is instance of {@link Writer}.
+     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid if given appendable is instance of
+     * {@link Writer}.
      *
      * @param appendable given appendable
      * @return given appendable as {@link OutputStream}
@@ -739,8 +724,8 @@ public class JieIO {
     /**
      * Wraps given appendable as {@link OutputStream} with specified charset.
      * <p>
-     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid
-     * if given appendable is instance of {@link Writer}.
+     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid if given appendable is instance of
+     * {@link Writer}.
      *
      * @param appendable given appendable
      * @param charset    specified charset
@@ -788,8 +773,8 @@ public class JieIO {
     }
 
     /**
-     * Limits given stream to a specified number for readable bytes.
-     * The returned stream doesn't support mark/reset methods.
+     * Limits given stream to a specified number for readable bytes. The returned stream doesn't support mark/reset
+     * methods.
      *
      * @param stream given stream
      * @param number number of readable bytes, must &gt;= 0
@@ -855,660 +840,6 @@ public class JieIO {
         return new TransformInputStream(source, blockSize, transformer);
     }
 
-    // Buffer methods:
-
-    /**
-     * Reads all bytes from source buffer into an array.
-     * Returns the array, or null if no data read out and reaches to the end of buffer.
-     *
-     * @param source source buffer
-     * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static byte[] read(ByteBuffer source) throws JieIOException {
-        try {
-            int length = source.remaining();
-            if (length <= 0) {
-                return null;
-            }
-            byte[] result = new byte[length];
-            source.get(result);
-            return result;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads specified number of bytes from source buffer into an array.
-     * Returns the array, or null if no data read out and reaches to the end of buffer.
-     * <p>
-     * If the number &lt; 0, read all as {@link #read(ByteBuffer)};
-     * els if the number is 0, no read and return an empty array;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the buffer.
-     *
-     * @param source source buffer
-     * @param number specified number
-     * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static byte[] read(ByteBuffer source, int number) throws JieIOException {
-        if (number < 0) {
-            return read(source);
-        }
-        if (number == 0) {
-            return new byte[0];
-        }
-        try {
-            int length = Math.min(number, source.remaining());
-            if (length <= 0) {
-                return null;
-            }
-            byte[] result = new byte[length];
-            source.get(result);
-            return result;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Marks and reads all bytes from source buffer into an array, resets the buffer after reading.
-     * Returns the array, or null if no data read out and reaches to the end of buffer.
-     *
-     * @param source source buffer
-     * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static byte[] readReset(ByteBuffer source) throws JieIOException {
-        try {
-            source.mark();
-            byte[] result = read(source);
-            source.reset();
-            return result;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Marks and reads specified number of bytes from source buffer into an array, resets the buffer after reading.
-     * Returns the array, or null if no data read out and reaches to the end of buffer.
-     * <p>
-     * If the number &lt; 0, read all as {@link #read(ByteBuffer)};
-     * els if the number is 0, no read and return an empty array;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the buffer.
-     *
-     * @param source source buffer
-     * @param number specified number
-     * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static byte[] readReset(ByteBuffer source, int number) throws JieIOException {
-        try {
-            source.mark();
-            byte[] result = read(source, number);
-            source.reset();
-            return result;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads bytes from source buffer into dest buffer,
-     * returns actual read number, or -1 if no data read out and reaches to the end of buffer.
-     * This method will keep reading until the dest buffer is filled up,
-     * or the reading reaches the end of the buffer.
-     *
-     * @param source source buffer
-     * @param dest   dest buffer
-     * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    public static int readTo(ByteBuffer source, ByteBuffer dest) throws JieIOException {
-        try {
-            int sr = source.remaining();
-            int dr = dest.remaining();
-            if (sr <= dr) {
-                dest.put(source);
-                return sr;
-            }
-            ByteBuffer slice = readSlice(source, dr);
-            dest.put(slice);
-            return dr;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads specified number of bytes from source buffer into dest buffer,
-     * returns actual read number, or -1 if no data read out and reaches to the end of buffer.
-     * <p>
-     * If the number &lt; 0, read as {@link #readTo(ByteBuffer, ByteBuffer)};
-     * els if the number is 0, no read and return 0;
-     * else this method will keep reading until the read number reaches to the specified number,
-     * or the reading reaches the end of the buffer (of source or dest).
-     *
-     * @param source source buffer
-     * @param dest   dest buffer
-     * @param number specified number
-     * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    public static int readTo(ByteBuffer source, ByteBuffer dest, int number) throws JieIOException {
-        if (number < 0) {
-            return readTo(source, dest);
-        }
-        if (number == 0) {
-            return 0;
-        }
-        try {
-            ByteBuffer src = source.remaining() == number ? source : slice(source, number);
-            int readNum = readTo(src, dest);
-            if (readNum > 0) {
-                source.position(source.position() + readNum);
-            }
-            return readNum;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads specified number of bytes from source buffer into dest array,
-     * returns actual read number, or -1 if no data read out and reaches to the end of buffer or array.
-     *
-     * @param source source buffer
-     * @param dest   dest array
-     * @return actual read number, or -1 if no data read out and reaches to the end of buffer or array
-     * @throws JieIOException IO exception
-     */
-    public static int readTo(ByteBuffer source, byte[] dest) throws JieIOException {
-        return readTo(source, dest, 0);
-    }
-
-    /**
-     * Reads specified number of bytes from source buffer into dest array starting from given offset,
-     * returns actual read number, or -1 if no data read out and reaches to the end of buffer or array.
-     *
-     * @param source source buffer
-     * @param dest   dest array
-     * @param offset given offset
-     * @return actual read number, or -1 if no data read out and reaches to the end of buffer or array
-     * @throws JieIOException IO exception
-     */
-    public static int readTo(ByteBuffer source, byte[] dest, int offset) throws JieIOException {
-        try {
-            JieCheck.checkInBounds(offset, 0, dest.length);
-            int minLen = Math.min(source.remaining(), dest.length - offset);
-            if (minLen <= 0) {
-                return 0;
-            }
-            if (source.remaining() >= minLen) {
-                source.get(dest, offset, minLen);
-            } else {
-                ByteBuffer slice = readSlice(source, minLen);
-                slice.get(dest, offset, minLen);
-            }
-            return minLen;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads bytes from source buffer into dest stream,
-     * returns actual read number, or -1 if no data read out and reaches to the end of buffer.
-     * This method will keep reading until the reading reaches the end of the buffer.
-     *
-     * @param source source buffer
-     * @param dest   dest stream
-     * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    public static int readTo(ByteBuffer source, OutputStream dest) throws JieIOException {
-        try {
-            if (source.hasArray()) {
-                int remaining = source.remaining();
-                dest.write(source.array(), source.arrayOffset() + source.position(), remaining);
-                source.position(source.position() + remaining);
-                return remaining;
-            }
-            byte[] bytes = read(source);
-            dest.write(bytes);
-            return bytes.length;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads all bytes from source buffer into a string with {@link JieChars#defaultCharset()}.
-     * Returns the string, or null if no data read out and reaches to the end of buffer.
-     *
-     * @param source source buffer
-     * @return the string, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static String readString(ByteBuffer source) throws JieIOException {
-        return readString(source, JieChars.defaultCharset());
-    }
-
-    /**
-     * Reads all bytes from source buffer into a string with specified charset.
-     * Returns the string, or null if no data read out and reaches to the end of buffer.
-     *
-     * @param source  source buffer
-     * @param charset specified charset
-     * @return the string, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static String readString(ByteBuffer source, Charset charset) throws JieIOException {
-        try {
-            byte[] bytes = read(source);
-            if (bytes == null) {
-                return null;
-            }
-            return new String(bytes, charset);
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Returns slice of given buffer by {@link ByteBuffer#slice()}, and sets the slice's limit to specified number
-     * (or remaining if remaining is less than specified number).
-     * Position of given buffer will not be changed.
-     *
-     * @param buffer given buffer
-     * @param number specified number
-     * @return the slice buffer
-     * @throws JieIOException IO exception
-     */
-    public static ByteBuffer slice(ByteBuffer buffer, int number) throws JieIOException {
-        try {
-            ByteBuffer slice = buffer.slice();
-            slice.limit(Math.min(number, buffer.remaining()));
-            return slice;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Returns slice of given buffer by {@link ByteBuffer#slice()}, and sets the slice's limit to specified number
-     * (or remaining if remaining is less than specified number).
-     * Position of given buffer will be set to {@code (buffer.position + slice.remaining())}.
-     *
-     * @param buffer given buffer
-     * @param number specified number
-     * @return the slice buffer
-     * @throws JieIOException IO exception
-     */
-    public static ByteBuffer readSlice(ByteBuffer buffer, int number) throws JieIOException {
-        try {
-            ByteBuffer slice = buffer.slice();
-            slice.limit(Math.min(number, buffer.remaining()));
-            buffer.position(buffer.position() + slice.remaining());
-            return slice;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Returns a sub-range view of given buffer, starting from given offset to buffer's limit.
-     * The two buffers will share the same data so any operation will reflect each other.
-     * <p>
-     * Note the offset is counted from 0, not {@code buffer.position()}.
-     *
-     * @param buffer given buffer
-     * @param offset given offset
-     * @return the sub-buffer
-     * @throws JieIOException IO exception
-     */
-    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset) throws JieIOException {
-        try {
-            JieCheck.checkInBounds(offset, 0, buffer.limit());
-            int pos = buffer.position();
-            buffer.position(offset);
-            ByteBuffer slice = buffer.slice();
-            buffer.position(pos);
-            return slice;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Returns a sub-range view of given buffer, starting from given offset to specified length.
-     * The two buffers will share the same data so any operation will reflect each other.
-     * <p>
-     * Note the offset is counted from 0, not {@code buffer.position()}.
-     *
-     * @param buffer given buffer
-     * @param offset given offset
-     * @param length specified length
-     * @return the sub-buffer
-     * @throws JieIOException IO exception
-     */
-    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset, int length) throws JieIOException {
-        try {
-            JieCheck.checkRangeInBounds(offset, offset + length, 0, buffer.limit());
-            int pos = buffer.position();
-            buffer.position(offset);
-            ByteBuffer slice = slice(buffer, length);
-            buffer.position(pos);
-            return slice;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Splits given buffer in specified length, returns split buffer list.
-     * This method starts the loop:
-     * <ul>
-     *     <li>
-     *         If remaining length is &gt;= specified length, this method will use {@link ByteBuffer#slice()} to
-     *         generate a slice buffer of specified length. Then moves the position with specified length.
-     *     </li>
-     *     <li>
-     *         If remaining length is less than specified length, loop will be broken.
-     *     </li>
-     * </ul>
-     *
-     * @param buffer given buffer
-     * @param length specified length
-     * @return split buffer list
-     */
-    public static List<ByteBuffer> split(ByteBuffer buffer, int length) {
-        return split(buffer, length, len -> null);
-    }
-
-    /**
-     * Splits given buffer in specified length, returns split buffer list.
-     * This method starts the loop:
-     * <ul>
-     *     <li>
-     *         If remaining length is &gt;= specified length, this method will call {@code generator} with specified
-     *         length to generate new buffer. If {@code generator} return a new buffer, this method will fill data from
-     *         given buffer into new buffer. If {@code generator} return null, use {@link ByteBuffer#slice()} to
-     *         generate a slice buffer of specified buffer. Then moves the position with specified length.
-     *     </li>
-     *     <li>
-     *         If remaining length is less than specified length, loop will be broken.
-     *     </li>
-     * </ul>
-     *
-     * @param buffer    given buffer
-     * @param length    specified length
-     * @param generator given buffer generator, the argument is specified length
-     * @return split buffer list
-     */
-    public static List<ByteBuffer> split(ByteBuffer buffer, int length, IntFunction<ByteBuffer> generator) {
-        int remaining = buffer.remaining();
-        if (remaining <= 0) {
-            return Collections.emptyList();
-        }
-        if (remaining < length) {
-            return Collections.emptyList();
-        }
-        List<ByteBuffer> result = new ArrayList<>(remaining / length);
-        while (buffer.remaining() >= length) {
-            ByteBuffer newBuffer = generator.apply(length);
-            if (newBuffer == null) {
-                result.add(readSlice(buffer, length));
-            } else {
-                readTo(buffer, newBuffer);
-                newBuffer.flip();
-                result.add(newBuffer);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Splits given buffer in specified length, returns split buffer list.
-     * This method assumes the length is specified at specified length offset, and starts the loop:
-     * <ul>
-     *     <li>
-     *         Marks current position.
-     *         If remaining length is &gt;= {@code lengthOffset + lengthSize}, this method will skip and read number of
-     *         {@code lengthSize} bytes at {@code lengthOffset} as specified length.
-     *     </li>
-     *     <li>
-     *         Resets current position.
-     *         If remaining length is &gt;= specified length, this method will use {@link ByteBuffer#slice()} to
-     *         generate a slice buffer of specified length. Then moves the position with specified length.
-     *     </li>
-     *     <li>
-     *         If remaining length is less than {@code lengthOffset + lengthSize} or specified length,
-     *         loop will be broken.
-     *     </li>
-     * </ul>
-     *
-     * @param buffer       given buffer
-     * @param lengthOffset offset of length
-     * @param lengthSize   byte number of length, must in 1, 2, 4
-     * @return split buffer list
-     */
-    public static List<ByteBuffer> split(ByteBuffer buffer, int lengthOffset, int lengthSize) {
-        return split(buffer, lengthOffset, lengthSize, len -> null);
-    }
-
-    /**
-     * Splits given buffer in specified length, returns split buffer list.
-     * This method assumes the length is specified at specified length offset, and starts the loop:
-     * <ul>
-     *     <li>
-     *         Marks current position.
-     *         If remaining length is &gt;= {@code lengthOffset + lengthSize}, this method will skip and read number of
-     *         {@code lengthSize} bytes at {@code lengthOffset} as specified length.
-     *     </li>
-     *     <li>
-     *         Resets current position.
-     *         If remaining length is &gt;= specified length, this method will call {@code generator} with specified
-     *         length to generate new buffer. If {@code generator} return a new buffer, this method will fill data from
-     *         given buffer into new buffer. If {@code generator} return null, use {@link ByteBuffer#slice()} to
-     *         generate a slice buffer of specified buffer. Then moves the position with specified length.
-     *     </li>
-     *     <li>
-     *         If remaining length is less than {@code lengthOffset + lengthSize} or specified length,
-     *         loop will be broken.
-     *     </li>
-     * </ul>
-     *
-     * @param buffer       given buffer
-     * @param lengthOffset offset of length
-     * @param lengthSize   byte number of length, must in 1, 2, 4
-     * @param generator    given buffer generator, the argument is specified length
-     * @return split buffer list
-     */
-    public static List<ByteBuffer> split(
-        ByteBuffer buffer, int lengthOffset, int lengthSize, IntFunction<ByteBuffer> generator) {
-        if (!buffer.hasRemaining()) {
-            return Collections.emptyList();
-        }
-        int minSize = lengthOffset + lengthSize;
-        if (buffer.remaining() < minSize) {
-            return Collections.emptyList();
-        }
-        List<ByteBuffer> result = new LinkedList<>();
-        while (true) {
-            buffer.mark();
-            buffer.position(buffer.position() + lengthOffset);
-            int length = readLength(buffer, lengthSize);
-            buffer.reset();
-            if (buffer.remaining() < length) {
-                break;
-            }
-            ByteBuffer newBuffer = generator.apply(length);
-            if (newBuffer == null) {
-                result.add(readSlice(buffer, length));
-            } else {
-                readTo(buffer, newBuffer);
-                newBuffer.flip();
-                result.add(newBuffer);
-            }
-            if (buffer.remaining() < minSize) {
-                break;
-            }
-        }
-        return result;
-    }
-
-    private static int readLength(ByteBuffer buffer, int lengthSize) {
-        switch (lengthSize) {
-            case 1:
-                return buffer.get() & 0x000000ff;
-            case 2:
-                return buffer.getShort() & 0x0000ffff;
-            case 4:
-                return buffer.getInt();
-        }
-        throw new IllegalArgumentException("lengthSize must in (1, 2, 4).");
-    }
-
-    /**
-     * Splits given buffer in specified delimiter, returns split buffer list.
-     * This method starts the loop:
-     * <ul>
-     *     <li>
-     *         Marks current position, reads until meets specified delimiter.
-     *     </li>
-     *     <li>
-     *         If specified delimiter is met, this method will use {@link ByteBuffer#slice()} to generate a slice
-     *         buffer of read data (delimiter exclusive). Then moves the position to next of delimiter.
-     *     </li>
-     *     <li>
-     *         If no specified delimiter is met, reset position and loop will be broken.
-     *     </li>
-     * </ul>
-     * For example:
-     * <pre>
-     *     split("123|456|789|") = ["123", "456", "789"]
-     *     split("|123|456|789|") = ["", "123", "456", "789"]
-     *     split("|123|456|78") = ["", "123", "456"] and reset to position 9
-     * </pre>
-     *
-     * @param buffer    given buffer
-     * @param delimiter specified delimiter
-     * @return split buffer list
-     */
-    public static List<ByteBuffer> split(ByteBuffer buffer, byte delimiter) {
-        return split(buffer, delimiter, len -> null);
-    }
-
-    /**
-     * Splits given buffer in specified delimiter, returns split buffer list.
-     * This method starts the loop:
-     * <ul>
-     *     <li>
-     *         Marks current position, reads until meets specified delimiter.
-     *     </li>
-     *     <li>
-     *         If specified delimiter is met, this method will call {@code generator} with length of read data to
-     *         generate new buffer. If {@code generator} return a new buffer, this method will fill data from given
-     *         buffer into new buffer. If {@code generator} return null, use {@link ByteBuffer#slice()} to generate a
-     *         slice buffer of read data (delimiter exclusive).
-     *         Then moves the position to next of delimiter.
-     *     </li>
-     *     <li>
-     *         If no specified delimiter is met, reset position and loop will be broken.
-     *     </li>
-     * </ul>
-     * For example:
-     * <pre>
-     *     split("123|456|789|") = ["123", "456", "789"]
-     *     split("|123|456|789|") = ["", "123", "456", "789"]
-     *     split("|123|456|78") = ["", "123", "456"] and reset to position 9
-     * </pre>
-     *
-     * @param buffer    given buffer
-     * @param delimiter specified delimiter
-     * @param generator given buffer generator, the argument is specified length
-     * @return split buffer list
-     */
-    public static List<ByteBuffer> split(ByteBuffer buffer, byte delimiter, IntFunction<ByteBuffer> generator) {
-        if (!buffer.hasRemaining()) {
-            return Collections.emptyList();
-        }
-        List<ByteBuffer> result = null;
-        buffer.mark();
-        while (buffer.hasRemaining()) {
-            byte b = buffer.get();
-            int pos = buffer.position();
-            if (b == delimiter) {
-                int delimiterPos = pos - 1;
-                buffer.reset();
-                int length = delimiterPos - buffer.position();
-                ByteBuffer newBuffer = generator.apply(length);
-                if (result == null) {
-                    result = new LinkedList<>();
-                }
-                if (newBuffer == null) {
-                    result.add(readSlice(buffer, length));
-                } else {
-                    readTo(buffer, newBuffer);
-                    newBuffer.flip();
-                    result.add(newBuffer);
-                }
-                buffer.position(pos);
-                buffer.mark();
-            }
-        }
-        buffer.reset();
-        return result == null ? Collections.emptyList() : result;
-    }
-
-    /**
-     * Returns whether given buffer is a simple wrapper of back array:
-     * <pre>
-     *     return buffer.hasArray()
-     *             && buffer.position() == 0
-     *             && buffer.arrayOffset() == 0
-     *             && buffer.limit() == buffer.array().length;
-     * </pre>
-     *
-     * @param buffer given buffer
-     * @return whether given buffer is a simple wrapper of back array
-     */
-    public static boolean isSimpleWrapper(ByteBuffer buffer) {
-        return buffer.hasArray()
-            && buffer.position() == 0
-            && buffer.arrayOffset() == 0
-            && buffer.limit() == buffer.array().length;
-    }
-
-    /**
-     * Returns back array if {@link #isSimpleWrapper(ByteBuffer)} returns true for given buffer,
-     * and the position will be set to {@code buffer.limit()}.
-     * Otherwise, return {@link #read(ByteBuffer)}.
-     *
-     * @param buffer given buffer
-     * @return back array if {@link #isSimpleWrapper(ByteBuffer)} returns true for given buffer
-     */
-    public static byte[] readBack(ByteBuffer buffer) {
-        if (isSimpleWrapper(buffer)) {
-            buffer.position(buffer.limit());
-            return buffer.array();
-        }
-        return read(buffer);
-    }
-
-    // File methods:
-
     /**
      * Wraps given random access file as an input stream, supports mark/reset.
      * <p>
@@ -1523,10 +854,8 @@ public class JieIO {
     }
 
     /**
-     * Wraps given random access file as an input stream,
-     * readable bytes from {@code offset} position to {@code (offset + length)},
-     * supports mark/reset.
-     * {@code length} can be set to -1 if to read to end of the file.
+     * Wraps given random access file as an input stream, readable bytes from {@code offset} position to
+     * {@code (offset + length)}, supports mark/reset. {@code length} can be set to -1 if to read to end of the file.
      * <p>
      * Note this method will seek position of random access file to given offset immediately.
      *
@@ -1541,8 +870,8 @@ public class JieIO {
     }
 
     /**
-     * Wraps given random access file as an output stream.
-     * The stream will lock the file with exclusive lock by {@link FileChannel#tryLock(long, long, boolean)}.
+     * Wraps given random access file as an output stream. The stream will lock the file with exclusive lock by
+     * {@link FileChannel#tryLock(long, long, boolean)}.
      * <p>
      * Note this method will seek position of random access file to given offset immediately.
      *
@@ -1555,10 +884,9 @@ public class JieIO {
     }
 
     /**
-     * Wraps given random access file as an output stream,
-     * written bytes from {@code offset} position to {@code (offset + length)}.
-     * {@code length} can be set to -1 if to write unlimitedly.
-     * The stream will lock the file with exclusive lock by {@link FileChannel#tryLock(long, long, boolean)}.
+     * Wraps given random access file as an output stream, written bytes from {@code offset} position to
+     * {@code (offset + length)}. {@code length} can be set to -1 if to write unlimitedly. The stream will lock the file
+     * with exclusive lock by {@link FileChannel#tryLock(long, long, boolean)}.
      * <p>
      * Note this method will seek position of random access file to given offset immediately.
      *

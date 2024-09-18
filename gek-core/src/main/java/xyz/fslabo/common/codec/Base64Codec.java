@@ -3,6 +3,7 @@ package xyz.fslabo.common.codec;
 import lombok.Data;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieString;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 
 import java.io.ByteArrayOutputStream;
@@ -77,7 +78,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
     public Base64Codec reset() {
         this.input = null;
         this.output = null;
-        this.blockSize = JieIO.IO_BUFFER_SIZE;
+        this.blockSize = JieIO.BUFFER_SIZE;
         this.mode = ENCODE_MODE;
         this.type = BASIC_TYPE;
         this.withoutPadding = false;
@@ -117,8 +118,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
     }
 
     /**
-     * Sets type to basic which backed by
-     * {@link Base64#getEncoder()} or {@link Base64#getDecoder()}.
+     * Sets type to basic which backed by {@link Base64#getEncoder()} or {@link Base64#getDecoder()}.
      *
      * @return this
      */
@@ -128,8 +128,8 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
     }
 
     /**
-     * Sets type to URL and Filename safe type which backed by
-     * {@link Base64#getUrlEncoder()} or {@link Base64#getUrlDecoder()}.
+     * Sets type to URL and Filename safe type which backed by {@link Base64#getUrlEncoder()} or
+     * {@link Base64#getUrlDecoder()}.
      *
      * @return this
      */
@@ -139,8 +139,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
     }
 
     /**
-     * Sets type to MIME type which backed by
-     * {@link Base64#getMimeEncoder()} or {@link Base64#getMimeDecoder()}.
+     * Sets type to MIME type which backed by {@link Base64#getMimeEncoder()} or {@link Base64#getMimeDecoder()}.
      *
      * @return this
      */
@@ -150,12 +149,11 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
     }
 
     /**
-     * Sets type to MIME type which backed by
-     * {@link Base64#getMimeEncoder(int, byte[])}  or {@link Base64#getMimeDecoder()}.
+     * Sets type to MIME type which backed by {@link Base64#getMimeEncoder(int, byte[])}  or
+     * {@link Base64#getMimeDecoder()}.
      *
-     * @param lineLength    the length of each output line (rounded down to nearest multiple
-     *                      of 4). If {@code lineLength <= 0} the output will not be separated
-     *                      in lines
+     * @param lineLength    the length of each output line (rounded down to nearest multiple of 4). If
+     *                      {@code lineLength <= 0} the output will not be separated in lines
      * @param lineSeparator the line separator for each output line
      * @return this
      */
@@ -196,7 +194,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                     return encoder.encode(src, dest);
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (JieIO.isSimpleWrapper(dest)) {
+                    if (JieBuffer.isSimpleWrapper(dest)) {
                         int writeNum = encoder.encode(src, dest.array());
                         dest.position(writeNum);
                         return writeNum;
@@ -216,18 +214,18 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                 ByteBuffer src = (ByteBuffer) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    if (JieIO.isSimpleWrapper(src)) {
+                    if (JieBuffer.isSimpleWrapper(src)) {
                         int writeNum = encoder.encode(src.array(), dest);
                         src.position(src.limit());
                         return writeNum;
                     }
                     ByteBuffer encoded = encoder.encode(src);
                     int writeNum = encoded.remaining();
-                    JieIO.readTo(encoded, dest);
+                    JieBuffer.readTo(encoded, dest);
                     return writeNum;
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (JieIO.isSimpleWrapper(src) && JieIO.isSimpleWrapper(dest)) {
+                    if (JieBuffer.isSimpleWrapper(src) && JieBuffer.isSimpleWrapper(dest)) {
                         int writeNum = encoder.encode(src.array(), dest.array());
                         src.position(src.limit());
                         dest.position(writeNum);
@@ -241,10 +239,10 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                     OutputStream dest = (OutputStream) output;
                     ByteBuffer encoded = encoder.encode(src);
                     int writeNum = encoded.remaining();
-                    if (JieIO.isSimpleWrapper(encoded)) {
+                    if (JieBuffer.isSimpleWrapper(encoded)) {
                         dest.write(encoded.array());
                     } else {
-                        dest.write(JieIO.read(encoded));
+                        dest.write(JieBuffer.read(encoded));
                     }
                     return writeNum;
                 } else {
@@ -258,7 +256,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                     return encoder.encode(in, dest);
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (JieIO.isSimpleWrapper(dest)) {
+                    if (JieBuffer.isSimpleWrapper(dest)) {
                         int writeNum = encoder.encode(JieIO.read(src), dest.array());
                         dest.position(writeNum);
                         return writeNum;
@@ -296,7 +294,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                     return decoder.decode(src, dest);
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (JieIO.isSimpleWrapper(dest)) {
+                    if (JieBuffer.isSimpleWrapper(dest)) {
                         int writeNum = decoder.decode(src, dest.array());
                         dest.position(writeNum);
                         return writeNum;
@@ -316,18 +314,18 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                 ByteBuffer src = (ByteBuffer) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    if (JieIO.isSimpleWrapper(src)) {
+                    if (JieBuffer.isSimpleWrapper(src)) {
                         int writeNum = decoder.decode(src.array(), dest);
                         src.position(src.limit());
                         return writeNum;
                     }
                     ByteBuffer encoded = decoder.decode(src);
                     int writeNum = encoded.remaining();
-                    JieIO.readTo(encoded, dest);
+                    JieBuffer.readTo(encoded, dest);
                     return writeNum;
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (JieIO.isSimpleWrapper(src) && JieIO.isSimpleWrapper(dest)) {
+                    if (JieBuffer.isSimpleWrapper(src) && JieBuffer.isSimpleWrapper(dest)) {
                         int writeNum = decoder.decode(src.array(), dest.array());
                         src.position(src.limit());
                         dest.position(writeNum);
@@ -341,10 +339,10 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                     OutputStream dest = (OutputStream) output;
                     ByteBuffer encoded = decoder.decode(src);
                     int writeNum = encoded.remaining();
-                    if (JieIO.isSimpleWrapper(encoded)) {
+                    if (JieBuffer.isSimpleWrapper(encoded)) {
                         dest.write(encoded.array());
                     } else {
-                        dest.write(JieIO.read(encoded));
+                        dest.write(JieBuffer.read(encoded));
                     }
                     return writeNum;
                 } else {
@@ -358,7 +356,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                     return decoder.decode(in, dest);
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    if (JieIO.isSimpleWrapper(dest)) {
+                    if (JieBuffer.isSimpleWrapper(dest)) {
                         int writeNum = decoder.decode(JieIO.read(src), dest.array());
                         dest.position(writeNum);
                         return writeNum;
@@ -458,7 +456,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
             return (byte[]) input;
         }
         if (input instanceof ByteBuffer) {
-            return JieIO.read((ByteBuffer) input);
+            return JieBuffer.read((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return JieIO.read((InputStream) input);
@@ -544,7 +542,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
 
         @Override
         public void close() {
-            //do nothing
+            // do nothing
         }
     }
 }

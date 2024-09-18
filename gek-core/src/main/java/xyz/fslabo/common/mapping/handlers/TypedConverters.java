@@ -7,6 +7,7 @@ import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieDate;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.bean.PropertyInfo;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.mapping.MappingException;
 import xyz.fslabo.common.mapping.MappingOptions;
@@ -224,7 +225,7 @@ public class TypedConverters {
      * Note:
      * <ul>
      *     <li>
-     *         For {@link ByteBuffer}, this converter use {@link JieIO#readReset(ByteBuffer)} to read and reset;
+     *         For {@link ByteBuffer}, this converter use {@link JieBuffer#readReset(ByteBuffer)} to read and reset;
      *     </li>
      *     <li>
      *         If charset option is not found, use {@link JieChars#defaultCharset()};
@@ -266,7 +267,7 @@ public class TypedConverters {
             }
             if (source instanceof ByteBuffer) {
                 Charset charset = options.getCharset(targetProperty);
-                byte[] bytes = JieIO.readReset((ByteBuffer) source);
+                byte[] bytes = JieBuffer.readReset((ByteBuffer) source);
                 if (charset != null) {
                     return new String(bytes, charset);
                 }
@@ -288,7 +289,7 @@ public class TypedConverters {
      * Note:
      * <ul>
      *     <li>
-     *         For {@link ByteBuffer}, this converter use {@link JieIO#readReset(ByteBuffer)} to read and reset, but no
+     *         For {@link ByteBuffer}, this converter use {@link JieBuffer#readReset(ByteBuffer)} to read and reset, but no
      *         reset for {@link InputStream};
      *     </li>
      *     <li>
@@ -312,7 +313,7 @@ public class TypedConverters {
                 return ((byte[]) source).clone();
             }
             if (source instanceof ByteBuffer) {
-                return JieIO.readReset((ByteBuffer) source);
+                return JieBuffer.readReset((ByteBuffer) source);
             }
             if (source instanceof InputStream) {
                 return JieIO.read((InputStream) source);
@@ -331,7 +332,7 @@ public class TypedConverters {
      * Note:
      * <ul>
      *     <li>
-     *         For {@link ByteBuffer}, this converter use {@link JieIO#readReset(ByteBuffer)} to read and reset;
+     *         For {@link ByteBuffer}, this converter use {@link JieBuffer#readReset(ByteBuffer)} to read and reset;
      *     </li>
      *     <li>
      *         For {@link Date} and {@link TemporalAccessor}, this converter map them as milliseconds;
@@ -353,7 +354,7 @@ public class TypedConverters {
                 return new BigInteger((byte[]) source);
             }
             if (source instanceof ByteBuffer) {
-                return new BigInteger(JieIO.readReset((ByteBuffer) source));
+                return new BigInteger(JieBuffer.readReset((ByteBuffer) source));
             }
             if (source instanceof Character) {
                 char c = (Character) source;

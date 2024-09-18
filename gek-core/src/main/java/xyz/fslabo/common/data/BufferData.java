@@ -1,6 +1,7 @@
 package xyz.fslabo.common.data;
 
 import xyz.fslabo.common.base.JieCheck;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 
 import java.io.InputStream;
@@ -67,7 +68,7 @@ final class BufferData implements GekData.OfBuffer {
 
     @Override
     public int write(ByteBuffer dest, int length) {
-        return JieIO.readTo(buffer, dest, length);
+        return JieBuffer.readTo(buffer, dest, length);
     }
 
     @Override
@@ -85,7 +86,7 @@ final class BufferData implements GekData.OfBuffer {
         if (!buffer.hasRemaining()) {
             return null;
         }
-        return JieIO.read(buffer);
+        return JieBuffer.read(buffer);
     }
 
     @Override

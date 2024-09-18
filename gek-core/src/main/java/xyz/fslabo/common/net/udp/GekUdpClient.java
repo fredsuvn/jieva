@@ -2,7 +2,7 @@ package xyz.fslabo.common.net.udp;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
-import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.net.GekNetException;
 
 import java.io.IOException;
@@ -19,8 +19,7 @@ import java.util.function.Consumer;
 public interface GekUdpClient {
 
     /**
-     * Returns new builder of {@link GekUdpClient}.
-     * The returned builder is based on {@link DatagramSocket}.
+     * Returns new builder of {@link GekUdpClient}. The returned builder is based on {@link DatagramSocket}.
      *
      * @return new builder
      */
@@ -157,7 +156,7 @@ public interface GekUdpClient {
                 if (buffer.hasArray()) {
                     datagramPacket = new DatagramPacket(buffer.array(), buffer.arrayOffset(), buffer.remaining());
                 } else {
-                    byte[] bytes = JieIO.read(buffer);
+                    byte[] bytes = JieBuffer.read(buffer);
                     datagramPacket = new DatagramPacket(bytes, bytes.length);
                 }
                 datagramPacket.setSocketAddress(packet.getHeader().getInetSocketAddress());

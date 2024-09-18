@@ -1,6 +1,6 @@
 package xyz.fslabo.common.net.udp;
 
-import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieBuffer;
 
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
@@ -40,15 +40,14 @@ public interface GekUdpPacket {
     }
 
     /**
-     * Returns UDP header of given buffer and address.
-     * The given buffer will be read out by this method.
+     * Returns UDP header of given buffer and address. The given buffer will be read out by this method.
      *
      * @param buffer  given buffer
      * @param address given address
      * @return UDP packet
      */
     static GekUdpPacket of(ByteBuffer buffer, InetSocketAddress address) {
-        ByteBuffer data = ByteBuffer.wrap(JieIO.read(buffer));
+        ByteBuffer data = ByteBuffer.wrap(JieBuffer.read(buffer));
         return new GekUdpPacket() {
 
             @Override

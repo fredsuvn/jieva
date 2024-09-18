@@ -1,6 +1,7 @@
 package xyz.fslabo.common.codec;
 
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 
 import javax.crypto.Cipher;
@@ -263,8 +264,8 @@ public class JieCodec {
     }
 
     /**
-     * Encrypts/Decrypts with given {@link Cipher} from input buffer into output buffer.
-     * This method does not initialize the cipher, so it needs to be initialized before calling this method.
+     * Encrypts/Decrypts with given {@link Cipher} from input buffer into output buffer. This method does not initialize
+     * the cipher, so it needs to be initialized before calling this method.
      *
      * @param cipher    given {@link Cipher}
      * @param in        input buffer
@@ -282,7 +283,7 @@ public class JieCodec {
             int outSize = 0;
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
-                ByteBuffer r = JieIO.readSlice(in, inSize);
+                ByteBuffer r = JieBuffer.readSlice(in, inSize);
                 outSize += cipher.doFinal(r, out);
                 remaining -= inSize;
             }
@@ -293,8 +294,8 @@ public class JieCodec {
     }
 
     /**
-     * Encrypts/Decrypts with given {@link Cipher} from input buffer into output stream.
-     * This method does not initialize the cipher, so it needs to be initialized before calling this method.
+     * Encrypts/Decrypts with given {@link Cipher} from input buffer into output stream. This method does not initialize
+     * the cipher, so it needs to be initialized before calling this method.
      *
      * @param cipher    given {@link Cipher}
      * @param in        input buffer
@@ -317,7 +318,7 @@ public class JieCodec {
             long outSize = 0;
             while (remaining > 0) {
                 int inSize = Math.min(remaining, blockSize);
-                ByteBuffer r = JieIO.readSlice(in, inSize);
+                ByteBuffer r = JieBuffer.readSlice(in, inSize);
                 byte[] outBytes = doCipher(cipher, r);
                 if (outBytes != null) {
                     out.write(outBytes);
@@ -332,8 +333,8 @@ public class JieCodec {
     }
 
     /**
-     * Encrypts/Decrypts with given {@link Cipher} from input stream into output buffer.
-     * This method does not initialize the cipher, so it needs to be initialized before calling this method.
+     * Encrypts/Decrypts with given {@link Cipher} from input stream into output buffer. This method does not initialize
+     * the cipher, so it needs to be initialized before calling this method.
      *
      * @param cipher    given {@link Cipher}
      * @param in        input stream
@@ -374,8 +375,8 @@ public class JieCodec {
     }
 
     /**
-     * Encrypts/Decrypts with given {@link Cipher} from input stream into output stream.
-     * This method does not initialize the cipher, so it needs to be initialized before calling this method.
+     * Encrypts/Decrypts with given {@link Cipher} from input stream into output stream. This method does not initialize
+     * the cipher, so it needs to be initialized before calling this method.
      *
      * @param cipher    given {@link Cipher}
      * @param in        input stream
@@ -419,10 +420,9 @@ public class JieCodec {
     }
 
     /**
-     * Encrypts/Decrypts with given {@link Cipher} from input buffer into an array and returns.
-     * If input is ended without any byte read, return null.
-     * This method will encrypt/decrypt all the data at once without blocking.
-     * This method does not initialize the cipher, so it needs to be initialized before calling this method.
+     * Encrypts/Decrypts with given {@link Cipher} from input buffer into an array and returns. If input is ended
+     * without any byte read, return null. This method will encrypt/decrypt all the data at once without blocking. This
+     * method does not initialize the cipher, so it needs to be initialized before calling this method.
      *
      * @param cipher given {@link Cipher}
      * @param in     input buffer
@@ -438,7 +438,7 @@ public class JieCodec {
             if (in.hasArray()) {
                 return cipher.doFinal(in.array(), in.arrayOffset() + in.position(), in.remaining());
             }
-            byte[] inBytes = JieIO.read(in);
+            byte[] inBytes = JieBuffer.read(in);
             return cipher.doFinal(inBytes);
         } catch (Exception e) {
             throw new CodecException(e);
@@ -446,10 +446,9 @@ public class JieCodec {
     }
 
     /**
-     * Encrypts/Decrypts with given {@link Cipher} from input stream into an array and returns.
-     * If input is ended without any byte read, return null.
-     * This method will encrypt/decrypt all the data at once without blocking.
-     * This method does not initialize the cipher, so it needs to be initialized before calling this method.
+     * Encrypts/Decrypts with given {@link Cipher} from input stream into an array and returns. If input is ended
+     * without any byte read, return null. This method will encrypt/decrypt all the data at once without blocking. This
+     * method does not initialize the cipher, so it needs to be initialized before calling this method.
      *
      * @param cipher given {@link Cipher}
      * @param in     input stream
@@ -470,8 +469,8 @@ public class JieCodec {
     }
 
     /**
-     * Digests with given {@link MessageDigest} from input buffer, and return digest result.
-     * This method does not initialize the digest, so it needs to be initialized before calling this method.
+     * Digests with given {@link MessageDigest} from input buffer, and return digest result. This method does not
+     * initialize the digest, so it needs to be initialized before calling this method.
      *
      * @param digest given {@link MessageDigest}
      * @param in     input buffer
@@ -488,8 +487,8 @@ public class JieCodec {
     }
 
     /**
-     * Digests with given {@link MessageDigest} from input stream, and return digest result.
-     * This method does not initialize the digest, so it needs to be initialized before calling this method.
+     * Digests with given {@link MessageDigest} from input stream, and return digest result. This method does not
+     * initialize the digest, so it needs to be initialized before calling this method.
      *
      * @param digest given {@link MessageDigest}
      * @param in     input stream
@@ -497,12 +496,12 @@ public class JieCodec {
      * @throws CodecException codec exception
      */
     public static byte[] doDigest(MessageDigest digest, InputStream in) throws CodecException {
-        return doDigest(digest, in, JieIO.IO_BUFFER_SIZE);
+        return doDigest(digest, in, JieIO.BUFFER_SIZE);
     }
 
     /**
-     * Digests with given {@link MessageDigest} from input stream, and return digest result.
-     * This method does not initialize the digest, so it needs to be initialized before calling this method.
+     * Digests with given {@link MessageDigest} from input stream, and return digest result. This method does not
+     * initialize the digest, so it needs to be initialized before calling this method.
      *
      * @param digest     given {@link MessageDigest}
      * @param in         input stream
@@ -537,8 +536,8 @@ public class JieCodec {
     }
 
     /**
-     * Generates MAC with given {@link Mac} from input buffer, and return MAC result.
-     * This method does not initialize the mac, so it needs to be initialized before calling this method.
+     * Generates MAC with given {@link Mac} from input buffer, and return MAC result. This method does not initialize
+     * the mac, so it needs to be initialized before calling this method.
      *
      * @param mac given {@link Mac}
      * @param in  input buffer
@@ -555,8 +554,8 @@ public class JieCodec {
     }
 
     /**
-     * Generates MAC with given {@link Mac} from input stream, and return MAC result.
-     * This method does not initialize the mac, so it needs to be initialized before calling this method.
+     * Generates MAC with given {@link Mac} from input stream, and return MAC result. This method does not initialize
+     * the mac, so it needs to be initialized before calling this method.
      *
      * @param mac given {@link Mac}
      * @param in  input stream
@@ -564,12 +563,12 @@ public class JieCodec {
      * @throws CodecException codec exception
      */
     public static byte[] doMac(Mac mac, InputStream in) throws CodecException {
-        return doMac(mac, in, JieIO.IO_BUFFER_SIZE);
+        return doMac(mac, in, JieIO.BUFFER_SIZE);
     }
 
     /**
-     * Generates MAC with given {@link Mac} from input stream, and return MAC result.
-     * This method does not initialize the mac, so it needs to be initialized before calling this method.
+     * Generates MAC with given {@link Mac} from input stream, and return MAC result. This method does not initialize
+     * the mac, so it needs to be initialized before calling this method.
      *
      * @param mac        given {@link Mac}
      * @param in         input stream
@@ -604,8 +603,8 @@ public class JieCodec {
     }
 
     /**
-     * Generates signature with given {@link Signature} from input buffer, and return signature result.
-     * This method does not initialize the sign, so it needs to be initialized before calling this method.
+     * Generates signature with given {@link Signature} from input buffer, and return signature result. This method does
+     * not initialize the sign, so it needs to be initialized before calling this method.
      *
      * @param sign given {@link Signature}
      * @param in   input buffer
@@ -622,8 +621,8 @@ public class JieCodec {
     }
 
     /**
-     * Generates signature with given {@link Signature} from input stream, and return signature result.
-     * This method does not initialize the sign, so it needs to be initialized before calling this method.
+     * Generates signature with given {@link Signature} from input stream, and return signature result. This method does
+     * not initialize the sign, so it needs to be initialized before calling this method.
      *
      * @param sign given {@link Signature}
      * @param in   input stream
@@ -631,12 +630,12 @@ public class JieCodec {
      * @throws CodecException codec exception
      */
     public static byte[] doSign(Signature sign, InputStream in) throws CodecException {
-        return doSign(sign, in, JieIO.IO_BUFFER_SIZE);
+        return doSign(sign, in, JieIO.BUFFER_SIZE);
     }
 
     /**
-     * Generates signature with given {@link Signature} from input stream, and return signature result.
-     * This method does not initialize the sign, so it needs to be initialized before calling this method.
+     * Generates signature with given {@link Signature} from input stream, and return signature result. This method does
+     * not initialize the sign, so it needs to be initialized before calling this method.
      *
      * @param sign       given {@link Signature}
      * @param in         input stream
@@ -672,8 +671,8 @@ public class JieCodec {
     }
 
     /**
-     * Verifies signature with given {@link Signature} from input buffer and signature.
-     * This method does not initialize the sign, so it needs to be initialized before calling this method.
+     * Verifies signature with given {@link Signature} from input buffer and signature. This method does not initialize
+     * the sign, so it needs to be initialized before calling this method.
      *
      * @param sign      given {@link Signature}
      * @param in        input buffer
@@ -691,8 +690,8 @@ public class JieCodec {
     }
 
     /**
-     * Verifies signature with given {@link Signature} from input stream and signature.
-     * This method does not initialize the sign, so it needs to be initialized before calling this method.
+     * Verifies signature with given {@link Signature} from input stream and signature. This method does not initialize
+     * the sign, so it needs to be initialized before calling this method.
      *
      * @param sign      given {@link Signature}
      * @param in        input stream
@@ -701,12 +700,12 @@ public class JieCodec {
      * @throws CodecException codec exception
      */
     public static boolean doVerify(Signature sign, InputStream in, byte[] signature) throws CodecException {
-        return doVerify(sign, in, JieIO.IO_BUFFER_SIZE, signature);
+        return doVerify(sign, in, JieIO.BUFFER_SIZE, signature);
     }
 
     /**
-     * Verifies signature with given {@link Signature} from input buffer and signature.
-     * This method does not initialize the sign, so it needs to be initialized before calling this method.
+     * Verifies signature with given {@link Signature} from input buffer and signature. This method does not initialize
+     * the sign, so it needs to be initialized before calling this method.
      *
      * @param sign       given {@link Signature}
      * @param in         input stream

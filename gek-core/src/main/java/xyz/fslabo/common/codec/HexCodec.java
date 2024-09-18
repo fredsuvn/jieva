@@ -1,6 +1,7 @@
 package xyz.fslabo.common.codec;
 
 import xyz.fslabo.common.base.JieChars;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 
 import java.io.IOException;
@@ -68,7 +69,7 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
     public HexCodec reset() {
         this.input = null;
         this.output = null;
-        this.blockSize = JieIO.IO_BUFFER_SIZE;
+        this.blockSize = JieIO.BUFFER_SIZE;
         this.mode = ENCODE_MODE;
         return this;
     }
@@ -350,7 +351,7 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
             return (byte[]) input;
         }
         if (input instanceof ByteBuffer) {
-            return JieIO.read((ByteBuffer) input);
+            return JieBuffer.read((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return JieIO.read((InputStream) input);

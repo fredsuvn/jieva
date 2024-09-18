@@ -4,6 +4,7 @@ import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.GekNetException;
 import xyz.fslabo.common.net.GekServerStates;
@@ -24,9 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
- * UDP server interface.
- * The implementation should use {@link GekUdpPacket} to represents datagram packet of UDP.
- * And should support following types of callback handler:
+ * UDP server interface. The implementation should use {@link GekUdpPacket} to represents datagram packet of UDP. And
+ * should support following types of callback handler:
  * <ul>
  *     <li>
  *         one {@link GekUdpServerHandler}: to callback for server events;
@@ -42,8 +42,7 @@ import java.util.function.Consumer;
 public interface GekUdpServer extends GekUdpClient {
 
     /**
-     * Returns new builder of {@link GekUdpServer}.
-     * The returned builder is based on {@link DatagramSocket}.
+     * Returns new builder of {@link GekUdpServer}. The returned builder is based on {@link DatagramSocket}.
      *
      * @return new builder
      */
@@ -52,8 +51,8 @@ public interface GekUdpServer extends GekUdpClient {
     }
 
     /**
-     * Starts this server and wait until the server and all connections have been closed.
-     * This method is equivalent to {@link #start(boolean)}:
+     * Starts this server and wait until the server and all connections have been closed. This method is equivalent to
+     * {@link #start(boolean)}:
      * <pre>
      *     start(true);
      * </pre>
@@ -63,9 +62,8 @@ public interface GekUdpServer extends GekUdpClient {
     }
 
     /**
-     * Starts this server.
-     * If given {@code block} is true, this method will block current thread until
-     * the server and all connections have been closed.
+     * Starts this server. If given {@code block} is true, this method will block current thread until the server and
+     * all connections have been closed.
      *
      * @param block whether block current thread
      */
@@ -151,7 +149,7 @@ public interface GekUdpServer extends GekUdpClient {
         private final List<GekUdpPacketHandler<?>> packetHandlers = new LinkedList<>();
         private @Nullable GekUdpServerHandler serverHandler;
         private @Nullable ExecutorService executor;
-        private int packetBufferSize = JieIO.IO_BUFFER_SIZE;
+        private int packetBufferSize = JieIO.BUFFER_SIZE;
 
         /**
          * Sets local port, maybe 0 to get an available one from system.
@@ -317,7 +315,7 @@ public interface GekUdpServer extends GekUdpClient {
                 if (buffer.hasArray()) {
                     datagramPacket = new DatagramPacket(buffer.array(), buffer.arrayOffset(), buffer.remaining());
                 } else {
-                    byte[] bytes = JieIO.read(buffer);
+                    byte[] bytes = JieBuffer.read(buffer);
                     datagramPacket = new DatagramPacket(bytes, bytes.length);
                 }
                 datagramPacket.setSocketAddress(packet.getHeader().getInetSocketAddress());
@@ -374,7 +372,7 @@ public interface GekUdpServer extends GekUdpClient {
                 } catch (GekNetException e) {
                     throw e;
                 } catch (InterruptedException e) {
-                    //do nothing
+                    // do nothing
                 } catch (Exception e) {
                     throw new GekNetException(e);
                 } finally {
@@ -469,7 +467,7 @@ public interface GekUdpServer extends GekUdpClient {
                                 }
                             });
                         } catch (Throwable e) {
-                            //Ensure the loop continue
+                            // Ensure the loop continue
                         }
                     }
                     while (packetCounter.get() > 0) {
@@ -498,7 +496,7 @@ public interface GekUdpServer extends GekUdpClient {
                 if (!buffer.hasRemaining()) {
                     return EMPTY_BUFFER;
                 }
-                return ByteBuffer.wrap(JieIO.read(buffer)).asReadOnlyBuffer();
+                return ByteBuffer.wrap(JieBuffer.read(buffer)).asReadOnlyBuffer();
             }
         }
     }

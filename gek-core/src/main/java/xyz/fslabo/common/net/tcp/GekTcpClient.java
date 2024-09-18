@@ -5,6 +5,7 @@ import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.data.GekData;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.GekNetException;
 import xyz.fslabo.common.net.GekServerStates;
@@ -42,8 +43,7 @@ import java.util.function.IntFunction;
 public interface GekTcpClient extends GekTcpEndpoint {
 
     /**
-     * Returns new builder of {@link GekTcpClient}.
-     * The returned builder is based on {@link Socket}.
+     * Returns new builder of {@link GekTcpClient}. The returned builder is based on {@link Socket}.
      *
      * @return new builder
      */
@@ -52,8 +52,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
     }
 
     /**
-     * Starts this client and blocks until the client has been closed.
-     * Connection timeout is 30 seconds.
+     * Starts this client and blocks until the client has been closed. Connection timeout is 30 seconds.
      *
      * @param address address of target endpoint
      */
@@ -62,8 +61,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
     }
 
     /**
-     * Starts this client and blocks until the client has been closed.
-     * Connection timeout is 30 seconds.
+     * Starts this client and blocks until the client has been closed. Connection timeout is 30 seconds.
      *
      * @param host host name of target endpoint
      * @param port port of target endpoint
@@ -101,7 +99,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
         private @Nullable InetAddress address;
         private @Nullable GekTcpClientHandler clientHandler;
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;
-        private int channelBufferSize = JieIO.IO_BUFFER_SIZE;
+        private int channelBufferSize = JieIO.BUFFER_SIZE;
         private @Nullable Consumer<Socket> socketConfig;
         private @Nullable Proxy proxy;
 
@@ -176,9 +174,8 @@ public interface GekTcpClient extends GekTcpEndpoint {
         }
 
         /**
-         * Sets byte buffer generator: given an int returns a byte buffer with the int length.
-         * The generated buffer's position must be 0, and limit must be capacity.
-         * *
+         * Sets byte buffer generator: given an int returns a byte buffer with the int length. The generated buffer's
+         * position must be 0, and limit must be capacity. *
          *
          * @param bufferGenerator byte buffer generator
          * @return this builder
@@ -318,7 +315,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
                 } catch (GekNetException e) {
                     throw e;
                 } catch (InterruptedException e) {
-                    //do nothing
+                    // do nothing
                 } catch (Exception e) {
                     throw new GekNetException(e);
                 } finally {
@@ -420,7 +417,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
 
             private void doChannel(ChannelImpl channel) {
                 byte[] newBytes = channel.availableOrClosed();
-                //null means channel closed or error
+                // null means channel closed or error
                 if (newBytes == null) {
                     return;
                 }
@@ -555,7 +552,7 @@ public interface GekTcpClient extends GekTcpEndpoint {
                     if (data.hasArray()) {
                         send(data.array(), data.arrayOffset(), data.remaining());
                     } else {
-                        send(JieIO.read(data));
+                        send(JieBuffer.read(data));
                     }
                 }
 

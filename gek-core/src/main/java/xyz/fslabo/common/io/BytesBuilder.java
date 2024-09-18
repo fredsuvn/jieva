@@ -76,7 +76,7 @@ public class BytesBuilder extends ByteArrayOutputStream {
             write(bytes.array(), bytes.arrayOffset() + bytes.position(), bytes.remaining());
             bytes.position(bytes.position() + bytes.remaining());
         } else {
-            byte[] remaining = JieIO.read(bytes);
+            byte[] remaining = JieBuffer.read(bytes);
             write(remaining, 0, remaining.length);
         }
         return this;

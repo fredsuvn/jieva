@@ -5,6 +5,7 @@ import xyz.fslabo.annotations.ThreadSafe;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.data.GekData;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
 import xyz.fslabo.common.net.GekNetException;
 import xyz.fslabo.common.net.GekNetServerException;
@@ -25,9 +26,9 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 
 /**
- * TCP/IP server interface, server endpoint of {@link GekTcpEndpoint}.
- * The implementation should use {@link GekTcpChannel} to represents connection between server and remote endpoints.
- * And should support following types of callback handler:
+ * TCP/IP server interface, server endpoint of {@link GekTcpEndpoint}. The implementation should use
+ * {@link GekTcpChannel} to represents connection between server and remote endpoints. And should support following
+ * types of callback handler:
  * <ul>
  *     <li>
  *         one {@link GekTcpServerHandler}: to callback for server events;
@@ -43,8 +44,7 @@ import java.util.function.IntFunction;
 public interface GekTcpServer extends GekTcpEndpoint {
 
     /**
-     * Returns new builder of {@link GekTcpServer}.
-     * The returned builder is based on {@link ServerSocket}.
+     * Returns new builder of {@link GekTcpServer}. The returned builder is based on {@link ServerSocket}.
      *
      * @return new builder
      */
@@ -53,8 +53,8 @@ public interface GekTcpServer extends GekTcpEndpoint {
     }
 
     /**
-     * Starts this server and wait until the server and all connections have been closed.
-     * This method is equivalent to {@link #start(boolean)}:
+     * Starts this server and wait until the server and all connections have been closed. This method is equivalent to
+     * {@link #start(boolean)}:
      * <pre>
      *     start(true);
      * </pre>
@@ -64,9 +64,8 @@ public interface GekTcpServer extends GekTcpEndpoint {
     }
 
     /**
-     * Starts this server.
-     * If given {@code block} is true, this method will block current thread until
-     * the server and all connections have been closed.
+     * Starts this server. If given {@code block} is true, this method will block current thread until the server and
+     * all connections have been closed.
      *
      * @param block whether block current thread
      */
@@ -95,7 +94,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
         private @Nullable GekTcpServerHandler serverHandler;
         private @Nullable IntFunction<ByteBuffer> bufferGenerator;
         private @Nullable ExecutorService executor;
-        private int channelBufferSize = JieIO.IO_BUFFER_SIZE;
+        private int channelBufferSize = JieIO.BUFFER_SIZE;
         private @Nullable Consumer<ServerSocket> socketConfig;
 
         /**
@@ -180,8 +179,8 @@ public interface GekTcpServer extends GekTcpEndpoint {
         }
 
         /**
-         * Sets byte buffer generator: given an int returns a byte buffer with the int length.
-         * The generated buffer's position must be 0, and limit must be capacity.
+         * Sets byte buffer generator: given an int returns a byte buffer with the int length. The generated buffer's
+         * position must be 0, and limit must be capacity.
          *
          * @param bufferGenerator byte buffer generator
          * @return this builder
@@ -333,7 +332,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                 } catch (GekNetException e) {
                     throw e;
                 } catch (InterruptedException e) {
-                    //do nothing
+                    // do nothing
                 } catch (Exception e) {
                     throw new GekNetException(e);
                 } finally {
@@ -426,7 +425,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                             }
                             channels.add(channel);
                         } catch (Throwable e) {
-                            //Ensure the loop continue
+                            // Ensure the loop continue
                         }
                     }
                     outAcceptLoop = true;
@@ -468,7 +467,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                                     });
                                 }
                             } catch (Throwable e) {
-                                //Ensure the loop continue
+                                // Ensure the loop continue
                             }
                         }
                         if (outAcceptLoop && serverSocket.isClosed() && channels.isEmpty()) {
@@ -486,7 +485,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                 }
                 byte[] newBytes = channel.availableOrClosed();
                 if (newBytes == null) {
-                    //null means channel closed or error
+                    // null means channel closed or error
                     try {
                         channel.closeNow();
                         compactBuffer(channel);
@@ -637,7 +636,7 @@ public interface GekTcpServer extends GekTcpEndpoint {
                     if (data.hasArray()) {
                         send(data.array(), data.arrayOffset(), data.remaining());
                     } else {
-                        send(JieIO.read(data));
+                        send(JieBuffer.read(data));
                     }
                 }
 

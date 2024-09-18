@@ -1,7 +1,7 @@
 package xyz.fslabo.common.net.tcp.handlers;
 
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.net.tcp.GekTcpChannel;
 import xyz.fslabo.common.net.tcp.GekTcpChannelHandler;
 
@@ -15,19 +15,19 @@ import java.util.function.IntFunction;
  * <pre>
  *     buffer -&gt; data1data2data3..
  * </pre>
- * The returned object of {@link #onMessage(GekTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;,
- * each byte buffer is split in:
+ * The returned object of {@link #onMessage(GekTcpChannel, ByteBuffer)} is {@link List}&lt;{@link ByteBuffer}&gt;, each
+ * byte buffer is split in:
  * <ul>
  *     <li>
  *         Fixed length: created by {@link #LengthBasedTcpChannelHandler(int)}
  *         or {@link #LengthBasedTcpChannelHandler(int, IntFunction)},
- *         to split in fixed length with {@link JieIO#split(ByteBuffer, int)}
+ *         to split in fixed length with {@link JieBuffer#split(ByteBuffer, int)}
  *         and make returned buffers readonly;
  *     </li>
  *     <li>
  *         Specified length: created by {@link #LengthBasedTcpChannelHandler(int, int)}
  *         or {@link #LengthBasedTcpChannelHandler(int, int, IntFunction)},
- *         to split in specified length with {@link JieIO#split(ByteBuffer, int, int)}
+ *         to split in specified length with {@link JieBuffer#split(ByteBuffer, int, int)}
  *         and make returned buffers readonly;
  *     </li>
  * </ul>
@@ -62,7 +62,8 @@ public class LengthBasedTcpChannelHandler implements GekTcpChannelHandler<ByteBu
     }
 
     /**
-     * Constructs with given length offset, length size and using {@link ByteBuffer#allocate(int)} to create new buffer.
+     * Constructs with given length offset, length size and using {@link ByteBuffer#allocate(int)} to create new
+     * buffer.
      *
      * @param lengthOffset given length offset
      * @param lengthSize   given length size
@@ -93,12 +94,12 @@ public class LengthBasedTcpChannelHandler implements GekTcpChannelHandler<ByteBu
     }
 
     private @Nullable Object onFixed(GekTcpChannel channel, ByteBuffer message) {
-        List<ByteBuffer> result = JieIO.split(message, lengthOffset, generator);
+        List<ByteBuffer> result = JieBuffer.split(message, lengthOffset, generator);
         return result.isEmpty() ? null : asReadOnly(result);
     }
 
     private @Nullable Object onSpecified(GekTcpChannel channel, ByteBuffer message) {
-        List<ByteBuffer> result = JieIO.split(message, lengthOffset, lengthSize, generator);
+        List<ByteBuffer> result = JieBuffer.split(message, lengthOffset, lengthSize, generator);
         return result.isEmpty() ? null : asReadOnly(result);
     }
 

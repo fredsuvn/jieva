@@ -36,7 +36,7 @@ final class AppendableOutputStream extends OutputStream {
     }
 
     AppendableOutputStream(Appendable appendable, Charset charset) {
-        this(appendable, charset, JieIO.IO_BUFFER_SIZE);
+        this(appendable, charset, JieIO.BUFFER_SIZE);
     }
 
     @Override
