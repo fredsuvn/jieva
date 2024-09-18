@@ -2,7 +2,6 @@ package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
-import xyz.fslabo.common.coll.CollBuilder;
 import xyz.fslabo.common.coll.JieArray;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.mapping.BeanMapper;
@@ -728,15 +727,5 @@ public class Jie {
     @SafeVarargs
     public static <K, V, T> LinkedHashMap<K, V> linkedHashMap(T... elements) {
         return JieColl.putAll(new LinkedHashMap<>(), elements);
-    }
-
-    /**
-     * Returns a new collection builder.
-     *
-     * @return a new collection builder
-     * @see CollBuilder#newBuilder()
-     */
-    public static CollBuilder collBuilder() {
-        return CollBuilder.newBuilder();
     }
 }

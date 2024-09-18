@@ -165,7 +165,7 @@ public abstract class AbstractBeanResolverHandler implements BeanResolver.Handle
             return type;
         }
         stack.clear();
-        Type result = JieColl.getNested(typeParameterMapping, type, stack);
+        Type result = JieColl.getRecursive(typeParameterMapping, type, stack);
         if (result != null) {
             return result;
         }

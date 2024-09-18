@@ -6,6 +6,7 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.coll.JieColl;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class CollTest {
 
@@ -168,18 +169,64 @@ public class CollTest {
 
     @Test
     public void testEnumeration() {
-        Assert.assertEquals(JieColl.asIterable(null),Collections.emptyList());
+        Assert.assertEquals(JieColl.asIterable(null), Collections.emptyList());
         Enumeration<Integer> enumeration = JieColl.asEnumeration(Jie.list(1, 2, 3));
-        Assert.assertEquals(enumeration.nextElement(),1);
-        Assert.assertEquals(enumeration.nextElement(),2);
-        Assert.assertEquals(enumeration.nextElement(),3);
+        Assert.assertEquals(enumeration.nextElement(), 1);
+        Assert.assertEquals(enumeration.nextElement(), 2);
+        Assert.assertEquals(enumeration.nextElement(), 3);
         Assert.assertFalse(enumeration.hasMoreElements());
         Iterable<Integer> iterable = JieColl.asIterable(JieColl.asEnumeration(Jie.list(1, 2, 3)));
         Iterator<Integer> iterator = iterable.iterator();
-        Assert.assertEquals(iterator.next(),1);
-        Assert.assertEquals(iterator.next(),2);
-        Assert.assertEquals(iterator.next(),3);
+        Assert.assertEquals(iterator.next(), 1);
+        Assert.assertEquals(iterator.next(), 2);
+        Assert.assertEquals(iterator.next(), 3);
         Assert.assertFalse(iterator.hasNext());
+        Assert.assertEquals(JieColl.asIterable(JieColl.asEnumeration(null)), Collections.emptyList());
+        Assert.expectThrows(NoSuchElementException.class, () -> JieColl.asEnumeration(null).nextElement());
+    }
+
+    @Test
+    public void testStream() {
+        Assert.assertEquals(JieColl.stream(Jie.array()).toArray(), Stream.empty().toArray());
+        Assert.assertEquals(JieColl.stream(Jie.list()).toArray(), Stream.empty().toArray());
+    }
+
+    @Test
+    public void testGet() {
+        Assert.assertEquals(JieColl.get(Jie.list(1, 2, null), 1, 6), 2);
+        Assert.assertEquals(JieColl.get(Jie.list(1, 2, null), -1, 6), 6);
+        Assert.assertEquals(JieColl.get(Jie.list(1, 2, null), 100, 6), 6);
+        Assert.assertEquals(JieColl.get(Jie.list(1, 2, null), 2, 6), 6);
+        Assert.assertEquals(JieColl.get(iterable(1, 2, null), 1, 6), 2);
+        Assert.assertEquals(JieColl.get(iterable(1, 2, null), -1, 6), 6);
+        Assert.assertEquals(JieColl.get(iterable(1, 2, null), 100, 6), 6);
+        Assert.assertEquals(JieColl.get(iterable(1, 2, null), 2, 6), 6);
+        Assert.assertEquals(JieColl.get((List<Integer>) null, 1, 6), 6);
+
+        Assert.assertEquals(JieColl.get(Jie.map(1, 2, 3), 1, 6), 2);
+        Assert.assertEquals(JieColl.get(Jie.map(1, 2, null), -1, 6), 6);
+        Assert.assertEquals(JieColl.get((Map<Integer, Integer>) null, 1, 6), 6);
+    }
+
+    @Test
+    public void testNestedGet() {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(1, 2);
+        map.put(2, 3);
+        map.put(10, 11);
+        map.put(11, 10);
+        map.put(20, 20);
+        map.put(6, 7);
+        map.put(7, 8);
+        map.put(8, 9);
+        map.put(9, 8);
+        Assert.assertEquals(JieColl.getRecursive(map, 1, new HashSet<>()), 3);
+        Assert.assertEquals(JieColl.getRecursive(map, 2, new HashSet<>()), 3);
+        Assert.assertEquals(JieColl.getRecursive(map, 3, new HashSet<>()), null);
+        Assert.assertEquals(JieColl.getRecursive(map, 10, new HashSet<>()), 11);
+        Assert.assertEquals(JieColl.getRecursive(map, 20, new HashSet<>()), 20);
+        Assert.assertEquals(JieColl.getRecursive(map, 6, new HashSet<>()), 9);
+        Assert.expectThrows(IllegalStateException.class, () -> JieColl.getRecursive(map, 6, new HashSet<>(), true));
     }
 
     private <T> Iterable<T> iterable(T... array) {

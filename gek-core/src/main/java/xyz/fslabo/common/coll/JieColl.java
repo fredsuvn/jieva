@@ -4,9 +4,9 @@ import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -78,7 +78,7 @@ public class JieColl {
      */
     @Immutable
     public static <T> List<T> asImmutableList(T[] elements) {
-        return JieArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements);
+        return JieArray.isEmpty(elements) ? Collections.emptyList() : Impls.immutableList(elements);
     }
 
     /**
@@ -143,7 +143,7 @@ public class JieColl {
             }
             i++;
         }
-        throw new UnsupportedOperationException(Constants.UNABLE_NULL_TYPE);
+        throw new UnsupportedOperationException(Impls.UNABLE_NULL_TYPE);
     }
 
     private static <T> T[] toArray0(T[] array, int start, Iterator<T> elements) {
@@ -197,7 +197,7 @@ public class JieColl {
      */
     @Immutable
     public static <T> List<T> toList(T[] elements) {
-        return JieArray.isEmpty(elements) ? Collections.emptyList() : new ImmutableList<>(elements.clone());
+        return JieArray.isEmpty(elements) ? Collections.emptyList() : Impls.immutableList(elements.clone());
     }
 
     /**
@@ -212,7 +212,7 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptyList();
         }
-        return new ImmutableList<>(toObjectArray(elements));
+        return Impls.immutableList(toObjectArray(elements));
     }
 
     /**
@@ -231,7 +231,7 @@ public class JieColl {
         if (JieArray.isEmpty(elements)) {
             return Collections.emptyList();
         }
-        return new ImmutableList<>(stream(elements).map(mapper).toArray());
+        return Impls.immutableList(stream(elements).map(mapper).toArray());
     }
 
     /**
@@ -250,7 +250,7 @@ public class JieColl {
         if (isEmpty(elements)) {
             return Collections.emptyList();
         }
-        return new ImmutableList<>(stream(elements).map(mapper).toArray());
+        return Impls.immutableList(stream(elements).map(mapper).toArray());
     }
 
     /**
@@ -884,8 +884,10 @@ public class JieColl {
      * @return given iterable as an {@link Enumeration}
      */
     public static <T> Enumeration<T> asEnumeration(@Nullable Iterable<? extends T> iterable) {
+        Vector<String> v = new Vector<>();
+        v.elements();
         if (iterable == null) {
-            return Jie.as(EmptyEnumeration.INSTANCE);
+            return Jie.as(Impls.emptyEnumeration());
         }
         return new Enumeration<T>() {
 
@@ -893,12 +895,12 @@ public class JieColl {
 
             @Override
             public boolean hasMoreElements() {
-                return iterator.hasNext();
+                return iterator().hasNext();
             }
 
             @Override
             public T nextElement() {
-                return iterator.next();
+                return iterator().next();
             }
 
             private Iterator<? extends T> iterator() {
@@ -967,35 +969,85 @@ public class JieColl {
     }
 
     /**
-     * Nested get value from given map with given key.
+     * Recursively get value from given map with given key.
      * <p>
-     * This method gets value of given key, then let the value as next key to find next value and keep looping. If last
-     * value as key cannot find next value (return null by {@link Map#get(Object)}), the last value will be returned. If
-     * given key cannot find at least one value, or a same value in the given stack (which will cause an infinite loop),
-     * return null.
+     * This method gets value of given key (by {@link Map#get(Object)}), then let the value as next key to find next
+     * value and keep looping. If last value as key cannot find next value (returns {@code null}), the last value will
+     * be returned. For example:
+     * <pre>
+     *     map.put(1, 2);
+     *     map.put(2, 3);
+     *     assertEquals(JieColl.getNested(map, 1, new HashSet<>()), 3)
+     * </pre>
+     * <p>
+     * If given key cannot find at least one value, or a same value in the given stack (which will cause an infinite
+     * loop), this method will return {@code null}. It is equivalent to
+     * ({@link #getRecursive(Map, Object, Set, boolean)}):
+     * <pre>
+     *     return getRecursive(map, key, stack, false);
+     * </pre>
      *
      * @param map   given map
      * @param key   given key
      * @param stack stack to store the historical values
      * @param <T>   type of element
      * @return nested value from given map with given key
+     * @throws IllegalStateException if in an infinite loop and {@code throwLoop} is true
      */
     @Nullable
-    public static <T> T getNested(Map<?, T> map, T key, Set<T> stack) {
-        T cur = key;
-        stack.add(cur);
+    public static <T> T getRecursive(Map<?, T> map, T key, Set<T> stack) {
+        return getRecursive(map, key, stack, false);
+    }
+
+    /**
+     * Recursively get value from given map with given key.
+     * <p>
+     * This method gets value of given key (by {@link Map#get(Object)}), then let the value as next key to find next
+     * value and keep looping. If last value as key cannot find next value (returns {@code null}), the last value will
+     * be returned. For example:
+     * <pre>
+     *     map.put(1, 2);
+     *     map.put(2, 3);
+     *     assertEquals(JieColl.getNested(map, 1, new HashSet<>(), false), 3)
+     * </pre>
+     * <p>
+     * If given key cannot find at least one value, or a same value in the given stack (which will cause an infinite
+     * loop), this method will throw an {@link IllegalStateException} if {@code throwLoop}, else return last found
+     * value.
+     *
+     * @param map       given map
+     * @param key       given key
+     * @param stack     stack to store the historical values
+     * @param throwLoop whether throws {@link IllegalStateException} if searching in an infinite loop
+     * @param <T>       type of element
+     * @return nested value from given map with given key
+     * @throws IllegalStateException if in an infinite loop and {@code throwLoop} is true
+     */
+    @Nullable
+    public static <T> T getRecursive(Map<?, T> map, T key, Set<T> stack, boolean throwLoop) throws IllegalStateException {
+        T first = map.get(key);
+        if (Objects.equals(first, key)) {
+            return first;
+        }
+        stack.add(first);
+        T curKey = first;
+        T last = first;
         while (true) {
-            T result = map.get(cur);
-            if (result == null || stack.contains(result)) {
-                break;
+            T result = map.get(curKey);
+            if (result == null) {
+                return last;
             }
-            cur = result;
-            stack.add(cur);
+            if (Objects.equals(key, result) || stack.contains(result)) {
+                if (throwLoop) {
+                    throw new IllegalStateException("Searching in an infinite loop: "
+                        + (key + "->" + stack.stream().map(String::valueOf).collect(Collectors.joining("->"))));
+                }
+                return last;
+            }
+            stack.add(result);
+            last = result;
+            curKey = result;
         }
-        if (Objects.equals(key, cur)) {
-            return null;
-        }
-        return cur;
     }
 
     /**
@@ -1027,99 +1079,5 @@ public class JieColl {
             return ((Collection<T>) elements).stream();
         }
         return StreamSupport.stream(elements.spliterator(), false);
-    }
-
-    private static final class ImmutableList<T> extends AbstractList<T> implements RandomAccess, Serializable {
-
-        private final Object[] array;
-
-        private ImmutableList(Object[] array) {
-            this.array = array;
-        }
-
-        @Override
-        public T get(int index) {
-            return Jie.as(array[index]);
-        }
-
-        @Override
-        public int size() {
-            return array.length;
-        }
-    }
-
-    // private static final class ImmutableSet<T> extends AbstractSet<T> implements Serializable {
-    //
-    //     private final Object[] array;
-    //
-    //     private ImmutableSet(Object[] array, boolean distinct) {
-    //         if (distinct) {
-    //             this.array = Arrays.stream(array).distinct().toArray();
-    //         } else {
-    //             this.array = array;
-    //         }
-    //     }
-    //
-    //     @Override
-    //     public Iterator<T> iterator() {
-    //         return new ImmutableIterator();
-    //     }
-    //
-    //     @Override
-    //     public int size() {
-    //         return array.length;
-    //     }
-    //
-    //     private final class ImmutableIterator implements Iterator<T> {
-    //
-    //         private int i = 0;
-    //
-    //         @Override
-    //         public boolean hasNext() {
-    //             return i < array.length;
-    //         }
-    //
-    //         @Override
-    //         public T next() {
-    //             return Jie.as(array[i++]);
-    //         }
-    //     }
-    // }
-
-    // private static final class ImmutableMap<K, V> extends AbstractMap<K, V> implements Serializable {
-    //
-    //     private final Set<Entry<K, V>> entries;
-    //
-    //     private ImmutableMap(Object[] array) {
-    //         if (array.length < 2) {
-    //             entries = Collections.emptySet();
-    //             return;
-    //         }
-    //         Map<K, V> map = addAll(new LinkedHashMap<>(), array);
-    //         entries = new ImmutableSet<>(
-    //             map.entrySet().stream().map(it -> new SimpleImmutableEntry<>(it.getKey(), it.getValue())).toArray(),
-    //             false
-    //         );
-    //     }
-    //
-    //     @Override
-    //     public Set<Entry<K, V>> entrySet() {
-    //         return entries;
-    //     }
-    // }
-
-    private static final class EmptyEnumeration implements Enumeration<Object> {
-
-        private static final EmptyEnumeration INSTANCE = new EmptyEnumeration();
-
-        @Override
-        public boolean hasMoreElements() {
-            return false;
-        }
-
-        @Override
-        public Object nextElement() {
-            throw new NoSuchElementException();
-        }
     }
 }

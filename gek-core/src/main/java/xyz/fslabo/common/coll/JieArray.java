@@ -247,7 +247,7 @@ public class JieArray {
                 return dest;
             }
         }
-        throw new UnsupportedOperationException(Constants.UNABLE_NULL_TYPE);
+        throw new UnsupportedOperationException(Impls.UNABLE_NULL_TYPE);
     }
 
     private static <T, R> void map0(T[] source, R[] dest, int start, Function<? super T, ? extends R> mapper) {

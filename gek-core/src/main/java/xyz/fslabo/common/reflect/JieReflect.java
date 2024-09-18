@@ -591,7 +591,7 @@ public class JieReflect {
         Set<Type> stack = new HashSet<>();
         return Arrays.stream(typeParameters)
             .map(it -> {
-                Type nestedValue = JieColl.getNested(typeArguments, it, stack);
+                Type nestedValue = JieColl.getRecursive(typeArguments, it, stack);
                 stack.clear();
                 return nestedValue == null ? it : nestedValue;
             }).collect(Collectors.toList());
@@ -617,7 +617,7 @@ public class JieReflect {
      *     K -&gt; Integer
      *     V -&gt; Long
      * </pre>
-     * It is recommended using {@link JieColl#getNested(Map, Object, Set)} to get actual type of type variable in the
+     * It is recommended using {@link JieColl#getRecursive(Map, Object, Set)} to get actual type of type variable in the
      * result.
      *
      * @param type given type
