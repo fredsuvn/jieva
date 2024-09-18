@@ -35,8 +35,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given obj is null, if it is, throw a {@link NullPointerException} with message
-     * concatenated from given message arguments.
+     * Checks whether given obj is null, if it is, throw a {@link NullPointerException} with message concatenated from
+     * given message arguments.
      *
      * @param obj         given object
      * @param messageArgs given message arguments
@@ -59,8 +59,7 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw a {@link NullPointerException} with given message.
+     * Checks whether given expression is true, if it is not, throw a {@link NullPointerException} with given message.
      *
      * @param expr    given expression
      * @param message given message
@@ -72,8 +71,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw a {@link NullPointerException} with message concatenated from given message arguments.
+     * Checks whether given expression is true, if it is not, throw a {@link NullPointerException} with message
+     * concatenated from given message arguments.
      *
      * @param expr        given expression
      * @param messageArgs given message arguments
@@ -96,8 +95,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link IllegalArgumentException} with given message.
+     * Checks whether given expression is true, if it is not, throw an {@link IllegalArgumentException} with given
+     * message.
      *
      * @param expr    given expression
      * @param message given message
@@ -109,8 +108,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link IllegalArgumentException} with given message concatenated from given message arguments.
+     * Checks whether given expression is true, if it is not, throw an {@link IllegalArgumentException} with given
+     * message concatenated from given message arguments.
      *
      * @param expr        given expression
      * @param messageArgs given message arguments
@@ -133,8 +132,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link IllegalStateException} with given message.
+     * Checks whether given expression is true, if it is not, throw an {@link IllegalStateException} with given
+     * message.
      *
      * @param expr    given expression
      * @param message given message
@@ -146,8 +145,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link IllegalStateException} with given message concatenated from given message arguments.
+     * Checks whether given expression is true, if it is not, throw an {@link IllegalStateException} with given message
+     * concatenated from given message arguments.
      *
      * @param expr        given expression
      * @param messageArgs given message arguments
@@ -170,8 +169,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link UnsupportedOperationException} with given message.
+     * Checks whether given expression is true, if it is not, throw an {@link UnsupportedOperationException} with given
+     * message.
      *
      * @param expr    given expression
      * @param message given message
@@ -183,8 +182,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw an {@link UnsupportedOperationException} with given message concatenated from given message arguments.
+     * Checks whether given expression is true, if it is not, throw an {@link UnsupportedOperationException} with given
+     * message concatenated from given message arguments.
      *
      * @param expr        given expression
      * @param messageArgs given message arguments
@@ -207,8 +206,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw a {@link NoSuchElementException} with given message.
+     * Checks whether given expression is true, if it is not, throw a {@link NoSuchElementException} with given
+     * message.
      *
      * @param expr    given expression
      * @param message given message
@@ -220,8 +219,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given expression is true, if it is not,
-     * throw a {@link IllegalArgumentException} with given message concatenated from given message arguments.
+     * Checks whether given expression is true, if it is not, throw a {@link IllegalArgumentException} with given
+     * message concatenated from given message arguments.
      *
      * @param expr        given expression
      * @param messageArgs given message arguments
@@ -261,8 +260,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
-     * if it is not, throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): index.
+     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive), if it is not,
+     * throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): index.
      * <p>
      * Note all indexed must &gt;= 0;
      *
@@ -277,8 +276,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
-     * if it is not, throw an {@link IndexOutOfBoundsException} with given message.
+     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive), if it is not,
+     * throw an {@link IndexOutOfBoundsException} with given message.
      * <p>
      * Note all indexed must &gt;= 0;
      *
@@ -295,8 +294,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
-     * if it is not, throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): index.
+     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive), if it is not,
+     * throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): index.
      * <p>
      * Note all indexed must &gt;= 0;
      *
@@ -311,8 +310,8 @@ public class JieCheck {
     }
 
     /**
-     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive),
-     * if it is not, throw an {@link IndexOutOfBoundsException} with given message.
+     * Checks whether given index is in bounds from start index (inclusive) to end index (exclusive), if it is not,
+     * throw an {@link IndexOutOfBoundsException} with given message.
      * <p>
      * Note all indexed must &gt;= 0;
      *
@@ -338,8 +337,8 @@ public class JieCheck {
      * @param endRange   end range index exclusive
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
-     * @return whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * * start index (inclusive) to end index (exclusive)
+     * @return whether given range (from start range index inclusive to end range index exclusive) is in bounds from *
+     * start index (inclusive) to end index (exclusive)
      */
     public static boolean isRangeInBounds(int startRange, int endRange, int startIndex, int endIndex) {
         return startRange >= startIndex && endRange <= endIndex && startRange <= endRange && startRange >= 0 && startIndex >= 0;
@@ -355,8 +354,8 @@ public class JieCheck {
      * @param endRange   end range index exclusive
      * @param startIndex start index (inclusive)
      * @param endIndex   end index (exclusive)
-     * @return whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * * start index (inclusive) to end index (exclusive)
+     * @return whether given range (from start range index inclusive to end range index exclusive) is in bounds from *
+     * start index (inclusive) to end index (exclusive)
      */
     public static boolean isRangeInBounds(long startRange, long endRange, long startIndex, long endIndex) {
         return startRange >= startIndex && endRange <= endIndex && startRange <= endRange && startRange >= 0 && startIndex >= 0;
@@ -364,8 +363,8 @@ public class JieCheck {
 
     /**
      * Checks whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive), if it is not,
-     * throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): [startRange, endRange).
+     * start index (inclusive) to end index (exclusive), if it is not, throw an {@link IndexOutOfBoundsException} with
+     * message pattern: [startIndex, endIndex): [startRange, endRange).
      * <p>
      * Note all ranges and indexed must &gt;= 0;
      *
@@ -383,8 +382,8 @@ public class JieCheck {
 
     /**
      * Checks whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive), if it is not,
-     * throw an {@link IndexOutOfBoundsException} with given message.
+     * start index (inclusive) to end index (exclusive), if it is not, throw an {@link IndexOutOfBoundsException} with
+     * given message.
      * <p>
      * Note all ranges and indexed must &gt;= 0;
      *
@@ -403,8 +402,8 @@ public class JieCheck {
 
     /**
      * Checks whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive), if it is not,
-     * throw an {@link IndexOutOfBoundsException} with message pattern: [startIndex, endIndex): [startRange, endRange).
+     * start index (inclusive) to end index (exclusive), if it is not, throw an {@link IndexOutOfBoundsException} with
+     * message pattern: [startIndex, endIndex): [startRange, endRange).
      * <p>
      * Note all ranges and indexed must &gt;= 0;
      *
@@ -422,8 +421,8 @@ public class JieCheck {
 
     /**
      * Checks whether given range (from start range index inclusive to end range index exclusive) is in bounds from
-     * start index (inclusive) to end index (exclusive), if it is not,
-     * throw an {@link IndexOutOfBoundsException} with given message.
+     * start index (inclusive) to end index (exclusive), if it is not, throw an {@link IndexOutOfBoundsException} with
+     * given message.
      * <p>
      * Note all ranges and indexed must &gt;= 0;
      *
@@ -438,5 +437,45 @@ public class JieCheck {
         if (!isRangeInBounds(startRange, endRange, startIndex, endIndex)) {
             throw new IndexOutOfBoundsException(message.toString());
         }
+    }
+
+    /**
+     * If given float value in bounds of specified start value inclusive and end value exclusive, returns itself.
+     * Otherwise, if the float value less than {@code startInclusive}, return {@code startInclusive}, else return
+     * {@link Math#nextDown(float)} of {@code endExclusive}.
+     *
+     * @param value          given float value
+     * @param startInclusive specified start value inclusive
+     * @param endExclusive   specified end value exclusive
+     * @return the float value in bounds
+     */
+    public static float makeIn(float value, float startInclusive, float endExclusive) {
+        if (value < startInclusive) {
+            return startInclusive;
+        }
+        if (value >= endExclusive) {
+            return Math.nextDown(endExclusive);
+        }
+        return value;
+    }
+
+    /**
+     * If given double value in bounds of specified start value inclusive and end value exclusive, returns itself.
+     * Otherwise, if the double value less than {@code startInclusive}, return {@code startInclusive}, else return
+     * {@link Math#nextDown(float)} of {@code endExclusive}.
+     *
+     * @param value          given double value
+     * @param startInclusive specified start value inclusive
+     * @param endExclusive   specified end value exclusive
+     * @return the double value in bounds
+     */
+    public static double makeIn(double value, double startInclusive, double endExclusive) {
+        if (value < startInclusive) {
+            return startInclusive;
+        }
+        if (value >= endExclusive) {
+            return Math.nextDown(endExclusive);
+        }
+        return value;
     }
 }

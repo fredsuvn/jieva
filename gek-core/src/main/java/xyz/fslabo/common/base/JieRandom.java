@@ -1,6 +1,15 @@
 package xyz.fslabo.common.base;
 
+import xyz.fslabo.annotations.Immutable;
+import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.coll.JieArray;
+import xyz.fslabo.common.coll.JieColl;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
 /**
  * Random utilities.
@@ -363,7 +372,8 @@ public class JieRandom {
      * @return next random value between specified start value inclusive and end value exclusive
      */
     public static float nextFloat(float startInclusive, float endExclusive) {
-        return (float) nextDouble(startInclusive, endExclusive);
+        float f = (float) nextDouble(startInclusive, endExclusive);
+        return JieCheck.makeIn(f, startInclusive, endExclusive);
     }
 
     /**
@@ -446,5 +456,239 @@ public class JieRandom {
 
     private static ThreadLocalRandom random() {
         return ThreadLocalRandom.current();
+    }
+
+    /**
+     * Returns a random {@link Supplier} which products a random object for each {@link Supplier#get()}.
+     * <p>
+     * When the {@link Supplier#get()} of returned supplier is invoked, the supplier first randomly selects a
+     * {@code score} based on their proportion, and then returns the object generated from the supplier or value of
+     * selected {@code score}. For example, to get a random supplier which has an 80% chance of returning A and a 20%
+     * chance of returning B:
+     * <pre>
+     *     JieRandom.supplier(
+     *         JieRandom.score(80, "A"),
+     *         JieRandom.score(20, () -> "B")
+     *     );
+     * </pre>
+     *
+     * @param scores specified scores info
+     * @param <T>    type of random object
+     * @return a {@link Supplier} which products a random object for each {@link Supplier#get()}
+     */
+    @SafeVarargs
+    public static <T> Supplier<T> supplier(Score<T>... scores) {
+        if (JieArray.isEmpty(scores)) {
+            throw new IllegalArgumentException("Empty scores!");
+        }
+        return new RandomSupplier<>(JieRandom::random, Jie.list(scores));
+    }
+
+    /**
+     * Returns a random {@link Supplier} which products a random object for each {@link Supplier#get()}.
+     * <p>
+     * When the {@link Supplier#get()} of returned supplier is invoked, the supplier first randomly selects a
+     * {@code score} based on their proportion, and then returns the object generated from the supplier or value of
+     * selected {@code score}. For example, to get a random supplier which has an 80% chance of returning A and a 20%
+     * chance of returning B:
+     * <pre>
+     *     JieRandom.supplier(Jie.list(
+     *         JieRandom.score(80, "A"),
+     *         JieRandom.score(20, () -> "B")
+     *     ));
+     * </pre>
+     *
+     * @param scores specified scores info
+     * @param <T>    type of random object
+     * @return a {@link Supplier} which products a random object for each {@link Supplier#get()}
+     */
+    public static <T> Supplier<T> supplier(Iterable<Score<T>> scores) {
+        if (JieColl.isEmpty(scores)) {
+            throw new IllegalArgumentException("Empty scores!");
+        }
+        return new RandomSupplier<>(JieRandom::random, scores);
+    }
+
+    /**
+     * Returns a random {@link Supplier} which products a random object for each {@link Supplier#get()}.
+     * <p>
+     * When the {@link Supplier#get()} of returned supplier is invoked, the supplier first randomly selects a
+     * {@code score} based on their proportion, and then returns the object generated from the supplier or value of
+     * selected {@code score}. For example, to get a random supplier which has an 80% chance of returning A and a 20%
+     * chance of returning B:
+     * <pre>
+     *     JieRandom.supplier(
+     *         JieRandom.score(80, "A"),
+     *         JieRandom.score(20, () -> "B")
+     *     );
+     * </pre>
+     *
+     * @param random base random to select the {@code score}
+     * @param scores specified scores info
+     * @param <T>    type of random object
+     * @return a {@link Supplier} which products a random object for each {@link Supplier#get()}
+     */
+    @SafeVarargs
+    public static <T> Supplier<T> supplier(Random random, Score<T>... scores) {
+        if (JieArray.isEmpty(scores)) {
+            throw new IllegalArgumentException("Empty scores!");
+        }
+        return new RandomSupplier<>(() -> random, Jie.list(scores));
+    }
+
+    /**
+     * Returns a random {@link Supplier} which products a random object for each {@link Supplier#get()}.
+     * <p>
+     * When the {@link Supplier#get()} of returned supplier is invoked, the supplier first randomly selects a
+     * {@code score} based on their proportion, and then returns the object generated from the supplier or value of
+     * selected {@code score}. For example, to get a random supplier which has an 80% chance of returning A and a 20%
+     * chance of returning B:
+     * <pre>
+     *     JieRandom.supplier(Jie.list(
+     *         JieRandom.score(80, "A"),
+     *         JieRandom.score(20, () -> "B")
+     *     ));
+     * </pre>
+     *
+     * @param random base random to select the {@code score}
+     * @param scores specified scores info
+     * @param <T>    type of random object
+     * @return a {@link Supplier} which products a random object for each {@link Supplier#get()}
+     */
+    public static <T> Supplier<T> supplier(Random random, Iterable<Score<T>> scores) {
+        if (JieColl.isEmpty(scores)) {
+            throw new IllegalArgumentException("Empty scores!");
+        }
+        return new RandomSupplier<>(() -> random, scores);
+    }
+
+    /**
+     * Returns a random {@code score} consists of a score and a value. See {@link #supplier(Score[])},
+     * {@link #supplier(Iterable)}, {@link #supplier(Random, Score[])} and {@link #supplier(Random, Iterable)}.
+     *
+     * @param score the score
+     * @param value value of the score
+     * @param <T>   type of random object
+     * @return a random {@code score}
+     * @see #supplier(Score[])
+     * @see #supplier(Iterable)
+     * @see #supplier(Random, Iterable)
+     * @see #supplier(Random, Score[])
+     */
+    public static <T> Score<T> score(int score, T value) {
+        return score(score, () -> value);
+    }
+
+    /**
+     * Returns a random {@code score} consists of a score and a supplier. See {@link #supplier(Score[])},
+     * {@link #supplier(Iterable)}, {@link #supplier(Random, Score[])} and {@link #supplier(Random, Iterable)}.
+     *
+     * @param score    the score
+     * @param supplier supplier of the score
+     * @param <T>      type of random object
+     * @return a random {@code score}
+     * @see #supplier(Score[])
+     * @see #supplier(Iterable)
+     * @see #supplier(Random, Iterable)
+     * @see #supplier(Random, Score[])
+     */
+    public static <T> Score<T> score(int score, Supplier<T> supplier) {
+        return new Score<>(score, supplier);
+    }
+
+    /**
+     * This class represents a score and an object supplier for a random supplier. See {@link #supplier(Score[])},
+     * {@link #supplier(Iterable)}, * {@link #supplier(Random, Score[])} and {@link #supplier(Random, Iterable)}.
+     *
+     * @param <T> type of random object
+     * @see #supplier(Score[])
+     * @see #supplier(Iterable)
+     * @see #supplier(Random, Iterable)
+     * @see #supplier(Random, Score[])
+     */
+    @Immutable
+    public static class Score<T> {
+
+        private final int score;
+        private final Supplier<T> supplier;
+
+        private Score(int score, Supplier<T> supplier) {
+            this.score = score;
+            this.supplier = supplier;
+        }
+    }
+
+    private static final class RandomSupplier<T> implements Supplier<T> {
+
+        private final Supplier<Random> random;
+        private final Node<T>[] nodes;
+        private final int min;
+        private final int max;
+
+        RandomSupplier(Supplier<Random> random, Iterable<Score<T>> scores) {
+            this.random = random;
+            int totalScore = 0;
+            List<Node<T>> nodeList = new LinkedList<>();
+            for (Score<T> score : scores) {
+                nodeList.add(new Node<>(totalScore, totalScore + score.score, score.supplier));
+                totalScore += score.score;
+            }
+            this.nodes = JieColl.toArray(nodeList);
+            this.min = nodes[0].from;
+            this.max = nodes[nodes.length - 1].to;
+        }
+
+        @Override
+        public T get() {
+            int next = random.get().nextInt(max - min) + min;
+            Node<T> node = binarySearch(next);
+            if (node == null) {
+                throw new IllegalStateException("Child supplier cannot be found.");
+            }
+            return node.supplier.get();
+        }
+
+        @Nullable
+        private Node<T> binarySearch(int next) {
+            int left = 0;
+            int right = nodes.length - 1;
+            while (left <= right) {
+                int mid = left + (right - left) / 2;
+                Node<T> node = nodes[mid];
+                int compare = compare(next, node);
+                if (compare == 0) {
+                    return node;
+                }
+                if (compare > 0) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+            return null;
+        }
+
+        private int compare(int next, Node<T> node) {
+            if (next < node.from) {
+                return -1;
+            }
+            if (next >= node.to) {
+                return 1;
+            }
+            return 0;
+        }
+
+        private static final class Node<T> {
+
+            private final int from;
+            private final int to;
+            private final Supplier<T> supplier;
+
+            private Node(int from, int to, Supplier<T> supplier) {
+                this.from = from;
+                this.to = to;
+                this.supplier = supplier;
+            }
+        }
     }
 }
