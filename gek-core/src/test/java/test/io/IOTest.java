@@ -142,27 +142,27 @@ public class IOTest {
     //     Assert.assertEquals(dest.apply(67, chars.length), Arrays.copyOfRange(chars, 0, chars.length));
     // }
     //
-    // @Test
-    // public void testRead() {
-    //     String str = DATA;
-    //     byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-    //     Assert.assertEquals(JieIO.read(new ByteArrayInputStream(bytes)), bytes);
-    //     Assert.assertEquals(JieIO.read(new ByteArrayInputStream(bytes), 22), Arrays.copyOf(bytes, 22));
-    //     Assert.assertEquals(JieIO.read(new StringReader(str)), str);
-    //     Assert.assertEquals(JieIO.read(new StringReader(str), 11), str.substring(0, 11));
-    //     Assert.assertEquals(JieIO.readString(new ByteArrayInputStream(bytes)), str);
-    //     Assert.assertEquals(JieIO.readString(new ByteArrayInputStream(bytes, 0, 8)), str.substring(0, 8));
-    //     Assert.assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes))), bytes);
-    //     Assert.assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
-    //
-    //     byte[] empty = new byte[0];
-    //     InputStream emptyInput = new ByteArrayInputStream(empty);
-    //     Assert.assertNull(JieIO.read(emptyInput));
-    //     Assert.assertNull(JieIO.available(emptyInput));
-    //     Assert.assertNull(JieIO.readString(emptyInput));
-    //     Assert.assertNull(JieIO.avalaibleString(emptyInput));
-    //     Assert.assertNull(JieIO.read(JieIO.toReader(emptyInput)));
-    // }
+    @Test
+    public void testRead() {
+        String str = DATA;
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+        Assert.assertEquals(JieIO.read(new ByteArrayInputStream(bytes)), bytes);
+        Assert.assertEquals(JieIO.read(new ByteArrayInputStream(bytes), 22), Arrays.copyOf(bytes, 22));
+        Assert.assertEquals(JieIO.read(new StringReader(str)), str);
+        Assert.assertEquals(JieIO.read(new StringReader(str), 11), str.substring(0, 11));
+        Assert.assertEquals(JieIO.readString(new ByteArrayInputStream(bytes)), str);
+        Assert.assertEquals(JieIO.readString(new ByteArrayInputStream(bytes, 0, 8)), str.substring(0, 8));
+        Assert.assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes))), bytes);
+        Assert.assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
+
+        byte[] empty = new byte[0];
+        InputStream emptyInput = new ByteArrayInputStream(empty);
+        Assert.assertNull(JieIO.read(emptyInput));
+        Assert.assertNull(JieIO.available(emptyInput));
+        Assert.assertNull(JieIO.readString(emptyInput));
+        Assert.assertNull(JieIO.avalaibleString(emptyInput));
+        Assert.assertNull(JieIO.read(JieIO.toReader(emptyInput)));
+    }
     //
     // @Test
     // public void testReadTo() {
@@ -393,61 +393,61 @@ public class IOTest {
     //     file.delete();
     // }
     //
-    // private static final class TestInput extends InputStream {
-    //
-    //     private final InputStream in;
-    //
-    //     private TestInput(InputStream in) {
-    //         this.in = in;
-    //     }
-    //
-    //     @Override
-    //     public int read() throws IOException {
-    //         return in.read();
-    //     }
-    //
-    //     @Override
-    //     public int read(byte[] b) throws IOException {
-    //         return in.read(b);
-    //     }
-    //
-    //     @Override
-    //     public int read(byte[] b, int off, int len) throws IOException {
-    //         return in.read(b, off, len);
-    //     }
-    //
-    //     @Override
-    //     public long skip(long n) throws IOException {
-    //         return in.skip(n);
-    //     }
-    //
-    //     @Override
-    //     public int available() throws IOException {
-    //         int a = in.available();
-    //         if (a <= 0) {
-    //             return a;
-    //         }
-    //         return 1;
-    //     }
-    //
-    //     @Override
-    //     public void close() throws IOException {
-    //         in.close();
-    //     }
-    //
-    //     @Override
-    //     public void mark(int readlimit) {
-    //         in.mark(readlimit);
-    //     }
-    //
-    //     @Override
-    //     public void reset() throws IOException {
-    //         in.reset();
-    //     }
-    //
-    //     @Override
-    //     public boolean markSupported() {
-    //         return in.markSupported();
-    //     }
-    // }
+    private static final class TestInput extends InputStream {
+
+        private final InputStream in;
+
+        private TestInput(InputStream in) {
+            this.in = in;
+        }
+
+        @Override
+        public int read() throws IOException {
+            return in.read();
+        }
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            return in.read(b);
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            return in.read(b, off, len);
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            return in.skip(n);
+        }
+
+        @Override
+        public int available() throws IOException {
+            int a = in.available();
+            if (a <= 0) {
+                return a;
+            }
+            return 1;
+        }
+
+        @Override
+        public void close() throws IOException {
+            in.close();
+        }
+
+        @Override
+        public void mark(int readlimit) {
+            in.mark(readlimit);
+        }
+
+        @Override
+        public void reset() throws IOException {
+            in.reset();
+        }
+
+        @Override
+        public boolean markSupported() {
+            return in.markSupported();
+        }
+    }
 }

@@ -27,6 +27,16 @@ public interface ByteVal {
     }
 
     /**
+     * Returns an instance of {@link ByteVal} of initialized value.
+     *
+     * @param value initialized value
+     * @return an instance of {@link ByteVal} of initialized value
+     */
+    static ByteVal of(int value) {
+        return of((byte) value);
+    }
+
+    /**
      * Returns referenced value.
      *
      * @return referenced value

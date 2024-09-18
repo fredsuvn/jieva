@@ -27,12 +27,32 @@ public interface CharVar extends CharVal {
     }
 
     /**
+     * Returns an instance of {@link CharVar} of initialized value.
+     *
+     * @param value initialized value
+     * @return an instance of {@link CharVar} of initialized value
+     */
+    static CharVar of(int value) {
+        return of((char) value);
+    }
+
+    /**
      * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
      * @return this ref itself
      */
     CharVar set(char value);
+
+    /**
+     * Sets specified value for this ref and returns this ref itself.
+     *
+     * @param value specified value
+     * @return this ref itself
+     */
+    default CharVar set(int value) {
+        return set((char) value);
+    }
 
     /**
      * Adds specified value on current value for this ref and returns this ref itself.

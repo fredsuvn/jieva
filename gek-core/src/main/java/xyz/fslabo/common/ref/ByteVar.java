@@ -27,12 +27,32 @@ public interface ByteVar extends ByteVal {
     }
 
     /**
+     * Returns an instance of {@link ByteVar} of initialized value.
+     *
+     * @param value initialized value
+     * @return an instance of {@link ByteVar} of initialized value
+     */
+    static ByteVar of(int value) {
+        return of((byte) value);
+    }
+
+    /**
      * Sets specified value for this ref and returns this ref itself.
      *
      * @param value specified value
      * @return this ref itself
      */
     ByteVar set(byte value);
+
+    /**
+     * Sets specified value for this ref and returns this ref itself.
+     *
+     * @param value specified value
+     * @return this ref itself
+     */
+    default ByteVar set(int value) {
+        return set((byte) value);
+    }
 
     /**
      * Adds specified value on current value for this ref and returns this ref itself.

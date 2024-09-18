@@ -27,6 +27,16 @@ public interface ShortVal {
     }
 
     /**
+     * Returns an instance of {@link ShortVal} of initialized value.
+     *
+     * @param value initialized value
+     * @return an instance of {@link ShortVal} of initialized value
+     */
+    static ShortVal of(int value) {
+        return of((short) value);
+    }
+
+    /**
      * Returns referenced value.
      *
      * @return referenced value

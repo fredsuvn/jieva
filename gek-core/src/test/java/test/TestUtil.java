@@ -9,9 +9,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestUtil {
 
+    private static final Random random = new Random(System.currentTimeMillis());
+
     private static final char[] CHARS = ("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" +
         "!@#$%^&*()_+{}:\"?><|~!@#$%^&*()-=[];',./`").toCharArray();
     private static final char[] CHARS_CN = ("啥奖励返回连接暗示暗示福建烤老鼠理发卡思考复刻撒回复iwuwueiwio打算法法师净空法师看接口").toCharArray();
+
+    public static byte[] randomBytes(int size) {
+        byte[] result = new byte[size];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (byte) nextInt();
+        }
+        return result;
+    }
+
+    // public static String randomString(int size) {
+    //     StringBuilder sb = new StringBuilder(size);
+    //
+    // }
 
     public static String buildRandomString(int enSize, int cnSize) {
         StringBuilder sb = new StringBuilder(enSize + cnSize);
@@ -42,4 +57,13 @@ public class TestUtil {
     public static List<Method> getMethods(Class<?> type) {
         return Arrays.asList(type.getMethods());
     }
+
+    private static int nextInt() {
+        return random.nextInt();
+    }
+
+    // private static char nextChar() {
+    //     boolean isLetter = nextInt() % 2 == 0;
+    //     return isLetter ? CHARS
+    // }
 }

@@ -27,6 +27,16 @@ public interface CharVal {
     }
 
     /**
+     * Returns an instance of {@link CharVal} of initialized value.
+     *
+     * @param value initialized value
+     * @return an instance of {@link CharVal} of initialized value
+     */
+    static CharVal of(int value) {
+        return of((char) value);
+    }
+
+    /**
      * Returns referenced value.
      *
      * @return referenced value
