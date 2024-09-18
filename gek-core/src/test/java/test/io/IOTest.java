@@ -1,19 +1,18 @@
 package test.io;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import test.TestUtil;
 import xyz.fslabo.common.base.JieChars;
-import xyz.fslabo.common.file.JieFile;
 import xyz.fslabo.common.io.JieIO;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Random;
-import java.util.function.BiFunction;
+
+import static org.testng.Assert.*;
 
 public class IOTest {
 
@@ -31,34 +30,34 @@ public class IOTest {
             throw new IllegalArgumentException("Data length not enough!");
         }
         if (testMark) {
-            Assert.assertTrue(inputStream.markSupported());
+            assertTrue(inputStream.markSupported());
             long available = inputStream.available();
-            Assert.assertEquals(available, length);
+            assertEquals(available, length);
             inputStream.mark(length);
             byte[] readBytes = JieIO.read(inputStream, 6);
-            Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, offset, 6 + offset));
-            Assert.assertEquals(inputStream.available(), available - 6);
+            assertEquals(readBytes, Arrays.copyOfRange(bytes, offset, 6 + offset));
+            assertEquals(inputStream.available(), available - 6);
             inputStream.reset();
-            Assert.assertEquals(inputStream.available(), available);
+            assertEquals(inputStream.available(), available);
             readBytes = JieIO.read(inputStream, 6);
-            Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, offset, 6 + offset));
-            Assert.assertEquals(inputStream.available(), available - 6);
+            assertEquals(readBytes, Arrays.copyOfRange(bytes, offset, 6 + offset));
+            assertEquals(inputStream.available(), available - 6);
             readBytes = JieIO.read(inputStream);
-            Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, 6 + offset, offset + length));
-            Assert.assertEquals(inputStream.available(), 0);
-            Assert.assertEquals(inputStream.read(), -1);
-            Assert.assertEquals(inputStream.available(), 0);
+            assertEquals(readBytes, Arrays.copyOfRange(bytes, 6 + offset, offset + length));
+            assertEquals(inputStream.available(), 0);
+            assertEquals(inputStream.read(), -1);
+            assertEquals(inputStream.available(), 0);
             inputStream.reset();
             inputStream.mark(length);
             inputStream.skip(10);
             readBytes = JieIO.read(inputStream, 6);
-            Assert.assertEquals(readBytes, Arrays.copyOfRange(bytes, 10 + offset, 16 + offset));
+            assertEquals(readBytes, Arrays.copyOfRange(bytes, 10 + offset, 16 + offset));
             inputStream.reset();
         }
-        Assert.assertEquals(inputStream.read(), bytes[offset] & 0x000000ff);
+        assertEquals(inputStream.read(), bytes[offset] & 0x000000ff);
         int k = (int) inputStream.skip(10);
-        Assert.assertEquals(JieIO.read(inputStream, 12), Arrays.copyOfRange(bytes, 1 + k + offset, 13 + k + offset));
-        Assert.assertEquals(JieIO.read(inputStream), Arrays.copyOfRange(bytes, 13 + k + offset, offset + length));
+        assertEquals(JieIO.read(inputStream, 12), Arrays.copyOfRange(bytes, 1 + k + offset, 13 + k + offset));
+        assertEquals(JieIO.read(inputStream), Arrays.copyOfRange(bytes, 13 + k + offset, offset + length));
     }
 
     // public static void testReader(
@@ -72,27 +71,27 @@ public class IOTest {
     //         throw new IllegalArgumentException("Data length not enough!");
     //     }
     //     if (testMark) {
-    //         Assert.assertTrue(reader.markSupported());
+    //        assertTrue(reader.markSupported());
     //         reader.mark(length);
     //         String readString = JieIO.read(reader, 6);
-    //         Assert.assertEquals(readString, data.substring(offset, 6 + offset));
+    //        assertEquals(readString, data.substring(offset, 6 + offset));
     //         reader.reset();
     //         readString = JieIO.read(reader, 6);
-    //         Assert.assertEquals(readString, data.substring(offset, 6 + offset));
+    //        assertEquals(readString, data.substring(offset, 6 + offset));
     //         readString = JieIO.read(reader);
-    //         Assert.assertEquals(readString, data.substring(6 + offset, offset + length));
-    //         Assert.assertEquals(reader.read(), -1);
+    //        assertEquals(readString, data.substring(6 + offset, offset + length));
+    //        assertEquals(reader.read(), -1);
     //         reader.reset();
     //         reader.mark(length);
     //         reader.skip(10);
     //         readString = JieIO.read(reader, 6);
-    //         Assert.assertEquals(readString, data.substring(10 + offset, 16 + offset));
+    //        assertEquals(readString, data.substring(10 + offset, 16 + offset));
     //         reader.reset();
     //     }
-    //     Assert.assertEquals(reader.read(), data.charAt(offset));
+    //    assertEquals(reader.read(), data.charAt(offset));
     //     int k = (int) reader.skip(10);
-    //     Assert.assertEquals(JieIO.read(reader, 12), data.substring(1 + k + offset, 13 + k + offset));
-    //     Assert.assertEquals(JieIO.read(reader), data.substring(13 + k + offset, offset + length));
+    //    assertEquals(JieIO.read(reader, 12), data.substring(1 + k + offset, 13 + k + offset));
+    //    assertEquals(JieIO.read(reader), data.substring(13 + k + offset, offset + length));
     // }
     //
     // public static void testOutStream(
@@ -107,22 +106,22 @@ public class IOTest {
     //     long remaining = bytes.length;
     //     outputStream.write(bytes, 0, 66);
     //     outputStream.flush();
-    //     Assert.assertEquals(dest.apply(0, 66), Arrays.copyOfRange(bytes, 0, 66));
+    //    assertEquals(dest.apply(0, 66), Arrays.copyOfRange(bytes, 0, 66));
     //     remaining -= 66;
     //     outputStream.write(22);
     //     outputStream.flush();
-    //     Assert.assertEquals(dest.apply(66, 1), new byte[]{22});
+    //    assertEquals(dest.apply(66, 1), new byte[]{22});
     //     remaining -= 1;
     //     int writeSize = (int) (remaining - 8);
     //     outputStream.write(bytes, 8, writeSize);
     //     outputStream.flush();
-    //     Assert.assertEquals(dest.apply(67, writeSize), Arrays.copyOfRange(bytes, 8, 8 + writeSize));
+    //    assertEquals(dest.apply(67, writeSize), Arrays.copyOfRange(bytes, 8, 8 + writeSize));
     //     remaining -= writeSize;
     //     outputStream.write(bytes, 0, (int) remaining);
     //     outputStream.flush();
-    //     Assert.assertEquals(dest.apply(67 + writeSize, (int) remaining), Arrays.copyOfRange(bytes, 0, (int) remaining));
+    //    assertEquals(dest.apply(67 + writeSize, (int) remaining), Arrays.copyOfRange(bytes, 0, (int) remaining));
     //     if (limit > 0) {
-    //         Assert.expectThrows(IOException.class, () -> outputStream.write(bytes, 0, bytes.length));
+    //        expectThrows(IOException.class, () -> outputStream.write(bytes, 0, bytes.length));
     //     }
     // }
     //
@@ -133,36 +132,37 @@ public class IOTest {
     //     char[] chars = DATA.toCharArray();
     //     writer.write(chars, 0, 66);
     //     writer.flush();
-    //     Assert.assertEquals(dest.apply(0, 66), Arrays.copyOfRange(chars, 0, 66));
+    //    assertEquals(dest.apply(0, 66), Arrays.copyOfRange(chars, 0, 66));
     //     writer.write(22);
     //     writer.flush();
-    //     Assert.assertEquals(dest.apply(66, 1), new char[]{22});
+    //    assertEquals(dest.apply(66, 1), new char[]{22});
     //     writer.write(chars, 0, chars.length);
     //     writer.flush();
-    //     Assert.assertEquals(dest.apply(67, chars.length), Arrays.copyOfRange(chars, 0, chars.length));
+    //    assertEquals(dest.apply(67, chars.length), Arrays.copyOfRange(chars, 0, chars.length));
     // }
     //
     @Test
     public void testRead() {
         String str = DATA;
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-        Assert.assertEquals(JieIO.read(new ByteArrayInputStream(bytes)), bytes);
-        Assert.assertEquals(JieIO.read(new ByteArrayInputStream(bytes), 22), Arrays.copyOf(bytes, 22));
-        Assert.assertEquals(JieIO.read(new StringReader(str)), str);
-        Assert.assertEquals(JieIO.read(new StringReader(str), 11), str.substring(0, 11));
-        Assert.assertEquals(JieIO.readString(new ByteArrayInputStream(bytes)), str);
-        Assert.assertEquals(JieIO.readString(new ByteArrayInputStream(bytes, 0, 8)), str.substring(0, 8));
-        Assert.assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes))), bytes);
-        Assert.assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
+        assertEquals(JieIO.read(new ByteArrayInputStream(bytes)), bytes);
+        assertEquals(JieIO.read(new ByteArrayInputStream(bytes), 22), Arrays.copyOf(bytes, 22));
+        assertEquals(JieIO.read(new StringReader(str)), str);
+        assertEquals(JieIO.read(new StringReader(str), 11), str.substring(0, 11));
+        assertEquals(JieIO.readString(new ByteArrayInputStream(bytes)), str);
+        assertEquals(JieIO.readString(new ByteArrayInputStream(bytes, 0, 8)), str.substring(0, 8));
+        assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes))), bytes);
+        assertEquals(JieIO.read(new TestInput(new ByteArrayInputStream(bytes)), 22), Arrays.copyOf(bytes, 22));
 
         byte[] empty = new byte[0];
         InputStream emptyInput = new ByteArrayInputStream(empty);
-        Assert.assertNull(JieIO.read(emptyInput));
-        Assert.assertNull(JieIO.available(emptyInput));
-        Assert.assertNull(JieIO.readString(emptyInput));
-        Assert.assertNull(JieIO.avalaibleString(emptyInput));
-        Assert.assertNull(JieIO.read(JieIO.toReader(emptyInput)));
+        assertNull(JieIO.read(emptyInput));
+        assertNull(JieIO.available(emptyInput));
+        assertNull(JieIO.readString(emptyInput));
+        assertNull(JieIO.avalaibleString(emptyInput));
+        assertNull(JieIO.read(JieIO.toReader(emptyInput)));
     }
+
     //
     // @Test
     // public void testReadTo() {
@@ -170,61 +170,61 @@ public class IOTest {
     //     byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
     //     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     //     JieIO.readTo(new ByteArrayInputStream(bytes), outputStream, -1, 1);
-    //     Assert.assertEquals(outputStream.toByteArray(), bytes);
+    //    assertEquals(outputStream.toByteArray(), bytes);
     //     outputStream.reset();
     //     JieIO.readTo(new ByteArrayInputStream(bytes), outputStream, -1, 1024 * 16);
-    //     Assert.assertEquals(outputStream.toByteArray(), bytes);
+    //    assertEquals(outputStream.toByteArray(), bytes);
     //     ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
     //     JieIO.readTo(new ByteArrayInputStream(bytes), buffer);
     //     buffer.flip();
-    //     Assert.assertEquals(JieIO.read(buffer), bytes);
+    //    assertEquals(JieIO.read(buffer), bytes);
     //     buffer = ByteBuffer.allocate(bytes.length);
     //     JieIO.readTo(new ByteArrayInputStream(bytes), buffer);
     //     buffer.flip();
-    //     Assert.assertEquals(JieIO.read(buffer), bytes);
+    //    assertEquals(JieIO.read(buffer), bytes);
     //     ByteBuffer source = ByteBuffer.wrap(bytes);
     //     buffer = ByteBuffer.allocate(bytes.length);
     //     JieIO.readTo(source, buffer);
     //     buffer.flip();
-    //     Assert.assertEquals(JieIO.read(buffer), bytes);
-    //     Assert.assertEquals(source.remaining(), 0);
+    //    assertEquals(JieIO.read(buffer), bytes);
+    //    assertEquals(source.remaining(), 0);
     //     source.flip();
     //     buffer = ByteBuffer.allocate(bytes.length);
     //     JieIO.readTo(source, buffer, 2);
     //     buffer.flip();
-    //     Assert.assertEquals(JieIO.read(buffer), Arrays.copyOf(bytes, 2));
-    //     Assert.assertEquals(source.remaining(), bytes.length - 2);
+    //    assertEquals(JieIO.read(buffer), Arrays.copyOf(bytes, 2));
+    //    assertEquals(source.remaining(), bytes.length - 2);
     //
     //     byte[] dest = new byte[bytes.length * 2];
     //     buffer = ByteBuffer.wrap(bytes);
     //     int size = JieIO.readTo(buffer, dest);
-    //     Assert.assertEquals(buffer.position(), bytes.length);
-    //     Assert.assertEquals(size, bytes.length);
-    //     Assert.assertEquals(bytes, Arrays.copyOf(dest, bytes.length));
+    //    assertEquals(buffer.position(), bytes.length);
+    //    assertEquals(size, bytes.length);
+    //    assertEquals(bytes, Arrays.copyOf(dest, bytes.length));
     //     buffer = ByteBuffer.wrap(bytes, 10, 10);
     //     size = JieIO.readTo(ByteBuffer.wrap(bytes, 10, 10), dest, 5);
-    //     Assert.assertEquals(buffer.position(), 10);
-    //     Assert.assertEquals(size, 10);
-    //     Assert.assertEquals(Arrays.copyOfRange(bytes, 10, 10 + 10), Arrays.copyOfRange(dest, 5, 5 + 10));
+    //    assertEquals(buffer.position(), 10);
+    //    assertEquals(size, 10);
+    //    assertEquals(Arrays.copyOfRange(bytes, 10, 10 + 10), Arrays.copyOfRange(dest, 5, 5 + 10));
     // }
     //
     // @Test
     // public void testAvailable() {
     //     String str = DATA;
     //     byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-    //     Assert.assertEquals(JieIO.available(new ByteArrayInputStream(bytes)), bytes);
-    //     Assert.assertEquals(JieIO.avalaibleString(new ByteArrayInputStream(bytes)), str);
-    //     Assert.assertEquals(JieIO.available(
+    //    assertEquals(JieIO.available(new ByteArrayInputStream(bytes)), bytes);
+    //    assertEquals(JieIO.avalaibleString(new ByteArrayInputStream(bytes)), str);
+    //    assertEquals(JieIO.available(
     //         new ByteArrayInputStream(bytes, 1, bytes.length)), Arrays.copyOfRange(bytes, 1, bytes.length));
-    //     Assert.assertEquals(JieIO.avalaibleString(
+    //    assertEquals(JieIO.avalaibleString(
     //         new ByteArrayInputStream(bytes, 1, bytes.length)), str.substring(1));
     //     ByteArrayOutputStream out = new ByteArrayOutputStream();
     //     JieIO.availableTo(new ByteArrayInputStream(bytes), out);
-    //     Assert.assertEquals(out.toByteArray(), bytes);
+    //    assertEquals(out.toByteArray(), bytes);
     //     out.reset();
     //     JieIO.availableTo(new ByteArrayInputStream(bytes, 1, bytes.length), out);
-    //     Assert.assertEquals(out.toByteArray(), Arrays.copyOfRange(bytes, 1, bytes.length));
-    //     Assert.assertEquals(JieIO.available(new TestInput(new ByteArrayInputStream(bytes))), Arrays.copyOf(bytes, 1));
+    //    assertEquals(out.toByteArray(), Arrays.copyOfRange(bytes, 1, bytes.length));
+    //    assertEquals(JieIO.available(new TestInput(new ByteArrayInputStream(bytes))), Arrays.copyOf(bytes, 1));
     // }
     //
     // @Test
@@ -234,16 +234,16 @@ public class IOTest {
     //     InputStream in = JieIO.limit(new ByteArrayInputStream(bytes), 6);
     //     in.skip(5);
     //     in.read();
-    //     Assert.assertEquals(in.read(), -1);
-    //     Assert.assertEquals(in.read(bytes), -1);
+    //    assertEquals(in.read(), -1);
+    //    assertEquals(in.read(bytes), -1);
     //     InputStream in2 = JieIO.limit(new ByteArrayInputStream(bytes), 6);
-    //     Assert.assertEquals(in2.read(bytes), 6);
-    //     Assert.assertEquals(in2.read(), -1);
-    //     Assert.assertEquals(in2.read(bytes), -1);
+    //    assertEquals(in2.read(bytes), 6);
+    //    assertEquals(in2.read(), -1);
+    //    assertEquals(in2.read(bytes), -1);
     //     OutputStream out = JieIO.limit(new ByteArrayOutputStream(), 6);
-    //     Assert.expectThrows(IOException.class, () -> out.write(bytes));
+    //    expectThrows(IOException.class, () -> out.write(bytes));
     //     out.write(bytes, 0, 6);
-    //     Assert.expectThrows(IOException.class, () -> out.write(1));
+    //    expectThrows(IOException.class, () -> out.write(1));
     // }
     //
     // @Test
@@ -298,23 +298,23 @@ public class IOTest {
     //     ByteArrayInputStream source = new ByteArrayInputStream(bytes);
     //     source.mark(0);
     //     InputStream trans = JieIO.transform(source, 8, bs -> Arrays.copyOf(bs, bs.length / 2));
-    //     Assert.assertEquals(JieIO.read(trans), new byte[]{1, 2, 3, 4, 8, 7, 6, 5, 1, 2});
+    //    assertEquals(JieIO.read(trans), new byte[]{1, 2, 3, 4, 8, 7, 6, 5, 1, 2});
     //     source.reset();
     //     trans = JieIO.transform(source, 8, bs -> Arrays.copyOf(bs, bs.length / 2));
-    //     Assert.assertEquals(trans.skip(5), 5);
-    //     Assert.assertEquals(trans.read(), 7);
-    //     Assert.assertEquals(JieIO.read(trans), new byte[]{6, 5, 1, 2});
+    //    assertEquals(trans.skip(5), 5);
+    //    assertEquals(trans.read(), 7);
+    //    assertEquals(JieIO.read(trans), new byte[]{6, 5, 1, 2});
     // }
     //
     // @Test
     // public void testSimpleBuffer() {
     //     byte[] bytes = TestUtil.buildRandomBytes(111);
-    //     Assert.assertTrue(JieIO.isSimpleWrapper(ByteBuffer.wrap(bytes)));
-    //     Assert.assertFalse(JieIO.isSimpleWrapper(ByteBuffer.wrap(bytes, 0, 1)));
-    //     Assert.assertFalse(JieIO.isSimpleWrapper(ByteBuffer.wrap(bytes, 1, 1)));
-    //     Assert.assertFalse(JieIO.isSimpleWrapper(ByteBuffer.wrap(bytes).get(new byte[5])));
-    //     Assert.assertSame(JieIO.readBack(ByteBuffer.wrap(bytes)), bytes);
-    //     Assert.assertEquals(JieIO.readBack(ByteBuffer.wrap(bytes, 0, 1)), Arrays.copyOf(bytes, 1));
+    //    assertTrue(JieIO.isSimpleWrapper(ByteBuffer.wrap(bytes)));
+    //    assertFalse(JieIO.isSimpleWrapper(ByteBuffer.wrap(bytes, 0, 1)));
+    //    assertFalse(JieIO.isSimpleWrapper(ByteBuffer.wrap(bytes, 1, 1)));
+    //    assertFalse(JieIO.isSimpleWrapper(ByteBuffer.wrap(bytes).get(new byte[5])));
+    //    assertSame(JieIO.readBack(ByteBuffer.wrap(bytes)), bytes);
+    //    assertEquals(JieIO.readBack(ByteBuffer.wrap(bytes, 0, 1)), Arrays.copyOf(bytes, 1));
     // }
     //
     // @Test
@@ -328,7 +328,7 @@ public class IOTest {
     //     String string = text.toString();
     //     byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
     //     InputStream in = JieIO.toInputStream(new StringReader(string), StandardCharsets.UTF_8);
-    //     Assert.assertEquals(JieIO.readString(in), string);
+    //    assertEquals(JieIO.readString(in), string);
     //
     //     InputStream in2 = JieIO.toInputStream(new StringReader(string), StandardCharsets.UTF_8);
     //     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -340,37 +340,37 @@ public class IOTest {
     //             break;
     //         }
     //     }
-    //     Assert.assertEquals(new String(out.toByteArray(), StandardCharsets.UTF_8), string);
+    //    assertEquals(new String(out.toByteArray(), StandardCharsets.UTF_8), string);
     //
     //     StringWriter sw = new StringWriter();
     //     OutputStream wo = JieIO.toOutputStream(sw, StandardCharsets.UTF_8);
     //     wo.write(bytes);
     //     wo.close();
-    //     Assert.assertEquals(sw.toString(), string);
+    //    assertEquals(sw.toString(), string);
     //     StringWriter sw2 = new StringWriter();
     //     OutputStream wo2 = JieIO.toOutputStream(sw2, StandardCharsets.UTF_8);
     //     for (byte aByte : bytes) {
     //         wo2.write(aByte);
     //     }
     //     wo2.close();
-    //     Assert.assertEquals(sw2.toString(), string);
+    //    assertEquals(sw2.toString(), string);
     //
     //     char[] chars = new char[string.length()];
     //     CharBuffer charBuffer = CharBuffer.wrap(chars);
     //     JieIO.toWriter(charBuffer).write(string.toCharArray());
-    //     Assert.assertEquals(chars, string.toCharArray());
+    //    assertEquals(chars, string.toCharArray());
     //     byte[] bytes2 = new byte[bytes.length];
     //     ByteBuffer byteBuffer = ByteBuffer.wrap(bytes2);
     //     JieIO.toOutputStream(byteBuffer).write(bytes);
-    //     Assert.assertEquals(bytes2, bytes);
+    //    assertEquals(bytes2, bytes);
     // }
     //
     // @Test
     // public void testReadFile() throws IOException {
     //     String data = DATA;
     //     File file = FileTest.createFile("IOTest-testReadFile.txt", data);
-    //     Assert.assertEquals(JieFile.readString(file.toPath()), data);
-    //     Assert.assertEquals(
+    //    assertEquals(JieFile.readString(file.toPath()), data);
+    //    assertEquals(
     //         JieFile.readString(file.toPath(), 18, 36),
     //         new String(data.getBytes(JieChars.defaultCharset()), 18, 36)
     //     );
@@ -385,11 +385,11 @@ public class IOTest {
     //     }
     //     JieFile.writeString(file.toPath(), "lalala");
     //     JieFile.writeString(file.toPath(), 6, 18, "222");
-    //     Assert.assertEquals(JieFile.readString(file.toPath()), "lalala222");
+    //    assertEquals(JieFile.readString(file.toPath()), "lalala222");
     //     JieFile.writeString(file.toPath(), 6, 7, "1");
-    //     Assert.assertEquals(JieFile.readString(file.toPath()), "lalala122");
+    //    assertEquals(JieFile.readString(file.toPath()), "lalala122");
     //     JieFile.writeString(file.toPath(), 7, 100, "3333中文中文");
-    //     Assert.assertEquals(JieFile.readString(file.toPath()), "lalala13333中文中文");
+    //    assertEquals(JieFile.readString(file.toPath()), "lalala13333中文中文");
     //     file.delete();
     // }
     //

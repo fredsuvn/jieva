@@ -1,6 +1,5 @@
 package test.reflect;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
@@ -9,6 +8,8 @@ import xyz.fslabo.common.reflect.proxy.MethodProxyHandler;
 import xyz.fslabo.common.reflect.proxy.ProxyInvoker;
 
 import java.lang.reflect.Method;
+
+import static org.testng.Assert.assertEquals;
 
 public class BigMethodTest {
 
@@ -29,7 +30,7 @@ public class BigMethodTest {
             }
         };
         BigInter bigInter = JieProxy.asm(Jie.list(BigInter.class), handler);
-        Assert.assertEquals(bigInter.big(
+        assertEquals(bigInter.big(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -51,7 +52,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "big");
-        Assert.assertEquals(bigInter.bigDefault(
+        assertEquals(bigInter.bigDefault(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -74,7 +75,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "bigDefault");
         BigClass bigClass = JieProxy.asm(Jie.list(BigClass.class), handler);
-        Assert.assertEquals(bigClass.bigClass(
+        assertEquals(bigClass.bigClass(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -97,7 +98,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "BigClass");
         Object big = JieProxy.asm(Jie.list(BigClass.class, BigInter.class), handler);
-        Assert.assertEquals(((BigInter) big).big(
+        assertEquals(((BigInter) big).big(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -119,7 +120,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "big");
-        Assert.assertEquals(((BigInter) big).bigDefault(
+        assertEquals(((BigInter) big).bigDefault(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -141,7 +142,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "bigDefault");
-        Assert.assertEquals(((BigClass) big).bigClass(
+        assertEquals(((BigClass) big).bigClass(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"

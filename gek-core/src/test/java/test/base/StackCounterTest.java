@@ -1,8 +1,9 @@
 package test.base;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.StackCounter;
+
+import static org.testng.Assert.assertEquals;
 
 public class StackCounterTest {
 
@@ -15,31 +16,31 @@ public class StackCounterTest {
     }
 
     private void testStackCounterValue(StackCounter counter) {
-        Assert.assertEquals(counter.getDepth(), 0);
-        Assert.assertEquals(counter.getMaxDepth(), 0);
+        assertEquals(counter.getDepth(), 0);
+        assertEquals(counter.getMaxDepth(), 0);
         counter.increment();
-        Assert.assertEquals(counter.getDepth(), 1);
-        Assert.assertEquals(counter.getMaxDepth(), 1);
+        assertEquals(counter.getDepth(), 1);
+        assertEquals(counter.getMaxDepth(), 1);
         counter.increment();
-        Assert.assertEquals(counter.getDepth(), 2);
-        Assert.assertEquals(counter.getMaxDepth(), 2);
+        assertEquals(counter.getDepth(), 2);
+        assertEquals(counter.getMaxDepth(), 2);
         counter.increment(2);
-        Assert.assertEquals(counter.getDepth(), 4);
-        Assert.assertEquals(counter.getMaxDepth(), 4);
+        assertEquals(counter.getDepth(), 4);
+        assertEquals(counter.getMaxDepth(), 4);
         counter.decrement();
-        Assert.assertEquals(counter.getDepth(), 3);
-        Assert.assertEquals(counter.getMaxDepth(), 4);
+        assertEquals(counter.getDepth(), 3);
+        assertEquals(counter.getMaxDepth(), 4);
         counter.decrement(2);
-        Assert.assertEquals(counter.getDepth(), 1);
-        Assert.assertEquals(counter.getMaxDepth(), 4);
+        assertEquals(counter.getDepth(), 1);
+        assertEquals(counter.getMaxDepth(), 4);
         counter.increment(1);
-        Assert.assertEquals(counter.getDepth(), 2);
-        Assert.assertEquals(counter.getMaxDepth(), 4);
+        assertEquals(counter.getDepth(), 2);
+        assertEquals(counter.getMaxDepth(), 4);
         counter.increment();
-        Assert.assertEquals(counter.getDepth(), 3);
-        Assert.assertEquals(counter.getMaxDepth(), 4);
+        assertEquals(counter.getDepth(), 3);
+        assertEquals(counter.getMaxDepth(), 4);
         counter.resetDepth();
-        Assert.assertEquals(counter.getDepth(), 0);
-        Assert.assertEquals(counter.getMaxDepth(), 4);
+        assertEquals(counter.getDepth(), 0);
+        assertEquals(counter.getMaxDepth(), 4);
     }
 }

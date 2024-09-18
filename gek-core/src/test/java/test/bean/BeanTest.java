@@ -3,7 +3,6 @@ package test.bean;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.annotations.NonNull;
 import xyz.fslabo.annotations.Nullable;
@@ -20,6 +19,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
+import static org.testng.Assert.*;
+
 public class BeanTest {
 
     @Test
@@ -29,17 +30,17 @@ public class BeanTest {
         }.getType());
         BeanInfo b2 = provider.getBeanInfo(new TypeRef<Inner<Short, Long>>() {
         }.getType());
-        Assert.assertSame(b1, b2);
-        Assert.assertEquals(b1, b2);
-        Assert.assertEquals(b1.toString(), b2.toString());
-        Assert.assertEquals(b1.hashCode(), b2.hashCode());
+        assertSame(b1, b2);
+        assertEquals(b1, b2);
+        assertEquals(b1.toString(), b2.toString());
+        assertEquals(b1.hashCode(), b2.hashCode());
         BeanProvider provider2 = BeanProvider.withResolver(BeanResolver.defaultResolver());
         BeanInfo b3 = provider2.getBeanInfo(new TypeRef<Inner<Short, Long>>() {
         }.getType());
-        Assert.assertNotSame(b1, b3);
-        Assert.assertEquals(b1, b3);
-        Assert.assertEquals(b1.toString(), b3.toString());
-        Assert.assertEquals(b1.hashCode(), b3.hashCode());
+        assertNotSame(b1, b3);
+        assertEquals(b1, b3);
+        assertEquals(b1.toString(), b3.toString());
+        assertEquals(b1.hashCode(), b3.hashCode());
     }
 
     @Test
@@ -48,19 +49,19 @@ public class BeanTest {
         }.getType());
         BeanInfo b2 = BeanResolver.defaultResolver().resolve(new TypeRef<Inner<Short, Long>>() {
         }.getType());
-        Assert.assertEquals(b1.getType(), new TypeRef<Inner<Short, Long>>() {
+        assertEquals(b1.getType(), new TypeRef<Inner<Short, Long>>() {
         }.getType());
-        Assert.assertEquals(b1.getRawType(), Inner.class);
-        Assert.assertNotSame(b1, b2);
-        Assert.assertEquals(b1, b2);
-        Assert.assertEquals(b1.toString(), b2.toString());
-        Assert.assertEquals(b1.hashCode(), b2.hashCode());
-        Assert.assertTrue(b1.equals(b1));
-        Assert.assertFalse(b1.equals(null));
-        Assert.assertFalse(b1.equals(""));
-        Assert.assertFalse(b1.equals(BeanInfo.get(new TypeRef<Inner<Long, Long>>() {
+        assertEquals(b1.getRawType(), Inner.class);
+        assertNotSame(b1, b2);
+        assertEquals(b1, b2);
+        assertEquals(b1.toString(), b2.toString());
+        assertEquals(b1.hashCode(), b2.hashCode());
+        assertTrue(b1.equals(b1));
+        assertFalse(b1.equals(null));
+        assertFalse(b1.equals(""));
+        assertFalse(b1.equals(BeanInfo.get(new TypeRef<Inner<Long, Long>>() {
         }.getType())));
-        Assert.assertEquals(
+        assertEquals(
             JieColl.putAll(new HashMap<>(), b1.getProperties(), k -> k, BasePropertyInfo::getType),
             Jie.hashMap("ffFf1", String.class
                 , "ffFf2", Short.class
@@ -82,17 +83,17 @@ public class BeanTest {
                 !Jie.list("gett", "sett", "iss", "isss", "getMm", "setMm", "gettAa", "issAa", "settAa").contains(m.getName())
             )
         );
-        Assert.assertEquals(
+        assertEquals(
             JieColl.addAll(new HashSet<>(), b1.getMethods(), BaseMethodInfo::getMethod),
             mSet
         );
-        Assert.assertEquals(
+        assertEquals(
             b1.getType(), new TypeRef<Inner<Short, Long>>() {
             }.getType()
         );
 
         BeanInfo b3 = BeanInfo.get(Inner.class);
-        Assert.assertEquals(
+        assertEquals(
             JieColl.putAll(new HashMap<>(), b3.getProperties(), k -> k, BasePropertyInfo::getType),
             Jie.hashMap("ffFf1", String.class
                 , "ffFf2", Inner.class.getTypeParameters()[0]
@@ -107,19 +108,19 @@ public class BeanTest {
         );
 
         BeanInfo bo1 = BeanInfo.get(Object.class);
-        Assert.assertEquals(bo1.getProperties().size(), 1);
+        assertEquals(bo1.getProperties().size(), 1);
         BeanInfo bo2 = BeanResolver.withHandlers(new NonPrefixResolverHandler()).resolve(Object.class);
-        Assert.assertEquals(bo2.getProperties().size(), 0);
-        Assert.assertNotNull(bo1.getProperty("class"));
+        assertEquals(bo2.getProperties().size(), 0);
+        assertNotNull(bo1.getProperty("class"));
         BeanInfo bc = BeanInfo.get(InnerSuperChild.class);
         PropertyInfo pc = bc.getProperty("c1");
-        Assert.assertEquals(pc.getType(), String.class);
+        assertEquals(pc.getType(), String.class);
         BeanInfo bs3 = BeanResolver.withHandlers(new NonPrefixResolverHandler()).resolve(Simple3.class);
         PropertyInfo ps3 = bs3.getProperty("c1");
-        Assert.assertEquals(ps3.getType(), String.class);
+        assertEquals(ps3.getType(), String.class);
         BeanInfo s1 = BeanResolver.withHandlers(new NonGetterPrefixResolverHandler()).resolve(Simple1.class);
-        Assert.assertEquals(s1.getProperties().size(), 1);
-        Assert.assertNotNull(s1.getProperty("aa"));
+        assertEquals(s1.getProperties().size(), 1);
+        assertNotNull(s1.getProperty("aa"));
     }
 
     @Test
@@ -129,84 +130,84 @@ public class BeanTest {
         BeanInfo b3 = BeanResolver.defaultResolver().resolve(new TypeRef<Inner<Short, Long>>() {
         }.getType());
         PropertyInfo p1 = b1.getProperty("ffFf1");
-        Assert.assertEquals(p1.getOwner(), b1);
-        Assert.assertEquals(b1.toString(), b1.getType().getTypeName());
-        Assert.assertEquals(p1.toString(),
+        assertEquals(p1.getOwner(), b1);
+        assertEquals(b1.toString(), b1.getType().getTypeName());
+        assertEquals(p1.toString(),
             b1.getType().getTypeName() + "." + p1.getName() + "[" + p1.getType().getTypeName() + "]");
         MethodInfo m1 = b1.getMethod("m1");
-        Assert.assertEquals(m1.toString(),
+        assertEquals(m1.toString(),
             b1.getType().getTypeName() + "." + m1.getName() + "()[" + m1.getMethod().getGenericReturnType() + "]");
-        Assert.assertEquals(p1, b3.getProperty("ffFf1"));
-        Assert.assertEquals(p1.toString(), b3.getProperty("ffFf1").toString());
-        Assert.assertEquals(p1.hashCode(), b3.getProperty("ffFf1").hashCode());
-        Assert.assertNotSame(p1, b3.getProperty("ffFf1"));
-        Assert.assertSame(p1, p1);
-        Assert.assertTrue(p1.equals(p1));
-        Assert.assertFalse(p1.equals(null));
-        Assert.assertFalse(p1.equals(""));
-        Assert.assertEquals(m1, b3.getMethod("m1"));
-        Assert.assertEquals(m1.toString(), b3.getMethod("m1").toString());
-        Assert.assertEquals(m1.hashCode(), b3.getMethod("m1").hashCode());
-        Assert.assertNotSame(m1, b3.getMethod("m1"));
-        Assert.assertSame(m1, m1);
-        Assert.assertTrue(m1.equals(m1));
-        Assert.assertFalse(m1.equals(null));
-        Assert.assertFalse(m1.equals(""));
+        assertEquals(p1, b3.getProperty("ffFf1"));
+        assertEquals(p1.toString(), b3.getProperty("ffFf1").toString());
+        assertEquals(p1.hashCode(), b3.getProperty("ffFf1").hashCode());
+        assertNotSame(p1, b3.getProperty("ffFf1"));
+        assertSame(p1, p1);
+        assertTrue(p1.equals(p1));
+        assertFalse(p1.equals(null));
+        assertFalse(p1.equals(""));
+        assertEquals(m1, b3.getMethod("m1"));
+        assertEquals(m1.toString(), b3.getMethod("m1").toString());
+        assertEquals(m1.hashCode(), b3.getMethod("m1").hashCode());
+        assertNotSame(m1, b3.getMethod("m1"));
+        assertSame(m1, m1);
+        assertTrue(m1.equals(m1));
+        assertFalse(m1.equals(null));
+        assertFalse(m1.equals(""));
 
         PropertyInfo p2 = b1.getProperty("ffFf2");
         PropertyInfo p3 = b1.getProperty("ffFf3");
         PropertyInfo p4 = b1.getProperty("ffFf4");
         PropertyInfo p5 = b1.getProperty("ffFf5");
         PropertyInfo c1 = b1.getProperty("c1");
-        Assert.assertEquals(p1.getAnnotations().get(0).annotationType(), Nullable.class);
-        Assert.assertEquals(p1.getGetterAnnotations().get(0).annotationType(), Nullable.class);
-        Assert.assertTrue(p1.getSetterAnnotations().isEmpty());
-        Assert.assertTrue(p1.getFieldAnnotations().isEmpty());
-        Assert.assertNotNull(p1.getAnnotation(Nullable.class));
-        Assert.assertEquals(p4.getAnnotations().get(0).annotationType(), Nullable.class);
-        Assert.assertEquals(p4.getSetterAnnotations().get(0).annotationType(), Nullable.class);
-        Assert.assertTrue(p4.getGetterAnnotations().isEmpty());
-        Assert.assertTrue(p4.getFieldAnnotations().isEmpty());
-        Assert.assertNotNull(p4.getAnnotation(Nullable.class));
-        Assert.assertEquals(c1.getAnnotations().get(0).annotationType(), Nullable.class);
-        Assert.assertEquals(c1.getFieldAnnotations().get(0).annotationType(), Nullable.class);
-        Assert.assertTrue(c1.getSetterAnnotations().isEmpty());
-        Assert.assertTrue(c1.getGetterAnnotations().isEmpty());
-        Assert.assertNotNull(c1.getAnnotation(Nullable.class));
-        Assert.assertEquals(m1.getAnnotations().get(0).annotationType(), Nullable.class);
-        Assert.assertNull(p2.getAnnotation(Nullable.class));
-        Assert.assertNull(p3.getAnnotation(Nullable.class));
-        Assert.assertTrue(p1.isReadable());
-        Assert.assertFalse(p1.isWriteable());
-        Assert.assertTrue(p2.isReadable());
-        Assert.assertTrue(p2.isWriteable());
-        Assert.assertTrue(p3.isReadable());
-        Assert.assertTrue(p3.isWriteable());
-        Assert.assertFalse(p4.isReadable());
-        Assert.assertTrue(p4.isWriteable());
-        Assert.assertTrue(p5.isReadable());
-        Assert.assertTrue(p5.isWriteable());
-        Assert.assertTrue(c1.isReadable());
-        Assert.assertTrue(c1.isWriteable());
-        Assert.assertEquals(p4.getRawType(), List.class);
-        Assert.assertEquals(p2.getGetter(), Inner.class.getMethod("getFfFf2"));
-        Assert.assertEquals(p2.getSetter(), Inner.class.getMethod("setFfFf2", Object.class));
-        Assert.assertEquals(p2.getField(), Inner.class.getDeclaredField("ffFf2"));
-        Assert.assertEquals(c1.getField(), InnerSuper.class.getDeclaredField("c1"));
-        Assert.assertFalse(p1.equals(c1));
-        Assert.assertNull(p1.getAnnotation(NonNull.class));
+        assertEquals(p1.getAnnotations().get(0).annotationType(), Nullable.class);
+        assertEquals(p1.getGetterAnnotations().get(0).annotationType(), Nullable.class);
+        assertTrue(p1.getSetterAnnotations().isEmpty());
+        assertTrue(p1.getFieldAnnotations().isEmpty());
+        assertNotNull(p1.getAnnotation(Nullable.class));
+        assertEquals(p4.getAnnotations().get(0).annotationType(), Nullable.class);
+        assertEquals(p4.getSetterAnnotations().get(0).annotationType(), Nullable.class);
+        assertTrue(p4.getGetterAnnotations().isEmpty());
+        assertTrue(p4.getFieldAnnotations().isEmpty());
+        assertNotNull(p4.getAnnotation(Nullable.class));
+        assertEquals(c1.getAnnotations().get(0).annotationType(), Nullable.class);
+        assertEquals(c1.getFieldAnnotations().get(0).annotationType(), Nullable.class);
+        assertTrue(c1.getSetterAnnotations().isEmpty());
+        assertTrue(c1.getGetterAnnotations().isEmpty());
+        assertNotNull(c1.getAnnotation(Nullable.class));
+        assertEquals(m1.getAnnotations().get(0).annotationType(), Nullable.class);
+        assertNull(p2.getAnnotation(Nullable.class));
+        assertNull(p3.getAnnotation(Nullable.class));
+        assertTrue(p1.isReadable());
+        assertFalse(p1.isWriteable());
+        assertTrue(p2.isReadable());
+        assertTrue(p2.isWriteable());
+        assertTrue(p3.isReadable());
+        assertTrue(p3.isWriteable());
+        assertFalse(p4.isReadable());
+        assertTrue(p4.isWriteable());
+        assertTrue(p5.isReadable());
+        assertTrue(p5.isWriteable());
+        assertTrue(c1.isReadable());
+        assertTrue(c1.isWriteable());
+        assertEquals(p4.getRawType(), List.class);
+        assertEquals(p2.getGetter(), Inner.class.getMethod("getFfFf2"));
+        assertEquals(p2.getSetter(), Inner.class.getMethod("setFfFf2", Object.class));
+        assertEquals(p2.getField(), Inner.class.getDeclaredField("ffFf2"));
+        assertEquals(c1.getField(), InnerSuper.class.getDeclaredField("c1"));
+        assertFalse(p1.equals(c1));
+        assertNull(p1.getAnnotation(NonNull.class));
 
         Inner<Short, Long> inner = new Inner<>();
         inner.setFfFf2((short) 22);
-        Assert.assertEquals(m1.invoke(inner), (short) 22);
-        Assert.assertEquals(p2.getValue(inner), (short) 22);
+        assertEquals(m1.invoke(inner), (short) 22);
+        assertEquals(p2.getValue(inner), (short) 22);
         p2.setValue(inner, (short) 111);
-        Assert.assertEquals(p2.getValue(inner), (short) 111);
-        Assert.expectThrows(BeanException.class, () -> p4.getValue(inner));
-        Assert.expectThrows(BeanException.class, () -> p1.setValue(inner, 111));
-        Assert.assertNull(b1.getMethod("m1", Object.class));
-        Assert.assertNull(b1.getMethod("m11"));
-        Assert.assertFalse(m1.equals(b1.getMethod("get")));
+        assertEquals(p2.getValue(inner), (short) 111);
+        expectThrows(BeanException.class, () -> p4.getValue(inner));
+        expectThrows(BeanException.class, () -> p1.setValue(inner, 111));
+        assertNull(b1.getMethod("m1", Object.class));
+        assertNull(b1.getMethod("m11"));
+        assertFalse(m1.equals(b1.getMethod("get")));
     }
 
     @Test
@@ -216,63 +217,63 @@ public class BeanTest {
         TestHandler h3 = new TestHandler();
         BeanResolver r1 = BeanResolver.withHandlers(h1);
         BeanInfo b1 = r1.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 1);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 1);
         r1 = BeanResolver.withHandlers(Jie.list(h1));
         b1 = r1.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 2);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 2);
         r1 = r1.addFirstHandler(h2);
         b1 = r1.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 3);
-        Assert.assertEquals(h2.times, 1);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 3);
+        assertEquals(h2.times, 1);
         r1 = r1.addLastHandler(h3);
         b1 = r1.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 4);
-        Assert.assertEquals(h2.times, 2);
-        Assert.assertEquals(h3.times, 1);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 4);
+        assertEquals(h2.times, 2);
+        assertEquals(h3.times, 1);
         r1 = r1.replaceFirstHandler(h3);
         r1 = r1.replaceFirstHandler(h3);
         b1 = r1.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 5);
-        Assert.assertEquals(h2.times, 2);
-        Assert.assertEquals(h3.times, 3);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 5);
+        assertEquals(h2.times, 2);
+        assertEquals(h3.times, 3);
         r1 = r1.replaceLastHandler(h2);
         r1 = r1.replaceLastHandler(h2);
         b1 = r1.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 6);
-        Assert.assertEquals(h2.times, 3);
-        Assert.assertEquals(h3.times, 4);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 6);
+        assertEquals(h2.times, 3);
+        assertEquals(h3.times, 4);
         // h3 -> h1 -> h2
         // h4 = h3 -> h1 -> h2
         BeanResolver.Handler h4 = r1.asHandler();
         // h3 -> h1 -> h2 -> h4
         r1 = r1.addLastHandler(h4);
         b1 = r1.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 8);
-        Assert.assertEquals(h2.times, 5);
-        Assert.assertEquals(h3.times, 6);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 8);
+        assertEquals(h2.times, 5);
+        assertEquals(h3.times, 6);
         BreakHandler h5 = new BreakHandler();
         // h5 -> h3 -> h1 -> h2 -> h4
         r1 = r1.addFirstHandler(h5);
         b1 = r1.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 8);
-        Assert.assertEquals(h2.times, 5);
-        Assert.assertEquals(h3.times, 6);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 8);
+        assertEquals(h2.times, 5);
+        assertEquals(h3.times, 6);
 
         BeanResolver r4 = (BeanResolver) h4;
         // h5 -> h4
@@ -280,36 +281,36 @@ public class BeanTest {
         h4 = r4.asHandler();
         BeanResolver r5 = BeanResolver.withHandlers(h4);
         b1 = r5.resolve(Inner.class);
-        Assert.assertEquals(b1.getProperties(), Collections.emptyMap());
-        Assert.assertEquals(b1.getMethods(), Collections.emptyList());
-        Assert.assertEquals(h1.times, 8);
-        Assert.assertEquals(h2.times, 5);
-        Assert.assertEquals(h3.times, 6);
+        assertEquals(b1.getProperties(), Collections.emptyMap());
+        assertEquals(b1.getMethods(), Collections.emptyList());
+        assertEquals(h1.times, 8);
+        assertEquals(h2.times, 5);
+        assertEquals(h3.times, 6);
 
         ThrowHandler h6 = new ThrowHandler();
         // h6 -> h5 -> h4
         BeanResolver r6 = r5.addFirstHandler(h6);
-        Assert.expectThrows(BeanResolvingException.class, () -> r6.resolve(Inner.class));
+        expectThrows(BeanResolvingException.class, () -> r6.resolve(Inner.class));
     }
 
     @Test
     public void testHandler() {
-        Assert.expectThrows(BeanResolvingException.class, () -> BeanInfo.get(JieType.array(String.class)));
+        expectThrows(BeanResolvingException.class, () -> BeanInfo.get(JieType.array(String.class)));
         BeanInfo b1 = BeanResolver.withHandlers(new NonGetterPrefixResolverHandler()).resolve(Simple1.class);
-        Assert.assertEquals(b1.getProperties().size(), 1);
+        assertEquals(b1.getProperties().size(), 1);
         Simple1 s1 = new Simple1();
         PropertyInfo aa1 = b1.getProperty("aa");
-        Assert.assertEquals(aa1.getValue(s1), null);
+        assertEquals(aa1.getValue(s1), null);
         aa1.setValue(s1, "ss");
-        Assert.assertEquals(aa1.getValue(s1), "ss");
+        assertEquals(aa1.getValue(s1), "ss");
 
         BeanInfo b2 = BeanResolver.withHandlers(new NonPrefixResolverHandler()).resolve(Simple2.class);
-        Assert.assertEquals(b2.getProperties().size(), 1);
+        assertEquals(b2.getProperties().size(), 1);
         Simple2 s2 = new Simple2();
         PropertyInfo aa2 = b2.getProperty("aa");
-        Assert.assertEquals(aa2.getValue(s2), null);
+        assertEquals(aa2.getValue(s2), null);
         aa2.setValue(s2, "ss");
-        Assert.assertEquals(aa2.getValue(s2), "ss");
+        assertEquals(aa2.getValue(s2), "ss");
     }
 
     public static class TestHandler implements BeanResolver.Handler {

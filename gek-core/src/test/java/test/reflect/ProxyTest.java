@@ -1,6 +1,5 @@
 package test.reflect;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import test.JieTestException;
 import xyz.fslabo.annotations.Nullable;
@@ -11,6 +10,9 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.expectThrows;
 
 public class ProxyTest {
 
@@ -38,9 +40,9 @@ public class ProxyTest {
             getClass().getClassLoader(), Jie.list(ClassP.class, Inter1.class, Inter2.class), testHandler);
         testAsm(proxyAsm, "Inter1-proxy", true);
 
-        Assert.expectThrows(ProxyException.class, () -> JieProxy.asm(null, testHandler));
-        Assert.expectThrows(ProxyException.class, () -> JieProxy.asm(Jie.list(ClassP.class, ClassP.class), testHandler));
-        Assert.expectThrows(ProxyException.class, () -> JieProxy.asm(Jie.list(ClassO.class), testHandler));
+        expectThrows(ProxyException.class, () -> JieProxy.asm(null, testHandler));
+        expectThrows(ProxyException.class, () -> JieProxy.asm(Jie.list(ClassP.class, ClassP.class), testHandler));
+        expectThrows(ProxyException.class, () -> JieProxy.asm(Jie.list(ClassO.class), testHandler));
 
         MethodProxyHandler superHandle = new MethodProxyHandler() {
             @Override
@@ -54,9 +56,9 @@ public class ProxyTest {
             }
         };
         Inter2<?> ppi1 = JieProxy.asm(Jie.list(Inter1.class, Inter2.class), superHandle);
-        Assert.assertEquals(ppi1.ppi_String(), "Inter1");
+        assertEquals(ppi1.ppi_String(), "Inter1");
         Inter1<?> ppi2 = JieProxy.asm(Jie.list(Inter2.class, Inter1.class), superHandle);
-        Assert.assertEquals(ppi2.ppi_String(), "Inter2");
+        assertEquals(ppi2.ppi_String(), "Inter2");
 
         Object op = JieProxy.asm(Jie.list(Object.class), new MethodProxyHandler() {
             @Override
@@ -78,9 +80,9 @@ public class ProxyTest {
                 return invoker.invokeSuper(args);
             }
         });
-        Assert.assertEquals(op.equals("anyone"), true);
-        Assert.assertEquals(op.hashCode(), 666);
-        Assert.assertEquals(op.toString(), "666");
+        assertEquals(op.equals("anyone"), true);
+        assertEquals(op.hashCode(), 666);
+        assertEquals(op.toString(), "666");
     }
 
     private void testAsm(ClassP proxy, String ppi_String, boolean absError) {
@@ -88,75 +90,75 @@ public class ProxyTest {
         testInter1((Inter1<?>) proxy, absError);
         testInter2((Inter2<?>) proxy, absError);
         Inter1<?> i1 = (Inter1<?>) proxy;
-        Assert.assertEquals(i1.ppi_String(), ppi_String);
-        Assert.assertEquals(i1.ppi_String(), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(i1.ppi1t_String(), "Inter1_t-proxy");
-        Assert.assertEquals(i1.ppi_String(), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(i1.ppi_String(), ppi_String);
+        assertEquals(i1.ppi_String(), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(i1.ppi1t_String(), "Inter1_t-proxy");
+        assertEquals(i1.ppi_String(), TestHandler.superStack.get(0) + "-proxy");
         Inter2<?> i2 = (Inter2<?>) proxy;
-        Assert.assertEquals(i2.ppi_String(), ppi_String);
-        Assert.assertEquals(i2.ppi_String(), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(i2.ppi2t_Integer(), 8);
-        Assert.assertEquals(i2.ppi2t_Integer(), (Integer) TestHandler.superStack.get(0) + 1);
+        assertEquals(i2.ppi_String(), ppi_String);
+        assertEquals(i2.ppi_String(), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(i2.ppi2t_Integer(), 8);
+        assertEquals(i2.ppi2t_Integer(), (Integer) TestHandler.superStack.get(0) + 1);
     }
 
     private void testClass1(ClassP proxy) {
-        Assert.assertEquals(proxy.ppc_boolean(), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppc_byte(), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppc_short(), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppc_char(), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppc_int(), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppc_long(), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppc_float(), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppc_double(), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppc_String(), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true), true + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2), "" + true + 2 + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3), "" + true + 2 + 3 + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4'), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4'), "" + true + 2 + 3 + '4' + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5), "" + true + 2 + 3 + '4' + 5 + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6), "" + true + 2 + 3 + '4' + 5 + 6 + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7), "" + true + 2 + 3 + '4' + 5 + 6 + 7.0 + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8), "" + true + 2 + 3 + '4' + 5 + 6 + 7.0 + 8.0 + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8, "9"), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8, "9"), "" + true + 2 + 3 + '4' + 5 + 6 + 7.0 + 8.0 + "9" + "-proxy");
+        assertEquals(proxy.ppc_boolean(), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppc_byte(), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppc_short(), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppc_char(), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppc_int(), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppc_long(), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppc_float(), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppc_double(), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppc_String(), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true), true + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2), "" + true + 2 + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3), "" + true + 2 + 3 + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4'), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4'), "" + true + 2 + 3 + '4' + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5), "" + true + 2 + 3 + '4' + 5 + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6), "" + true + 2 + 3 + '4' + 5 + 6 + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7), "" + true + 2 + 3 + '4' + 5 + 6 + 7.0 + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8), "" + true + 2 + 3 + '4' + 5 + 6 + 7.0 + 8.0 + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8, "9"), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(proxy.ppc_String(true, (byte) 2, (short) 3, '4', 5, 6, 7, 8, "9"), "" + true + 2 + 3 + '4' + 5 + 6 + 7.0 + 8.0 + "9" + "-proxy");
         proxy.ppc_void();
-        Assert.assertEquals("ppc_void", TestHandler.superStack.get(0));
-        Assert.assertEquals("ppc_void", TestHandler.superStack.get(1));
-        Assert.expectThrows(JieTestException.class, proxy::ppc_Throw);
-        Assert.assertEquals(ClassP.ppc_static(), "non-proxy");
-        Assert.assertEquals(proxy.ppc_i(), 3);
-        Assert.assertEquals(proxy.pp_Proxied("", 2), TestHandler.superStack.get(0));
-        Assert.assertEquals(proxy.ppp_Proxied("", 2), TestHandler.superStack.get(0));
+        assertEquals("ppc_void", TestHandler.superStack.get(0));
+        assertEquals("ppc_void", TestHandler.superStack.get(1));
+        expectThrows(JieTestException.class, proxy::ppc_Throw);
+        assertEquals(ClassP.ppc_static(), "non-proxy");
+        assertEquals(proxy.ppc_i(), 3);
+        assertEquals(proxy.pp_Proxied("", 2), TestHandler.superStack.get(0));
+        assertEquals(proxy.ppp_Proxied("", 2), TestHandler.superStack.get(0));
     }
 
     private void testInter1(Inter1<?> inter1, boolean absError) {
         if (absError) {
-            Assert.expectThrows(AbstractMethodError.class, inter1::ppi1_boolean);
-            Assert.expectThrows(AbstractMethodError.class, () -> inter1.ppi1_double(1, "a"));
+            expectThrows(AbstractMethodError.class, inter1::ppi1_boolean);
+            expectThrows(AbstractMethodError.class, () -> inter1.ppi1_double(1, "a"));
         }
-        Assert.expectThrows(JieTestException.class, inter1::ppi1_Throw);
-        Assert.assertEquals(inter1.ppi1_String(1, 1, "s"), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(inter1.ppi1_String(1, 1, "s"), 1 + 1.0 + "s" + "-proxy");
-        Assert.assertEquals(Inter1.ppi1_static(), "non-proxy");
+        expectThrows(JieTestException.class, inter1::ppi1_Throw);
+        assertEquals(inter1.ppi1_String(1, 1, "s"), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(inter1.ppi1_String(1, 1, "s"), 1 + 1.0 + "s" + "-proxy");
+        assertEquals(Inter1.ppi1_static(), "non-proxy");
     }
 
     private void testInter2(Inter2<?> inter2, boolean absError) {
         if (absError) {
-            Assert.expectThrows(AbstractMethodError.class, inter2::ppi2_boolean);
-            Assert.expectThrows(AbstractMethodError.class, () -> inter2.ppi2_double(1, "a"));
+            expectThrows(AbstractMethodError.class, inter2::ppi2_boolean);
+            expectThrows(AbstractMethodError.class, () -> inter2.ppi2_double(1, "a"));
         }
-        Assert.expectThrows(JieTestException.class, inter2::ppi2_Throw);
-        Assert.assertEquals(inter2.ppi2_String(1, 1, "s"), TestHandler.superStack.get(0) + "-proxy");
-        Assert.assertEquals(inter2.ppi2_String(1, 1, "s"), 1 + 1.0 + "s" + "-proxy");
-        Assert.assertEquals(Inter2.ppi2_static(), "non-proxy");
+        expectThrows(JieTestException.class, inter2::ppi2_Throw);
+        assertEquals(inter2.ppi2_String(1, 1, "s"), TestHandler.superStack.get(0) + "-proxy");
+        assertEquals(inter2.ppi2_String(1, 1, "s"), 1 + 1.0 + "s" + "-proxy");
+        assertEquals(Inter2.ppi2_static(), "non-proxy");
     }
 
     @Test
@@ -165,19 +167,19 @@ public class ProxyTest {
         TestHandler testHandler = new TestHandler(inst);
         Object proxy = JieProxy.jdk(null, Jie.list(Inter1.class, Inter2.class), testHandler);
         Inter1<?> i1 = (Inter1<?>) proxy;
-        Assert.expectThrows(AbstractMethodError.class, i1::ppi1_boolean);
-        Assert.expectThrows(JieTestException.class, i1::ppi1_Throw);
-        Assert.expectThrows(ProxyException.class, i1::ppi1_nonProxied);
+        expectThrows(AbstractMethodError.class, i1::ppi1_boolean);
+        expectThrows(JieTestException.class, i1::ppi1_Throw);
+        expectThrows(ProxyException.class, i1::ppi1_nonProxied);
         Inter2<?> i2 = (Inter2<?>) proxy;
-        Assert.expectThrows(AbstractMethodError.class, i2::ppi2_boolean);
-        Assert.expectThrows(JieTestException.class, i2::ppi2_Throw);
-        Assert.assertEquals(Inter2.ppi2_static(), "non-proxy");
+        expectThrows(AbstractMethodError.class, i2::ppi2_boolean);
+        expectThrows(JieTestException.class, i2::ppi2_Throw);
+        assertEquals(Inter2.ppi2_static(), "non-proxy");
 
         // test default method
-        Assert.expectThrows(ProxyException.class, i1::ppi_String);
-        Assert.assertEquals(Inter1.ppi1_static(), "non-proxy");
-        Assert.expectThrows(ProxyException.class, i2::ppi_String);
-        Assert.expectThrows(AbstractMethodError.class, i2::ppi2_nonProxied);
+        expectThrows(ProxyException.class, i1::ppi_String);
+        assertEquals(Inter1.ppi1_static(), "non-proxy");
+        expectThrows(ProxyException.class, i2::ppi_String);
+        expectThrows(AbstractMethodError.class, i2::ppi2_nonProxied);
 
         // test ProxyInvoker
         MethodProxyHandler handler = new MethodProxyHandler() {
@@ -209,17 +211,17 @@ public class ProxyTest {
         };
         Object proxy2 = JieProxy.jdk(getClass().getClassLoader(), Jie.list(Inter1.class, Inter2.class), handler);
         Inter1<?> i11 = (Inter1<?>) proxy2;
-        Assert.assertEquals(i11.ppi1_boolean(), true);
-        Assert.assertEquals(i11.ppi1_double(6.6, "a"), 6.6);
-        Assert.assertEquals(i11.ppi_String(), "proxy");
-        Assert.assertEquals(i11.ppi1_Proxied("qq", "ww"), "qqww");
-        Assert.assertEquals(i11.ppi1_Proxied("qq", "ww", "ee"), "qqwwee");
+        assertEquals(i11.ppi1_boolean(), true);
+        assertEquals(i11.ppi1_double(6.6, "a"), 6.6);
+        assertEquals(i11.ppi_String(), "proxy");
+        assertEquals(i11.ppi1_Proxied("qq", "ww"), "qqww");
+        assertEquals(i11.ppi1_Proxied("qq", "ww", "ee"), "qqwwee");
         Inter2<?> i22 = (Inter2<?>) proxy2;
-        Assert.assertEquals(i22.ppi2_boolean(), true);
-        Assert.assertEquals(i22.ppi2_double(7.7, "a"), 7.7);
-        Assert.assertEquals(i22.ppi_String(), "proxy");
-        Assert.assertEquals(i22.ppi2_Proxied("11", "22"), "1122");
-        Assert.assertEquals(i22.ppi2_Proxied("11", "22", "33"), "112233");
+        assertEquals(i22.ppi2_boolean(), true);
+        assertEquals(i22.ppi2_double(7.7, "a"), 7.7);
+        assertEquals(i22.ppi_String(), "proxy");
+        assertEquals(i22.ppi2_Proxied("11", "22"), "1122");
+        assertEquals(i22.ppi2_Proxied("11", "22", "33"), "112233");
     }
 
     public static class TestHandler implements MethodProxyHandler {
@@ -252,14 +254,14 @@ public class ProxyTest {
                 Object ppci = ((ClassP) inst).ppc_i();
                 Object result1 = invoker.invoke(inst, args);
                 Object result2 = invoker.invokeSuper(args);
-                Assert.assertEquals(ppci, ClassP.DEFAULT_I * 2);
-                Assert.assertEquals(ppci, result1);
-                Assert.assertEquals(result2, ClassP.DEFAULT_I);
+                assertEquals(ppci, ClassP.DEFAULT_I * 2);
+                assertEquals(ppci, result1);
+                assertEquals(result2, ClassP.DEFAULT_I);
                 return result2;
             }
             Object result1 = invoker.invoke(inst, args);
             Object result2 = invoker.invokeSuper(args);
-            Assert.assertEquals(result1, result2);
+            assertEquals(result1, result2);
             superStack.add(result2);
             if (method.getName().endsWith("_String")) {
                 return result2 + "-proxy";

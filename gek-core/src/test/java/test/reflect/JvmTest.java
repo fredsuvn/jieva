@@ -1,6 +1,5 @@
 package test.reflect;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.reflect.JieJvm;
 import xyz.fslabo.common.reflect.JieType;
@@ -10,20 +9,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.expectThrows;
+
 public class JvmTest {
 
     @Test
     public void testName() throws Exception {
-        Assert.assertEquals(JieJvm.getInternalName(boolean.class), org.objectweb.asm.Type.getInternalName(boolean.class));
-        Assert.assertEquals(JieJvm.getInternalName(byte.class), org.objectweb.asm.Type.getInternalName(byte.class));
-        Assert.assertEquals(JieJvm.getInternalName(short.class), org.objectweb.asm.Type.getInternalName(short.class));
-        Assert.assertEquals(JieJvm.getInternalName(char.class), org.objectweb.asm.Type.getInternalName(char.class));
-        Assert.assertEquals(JieJvm.getInternalName(int.class), org.objectweb.asm.Type.getInternalName(int.class));
-        Assert.assertEquals(JieJvm.getInternalName(long.class), org.objectweb.asm.Type.getInternalName(long.class));
-        Assert.assertEquals(JieJvm.getInternalName(float.class), org.objectweb.asm.Type.getInternalName(float.class));
-        Assert.assertEquals(JieJvm.getInternalName(double.class), org.objectweb.asm.Type.getInternalName(double.class));
-        Assert.assertEquals(JieJvm.getInternalName(void.class), org.objectweb.asm.Type.getInternalName(void.class));
-        Assert.assertEquals(
+        assertEquals(JieJvm.getInternalName(boolean.class), org.objectweb.asm.Type.getInternalName(boolean.class));
+        assertEquals(JieJvm.getInternalName(byte.class), org.objectweb.asm.Type.getInternalName(byte.class));
+        assertEquals(JieJvm.getInternalName(short.class), org.objectweb.asm.Type.getInternalName(short.class));
+        assertEquals(JieJvm.getInternalName(char.class), org.objectweb.asm.Type.getInternalName(char.class));
+        assertEquals(JieJvm.getInternalName(int.class), org.objectweb.asm.Type.getInternalName(int.class));
+        assertEquals(JieJvm.getInternalName(long.class), org.objectweb.asm.Type.getInternalName(long.class));
+        assertEquals(JieJvm.getInternalName(float.class), org.objectweb.asm.Type.getInternalName(float.class));
+        assertEquals(JieJvm.getInternalName(double.class), org.objectweb.asm.Type.getInternalName(double.class));
+        assertEquals(JieJvm.getInternalName(void.class), org.objectweb.asm.Type.getInternalName(void.class));
+        assertEquals(
             JieJvm.getInternalName(Object.class),
             org.objectweb.asm.Type.getInternalName(Object.class)
         );
@@ -31,48 +33,48 @@ public class JvmTest {
 
     @Test
     public void testDescriptor() throws Exception {
-        Assert.assertEquals(JieJvm.getDescriptor(boolean.class), org.objectweb.asm.Type.getDescriptor(boolean.class));
-        Assert.assertEquals(JieJvm.getDescriptor(byte.class), org.objectweb.asm.Type.getDescriptor(byte.class));
-        Assert.assertEquals(JieJvm.getDescriptor(short.class), org.objectweb.asm.Type.getDescriptor(short.class));
-        Assert.assertEquals(JieJvm.getDescriptor(char.class), org.objectweb.asm.Type.getDescriptor(char.class));
-        Assert.assertEquals(JieJvm.getDescriptor(int.class), org.objectweb.asm.Type.getDescriptor(int.class));
-        Assert.assertEquals(JieJvm.getDescriptor(long.class), org.objectweb.asm.Type.getDescriptor(long.class));
-        Assert.assertEquals(JieJvm.getDescriptor(float.class), org.objectweb.asm.Type.getDescriptor(float.class));
-        Assert.assertEquals(JieJvm.getDescriptor(double.class), org.objectweb.asm.Type.getDescriptor(double.class));
-        Assert.assertEquals(JieJvm.getDescriptor(void.class), org.objectweb.asm.Type.getDescriptor(void.class));
-        Assert.assertEquals(
+        assertEquals(JieJvm.getDescriptor(boolean.class), org.objectweb.asm.Type.getDescriptor(boolean.class));
+        assertEquals(JieJvm.getDescriptor(byte.class), org.objectweb.asm.Type.getDescriptor(byte.class));
+        assertEquals(JieJvm.getDescriptor(short.class), org.objectweb.asm.Type.getDescriptor(short.class));
+        assertEquals(JieJvm.getDescriptor(char.class), org.objectweb.asm.Type.getDescriptor(char.class));
+        assertEquals(JieJvm.getDescriptor(int.class), org.objectweb.asm.Type.getDescriptor(int.class));
+        assertEquals(JieJvm.getDescriptor(long.class), org.objectweb.asm.Type.getDescriptor(long.class));
+        assertEquals(JieJvm.getDescriptor(float.class), org.objectweb.asm.Type.getDescriptor(float.class));
+        assertEquals(JieJvm.getDescriptor(double.class), org.objectweb.asm.Type.getDescriptor(double.class));
+        assertEquals(JieJvm.getDescriptor(void.class), org.objectweb.asm.Type.getDescriptor(void.class));
+        assertEquals(
             JieJvm.getDescriptor(Object.class),
             org.objectweb.asm.Type.getDescriptor(Object.class)
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getDescriptor(BaseClass.class.getMethod("m1")),
             org.objectweb.asm.Type.getMethodDescriptor(BaseClass.class.getMethod("m1"))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getDescriptor(BaseClass.class.getMethod("m2", String.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseClass.class.getMethod("m2", String.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getDescriptor(BaseClass.class.getMethod("m3", String.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseClass.class.getMethod("m3", String.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getDescriptor(BaseInter.class.getMethod("i1", String.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseInter.class.getMethod("i1", String.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getDescriptor(BaseInter.class.getMethod("i2", String.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseInter.class.getMethod("i2", String.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getDescriptor(BaseClass.class.getMethod("m4", String.class, List.class, List.class, List.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseClass.class.getMethod("m4", String.class, List.class, List.class, List.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getDescriptor(BaseClass.class.getConstructor()),
             org.objectweb.asm.Type.getConstructorDescriptor(BaseClass.class.getConstructor())
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getDescriptor(BaseClass.class.getConstructor(String.class, List.class, List.class, List.class)),
             org.objectweb.asm.Type.getConstructorDescriptor(BaseClass.class.getConstructor(String.class, List.class, List.class, List.class))
         );
@@ -80,83 +82,83 @@ public class JvmTest {
 
     @Test
     public void testSignature() throws Exception {
-        Assert.expectThrows(IllegalArgumentException.class, () -> JieJvm.getSignature(JieType.other()));
-        Assert.assertEquals(
+        expectThrows(IllegalArgumentException.class, () -> JieJvm.getSignature(JieType.other()));
+        assertEquals(
             JieJvm.getSignature(BaseClass.class.getMethod("m1")),
             org.objectweb.asm.Type.getMethodDescriptor(BaseClass.class.getMethod("m1"))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(BaseClass.class.getMethod("m2", String.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseClass.class.getMethod("m2", String.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(BaseClass.class.getMethod("m3", String.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseClass.class.getMethod("m3", String.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(BaseInter.class.getMethod("i1", String.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseInter.class.getMethod("i1", String.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(BaseInter.class.getMethod("i2", String.class)),
             org.objectweb.asm.Type.getMethodDescriptor(BaseInter.class.getMethod("i2", String.class))
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(BaseClass.class.getMethod("m4", String.class, List.class, List.class, List.class)),
             "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<-Ljava/lang/String;>;Ljava/util/List<+Ljava/lang/String;>;)Ljava/lang/String;"
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(BaseClass.class.getConstructor()),
             org.objectweb.asm.Type.getConstructorDescriptor(BaseClass.class.getConstructor())
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(BaseClass.class.getConstructor(String.class, List.class, List.class, List.class)),
             "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<-Ljava/lang/String;>;Ljava/util/List<+Ljava/lang/String;>;)V"
         );
 
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getDeclaredField("f1").getGenericType()),
             org.objectweb.asm.Type.getDescriptor(XClass.class.getDeclaredField("f1").getType())
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getDeclaredField("f2").getGenericType()),
             org.objectweb.asm.Type.getDescriptor(XClass.class.getDeclaredField("f2").getType())
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getDeclaredField("f3").getGenericType()),
             org.objectweb.asm.Type.getDescriptor(XClass.class.getDeclaredField("f3").getType())
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getDeclaredField("f4").getGenericType()),
             "Ljava/util/List<+TV;>;"
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getDeclaredField("f5").getGenericType()),
             "Ljava/util/List<-TV;>;"
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getDeclaredField("f6").getGenericType()),
             "[Ljava/util/List<+TV;>;"
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getDeclaredField("f7").getGenericType()),
             "[Ljava/util/List<-Ljava/lang/String;>;"
         );
 
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getMethod("x1", List.class, List.class, List[].class, List.class)),
             "(TX;Ljava/util/List<+TT;>;[Ljava/util/List;Ljava/util/List<+Ljava/lang/String;>;)Ljava/util/List<+TU;>;"
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.getSignature(XClass.class.getConstructor(List.class, List.class, List[].class, List.class)),
             "(TX;Ljava/util/List<+TT;>;[Ljava/util/List;Ljava/util/List<+Ljava/lang/String;>;)V"
         );
 
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.declareSignature(BaseClass.class),
             org.objectweb.asm.Type.getDescriptor(Object.class)
         );
-        Assert.assertEquals(
+        assertEquals(
             JieJvm.declareSignature(XClass.class),
             "<T:Ljava/lang/Number;:Ljava/lang/CharSequence;U:Ljava/lang/Object;V:TT;X::Ljava/util/List<-Ljava/lang/Integer;>;Y::Ljava/io/Serializable;W::Ljava/lang/CharSequence;:Ljava/util/RandomAccess;P:Ljava/lang/String;O:TY;M:Ljava/util/ArrayList<Ljava/lang/String;>;>Ltest/reflect/JvmTest$BaseClass;Ltest/reflect/JvmTest$BaseInter;Ltest/reflect/JvmTest$XInter<TV;TV;Ljava/lang/String;>;"
         );

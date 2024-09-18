@@ -1,122 +1,123 @@
 package test.base;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.ref.*;
+
+import static org.testng.Assert.*;
 
 public class RefTest {
 
     @Test
     public void testVal() {
-        Assert.assertSame(Val.ofNull(), Val.ofNull());
+        assertSame(Val.ofNull(), Val.ofNull());
         Object o = new Object();
-        Assert.assertSame(Val.of(o).get(), o);
-        Assert.assertSame(BooleanVal.ofFalse(), BooleanVal.ofFalse());
-        Assert.assertEquals(BooleanVal.of(true).get(), true);
-        Assert.assertEquals(BooleanVal.of(true).toWrapper().get(), Boolean.TRUE);
-        Assert.assertSame(ByteVal.ofZero(), ByteVal.ofZero());
-        Assert.assertEquals(ByteVal.of(1).get(), 1);
-        Assert.assertEquals(ByteVal.of(1).toWrapper().get(), Byte.valueOf((byte) 1));
-        Assert.assertSame(CharVal.ofZero(), CharVal.ofZero());
-        Assert.assertEquals(CharVal.of(1).get(), 1);
-        Assert.assertEquals(CharVal.of(1).toWrapper().get(), Character.valueOf((char) 1));
-        Assert.assertSame(ShortVal.ofZero(), ShortVal.ofZero());
-        Assert.assertEquals(ShortVal.of(1).get(), 1);
-        Assert.assertEquals(ShortVal.of(1).toWrapper().get(), Short.valueOf((short) 1));
-        Assert.assertSame(IntVal.ofZero(), IntVal.ofZero());
-        Assert.assertEquals(IntVal.of(1).get(), 1);
-        Assert.assertEquals(IntVal.of(1).toWrapper().get(), Integer.valueOf(1));
-        Assert.assertSame(LongVal.ofZero(), LongVal.ofZero());
-        Assert.assertEquals(LongVal.of(1).get(), 1);
-        Assert.assertEquals(LongVal.of(1).toWrapper().get(), Long.valueOf(1));
-        Assert.assertSame(FloatVal.ofZero(), FloatVal.ofZero());
-        Assert.assertEquals(FloatVal.of(1).get(), 1);
-        Assert.assertEquals(FloatVal.of(1).toWrapper().get(), Float.valueOf(1));
-        Assert.assertSame(DoubleVal.ofZero(), DoubleVal.ofZero());
-        Assert.assertEquals(DoubleVal.of(1).get(), 1);
-        Assert.assertEquals(DoubleVal.of(1).toWrapper().get(), Double.valueOf(1));
+        assertSame(Val.of(o).get(), o);
+        assertSame(BooleanVal.ofFalse(), BooleanVal.ofFalse());
+        assertEquals(BooleanVal.of(true).get(), true);
+        assertEquals(BooleanVal.of(true).toWrapper().get(), Boolean.TRUE);
+        assertSame(ByteVal.ofZero(), ByteVal.ofZero());
+        assertEquals(ByteVal.of(1).get(), 1);
+        assertEquals(ByteVal.of(1).toWrapper().get(), Byte.valueOf((byte) 1));
+        assertSame(CharVal.ofZero(), CharVal.ofZero());
+        assertEquals(CharVal.of(1).get(), 1);
+        assertEquals(CharVal.of(1).toWrapper().get(), Character.valueOf((char) 1));
+        assertSame(ShortVal.ofZero(), ShortVal.ofZero());
+        assertEquals(ShortVal.of(1).get(), 1);
+        assertEquals(ShortVal.of(1).toWrapper().get(), Short.valueOf((short) 1));
+        assertSame(IntVal.ofZero(), IntVal.ofZero());
+        assertEquals(IntVal.of(1).get(), 1);
+        assertEquals(IntVal.of(1).toWrapper().get(), Integer.valueOf(1));
+        assertSame(LongVal.ofZero(), LongVal.ofZero());
+        assertEquals(LongVal.of(1).get(), 1);
+        assertEquals(LongVal.of(1).toWrapper().get(), Long.valueOf(1));
+        assertSame(FloatVal.ofZero(), FloatVal.ofZero());
+        assertEquals(FloatVal.of(1).get(), 1);
+        assertEquals(FloatVal.of(1).toWrapper().get(), Float.valueOf(1));
+        assertSame(DoubleVal.ofZero(), DoubleVal.ofZero());
+        assertEquals(DoubleVal.of(1).get(), 1);
+        assertEquals(DoubleVal.of(1).toWrapper().get(), Double.valueOf(1));
     }
 
     @Test
     public void testVar() {
-        Assert.assertNotEquals(Var.ofNull(), Var.ofNull());
+        assertNotEquals(Var.ofNull(), Var.ofNull());
         Object o = new Object();
-        Assert.assertSame(Var.of(o).get(), o);
+        assertSame(Var.of(o).get(), o);
 
-        Assert.assertNotEquals(BooleanVar.ofFalse(), BooleanVar.ofFalse());
-        Assert.assertEquals(BooleanVar.of(true).get(), true);
-        Assert.assertEquals(BooleanVar.of(true).set(false).get(), false);
-        Assert.assertEquals(BooleanVar.of(true).toggleAndGet(), false);
+        assertNotEquals(BooleanVar.ofFalse(), BooleanVar.ofFalse());
+        assertEquals(BooleanVar.of(true).get(), true);
+        assertEquals(BooleanVar.of(true).set(false).get(), false);
+        assertEquals(BooleanVar.of(true).toggleAndGet(), false);
         BooleanVar bool = BooleanVar.of(true);
-        Assert.assertEquals(bool.getAndToggle(), true);
-        Assert.assertEquals(bool.get(), false);
-        Assert.assertEquals(BooleanVar.of(true).toWrapper().get(), Boolean.TRUE);
+        assertEquals(bool.getAndToggle(), true);
+        assertEquals(bool.get(), false);
+        assertEquals(BooleanVar.of(true).toWrapper().get(), Boolean.TRUE);
 
-        Assert.assertNotEquals(ByteVar.ofZero(), ByteVar.ofZero());
-        Assert.assertEquals(ByteVar.of(1).get(), 1);
-        Assert.assertEquals(ByteVar.of(1).set(2).get(), 2);
-        Assert.assertEquals(ByteVar.of(1).add(1).get(), 2);
-        Assert.assertEquals(ByteVar.of(1).getAndIncrement(), 1);
-        Assert.assertEquals(ByteVar.of(1).incrementAndGet(), 2);
+        assertNotEquals(ByteVar.ofZero(), ByteVar.ofZero());
+        assertEquals(ByteVar.of(1).get(), 1);
+        assertEquals(ByteVar.of(1).set(2).get(), 2);
+        assertEquals(ByteVar.of(1).add(1).get(), 2);
+        assertEquals(ByteVar.of(1).getAndIncrement(), 1);
+        assertEquals(ByteVar.of(1).incrementAndGet(), 2);
         ByteVar bv = ByteVar.of(1);
-        Assert.assertEquals(bv.getAndIncrement(), 1);
-        Assert.assertEquals(bv.get(), 2);
-        Assert.assertEquals(ByteVar.of(1).toWrapper().get(), Byte.valueOf((byte) 1));
+        assertEquals(bv.getAndIncrement(), 1);
+        assertEquals(bv.get(), 2);
+        assertEquals(ByteVar.of(1).toWrapper().get(), Byte.valueOf((byte) 1));
 
-        Assert.assertNotEquals(CharVar.ofZero(), CharVar.ofZero());
-        Assert.assertEquals(CharVar.of(1).get(), 1);
-        Assert.assertEquals(CharVar.of(1).set(2).get(), 2);
-        Assert.assertEquals(CharVar.of(1).add(1).get(), 2);
-        Assert.assertEquals(CharVar.of(1).getAndIncrement(), 1);
-        Assert.assertEquals(CharVar.of(1).incrementAndGet(), 2);
+        assertNotEquals(CharVar.ofZero(), CharVar.ofZero());
+        assertEquals(CharVar.of(1).get(), 1);
+        assertEquals(CharVar.of(1).set(2).get(), 2);
+        assertEquals(CharVar.of(1).add(1).get(), 2);
+        assertEquals(CharVar.of(1).getAndIncrement(), 1);
+        assertEquals(CharVar.of(1).incrementAndGet(), 2);
         CharVar cv = CharVar.of(1);
-        Assert.assertEquals(cv.getAndIncrement(), 1);
-        Assert.assertEquals(cv.get(), 2);
-        Assert.assertEquals(CharVar.of(1).toWrapper().get(), Character.valueOf((char) 1));
+        assertEquals(cv.getAndIncrement(), 1);
+        assertEquals(cv.get(), 2);
+        assertEquals(CharVar.of(1).toWrapper().get(), Character.valueOf((char) 1));
 
-        Assert.assertNotEquals(ShortVar.ofZero(), ShortVar.ofZero());
-        Assert.assertEquals(ShortVar.of(1).get(), 1);
-        Assert.assertEquals(ShortVar.of(1).set(2).get(), 2);
-        Assert.assertEquals(ShortVar.of(1).add(1).get(), 2);
-        Assert.assertEquals(ShortVar.of(1).getAndIncrement(), 1);
-        Assert.assertEquals(ShortVar.of(1).incrementAndGet(), 2);
+        assertNotEquals(ShortVar.ofZero(), ShortVar.ofZero());
+        assertEquals(ShortVar.of(1).get(), 1);
+        assertEquals(ShortVar.of(1).set(2).get(), 2);
+        assertEquals(ShortVar.of(1).add(1).get(), 2);
+        assertEquals(ShortVar.of(1).getAndIncrement(), 1);
+        assertEquals(ShortVar.of(1).incrementAndGet(), 2);
         ShortVar sv = ShortVar.of(1);
-        Assert.assertEquals(sv.getAndIncrement(), 1);
-        Assert.assertEquals(sv.get(), 2);
-        Assert.assertEquals(ShortVar.of(1).toWrapper().get(), Short.valueOf((short) 1));
+        assertEquals(sv.getAndIncrement(), 1);
+        assertEquals(sv.get(), 2);
+        assertEquals(ShortVar.of(1).toWrapper().get(), Short.valueOf((short) 1));
 
-        Assert.assertNotEquals(IntVar.ofZero(), IntVar.ofZero());
-        Assert.assertEquals(IntVar.of(1).get(), 1);
-        Assert.assertEquals(IntVar.of(1).set(2).get(), 2);
-        Assert.assertEquals(IntVar.of(1).add(1).get(), 2);
-        Assert.assertEquals(IntVar.of(1).getAndIncrement(), 1);
-        Assert.assertEquals(IntVar.of(1).incrementAndGet(), 2);
+        assertNotEquals(IntVar.ofZero(), IntVar.ofZero());
+        assertEquals(IntVar.of(1).get(), 1);
+        assertEquals(IntVar.of(1).set(2).get(), 2);
+        assertEquals(IntVar.of(1).add(1).get(), 2);
+        assertEquals(IntVar.of(1).getAndIncrement(), 1);
+        assertEquals(IntVar.of(1).incrementAndGet(), 2);
         IntVar iv = IntVar.of(1);
-        Assert.assertEquals(iv.getAndIncrement(), 1);
-        Assert.assertEquals(iv.get(), 2);
-        Assert.assertEquals(IntVar.of(1).toWrapper().get(), Integer.valueOf(1));
+        assertEquals(iv.getAndIncrement(), 1);
+        assertEquals(iv.get(), 2);
+        assertEquals(IntVar.of(1).toWrapper().get(), Integer.valueOf(1));
 
-        Assert.assertNotEquals(LongVar.ofZero(), LongVar.ofZero());
-        Assert.assertEquals(LongVar.of(1).get(), 1);
-        Assert.assertEquals(LongVar.of(1).set(2).get(), 2);
-        Assert.assertEquals(LongVar.of(1).add(1).get(), 2);
-        Assert.assertEquals(LongVar.of(1).getAndIncrement(), 1);
-        Assert.assertEquals(LongVar.of(1).incrementAndGet(), 2);
+        assertNotEquals(LongVar.ofZero(), LongVar.ofZero());
+        assertEquals(LongVar.of(1).get(), 1);
+        assertEquals(LongVar.of(1).set(2).get(), 2);
+        assertEquals(LongVar.of(1).add(1).get(), 2);
+        assertEquals(LongVar.of(1).getAndIncrement(), 1);
+        assertEquals(LongVar.of(1).incrementAndGet(), 2);
         LongVar lv = LongVar.of(1);
-        Assert.assertEquals(lv.getAndIncrement(), 1);
-        Assert.assertEquals(lv.get(), 2);
-        Assert.assertEquals(LongVar.of(1).toWrapper().get(), Long.valueOf(1));
+        assertEquals(lv.getAndIncrement(), 1);
+        assertEquals(lv.get(), 2);
+        assertEquals(LongVar.of(1).toWrapper().get(), Long.valueOf(1));
 
-        Assert.assertNotEquals(FloatVar.ofZero(), FloatVar.ofZero());
-        Assert.assertEquals(FloatVar.of(1).get(), 1);
-        Assert.assertEquals(FloatVar.of(1).set(2).get(), 2);
-        Assert.assertEquals(FloatVar.of(1).add(1).get(), 2);
-        Assert.assertEquals(FloatVar.of(1).toWrapper().get(), Float.valueOf(1));
+        assertNotEquals(FloatVar.ofZero(), FloatVar.ofZero());
+        assertEquals(FloatVar.of(1).get(), 1);
+        assertEquals(FloatVar.of(1).set(2).get(), 2);
+        assertEquals(FloatVar.of(1).add(1).get(), 2);
+        assertEquals(FloatVar.of(1).toWrapper().get(), Float.valueOf(1));
 
-        Assert.assertNotEquals(DoubleVar.ofZero(), DoubleVar.ofZero());
-        Assert.assertEquals(DoubleVar.of(1).get(), 1);
-        Assert.assertEquals(DoubleVar.of(1).set(2).get(), 2);
-        Assert.assertEquals(DoubleVar.of(1).add(1).get(), 2);
-        Assert.assertEquals(DoubleVar.of(1).toWrapper().get(), Double.valueOf(1));
+        assertNotEquals(DoubleVar.ofZero(), DoubleVar.ofZero());
+        assertEquals(DoubleVar.of(1).get(), 1);
+        assertEquals(DoubleVar.of(1).set(2).get(), 2);
+        assertEquals(DoubleVar.of(1).add(1).get(), 2);
+        assertEquals(DoubleVar.of(1).toWrapper().get(), Double.valueOf(1));
     }
 }

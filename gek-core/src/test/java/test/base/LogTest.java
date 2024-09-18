@@ -1,10 +1,12 @@
 package test.base;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.JieLog;
 
 import java.io.IOException;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.expectThrows;
 
 public class LogTest {
 
@@ -46,11 +48,11 @@ public class LogTest {
                 throw new IOException();
             }
         });
-        Assert.expectThrows(IllegalStateException.class, () -> cusLog4.debug("123"));
+        expectThrows(IllegalStateException.class, () -> cusLog4.debug("123"));
     }
 
     private void doLog(JieLog logger, int level) {
-        Assert.assertEquals(level, logger.getLevel());
+        assertEquals(level, logger.getLevel());
         logger.trace("test trace");
         logger.debug("test debug");
         logger.info("test info");
