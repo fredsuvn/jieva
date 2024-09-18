@@ -48,7 +48,7 @@ public class Jie {
      * @param <T>          type of values
      * @return default value if given object is null, or given object itself if it is not null
      */
-    public static <T> T notNull(@Nullable T obj, T defaultValue) {
+    public static <T> T nonNull(@Nullable T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
     }
 
@@ -63,7 +63,7 @@ public class Jie {
      * @param <T>             type of values
      * @return computed value if given object is null, or given object itself if it is not null
      */
-    public static <T> T notNull(@Nullable T obj, Supplier<? extends T> defaultSupplier) {
+    public static <T> T nonNull(@Nullable T obj, Supplier<? extends T> defaultSupplier) {
         return obj == null ? defaultSupplier.get() : obj;
     }
 

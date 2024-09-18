@@ -221,10 +221,10 @@ public class MappingOptions {
         if (targetProperty != null) {
             Function<PropertyInfo, Charset> func = getPropertyCharset();
             if (func != null) {
-                return Jie.notNull(func.apply(targetProperty), JieChars.defaultCharset());
+                return Jie.nonNull(func.apply(targetProperty), JieChars.defaultCharset());
             }
         }
-        return Jie.notNull(getCharset(), JieChars.defaultCharset());
+        return Jie.nonNull(getCharset(), JieChars.defaultCharset());
     }
 
     /**

@@ -49,10 +49,10 @@ final class BeanMapperImpl implements BeanMapper {
         Type destKeyType = destParamType.get(0);
         Type destValueType = destParamType.get(1);
         Map<Object, Object> destMap = Jie.as(dest);
-        Collection<?> ignored = Jie.notNull(options.getIgnored(), Collections.emptyList());
+        Collection<?> ignored = Jie.nonNull(options.getIgnored(), Collections.emptyList());
         boolean ignoreNull = options.isIgnoreNull();
-        BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.notNull(options.getNameMapper(), (o1, o2) -> o1);
-        Mapper mapper = Jie.notNull(options.getMapper(), Mapper.defaultMapper());
+        BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.nonNull(options.getNameMapper(), (o1, o2) -> o1);
+        Mapper mapper = Jie.nonNull(options.getMapper(), Mapper.defaultMapper());
         boolean ignoreError = options.isIgnoreError();
         sourceMap.forEach((key, value) -> {
             if (ignored.contains(key)) {
@@ -78,13 +78,13 @@ final class BeanMapperImpl implements BeanMapper {
         Type sourceKeyType = sourceTypeArgs.get(0);
         Type sourceValueType = sourceTypeArgs.get(1);
         Map<Object, Object> sourceMap = Jie.as(source);
-        BeanProvider beanProvider = Jie.notNull(options.getBeanProvider(), BeanProvider.defaultProvider());
+        BeanProvider beanProvider = Jie.nonNull(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo destInfo = beanProvider.getBeanInfo(destType);
         Map<String, PropertyInfo> destProperties = destInfo.getProperties();
-        Collection<?> ignored = Jie.notNull(options.getIgnored(), Collections.emptyList());
+        Collection<?> ignored = Jie.nonNull(options.getIgnored(), Collections.emptyList());
         boolean ignoreNull = options.isIgnoreNull();
-        BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.notNull(options.getNameMapper(), (o1, o2) -> o1);
-        Mapper mapper = Jie.notNull(options.getMapper(), Mapper.defaultMapper());
+        BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.nonNull(options.getNameMapper(), (o1, o2) -> o1);
+        Mapper mapper = Jie.nonNull(options.getMapper(), Mapper.defaultMapper());
         boolean ignoreError = options.isIgnoreError();
         sourceMap.forEach((key, value) -> {
             if (ignored.contains(key)) {
@@ -105,17 +105,17 @@ final class BeanMapperImpl implements BeanMapper {
     }
 
     private void beanToMap(Object source, Type sourceType, Object dest, Type destType, MappingOptions options) {
-        BeanProvider beanProvider = Jie.notNull(options.getBeanProvider(), BeanProvider.defaultProvider());
+        BeanProvider beanProvider = Jie.nonNull(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo sourceInfo = beanProvider.getBeanInfo(sourceType);
         Map<String, PropertyInfo> sourceProperties = sourceInfo.getProperties();
         List<Type> destTypeArgs = getMapTypeArgs(destType);
         Type destKeyType = destTypeArgs.get(0);
         Type destValueType = destTypeArgs.get(1);
         Map<Object, Object> destMap = Jie.as(dest);
-        Collection<?> ignored = Jie.notNull(options.getIgnored(), Collections.emptyList());
+        Collection<?> ignored = Jie.nonNull(options.getIgnored(), Collections.emptyList());
         boolean ignoreNull = options.isIgnoreNull();
-        BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.notNull(options.getNameMapper(), (o1, o2) -> o1);
-        Mapper mapper = Jie.notNull(options.getMapper(), Mapper.defaultMapper());
+        BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.nonNull(options.getNameMapper(), (o1, o2) -> o1);
+        Mapper mapper = Jie.nonNull(options.getMapper(), Mapper.defaultMapper());
         boolean ignoreError = options.isIgnoreError();
         boolean ignoreClass = options.isIgnoreClass();
         sourceProperties.forEach((name, property) -> {
@@ -142,15 +142,15 @@ final class BeanMapperImpl implements BeanMapper {
     }
 
     private void beanToBean(Object source, Type sourceType, Object dest, Type destType, MappingOptions options) {
-        BeanProvider beanProvider = Jie.notNull(options.getBeanProvider(), BeanProvider.defaultProvider());
+        BeanProvider beanProvider = Jie.nonNull(options.getBeanProvider(), BeanProvider.defaultProvider());
         BeanInfo sourceInfo = beanProvider.getBeanInfo(sourceType);
         Map<String, PropertyInfo> sourceProperties = sourceInfo.getProperties();
         BeanInfo destInfo = beanProvider.getBeanInfo(destType);
         Map<String, PropertyInfo> destProperties = destInfo.getProperties();
-        Collection<?> ignored = Jie.notNull(options.getIgnored(), Collections.emptyList());
+        Collection<?> ignored = Jie.nonNull(options.getIgnored(), Collections.emptyList());
         boolean ignoreNull = options.isIgnoreNull();
-        BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.notNull(options.getNameMapper(), (o1, o2) -> o1);
-        Mapper mapper = Jie.notNull(options.getMapper(), Mapper.defaultMapper());
+        BiFunction<Object, Type, @Nullable Object> nameMapper = Jie.nonNull(options.getNameMapper(), (o1, o2) -> o1);
+        Mapper mapper = Jie.nonNull(options.getMapper(), Mapper.defaultMapper());
         boolean ignoreError = options.isIgnoreError();
         boolean ignoreClass = options.isIgnoreClass();
         sourceProperties.forEach((name, property) -> {
