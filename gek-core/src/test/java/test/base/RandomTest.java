@@ -6,6 +6,8 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieRandom;
 import xyz.fslabo.common.coll.JieArray;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -134,7 +136,7 @@ public class RandomTest {
     }
 
     @Test
-    public void testSupplier() {
+    public void testSupplier() throws Exception {
         Supplier<Integer> s1 = JieRandom.supplier(
             JieRandom.score(20, 1),
             JieRandom.score(30, 2),
@@ -166,6 +168,16 @@ public class RandomTest {
         expectThrows(IllegalArgumentException.class, () -> JieRandom.supplier(Jie.list()));
         expectThrows(IllegalArgumentException.class, () -> JieRandom.supplier(new Random()));
         expectThrows(IllegalArgumentException.class, () -> JieRandom.supplier(new Random(), Jie.list()));
+
+        // test unreadable
+        Method method = s1.getClass().getDeclaredMethod("binarySearch", int.class);
+        method.setAccessible(true);
+        Field field = s1.getClass().getDeclaredField("totalScore");
+        field.setAccessible(true);
+        int totalScore = (Integer) field.get(s1);
+        for (int i = 0; i < totalScore; i++) {
+            method.invoke(s1, totalScore);
+        }
     }
 
     private void testSupplier(Supplier<?> supplier) {

@@ -622,8 +622,7 @@ public class JieRandom {
 
         private final Supplier<Random> random;
         private final Node<T>[] nodes;
-        private final int min;
-        private final int max;
+        private final int totalScore;
 
         RandomSupplier(Supplier<Random> random, Iterable<Score<T>> scores) {
             this.random = random;
@@ -634,16 +633,15 @@ public class JieRandom {
                 totalScore += score.score;
             }
             this.nodes = JieColl.toArray(nodeList);
-            this.min = nodes[0].from;
-            this.max = nodes[nodes.length - 1].to;
+            this.totalScore = totalScore;
         }
 
         @Override
         public T get() {
-            int next = random.get().nextInt(max - min) + min;
+            int next = random.get().nextInt(totalScore);
             Node<T> node = binarySearch(next);
             if (node == null) {
-                throw new IllegalStateException("Child supplier cannot be found.");
+                throw new IllegalStateException("Score not found!");
             }
             return node.supplier.get();
         }
@@ -653,7 +651,7 @@ public class JieRandom {
             int left = 0;
             int right = nodes.length - 1;
             while (left <= right) {
-                int mid = left + (right - left) / 2;
+                int mid = (left + right) / 2;
                 Node<T> node = nodes[mid];
                 int compare = compare(next, node);
                 if (compare == 0) {
