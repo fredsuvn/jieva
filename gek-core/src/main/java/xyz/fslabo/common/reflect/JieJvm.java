@@ -30,7 +30,16 @@ public class JieJvm {
 
     private static final Map<Class<?>, String> INTERNAL_NAMES = Jie.map(
         Object.class, "java/lang/Object",
-        String.class, "java/lang/String"
+        String.class, "java/lang/String",
+        Boolean.class, "java/lang/Boolean",
+        Byte.class, "java/lang/Byte",
+        Short.class, "java/lang/Short",
+        Character.class, "java/lang/Character",
+        Integer.class, "java/lang/Integer",
+        Long.class, "java/lang/Long",
+        Float.class, "java/lang/Float",
+        Double.class, "java/lang/Double",
+        Void.class, "java/lang/Void"
     );
 
     /**
@@ -57,8 +66,18 @@ public class JieJvm {
         if (cls.isArray()) {
             return "[" + getDescriptor(cls.getComponentType());
         }
+        if (!cls.isPrimitive()) {
+            return "L" + getInternalName(cls) + ";";
+        }
+        return getPrimitiveDescriptor(cls);
+    }
+
+    private static String getPrimitiveDescriptor(Class<?> cls) {
         String result = DESCRIPTORS.get(cls);
-        return result != null ? result : "L" + getInternalName(cls) + ";";
+        if (result != null) {
+            return result;
+        }
+        throw new IllegalStateException("Not a primitive type: " + cls.getName());
     }
 
     /**

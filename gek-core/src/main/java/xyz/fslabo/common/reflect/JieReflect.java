@@ -32,6 +32,17 @@ public class JieReflect {
         void.class, Void.class
     );
 
+    private static final Map<Class<?>, String> PRIMITIVE_ARRAY_CLASS_NAMES = Jie.map(
+        boolean.class, "[Z",
+        byte.class, "[B",
+        short.class, "[S",
+        char.class, "[C",
+        int.class, "[I",
+        long.class, "[J",
+        float.class, "[F",
+        double.class, "[D"
+    );
+
     private static final Cache<Type, Map<TypeVariable<?>, Type>> TYPE_PARAMETER_MAPPING_CACHE = Cache.softCache();
 
     /**
@@ -448,32 +459,18 @@ public class JieReflect {
      * @return array class name of which component type is specified type
      */
     public static String arrayClassName(Class<?> componentType) {
-        String name;
         if (componentType.isArray()) {
-            name = "[" + componentType.getName();
-        } else if (Objects.equals(boolean.class, componentType)) {
-            name = "[Z";
-        } else if (Objects.equals(byte.class, componentType)) {
-            name = "[B";
-        } else if (Objects.equals(short.class, componentType)) {
-            name = "[S";
-        } else if (Objects.equals(char.class, componentType)) {
-            name = "[C";
-        } else if (Objects.equals(int.class, componentType)) {
-            name = "[I";
-        } else if (Objects.equals(long.class, componentType)) {
-            name = "[J";
-        } else if (Objects.equals(float.class, componentType)) {
-            name = "[F";
-        } else if (Objects.equals(double.class, componentType)) {
-            name = "[D";
-        } else if (Objects.equals(void.class, componentType)) {
-            // name = "[V";
-            throw new IllegalArgumentException("Class doesn't exists: void[].");
-        } else {
-            name = "[L" + componentType.getName() + ";";
+            return "[" + componentType.getName();
         }
-        return name;
+        if (componentType.isPrimitive()) {
+            String name = PRIMITIVE_ARRAY_CLASS_NAMES.get(componentType);
+            if (name != null) {
+                return name;
+            }
+            // void
+            throw new IllegalArgumentException("Array class doesn't exists: " + componentType.getName() + ".");
+        }
+        return "[L" + componentType.getName() + ";";
     }
 
     /**

@@ -6,6 +6,7 @@ import xyz.fslabo.common.base.Jie;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -922,9 +923,23 @@ public class JieColl {
      * @param <T>          type of element
      * @return value or default value
      */
-    public static <T> T get(@Nullable Iterable<? extends T> iterable, int index, @Nullable T defaultValue) {
+    public static <T> T get(@Nullable Iterable<? extends T> iterable, int index, T defaultValue) {
+        return get(iterable, index, i -> defaultValue);
+    }
+
+    /**
+     * Returns value from given iterable at specified index, if the value is null or failed to obtain, invoke specified
+     * function and return the result, the passed argument of function is specified index.
+     *
+     * @param iterable given iterable
+     * @param index    specified index
+     * @param func     specified function
+     * @param <T>      type of element
+     * @return value or default value
+     */
+    public static <T> T get(@Nullable Iterable<? extends T> iterable, int index, IntFunction<? extends T> func) {
         if (iterable == null || index < 0) {
-            return defaultValue;
+            return func.apply(index);
         }
         if (iterable instanceof List) {
             List<T> list = Jie.as(iterable);
@@ -934,7 +949,7 @@ public class JieColl {
                     return result;
                 }
             }
-            return defaultValue;
+            return func.apply(index);
         }
         int i = 0;
         for (T t : iterable) {
@@ -942,12 +957,12 @@ public class JieColl {
                 if (t != null) {
                     return t;
                 } else {
-                    return defaultValue;
+                    return func.apply(index);
                 }
             }
             i++;
         }
-        return defaultValue;
+        return func.apply(index);
     }
 
     /**
@@ -961,11 +976,29 @@ public class JieColl {
      * @return value or default value
      */
     public static <K, V> V get(@Nullable Map<K, V> map, K key, V defaultValue) {
+        return get(map, key, (Function<? super K, ? extends V>) k -> defaultValue);
+    }
+
+    /**
+     * Returns value from given map at specified key, if the value is null or failed to obtain, invoke specified
+     * function and return the result, the passed argument of function is specified key.
+     *
+     * @param map  given map
+     * @param key  specified key
+     * @param func specified function
+     * @param <K>  type of keys
+     * @param <V>  type of values
+     * @return value or default value
+     */
+    public static <K, V> V get(@Nullable Map<K, V> map, K key, Function<? super K, ? extends V> func) {
         if (map == null) {
-            return defaultValue;
+            return func.apply(key);
         }
         V v = map.get(key);
-        return v == null ? defaultValue : v;
+        if (v == null) {
+            return func.apply(key);
+        }
+        return v;
     }
 
     /**

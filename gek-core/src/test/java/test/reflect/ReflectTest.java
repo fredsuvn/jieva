@@ -156,6 +156,7 @@ public class ReflectTest {
         assertEquals(JieReflect.arrayClass(Object.class), Object[].class);
         assertEquals(JieReflect.arrayClass(Object[].class), Object[][].class);
         assertEquals(JieReflect.arrayClass(boolean.class), boolean[].class);
+        assertEquals(JieReflect.arrayClass(boolean[].class), boolean[][].class);
         assertEquals(JieReflect.arrayClass(byte.class), byte[].class);
         assertEquals(JieReflect.arrayClass(short.class), short[].class);
         assertEquals(JieReflect.arrayClass(char.class), char[].class);

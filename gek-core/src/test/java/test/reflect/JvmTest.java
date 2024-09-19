@@ -1,10 +1,12 @@
 package test.reflect;
 
 import org.testng.annotations.Test;
+import test.JieTest;
 import xyz.fslabo.common.reflect.JieJvm;
 import xyz.fslabo.common.reflect.JieType;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
@@ -78,6 +80,10 @@ public class JvmTest {
             JieJvm.getDescriptor(BaseClass.class.getConstructor(String.class, List.class, List.class, List.class)),
             org.objectweb.asm.Type.getConstructorDescriptor(BaseClass.class.getConstructor(String.class, List.class, List.class, List.class))
         );
+
+        // exception
+        Method getPrimitiveDescriptor = JieJvm.class.getDeclaredMethod("getPrimitiveDescriptor", Class.class);
+        JieTest.testThrow(IllegalStateException.class, getPrimitiveDescriptor, null, Object.class);
     }
 
     @Test
