@@ -3,6 +3,7 @@ plugins {
   id 'gek-config'
   id 'gek-repo'
   id 'java-library'
+  id 'gek-test'
   id 'gek-publish'
 }
 

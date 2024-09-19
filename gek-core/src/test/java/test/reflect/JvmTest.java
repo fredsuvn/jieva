@@ -1,9 +1,9 @@
 package test.reflect;
 
 import org.testng.annotations.Test;
-import test.JieTest;
 import xyz.fslabo.common.reflect.JieJvm;
 import xyz.fslabo.common.reflect.JieType;
+import xyz.fslabo.test.JieTest;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
