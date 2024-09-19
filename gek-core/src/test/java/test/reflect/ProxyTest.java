@@ -2,12 +2,12 @@ package test.reflect;
 
 import org.objectweb.asm.MethodVisitor;
 import org.testng.annotations.Test;
-import test.JieTestException;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.reflect.NotPrimitiveException;
 import xyz.fslabo.common.reflect.proxy.*;
 import xyz.fslabo.test.JieTest;
+import xyz.fslabo.test.JieTestException;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
