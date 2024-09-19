@@ -128,8 +128,8 @@ public interface IOConfigurator<T extends IOConfigurator<T>> extends BaseConfigu
     long doFinal();
 
     /**
-     * Starts and does final process, returns int number of bytes written in output, or {@link Integer#MAX_VALUE}
-     * if the number is greater than {@link Integer#MAX_VALUE}.
+     * Starts and does final process, returns int number of bytes written in output, or {@link Integer#MAX_VALUE} if the
+     * number is greater than {@link Integer#MAX_VALUE}.
      *
      * @return int number of bytes written in output or {@link Integer#MAX_VALUE} if the number is greater than
      * {@link Integer#MAX_VALUE}.
@@ -149,8 +149,8 @@ public interface IOConfigurator<T extends IOConfigurator<T>> extends BaseConfigu
     }
 
     /**
-     * Returns an input stream which contains all configurations of current process,
-     * and will start and do final data process when read methods are called.
+     * Returns an input stream which contains all configurations of current process, and will start and do final data
+     * process when read methods are called.
      *
      * @return an input stream which contains all configurations of current process
      */

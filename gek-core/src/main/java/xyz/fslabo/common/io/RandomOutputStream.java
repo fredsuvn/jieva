@@ -24,7 +24,7 @@ final class RandomOutputStream extends OutputStream {
             this.pos = offset;
             this.random.seek(pos);
         } catch (IOException e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 

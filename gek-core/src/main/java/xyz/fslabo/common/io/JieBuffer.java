@@ -26,10 +26,10 @@ public class JieBuffer {
      *
      * @param source source buffer
      * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
     @Nullable
-    public static byte[] read(ByteBuffer source) throws JieIOException {
+    public static byte[] read(ByteBuffer source) throws IORuntimeException {
         try {
             int length = source.remaining();
             if (length <= 0) {
@@ -39,7 +39,7 @@ public class JieBuffer {
             source.get(result);
             return result;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -54,10 +54,10 @@ public class JieBuffer {
      * @param source source buffer
      * @param number specified number
      * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
     @Nullable
-    public static byte[] read(ByteBuffer source, int number) throws JieIOException {
+    public static byte[] read(ByteBuffer source, int number) throws IORuntimeException {
         if (number < 0) {
             return read(source);
         }
@@ -73,7 +73,7 @@ public class JieBuffer {
             source.get(result);
             return result;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -83,17 +83,17 @@ public class JieBuffer {
      *
      * @param source source buffer
      * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
     @Nullable
-    public static byte[] readReset(ByteBuffer source) throws JieIOException {
+    public static byte[] readReset(ByteBuffer source) throws IORuntimeException {
         try {
             source.mark();
             byte[] result = read(source);
             source.reset();
             return result;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -108,17 +108,17 @@ public class JieBuffer {
      * @param source source buffer
      * @param number specified number
      * @return the array, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
     @Nullable
-    public static byte[] readReset(ByteBuffer source, int number) throws JieIOException {
+    public static byte[] readReset(ByteBuffer source, int number) throws IORuntimeException {
         try {
             source.mark();
             byte[] result = read(source, number);
             source.reset();
             return result;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -130,9 +130,9 @@ public class JieBuffer {
      * @param source source buffer
      * @param dest   dest buffer
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static int readTo(ByteBuffer source, ByteBuffer dest) throws JieIOException {
+    public static int readTo(ByteBuffer source, ByteBuffer dest) throws IORuntimeException {
         try {
             int sr = source.remaining();
             int dr = dest.remaining();
@@ -144,7 +144,7 @@ public class JieBuffer {
             dest.put(slice);
             return dr;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -160,9 +160,9 @@ public class JieBuffer {
      * @param dest   dest buffer
      * @param number specified number
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static int readTo(ByteBuffer source, ByteBuffer dest, int number) throws JieIOException {
+    public static int readTo(ByteBuffer source, ByteBuffer dest, int number) throws IORuntimeException {
         if (number < 0) {
             return readTo(source, dest);
         }
@@ -177,7 +177,7 @@ public class JieBuffer {
             }
             return readNum;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -188,9 +188,9 @@ public class JieBuffer {
      * @param source source buffer
      * @param dest   dest array
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer or array
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static int readTo(ByteBuffer source, byte[] dest) throws JieIOException {
+    public static int readTo(ByteBuffer source, byte[] dest) throws IORuntimeException {
         return readTo(source, dest, 0);
     }
 
@@ -202,9 +202,9 @@ public class JieBuffer {
      * @param dest   dest array
      * @param offset given offset
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer or array
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static int readTo(ByteBuffer source, byte[] dest, int offset) throws JieIOException {
+    public static int readTo(ByteBuffer source, byte[] dest, int offset) throws IORuntimeException {
         try {
             JieCheck.checkInBounds(offset, 0, dest.length);
             int minLen = Math.min(source.remaining(), dest.length - offset);
@@ -219,7 +219,7 @@ public class JieBuffer {
             }
             return minLen;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -230,9 +230,9 @@ public class JieBuffer {
      * @param source source buffer
      * @param dest   dest stream
      * @return actual read number, or -1 if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static int readTo(ByteBuffer source, OutputStream dest) throws JieIOException {
+    public static int readTo(ByteBuffer source, OutputStream dest) throws IORuntimeException {
         try {
             if (source.hasArray()) {
                 int remaining = source.remaining();
@@ -244,7 +244,7 @@ public class JieBuffer {
             dest.write(bytes);
             return bytes.length;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -254,10 +254,10 @@ public class JieBuffer {
      *
      * @param source source buffer
      * @return the string, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
     @Nullable
-    public static String readString(ByteBuffer source) throws JieIOException {
+    public static String readString(ByteBuffer source) throws IORuntimeException {
         return readString(source, JieChars.defaultCharset());
     }
 
@@ -268,10 +268,10 @@ public class JieBuffer {
      * @param source  source buffer
      * @param charset specified charset
      * @return the string, or null if no data read out and reaches to the end of buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
     @Nullable
-    public static String readString(ByteBuffer source, Charset charset) throws JieIOException {
+    public static String readString(ByteBuffer source, Charset charset) throws IORuntimeException {
         try {
             byte[] bytes = read(source);
             if (bytes == null) {
@@ -279,7 +279,7 @@ public class JieBuffer {
             }
             return new String(bytes, charset);
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -290,15 +290,15 @@ public class JieBuffer {
      * @param buffer given buffer
      * @param number specified number
      * @return the slice buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static ByteBuffer slice(ByteBuffer buffer, int number) throws JieIOException {
+    public static ByteBuffer slice(ByteBuffer buffer, int number) throws IORuntimeException {
         try {
             ByteBuffer slice = buffer.slice();
             slice.limit(Math.min(number, buffer.remaining()));
             return slice;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -310,16 +310,16 @@ public class JieBuffer {
      * @param buffer given buffer
      * @param number specified number
      * @return the slice buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static ByteBuffer readSlice(ByteBuffer buffer, int number) throws JieIOException {
+    public static ByteBuffer readSlice(ByteBuffer buffer, int number) throws IORuntimeException {
         try {
             ByteBuffer slice = buffer.slice();
             slice.limit(Math.min(number, buffer.remaining()));
             buffer.position(buffer.position() + slice.remaining());
             return slice;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -332,9 +332,9 @@ public class JieBuffer {
      * @param buffer given buffer
      * @param offset given offset
      * @return the sub-buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset) throws JieIOException {
+    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset) throws IORuntimeException {
         try {
             JieCheck.checkInBounds(offset, 0, buffer.limit());
             int pos = buffer.position();
@@ -343,7 +343,7 @@ public class JieBuffer {
             buffer.position(pos);
             return slice;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -357,9 +357,9 @@ public class JieBuffer {
      * @param offset given offset
      * @param length specified length
      * @return the sub-buffer
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO exception
      */
-    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset, int length) throws JieIOException {
+    public static ByteBuffer subBuffer(ByteBuffer buffer, int offset, int length) throws IORuntimeException {
         try {
             JieCheck.checkRangeInBounds(offset, offset + length, 0, buffer.limit());
             int pos = buffer.position();
@@ -368,7 +368,7 @@ public class JieBuffer {
             buffer.position(pos);
             return slice;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 

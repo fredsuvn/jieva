@@ -1,16 +1,18 @@
 package xyz.fslabo.common.io;
 
+import java.io.IOException;
+
 /**
- * Exception for IO.
+ * Runtime version of {@link IOException}.
  *
  * @author fredsuvn
  */
-public class JieIOException extends RuntimeException {
+public class IORuntimeException extends RuntimeException {
 
     /**
      * Empty constructor.
      */
-    public JieIOException() {
+    public IORuntimeException() {
     }
 
     /**
@@ -18,7 +20,7 @@ public class JieIOException extends RuntimeException {
      *
      * @param message exception message
      */
-    public JieIOException(String message) {
+    public IORuntimeException(String message) {
         super(message);
     }
 
@@ -28,7 +30,7 @@ public class JieIOException extends RuntimeException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public JieIOException(String message, Throwable cause) {
+    public IORuntimeException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -37,7 +39,16 @@ public class JieIOException extends RuntimeException {
      *
      * @param cause exception cause
      */
-    public JieIOException(Throwable cause) {
+    public IORuntimeException(Throwable cause) {
         super(cause);
+    }
+
+    /**
+     * Constructs with exception cause.
+     *
+     * @param io exception cause
+     */
+    public IORuntimeException(IOException io) {
+        super(io.getMessage(), io.getCause());
     }
 }

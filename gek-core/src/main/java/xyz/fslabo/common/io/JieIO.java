@@ -24,22 +24,18 @@ public class JieIO {
      */
     public static final int BUFFER_SIZE = 1024 * 8;
 
-    // Common IO methods:
-
     /**
      * Reads all bytes from source stream into an array. Returns the array, or null if no data read out and reaches to
      * the end of stream.
      *
      * @param source source stream
      * @return the array, or null if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
     @Nullable
-    public static byte[] read(InputStream source) throws JieIOException {
+    public static byte[] read(InputStream source) throws IORuntimeException {
         try {
             int available = source.available();
-            ByteArrayOutputStream dest;
-            boolean hasRead = false;
             if (available > 0) {
                 byte[] bytes = new byte[available];
                 int c = source.read(bytes);
@@ -51,29 +47,22 @@ public class JieIO {
                     if (r == -1) {
                         return bytes;
                     } else {
-                        dest = new ByteArrayOutputStream(available + 1);
+                        ByteArrayOutputStream dest = new ByteArrayOutputStream(available + 1);
                         dest.write(bytes);
                         dest.write(r);
-                        hasRead = true;
+                        readTo(source, dest);
+                        return dest.toByteArray();
                     }
                 } else {
-                    dest = new ByteArrayOutputStream(c);
-                    dest.write(bytes, 0, c);
-                    hasRead = true;
+                    return Arrays.copyOf(bytes, c);
                 }
             } else {
-                dest = new ByteArrayOutputStream();
+                ByteArrayOutputStream dest = new ByteArrayOutputStream();
+                long num = readTo(source, dest);
+                return num < 0 ? null : dest.toByteArray();
             }
-            long readCount = readTo(source, dest);
-            if (readCount == -1) {
-                if (hasRead) {
-                    return dest.toByteArray();
-                }
-                return null;
-            }
-            return dest.toByteArray();
-        } catch (Exception e) {
-            throw new JieIOException(e);
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
         }
     }
 
@@ -88,17 +77,17 @@ public class JieIO {
      * @param source source stream
      * @param number specified number
      * @return the array, or null if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
     @Nullable
-    public static byte[] read(InputStream source, int number) throws JieIOException {
-        if (number < 0) {
-            return read(source);
-        }
-        if (number == 0) {
-            return new byte[0];
-        }
+    public static byte[] read(InputStream source, int number) throws IORuntimeException {
         try {
+            if (number < 0) {
+                return read(source);
+            }
+            if (number == 0) {
+                return new byte[0];
+            }
             int b = source.read();
             if (b == -1) {
                 return null;
@@ -116,8 +105,155 @@ public class JieIO {
                 offset += readSize;
             }
             return dest;
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
+        }
+    }
+
+    /**
+     * Reads all chars from source reader into a string. Returns the string, or null if no data read out and reaches to
+     * the end of reader.
+     *
+     * @param source source reader
+     * @return the string, or null if no data read out and reaches to the end of reader
+     * @throws IORuntimeException IO runtime exception
+     */
+    @Nullable
+    public static String read(Reader source) throws IORuntimeException {
+        StringBuilder dest = new StringBuilder();
+        long readCount = readTo(source, dest);
+        if (readCount == -1) {
+            return null;
+        }
+        return dest.toString();
+    }
+
+    /**
+     * Reads specified number of chars from source reader into a string. Returns the string, or null if no data read out
+     * and reaches to the end of reader.
+     * <p>
+     * If the number &lt; 0, read all as {@link #read(Reader)}; els if the number is 0, no read and return an empty
+     * array; else this method will keep reading until the read number reaches to the specified number, or the reading
+     * reaches the end of the reader.
+     *
+     * @param source source reader
+     * @param number specified number
+     * @return the string, or null if no data read out and reaches to the end of reader
+     * @throws IORuntimeException IO runtime exception
+     */
+    @Nullable
+    public static String read(Reader source, int number) throws IORuntimeException {
+        StringBuilder dest = new StringBuilder();
+        long readCount = readTo(source, dest, number);
+        if (readCount == -1) {
+            return null;
+        }
+        return dest.toString();
+    }
+
+    /**
+     * Reads all bytes from source stream into a string with {@link JieChars#defaultCharset()}. Returns the string, or
+     * null if no data read out and reaches to the end of stream.
+     *
+     * @param source source stream
+     * @return the string, or null if no data read out and reaches to the end of stream
+     * @throws IORuntimeException IO runtime exception
+     */
+    @Nullable
+    public static String readString(InputStream source) throws IORuntimeException {
+        return readString(source, JieChars.defaultCharset());
+    }
+
+    /**
+     * Reads all bytes from source stream into a string with specified charset. Returns the string, or null if no data
+     * read out and reaches to the end of stream.
+     *
+     * @param source  source stream
+     * @param charset specified charset
+     * @return the string, or null if no data read out and reaches to the end of stream
+     * @throws IORuntimeException IO runtime exception
+     */
+    @Nullable
+    public static String readString(InputStream source, Charset charset) throws IORuntimeException {
+        byte[] bytes = read(source);
+        if (bytes == null) {
+            return null;
+        }
+        return new String(bytes, charset);
+    }
+
+    /**
+     * Reads available bytes from source stream into an array. Returns the array, or null if no data read out and
+     * reaches to the end of stream.
+     *
+     * @param source source stream
+     * @return the array, or null if no data read out and reaches to the end of stream
+     * @throws IORuntimeException IO runtime exception
+     */
+    @Nullable
+    public static byte[] available(InputStream source) throws IORuntimeException {
+        try {
+            int available = source.available();
+            if (available > 0) {
+                byte[] bytes = new byte[available];
+                int c = source.read(bytes);
+                if (c == -1) {
+                    return null;
+                }
+                if (c == available) {
+                    return bytes;
+                }
+                return Arrays.copyOf(bytes, c);
+            }
+            if (available == 0) {
+                byte[] b = new byte[1];
+                int readSize = source.read(b);
+                if (readSize == -1) {
+                    return null;
+                }
+                if (readSize == 0) {
+                    return new byte[0];
+                }
+                return b;
+            }
+            return null;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
+        }
+    }
+
+    /**
+     * Reads available bytes from source stream into a string with {@link JieChars#defaultCharset()}. Returns the
+     * string, or null if no data read out and reaches to the end of stream.
+     *
+     * @param source source stream
+     * @return the string, or null if no data read out and reaches to the end of stream
+     * @throws IORuntimeException IO runtime exception
+     */
+    @Nullable
+    public static String avalaibleString(InputStream source) throws IORuntimeException {
+        return avalaibleString(source, JieChars.defaultCharset());
+    }
+
+    /**
+     * Reads available bytes from source stream into a string with specified charset. Returns the string, or null if no
+     * data read out and reaches to the end of stream.
+     *
+     * @param source  source stream
+     * @param charset specified charset
+     * @return the string, or null if no data read out and reaches to the end of stream
+     * @throws IORuntimeException IO runtime exception
+     */
+    @Nullable
+    public static String avalaibleString(InputStream source, Charset charset) throws IORuntimeException {
+        try {
+            byte[] bytes = available(source);
+            if (bytes == null) {
+                return null;
+            }
+            return new String(bytes, charset);
+        } catch (Exception e) {
+            throw new IORuntimeException(e);
         }
     }
 
@@ -129,7 +265,7 @@ public class JieIO {
      * @param source source stream
      * @param dest   dest array
      * @return actual read number, or -1 if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
     public static int readTo(InputStream source, byte[] dest) {
         return readTo(source, dest, 0, dest.length);
@@ -145,9 +281,9 @@ public class JieIO {
      * @param offset given offset
      * @param length specified length
      * @return actual read number, or -1 if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(InputStream source, byte[] dest, int offset, int length) throws JieIOException {
+    public static int readTo(InputStream source, byte[] dest, int offset, int length) throws IORuntimeException {
         try {
             JieCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
             if (length < 0) {
@@ -171,7 +307,7 @@ public class JieIO {
             }
             return length;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -183,7 +319,7 @@ public class JieIO {
      * @param source source stream
      * @param dest   dest buffer
      * @return actual read number, or -1 if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
     public static int readTo(InputStream source, ByteBuffer dest) {
         try {
@@ -207,7 +343,7 @@ public class JieIO {
             dest.put(bytes);
             return bytes.length;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -219,9 +355,9 @@ public class JieIO {
      * @param source source stream
      * @param dest   dest stream
      * @return actual read number, or -1 if no data read out and reaches to the end of source stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(InputStream source, OutputStream dest) throws JieIOException {
+    public static long readTo(InputStream source, OutputStream dest) throws IORuntimeException {
         return readTo(source, dest, -1);
     }
 
@@ -236,9 +372,9 @@ public class JieIO {
      * @param dest   dest stream
      * @param number specified number
      * @return actual read number, or -1 if no data read out and reaches to the end of source stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(InputStream source, OutputStream dest, long number) throws JieIOException {
+    public static long readTo(InputStream source, OutputStream dest, long number) throws IORuntimeException {
         return readTo(source, dest, number, BUFFER_SIZE);
     }
 
@@ -254,9 +390,9 @@ public class JieIO {
      * @param number     specified number
      * @param bufferSize buffer size for each IO operation
      * @return actual read number, or -1 if no data read out and reaches to the end of source stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(InputStream source, OutputStream dest, long number, int bufferSize) throws JieIOException {
+    public static long readTo(InputStream source, OutputStream dest, long number, int bufferSize) throws IORuntimeException {
         try {
             if (bufferSize <= 0) {
                 throw new IllegalArgumentException("bufferSize <= 0.");
@@ -289,121 +425,7 @@ public class JieIO {
             }
             return readNum;
         } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads available bytes from source stream into an array. Returns the array, or null if no data read out and
-     * reaches to the end of stream.
-     *
-     * @param source source stream
-     * @return the array, or null if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static byte[] available(InputStream source) throws JieIOException {
-        try {
-            int available = source.available();
-            if (available > 0) {
-                byte[] bytes = new byte[available];
-                int c = source.read(bytes);
-                if (c == -1) {
-                    return null;
-                }
-                if (c == available) {
-                    return bytes;
-                }
-                return Arrays.copyOf(bytes, c);
-            }
-            if (available == 0) {
-                byte[] b = new byte[1];
-                int readSize = source.read(b);
-                if (readSize == -1) {
-                    return null;
-                }
-                if (readSize == 0) {
-                    return new byte[0];
-                }
-                return b;
-            }
-            return null;
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads available bytes from source stream into dest stream, returns actual read number, or -1 if no data read out
-     * and reaches to the end of source stream.
-     *
-     * @param source source stream
-     * @param dest   dest stream
-     * @return actual read number, or -1 if no data read out and reaches to the end of source stream
-     * @throws JieIOException IO exception
-     */
-    public static long availableTo(InputStream source, OutputStream dest) throws JieIOException {
-        try {
-            byte[] available = available(source);
-            if (available == null) {
-                return -1;
-            }
-            if (available.length == 0) {
-                return 0;
-            }
-            dest.write(available);
-            return available.length;
-        } catch (IOException e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads all chars from source reader into a string. Returns the string, or null if no data read out and reaches to
-     * the end of reader.
-     *
-     * @param source source reader
-     * @return the string, or null if no data read out and reaches to the end of reader
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static String read(Reader source) throws JieIOException {
-        try {
-            StringBuilder dest = new StringBuilder();
-            long readCount = readTo(source, dest);
-            if (readCount == -1) {
-                return null;
-            }
-            return dest.toString();
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads specified number of chars from source reader into a string. Returns the string, or null if no data read out
-     * and reaches to the end of reader.
-     * <p>
-     * If the number &lt; 0, read all as {@link #read(Reader)}; els if the number is 0, no read and return an empty
-     * array; else this method will keep reading until the read number reaches to the specified number, or the reading
-     * reaches the end of the reader.
-     *
-     * @param source source reader
-     * @param number specified number
-     * @return the string, or null if no data read out and reaches to the end of reader
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static String read(Reader source, int number) throws JieIOException {
-        try {
-            StringBuilder dest = new StringBuilder();
-            long readCount = readTo(source, dest, number);
-            if (readCount == -1) {
-                return null;
-            }
-            return dest.toString();
-        } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -414,14 +436,14 @@ public class JieIO {
      * @param source source reader
      * @param dest   dest appendable
      * @return actual read number, or -1 if no data read out and reaches to the end of reader
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(Reader source, Appendable dest) throws JieIOException {
+    public static long readTo(Reader source, Appendable dest) throws IORuntimeException {
         if (dest instanceof CharBuffer) {
             try {
                 return source.read((CharBuffer) dest);
             } catch (IOException e) {
-                throw new JieIOException(e);
+                throw new IORuntimeException(e);
             }
         }
         return readTo(source, dest, -1);
@@ -438,9 +460,9 @@ public class JieIO {
      * @param dest   dest appendable
      * @param number specified number
      * @return actual read number, or -1 if no data read out and reaches to the end of source reader
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(Reader source, Appendable dest, int number) throws JieIOException {
+    public static long readTo(Reader source, Appendable dest, int number) throws IORuntimeException {
         return readTo(source, dest, number, BUFFER_SIZE);
     }
 
@@ -456,9 +478,9 @@ public class JieIO {
      * @param number     specified number
      * @param bufferSize buffer size for each IO operation
      * @return actual read number, or -1 if no data read out and reaches to the end of source reader
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(Reader source, Appendable dest, int number, int bufferSize) throws JieIOException {
+    public static long readTo(Reader source, Appendable dest, int number, int bufferSize) throws IORuntimeException {
         try {
             if (bufferSize <= 0) {
                 throw new IllegalArgumentException("bufferSize <= 0.");
@@ -491,7 +513,7 @@ public class JieIO {
             }
             return readNum;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
@@ -510,72 +532,27 @@ public class JieIO {
     }
 
     /**
-     * Reads all bytes from source stream into a string with {@link JieChars#defaultCharset()}. Returns the string, or
-     * null if no data read out and reaches to the end of stream.
+     * Reads available bytes from source stream into dest stream, returns actual read number, or -1 if no data read out
+     * and reaches to the end of source stream.
      *
      * @param source source stream
-     * @return the string, or null if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
+     * @param dest   dest stream
+     * @return actual read number, or -1 if no data read out and reaches to the end of source stream
+     * @throws IORuntimeException IO runtime exception
      */
-    @Nullable
-    public static String readString(InputStream source) throws JieIOException {
-        return readString(source, JieChars.defaultCharset());
-    }
-
-    /**
-     * Reads all bytes from source stream into a string with specified charset. Returns the string, or null if no data
-     * read out and reaches to the end of stream.
-     *
-     * @param source  source stream
-     * @param charset specified charset
-     * @return the string, or null if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static String readString(InputStream source, Charset charset) throws JieIOException {
+    public static long availableTo(InputStream source, OutputStream dest) throws IORuntimeException {
         try {
-            byte[] bytes = read(source);
-            if (bytes == null) {
-                return null;
+            byte[] available = available(source);
+            if (available == null) {
+                return -1;
             }
-            return new String(bytes, charset);
-        } catch (Exception e) {
-            throw new JieIOException(e);
-        }
-    }
-
-    /**
-     * Reads available bytes from source stream into a string with {@link JieChars#defaultCharset()}. Returns the
-     * string, or null if no data read out and reaches to the end of stream.
-     *
-     * @param source source stream
-     * @return the string, or null if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static String avalaibleString(InputStream source) throws JieIOException {
-        return avalaibleString(source, JieChars.defaultCharset());
-    }
-
-    /**
-     * Reads available bytes from source stream into a string with specified charset. Returns the string, or null if no
-     * data read out and reaches to the end of stream.
-     *
-     * @param source  source stream
-     * @param charset specified charset
-     * @return the string, or null if no data read out and reaches to the end of stream
-     * @throws JieIOException IO exception
-     */
-    @Nullable
-    public static String avalaibleString(InputStream source, Charset charset) throws JieIOException {
-        try {
-            byte[] bytes = available(source);
-            if (bytes == null) {
-                return null;
+            if (available.length == 0) {
+                return 0;
             }
-            return new String(bytes, charset);
-        } catch (Exception e) {
-            throw new JieIOException(e);
+            dest.write(available);
+            return available.length;
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
         }
     }
 
@@ -584,9 +561,9 @@ public class JieIO {
      *
      * @param stream given stream
      * @return given stream as {@link Reader}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static Reader toReader(InputStream stream) throws JieIOException {
+    public static Reader toReader(InputStream stream) throws IORuntimeException {
         return toReader(stream, JieChars.defaultCharset());
     }
 
@@ -596,9 +573,9 @@ public class JieIO {
      * @param stream  given stream
      * @param charset specified charset
      * @return given stream as {@link Reader}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static Reader toReader(InputStream stream, Charset charset) throws JieIOException {
+    public static Reader toReader(InputStream stream, Charset charset) throws IORuntimeException {
         return new InputStreamReader(stream, charset);
     }
 
@@ -607,9 +584,9 @@ public class JieIO {
      *
      * @param buffer given buffer
      * @return given buffer as {@link Reader}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static Reader toReader(CharBuffer buffer) throws JieIOException {
+    public static Reader toReader(CharBuffer buffer) throws IORuntimeException {
         return new CharBufferReader(buffer);
     }
 
@@ -619,9 +596,9 @@ public class JieIO {
      *
      * @param reader given reader
      * @return given reader as {@link InputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static InputStream toInputStream(Reader reader) throws JieIOException {
+    public static InputStream toInputStream(Reader reader) throws IORuntimeException {
         return toInputStream(reader, JieChars.defaultCharset());
     }
 
@@ -632,9 +609,9 @@ public class JieIO {
      * @param reader  given reader
      * @param charset specified charset
      * @return given reader as {@link InputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static InputStream toInputStream(Reader reader, Charset charset) throws JieIOException {
+    public static InputStream toInputStream(Reader reader, Charset charset) throws IORuntimeException {
         return new ReaderInputStream(reader, charset);
     }
 
@@ -643,9 +620,9 @@ public class JieIO {
      *
      * @param array given array
      * @return given array as {@link ByteArrayInputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static ByteArrayInputStream toInputStream(byte[] array) throws JieIOException {
+    public static ByteArrayInputStream toInputStream(byte[] array) throws IORuntimeException {
         return new ByteArrayInputStream(array);
     }
 
@@ -656,9 +633,9 @@ public class JieIO {
      * @param offset given offset
      * @param length specified length
      * @return given array as {@link ByteArrayInputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) throws JieIOException {
+    public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) throws IORuntimeException {
         return new ByteArrayInputStream(array, offset, length);
     }
 
@@ -667,9 +644,9 @@ public class JieIO {
      *
      * @param buffer given buffer
      * @return given buffer as {@link InputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static InputStream toInputStream(ByteBuffer buffer) throws JieIOException {
+    public static InputStream toInputStream(ByteBuffer buffer) throws IORuntimeException {
         return new ByteBufferInputStream(buffer);
     }
 
@@ -678,9 +655,9 @@ public class JieIO {
      *
      * @param stream given stream
      * @return given stream as {@link Writer}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static Writer toWriter(OutputStream stream) throws JieIOException {
+    public static Writer toWriter(OutputStream stream) throws IORuntimeException {
         return toWriter(stream, JieChars.defaultCharset());
     }
 
@@ -690,9 +667,9 @@ public class JieIO {
      * @param stream  given stream
      * @param charset specified charset
      * @return given stream as {@link Writer}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static Writer toWriter(OutputStream stream, Charset charset) throws JieIOException {
+    public static Writer toWriter(OutputStream stream, Charset charset) throws IORuntimeException {
         return new OutputStreamWriter(stream, charset);
     }
 
@@ -701,9 +678,9 @@ public class JieIO {
      *
      * @param buffer given buffer
      * @return given buffer as {@link Writer}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static Writer toWriter(CharBuffer buffer) throws JieIOException {
+    public static Writer toWriter(CharBuffer buffer) throws IORuntimeException {
         return new CharBufferWriter(buffer);
     }
 
@@ -715,9 +692,9 @@ public class JieIO {
      *
      * @param appendable given appendable
      * @return given appendable as {@link OutputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static OutputStream toOutputStream(Appendable appendable) throws JieIOException {
+    public static OutputStream toOutputStream(Appendable appendable) throws IORuntimeException {
         return toOutputStream(appendable, JieChars.defaultCharset());
     }
 
@@ -730,9 +707,9 @@ public class JieIO {
      * @param appendable given appendable
      * @param charset    specified charset
      * @return given appendable as {@link OutputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static OutputStream toOutputStream(Appendable appendable, Charset charset) throws JieIOException {
+    public static OutputStream toOutputStream(Appendable appendable, Charset charset) throws IORuntimeException {
         return new AppendableOutputStream(appendable, charset);
     }
 
@@ -741,9 +718,9 @@ public class JieIO {
      *
      * @param array given array
      * @return given array as {@link OutputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static OutputStream toOutputStream(byte[] array) throws JieIOException {
+    public static OutputStream toOutputStream(byte[] array) throws IORuntimeException {
         return new BytesWrapperOutputStream(array, 0, array.length);
     }
 
@@ -754,9 +731,9 @@ public class JieIO {
      * @param offset given offset
      * @param length specified length
      * @return given array as {@link OutputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static OutputStream toOutputStream(byte[] array, int offset, int length) throws JieIOException {
+    public static OutputStream toOutputStream(byte[] array, int offset, int length) throws IORuntimeException {
         JieCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
         return new BytesWrapperOutputStream(array, offset, length);
     }
@@ -766,9 +743,9 @@ public class JieIO {
      *
      * @param buffer given buffer
      * @return given buffer as {@link OutputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static OutputStream toOutputStream(ByteBuffer buffer) throws JieIOException {
+    public static OutputStream toOutputStream(ByteBuffer buffer) throws IORuntimeException {
         return new ByteBufferOutputStream(buffer);
     }
 
@@ -779,9 +756,9 @@ public class JieIO {
      * @param stream given stream
      * @param number number of readable bytes, must &gt;= 0
      * @return limited {@link InputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static InputStream limit(InputStream stream, long number) throws JieIOException {
+    public static InputStream limit(InputStream stream, long number) throws IORuntimeException {
         if (number < 0) {
             throw new IllegalArgumentException("number < 0.");
         }
@@ -794,9 +771,9 @@ public class JieIO {
      * @param stream given stream
      * @param number number of writeable bytes, must &gt;= 0
      * @return limited {@link OutputStream}
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static OutputStream limit(OutputStream stream, long number) throws JieIOException {
+    public static OutputStream limit(OutputStream stream, long number) throws IORuntimeException {
         if (number < 0) {
             throw new IllegalArgumentException("number < 0.");
         }
@@ -847,9 +824,9 @@ public class JieIO {
      *
      * @param random given random access file
      * @return wrapped stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static InputStream toInputStream(RandomAccessFile random) throws JieIOException {
+    public static InputStream toInputStream(RandomAccessFile random) throws IORuntimeException {
         return toInputStream(random, 0, -1);
     }
 
@@ -863,9 +840,9 @@ public class JieIO {
      * @param offset offset position to start read
      * @param length length of readable bytes, or -1 to read to end of file
      * @return wrapped stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static InputStream toInputStream(RandomAccessFile random, long offset, long length) throws JieIOException {
+    public static InputStream toInputStream(RandomAccessFile random, long offset, long length) throws IORuntimeException {
         return new RandomInputStream(random, offset, length);
     }
 
@@ -877,9 +854,9 @@ public class JieIO {
      *
      * @param random given random access file
      * @return wrapped stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static OutputStream toOutputStream(RandomAccessFile random) throws JieIOException {
+    public static OutputStream toOutputStream(RandomAccessFile random) throws IORuntimeException {
         return toOutputStream(random, 0, -1);
     }
 
@@ -894,9 +871,9 @@ public class JieIO {
      * @param offset offset position to start write
      * @param length length of written bytes, or -1 to write unlimitedly
      * @return wrapped stream
-     * @throws JieIOException IO exception
+     * @throws IORuntimeException IO runtime exception
      */
-    public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) throws JieIOException {
+    public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) throws IORuntimeException {
         return new RandomOutputStream(random, offset, length);
     }
 
@@ -914,7 +891,7 @@ public class JieIO {
         private static final EmptyInputStream SINGLETON = new EmptyInputStream();
 
         @Override
-        public int read() throws IOException {
+        public int read() {
             return -1;
         }
     }

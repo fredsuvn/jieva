@@ -16,7 +16,7 @@ final class LimitedOutputStream extends OutputStream {
             this.source = source;
             this.remaining = limit;
         } catch (Exception e) {
-            throw new JieIOException(e);
+            throw new IORuntimeException(e);
         }
     }
 
