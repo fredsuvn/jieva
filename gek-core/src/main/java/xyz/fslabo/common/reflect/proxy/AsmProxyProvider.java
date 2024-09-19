@@ -8,6 +8,7 @@ import xyz.fslabo.common.base.Tuple;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieJvm;
 import xyz.fslabo.common.reflect.JieReflect;
+import xyz.fslabo.common.reflect.NotPrimitiveException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -133,14 +134,14 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
     }
 
     private static final Map<Class<?>, String> VALUE_OF_DESCRIPTORS = Jie.map(
-        boolean.class, Tuple.of(Opcodes.ILOAD,"(Z)Ljava/lang/Boolean;"),
-        byte.class, Tuple.of(Opcodes.ILOAD,"(B)Ljava/lang/Byte;"),
-        short.class, Tuple.of(Opcodes.ILOAD,"(S)Ljava/lang/Short;"),
-        char.class, Tuple.of(Opcodes.ILOAD,"(C)Ljava/lang/Character;"),
-        int.class, Tuple.of(Opcodes.ILOAD,"(I)Ljava/lang/Integer;"),
-        long.class, Tuple.of(Opcodes.ILOAD,"(J)Ljava/lang/Long;"),
-        float.class, Tuple.of(Opcodes.ILOAD,"(F)Ljava/lang/Float;"),
-        double.class, Tuple.of(Opcodes.ILOAD,"(D)Ljava/lang/Double;")
+        boolean.class, Tuple.of(Opcodes.ILOAD, "(Z)Ljava/lang/Boolean;"),
+        byte.class, Tuple.of(Opcodes.ILOAD, "(B)Ljava/lang/Byte;"),
+        short.class, Tuple.of(Opcodes.ILOAD, "(S)Ljava/lang/Short;"),
+        char.class, Tuple.of(Opcodes.ILOAD, "(C)Ljava/lang/Character;"),
+        int.class, Tuple.of(Opcodes.ILOAD, "(I)Ljava/lang/Integer;"),
+        long.class, Tuple.of(Opcodes.ILOAD, "(J)Ljava/lang/Long;"),
+        float.class, Tuple.of(Opcodes.ILOAD, "(F)Ljava/lang/Float;"),
+        double.class, Tuple.of(Opcodes.ILOAD, "(D)Ljava/lang/Double;")
     );
 
     private static void visitLoadParamAsObject(MethodVisitor visitor, Class<?> type, int i) {
@@ -148,6 +149,10 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             visitor.visitVarInsn(Opcodes.ALOAD, i);
             return;
         }
+        visitLoadPrimitiveParamAsObject(visitor, type, i);
+    }
+
+    private static void visitLoadPrimitiveParamAsObject(MethodVisitor visitor, Class<?> type, int i) {
         if (Objects.equals(type, boolean.class)) {
             visitor.visitVarInsn(Opcodes.ILOAD, i);
             visitor.visitMethodInsn(
@@ -190,21 +195,16 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
                 Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
             return;
         }
-        // if (Objects.equals(type, double.class))
-        {
+        if (Objects.equals(type, double.class)) {
             visitor.visitVarInsn(Opcodes.DLOAD, i);
             visitor.visitMethodInsn(
                 Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
-            // return;
+            return;
         }
+        throw new NotPrimitiveException(type);
     }
 
     private static void visitObjectCast(MethodVisitor visitor, Class<?> type, boolean needReturn) {
-        if (type.isPrimitive()) {
-
-        }
-
-
         if (!type.isPrimitive()) {
             visitor.visitTypeInsn(Opcodes.CHECKCAST, JieJvm.getInternalName(type));
             if (needReturn) {
@@ -212,6 +212,10 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             }
             return;
         }
+        visitObjectCastPrimitive(visitor, type, needReturn);
+    }
+
+    private static void visitObjectCastPrimitive(MethodVisitor visitor, Class<?> type, boolean needReturn) {
         if (Objects.equals(type, boolean.class)) {
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Boolean");
             visitor.visitMethodInsn(
@@ -275,16 +279,16 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             }
             return;
         }
-        // if (Objects.equals(type, double.class))
-        {
+        if (Objects.equals(type, double.class)) {
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Double");
             visitor.visitMethodInsn(
                 Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false);
             if (needReturn) {
                 visitor.visitInsn(Opcodes.DRETURN);
             }
-            // return;
+            return;
         }
+        throw new NotPrimitiveException(type);
     }
 
     private static void returnCastObject(MethodVisitor visitor, Class<?> type) {
@@ -292,6 +296,10 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
             visitor.visitInsn(Opcodes.ARETURN);
             return;
         }
+        returnPrimitiveCastObject(visitor, type);
+    }
+
+    private static void returnPrimitiveCastObject(MethodVisitor visitor, Class<?> type) {
         if (Objects.equals(type, boolean.class)) {
             visitor.visitMethodInsn(
                 Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
@@ -316,8 +324,10 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         } else if (Objects.equals(type, double.class)) {
             visitor.visitMethodInsn(
                 Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
-        } else {
+        } else if (Objects.equals(type, void.class)) {
             visitor.visitInsn(ACONST_NULL);
+        } else {
+            throw new NotPrimitiveException(type);
         }
         visitor.visitInsn(Opcodes.ARETURN);
     }

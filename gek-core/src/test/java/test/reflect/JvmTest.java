@@ -3,6 +3,7 @@ package test.reflect;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.reflect.JieJvm;
 import xyz.fslabo.common.reflect.JieType;
+import xyz.fslabo.common.reflect.NotPrimitiveException;
 import xyz.fslabo.test.JieTest;
 
 import java.io.Serializable;
@@ -83,7 +84,7 @@ public class JvmTest {
 
         // exception
         Method getPrimitiveDescriptor = JieJvm.class.getDeclaredMethod("getPrimitiveDescriptor", Class.class);
-        JieTest.testThrow(IllegalStateException.class, getPrimitiveDescriptor, null, Object.class);
+        JieTest.testThrow(NotPrimitiveException.class, getPrimitiveDescriptor, null, Object.class);
     }
 
     @Test

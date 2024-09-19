@@ -77,7 +77,7 @@ public class JieJvm {
         if (result != null) {
             return result;
         }
-        throw new IllegalStateException("Not a primitive type: " + cls.getName());
+        throw new NotPrimitiveException(cls);
     }
 
     /**

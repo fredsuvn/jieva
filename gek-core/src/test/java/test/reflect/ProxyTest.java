@@ -1,10 +1,13 @@
 package test.reflect;
 
+import org.objectweb.asm.MethodVisitor;
 import org.testng.annotations.Test;
 import test.JieTestException;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
+import xyz.fslabo.common.reflect.NotPrimitiveException;
 import xyz.fslabo.common.reflect.proxy.*;
+import xyz.fslabo.test.JieTest;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
@@ -83,6 +86,18 @@ public class ProxyTest {
         assertEquals(op.equals("anyone"), true);
         assertEquals(op.hashCode(), 666);
         assertEquals(op.toString(), "666");
+
+        // exception
+        AsmProxyProvider asmProxyProvider = new AsmProxyProvider();
+        Method method = AsmProxyProvider.class.getDeclaredMethod(
+            "visitLoadPrimitiveParamAsObject", MethodVisitor.class, Class.class, int.class);
+        JieTest.testThrow(NotPrimitiveException.class, method, asmProxyProvider, null, Object.class, 1);
+        method = AsmProxyProvider.class.getDeclaredMethod(
+            "visitObjectCastPrimitive", MethodVisitor.class, Class.class, boolean.class);
+        JieTest.testThrow(NotPrimitiveException.class, method, asmProxyProvider, null, Object.class, true);
+        method = AsmProxyProvider.class.getDeclaredMethod(
+            "returnPrimitiveCastObject", MethodVisitor.class, Class.class);
+        JieTest.testThrow(NotPrimitiveException.class, method, asmProxyProvider, null, Object.class);
     }
 
     private void testAsm(ClassP proxy, String ppi_String, boolean absError) {

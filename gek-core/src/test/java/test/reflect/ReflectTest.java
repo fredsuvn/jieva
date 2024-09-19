@@ -5,7 +5,9 @@ import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.JieType;
+import xyz.fslabo.common.reflect.NotPrimitiveException;
 import xyz.fslabo.common.reflect.TypeRef;
+import xyz.fslabo.test.JieTest;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -186,7 +188,7 @@ public class ReflectTest {
     }
 
     @Test
-    public void testWrapper() {
+    public void testWrapper() throws Exception {
         assertEquals(JieReflect.wrapper(boolean.class), Boolean.class);
         assertEquals(JieReflect.wrapper(byte.class), Byte.class);
         assertEquals(JieReflect.wrapper(short.class), Short.class);
@@ -197,6 +199,10 @@ public class ReflectTest {
         assertEquals(JieReflect.wrapper(double.class), Double.class);
         assertEquals(JieReflect.wrapper(void.class), Void.class);
         assertEquals(JieReflect.wrapper(Object.class), Object.class);
+
+        // exception
+        Method wrapperPrimitive = JieReflect.class.getDeclaredMethod("wrapperPrimitive", Class.class);
+        JieTest.testThrow(NotPrimitiveException.class, wrapperPrimitive, null, Object.class);
     }
 
     @Test
