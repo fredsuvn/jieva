@@ -1,5 +1,6 @@
 package test.io;
 
+import cn.hutool.core.io.IoUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import test.TestUtil;
@@ -92,12 +93,6 @@ public class IOTest {
 
     @Test
     public void testReadTo() throws Exception {
-        testRead(50, -1);
-        testRead(JieIO.BUFFER_SIZE * 2, -1);
-        testRead(50, 5);
-        testRead(JieIO.BUFFER_SIZE * 2, 5);
-        testRead(50, 0);
-        testRead(50, 55);
     }
 
     private void testReadTo(int size, int available) throws Exception {

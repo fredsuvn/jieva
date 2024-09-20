@@ -4,7 +4,6 @@ import org.objectweb.asm.*;
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieString;
-import xyz.fslabo.common.base.Tuple;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieJvm;
 import xyz.fslabo.common.reflect.JieReflect;
@@ -132,17 +131,6 @@ public class AsmProxyProvider implements ProxyProvider, Opcodes {
         }
         return sb.toString();
     }
-
-    private static final Map<Class<?>, String> VALUE_OF_DESCRIPTORS = Jie.map(
-        boolean.class, Tuple.of(Opcodes.ILOAD, "(Z)Ljava/lang/Boolean;"),
-        byte.class, Tuple.of(Opcodes.ILOAD, "(B)Ljava/lang/Byte;"),
-        short.class, Tuple.of(Opcodes.ILOAD, "(S)Ljava/lang/Short;"),
-        char.class, Tuple.of(Opcodes.ILOAD, "(C)Ljava/lang/Character;"),
-        int.class, Tuple.of(Opcodes.ILOAD, "(I)Ljava/lang/Integer;"),
-        long.class, Tuple.of(Opcodes.ILOAD, "(J)Ljava/lang/Long;"),
-        float.class, Tuple.of(Opcodes.ILOAD, "(F)Ljava/lang/Float;"),
-        double.class, Tuple.of(Opcodes.ILOAD, "(D)Ljava/lang/Double;")
-    );
 
     private static void visitLoadParamAsObject(MethodVisitor visitor, Class<?> type, int i) {
         if (!type.isPrimitive()) {
