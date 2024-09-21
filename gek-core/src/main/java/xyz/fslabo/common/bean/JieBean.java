@@ -1,10 +1,16 @@
 package xyz.fslabo.common.bean;
 
+import xyz.fslabo.annotations.Immutable;
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.coll.JieColl;
+import xyz.fslabo.common.reflect.JieReflect;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Objects;
+import java.lang.reflect.TypeVariable;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -60,8 +66,8 @@ public class JieBean {
             return false;
         }
         PropertyInfo other = (PropertyInfo) o;
-        return Objects.equals(info.getName(), other.getName())
-            && Objects.equals(info.getOwner(), other.getOwner());
+        return Objects.equals(info.getName(), other.getName()) &&
+            Objects.equals(info.getOwner(), other.getOwner());
     }
 
     /**
@@ -185,5 +191,209 @@ public class JieBean {
      */
     public static String toString(BeanInfo beanInfo) {
         return beanInfo.getType().getTypeName();
+    }
+
+    /**
+     * Tries to map unresolved type variables of properties of given bean info with extra type variable mapping. If no
+     * mapping found, given bean info itself will be returned. Otherwise, a new bean info with extra mapping will be
+     * returned.
+     *
+     * @param beanInfo            given bean info
+     * @param extraTypeVarMapping extra type variable mapping
+     * @return iven bean info itself or a new bean info with extra mapping
+     * @throws BeanResolvingException if any problem occurs when resolving
+     */
+    public static BeanInfo withExtraTypeVariableMapping(
+        BeanInfo beanInfo, @Nullable Map<TypeVariable<?>, Type> extraTypeVarMapping
+    ) throws BeanResolvingException {
+        if (JieColl.isNotEmpty(extraTypeVarMapping)) {
+            Map<PropertyInfo, Type> mapping = new HashMap<>();
+            Set<Type> stack = new HashSet<>();
+            beanInfo.getProperties().forEach((n, p) -> {
+                Type pt = p.getType();
+                if (pt instanceof TypeVariable) {
+                    stack.clear();
+                    Type newType = JieColl.getRecursive(extraTypeVarMapping, pt, stack);
+                    if (newType != null) {
+                        mapping.put(p, newType);
+                    }
+                }
+            });
+            if (!mapping.isEmpty()) {
+                return new BeanInfoWrapper(beanInfo, mapping);
+            }
+        }
+        return beanInfo;
+    }
+
+    private static final class BeanInfoWrapper implements BeanInfo {
+
+        private final BeanInfo origin;
+        private final Map<String, PropertyInfo> props;
+
+        private BeanInfoWrapper(BeanInfo origin, Map<PropertyInfo, Type> mapping) {
+            this.origin = origin;
+            Map<String, PropertyInfo> newProps = new LinkedHashMap<>();
+            origin.getProperties().forEach((n, p) -> {
+                Type newType = mapping.get(p);
+                if (newType != null) {
+                    newProps.put(n, new PropertyInfoWrapper(p, newType));
+                    return;
+                }
+                newProps.put(n, new PropertyInfoWrapper(p, p.getType()));
+            });
+            this.props = Collections.unmodifiableMap(newProps);
+        }
+
+        @Override
+        public Type getType() {
+            return origin.getType();
+        }
+
+        @Override
+        public Class<?> getRawType() {
+            return origin.getRawType();
+        }
+
+        @Override
+        public @Immutable Map<String, PropertyInfo> getProperties() {
+            return props;
+        }
+
+        @Override
+        public @Nullable PropertyInfo getProperty(String name) {
+            return props.get(name);
+        }
+
+        @Override
+        public @Immutable List<MethodInfo> getMethods() {
+            return origin.getMethods();
+        }
+
+        @Override
+        public @Nullable MethodInfo getMethod(String name, Class<?>... parameterTypes) {
+            return origin.getMethod(name, parameterTypes);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return JieBean.equals(this, o);
+        }
+
+        @Override
+        public int hashCode() {
+            return JieBean.hashCode(this);
+        }
+
+        @Override
+        public String toString() {
+            return JieBean.toString(this);
+        }
+
+        private final class PropertyInfoWrapper implements PropertyInfo {
+
+            private final PropertyInfo prop;
+            private final Type type;
+
+            private PropertyInfoWrapper(PropertyInfo prop, Type type) {
+                this.prop = prop;
+                this.type = type;
+            }
+
+            @Override
+            public BeanInfo getOwner() {
+                return BeanInfoWrapper.this;
+            }
+
+            @Override
+            public String getName() {
+                return prop.getName();
+            }
+
+            @Override
+            public List<Annotation> getAnnotations() {
+                return prop.getAnnotations();
+            }
+
+            @Override
+            public <A extends Annotation> @Nullable A getAnnotation(Class<A> annotationType) {
+                return prop.getAnnotation(annotationType);
+            }
+
+            @Override
+            public @Nullable Object getValue(Object bean) {
+                return prop.getValue(bean);
+            }
+
+            @Override
+            public void setValue(Object bean, @Nullable Object value) {
+                prop.setValue(bean, value);
+            }
+
+            @Override
+            public Type getType() {
+                return type;
+            }
+
+            @Override
+            public @Nullable Class<?> getRawType() {
+                return JieReflect.getRawType(type);
+            }
+
+            @Override
+            public @Nullable Method getGetter() {
+                return prop.getGetter();
+            }
+
+            @Override
+            public @Nullable Method getSetter() {
+                return prop.getSetter();
+            }
+
+            @Override
+            public @Nullable Field getField() {
+                return prop.getField();
+            }
+
+            @Override
+            public List<Annotation> getFieldAnnotations() {
+                return prop.getFieldAnnotations();
+            }
+
+            @Override
+            public List<Annotation> getGetterAnnotations() {
+                return prop.getGetterAnnotations();
+            }
+
+            @Override
+            public List<Annotation> getSetterAnnotations() {
+                return prop.getSetterAnnotations();
+            }
+
+            @Override
+            public boolean isReadable() {
+                return prop.isReadable();
+            }
+
+            @Override
+            public boolean isWriteable() {
+                return prop.isWriteable();
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return JieBean.equals(this, o);
+            }
+
+            @Override
+            public int hashCode() {
+                return JieBean.hashCode(this);
+            }
+
+            @Override
+            public String toString() {
+                return JieBean.toString(this);
+            }
+        }
     }
 }

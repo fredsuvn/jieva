@@ -12,12 +12,15 @@ import xyz.fslabo.common.bean.*;
 import xyz.fslabo.common.bean.handlers.NonGetterPrefixResolverHandler;
 import xyz.fslabo.common.bean.handlers.NonPrefixResolverHandler;
 import xyz.fslabo.common.coll.JieColl;
+import xyz.fslabo.common.reflect.JieReflect;
 import xyz.fslabo.common.reflect.JieType;
 import xyz.fslabo.common.reflect.TypeRef;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.testng.Assert.*;
 
@@ -313,6 +316,82 @@ public class BeanTest {
         assertEquals(aa2.getValue(s2), "ss");
     }
 
+    @Test
+    public void testExtra() {
+        Map<TypeVariable<?>, Type> extra =
+            JieReflect.getTypeParameterMapping(new TypeRef<TestExtra<String>>() {}.getType());
+        Map<TypeVariable<?>, Type> empty = Collections.emptyMap();
+        BeanInfo b1 = BeanInfo.get(new TypeRef<TestExtra<String>>() {}.getType());
+        BeanInfo b2 = JieBean.withExtraTypeVariableMapping(BeanInfo.get(TestExtra.class), extra);
+        assertNotEquals(b1, b2);
+        assertNotEquals(b1.getProperty("tt"), b2.getProperty("tt"));
+        assertEquals(b1.getProperty("tt").getType(), b2.getProperty("tt").getType());
+        BeanInfo b3 = BeanInfo.get(TestExtra.class);
+        assertNotEquals(b3, b2);
+        assertNotEquals(b3.getProperty("tt"), b2.getProperty("tt"));
+        assertNotEquals(b3.getProperty("tt").getType(), b2.getProperty("tt").getType());
+        BeanInfo b4 = JieBean.withExtraTypeVariableMapping(BeanInfo.get(TestExtra.class), empty);
+        assertEquals(b4, b3);
+        assertEquals(b4.getProperty("tt"), b4.getProperty("tt"));
+        BeanInfo b5 = JieBean.withExtraTypeVariableMapping(BeanInfo.get(TestExtra.class),
+            JieReflect.getTypeParameterMapping(new TypeRef<TestExtra2<String>>() {}.getType()));
+        assertEquals(b5, b3);
+        assertEquals(b5.getProperty("tt"), b3.getProperty("tt"));
+
+        assertEquals(b1.getRawType(), b2.getRawType());
+        assertEquals(b2.getRawType(), b3.getRawType());
+        assertEquals(
+            b1.getProperties().values().stream().map(BasePropertyInfo::getType).collect(Collectors.toList()),
+            b2.getProperties().values().stream().map(BasePropertyInfo::getType).collect(Collectors.toList())
+        );
+        assertNotEquals(
+            b2.getProperties().values().stream().map(BasePropertyInfo::getType).collect(Collectors.toList()),
+            b3.getProperties().values().stream().map(BasePropertyInfo::getType).collect(Collectors.toList())
+        );
+
+        assertNotEquals(b1.hashCode(), b2.hashCode());
+        assertNotEquals(b1.toString(), b2.toString());
+        assertEquals(b2.hashCode(), b3.hashCode());
+        assertEquals(b2.toString(), b3.toString());
+        assertEquals(b1.getProperty("tt").hashCode(), b2.getProperty("tt").hashCode());
+        assertNotEquals(b1.getProperty("tt").toString(), b2.getProperty("tt").toString());
+
+        assertNotEquals(b1.getMethods(), b2.getMethods());
+        assertEquals(b2.getMethods(), b3.getMethods());
+        assertNotEquals(b1.getMethod("hashCode"), b2.getMethod("hashCode"));
+        assertEquals(b2.getMethod("hashCode"), b3.getMethod("hashCode"));
+
+        PropertyInfo p1 = b1.getProperty("tt");
+        PropertyInfo p2 = b2.getProperty("tt");
+        PropertyInfo p3 = b3.getProperty("tt");
+        assertEquals(p1.getAnnotations(), p2.getAnnotations());
+        assertEquals(p2.getAnnotations(), p3.getAnnotations());
+        assertEquals(p1.getAnnotation(Nullable.class), p2.getAnnotation(Nullable.class));
+        assertEquals(p2.getAnnotation(Nullable.class), p3.getAnnotation(Nullable.class));
+        TestExtra<?> te = new TestExtra<>();
+        p1.setValue(te, "1");
+        p2.setValue(te, "1");
+        p3.setValue(te, "1");
+        assertEquals(p1.getValue(te), p2.getValue(te));
+        assertEquals(p2.getValue(te), p3.getValue(te));
+        assertEquals(p1.getRawType(), p2.getRawType());
+        assertNotEquals(p2.getRawType(), p3.getRawType());
+        assertEquals(p1.getGetter(), p2.getGetter());
+        assertEquals(p2.getSetter(), p3.getSetter());
+        assertEquals(p1.getField(), p2.getField());
+        assertEquals(p2.getField(), p3.getField());
+        assertEquals(p1.getFieldAnnotations(), p2.getFieldAnnotations());
+        assertEquals(p2.getFieldAnnotations(), p3.getFieldAnnotations());
+        assertEquals(p1.getGetterAnnotations(), p2.getGetterAnnotations());
+        assertEquals(p2.getGetterAnnotations(), p3.getGetterAnnotations());
+        assertEquals(p1.getSetterAnnotations(), p2.getSetterAnnotations());
+        assertEquals(p2.getSetterAnnotations(), p3.getSetterAnnotations());
+        assertEquals(p1.isWriteable(), p2.isWriteable());
+        assertEquals(p2.isWriteable(), p3.isWriteable());
+        assertEquals(p1.isReadable(), p2.isReadable());
+        assertEquals(p2.isReadable(), p3.isReadable());
+    }
+
     public static class TestHandler implements BeanResolver.Handler {
 
         public int times = 0;
@@ -493,5 +572,15 @@ public class BeanTest {
     public static class Simple3 {
         public void c1(String c1) {
         }
+    }
+
+    @Data
+    public static class TestExtra<T> {
+        private T tt;
+    }
+
+    @Data
+    public static class TestExtra2<T> {
+        private T tt;
     }
 }
