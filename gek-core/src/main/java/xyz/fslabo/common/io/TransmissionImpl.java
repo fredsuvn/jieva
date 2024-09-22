@@ -1,5 +1,7 @@
 package xyz.fslabo.common.io;
 
+import xyz.fslabo.common.base.JieCheck;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,8 +12,7 @@ final class TransmissionImpl implements Transmission {
 
     private Object source;
     private Object dest;
-    private long readLimit = -1;
-    private boolean writeLimit = true;
+    private long readSize = -1;
     private int blockSize = JieIO.BUFFER_SIZE;
     private boolean breakIfNoRead = false;
     private Function<ByteBuffer, ByteBuffer> conversion;
@@ -71,19 +72,14 @@ final class TransmissionImpl implements Transmission {
     }
 
     @Override
-    public Transmission readLimit(long readLimit) {
-        this.readLimit = readLimit;
-        return this;
-    }
-
-    @Override
-    public Transmission writeLimit(boolean writeLimit) {
-        this.writeLimit = writeLimit;
+    public Transmission readSize(long readSize) {
+        this.readSize = readSize;
         return this;
     }
 
     @Override
     public Transmission blockSize(int blockSize) {
+        JieCheck.checkArgument(blockSize > 0, "blockSize must > 0!");
         this.blockSize = blockSize;
         return this;
     }
@@ -105,6 +101,9 @@ final class TransmissionImpl implements Transmission {
         if (source == null || dest == null) {
             throw new IORuntimeException("Source or dest is null!");
         }
+        if (readSize == 0) {
+            return 0;
+        }
         try {
             return start(source, dest);
         } catch (IOException e) {
@@ -113,9 +112,6 @@ final class TransmissionImpl implements Transmission {
     }
 
     private long start(Object src, Object dst) throws IOException {
-        if (readLimit == 0) {
-            return 0;
-        }
         if (src instanceof InputStream) {
             if (dst instanceof OutputStream) {
                 return transmit((InputStream) src, (OutputStream) dst);
@@ -155,35 +151,51 @@ final class TransmissionImpl implements Transmission {
         throw new IORuntimeException("Unexpected source type: " + src.getClass());
     }
 
+    private int getBufferSize() {
+        if (readSize < 0) {
+            return blockSize;
+        }
+        return (int) Math.min(readSize, blockSize);
+    }
+
     private long transmit(InputStream src, OutputStream dst) throws IOException {
-        byte[] buf = new byte[readLimit < 0 ? blockSize : (int) Math.min(readLimit, blockSize)];
-        long count = 0;
-        while (true) {
-            int c = src.read(buf);
+        byte[] block = new byte[getBufferSize()];
+        ByteBuffer buf = null;
+        long readCount = 0;
+        long writeCount = 0;
+        while (readCount < readSize) {
+            int c = src.read(block);
             if (c == -1) {
-                return count == 0 ? -1 : count;
+                return readCount == 0 ? -1 : writeCount;
             }
             if (c == 0) {
                 if (breakIfNoRead) {
-                    return count;
+                    return writeCount;
                 }
                 continue;
             }
+            readCount += c;
             if (conversion != null) {
-                ByteBuffer converted = conversion.apply(ByteBuffer.wrap(buf, 0, c));
-                count += bufferToOut(converted, dst);
+                if (buf == null) {
+                    buf = ByteBuffer.wrap(block);
+                }
+                buf.position(0);
+                buf.limit(c);
+                ByteBuffer converted = conversion.apply(buf);
+                writeCount += bufToOut(converted, dst);
             } else {
-                dst.write(buf, 0, c);
-                count += c;
+                dst.write(block, 0, c);
+                writeCount += c;
             }
         }
+        return writeCount;
     }
 
     private long transmit(InputStream src, byte[] dst, int off, int len) throws IOException {
         int actualLen = len;
-        if (writeLimit && readLimit > 0) {
-            actualLen = (int) Math.min(readLimit, actualLen);
-        }
+        // if (writeLimit && readSize > 0) {
+        //     actualLen = (int) Math.min(readSize, actualLen);
+        // }
         if (conversion != null) {
             return transmit(src, JieIO.toOutputStream(dst, off, actualLen));
         }
@@ -204,18 +216,18 @@ final class TransmissionImpl implements Transmission {
     }
 
     private long transmit(InputStream src, ByteBuffer dst) throws IOException {
-        int actualLen = dst.remaining();
-        if (writeLimit && readLimit > 0) {
-            actualLen = (int) Math.min(readLimit, actualLen);
-        }
-        if (conversion != null) {
-            return transmit(src, JieIO.toOutputStream(dst));
-        }
-        if (dst.hasArray()) {
-            byte[] dstArray = dst.array();
-            int dstOff = dst.arrayOffset();
-            int dstLen = readLimit < 0 ? dst.remaining() : (int) Math.min(readLimit, dst.remaining());
-        }
+        // int actualLen = dst.remaining();
+        // if (writeLimit && readSize > 0) {
+        //     actualLen = (int) Math.min(readSize, actualLen);
+        // }
+        // if (conversion != null) {
+        //     return transmit(src, JieIO.toOutputStream(dst));
+        // }
+        // if (dst.hasArray()) {
+        //     byte[] dstArray = dst.array();
+        //     int dstOff = dst.arrayOffset();
+        //     int dstLen = readSize < 0 ? dst.remaining() : (int) Math.min(readSize, dst.remaining());
+        // }
         return 0;
     }
 
@@ -243,7 +255,7 @@ final class TransmissionImpl implements Transmission {
         return 0;
     }
 
-    private int bufferToOut(ByteBuffer buffer, OutputStream out) throws IOException {
+    private int bufToOut(ByteBuffer buffer, OutputStream out) throws IOException {
         int remain = buffer.remaining();
         if (buffer.hasArray()) {
             out.write(buffer.array(), buffer.arrayOffset(), buffer.remaining());
