@@ -191,17 +191,21 @@ final class TransmissionImpl implements Transmission {
         return writeCount;
     }
 
-    private long transmit(InputStream src, byte[] dst, int off, int len) throws IOException {
-        int actualLen = len;
-        // if (writeLimit && readSize > 0) {
-        //     actualLen = (int) Math.min(readSize, actualLen);
-        // }
-        if (conversion != null) {
-            return transmit(src, JieIO.toOutputStream(dst, off, actualLen));
+    private int getActualReadSize(int len) {
+        if (readSize < 0) {
+            return len;
         }
+        return (int) Math.min(readSize, len);
+    }
+
+    private long transmit(InputStream src, byte[] dst, int off, int len) throws IOException {
+        if (conversion != null) {
+            return transmit(src, JieIO.toOutputStream(dst, off, len));
+        }
+        int actualReadSize = getActualReadSize(len);
         int count = 0;
-        while (true) {
-            int c = src.read(dst, off + count, actualLen - count);
+        while (count < actualReadSize) {
+            int c = src.read(dst, off + count, actualReadSize - count);
             if (c == -1) {
                 return count == 0 ? -1 : count;
             }
@@ -213,33 +217,41 @@ final class TransmissionImpl implements Transmission {
             }
             count += c;
         }
+        return count;
     }
 
     private long transmit(InputStream src, ByteBuffer dst) throws IOException {
-        // int actualLen = dst.remaining();
-        // if (writeLimit && readSize > 0) {
-        //     actualLen = (int) Math.min(readSize, actualLen);
-        // }
-        // if (conversion != null) {
-        //     return transmit(src, JieIO.toOutputStream(dst));
-        // }
-        // if (dst.hasArray()) {
-        //     byte[] dstArray = dst.array();
-        //     int dstOff = dst.arrayOffset();
-        //     int dstLen = readSize < 0 ? dst.remaining() : (int) Math.min(readSize, dst.remaining());
-        // }
-        return 0;
+        if (conversion != null) {
+            return transmit(src, JieIO.toOutputStream(dst));
+        }
+        int actualReadSize = getActualReadSize(dst.remaining());
+        ByteBuffer dstSlice = JieBuffer.slice(dst, actualReadSize);
+        return transmit(src, JieIO.toOutputStream(dstSlice));
     }
 
     private long transmit(byte[] src, int off, int len, OutputStream dst) throws IOException {
-        return 0;
+        if (conversion != null) {
+            return transmit(JieIO.toInputStream(src, off, len), dst);
+        }
+        int actualReadSize = getActualReadSize(len);
+        dst.write(src, off, actualReadSize);
+        return actualReadSize;
     }
 
-    private long transmit(byte[] src, int srcOff, int srcLen, byte[] dst, int dstOff, int detLen) throws IOException {
-        return 0;
+    private long transmit(byte[] src, int srcOff, int srcLen, byte[] dst, int dstOff, int dstLen) throws IOException {
+        if (conversion != null) {
+            return transmit(JieIO.toInputStream(src, srcOff, srcLen), JieIO.toOutputStream(dst, dstOff, dstLen));
+        }
+        int minLen = Math.min(srcLen, dstLen);
+        int actualReadSize = getActualReadSize(minLen);
+        System.arraycopy(src, srcOff, dst, dstOff, actualReadSize);
+        return actualReadSize;
     }
 
     private long transmit(byte[] src, int off, int len, ByteBuffer dst) throws IOException {
+        if (conversion != null) {
+            return transmit(JieIO.toInputStream(src, off, len), JieIO.toOutputStream(dst));
+        }
         return 0;
     }
 

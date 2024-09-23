@@ -158,12 +158,15 @@ public interface Transmission {
     Transmission conversion(Function<ByteBuffer, ByteBuffer> conversion);
 
     /**
-     * Starts this operation, returns actual written bytes number which is success to written into the destination.
-     * Specifically, if it is detected that the data source reaches to the end and no data has been written, return -1.
+     * Starts this operation, returns the actual bytes number that read and success to deal with.
+     * <p>
+     * If the {@code conversion} is {@code null}, read number equals to written number, otherwise the written number may
+     * not equal to read number, and this method returns read number. Specifically, if it is detected that the data
+     * source reaches to the end and no data has been read, return -1.
      * <p>
      * This is a final method.
      *
-     * @return actual written bytes number which is success to written into the destination
+     * @return the actual bytes number that read and success to deal with
      * @throws IORuntimeException IO runtime exception
      */
     long start() throws IORuntimeException;
