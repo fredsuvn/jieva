@@ -1,6 +1,7 @@
 package xyz.fslabo.common.io;
 
 import xyz.fslabo.common.base.JieCheck;
+import xyz.fslabo.common.bean.JieBean;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -231,7 +232,7 @@ final class TransmissionImpl implements Transmission {
 
     private long transmit(byte[] src, int off, int len, OutputStream dst) throws IOException {
         if (conversion != null) {
-            return transmit(JieIO.toInputStream(src, off, len), dst);
+            return transmit(ByteBuffer.wrap(src, off, len), dst);
         }
         int actualReadSize = getActualReadSize(len);
         dst.write(src, off, actualReadSize);
@@ -240,7 +241,7 @@ final class TransmissionImpl implements Transmission {
 
     private long transmit(byte[] src, int srcOff, int srcLen, byte[] dst, int dstOff, int dstLen) throws IOException {
         if (conversion != null) {
-            return transmit(JieIO.toInputStream(src, srcOff, srcLen), JieIO.toOutputStream(dst, dstOff, dstLen));
+            return transmit(ByteBuffer.wrap(src, srcOff, srcLen), JieIO.toOutputStream(dst, dstOff, dstLen));
         }
         int minLen = Math.min(srcLen, dstLen);
         int actualReadSize = getActualReadSize(minLen);
@@ -264,7 +265,27 @@ final class TransmissionImpl implements Transmission {
     }
 
     private long transmit(ByteBuffer src, ByteBuffer dst) throws IOException {
-        return 0;
+        if (conversion == null) {
+            long actualReadSize = getActualReadSize(Math.min(src.remaining(), dst.remaining()));
+            if (actualReadSize == src.remaining()) {
+                dst.put(src);
+            }else{
+                dst.put(JieBuffer.readSlice(src, (int) actualReadSize));
+            }
+            return actualReadSize;
+        }
+
+        long actualReadSize = getActualReadSize(src.remaining());
+        int actualBlockSize = (int) Math.min(blockSize, actualReadSize);
+        long remaining = actualReadSize;
+        while (remaining > 0) {
+            int read = (int) Math.min(remaining, actualBlockSize);
+            ByteBuffer block = JieBuffer.readSlice(src, read);
+            ByteBuffer converted = conversion.apply(block);
+            dst.put(converted);
+            remaining -= read;
+        }
+        return actualReadSize;
     }
 
     private int bufToOut(ByteBuffer buffer, OutputStream out) throws IOException {
