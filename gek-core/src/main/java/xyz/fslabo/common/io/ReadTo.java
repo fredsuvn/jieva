@@ -6,24 +6,23 @@ import java.nio.ByteBuffer;
 import java.util.function.Function;
 
 /**
- * This interface represents a bytes transmission that transmit bytes from a data source into a destination. There are
+ * This interface represents a transmission operation that reads bytes from a data source into a destination. There are
  * two types of method in this interface:
  * <ul>
  *     <li>
- *         The setting methods, used to set this transmission before this it is started;
+ *         Setting methods, used to set options of current transmission operation before this it is started;
  *     </li>
  *     <li>
  *         Final methods, start transmission, and when the transmission is finished, the current instance will
- *         be invalid
+ *         be invalid;
  *     </li>
  * </ul>
- * If the size of source or destination is unknown, the transmission will keep sending data as long as possible, until
- * either all the data is transmitted or a written exception occurs. Otherwise, the transmission will in bounds of
- * remaining size.
+ * The transmission will keep reading and writing until source reaches to the end or specified {@code readLimit} (by
+ * {@link #readLimit(long)}). Therefore, the destination must ensure it has sufficient remaining space.
  *
  * @author fredsuvn
  */
-public interface Transmission {
+public interface ReadTo {
 
     /**
      * Sets the data source to read.
@@ -33,7 +32,7 @@ public interface Transmission {
      * @param source the data source to read
      * @return this
      */
-    Transmission source(InputStream source);
+    ReadTo input(InputStream source);
 
     /**
      * Sets the data source to read.
@@ -43,7 +42,7 @@ public interface Transmission {
      * @param source the data source to read
      * @return this
      */
-    Transmission source(byte[] source);
+    ReadTo input(byte[] source);
 
     /**
      * Sets the data source to read, starting from the start index up to the specified length
@@ -55,7 +54,7 @@ public interface Transmission {
      * @param length specified length
      * @return this
      */
-    Transmission source(byte[] source, int offset, int length);
+    ReadTo input(byte[] source, int offset, int length);
 
     /**
      * Sets the data source to read.
@@ -65,7 +64,7 @@ public interface Transmission {
      * @param source the data source to read
      * @return this
      */
-    Transmission source(ByteBuffer source);
+    ReadTo input(ByteBuffer source);
 
     /**
      * Sets the destination to written.
@@ -75,7 +74,7 @@ public interface Transmission {
      * @param dest the destination to written
      * @return this
      */
-    Transmission dest(OutputStream dest);
+    ReadTo output(OutputStream dest);
 
     /**
      * Sets the destination to written.
@@ -85,7 +84,7 @@ public interface Transmission {
      * @param dest the destination to written
      * @return this
      */
-    Transmission dest(byte[] dest);
+    ReadTo output(byte[] dest);
 
     /**
      * Sets the destination to written, starting from the start index up to the specified length
@@ -97,7 +96,7 @@ public interface Transmission {
      * @param length specified length
      * @return this
      */
-    Transmission dest(byte[] dest, int offset, int length);
+    ReadTo output(byte[] dest, int offset, int length);
 
     /**
      * Sets the destination to written.
@@ -107,17 +106,17 @@ public interface Transmission {
      * @param dest the destination to written
      * @return this
      */
-    Transmission dest(ByteBuffer dest);
+    ReadTo output(ByteBuffer dest);
 
     /**
-     * Sets the bytes number to read. May be -1 if set to read to end, and this is default setting.
+     * Sets max bytes number to read. May be -1 if set to read to end, and this is default setting.
      * <p>
      * This is a setting method.
      *
-     * @param readSize the bytes number to read
+     * @param readLimit max bytes number to read
      * @return this
      */
-    Transmission readSize(long readSize);
+    ReadTo readLimit(long readLimit);
 
     /**
      * Sets the bytes number for each reading from data source. This setting is used for read stream or need data
@@ -128,7 +127,7 @@ public interface Transmission {
      * @param blockSize the bytes number for each reading from data source
      * @return this
      */
-    Transmission blockSize(int blockSize);
+    ReadTo blockSize(int blockSize);
 
     /**
      * Sets whether break transmission immediately when the number of bytes read is 0. If it is set to {@code false},
@@ -139,13 +138,12 @@ public interface Transmission {
      * @param breakIfNoRead whether break reading immediately when the number of bytes read is 0
      * @return this
      */
-    Transmission breakIfNoRead(boolean breakIfNoRead);
+    ReadTo breakIfNoRead(boolean breakIfNoRead);
 
     /**
      * Set data conversion. If the conversion is not null, source bytes will be converted by the conversion at first,
-     * then written into the destination. Size of source bytes read each time is set by {@link #blockSize(int)} (Note if
-     * {@code readSize} is less than {@code blockSize}, only bytes of {@code readSize} will be read and passed into the
-     * conversion). Default is {@code null}.
+     * then written into the destination. Size of source bytes read to convert is determined by {@code blockSize}, but
+     * it could be less than {@code blockSize} if remaining readable size is not enough. Default is {@code null}.
      * <p>
      * Note that the {@link ByteBuffer} instance passed as the argument may not always be new, it could be reused. And
      * returned {@link ByteBuffer} will also be considered as such.
@@ -155,14 +153,14 @@ public interface Transmission {
      * @param conversion data conversion
      * @return this
      */
-    Transmission conversion(Function<ByteBuffer, ByteBuffer> conversion);
+    ReadTo conversion(Function<ByteBuffer, ByteBuffer> conversion);
 
     /**
-     * Starts this operation, returns the actual bytes number that read and success to deal with.
+     * Starts this transmission, returns the actual bytes number that read and success to deal with.
      * <p>
-     * If the {@code conversion} is {@code null}, read number equals to written number, otherwise the written number may
-     * not equal to read number, and this method returns read number. Specifically, if it is detected that the data
-     * source reaches to the end and no data has been read, return -1.
+     * If the {@code conversion} is {@code null}, read number equals to written number. Otherwise, the written number
+     * may not equal to read number, and this method returns actual read number. Specifically, if it is detected that
+     * the data source reaches to the end and no data has been read, return -1.
      * <p>
      * This is a final method.
      *

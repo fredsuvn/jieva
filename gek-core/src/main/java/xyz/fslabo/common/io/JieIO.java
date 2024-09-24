@@ -258,6 +258,17 @@ public class JieIO {
     }
 
     /**
+     * Returns an instance of {@link ReadTo} to transmit bytes from specified source into specified destination. See
+     * {@link ReadTo}.
+     *
+     * @return an instance of {@link ReadTo} to transmit bytes from specified source into specified destination
+     * @see ReadTo
+     */
+    public static ReadTo readTo() {
+        return new ReadToImpl();
+    }
+
+    /**
      * Reads bytes from source stream into dest array, returns actual read number, or -1 if no data read out and reaches
      * to the end of stream. This method will keep reading until the dest array is filled up, or the reading reaches the
      * end of the stream.
@@ -267,8 +278,8 @@ public class JieIO {
      * @return actual read number, or -1 if no data read out and reaches to the end of stream
      * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(InputStream source, byte[] dest) {
-        return readTo(source, dest, 0, dest.length);
+    public static int readTo(InputStream source, byte[] dest) throws IORuntimeException {
+        return (int) readTo().input(source).output(dest).readLimit(dest.length).start();
     }
 
     /**
@@ -284,31 +295,7 @@ public class JieIO {
      * @throws IORuntimeException IO runtime exception
      */
     public static int readTo(InputStream source, byte[] dest, int offset, int length) throws IORuntimeException {
-        try {
-            JieCheck.checkRangeInBounds(offset, offset + length, 0, dest.length);
-            if (length < 0) {
-                throw new IllegalArgumentException("length < 0: " + length + ".");
-            }
-            if (length == 0) {
-                return 0;
-            }
-            int remaining = length;
-            int off = 0;
-            while (remaining > 0) {
-                int readSize = source.read(dest, off, remaining);
-                if (readSize < 0) {
-                    if (remaining == length) {
-                        return -1;
-                    }
-                    return length - remaining;
-                }
-                remaining -= readSize;
-                offset += readSize;
-            }
-            return length;
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
-        }
+        return (int) readTo().input(source).output(dest, offset, length).start();
     }
 
     /**
@@ -321,30 +308,8 @@ public class JieIO {
      * @return actual read number, or -1 if no data read out and reaches to the end of stream
      * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(InputStream source, ByteBuffer dest) {
-        try {
-            if (dest.remaining() <= 0) {
-                return 0;
-            }
-            if (dest.hasArray()) {
-                int readSize = readTo(source, dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
-                if (readSize > 0) {
-                    dest.position(dest.position() + readSize);
-                }
-                return readSize;
-            }
-            byte[] bytes = read(source, dest.remaining());
-            if (bytes == null) {
-                return -1;
-            }
-            if (bytes.length == 0) {
-                return 0;
-            }
-            dest.put(bytes);
-            return bytes.length;
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
-        }
+    public static int readTo(InputStream source, ByteBuffer dest) throws IORuntimeException {
+        return (int) readTo().input(source).output(dest).start();
     }
 
     /**
@@ -358,7 +323,7 @@ public class JieIO {
      * @throws IORuntimeException IO runtime exception
      */
     public static long readTo(InputStream source, OutputStream dest) throws IORuntimeException {
-        return readTo(source, dest, -1);
+        return (int) readTo().input(source).output(dest).start();
     }
 
     /**
@@ -375,7 +340,7 @@ public class JieIO {
      * @throws IORuntimeException IO runtime exception
      */
     public static long readTo(InputStream source, OutputStream dest, long number) throws IORuntimeException {
-        return readTo(source, dest, number, BUFFER_SIZE);
+        return (int) readTo().input(source).output(dest).readLimit(number).start();
     }
 
     /**
@@ -393,40 +358,7 @@ public class JieIO {
      * @throws IORuntimeException IO runtime exception
      */
     public static long readTo(InputStream source, OutputStream dest, long number, int bufferSize) throws IORuntimeException {
-        try {
-            if (bufferSize <= 0) {
-                throw new IllegalArgumentException("bufferSize <= 0.");
-            }
-            if (number == 0) {
-                return 0;
-            }
-            long readNum = 0;
-            int bufSize = number < 0 ? bufferSize : (int) Math.min(number, bufferSize);
-            byte[] buffer = new byte[bufSize];
-            while (true) {
-                int tryReadLen = number < 0 ? buffer.length : (int) Math.min(number - readNum, buffer.length);
-                int readSize = source.read(buffer, 0, tryReadLen);
-                if (readSize < 0) {
-                    if (readNum == 0) {
-                        return -1;
-                    }
-                    break;
-                }
-                if (readSize > 0) {
-                    dest.write(buffer, 0, readSize);
-                    readNum += readSize;
-                }
-                if (number < 0) {
-                    continue;
-                }
-                if (number - readNum <= 0) {
-                    break;
-                }
-            }
-            return readNum;
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
-        }
+        return (int) readTo().input(source).output(dest).readLimit(number).blockSize(bufferSize).start();
     }
 
     /**
