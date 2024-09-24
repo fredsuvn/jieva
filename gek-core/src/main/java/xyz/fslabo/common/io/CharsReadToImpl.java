@@ -1,41 +1,42 @@
 package xyz.fslabo.common.io;
 
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.JieString;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.CharBuffer;
 import java.util.function.Function;
 
-final class ReadToImpl implements ReadTo {
+final class CharsReadToImpl implements CharsReadTo {
 
     private Object source;
     private Object dest;
     private long readLimit = -1;
     private int blockSize = JieIO.BUFFER_SIZE;
     private boolean breakIfNoRead = false;
-    private Function<ByteBuffer, ByteBuffer> conversion;
+    private Function<CharBuffer, CharBuffer> conversion;
 
     @Override
-    public ReadTo input(InputStream source) {
+    public CharsReadTo input(Reader source) {
         this.source = source;
         return this;
     }
 
     @Override
-    public ReadTo input(byte[] source) {
+    public CharsReadTo input(char[] source) {
         this.source = source;
         return this;
     }
 
     @Override
-    public ReadTo input(byte[] source, int offset, int length) {
+    public CharsReadTo input(char[] source, int offset, int length) {
         if (offset == 0 && length == source.length) {
             return input(source);
         }
         try {
-            this.source = ByteBuffer.wrap(source, offset, length);
+            this.source = CharBuffer.wrap(source, offset, length);
         } catch (Exception e) {
             throw new IORuntimeException(e);
         }
@@ -43,30 +44,27 @@ final class ReadToImpl implements ReadTo {
     }
 
     @Override
-    public ReadTo input(ByteBuffer source) {
+    public CharsReadTo input(CharBuffer source) {
         this.source = source;
         return this;
     }
 
     @Override
-    public ReadTo output(OutputStream dest) {
+    public CharsReadTo output(Appendable dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public ReadTo output(byte[] dest) {
-        this.dest = dest;
+    public CharsReadTo output(char[] dest) {
+        this.dest = CharBuffer.wrap(dest);
         return this;
     }
 
     @Override
-    public ReadTo output(byte[] dest, int offset, int length) {
-        if (offset == 0 && length == dest.length) {
-            return output(dest);
-        }
+    public CharsReadTo output(char[] dest, int offset, int length) {
         try {
-            this.dest = ByteBuffer.wrap(dest, offset, length);
+            this.dest = CharBuffer.wrap(dest, offset, length);
         } catch (Exception e) {
             throw new IORuntimeException(e);
         }
@@ -74,19 +72,19 @@ final class ReadToImpl implements ReadTo {
     }
 
     @Override
-    public ReadTo output(ByteBuffer dest) {
+    public CharsReadTo output(CharBuffer dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public ReadTo readLimit(long readLimit) {
+    public CharsReadTo readLimit(long readLimit) {
         this.readLimit = readLimit;
         return this;
     }
 
     @Override
-    public ReadTo blockSize(int blockSize) {
+    public CharsReadTo blockSize(int blockSize) {
         if (blockSize <= 0) {
             throw new IORuntimeException("blockSize must > 0!");
         }
@@ -95,13 +93,13 @@ final class ReadToImpl implements ReadTo {
     }
 
     @Override
-    public ReadTo breakIfNoRead(boolean breakIfNoRead) {
+    public CharsReadTo breakIfNoRead(boolean breakIfNoRead) {
         this.breakIfNoRead = breakIfNoRead;
         return this;
     }
 
     @Override
-    public ReadTo conversion(Function<ByteBuffer, ByteBuffer> conversion) {
+    public CharsReadTo conversion(Function<CharBuffer, CharBuffer> conversion) {
         this.conversion = conversion;
         return this;
     }
@@ -127,27 +125,24 @@ final class ReadToImpl implements ReadTo {
 
     private BufferIn toBufferIn(Object src) {
         int actualBlockSize = getActualBlockSize();
-        if (src instanceof InputStream) {
-            return new InputStreamBufferIn((InputStream) src, actualBlockSize, readLimit);
+        if (src instanceof Reader) {
+            return new ReaderBufferIn((Reader) src, actualBlockSize, readLimit);
         }
-        if (src instanceof byte[]) {
-            return new BytesBufferIn((byte[]) src, actualBlockSize,readLimit);
+        if (src instanceof char[]) {
+            return new CharsBufferIn((char[]) src, actualBlockSize);
         }
-        if (src instanceof ByteBuffer) {
-            return new BufferBufferIn((ByteBuffer) src, actualBlockSize);
+        if (src instanceof CharBuffer) {
+            return new BufferBufferIn((CharBuffer) src, actualBlockSize);
         }
         throw new IORuntimeException("Unexpected source type: " + src.getClass());
     }
 
     private BufferOut toBufferOut(Object dst) {
-        if (dst instanceof OutputStream) {
-            return new OutputSteamBufferOut((OutputStream) dst);
+        if (dst instanceof CharBuffer) {
+            return new AppendableBufferOut(JieIO.toWriter((CharBuffer) dst));
         }
-        if (dst instanceof byte[]) {
-            return new OutputSteamBufferOut(JieIO.toOutputStream((byte[]) dst));
-        }
-        if (dst instanceof ByteBuffer) {
-            return new OutputSteamBufferOut(JieIO.toOutputStream((ByteBuffer) dst));
+        if (dst instanceof Appendable) {
+            return new AppendableBufferOut((Appendable) dst);
         }
         throw new IORuntimeException("Unexpected destination type: " + dst.getClass());
     }
@@ -162,7 +157,7 @@ final class ReadToImpl implements ReadTo {
     private long readTo(BufferIn in, BufferOut out) throws Exception {
         long count = 0;
         while (true) {
-            ByteBuffer buf = in.read();
+            CharBuffer buf = in.read();
             if (buf == null) {
                 return count == 0 ? -1 : count;
             }
@@ -174,7 +169,7 @@ final class ReadToImpl implements ReadTo {
             }
             count += buf.remaining();
             if (conversion != null) {
-                ByteBuffer converted = conversion.apply(buf);
+                CharBuffer converted = conversion.apply(buf);
                 out.write(converted);
             } else {
                 out.write(buf);
@@ -188,89 +183,77 @@ final class ReadToImpl implements ReadTo {
 
     private interface BufferIn {
         @Nullable
-        ByteBuffer read() throws Exception;
+        CharBuffer read() throws Exception;
     }
 
     private interface BufferOut {
-        void write(ByteBuffer buffer) throws Exception;
+        void write(CharBuffer buffer) throws Exception;
     }
 
-    private static final class InputStreamBufferIn implements BufferIn {
+    private static final class ReaderBufferIn implements BufferIn {
 
-        private final InputStream source;
-        private final byte[] block;
-        private final ByteBuffer blockBuffer;
-        private long limit;
+        private final Reader source;
+        private final char[] block;
+        private final CharBuffer blockBuffer;
+        private  long remaining;
 
-        private InputStreamBufferIn(InputStream source, int blockSize, long limit) {
+        private ReaderBufferIn(Reader source, int blockSize, long remaining) {
             this.source = source;
-            this.block = new byte[blockSize];
-            this.blockBuffer = ByteBuffer.wrap(block);
-            this.limit = limit;
+            this.block = new char[blockSize];
+            this.blockBuffer = CharBuffer.wrap(block);
+            this.remaining = remaining;
         }
 
         @Override
-        public ByteBuffer read() throws IOException {
-            if (limit == 0) {
-                return null;
-            }
-            int readSize = limit < 0 ? block.length : (int) Math.min(limit, block.length);
-            int size = source.read(block,0,readSize);
+        public CharBuffer read() throws IOException {
+            int readSize = remaining > 0 ? (int) Math.min(block.length, remaining) : block.length;
+            int size = source.read(block, 0, readSize);
             if (size < 0) {
                 return null;
             }
             blockBuffer.position(0);
             blockBuffer.limit(size);
-            if (limit > 0) {
-                limit -= size;
+            if (remaining > 0) {
+                remaining -= size;
             }
             return blockBuffer;
         }
     }
 
-    private static final class BytesBufferIn implements BufferIn {
+    private static final class CharsBufferIn implements BufferIn {
 
-        private final byte[] source;
-        private final ByteBuffer sourceBuffer;
+        private final char[] source;
+        private final CharBuffer sourceBuffer;
         private final int blockSize;
         private int pos = 0;
-        private long limit;
 
-        private BytesBufferIn(byte[] source, int blockSize, long limit) {
+        private CharsBufferIn(char[] source, int blockSize) {
             this.source = source;
-            this.sourceBuffer = ByteBuffer.wrap(source);
+            this.sourceBuffer = CharBuffer.wrap(source);
             this.blockSize = blockSize;
-            this.limit = limit;
         }
 
         @Override
-        public ByteBuffer read() {
-            if (limit == 0) {
-                return null;
-            }
+        public CharBuffer read() {
             if (pos >= source.length) {
                 return null;
             }
             sourceBuffer.position(pos);
-            int readSize = limit < 0 ? blockSize : (int) Math.min(limit, blockSize);
-            int newPos = Math.min(pos + readSize, source.length);
+            int newPos = Math.min(pos + blockSize, source.length);
             sourceBuffer.limit(newPos);
             pos = newPos;
-            // if (limit > 0) {
-            //     limit -= size;
-            // }
             return sourceBuffer;
         }
     }
 
     private static final class BufferBufferIn implements BufferIn {
 
-        private final ByteBuffer source;
+        private final CharBuffer source;
         private final int blockSize;
         private int pos;
         private final int finalLimit;
 
-        private BufferBufferIn(ByteBuffer source, int blockSize) {
+        private BufferBufferIn(CharBuffer source, int blockSize) {
             this.source = source;
             this.blockSize = blockSize;
             this.pos = this.source.position();
@@ -278,7 +261,7 @@ final class ReadToImpl implements ReadTo {
         }
 
         @Override
-        public ByteBuffer read() {
+        public CharBuffer read() {
             int newLen = Math.min(blockSize, finalLimit - pos);
             if (newLen <= 0) {
                 return null;
@@ -290,24 +273,41 @@ final class ReadToImpl implements ReadTo {
         }
     }
 
-    private static final class OutputSteamBufferOut implements BufferOut {
+    private static final class AppendableBufferOut implements BufferOut {
 
-        private final OutputStream dest;
+        private final Appendable dest;
 
-        private OutputSteamBufferOut(OutputStream dest) {
+        private AppendableBufferOut(Appendable dest) {
             this.dest = dest;
         }
 
         @Override
-        public void write(ByteBuffer buffer) throws IOException {
+        public void write(CharBuffer buffer) throws IOException {
+            if (dest instanceof Writer) {
+                write(buffer, (Writer) dest);
+                return;
+            }
             if (buffer.hasArray()) {
                 int remaining = buffer.remaining();
-                dest.write(buffer.array(), buffer.arrayOffset() + buffer.position(), remaining);
+                int start = buffer.arrayOffset() + buffer.position();
+                dest.append(JieString.asChars(buffer.array(), start, start + remaining));
                 buffer.position(buffer.position() + remaining);
             } else {
-                byte[] buf = new byte[buffer.remaining()];
+                char[] buf = new char[buffer.remaining()];
                 buffer.get(buf);
-                dest.write(buf);
+                dest.append(JieString.asChars(buf, 0, buf.length));
+            }
+        }
+
+        private void write(CharBuffer buffer, Writer writer) throws IOException {
+            if (buffer.hasArray()) {
+                int remaining = buffer.remaining();
+                writer.write(buffer.array(), buffer.arrayOffset() + buffer.position(), remaining);
+                buffer.position(buffer.position() + remaining);
+            } else {
+                char[] buf = new char[buffer.remaining()];
+                buffer.get(buf);
+                writer.write(buf);
             }
         }
     }

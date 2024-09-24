@@ -24,8 +24,8 @@ public class JieString {
     }
 
     /**
-     * Returns string decoding from given bytes (from given offset to specified length)
-     * with {@link JieChars#defaultCharset()}.
+     * Returns string decoding from given bytes (from given offset to specified length) with
+     * {@link JieChars#defaultCharset()}.
      *
      * @param bytes  given bytes
      * @param offset given offset
@@ -394,13 +394,12 @@ public class JieString {
     }
 
     /**
-     * Splits given chars by given separator,
-     * using {@link #subChars(CharSequence, int, int)} to generate sub CharSequence.
-     * If chars or separator is empty, or separator's length is greater than chars' length,
-     * or separator is never matched, return an empty list.
+     * Splits given chars by given separator, using {@link #subChars(CharSequence, int, int)} to generate sub
+     * CharSequence. If chars or separator is empty, or separator's length is greater than chars' length, or separator
+     * is never matched, return an empty list.
      * <p>
-     * Note empty part will be created there is no char between separator and the next separator,
-     * position of start or end. That means, if the returned list is not empty, its length is at least 2.
+     * Note empty part will be created there is no char between separator and the next separator, position of start or
+     * end. That means, if the returned list is not empty, its length is at least 2.
      *
      * @param chars     given chars
      * @param separator given separator
@@ -411,12 +410,12 @@ public class JieString {
     }
 
     /**
-     * Splits given chars by given separator, using given sub-sequence function to generate sub-CharSequence.
-     * If chars or separator is empty, or separator's length is greater than chars' length,
-     * or separator is never matched, return an empty list.
+     * Splits given chars by given separator, using given sub-sequence function to generate sub-CharSequence. If chars
+     * or separator is empty, or separator's length is greater than chars' length, or separator is never matched, return
+     * an empty list.
      * <p>
-     * Note empty part will be created there is no char between separator and the next separator,
-     * position of start or end. That means, if the returned list is not empty, its length is at least 2.
+     * Note empty part will be created there is no char between separator and the next separator, position of start or
+     * end. That means, if the returned list is not empty, its length is at least 2.
      *
      * @param chars     given chars
      * @param separator given separator
@@ -462,10 +461,9 @@ public class JieString {
     }
 
     /**
-     * Replaces given matcher in given chars with given replacement.
-     * If given limit &lt; 0, replace all;
-     * if given limit = 0, do nothing and return given chars to string;
-     * If given limit &gt; 0, this method will replace given limit times.
+     * Replaces given matcher in given chars with given replacement. If given limit &lt; 0, replace all; if given limit
+     * = 0, do nothing and return given chars to string; If given limit &gt; 0, this method will replace given limit
+     * times.
      * <p>
      * FOr example, replaceFirst is equivalent to:
      * <pre>
@@ -529,8 +527,7 @@ public class JieString {
     }
 
     /**
-     * Returns first index of given search word in given chars, starts from index 0,
-     * in natural order (0,1,2,3...end).
+     * Returns first index of given search word in given chars, starts from index 0, in natural order (0,1,2,3...end).
      * Returns -1 if not found.
      *
      * @param chars  given chars
@@ -542,9 +539,8 @@ public class JieString {
     }
 
     /**
-     * Returns first index of given search word in given chars, starts from given index,
-     * in natural order (0,1,2,3...end).
-     * Returns -1 if not found.
+     * Returns first index of given search word in given chars, starts from given index, in natural order
+     * (0,1,2,3...end). Returns -1 if not found.
      *
      * @param chars  given chars
      * @param search given search word
@@ -579,9 +575,8 @@ public class JieString {
     }
 
     /**
-     * Returns last index of given search word in given chars, starts from last index,
-     * in reversed natural order (end...3,2,1,0).
-     * Returns -1 if not found.
+     * Returns last index of given search word in given chars, starts from last index, in reversed natural order
+     * (end...3,2,1,0). Returns -1 if not found.
      *
      * @param chars  given chars
      * @param search given search word
@@ -595,9 +590,8 @@ public class JieString {
     }
 
     /**
-     * Returns last index of given search word in given chars, starts given index,
-     * in reversed natural order (end...3,2,1,0).
-     * Returns -1 if not found.
+     * Returns last index of given search word in given chars, starts given index, in reversed natural order
+     * (end...3,2,1,0). Returns -1 if not found.
      *
      * @param chars  given chars
      * @param search given search word
@@ -771,9 +765,8 @@ public class JieString {
     }
 
     /**
-     * Returns a string starts with given start string.
-     * If given source string starts with given start string, return itself;
-     * if not, return start + src.
+     * Returns a string starts with given start string. If given source string starts with given start string, return
+     * itself; if not, return start + src.
      *
      * @param src   given source string
      * @param start given start string
@@ -787,9 +780,8 @@ public class JieString {
     }
 
     /**
-     * Returns a string doesn't start with given start string.
-     * If given source string starts with given start string, remove the start chars and return;
-     * else return source string.
+     * Returns a string doesn't start with given start string. If given source string starts with given start string,
+     * remove the start chars and return; else return source string.
      *
      * @param src   given source string
      * @param start given start string
@@ -808,9 +800,8 @@ public class JieString {
     }
 
     /**
-     * Returns a string ends with given end string.
-     * If given source string ends with given end string, return itself;
-     * if not, return src + end.
+     * Returns a string ends with given end string. If given source string ends with given end string, return itself; if
+     * not, return src + end.
      *
      * @param src given source string
      * @param end given end string
@@ -824,9 +815,8 @@ public class JieString {
     }
 
     /**
-     * Returns a string doesn't end with given end string.
-     * If given source string ends with given end string, remove the end chars and return;
-     * else return source string.
+     * Returns a string doesn't end with given end string. If given source string ends with given end string, remove the
+     * end chars and return; else return source string.
      *
      * @param src given source string
      * @param end given end string
@@ -1015,25 +1005,37 @@ public class JieString {
     }
 
     /**
-     * Returns a {@link CharSequence} of which contents are shared with given char array, starting from {@code start}
-     * index inclusive and ending with {@code end} index exclusive.
+     * Wraps given char array as an instance of {@link CharSequence}. Any change for content of wrapped array will
+     * reflect to the returned instance.
+     *
+     * @param array given char array
+     * @return an instance of {@link CharSequence} wraps given char array
+     */
+    public static CharSequence asChars(char[] array) {
+        return asChars(array, 0, array.length);
+    }
+
+    /**
+     * Wraps given char array as an instance of {@link CharSequence}, starting from specified start index inclusive and
+     * ending at specified end index exclusive. Any change for content of wrapped array will reflect to the returned
+     * instance.
      *
      * @param array given char array
      * @param start start index inclusive
      * @param end   end index exclusive
-     * @return a {@link CharSequence} of which contents are shared with given char array
+     * @return an instance of {@link CharSequence} wraps given char array
      */
-    public static CharSequence chars(char[] array, int start, int end) {
+    public static CharSequence asChars(char[] array, int start, int end) {
         JieCheck.checkRangeInBounds(start, end, 0, array.length);
-        return new Chars(array, start, end);
+        return new CharsWrapper(array, start, end);
     }
 
     /**
-     * Returns a {@link CharSequence} which is lazy for executing method {@link Object#toString()},
-     * the executing was provided by given supplier.
+     * Returns a {@link CharSequence} which is lazy for executing method {@link Object#toString()}, the executing was
+     * provided by given supplier.
      * <p>
-     * Note returned {@link CharSequence}'s other methods (such as {@link CharSequence#length()})
-     * were based on its lazy toString().
+     * Note returned {@link CharSequence}'s other methods (such as {@link CharSequence#length()}) were based on its lazy
+     * toString().
      *
      * @param supplier given supplier
      * @return lazy char sequence
@@ -1043,8 +1045,8 @@ public class JieString {
     }
 
     /**
-     * Returns a sub-range view of given chars from given start index inclusive to end.
-     * The two chars will share the same data so any operation will reflect each other.
+     * Returns a sub-range view of given chars from given start index inclusive to end. The two chars will share the
+     * same data so any operation will reflect each other.
      * <p>
      * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence will still use
      * {@link #subChars(CharSequence, int, int)}.
@@ -1058,8 +1060,8 @@ public class JieString {
     }
 
     /**
-     * Returns a sub-range view of given chars from given start index inclusive to given end index exclusive.
-     * The two chars will share the same data so any operation will reflect each other.
+     * Returns a sub-range view of given chars from given start index inclusive to given end index exclusive. The two
+     * chars will share the same data so any operation will reflect each other.
      * <p>
      * Note the method {@link CharSequence#subSequence(int, int)} of returned CharSequence will still use this method.
      *
@@ -1073,13 +1075,13 @@ public class JieString {
         return new SubChars(chars, start, end);
     }
 
-    private static final class Chars implements CharSequence {
+    private static final class CharsWrapper implements CharSequence {
 
         private final char[] source;
         private final int start;
         private final int end;
 
-        private Chars(char[] source, int start, int end) {
+        private CharsWrapper(char[] source, int start, int end) {
             this.source = source;
             this.start = start;
             this.end = end;
@@ -1097,7 +1099,7 @@ public class JieString {
 
         @Override
         public CharSequence subSequence(int start, int end) {
-            return JieString.chars(source, this.start + start, this.start + end);
+            return JieString.asChars(source, this.start + start, this.start + end);
         }
 
         @Override
