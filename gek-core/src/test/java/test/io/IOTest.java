@@ -268,22 +268,23 @@ public class IOTest {
 
         // buffer -> stream
         ByteBuffer inBuffer = ByteBuffer.allocateDirect(bytes.length);
+        inBuffer.mark();
         inBuffer.put(bytes);
-        inBuffer.flip();
+        inBuffer.reset();
         out.reset();
         readNum = JieIO.readTo().input(inBuffer).output(out).blockSize(blockSize).readLimit(readLimit).start();
         assertEquals(readNum, getLength(bytes.length, readLimit));
         assertEquals(str.substring(0, getLength(bytes.length, readLimit)), new String(out.toByteArray(), 0, getLength(bytes.length, readLimit), JieChars.UTF_8));
 
         // buffer -> byte[]
-        inBuffer.flip();
+        inBuffer.reset();
         outBytes = new byte[bytes.length];
         readNum = JieIO.readTo().input(inBuffer).output(outBytes).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         assertEquals(str, new String(outBytes, JieChars.UTF_8));
 
         // buffer -> buffer
-        inBuffer.flip();
+        inBuffer.reset();
         outBuffer = ByteBuffer.allocateDirect(bytes.length);
         readNum = JieIO.readTo().input(inBuffer).output(outBuffer).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);

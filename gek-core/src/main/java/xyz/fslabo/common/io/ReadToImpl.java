@@ -131,10 +131,10 @@ final class ReadToImpl implements ReadTo {
             return new InputStreamBufferIn((InputStream) src, actualBlockSize, readLimit);
         }
         if (src instanceof byte[]) {
-            return new BytesBufferIn((byte[]) src, actualBlockSize,readLimit);
+            return new BytesBufferIn((byte[]) src, actualBlockSize, readLimit);
         }
         if (src instanceof ByteBuffer) {
-            return new BufferBufferIn((ByteBuffer) src, actualBlockSize);
+            return new BufferBufferIn((ByteBuffer) src, actualBlockSize, readLimit);
         }
         throw new IORuntimeException("Unexpected source type: " + src.getClass());
     }
@@ -200,29 +200,31 @@ final class ReadToImpl implements ReadTo {
         private final InputStream source;
         private final byte[] block;
         private final ByteBuffer blockBuffer;
-        private long limit;
+        private final long limit;
+        private long remaining;
 
         private InputStreamBufferIn(InputStream source, int blockSize, long limit) {
             this.source = source;
             this.block = new byte[blockSize];
             this.blockBuffer = ByteBuffer.wrap(block);
             this.limit = limit;
+            this.remaining = limit;
         }
 
         @Override
         public ByteBuffer read() throws IOException {
-            if (limit == 0) {
+            if (limit == 0 || remaining == 0) {
                 return null;
             }
-            int readSize = limit < 0 ? block.length : (int) Math.min(limit, block.length);
-            int size = source.read(block,0,readSize);
+            int readSize = limit < 0 ? block.length : (int) Math.min(remaining, block.length);
+            int size = source.read(block, 0, readSize);
             if (size < 0) {
                 return null;
             }
             blockBuffer.position(0);
             blockBuffer.limit(size);
             if (limit > 0) {
-                limit -= size;
+                remaining -= size;
             }
             return blockBuffer;
         }
@@ -234,31 +236,34 @@ final class ReadToImpl implements ReadTo {
         private final ByteBuffer sourceBuffer;
         private final int blockSize;
         private int pos = 0;
-        private long limit;
+        private final long limit;
+        private long remaining;
 
         private BytesBufferIn(byte[] source, int blockSize, long limit) {
             this.source = source;
             this.sourceBuffer = ByteBuffer.wrap(source);
             this.blockSize = blockSize;
             this.limit = limit;
+            this.remaining = limit;
         }
 
         @Override
         public ByteBuffer read() {
-            if (limit == 0) {
+            if (limit == 0 || remaining == 0) {
                 return null;
             }
             if (pos >= source.length) {
                 return null;
             }
             sourceBuffer.position(pos);
-            int readSize = limit < 0 ? blockSize : (int) Math.min(limit, blockSize);
+            int readSize = limit < 0 ? blockSize : (int) Math.min(remaining, blockSize);
             int newPos = Math.min(pos + readSize, source.length);
             sourceBuffer.limit(newPos);
+            int size = newPos - pos;
             pos = newPos;
-            // if (limit > 0) {
-            //     limit -= size;
-            // }
+            if (limit > 0) {
+                remaining -= size;
+            }
             return sourceBuffer;
         }
     }
@@ -267,25 +272,37 @@ final class ReadToImpl implements ReadTo {
 
         private final ByteBuffer source;
         private final int blockSize;
+        private final int sourceLimit;
         private int pos;
-        private final int finalLimit;
+        private final long limit;
+        private long remaining;
 
-        private BufferBufferIn(ByteBuffer source, int blockSize) {
+        private BufferBufferIn(ByteBuffer source, int blockSize, long limit) {
             this.source = source;
             this.blockSize = blockSize;
+            this.sourceLimit = source.limit();
             this.pos = this.source.position();
-            this.finalLimit = this.source.limit();
+            this.limit = limit;
+            this.remaining = limit;
         }
 
         @Override
         public ByteBuffer read() {
-            int newLen = Math.min(blockSize, finalLimit - pos);
-            if (newLen <= 0) {
+            if (limit == 0 || remaining == 0) {
                 return null;
             }
+            if (pos >= sourceLimit) {
+                return null;
+            }
+            int readSize = limit < 0 ? blockSize : (int) Math.min(remaining, blockSize);
+            int newPos = Math.min(source.position() + readSize, sourceLimit);
             source.position(pos);
-            source.limit(pos + newLen);
-            pos = source.limit();
+            source.limit(newPos);
+            int size = newPos - pos;
+            pos = newPos;
+            if (limit > 0) {
+                remaining -= size;
+            }
             return source;
         }
     }
