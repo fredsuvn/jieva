@@ -12,6 +12,7 @@ import xyz.fslabo.test.JieTest;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.util.Arrays;
 
@@ -96,17 +97,19 @@ public class IOTest {
     }
 
     @Test
-    public void testReadTo() throws Exception {
+    public void testByteTransfer() throws Exception {
         // readTo()
-        testReadTo(666, JieIO.BUFFER_SIZE, -1);
-        testReadTo(666, 67, -1);
-        testReadTo(666, 1, -1);
-        testReadTo(100, 10, -1);
-        testReadTo(666, JieIO.BUFFER_SIZE, -1);
-        testReadTo(666, 67, 667);
-        testReadTo(666, 1, 667);
-        testReadTo(100, 10, 101);
-        testReadTo(222, 33, 55);
+        testByteTransfer(666, JieIO.BUFFER_SIZE, -1);
+        testByteTransfer(666, 67, -1);
+        testByteTransfer(666, 1, -1);
+        testByteTransfer(100, 10, -1);
+        testByteTransfer(666, JieIO.BUFFER_SIZE, -1);
+        testByteTransfer(666, 67, 667);
+        testByteTransfer(666, 1, 667);
+        testByteTransfer(100, 10, 101);
+        testByteTransfer(222, 33, 55);
+        testByteTransfer(100, 10, 0);
+        testByteTransfer(100, 10, 100);
 
         int size = 10;
         int offset = 6;
@@ -118,46 +121,46 @@ public class IOTest {
 
         // readTo methods
         byte[] outBytes = new byte[bytes.length];
-        JieIO.readTo(in, outBytes);
+        JieIO.transfer(in, outBytes);
         assertEquals(bytes, outBytes);
         byte[] outBytes2 = new byte[bytes.length * 2];
         in.reset();
-        JieIO.readTo(in, outBytes2, offset, bytes.length);
+        JieIO.transfer(in, outBytes2, offset, bytes.length);
         assertEquals(bytes, Arrays.copyOfRange(outBytes2, offset, offset + bytes.length));
         ByteBuffer outBuffer = ByteBuffer.allocateDirect(bytes.length);
         in.reset();
-        JieIO.readTo(in, outBuffer);
+        JieIO.transfer(in, outBuffer);
         byte[] outBufferContent = new byte[bytes.length];
         outBuffer.flip();
         outBuffer.get(outBufferContent);
         assertEquals(bytes, outBufferContent);
         in.reset();
-        JieIO.readTo(in, out);
+        JieIO.transfer(in, out);
         assertEquals(bytes, out.toByteArray());
         in.reset();
         out.reset();
-        JieIO.readTo(in, out, 2);
+        JieIO.transfer(in, out, 2);
         assertEquals(Arrays.copyOfRange(bytes, 0, 2), out.toByteArray());
         in.reset();
         out.reset();
-        JieIO.readTo(in, out, 2, 1);
+        JieIO.transfer(in, out, 2, 1);
         assertEquals(Arrays.copyOfRange(bytes, 0, 2), out.toByteArray());
         in.reset();
         out.reset();
-        JieIO.readTo(in, out, 2, 100);
+        JieIO.transfer(in, out, 2, 100);
         assertEquals(Arrays.copyOfRange(bytes, 0, 2), out.toByteArray());
 
         // read limit
         in.reset();
         out.reset();
-        long readNum = JieIO.readTo().input(in).output(out).readLimit(0).start();
+        long readNum = JieIO.byteTransfer().input(in).output(out).readLimit(0).start();
         assertEquals(readNum, 0);
-        readNum = JieIO.readTo().input(in).output(out).readLimit(1).start();
+        readNum = JieIO.byteTransfer().input(in).output(out).readLimit(1).start();
         assertEquals(readNum, 1);
         assertEquals(str.substring(0, 1), new String(Arrays.copyOfRange(out.toByteArray(), 0, 1), JieChars.UTF_8));
         in.reset();
         out.reset();
-        readNum = JieIO.readTo().input(in).output(out).conversion(b -> {
+        readNum = JieIO.byteTransfer().input(in).output(out).conversion(b -> {
             int len = b.remaining();
             byte[] bs = new byte[len * 2];
             b.get(bs, 0, len);
@@ -171,7 +174,7 @@ public class IOTest {
         // nio
         NioIn nioIn = new NioIn();
         byte[] nioBytes = new byte[size];
-        readNum = JieIO.readTo().input(nioIn).output(nioBytes).readLimit(nioBytes.length).start();
+        readNum = JieIO.byteTransfer().input(nioIn).output(nioBytes).readLimit(nioBytes.length).start();
         assertEquals(readNum, size);
         byte[] compareBytes = Arrays.copyOf(nioBytes, nioBytes.length);
         Arrays.fill(compareBytes, (byte) 1);
@@ -179,24 +182,26 @@ public class IOTest {
         nioIn.reset();
         Arrays.fill(nioBytes, (byte) 2);
         Arrays.fill(compareBytes, (byte) 2);
-        readNum = JieIO.readTo().input(nioIn).output(nioBytes).breakIfNoRead(true).start();
+        readNum = JieIO.byteTransfer().input(nioIn).output(nioBytes).breakIfNoRead(true).start();
         assertEquals(readNum, 0);
         assertEquals(nioBytes, compareBytes);
 
         // error
-        expectThrows(IORuntimeException.class, () -> testReadTo(666, 0, 0));
-        expectThrows(IORuntimeException.class, () -> JieIO.readTo().start());
-        expectThrows(IORuntimeException.class, () -> JieIO.readTo().input(new byte[0]).start());
-        expectThrows(IORuntimeException.class, () -> JieIO.readTo().output(new byte[0]).start());
-        Method method = JieIO.readTo().getClass().getDeclaredMethod("toBufferIn", Object.class);
-        JieTest.testThrow(IORuntimeException.class, method, JieIO.readTo(), "");
-        method = JieIO.readTo().getClass().getDeclaredMethod("toBufferOut", Object.class);
-        JieTest.testThrow(IORuntimeException.class, method, JieIO.readTo(), "");
-        expectThrows(IORuntimeException.class, () -> JieIO.readTo().input(new ThrowIn(0)).output(new byte[0]).start());
-        expectThrows(IORuntimeException.class, () -> JieIO.readTo().input(new ThrowIn(1)).output(new byte[0]).start());
+        expectThrows(IORuntimeException.class, () -> testByteTransfer(666, 0, 0));
+        expectThrows(IORuntimeException.class, () -> JieIO.byteTransfer().start());
+        expectThrows(IORuntimeException.class, () -> JieIO.byteTransfer().input(new byte[0], 0, 100));
+        expectThrows(IORuntimeException.class, () -> JieIO.byteTransfer().output(new byte[0], 0, 100));
+        expectThrows(IORuntimeException.class, () -> JieIO.byteTransfer().input(new byte[0]).start());
+        expectThrows(IORuntimeException.class, () -> JieIO.byteTransfer().output(new byte[0]).start());
+        Method method = JieIO.byteTransfer().getClass().getDeclaredMethod("toBufferIn", Object.class);
+        JieTest.testThrow(IORuntimeException.class, method, JieIO.byteTransfer(), "");
+        method = JieIO.byteTransfer().getClass().getDeclaredMethod("toBufferOut", Object.class);
+        JieTest.testThrow(IORuntimeException.class, method, JieIO.byteTransfer(), "");
+        expectThrows(IORuntimeException.class, () -> JieIO.byteTransfer().input(new ThrowIn(0)).output(new byte[0]).start());
+        expectThrows(IORuntimeException.class, () -> JieIO.byteTransfer().input(new ThrowIn(1)).output(new byte[0]).start());
     }
 
-    private void testReadTo(int size, int blockSize, int readLimit) throws Exception {
+    private void testByteTransfer(int size, int blockSize, int readLimit) throws Exception {
         int offset = 22;
         String str = new String(JieRandom.fill(new char[size], 'a', 'z'));
         byte[] bytes = str.getBytes(JieChars.UTF_8);
@@ -205,26 +210,26 @@ public class IOTest {
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         in.mark(0);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        long readNum = JieIO.readTo().input(in).output(out).blockSize(blockSize).readLimit(readLimit).start();
+        long readNum = JieIO.byteTransfer().input(in).output(out).blockSize(blockSize).readLimit(readLimit).start();
         assertEquals(readNum, getLength(bytes.length, readLimit));
         assertEquals(str.substring(0, getLength(bytes.length, readLimit)), new String(out.toByteArray(), 0, getLength(bytes.length, readLimit), JieChars.UTF_8));
 
         // stream -> byte[]
         byte[] outBytes = new byte[bytes.length];
         in.reset();
-        readNum = JieIO.readTo().input(in).output(outBytes).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(in).output(outBytes).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         assertEquals(str, new String(outBytes, 0, bytes.length, JieChars.UTF_8));
         outBytes = new byte[bytes.length * 2];
         in.reset();
-        readNum = JieIO.readTo().input(in).output(outBytes, offset, bytes.length).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(in).output(outBytes, offset, bytes.length).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         assertEquals(str, new String(Arrays.copyOfRange(outBytes, offset, offset + bytes.length), JieChars.UTF_8));
 
         // stream -> buffer
         ByteBuffer outBuffer = ByteBuffer.allocateDirect(bytes.length);
         in.reset();
-        readNum = JieIO.readTo().input(in).output(outBuffer).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(in).output(outBuffer).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         outBuffer.flip();
         byte[] outBufferContent = new byte[outBuffer.capacity()];
@@ -233,33 +238,33 @@ public class IOTest {
 
         // byte[] -> stream
         out.reset();
-        readNum = JieIO.readTo().input(bytes).output(out).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.byteTransfer().input(bytes).output(out).blockSize(blockSize).readLimit(readLimit).start();
         assertEquals(readNum, getLength(bytes.length, readLimit));
         assertEquals(str.substring(0, getLength(bytes.length, readLimit)), new String(out.toByteArray(), 0, getLength(bytes.length, readLimit), JieChars.UTF_8));
 
         // byte[] -> byte[]
         outBytes = new byte[bytes.length];
-        readNum = JieIO.readTo().input(bytes).output(outBytes).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(bytes).output(outBytes).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         assertEquals(str, new String(outBytes, JieChars.UTF_8));
         byte[] inBytes = new byte[bytes.length * 2];
         outBytes = new byte[bytes.length];
         System.arraycopy(bytes, 0, inBytes, offset, bytes.length);
-        readNum = JieIO.readTo().input(inBytes, offset, bytes.length).output(outBytes).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(inBytes, offset, bytes.length).output(outBytes).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         assertEquals(str, new String(outBytes, JieChars.UTF_8));
         outBytes = new byte[bytes.length];
-        readNum = JieIO.readTo().input(bytes, 0, bytes.length).output(outBytes, 0, outBytes.length).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(bytes, 0, bytes.length).output(outBytes, 0, outBytes.length).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         assertEquals(str, new String(outBytes, JieChars.UTF_8));
         outBytes = new byte[bytes.length];
-        readNum = JieIO.readTo().input(bytes, 0, bytes.length - 1).output(outBytes, 0, outBytes.length - 1).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(bytes, 0, bytes.length - 1).output(outBytes, 0, outBytes.length - 1).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length - 1);
         assertEquals(str.substring(0, str.length() - 1), new String(Arrays.copyOfRange(outBytes, 0, outBytes.length - 1), JieChars.UTF_8));
 
         // byte[] -> buffer
         outBuffer = ByteBuffer.allocateDirect(bytes.length);
-        readNum = JieIO.readTo().input(bytes).output(outBuffer).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(bytes).output(outBuffer).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         outBuffer.flip();
         outBufferContent = new byte[outBuffer.capacity()];
@@ -272,21 +277,21 @@ public class IOTest {
         inBuffer.put(bytes);
         inBuffer.reset();
         out.reset();
-        readNum = JieIO.readTo().input(inBuffer).output(out).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.byteTransfer().input(inBuffer).output(out).blockSize(blockSize).readLimit(readLimit).start();
         assertEquals(readNum, getLength(bytes.length, readLimit));
         assertEquals(str.substring(0, getLength(bytes.length, readLimit)), new String(out.toByteArray(), 0, getLength(bytes.length, readLimit), JieChars.UTF_8));
 
         // buffer -> byte[]
         inBuffer.reset();
         outBytes = new byte[bytes.length];
-        readNum = JieIO.readTo().input(inBuffer).output(outBytes).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(inBuffer).output(outBytes).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         assertEquals(str, new String(outBytes, JieChars.UTF_8));
 
         // buffer -> buffer
         inBuffer.reset();
         outBuffer = ByteBuffer.allocateDirect(bytes.length);
-        readNum = JieIO.readTo().input(inBuffer).output(outBuffer).blockSize(blockSize).start();
+        readNum = JieIO.byteTransfer().input(inBuffer).output(outBuffer).blockSize(blockSize).start();
         assertEquals(readNum, bytes.length);
         outBuffer.flip();
         outBufferContent = new byte[outBuffer.capacity()];
@@ -294,24 +299,20 @@ public class IOTest {
         assertEquals(str, new String(outBufferContent, JieChars.UTF_8));
     }
 
-    private int getLength(int length, int readLimit) {
-        if (readLimit < 0) {
-            return length;
-        }
-        return Math.min(length, readLimit);
-    }
-
     @Test
-    public void testCharsReadTo() throws Exception {
+    public void testCharTransfer() throws Exception {
         // readTo()
-        testCharsReadTo(666, JieIO.BUFFER_SIZE, -1);
-        testCharsReadTo(666, 67, -1);
-        testCharsReadTo(666, 1, -1);
-        testCharsReadTo(100, 10, -1);
-        testCharsReadTo(666, JieIO.BUFFER_SIZE, -1);
-        testCharsReadTo(666, 67, 667);
-        testCharsReadTo(666, 1, 667);
-        testCharsReadTo(100, 10, 101);
+        testCharTransfer(666, JieIO.BUFFER_SIZE, -1);
+        testCharTransfer(666, 67, -1);
+        testCharTransfer(666, 1, -1);
+        testCharTransfer(100, 10, -1);
+        testCharTransfer(666, JieIO.BUFFER_SIZE, -1);
+        testCharTransfer(666, 67, 667);
+        testCharTransfer(666, 1, 667);
+        testCharTransfer(100, 10, 101);
+        testCharTransfer(222, 33, 55);
+        testCharTransfer(100, 10, 0);
+        testCharTransfer(100, 10, 100);
 
         int size = 10;
         int offset = 6;
@@ -332,46 +333,46 @@ public class IOTest {
 
         // readTo methods
         char[] outChars = new char[chars.length];
-        JieIO.readTo(in, outChars);
+        JieIO.transfer(in, outChars);
         assertEquals(chars, outChars);
         char[] outChars2 = new char[chars.length * 2];
         in.reset();
-        JieIO.readTo(in, outChars2, offset, chars.length);
+        JieIO.transfer(in, outChars2, offset, chars.length);
         assertEquals(chars, Arrays.copyOfRange(outChars2, offset, offset + chars.length));
         CharBuffer outBuffer = dirBuffer.asCharBuffer();
         in.reset();
-        JieIO.readTo(in, outBuffer);
+        JieIO.transfer(in, outBuffer);
         char[] outBufferContent = new char[chars.length];
         outBuffer.flip();
         outBuffer.get(outBufferContent);
         assertEquals(chars, outBufferContent);
         in.reset();
-        JieIO.readTo(in, out);
+        JieIO.transfer(in, out);
         assertEquals(chars, out.toCharArray());
         in.reset();
         out.reset();
-        JieIO.readTo(in, out, 2);
+        JieIO.transfer(in, out, 2);
         assertEquals(Arrays.copyOfRange(chars, 0, 2), out.toCharArray());
         in.reset();
         out.reset();
-        JieIO.readTo(in, out, 2, 1);
+        JieIO.transfer(in, out, 2, 1);
         assertEquals(Arrays.copyOfRange(chars, 0, 2), out.toCharArray());
         in.reset();
         out.reset();
-        JieIO.readTo(in, out, 2, 100);
+        JieIO.transfer(in, out, 2, 100);
         assertEquals(Arrays.copyOfRange(chars, 0, 2), out.toCharArray());
 
         // read limit
         in.reset();
         out.reset();
-        long readNum = JieIO.charsReadTo().input(in).output(out).readLimit(0).start();
+        long readNum = JieIO.charTransfer().input(in).output(out).readLimit(0).start();
         assertEquals(readNum, 0);
-        readNum = JieIO.charsReadTo().input(in).output(out).readLimit(1).start();
+        readNum = JieIO.charTransfer().input(in).output(out).readLimit(1).start();
         assertEquals(readNum, 1);
         assertEquals(str.substring(0, 1), new String(Arrays.copyOfRange(out.toCharArray(), 0, 1)));
         in.reset();
         out.reset();
-        readNum = JieIO.charsReadTo().input(in).output(out).conversion(b -> {
+        readNum = JieIO.charTransfer().input(in).output(out).conversion(b -> {
             int len = b.remaining();
             char[] bs = new char[len * 2];
             b.get(bs, 0, len);
@@ -385,7 +386,7 @@ public class IOTest {
         // nio
         NioReader nioReader = new NioReader();
         char[] nioChars = new char[size];
-        readNum = JieIO.charsReadTo().input(nioReader).output(nioChars).readLimit(nioChars.length).start();
+        readNum = JieIO.charTransfer().input(nioReader).output(nioChars).readLimit(nioChars.length).start();
         assertEquals(readNum, size);
         char[] compareChars = Arrays.copyOf(nioChars, nioChars.length);
         Arrays.fill(compareChars, (char) 1);
@@ -393,24 +394,26 @@ public class IOTest {
         nioReader.reset();
         Arrays.fill(nioChars, (char) 2);
         Arrays.fill(compareChars, (char) 2);
-        readNum = JieIO.charsReadTo().input(nioReader).output(nioChars).breakIfNoRead(true).start();
+        readNum = JieIO.charTransfer().input(nioReader).output(nioChars).breakIfNoRead(true).start();
         assertEquals(readNum, 0);
         assertEquals(nioChars, compareChars);
 
         // error
-        expectThrows(IORuntimeException.class, () -> testReadTo(666, 0, 0));
-        expectThrows(IORuntimeException.class, () -> JieIO.charsReadTo().start());
-        expectThrows(IORuntimeException.class, () -> JieIO.charsReadTo().input(new char[0]).start());
-        expectThrows(IORuntimeException.class, () -> JieIO.charsReadTo().output(new char[0]).start());
-        Method method = JieIO.charsReadTo().getClass().getDeclaredMethod("toBufferIn", Object.class);
-        JieTest.testThrow(IORuntimeException.class, method, JieIO.charsReadTo(), "");
-        method = JieIO.charsReadTo().getClass().getDeclaredMethod("toBufferOut", Object.class);
-        JieTest.testThrow(IORuntimeException.class, method, JieIO.charsReadTo(), "");
-        // expectThrows(IORuntimeException.class, () -> JieIO.charsReadTo().input(new ThrowIn(0)).output(new char[0]).start());
-        // expectThrows(IORuntimeException.class, () -> JieIO.charsReadTo().input(new ThrowIn(1)).output(new char[0]).start());
+        expectThrows(IORuntimeException.class, () -> testCharTransfer(666, 0, 0));
+        expectThrows(IORuntimeException.class, () -> JieIO.charTransfer().start());
+        expectThrows(IORuntimeException.class, () -> JieIO.charTransfer().input(new char[0], 0, 100));
+        expectThrows(IORuntimeException.class, () -> JieIO.charTransfer().output(new char[0], 0, 100));
+        expectThrows(IORuntimeException.class, () -> JieIO.charTransfer().input(new char[0]).start());
+        expectThrows(IORuntimeException.class, () -> JieIO.charTransfer().output(new char[0]).start());
+        Method method = JieIO.charTransfer().getClass().getDeclaredMethod("toBufferIn", Object.class);
+        JieTest.testThrow(IORuntimeException.class, method, JieIO.charTransfer(), 1);
+        method = JieIO.charTransfer().getClass().getDeclaredMethod("toBufferOut", Object.class);
+        JieTest.testThrow(IORuntimeException.class, method, JieIO.charTransfer(), "");
+        expectThrows(IORuntimeException.class, () -> JieIO.charTransfer().input(new ThrowReader(0)).output(new char[0]).start());
+        expectThrows(IORuntimeException.class, () -> JieIO.charTransfer().input(new ThrowReader(1)).output(new char[0]).start());
     }
 
-    private void testCharsReadTo(int size, int blockSize, int readLimit) throws Exception {
+    private void testCharTransfer(int size, int blockSize, int readLimit) throws Exception {
         int offset = 22;
         String str = new String(JieRandom.fill(new char[size], 'a', 'z'));
         char[] chars = str.toCharArray();
@@ -422,32 +425,44 @@ public class IOTest {
         }
         ByteBuffer dirBuffer = ByteBuffer.allocateDirect(bytes.length);
         dirBuffer.put(bytes);
+        dirBuffer.order(ByteOrder.BIG_ENDIAN);
         dirBuffer.flip();
 
         // stream -> stream
         CharArrayReader in = new CharArrayReader(chars);
         in.mark(0);
         CharArrayWriter out = new CharArrayWriter();
-        long readNum = JieIO.charsReadTo().input(in).output(out).blockSize(blockSize).readLimit(readLimit).start();
-        assertEquals(readNum, chars.length);
-        assertEquals(str, new String(out.toCharArray()));
+        long readNum = JieIO.charTransfer().input(in).output(out).blockSize(blockSize).readLimit(readLimit).start();
+        assertEquals(readNum, getLength(chars.length, readLimit));
+        assertEquals(str.substring(0, getLength(chars.length, readLimit)), new String(out.toCharArray(), 0, getLength(chars.length, readLimit)));
+        // string -> stream
+        out.reset();
+        readNum = JieIO.charTransfer().input(str).output(out).blockSize(blockSize).readLimit(readLimit).start();
+        assertEquals(readNum, getLength(chars.length, readLimit));
+        assertEquals(str.substring(0, getLength(chars.length, readLimit)), new String(out.toCharArray(), 0, getLength(chars.length, readLimit)));
+        // direct -> stream
+        CharBuffer dirInBuffer = dirBuffer.asCharBuffer();
+        StringBuilder outBuilder = new StringBuilder();
+        readNum = JieIO.charTransfer().input(dirInBuffer).output(outBuilder).blockSize(blockSize).readLimit(readLimit).start();
+        assertEquals(readNum, getLength(chars.length, readLimit));
+        assertEquals(str.substring(0, getLength(chars.length, readLimit)), outBuilder.toString());
 
         // stream -> char[]
         char[] outChars = new char[chars.length];
         in.reset();
-        readNum = JieIO.charsReadTo().input(in).output(outChars).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(in).output(outChars).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         assertEquals(str, new String(outChars));
         outChars = new char[chars.length * 2];
         in.reset();
-        readNum = JieIO.charsReadTo().input(in).output(outChars, offset, chars.length).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(in).output(outChars, offset, chars.length).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         assertEquals(str, new String(Arrays.copyOfRange(outChars, offset, offset + chars.length)));
 
         // stream -> buffer
         CharBuffer outBuffer = dirBuffer.asCharBuffer();
         in.reset();
-        readNum = JieIO.charsReadTo().input(in).output(outBuffer).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(in).output(outBuffer).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         outBuffer.flip();
         char[] outBufferContent = new char[outBuffer.capacity()];
@@ -456,33 +471,33 @@ public class IOTest {
 
         // char[] -> stream
         out.reset();
-        readNum = JieIO.charsReadTo().input(chars).output(out).blockSize(blockSize).readLimit(readLimit).start();
-        assertEquals(readNum, chars.length);
-        assertEquals(str, new String(out.toCharArray()));
+        readNum = JieIO.charTransfer().input(chars).output(out).blockSize(blockSize).readLimit(readLimit).start();
+        assertEquals(readNum, getLength(chars.length, readLimit));
+        assertEquals(str.substring(0, getLength(chars.length, readLimit)), new String(out.toCharArray(), 0, getLength(chars.length, readLimit)));
 
         // char[] -> char[]
         outChars = new char[chars.length];
-        readNum = JieIO.charsReadTo().input(chars).output(outChars).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(chars).output(outChars).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         assertEquals(str, new String(outChars));
         char[] inChars = new char[chars.length * 2];
         outChars = new char[chars.length];
         System.arraycopy(chars, 0, inChars, offset, chars.length);
-        readNum = JieIO.charsReadTo().input(inChars, offset, chars.length).output(outChars).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(inChars, offset, chars.length).output(outChars).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         assertEquals(str, new String(outChars));
         outChars = new char[chars.length];
-        readNum = JieIO.charsReadTo().input(chars, 0, chars.length).output(outChars, 0, outChars.length).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(chars, 0, chars.length).output(outChars, 0, outChars.length).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         assertEquals(str, new String(outChars));
         outChars = new char[chars.length];
-        readNum = JieIO.charsReadTo().input(chars, 0, chars.length - 1).output(outChars, 0, outChars.length - 1).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(chars, 0, chars.length - 1).output(outChars, 0, outChars.length - 1).blockSize(blockSize).start();
         assertEquals(readNum, chars.length - 1);
         assertEquals(str.substring(0, str.length() - 1), new String(Arrays.copyOfRange(outChars, 0, outChars.length - 1)));
 
         // char[] -> buffer
         outBuffer = dirBuffer.asCharBuffer();
-        readNum = JieIO.charsReadTo().input(chars).output(outBuffer).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(chars).output(outBuffer).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         outBuffer.flip();
         outBufferContent = new char[outBuffer.capacity()];
@@ -491,29 +506,37 @@ public class IOTest {
 
         // buffer -> stream
         CharBuffer inBuffer = CharBuffer.allocate(chars.length);
+        inBuffer.mark();
         inBuffer.put(chars);
-        inBuffer.flip();
+        inBuffer.reset();
         out.reset();
-        readNum = JieIO.charsReadTo().input(inBuffer).output(out).blockSize(blockSize).readLimit(readLimit).start();
-        assertEquals(readNum, chars.length);
-        assertEquals(str, new String(out.toCharArray()));
+        readNum = JieIO.charTransfer().input(inBuffer).output(out).blockSize(blockSize).readLimit(readLimit).start();
+        assertEquals(readNum, getLength(chars.length, readLimit));
+        assertEquals(str.substring(0, getLength(chars.length, readLimit)), new String(out.toCharArray(), 0, getLength(chars.length, readLimit)));
 
         // buffer -> char[]
-        inBuffer.flip();
+        inBuffer.reset();
         outChars = new char[chars.length];
-        readNum = JieIO.charsReadTo().input(inBuffer).output(outChars).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(inBuffer).output(outChars).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         assertEquals(str, new String(outChars));
 
         // buffer -> buffer
-        inBuffer.flip();
+        inBuffer.reset();
         outBuffer = dirBuffer.asCharBuffer();
-        readNum = JieIO.charsReadTo().input(inBuffer).output(outBuffer).blockSize(blockSize).readLimit(readLimit).start();
+        readNum = JieIO.charTransfer().input(inBuffer).output(outBuffer).blockSize(blockSize).start();
         assertEquals(readNum, chars.length);
         outBuffer.flip();
         outBufferContent = new char[outBuffer.capacity()];
         outBuffer.get(outBufferContent);
         assertEquals(str, new String(outBufferContent));
+    }
+
+    private int getLength(int length, int readLimit) {
+        if (readLimit < 0) {
+            return length;
+        }
+        return Math.min(length, readLimit);
     }
 
     private InputStream bytesIn(byte[] array, int available) {
@@ -655,6 +678,33 @@ public class IOTest {
                 throw new IOException("e == 0");
             }
             throw new IllegalArgumentException("e = " + e);
+        }
+    }
+
+    private static final class ThrowReader extends Reader {
+
+        private final int e;
+
+        private ThrowReader(int e) {
+            this.e = e;
+        }
+
+        @Override
+        public int read() throws IOException {
+            return -1;
+        }
+
+        @Override
+        public int read(@NotNull char[] cbuf, int off, int len) throws IOException {
+            if (e == 0) {
+                throw new IOException("e == 0");
+            }
+            throw new IllegalArgumentException("e = " + e);
+        }
+
+        @Override
+        public void close() throws IOException {
+
         }
     }
 }

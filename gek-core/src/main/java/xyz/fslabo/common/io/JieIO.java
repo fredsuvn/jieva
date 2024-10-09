@@ -50,7 +50,7 @@ public class JieIO {
                         ByteArrayOutputStream dest = new ByteArrayOutputStream(available + 1);
                         dest.write(bytes);
                         dest.write(r);
-                        readTo(source, dest);
+                        transfer(source, dest);
                         return dest.toByteArray();
                     }
                 } else {
@@ -58,7 +58,7 @@ public class JieIO {
                 }
             } else {
                 ByteArrayOutputStream dest = new ByteArrayOutputStream();
-                long num = readTo(source, dest);
+                long num = transfer(source, dest);
                 return num < 0 ? null : dest.toByteArray();
             }
         } catch (IOException e) {
@@ -121,7 +121,7 @@ public class JieIO {
     @Nullable
     public static String read(Reader source) throws IORuntimeException {
         StringBuilder dest = new StringBuilder();
-        long readCount = readTo(source, dest);
+        long readCount = transfer(source, dest);
         if (readCount == -1) {
             return null;
         }
@@ -144,7 +144,7 @@ public class JieIO {
     @Nullable
     public static String read(Reader source, int number) throws IORuntimeException {
         StringBuilder dest = new StringBuilder();
-        long readCount = readTo(source, dest, number);
+        long readCount = transfer(source, dest, number);
         if (readCount == -1) {
             return null;
         }
@@ -258,20 +258,30 @@ public class JieIO {
     }
 
     /**
-     * Returns an instance of {@link ReadTo} to transmit bytes from specified source into specified destination.
+     * Returns an instance of {@link ByteTransfer} to transfer bytes from specified source into specified destination.
      *
-     * @return an instance of {@link ReadTo} to transmit bytes from specified source into specified destination
-     * @see ReadTo
+     * @return an instance of {@link ByteTransfer} to transfer bytes from specified source into specified destination
+     * @see ByteTransfer
      */
-    public static ReadTo readTo() {
-        return new ReadToImpl();
+    public static ByteTransfer byteTransfer() {
+        return new ByteTransferImpl();
     }
 
     /**
-     * Reads bytes from source stream into dest array, returns actual read number. If the source has been ended and no
-     * data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Returns an instance of {@link CharTransfer} to transfer chars from specified source into specified destination.
+     *
+     * @return an instance of {@link CharTransfer} to transfer chars from specified source into specified destination
+     * @see CharTransfer
+     */
+    public static CharTransfer charTransfer() {
+        return new CharTransferImpl();
+    }
+
+    /**
+     * Transfers bytes from source stream into dest array, returns actual read number. If the source has been ended and
+     * no data read out, return -1. This method is equivalent to ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest).readLimit(dest.length).start();
+     *     return (int) byteTransfer().input(source).output(dest).readLimit(dest.length).start();
      * </pre>
      *
      * @param source source stream
@@ -279,15 +289,16 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(InputStream source, byte[] dest) throws IORuntimeException {
-        return (int) readTo().input(source).output(dest).readLimit(dest.length).start();
+    public static int transfer(InputStream source, byte[] dest) throws IORuntimeException {
+        return (int) byteTransfer().input(source).output(dest).readLimit(dest.length).start();
     }
 
     /**
-     * Reads bytes from source stream into dest array within specified offset and length, returns actual read number. If
-     * the source has been ended and no data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers bytes from source stream into dest array within specified offset and length, returns actual read
+     * number. If the source has been ended and no data read out, return -1. This method is equivalent to
+     * ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest, offset, length).readLimit(length).start();
+     *     return (int) byteTransfer().input(source).output(dest, offset, length).readLimit(length).start();
      * </pre>
      *
      * @param source source stream
@@ -297,15 +308,15 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(InputStream source, byte[] dest, int offset, int length) throws IORuntimeException {
-        return (int) readTo().input(source).output(dest, offset, length).readLimit(length).start();
+    public static int transfer(InputStream source, byte[] dest, int offset, int length) throws IORuntimeException {
+        return (int) byteTransfer().input(source).output(dest, offset, length).readLimit(length).start();
     }
 
     /**
-     * Reads bytes from source stream into dest buffer, returns actual read number. If the source has been ended and no
-     * data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers bytes from source stream into dest buffer, returns actual read number. If the source has been ended and
+     * no data read out, return -1. This method is equivalent to ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest).readLimit(dest.remaining()).start();
+     *     return (int) byteTransfer().input(source).output(dest).readLimit(dest.remaining()).start();
      * </pre>
      *
      * @param source source stream
@@ -313,15 +324,15 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(InputStream source, ByteBuffer dest) throws IORuntimeException {
-        return (int) readTo().input(source).output(dest).readLimit(dest.remaining()).start();
+    public static int transfer(InputStream source, ByteBuffer dest) throws IORuntimeException {
+        return (int) byteTransfer().input(source).output(dest).readLimit(dest.remaining()).start();
     }
 
     /**
-     * Reads bytes from source stream into dest stream, returns actual read number. If the source has been ended and no
-     * data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers bytes from source stream into dest stream, returns actual read number. If the source has been ended and
+     * no data read out, return -1. This method is equivalent to ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest).start();
+     *     return (int) byteTransfer().input(source).output(dest).start();
      * </pre>
      *
      * @param source source stream
@@ -329,15 +340,16 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(InputStream source, OutputStream dest) throws IORuntimeException {
-        return (int) readTo().input(source).output(dest).start();
+    public static long transfer(InputStream source, OutputStream dest) throws IORuntimeException {
+        return (int) byteTransfer().input(source).output(dest).start();
     }
 
     /**
-     * Reads bytes from source stream into dest stream within specified read limit, returns actual read number. If the
-     * source has been ended and no data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers bytes from source stream into dest stream within specified read limit, returns actual read number. If
+     * the source has been ended and no data read out, return -1. This method is equivalent to
+     * ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest).readLimit(readLimit).start();
+     *     return (int) byteTransfer().input(source).output(dest).readLimit(readLimit).start();
      * </pre>
      *
      * @param source    source stream
@@ -346,16 +358,16 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(InputStream source, OutputStream dest, long readLimit) throws IORuntimeException {
-        return (int) readTo().input(source).output(dest).readLimit(readLimit).start();
+    public static long transfer(InputStream source, OutputStream dest, long readLimit) throws IORuntimeException {
+        return (int) byteTransfer().input(source).output(dest).readLimit(readLimit).start();
     }
 
     /**
-     * Reads bytes from source stream into dest stream within specified read limit and block size, returns actual read
-     * number. If the source has been ended and no data read out, return -1. This method is equivalent to
-     * ({@link #readTo()}):
+     * Transfers bytes from source stream into dest stream within specified read limit and block size, returns actual
+     * read number. If the source has been ended and no data read out, return -1. This method is equivalent to
+     * ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest).readLimit(readLimit).blockSize(blockSize).start();
+     *     return (int) byteTransfer().input(source).output(dest).readLimit(readLimit).blockSize(blockSize).start();
      * </pre>
      *
      * @param source    source stream
@@ -365,25 +377,15 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(InputStream source, OutputStream dest, long readLimit, int blockSize) throws IORuntimeException {
-        return (int) readTo().input(source).output(dest).readLimit(readLimit).blockSize(blockSize).start();
+    public static long transfer(InputStream source, OutputStream dest, long readLimit, int blockSize) throws IORuntimeException {
+        return (int) byteTransfer().input(source).output(dest).readLimit(readLimit).blockSize(blockSize).start();
     }
 
     /**
-     * Returns an instance of {@link CharsReadTo} to transmit chars from specified source into specified destination.
-     *
-     * @return an instance of {@link CharsReadTo} to transmit chars from specified source into specified destination
-     * @see CharsReadTo
-     */
-    public static CharsReadTo charsReadTo() {
-        return new CharsReadToImpl();
-    }
-
-    /**
-     * Reads chars from source reader into dest array, returns actual read number. If the source has been ended and no
-     * data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers chars from source reader into dest array, returns actual read number. If the source has been ended and
+     * no data read out, return -1. This method is equivalent to ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) charsReadTo().input(source).output(dest).readLimit(dest.length).start();
+     *     return (int) charTransfer().input(source).output(dest).readLimit(dest.length).start();
      * </pre>
      *
      * @param source source reader
@@ -391,15 +393,16 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(Reader source, char[] dest) throws IORuntimeException {
-        return (int) charsReadTo().input(source).output(dest).readLimit(dest.length).start();
+    public static int transfer(Reader source, char[] dest) throws IORuntimeException {
+        return (int) charTransfer().input(source).output(dest).readLimit(dest.length).start();
     }
 
     /**
-     * Reads chars from source reader into dest array within specified offset and length, returns actual read number. If
-     * the source has been ended and no data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers chars from source reader into dest array within specified offset and length, returns actual read
+     * number. If the source has been ended and no data read out, return -1. This method is equivalent to
+     * ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) charsReadTo().input(source).output(dest, offset, length).readLimit(length).start();
+     *     return (int) charTransfer().input(source).output(dest, offset, length).readLimit(length).start();
      * </pre>
      *
      * @param source source reader
@@ -409,15 +412,15 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(Reader source, char[] dest, int offset, int length) throws IORuntimeException {
-        return (int) charsReadTo().input(source).output(dest, offset, length).readLimit(length).start();
+    public static int transfer(Reader source, char[] dest, int offset, int length) throws IORuntimeException {
+        return (int) charTransfer().input(source).output(dest, offset, length).readLimit(length).start();
     }
 
     /**
-     * Reads chars from source reader into dest buffer, returns actual read number. If the source has been ended and no
-     * data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers chars from source reader into dest buffer, returns actual read number. If the source has been ended and
+     * no data read out, return -1. This method is equivalent to ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) charsReadTo().input(source).output(dest).readLimit(dest.remaining()).start();
+     *     return (int) charTransfer().input(source).output(dest).readLimit(dest.remaining()).start();
      * </pre>
      *
      * @param source source reader
@@ -425,15 +428,15 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static int readTo(Reader source, CharBuffer dest) throws IORuntimeException {
-        return (int) charsReadTo().input(source).output(dest).readLimit(dest.remaining()).start();
+    public static int transfer(Reader source, CharBuffer dest) throws IORuntimeException {
+        return (int) charTransfer().input(source).output(dest).readLimit(dest.remaining()).start();
     }
 
     /**
-     * Reads bytes from source reader into dest appendable, returns actual read number. If the source has been ended and
-     * no data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers bytes from source reader into dest appendable, returns actual read number. If the source has been ended
+     * and no data read out, return -1. This method is equivalent to ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest).start();
+     *     return (int) charTransfer().input(source).output(dest).start();
      * </pre>
      *
      * @param source source reader
@@ -441,15 +444,16 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(Reader source, Appendable dest) throws IORuntimeException {
-        return (int) charsReadTo().input(source).output(dest).start();
+    public static long transfer(Reader source, Appendable dest) throws IORuntimeException {
+        return (int) charTransfer().input(source).output(dest).start();
     }
 
     /**
-     * Reads bytes from source reader into dest appendable within specified read limit, returns actual read number. If
-     * the source has been ended and no data read out, return -1. This method is equivalent to ({@link #readTo()}):
+     * Transfers bytes from source reader into dest appendable within specified read limit, returns actual read number.
+     * If the source has been ended and no data read out, return -1. This method is equivalent to
+     * ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest).readLimit(readLimit).start();
+     *     return (int) charTransfer().input(source).output(dest).readLimit(readLimit).start();
      * </pre>
      *
      * @param source    source reader
@@ -458,16 +462,16 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(Reader source, Appendable dest, int readLimit) throws IORuntimeException {
-        return (int) charsReadTo().input(source).output(dest).readLimit(readLimit).start();
+    public static long transfer(Reader source, Appendable dest, int readLimit) throws IORuntimeException {
+        return (int) charTransfer().input(source).output(dest).readLimit(readLimit).start();
     }
 
     /**
-     * Reads bytes from source reader into dest appendable within specified read limit and block size, returns actual
-     * read number. If the source has been ended and no data read out, return -1. This method is equivalent to
-     * ({@link #readTo()}):
+     * Transfers bytes from source reader into dest appendable within specified read limit and block size, returns
+     * actual read number. If the source has been ended and no data read out, return -1. This method is equivalent to
+     * ({@link #byteTransfer()}):
      * <pre>
-     *     return (int) readTo().input(source).output(dest).readLimit(readLimit).blockSize(blockSize).start();
+     *     return (int) charTransfer().input(source).output(dest).readLimit(readLimit).blockSize(blockSize).start();
      * </pre>
      *
      * @param source    source reader
@@ -477,8 +481,8 @@ public class JieIO {
      * @return actual read number, or -1 if the source has been ended and no data read out
      * @throws IORuntimeException IO runtime exception
      */
-    public static long readTo(Reader source, Appendable dest, int readLimit, int blockSize) throws IORuntimeException {
-        return (int) charsReadTo().input(source).output(dest).readLimit(readLimit).blockSize(blockSize).start();
+    public static long transfer(Reader source, Appendable dest, int readLimit, int blockSize) throws IORuntimeException {
+        return (int) charTransfer().input(source).output(dest).readLimit(readLimit).blockSize(blockSize).start();
     }
 
     /**

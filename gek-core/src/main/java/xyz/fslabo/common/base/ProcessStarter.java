@@ -400,13 +400,13 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
         }
         Process process = builder.start();
         if (in != null) {
-            JieIO.readTo(in, process.getOutputStream());
+            JieIO.transfer(in, process.getOutputStream());
         }
         if (out != null) {
-            JieIO.readTo(process.getInputStream(), out);
+            JieIO.transfer(process.getInputStream(), out);
         }
         if (err != null) {
-            JieIO.readTo(process.getErrorStream(), out);
+            JieIO.transfer(process.getErrorStream(), out);
         }
         return process;
     }

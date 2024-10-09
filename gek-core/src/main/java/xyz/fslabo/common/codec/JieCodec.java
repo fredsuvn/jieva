@@ -355,7 +355,7 @@ public class JieCodec {
             int outSize = 0;
             byte[] inBytes = new byte[blockSize];
             while (true) {
-                int readCount = JieIO.readTo(in, inBytes);
+                int readCount = JieIO.transfer(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -399,7 +399,7 @@ public class JieCodec {
             int outSize = 0;
             byte[] inBytes = new byte[blockSize];
             while (true) {
-                int readCount = JieIO.readTo(in, inBytes);
+                int readCount = JieIO.transfer(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -517,7 +517,7 @@ public class JieCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = JieIO.readTo(in, inBytes);
+                int readCount = JieIO.transfer(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -584,7 +584,7 @@ public class JieCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = JieIO.readTo(in, inBytes);
+                int readCount = JieIO.transfer(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -652,7 +652,7 @@ public class JieCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = JieIO.readTo(in, inBytes);
+                int readCount = JieIO.transfer(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }
@@ -723,7 +723,7 @@ public class JieCodec {
             }
             byte[] inBytes = new byte[bufferSize];
             while (true) {
-                int readCount = JieIO.readTo(in, inBytes);
+                int readCount = JieIO.transfer(in, inBytes);
                 if (readCount < 0) {
                     break;
                 }

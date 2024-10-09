@@ -27,8 +27,8 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to read given length bytes of given path from offset position,
-     * the given length may be set to -1 to read to end of file.
+     * Using {@link RandomAccessFile} to read given length bytes of given path from offset position, the given length
+     * may be set to -1 to read to end of file.
      *
      * @param path   given path
      * @param offset offset position
@@ -44,8 +44,8 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to read all bytes of given path.
-     * The read bytes will be encoded to String with {@link JieChars#defaultCharset()}.
+     * Using {@link RandomAccessFile} to read all bytes of given path. The read bytes will be encoded to String with
+     * {@link JieChars#defaultCharset()}.
      *
      * @param path given path
      * @return read string
@@ -55,8 +55,8 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to read all bytes of given path.
-     * The read bytes will be encoded to String with given charset.
+     * Using {@link RandomAccessFile} to read all bytes of given path. The read bytes will be encoded to String with
+     * given charset.
      *
      * @param path    given path
      * @param charset given charset
@@ -67,9 +67,9 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to read given length bytes of given path from offset position,
-     * the given length may be set to -1 to read to end of file.
-     * The read bytes will be encoded to String with {@link JieChars#defaultCharset()}.
+     * Using {@link RandomAccessFile} to read given length bytes of given path from offset position, the given length
+     * may be set to -1 to read to end of file. The read bytes will be encoded to String with
+     * {@link JieChars#defaultCharset()}.
      *
      * @param path   given path
      * @param offset offset position
@@ -81,9 +81,8 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to read given length bytes of given path from offset position,
-     * the given length may be set to -1 to read to end of file.
-     * The read bytes will be encoded to String with given charset.
+     * Using {@link RandomAccessFile} to read given length bytes of given path from offset position, the given length
+     * may be set to -1 to read to end of file. The read bytes will be encoded to String with given charset.
      *
      * @param path    given path
      * @param offset  offset position
@@ -110,8 +109,8 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to write given length bytes into given path from offset position,
-     * the given length may be set to -1 to write unlimitedly.
+     * Using {@link RandomAccessFile} to write given length bytes into given path from offset position, the given length
+     * may be set to -1 to write unlimitedly.
      *
      * @param path   given path
      * @param offset offset position
@@ -121,7 +120,7 @@ public class JieFile {
     public static void writeBytes(Path path, long offset, long length, InputStream data) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
             OutputStream dest = JieIO.toOutputStream(random, offset, length);
-            JieIO.readTo(data, dest);
+            JieIO.transfer(data, dest);
             dest.flush();
         } catch (Exception e) {
             throw new FileException(e);
@@ -129,8 +128,8 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to write given data into given file.
-     * The written bytes will be decoded from given data with {@link JieChars#defaultCharset()}.
+     * Using {@link RandomAccessFile} to write given data into given file. The written bytes will be decoded from given
+     * data with {@link JieChars#defaultCharset()}.
      *
      * @param path given path
      * @param data given data
@@ -140,8 +139,8 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to write given data into given file.
-     * The written bytes will be decoded from given data with given charset.
+     * Using {@link RandomAccessFile} to write given data into given file. The written bytes will be decoded from given
+     * data with given charset.
      *
      * @param path    given path
      * @param data    given data
@@ -152,9 +151,9 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to write given data into given path from offset position,
-     * the given length may be set to -1 to write unlimitedly.
-     * The written bytes will be decoded from given data with {@link JieChars#defaultCharset()}.
+     * Using {@link RandomAccessFile} to write given data into given path from offset position, the given length may be
+     * set to -1 to write unlimitedly. The written bytes will be decoded from given data with
+     * {@link JieChars#defaultCharset()}.
      *
      * @param path   given path
      * @param offset offset position
@@ -166,9 +165,8 @@ public class JieFile {
     }
 
     /**
-     * Using {@link RandomAccessFile} to write given data into given path from offset position,
-     * the given length may be set to -1 to write unlimitedly.
-     * The written bytes will be decoded from given data with given charset.
+     * Using {@link RandomAccessFile} to write given data into given path from offset position, the given length may be
+     * set to -1 to write unlimitedly. The written bytes will be decoded from given data with given charset.
      *
      * @param path    given path
      * @param offset  offset position

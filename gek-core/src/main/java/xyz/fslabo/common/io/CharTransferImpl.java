@@ -9,7 +9,7 @@ import java.io.Writer;
 import java.nio.CharBuffer;
 import java.util.function.Function;
 
-final class CharsReadToImpl implements CharsReadTo {
+final class CharTransferImpl implements CharTransfer {
 
     private Object source;
     private Object dest;
@@ -19,19 +19,19 @@ final class CharsReadToImpl implements CharsReadTo {
     private Function<CharBuffer, CharBuffer> conversion;
 
     @Override
-    public CharsReadTo input(Reader source) {
+    public CharTransfer input(Reader source) {
         this.source = source;
         return this;
     }
 
     @Override
-    public CharsReadTo input(char[] source) {
+    public CharTransfer input(char[] source) {
         this.source = source;
         return this;
     }
 
     @Override
-    public CharsReadTo input(char[] source, int offset, int length) {
+    public CharTransfer input(char[] source, int offset, int length) {
         if (offset == 0 && length == source.length) {
             return input(source);
         }
@@ -44,25 +44,31 @@ final class CharsReadToImpl implements CharsReadTo {
     }
 
     @Override
-    public CharsReadTo input(CharBuffer source) {
+    public CharTransfer input(CharBuffer source) {
         this.source = source;
         return this;
     }
 
     @Override
-    public CharsReadTo output(Appendable dest) {
+    public CharTransfer input(CharSequence source) {
+        this.source = source;
+        return this;
+    }
+
+    @Override
+    public CharTransfer output(Appendable dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public CharsReadTo output(char[] dest) {
+    public CharTransfer output(char[] dest) {
         this.dest = CharBuffer.wrap(dest);
         return this;
     }
 
     @Override
-    public CharsReadTo output(char[] dest, int offset, int length) {
+    public CharTransfer output(char[] dest, int offset, int length) {
         try {
             this.dest = CharBuffer.wrap(dest, offset, length);
         } catch (Exception e) {
@@ -72,19 +78,19 @@ final class CharsReadToImpl implements CharsReadTo {
     }
 
     @Override
-    public CharsReadTo output(CharBuffer dest) {
+    public CharTransfer output(CharBuffer dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public CharsReadTo readLimit(long readLimit) {
+    public CharTransfer readLimit(long readLimit) {
         this.readLimit = readLimit;
         return this;
     }
 
     @Override
-    public CharsReadTo blockSize(int blockSize) {
+    public CharTransfer blockSize(int blockSize) {
         if (blockSize <= 0) {
             throw new IORuntimeException("blockSize must > 0!");
         }
@@ -93,13 +99,13 @@ final class CharsReadToImpl implements CharsReadTo {
     }
 
     @Override
-    public CharsReadTo breakIfNoRead(boolean breakIfNoRead) {
+    public CharTransfer breakIfNoRead(boolean breakIfNoRead) {
         this.breakIfNoRead = breakIfNoRead;
         return this;
     }
 
     @Override
-    public CharsReadTo conversion(Function<CharBuffer, CharBuffer> conversion) {
+    public CharTransfer conversion(Function<CharBuffer, CharBuffer> conversion) {
         this.conversion = conversion;
         return this;
     }
@@ -129,10 +135,13 @@ final class CharsReadToImpl implements CharsReadTo {
             return new ReaderBufferIn((Reader) src, actualBlockSize, readLimit);
         }
         if (src instanceof char[]) {
-            return new CharsBufferIn((char[]) src, actualBlockSize);
+            return new CharsBufferIn((char[]) src, actualBlockSize, readLimit);
         }
         if (src instanceof CharBuffer) {
-            return new BufferBufferIn((CharBuffer) src, actualBlockSize);
+            return new BufferBufferIn((CharBuffer) src, actualBlockSize, readLimit);
+        }
+        if (src instanceof CharSequence) {
+            return new StringBufferIn((CharSequence) src, actualBlockSize, readLimit);
         }
         throw new IORuntimeException("Unexpected source type: " + src.getClass());
     }
@@ -174,11 +183,7 @@ final class CharsReadToImpl implements CharsReadTo {
             } else {
                 out.write(buf);
             }
-            if (readLimit > 0 && count >= readLimit) {
-                break;
-            }
         }
-        return count;
     }
 
     private interface BufferIn {
@@ -195,25 +200,30 @@ final class CharsReadToImpl implements CharsReadTo {
         private final Reader source;
         private final char[] block;
         private final CharBuffer blockBuffer;
-        private  long remaining;
+        private final long limit;
+        private long remaining;
 
-        private ReaderBufferIn(Reader source, int blockSize, long remaining) {
+        private ReaderBufferIn(Reader source, int blockSize, long limit) {
             this.source = source;
             this.block = new char[blockSize];
             this.blockBuffer = CharBuffer.wrap(block);
-            this.remaining = remaining;
+            this.limit = limit;
+            this.remaining = limit;
         }
 
         @Override
         public CharBuffer read() throws IOException {
-            int readSize = remaining > 0 ? (int) Math.min(block.length, remaining) : block.length;
+            int readSize = limit < 0 ? block.length : (int) Math.min(remaining, block.length);
+            if (readSize <= 0) {
+                return null;
+            }
             int size = source.read(block, 0, readSize);
             if (size < 0) {
                 return null;
             }
             blockBuffer.position(0);
             blockBuffer.limit(size);
-            if (remaining > 0) {
+            if (limit > 0) {
                 remaining -= size;
             }
             return blockBuffer;
@@ -226,50 +236,111 @@ final class CharsReadToImpl implements CharsReadTo {
         private final CharBuffer sourceBuffer;
         private final int blockSize;
         private int pos = 0;
+        private final long limit;
+        private long remaining;
 
-        private CharsBufferIn(char[] source, int blockSize) {
+        private CharsBufferIn(char[] source, int blockSize, long limit) {
             this.source = source;
             this.sourceBuffer = CharBuffer.wrap(source);
             this.blockSize = blockSize;
+            this.limit = limit;
+            this.remaining = limit;
         }
 
         @Override
         public CharBuffer read() {
+            int readSize = limit < 0 ? blockSize : (int) Math.min(remaining, blockSize);
+            if (readSize <= 0) {
+                return null;
+            }
             if (pos >= source.length) {
                 return null;
             }
             sourceBuffer.position(pos);
-            int newPos = Math.min(pos + blockSize, source.length);
+            int newPos = Math.min(pos + readSize, source.length);
             sourceBuffer.limit(newPos);
+            int size = newPos - pos;
             pos = newPos;
+            if (limit > 0) {
+                remaining -= size;
+            }
             return sourceBuffer;
         }
     }
 
     private static final class BufferBufferIn implements BufferIn {
 
-        private final CharBuffer source;
+        private final CharBuffer sourceBuffer;
         private final int blockSize;
-        private int pos;
-        private final int finalLimit;
+        private int pos = 0;
+        private final long limit;
+        private long remaining;
+        private final int sourceRemaining;
 
-        private BufferBufferIn(CharBuffer source, int blockSize) {
-            this.source = source;
+        private BufferBufferIn(CharBuffer source, int blockSize, long limit) {
+            this.sourceBuffer = source.slice();
             this.blockSize = blockSize;
-            this.pos = this.source.position();
-            this.finalLimit = this.source.limit();
+            this.limit = limit;
+            this.remaining = limit;
+            this.sourceRemaining = source.remaining();
         }
 
         @Override
         public CharBuffer read() {
-            int newLen = Math.min(blockSize, finalLimit - pos);
-            if (newLen <= 0) {
+            int readSize = limit < 0 ? blockSize : (int) Math.min(remaining, blockSize);
+            if (readSize <= 0) {
                 return null;
             }
-            source.position(pos);
-            source.limit(pos + newLen);
-            pos = source.limit();
-            return source;
+            if (pos >= sourceRemaining) {
+                return null;
+            }
+            sourceBuffer.position(pos);
+            int newPos = Math.min(pos + readSize, sourceRemaining);
+            sourceBuffer.limit(newPos);
+            int size = newPos - pos;
+            pos = newPos;
+            if (limit > 0) {
+                remaining -= size;
+            }
+            return sourceBuffer;
+        }
+    }
+
+    private static final class StringBufferIn implements BufferIn {
+
+        private final CharSequence source;
+        private final CharBuffer sourceBuffer;
+        private final int blockSize;
+        private int pos = 0;
+        private final long limit;
+        private long remaining;
+
+        private StringBufferIn(CharSequence source, int blockSize, long limit) {
+            this.source = source;
+            this.sourceBuffer = CharBuffer.wrap(source);
+            this.blockSize = blockSize;
+            this.limit = limit;
+            this.remaining = limit;
+        }
+
+        @Override
+        public CharBuffer read() {
+            int readSize = limit < 0 ? blockSize : (int) Math.min(remaining, blockSize);
+            if (readSize <= 0) {
+                return null;
+            }
+            if (pos >= source.length()) {
+                return null;
+            }
+            sourceBuffer.position(pos);
+            int newPos = Math.min(pos + readSize, source.length());
+            sourceBuffer.limit(newPos);
+            int size = newPos - pos;
+            pos = newPos;
+            if (limit > 0) {
+                remaining -= size;
+            }
+            return sourceBuffer;
         }
     }
 

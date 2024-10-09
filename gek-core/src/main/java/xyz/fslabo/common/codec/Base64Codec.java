@@ -268,7 +268,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                     OutputStream dest = (OutputStream) output;
                     OutputCounter counter = new OutputCounter(dest);
                     OutputStream wrapper = encoder.wrap(counter);
-                    JieIO.readTo(src, wrapper, -1, blockSize);
+                    JieIO.transfer(src, wrapper, -1, blockSize);
                     wrapper.close();
                     return counter.count;
                 } else {
@@ -368,7 +368,7 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
                     OutputStream dest = (OutputStream) output;
                     InputStream wrapper = decoder.wrap(src);
                     OutputCounter counter = new OutputCounter(dest);
-                    JieIO.readTo(wrapper, counter, -1, blockSize);
+                    JieIO.transfer(wrapper, counter, -1, blockSize);
                     return counter.count;
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
