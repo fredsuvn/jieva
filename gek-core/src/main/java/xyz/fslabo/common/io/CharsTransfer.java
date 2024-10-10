@@ -20,101 +20,110 @@ import java.util.function.Function;
  *
  * @author fredsuvn
  */
-public interface CharTransfer {
+public interface CharsTransfer {
 
     /**
-     * Sets the data source to read.
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link CharsTransfer} with specified data source.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @return this
      */
-    CharTransfer input(Reader source);
+    static CharsTransfer from(Reader source) {
+        return new CharsTransferImpl(source);
+    }
 
     /**
-     * Sets the data source to read.
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link CharsTransfer} with specified data source.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @return this
      */
-    CharTransfer input(char[] source);
+    static CharsTransfer from(char[] source) {
+        return new CharsTransferImpl(source);
+    }
 
     /**
-     * Sets the data source to read, starting from the start index up to the specified length
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link CharsTransfer} with specified data source, starting from the start index up to the specified
+     * length.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @param offset start index
      * @param length specified length
      * @return this
      */
-    CharTransfer input(char[] source, int offset, int length);
+    static CharsTransfer from(char[] source, int offset, int length) {
+        if (offset == 0 && length == source.length) {
+            return from(source);
+        }
+        try {
+            CharBuffer buffer = CharBuffer.wrap(source, offset, length);
+            return from(buffer);
+        } catch (Exception e) {
+            throw new IORuntimeException(e);
+        }
+    }
 
     /**
-     * Sets the data source to read.
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link CharsTransfer} with specified data source.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @return this
      */
-    CharTransfer input(CharBuffer source);
+    static CharsTransfer from(CharBuffer source) {
+        return new CharsTransferImpl(source);
+    }
 
     /**
-     * Sets the data source to read.
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link CharsTransfer} with specified data source.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @return this
      */
-    CharTransfer input(CharSequence source);
+    static CharsTransfer from(CharSequence source) {
+        return new CharsTransferImpl(source);
+    }
 
     /**
-     * Sets the destination to written.
+     * Sets the destination to be written.
      * <p>
      * This is a setting method.
      *
-     * @param dest the destination to written
+     * @param dest the destination to be written
      * @return this
      */
-    CharTransfer output(Appendable dest);
+    CharsTransfer to(Appendable dest);
 
     /**
-     * Sets the destination to written.
+     * Sets the destination to be written.
      * <p>
      * This is a setting method.
      *
-     * @param dest the destination to written
+     * @param dest the destination to be written
      * @return this
      */
-    CharTransfer output(char[] dest);
+    CharsTransfer to(char[] dest);
 
     /**
-     * Sets the destination to written, starting from the start index up to the specified length
+     * Sets the destination to be written, starting from the start index up to the specified length
      * <p>
      * This is a setting method.
      *
-     * @param dest   the destination to written
+     * @param dest   the destination to be written
      * @param offset start index
      * @param length specified length
      * @return this
      */
-    CharTransfer output(char[] dest, int offset, int length);
+    CharsTransfer to(char[] dest, int offset, int length);
 
     /**
-     * Sets the destination to written.
+     * Sets the destination to be written.
      * <p>
      * This is a setting method.
      *
-     * @param dest the destination to written
+     * @param dest the destination to be written
      * @return this
      */
-    CharTransfer output(CharBuffer dest);
+    CharsTransfer to(CharBuffer dest);
 
     /**
      * Sets max chars number to read. May be -1 if set to read to end, and this is default setting.
@@ -124,18 +133,18 @@ public interface CharTransfer {
      * @param readLimit max chars number to read
      * @return this
      */
-    CharTransfer readLimit(long readLimit);
+    CharsTransfer readLimit(long readLimit);
 
     /**
-     * Sets the chars number for each reading from data source. This setting is used for read stream or need data
-     * conversion, default is {@link JieIO#BUFFER_SIZE}.
+     * Sets the chars number for each reading from data source. This setting is used for read stream or the transfer
+     * which need data transformer ({@link #transformer(Function)}), default is {@link JieIO#BUFFER_SIZE}.
      * <p>
      * This is a setting method.
      *
      * @param blockSize the chars number for each reading from data source
      * @return this
      */
-    CharTransfer blockSize(int blockSize);
+    CharsTransfer blockSize(int blockSize);
 
     /**
      * Sets whether break the transfer operation immediately when the number of chars read is 0. If it is set to
@@ -146,27 +155,28 @@ public interface CharTransfer {
      * @param breakIfNoRead whether break reading immediately when the number of chars read is 0
      * @return this
      */
-    CharTransfer breakIfNoRead(boolean breakIfNoRead);
+    CharsTransfer breakIfNoRead(boolean breakIfNoRead);
 
     /**
-     * Sets data conversion. If the conversion is not null, source chars will be converted by the conversion at first,
-     * then written into the destination. Size of source chars read to convert is determined by {@code blockSize}, but
-     * it could be less than {@code blockSize} if remaining readable size is not enough. Default is {@code null}.
+     * Sets data transformer. If the transformer is not null, source chars will be converted by the transformer at
+     * first, then written into the destination. Size of source chars read to convert is determined by
+     * {@code blockSize}, but it could be less than {@code blockSize} if remaining readable size is not enough. Default
+     * is {@code null}.
      * <p>
      * Note that the {@link CharBuffer} instance passed as the argument may not always be new, it could be reused. And
      * returned {@link CharBuffer} will also be considered as such.
      * <p>
      * This is a setting method.
      *
-     * @param conversion data conversion
+     * @param transformer data transformer
      * @return this
      */
-    CharTransfer conversion(Function<CharBuffer, CharBuffer> conversion);
+    CharsTransfer transformer(Function<CharBuffer, CharBuffer> transformer);
 
     /**
      * Starts this transfer, returns the actual chars number that read and success to deal with.
      * <p>
-     * If the {@code conversion} is {@code null}, read number equals to written number. Otherwise, the written number
+     * If the {@code transformer} is {@code null}, read number equals to written number. Otherwise, the written number
      * may not equal to read number, and this method returns actual read number. Specifically, if it is detected that
      * the data source reaches to the end and no data has been read, return -1.
      * <p>

@@ -8,62 +8,43 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.function.Function;
 
-final class ByteTransferImpl implements ByteTransfer {
+final class BytesTransferImpl implements BytesTransfer {
 
-    private Object source;
+    private final Object source;
     private Object dest;
     private long readLimit = -1;
     private int blockSize = JieIO.BUFFER_SIZE;
     private boolean breakIfNoRead = false;
     private Function<ByteBuffer, ByteBuffer> conversion;
 
-    @Override
-    public ByteTransfer input(InputStream source) {
+    BytesTransferImpl(InputStream source) {
         this.source = source;
-        return this;
     }
 
-    @Override
-    public ByteTransfer input(byte[] source) {
+    BytesTransferImpl(byte[] source) {
         this.source = source;
-        return this;
     }
 
-    @Override
-    public ByteTransfer input(byte[] source, int offset, int length) {
-        if (offset == 0 && length == source.length) {
-            return input(source);
-        }
-        try {
-            this.source = ByteBuffer.wrap(source, offset, length);
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
-        }
-        return this;
-    }
-
-    @Override
-    public ByteTransfer input(ByteBuffer source) {
+    BytesTransferImpl(ByteBuffer source) {
         this.source = source;
-        return this;
     }
 
     @Override
-    public ByteTransfer output(OutputStream dest) {
+    public BytesTransfer to(OutputStream dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public ByteTransfer output(byte[] dest) {
+    public BytesTransfer to(byte[] dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public ByteTransfer output(byte[] dest, int offset, int length) {
+    public BytesTransfer to(byte[] dest, int offset, int length) {
         if (offset == 0 && length == dest.length) {
-            return output(dest);
+            return to(dest);
         }
         try {
             this.dest = ByteBuffer.wrap(dest, offset, length);
@@ -74,19 +55,19 @@ final class ByteTransferImpl implements ByteTransfer {
     }
 
     @Override
-    public ByteTransfer output(ByteBuffer dest) {
+    public BytesTransfer to(ByteBuffer dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public ByteTransfer readLimit(long readLimit) {
+    public BytesTransfer readLimit(long readLimit) {
         this.readLimit = readLimit;
         return this;
     }
 
     @Override
-    public ByteTransfer blockSize(int blockSize) {
+    public BytesTransfer blockSize(int blockSize) {
         if (blockSize <= 0) {
             throw new IORuntimeException("blockSize must > 0!");
         }
@@ -95,14 +76,14 @@ final class ByteTransferImpl implements ByteTransfer {
     }
 
     @Override
-    public ByteTransfer breakIfNoRead(boolean breakIfNoRead) {
+    public BytesTransfer breakIfNoRead(boolean breakIfNoRead) {
         this.breakIfNoRead = breakIfNoRead;
         return this;
     }
 
     @Override
-    public ByteTransfer conversion(Function<ByteBuffer, ByteBuffer> conversion) {
-        this.conversion = conversion;
+    public BytesTransfer transformer(Function<ByteBuffer, ByteBuffer> transformer) {
+        this.conversion = transformer;
         return this;
     }
 

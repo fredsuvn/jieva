@@ -21,91 +21,100 @@ import java.util.function.Function;
  *
  * @author fredsuvn
  */
-public interface ByteTransfer {
+public interface BytesTransfer {
 
     /**
-     * Sets the data source to read.
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link BytesTransfer} with specified data source.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @return this
      */
-    ByteTransfer input(InputStream source);
+    static BytesTransfer from(InputStream source) {
+        return new BytesTransferImpl(source);
+    }
 
     /**
-     * Sets the data source to read.
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link BytesTransfer} with specified data source.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @return this
      */
-    ByteTransfer input(byte[] source);
+    static BytesTransfer from(byte[] source) {
+        return new BytesTransferImpl(source);
+    }
 
     /**
-     * Sets the data source to read, starting from the start index up to the specified length
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link BytesTransfer} with specified data source, starting from the start index up to the specified
+     * length.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @param offset start index
      * @param length specified length
      * @return this
      */
-    ByteTransfer input(byte[] source, int offset, int length);
+    static BytesTransfer from(byte[] source, int offset, int length) {
+        if (offset == 0 && length == source.length) {
+            return from(source);
+        }
+        try {
+            ByteBuffer buffer = ByteBuffer.wrap(source, offset, length);
+            return from(buffer);
+        } catch (Exception e) {
+            throw new IORuntimeException(e);
+        }
+    }
 
     /**
-     * Sets the data source to read.
-     * <p>
-     * This is a setting method.
+     * Returns a new {@link BytesTransfer} with specified data source.
      *
-     * @param source the data source to read
+     * @param source specified data source
      * @return this
      */
-    ByteTransfer input(ByteBuffer source);
+    static BytesTransfer from(ByteBuffer source) {
+        return new BytesTransferImpl(source);
+    }
 
     /**
-     * Sets the destination to written.
+     * Sets the destination to be written.
      * <p>
      * This is a setting method.
      *
-     * @param dest the destination to written
+     * @param dest the destination to be written
      * @return this
      */
-    ByteTransfer output(OutputStream dest);
+    BytesTransfer to(OutputStream dest);
 
     /**
-     * Sets the destination to written.
+     * Sets the destination to be written.
      * <p>
      * This is a setting method.
      *
-     * @param dest the destination to written
+     * @param dest the destination to be written
      * @return this
      */
-    ByteTransfer output(byte[] dest);
+    BytesTransfer to(byte[] dest);
 
     /**
-     * Sets the destination to written, starting from the start index up to the specified length
+     * Sets the destination to be written, starting from the start index up to the specified length
      * <p>
      * This is a setting method.
      *
-     * @param dest   the destination to written
+     * @param dest   the destination to be be written
      * @param offset start index
      * @param length specified length
      * @return this
      */
-    ByteTransfer output(byte[] dest, int offset, int length);
+    BytesTransfer to(byte[] dest, int offset, int length);
 
     /**
-     * Sets the destination to written.
+     * Sets the destination to be written.
      * <p>
      * This is a setting method.
      *
-     * @param dest the destination to written
+     * @param dest the destination to be written
      * @return this
      */
-    ByteTransfer output(ByteBuffer dest);
+    BytesTransfer to(ByteBuffer dest);
 
     /**
      * Sets max bytes number to read. May be -1 if set to read to end, and this is default setting.
@@ -115,18 +124,18 @@ public interface ByteTransfer {
      * @param readLimit max bytes number to read
      * @return this
      */
-    ByteTransfer readLimit(long readLimit);
+    BytesTransfer readLimit(long readLimit);
 
     /**
-     * Sets the bytes number for each reading from data source. This setting is used for read stream or need data
-     * conversion, default is {@link JieIO#BUFFER_SIZE}.
+     * Sets the bytes number for each reading from data source. This setting is used for read stream or the transfer
+     * which need data transformer ({@link #transformer(Function)}), default is {@link JieIO#BUFFER_SIZE}.
      * <p>
      * This is a setting method.
      *
      * @param blockSize the bytes number for each reading from data source
      * @return this
      */
-    ByteTransfer blockSize(int blockSize);
+    BytesTransfer blockSize(int blockSize);
 
     /**
      * Sets whether break the transfer operation immediately when the number of bytes read is 0. If it is set to
@@ -137,27 +146,28 @@ public interface ByteTransfer {
      * @param breakIfNoRead whether break reading immediately when the number of bytes read is 0
      * @return this
      */
-    ByteTransfer breakIfNoRead(boolean breakIfNoRead);
+    BytesTransfer breakIfNoRead(boolean breakIfNoRead);
 
     /**
-     * Sets data conversion. If the conversion is not null, source bytes will be converted by the conversion at first,
-     * then written into the destination. Size of source bytes read to convert is determined by {@code blockSize}, but
-     * it could be less than {@code blockSize} if remaining readable size is not enough. Default is {@code null}.
+     * Sets data transformer. If the transformer is not null, source bytes will be converted by the transformer at
+     * first, then written into the destination. Size of source bytes read to convert is determined by
+     * {@code blockSize}, but it could be less than {@code blockSize} if remaining readable size is not enough. Default
+     * is {@code null}.
      * <p>
      * Note that the {@link ByteBuffer} instance passed as the argument may not always be new, it could be reused. And
      * returned {@link ByteBuffer} will also be considered as such.
      * <p>
      * This is a setting method.
      *
-     * @param conversion data conversion
+     * @param transformer data transformer
      * @return this
      */
-    ByteTransfer conversion(Function<ByteBuffer, ByteBuffer> conversion);
+    BytesTransfer transformer(Function<ByteBuffer, ByteBuffer> transformer);
 
     /**
      * Starts this transfer, returns the actual bytes number that read and success to deal with.
      * <p>
-     * If the {@code conversion} is {@code null}, read number equals to written number. Otherwise, the written number
+     * If the {@code transformer} is {@code null}, read number equals to written number. Otherwise, the written number
      * may not equal to read number, and this method returns actual read number. Specifically, if it is detected that
      * the data source reaches to the end and no data has been read, return -1.
      * <p>

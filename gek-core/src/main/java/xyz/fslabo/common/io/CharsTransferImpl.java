@@ -9,66 +9,45 @@ import java.io.Writer;
 import java.nio.CharBuffer;
 import java.util.function.Function;
 
-final class CharTransferImpl implements CharTransfer {
+final class CharsTransferImpl implements CharsTransfer {
 
-    private Object source;
+    private final Object source;
     private Object dest;
     private long readLimit = -1;
     private int blockSize = JieIO.BUFFER_SIZE;
     private boolean breakIfNoRead = false;
     private Function<CharBuffer, CharBuffer> conversion;
 
-    @Override
-    public CharTransfer input(Reader source) {
+    CharsTransferImpl(Reader source) {
         this.source = source;
-        return this;
     }
 
-    @Override
-    public CharTransfer input(char[] source) {
+    CharsTransferImpl(char[] source) {
         this.source = source;
-        return this;
     }
 
-    @Override
-    public CharTransfer input(char[] source, int offset, int length) {
-        if (offset == 0 && length == source.length) {
-            return input(source);
-        }
-        try {
-            this.source = CharBuffer.wrap(source, offset, length);
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
-        }
-        return this;
-    }
-
-    @Override
-    public CharTransfer input(CharBuffer source) {
+    CharsTransferImpl(CharBuffer source) {
         this.source = source;
-        return this;
     }
 
-    @Override
-    public CharTransfer input(CharSequence source) {
+    CharsTransferImpl(CharSequence source) {
         this.source = source;
-        return this;
     }
 
     @Override
-    public CharTransfer output(Appendable dest) {
+    public CharsTransfer to(Appendable dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public CharTransfer output(char[] dest) {
+    public CharsTransfer to(char[] dest) {
         this.dest = CharBuffer.wrap(dest);
         return this;
     }
 
     @Override
-    public CharTransfer output(char[] dest, int offset, int length) {
+    public CharsTransfer to(char[] dest, int offset, int length) {
         try {
             this.dest = CharBuffer.wrap(dest, offset, length);
         } catch (Exception e) {
@@ -78,19 +57,19 @@ final class CharTransferImpl implements CharTransfer {
     }
 
     @Override
-    public CharTransfer output(CharBuffer dest) {
+    public CharsTransfer to(CharBuffer dest) {
         this.dest = dest;
         return this;
     }
 
     @Override
-    public CharTransfer readLimit(long readLimit) {
+    public CharsTransfer readLimit(long readLimit) {
         this.readLimit = readLimit;
         return this;
     }
 
     @Override
-    public CharTransfer blockSize(int blockSize) {
+    public CharsTransfer blockSize(int blockSize) {
         if (blockSize <= 0) {
             throw new IORuntimeException("blockSize must > 0!");
         }
@@ -99,13 +78,13 @@ final class CharTransferImpl implements CharTransfer {
     }
 
     @Override
-    public CharTransfer breakIfNoRead(boolean breakIfNoRead) {
+    public CharsTransfer breakIfNoRead(boolean breakIfNoRead) {
         this.breakIfNoRead = breakIfNoRead;
         return this;
     }
 
     @Override
-    public CharTransfer conversion(Function<CharBuffer, CharBuffer> conversion) {
+    public CharsTransfer transformer(Function<CharBuffer, CharBuffer> conversion) {
         this.conversion = conversion;
         return this;
     }
