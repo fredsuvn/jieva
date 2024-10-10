@@ -184,7 +184,7 @@ public class IOTest {
         nioIn.reset();
         Arrays.fill(nioBytes, (byte) 2);
         Arrays.fill(compareBytes, (byte) 2);
-        readNum = BytesTransfer.from(nioIn).to(nioBytes).breakIfNoRead(true).start();
+        readNum = BytesTransfer.from(nioIn).to(nioBytes).breakOnZeroRead(true).start();
         assertEquals(readNum, 0);
         assertEquals(nioBytes, compareBytes);
 
@@ -396,7 +396,7 @@ public class IOTest {
         nioReader.reset();
         Arrays.fill(nioChars, (char) 2);
         Arrays.fill(compareChars, (char) 2);
-        readNum = CharsTransfer.from(nioReader).to(nioChars).breakIfNoRead(true).start();
+        readNum = CharsTransfer.from(nioReader).to(nioChars).breakOnZeroRead(true).start();
         assertEquals(readNum, 0);
         assertEquals(nioChars, compareChars);
 

@@ -14,8 +14,8 @@ final class BytesTransferImpl implements BytesTransfer {
     private Object dest;
     private long readLimit = -1;
     private int blockSize = JieIO.BUFFER_SIZE;
-    private boolean breakIfNoRead = false;
-    private Function<ByteBuffer, ByteBuffer> conversion;
+    private boolean breakOnZeroRead = false;
+    private Function<ByteBuffer, ByteBuffer> transformer;
 
     BytesTransferImpl(InputStream source) {
         this.source = source;
@@ -76,14 +76,14 @@ final class BytesTransferImpl implements BytesTransfer {
     }
 
     @Override
-    public BytesTransfer breakIfNoRead(boolean breakIfNoRead) {
-        this.breakIfNoRead = breakIfNoRead;
+    public BytesTransfer breakOnZeroRead(boolean breakOnZeroRead) {
+        this.breakOnZeroRead = breakOnZeroRead;
         return this;
     }
 
     @Override
     public BytesTransfer transformer(Function<ByteBuffer, ByteBuffer> transformer) {
-        this.conversion = transformer;
+        this.transformer = transformer;
         return this;
     }
 
@@ -148,14 +148,14 @@ final class BytesTransferImpl implements BytesTransfer {
                 return count == 0 ? -1 : count;
             }
             if (!buf.hasRemaining()) {
-                if (breakIfNoRead) {
+                if (breakOnZeroRead) {
                     return count;
                 }
                 continue;
             }
             count += buf.remaining();
-            if (conversion != null) {
-                ByteBuffer converted = conversion.apply(buf);
+            if (transformer != null) {
+                ByteBuffer converted = transformer.apply(buf);
                 out.write(converted);
             } else {
                 out.write(buf);
@@ -182,7 +182,7 @@ final class BytesTransferImpl implements BytesTransfer {
 
         private InputStreamBufferIn(InputStream source, int blockSize, long limit) {
             this.source = source;
-            this.block = new byte[blockSize];
+            this.block = new byte[limit < 0 ? blockSize : (int) Math.min(blockSize, limit)];
             this.blockBuffer = ByteBuffer.wrap(block);
             this.limit = limit;
             this.remaining = limit;

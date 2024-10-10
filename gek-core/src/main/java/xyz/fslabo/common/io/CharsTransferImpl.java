@@ -15,8 +15,8 @@ final class CharsTransferImpl implements CharsTransfer {
     private Object dest;
     private long readLimit = -1;
     private int blockSize = JieIO.BUFFER_SIZE;
-    private boolean breakIfNoRead = false;
-    private Function<CharBuffer, CharBuffer> conversion;
+    private boolean breakOnZeroRead = false;
+    private Function<CharBuffer, CharBuffer> transformer;
 
     CharsTransferImpl(Reader source) {
         this.source = source;
@@ -78,14 +78,14 @@ final class CharsTransferImpl implements CharsTransfer {
     }
 
     @Override
-    public CharsTransfer breakIfNoRead(boolean breakIfNoRead) {
-        this.breakIfNoRead = breakIfNoRead;
+    public CharsTransfer breakOnZeroRead(boolean breakOnZeroRead) {
+        this.breakOnZeroRead = breakOnZeroRead;
         return this;
     }
 
     @Override
-    public CharsTransfer transformer(Function<CharBuffer, CharBuffer> conversion) {
-        this.conversion = conversion;
+    public CharsTransfer transformer(Function<CharBuffer, CharBuffer> transformer) {
+        this.transformer = transformer;
         return this;
     }
 
@@ -150,14 +150,14 @@ final class CharsTransferImpl implements CharsTransfer {
                 return count == 0 ? -1 : count;
             }
             if (!buf.hasRemaining()) {
-                if (breakIfNoRead) {
+                if (breakOnZeroRead) {
                     return count;
                 }
                 continue;
             }
             count += buf.remaining();
-            if (conversion != null) {
-                CharBuffer converted = conversion.apply(buf);
+            if (transformer != null) {
+                CharBuffer converted = transformer.apply(buf);
                 out.write(converted);
             } else {
                 out.write(buf);
@@ -184,7 +184,7 @@ final class CharsTransferImpl implements CharsTransfer {
 
         private ReaderBufferIn(Reader source, int blockSize, long limit) {
             this.source = source;
-            this.block = new char[blockSize];
+            this.block = new char[limit < 0 ? blockSize : (int) Math.min(blockSize, limit)];
             this.blockBuffer = CharBuffer.wrap(block);
             this.limit = limit;
             this.remaining = limit;

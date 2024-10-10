@@ -128,7 +128,7 @@ public interface BytesTransfer {
 
     /**
      * Sets the bytes number for each reading from data source. This setting is used for read stream or the transfer
-     * which need data transformer ({@link #transformer(Function)}), default is {@link JieIO#BUFFER_SIZE}.
+     * which need data transform ({@link #transformer(Function)}), default is {@link JieIO#BUFFER_SIZE}.
      * <p>
      * This is a setting method.
      *
@@ -138,24 +138,28 @@ public interface BytesTransfer {
     BytesTransfer blockSize(int blockSize);
 
     /**
-     * Sets whether break the transfer operation immediately when the number of bytes read is 0. If it is set to
-     * {@code false}, the reading will continue until reach to end of the source. Default is {@code false}.
+     * Sets whether break the transfer operation immediately if a read operation returns zero bytes. If it is set to
+     * {@code false}, the reading will continue until reaches to end of the source. Default is {@code false}.
      * <p>
      * This is a setting method.
      *
-     * @param breakIfNoRead whether break reading immediately when the number of bytes read is 0
+     * @param breakOnZeroRead whether break reading immediately when the number of bytes read is 0
      * @return this
      */
-    BytesTransfer breakIfNoRead(boolean breakIfNoRead);
+    BytesTransfer breakOnZeroRead(boolean breakOnZeroRead);
 
     /**
-     * Sets data transformer. If the transformer is not null, source bytes will be converted by the transformer at
-     * first, then written into the destination. Size of source bytes read to convert is determined by
-     * {@code blockSize}, but it could be less than {@code blockSize} if remaining readable size is not enough. Default
-     * is {@code null}.
+     * Set the data transformer to transform the source data before it is written to the destination. The transformed
+     * data will then be written to the destination. This setting is optional; if not set, the source data will be
+     * written directly to the destination.
      * <p>
-     * Note that the {@link ByteBuffer} instance passed as the argument may not always be new, it could be reused. And
-     * returned {@link ByteBuffer} will also be considered as such.
+     * The transfer will call the data transformer after each data read, passing the read data as the argument. The
+     * value returned by the transformer will be the actual data written to the destination. The length of data read in
+     * each read operation is specified by {@link #blockSize(int)}, although the remaining data of last read may be
+     * smaller than this value.
+     * <p>
+     * Note that the {@link ByteBuffer} passed as the argument is not always a new instance; it may be reused. And the
+     * returned {@link ByteBuffer} should also be treated as potentially reusable.
      * <p>
      * This is a setting method.
      *
