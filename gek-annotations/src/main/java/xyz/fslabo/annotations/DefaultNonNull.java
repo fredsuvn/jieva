@@ -6,15 +6,16 @@ import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 
 /**
- * Declares the annotated element and all methods, fields, parameters, local variables and type uses under its scope
- * must be non-null.
+ * Declares all methods, fields, parameters, local variables and type uses under the scope of annotated element must be
+ * non-null.
+ * <p>
  * It is equivalent to use {@link NonNull} on all those points.
  *
  * @author fredsuvn
  */
 @Documented
-@Nonnull
 @Retention(RetentionPolicy.RUNTIME)
+@Nonnull
 @TypeQualifierNickname
 @Target({
     ElementType.TYPE,

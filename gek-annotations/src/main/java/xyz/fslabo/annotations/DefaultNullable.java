@@ -7,8 +7,9 @@ import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
 /**
- * Declares the annotated element and all methods, fields, parameters, local variables and type uses under its scope
- * is nullable.
+ * Declares all methods, fields, parameters, local variables and type uses under the scope of annotated element is
+ * nullable.
+ * <p>
  * It is equivalent to use {@link Nullable} on all those points.
  *
  * @author fredsuvn
