@@ -372,6 +372,10 @@ public class JieRandom {
      * @return next random value between specified start value inclusive and end value exclusive
      */
     public static float nextFloat(float startInclusive, float endExclusive) {
+        return nextFloatJdkVer8(startInclusive, endExclusive);
+    }
+
+    private static float nextFloatJdkVer8(float startInclusive, float endExclusive) {
         float f = (float) nextDouble(startInclusive, endExclusive);
         return JieCheck.makeIn(f, startInclusive, endExclusive);
     }
