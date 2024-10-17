@@ -26,10 +26,10 @@ public class BigMethodTest {
                 if (method.getName().equals("big")) {
                     return "big";
                 }
-                return invoker.invokeSuper(args);
+                return invoker.invokeSuper(proxy, args);
             }
         };
-        BigInter bigInter = JieProxy.asm(Jie.list(BigInter.class), handler);
+        BigInter bigInter = JieProxy.asmProxyBuilder().interfaces(Jie.list(BigInter.class)).proxyHandler(handler).build().newInstance();
         assertEquals(bigInter.big(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -74,7 +74,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "bigDefault");
-        BigClass bigClass = JieProxy.asm(Jie.list(BigClass.class), handler);
+        BigClass bigClass = JieProxy.asmProxyBuilder().superClass((BigClass.class)).proxyHandler(handler).build().newInstance();
         assertEquals(bigClass.bigClass(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
@@ -97,7 +97,7 @@ public class BigMethodTest {
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"
         ), "BigClass");
-        Object big = JieProxy.asm(Jie.list(BigClass.class, BigInter.class), handler);
+        Object big = JieProxy.asmProxyBuilder().superClass((BigClass.class)).interfaces(Jie.list(BigInter.class)).proxyHandler(handler).build().newInstance();
         assertEquals(((BigInter) big).big(
             0, 0, "0", 0, 0, "0", 0, 0, "0"
             , 0, 0, "0", 0, 0, "0", 0, 0, "0"

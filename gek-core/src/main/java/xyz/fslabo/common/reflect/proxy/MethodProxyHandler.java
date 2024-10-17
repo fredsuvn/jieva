@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Method proxy handle for {@link ProxyProvider}.
+ * Method proxy handle for {@link ProxyClass}.
  * <p>
  * Each proxy instance has an associated method proxy handler. When the proxy instance is created, all non-final and
  * non-static method from {@link Class#getMethods()} will be passed into {@link #proxy(Method)}, to determine whether

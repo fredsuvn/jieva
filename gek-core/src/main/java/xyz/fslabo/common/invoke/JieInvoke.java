@@ -147,7 +147,7 @@ public class JieInvoke {
             try {
                 this.methodHandle = MethodHandles.lookup().unreflect(method);
                 this.isStatic = Modifier.isStatic(method.getModifiers());
-            } catch (IllegalAccessException e) {
+            } catch (Exception e) {
                 throw new InvokingException(e);
             }
         }
@@ -156,7 +156,7 @@ public class JieInvoke {
             try {
                 this.methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
                 this.isStatic = true;
-            } catch (IllegalAccessException e) {
+            } catch (Exception e) {
                 throw new InvokingException(e);
             }
         }

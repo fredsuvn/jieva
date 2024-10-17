@@ -10,42 +10,77 @@ import xyz.fslabo.test.JieTest;
 import xyz.fslabo.test.JieTestException;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.expectThrows;
+import static org.testng.Assert.*;
 
 public class ProxyTest {
 
     @Test
-    public void testAsmProxyProvider() throws Exception {
+    public void testAsmProxyBuilder() throws Exception {
         ClassO inst = new ClassO(ClassP.DEFAULT_I * 2);
         TestHandler testHandler = new TestHandler(inst);
-        ClassP proxy = JieProxy.asm(Jie.list(ClassP.class, Inter1.class, Inter2.class), testHandler);
+        ClassP proxy = JieProxy.asmProxyBuilder()
+            .superClass(ClassP.class).interfaces(Jie.list(Inter1.class, Inter2.class))
+            .proxyHandler(testHandler).build().newInstance();
         testAsm(proxy, "Inter1-proxy", true);
+        assertTrue(Modifier.isFinal(proxy.getClass().getModifiers()));
+        ProxyClass renameProxy = JieProxy.asmProxyBuilder()
+            .superClass(ClassP.class).interfaces(Jie.list(Inter1.class, Inter2.class))
+            .className("aaa.bbb.ccc.D").isFinal(false)
+            .proxyHandler(testHandler).build();
+        ClassP proxyRename = renameProxy.newInstance();
+        Class<?> renameClass = renameProxy.getProxyClass();
+        testAsm(proxyRename, "Inter1-proxy", true);
+        assertEquals(renameClass.getName(), "aaa.bbb.ccc.D");
+        assertFalse(Modifier.isFinal(renameClass.getModifiers()));
 
         ClassOO inst2 = new ClassOO(ClassP.DEFAULT_I * 2);
         TestHandler testHandler2 = new TestHandler(inst2);
-        ClassP proxy2 = JieProxy.asm(Jie.list(ClassPP.class, Inter1.class, Inter2.class), testHandler2);
+        ClassP proxy2 = JieProxy.asmProxyBuilder()
+            .superClass(ClassPP.class).interfaces(Jie.list(Inter1.class, Inter2.class))
+            .proxyHandler(testHandler2).build().newInstance();
         testAsm(proxy2, "Inter2-proxy", false);
 
-        Object proxyP = JieProxy.asm(Jie.list(ClassP.class), testHandler);
+        Object proxyP = JieProxy.asmProxyBuilder().superClass(ClassP.class).proxyHandler(testHandler).build().newInstance();
         testClass1((ClassP) proxyP);
-        Inter1<?> proxyI1 = JieProxy.asm(Jie.list(Inter1.class), testHandler);
+        Inter1<?> proxyI1 = JieProxy.asmProxyBuilder()
+            .interfaces(Jie.list(Inter1.class)).proxyHandler(testHandler).build().newInstance();
         testInter1(proxyI1, true);
 
-        Object proxyI12 = JieProxy.asm(Jie.list(Inter1.class, Inter2.class), testHandler);
+        Object proxyI12 = JieProxy.asmProxyBuilder()
+            .interfaces(Jie.list(Inter1.class, Inter2.class)).proxyHandler(testHandler).build().newInstance();
         testInter1((Inter1<?>) proxyI12, true);
         testInter2((Inter2<?>) proxyI12, true);
-        ClassP proxyAsm = new AsmProxyProvider().newProxyInstance(
-            getClass().getClassLoader(), Jie.list(ClassP.class, Inter1.class, Inter2.class), testHandler);
+        ClassP proxyAsm = JieProxy.asmProxyBuilder()
+            .superClass(ClassP.class).interfaces(Jie.list(Inter1.class, Inter2.class)).proxyHandler(testHandler)
+            .classLoader(getClass().getClassLoader()).build().newInstance();
         testAsm(proxyAsm, "Inter1-proxy", true);
 
-        expectThrows(ProxyException.class, () -> JieProxy.asm(null, testHandler));
-        expectThrows(ProxyException.class, () -> JieProxy.asm(Jie.list(ClassP.class, ClassP.class), testHandler));
-        expectThrows(ProxyException.class, () -> JieProxy.asm(Jie.list(ClassO.class), testHandler));
+        expectThrows(ProxyException.class, () ->
+            JieProxy.asmProxyBuilder().proxyHandler(testHandler).build().newInstance());
+        expectThrows(ProxyException.class, () ->
+            JieProxy.asmProxyBuilder().superClass(ClassP.class)
+                .interfaces(Jie.list(ClassP.class)).proxyHandler(testHandler).build().newInstance());
+        expectThrows(ProxyException.class, () ->
+            JieProxy.asmProxyBuilder().superClass(ClassO.class).proxyHandler(testHandler).build().newInstance());
+        expectThrows(ProxyException.class, () ->
+            JieProxy.asmProxyBuilder().superClass(ClassO.class).build().newInstance());
+        expectThrows(ProxyException.class, () ->
+            JieProxy.asmProxyBuilder().superClass(ClassO.class).proxyHandler(new MethodProxyHandler() {
+                @Override
+                public boolean proxy(Method method) {
+                    throw new IllegalStateException();
+                }
+
+                @Override
+                public @Nullable Object invoke(Object proxy, Method method, Object[] args, ProxyInvoker invoker) throws Throwable {
+                    throw new IllegalStateException();
+                }
+            }).build());
 
         MethodProxyHandler superHandle = new MethodProxyHandler() {
             @Override
@@ -55,15 +90,17 @@ public class ProxyTest {
 
             @Override
             public @Nullable Object invoke(Object proxy, Method method, Object[] args, ProxyInvoker invoker) throws Throwable {
-                return invoker.invokeSuper(args);
+                return invoker.invokeSuper(proxy, args);
             }
         };
-        Inter2<?> ppi1 = JieProxy.asm(Jie.list(Inter1.class, Inter2.class), superHandle);
+        Inter2<?> ppi1 = JieProxy.asmProxyBuilder()
+            .interfaces(Jie.list(Inter1.class, Inter2.class)).proxyHandler(superHandle).build().newInstance();
         assertEquals(ppi1.ppi_String(), "Inter1");
-        Inter1<?> ppi2 = JieProxy.asm(Jie.list(Inter2.class, Inter1.class), superHandle);
+        Inter1<?> ppi2 = JieProxy.asmProxyBuilder()
+            .interfaces(Jie.list(Inter2.class, Inter1.class)).proxyHandler(superHandle).build().newInstance();
         assertEquals(ppi2.ppi_String(), "Inter2");
 
-        Object op = JieProxy.asm(Jie.list(Object.class), new MethodProxyHandler() {
+        Object op = JieProxy.asmProxyBuilder().superClass(Object.class).proxyHandler(new MethodProxyHandler() {
             @Override
             public boolean proxy(Method method) {
                 return true;
@@ -80,24 +117,26 @@ public class ProxyTest {
                 if (method.getName().equals("toString")) {
                     return "666";
                 }
-                return invoker.invokeSuper(args);
+                return invoker.invokeSuper(proxy, args);
             }
-        });
+        }).build().newInstance();
         assertEquals(op.equals("anyone"), true);
         assertEquals(op.hashCode(), 666);
         assertEquals(op.toString(), "666");
+    }
 
-        // exception
-        AsmProxyProvider asmProxyProvider = new AsmProxyProvider();
-        Method method = AsmProxyProvider.class.getDeclaredMethod(
+    @Test
+    public void testAsmUtil() throws Exception {
+        Class<?> asmUtil = Class.forName("xyz.fslabo.common.reflect.proxy.impls.AsmUtil");
+        Method method = asmUtil.getDeclaredMethod(
             "visitLoadPrimitiveParamAsObject", MethodVisitor.class, Class.class, int.class);
-        JieTest.testThrow(NotPrimitiveException.class, method, asmProxyProvider, null, Object.class, 1);
-        method = AsmProxyProvider.class.getDeclaredMethod(
+        JieTest.testThrow(NotPrimitiveException.class, method, null, null, Object.class, 1);
+        method = asmUtil.getDeclaredMethod(
             "visitObjectCastPrimitive", MethodVisitor.class, Class.class, boolean.class);
-        JieTest.testThrow(NotPrimitiveException.class, method, asmProxyProvider, null, Object.class, true);
-        method = AsmProxyProvider.class.getDeclaredMethod(
+        JieTest.testThrow(NotPrimitiveException.class, method, null, null, Object.class, true);
+        method = asmUtil.getDeclaredMethod(
             "returnPrimitiveCastObject", MethodVisitor.class, Class.class);
-        JieTest.testThrow(NotPrimitiveException.class, method, asmProxyProvider, null, Object.class);
+        JieTest.testThrow(NotPrimitiveException.class, method, null, null, Object.class);
     }
 
     private void testAsm(ClassP proxy, String ppi_String, boolean absError) {
@@ -177,10 +216,10 @@ public class ProxyTest {
     }
 
     @Test
-    public void testJdkProxyProvider() throws Exception {
+    public void testJdkProxyBuilder() throws Exception {
         Inter12 inst = new Inter12();
         TestHandler testHandler = new TestHandler(inst);
-        Object proxy = JieProxy.jdk(null, Jie.list(Inter1.class, Inter2.class), testHandler);
+        Object proxy = JieProxy.jdkProxyBuilder().interfaces(Jie.list(Inter1.class, Inter2.class)).proxyHandler(testHandler).build().newInstance();
         Inter1<?> i1 = (Inter1<?>) proxy;
         expectThrows(AbstractMethodError.class, i1::ppi1_boolean);
         expectThrows(JieTestException.class, i1::ppi1_Throw);
@@ -190,11 +229,33 @@ public class ProxyTest {
         expectThrows(JieTestException.class, i2::ppi2_Throw);
         assertEquals(Inter2.ppi2_static(), "non-proxy");
 
+        ProxyClass renameProxy = JieProxy.jdkProxyBuilder()
+            .interfaces(Jie.list(Inter1.class, Inter2.class)).proxyHandler(testHandler)
+            .superClass(ClassP.class).className("aaa.bbb.ccc.D").isFinal(false)
+            .proxyHandler(testHandler).build();
+        assertNull(renameProxy.getProxyClass());
+
         // test default method
         expectThrows(ProxyException.class, i1::ppi_String);
         assertEquals(Inter1.ppi1_static(), "non-proxy");
         expectThrows(ProxyException.class, i2::ppi_String);
         expectThrows(AbstractMethodError.class, i2::ppi2_nonProxied);
+        expectThrows(ProxyException.class, () ->
+            JieProxy.jdkProxyBuilder().proxyHandler(testHandler).build().newInstance());
+        expectThrows(ProxyException.class, () ->
+            JieProxy.jdkProxyBuilder().interfaces(Jie.list(Inter1.class)).build().newInstance());
+        expectThrows(ProxyException.class, () ->
+            JieProxy.jdkProxyBuilder().interfaces(Jie.list(Inter1.class)).proxyHandler(new MethodProxyHandler() {
+                @Override
+                public boolean proxy(Method method) {
+                    throw new IllegalStateException();
+                }
+
+                @Override
+                public @Nullable Object invoke(Object proxy, Method method, Object[] args, ProxyInvoker invoker) throws Throwable {
+                    throw new IllegalStateException();
+                }
+            }).build().newInstance());
 
         // test ProxyInvoker
         MethodProxyHandler handler = new MethodProxyHandler() {
@@ -224,7 +285,7 @@ public class ProxyTest {
                 return null;
             }
         };
-        Object proxy2 = JieProxy.jdk(getClass().getClassLoader(), Jie.list(Inter1.class, Inter2.class), handler);
+        Object proxy2 = JieProxy.jdkProxyBuilder().classLoader(getClass().getClassLoader()).interfaces(Jie.list(Inter1.class, Inter2.class)).proxyHandler(handler).build().newInstance();
         Inter1<?> i11 = (Inter1<?>) proxy2;
         assertEquals(i11.ppi1_boolean(), true);
         assertEquals(i11.ppi1_double(6.6, "a"), 6.6);
@@ -262,20 +323,20 @@ public class ProxyTest {
             superStack.clear();
             if (Objects.equals(method.getReturnType(), void.class)) {
                 invoker.invoke(inst, args);
-                invoker.invokeSuper(args);
+                invoker.invokeSuper(proxy, args);
                 return null;
             }
             if (inst instanceof ClassP && Objects.equals(ClassP.class.getMethod("ppc_i"), method)) {
                 Object ppci = ((ClassP) inst).ppc_i();
                 Object result1 = invoker.invoke(inst, args);
-                Object result2 = invoker.invokeSuper(args);
+                Object result2 = invoker.invokeSuper(proxy, args);
                 assertEquals(ppci, ClassP.DEFAULT_I * 2);
                 assertEquals(ppci, result1);
                 assertEquals(result2, ClassP.DEFAULT_I);
                 return result2;
             }
             Object result1 = invoker.invoke(inst, args);
-            Object result2 = invoker.invokeSuper(args);
+            Object result2 = invoker.invokeSuper(proxy, args);
             assertEquals(result1, result2);
             superStack.add(result2);
             if (method.getName().endsWith("_String")) {
@@ -678,6 +739,51 @@ public class ProxyTest {
         @Override
         public String ppi2_Proxied(String s1, String s2) {
             return s1 + s2;
+        }
+    }
+
+    @Test
+    public void testSimple() {
+        Simple simple = new Simple();
+        ProxyClass proxyClass = JieProxy.asmProxyBuilder().superClass(Simple.class)
+            .interfaces(Jie.list(SimpleInter.class))
+            .className("xxx.yyy.Z")
+            .proxyHandler(new MethodProxyHandler() {
+
+                @Override
+                public boolean proxy(Method method) {
+                    return method.getName().startsWith("fun");
+                }
+
+                @Override
+                public @Nullable Object invoke(Object proxy, Method method, Object[] args, ProxyInvoker invoker) throws Throwable {
+                    String s = invoker.invokeSuper(proxy, args) + "_proxy";
+                    String s2 = invoker.invokeSuper(simple, args) + "_proxy";
+                    String s3 = invoker.invoke(simple, args) + "_proxy";
+                    // StackOverflowError
+                    // String s4 = invoker.invoke(proxy, args) + "_proxy";
+                    assertEquals(s, s2);
+                    assertEquals(s, s3);
+                    assertEquals(s2, s3);
+                    return s;
+                }
+            }).build();
+        Simple simpleProxy = proxyClass.newInstance();
+        assertEquals(simpleProxy.fun(), simple.fun() + "_proxy");
+        assertEquals(simpleProxy.fun2(), simple.fun2() + "_proxy");
+    }
+
+    public static class Simple implements SimpleInter {
+
+        public String fun() {
+            return Simple.class.getName();
+        }
+    }
+
+    public interface SimpleInter {
+
+        default String fun2() {
+            return SimpleInter.class.getName();
         }
     }
 }
