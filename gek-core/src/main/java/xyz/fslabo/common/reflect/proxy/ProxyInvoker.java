@@ -14,12 +14,13 @@ import java.lang.reflect.Method;
 public interface ProxyInvoker {
 
     /**
-     * Invokes method associated to this invoker with specified instance and arguments.
+     * Dynamically invokes instance method (by {@code INVOKEVIRTUAL}/{@code INVOKEINTERFACE}) associated to this invoker
+     * with specified instance and arguments.
      * <p>
-     * This method expects a non-proxy instance to be passed in, so that it invokes the actual method implementation of
-     * that instance. If a proxy instance is passed in (such as first argument of
-     * {@link MethodProxyHandler#invoke(Object, Method, Object[], ProxyInvoker)}), this method may cause a stack
-     * overflow because it always invokes this method recursively.
+     * Note this method does not expect a proxy instance, of which class declares the proxy method associated to this
+     * invoker, to be passed in. (as first argument of
+     * {@link MethodProxyHandler#invoke(Object, Method, Object[], ProxyInvoker)}), because executing method on the proxy
+     * instance would cause recursive calls, eventually resulting in a stack overflow.
      *
      * @param inst given instance
      * @param args the arguments
@@ -31,7 +32,8 @@ public interface ProxyInvoker {
     Object invoke(Object inst, Object[] args) throws Throwable;
 
     /**
-     * Invokes proxied ({@code super}) method associated to this invoker with specified instance and arguments.
+     * Specially invokes proxied ({@code super}) method (by {@code INVOKESPECIAL}) associated to this invoker with
+     * specified instance and arguments.
      *
      * @param inst given instance
      * @param args the arguments
