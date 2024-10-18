@@ -256,22 +256,24 @@ public class JieJvm {
     }
 
     /**
-     * Loads given bytecode.
+     * Loads given bytecode to {@link Class}.
      *
      * @param bytecode given bytecode
      * @return class loaded from given bytecode
+     * @throws JvmException if any loading problem occurs
      */
-    public static Class<?> loadBytecode(byte[] bytecode) {
+    public static Class<?> loadBytecode(byte[] bytecode) throws JvmException {
         return loadBytecode(ByteBuffer.wrap(bytecode));
     }
 
     /**
-     * Loads given bytecode.
+     * Loads given bytecode to {@link Class}.
      *
      * @param bytecode given bytecode
      * @return class loaded from given bytecode
+     * @throws JvmException if any loading problem occurs
      */
-    public static Class<?> loadBytecode(ByteBuffer bytecode) {
+    public static Class<?> loadBytecode(ByteBuffer bytecode) throws JvmException {
         return JieClassLoader.SINGLETON.load(bytecode);
     }
 
@@ -282,8 +284,12 @@ public class JieJvm {
         private JieClassLoader() {
         }
 
-        public Class<?> load(ByteBuffer buffer) {
-            return defineClass(null, buffer, null);
+        public Class<?> load(ByteBuffer buffer) throws JvmException {
+            try {
+                return defineClass(null, buffer, null);
+            } catch (ClassFormatError | Exception e) {
+                throw new JvmException(e);
+            }
         }
     }
 }

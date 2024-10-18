@@ -1,5 +1,7 @@
 package xyz.fslabo.common.reflect;
 
+import xyz.fslabo.common.coll.JieColl;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -35,6 +37,13 @@ public abstract class TypeRef<T> {
             }
         }
         List<Type> typeArgs = JieReflect.getActualTypeArguments(genericSuper, TypeRef.class);
+        return get0(typeArgs);
+    }
+
+    private Type get0(List<Type> typeArgs) {
+        if (JieColl.isEmpty(typeArgs)) {
+            throw new ReflectionException("Failed to get actual type of current TypeRef: " + getClass() + ".");
+        }
         return typeArgs.get(0);
     }
 

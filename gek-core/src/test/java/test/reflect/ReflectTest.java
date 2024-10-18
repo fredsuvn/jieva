@@ -3,10 +3,7 @@ package test.reflect;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.Jie;
-import xyz.fslabo.common.reflect.JieReflect;
-import xyz.fslabo.common.reflect.JieType;
-import xyz.fslabo.common.reflect.NotPrimitiveException;
-import xyz.fslabo.common.reflect.TypeRef;
+import xyz.fslabo.common.reflect.*;
 import xyz.fslabo.test.JieTest;
 
 import java.lang.annotation.Annotation;
@@ -166,7 +163,7 @@ public class ReflectTest {
         assertEquals(JieReflect.arrayClass(long.class), long[].class);
         assertEquals(JieReflect.arrayClass(float.class), float[].class);
         assertEquals(JieReflect.arrayClass(double.class), double[].class);
-        expectThrows(IllegalArgumentException.class, () -> JieReflect.arrayClass(void.class));
+        expectThrows(ReflectionException.class, () -> JieReflect.arrayClass(void.class));
         assertEquals(
             JieReflect.arrayClass(JieType.parameterized(List.class, Jie.array(JieType.upperBound(String.class)))),
             List[].class
@@ -183,8 +180,8 @@ public class ReflectTest {
             JieReflect.arrayClass(JieType.array(String.class)),
             String[][].class
         );
-        expectThrows(IllegalArgumentException.class, () -> JieReflect.arrayClass(JieType.array(JieType.other())));
-        expectThrows(IllegalArgumentException.class, () -> JieReflect.arrayClass(Inner.class.getTypeParameters()[0]));
+        expectThrows(ReflectionException.class, () -> JieReflect.arrayClass(JieType.array(JieType.other())));
+        expectThrows(ReflectionException.class, () -> JieReflect.arrayClass(Inner.class.getTypeParameters()[0]));
     }
 
     @Test
@@ -392,10 +389,16 @@ public class ReflectTest {
     }
 
     @Test
-    public void testTypeRef() {
+    public void testTypeRef() throws Exception {
         ParameterizedType parameterizedType = new TypeRef<List<String>>() {
         }.getParameterized();
         assertEquals(parameterizedType, JieType.parameterized(List.class, Jie.array(String.class)));
+        Class<?> stringType = (Class<?>) new TypeRef<String>() {
+        }.getType();
+        assertEquals(stringType, String.class);
+        Class<?> classType = (Class<?>) new TypeRef<Object>() {
+        }.getType();
+        assertEquals(classType, Object.class);
 
         class TestRef extends TypeRef<String> {
         }
@@ -409,6 +412,9 @@ public class ReflectTest {
         }
         assertEquals(new TestRef3<String>() {
         }.getType(), String.class);
+
+        Method get0 = TypeRef.class.getDeclaredMethod("get0", List.class);
+        JieTest.testThrow(ReflectionException.class, get0, new TypeRef<Object>() {}, Collections.emptyList());
     }
 
     @Test

@@ -3,11 +3,13 @@ package test.reflect;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.reflect.JieJvm;
 import xyz.fslabo.common.reflect.JieType;
+import xyz.fslabo.common.reflect.JvmException;
 import xyz.fslabo.common.reflect.NotPrimitiveException;
 import xyz.fslabo.test.JieTest;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
@@ -169,6 +171,11 @@ public class JvmTest {
             JieJvm.declareSignature(XClass.class),
             "<T:Ljava/lang/Number;:Ljava/lang/CharSequence;U:Ljava/lang/Object;V:TT;X::Ljava/util/List<-Ljava/lang/Integer;>;Y::Ljava/io/Serializable;W::Ljava/lang/CharSequence;:Ljava/util/RandomAccess;P:Ljava/lang/String;O:TY;M:Ljava/util/ArrayList<Ljava/lang/String;>;>Ltest/reflect/JvmTest$BaseClass;Ltest/reflect/JvmTest$BaseInter;Ltest/reflect/JvmTest$XInter<TV;TV;Ljava/lang/String;>;"
         );
+    }
+
+    @Test
+    public void testLoadBytecode() {
+        expectThrows(JvmException.class, () -> JieJvm.loadBytecode(ByteBuffer.wrap(new byte[0])));
     }
 
     public static class BaseClass {

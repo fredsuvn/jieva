@@ -1,5 +1,7 @@
 package xyz.fslabo.common.reflect;
 
+import xyz.fslabo.common.base.ShouldNotHappenException;
+
 import java.lang.reflect.Type;
 
 /**
@@ -7,7 +9,7 @@ import java.lang.reflect.Type;
  *
  * @author fredsuvn
  */
-public class NotPrimitiveException extends RuntimeException {
+public class NotPrimitiveException extends ShouldNotHappenException {
 
     /**
      * Constructs with specified type.

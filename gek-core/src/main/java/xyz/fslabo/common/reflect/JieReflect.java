@@ -410,8 +410,9 @@ public class JieReflect {
      *
      * @param componentType given component type
      * @return array class of given component type
+     * @throws ReflectionException if any reflection problem occurs
      */
-    public static Class<?> arrayClass(Type componentType) {
+    public static Class<?> arrayClass(Type componentType) throws ReflectionException {
         return arrayClass(componentType, null);
     }
 
@@ -421,8 +422,11 @@ public class JieReflect {
      * @param componentType given component type
      * @param classLoader   specified class loader
      * @return array class of given component type
+     * @throws ReflectionException if any reflection problem occurs
      */
-    public static Class<?> arrayClass(Type componentType, @Nullable ClassLoader classLoader) {
+    public static Class<?> arrayClass(
+        Type componentType, @Nullable ClassLoader classLoader
+    ) throws ReflectionException {
         if (componentType instanceof Class) {
             String name = arrayClassName((Class<?>) componentType);
             return classForName(name, classLoader);
@@ -444,12 +448,12 @@ public class JieReflect {
                     name.append("L").append(((Class<?>) ((ParameterizedType) cur).getRawType()).getName()).append(";");
                     break;
                 } else {
-                    throw new IllegalArgumentException("Illegal component type: " + componentType);
+                    throw new ReflectionException("Illegal component type: " + componentType);
                 }
             } while (true);
             return classForName(name.toString(), classLoader);
         }
-        throw new IllegalArgumentException("Illegal component type: " + componentType);
+        throw new ReflectionException("Illegal component type: " + componentType);
     }
 
     /**
@@ -457,8 +461,9 @@ public class JieReflect {
      *
      * @param componentType specified component type
      * @return array class name of which component type is specified type
+     * @throws ReflectionException if any reflection problem occurs
      */
-    public static String arrayClassName(Class<?> componentType) {
+    public static String arrayClassName(Class<?> componentType) throws ReflectionException {
         if (componentType.isArray()) {
             return "[" + componentType.getName();
         }
@@ -468,7 +473,7 @@ public class JieReflect {
                 return name;
             }
             // void
-            throw new IllegalArgumentException("Array class doesn't exists: " + componentType.getName() + ".");
+            throw new ReflectionException("Array class doesn't exists: " + componentType.getName() + ".");
         }
         return "[L" + componentType.getName() + ";";
     }
@@ -561,8 +566,8 @@ public class JieReflect {
      * <pre>
      *     [String.class, Integer.class, Long.class, Boolean.class]
      * </pre>
-     * Typically, the given type is same with or subtype of the specified raw type, and it returns an empty list if
-     * failed.
+     * Typically, the given type is same with or subtype of the specified raw type. And this method returns an empty
+     * list if failed to get actual type arguments.
      *
      * @param type    given type
      * @param rawType specified raw type
