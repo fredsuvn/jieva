@@ -8,7 +8,7 @@ import xyz.fslabo.common.reflect.NotPrimitiveException;
 import java.lang.reflect.Parameter;
 import java.util.Objects;
 
-final class AsmUtil {
+final class AsmMisc {
 
     static String generateSignature(Iterable<Class<?>> uppers) {
         StringBuilder sb = new StringBuilder();

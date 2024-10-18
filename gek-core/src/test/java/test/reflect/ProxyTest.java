@@ -126,15 +126,15 @@ public class ProxyTest {
     }
 
     @Test
-    public void testAsmUtil() throws Exception {
-        Class<?> asmUtil = Class.forName("xyz.fslabo.common.reflect.proxy.impls.AsmUtil");
-        Method method = asmUtil.getDeclaredMethod(
+    public void testAsmMisc() throws Exception {
+        Class<?> asmMisc = Class.forName("xyz.fslabo.common.reflect.proxy.impls.AsmMisc");
+        Method method = asmMisc.getDeclaredMethod(
             "visitLoadPrimitiveParamAsObject", MethodVisitor.class, Class.class, int.class);
         JieTest.testThrow(NotPrimitiveException.class, method, null, null, Object.class, 1);
-        method = asmUtil.getDeclaredMethod(
+        method = asmMisc.getDeclaredMethod(
             "visitObjectCastPrimitive", MethodVisitor.class, Class.class, boolean.class);
         JieTest.testThrow(NotPrimitiveException.class, method, null, null, Object.class, true);
-        method = asmUtil.getDeclaredMethod(
+        method = asmMisc.getDeclaredMethod(
             "returnPrimitiveCastObject", MethodVisitor.class, Class.class);
         JieTest.testThrow(NotPrimitiveException.class, method, null, null, Object.class);
     }
