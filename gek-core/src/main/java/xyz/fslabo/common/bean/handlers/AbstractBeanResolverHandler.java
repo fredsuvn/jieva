@@ -32,45 +32,41 @@ import java.util.*;
 public abstract class AbstractBeanResolverHandler implements BeanResolver.Handler {
 
     @Override
-    public @Nullable Flag resolve(BeanResolver.Context context) throws BeanResolvingException {
+    public @Nullable Flag resolve(BeanResolver.Context context) {
         Type type = context.getType();
-        try {
-            Class<?> rawType = JieReflect.getRawType(type);
-            if (rawType == null) {
-                throw new BeanResolvingException("Not a Class or ParameterizedType: " + type + ".");
-            }
-            Method[] methods = rawType.getMethods();
-            Map<String, Method> getters = new LinkedHashMap<>();
-            Map<String, Method> setters = new LinkedHashMap<>();
-            List<Method> extraMethods = new LinkedList<>();
-            for (Method method : methods) {
-                if (method.isBridge()) {
-                    continue;
-                }
-                GetterInfo getterInfo = resolveGetter(method);
-                if (getterInfo != null) {
-                    getters.put(getterInfo.getName(), method);
-                    continue;
-                }
-                SetterInfo setterInfo = resolveSetter(method);
-                if (setterInfo != null) {
-                    setters.put(setterInfo.getName(), method);
-                    continue;
-                }
-                context.getMethods().add(new BaseMethodInfoImpl(method));
-            }
-            if (JieColl.isNotEmpty(getters) || JieColl.isNotEmpty(setters)) {
-                mergeAccessors(context, getters, setters, rawType, extraMethods);
-            }
-            if (JieColl.isNotEmpty(extraMethods)) {
-                for (Method extraMethod : extraMethods) {
-                    context.getMethods().add(new BaseMethodInfoImpl(extraMethod));
-                }
-            }
-            return null;
-        } catch (Exception e) {
-            throw new BeanResolvingException(type, e);
+        Class<?> rawType = JieReflect.getRawType(type);
+        if (rawType == null) {
+            throw new BeanResolvingException("Not a Class or ParameterizedType: " + type + ".");
         }
+        Method[] methods = rawType.getMethods();
+        Map<String, Method> getters = new LinkedHashMap<>();
+        Map<String, Method> setters = new LinkedHashMap<>();
+        List<Method> extraMethods = new LinkedList<>();
+        for (Method method : methods) {
+            if (method.isBridge()) {
+                continue;
+            }
+            GetterInfo getterInfo = resolveGetter(method);
+            if (getterInfo != null) {
+                getters.put(getterInfo.getName(), method);
+                continue;
+            }
+            SetterInfo setterInfo = resolveSetter(method);
+            if (setterInfo != null) {
+                setters.put(setterInfo.getName(), method);
+                continue;
+            }
+            context.getMethods().add(new BaseMethodInfoImpl(method));
+        }
+        if (JieColl.isNotEmpty(getters) || JieColl.isNotEmpty(setters)) {
+            mergeAccessors(context, getters, setters, rawType, extraMethods);
+        }
+        if (JieColl.isNotEmpty(extraMethods)) {
+            for (Method extraMethod : extraMethods) {
+                context.getMethods().add(new BaseMethodInfoImpl(extraMethod));
+            }
+        }
+        return null;
     }
 
     private void mergeAccessors(

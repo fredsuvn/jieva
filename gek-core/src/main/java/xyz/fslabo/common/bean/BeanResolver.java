@@ -146,11 +146,10 @@ public interface BeanResolver {
          * will be ignored.
          *
          * @param context given resolving context
-         * @throws BeanResolvingException if any problem occurs when resolving
          * @see BeanResolver
          */
         @Nullable
-        Flag resolve(Context context) throws BeanResolvingException;
+        Flag resolve(Context context);
     }
 
     /**
