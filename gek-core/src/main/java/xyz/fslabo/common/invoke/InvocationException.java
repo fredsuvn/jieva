@@ -3,16 +3,16 @@ package xyz.fslabo.common.invoke;
 import xyz.fslabo.common.base.JieException;
 
 /**
- * Exception for invoking.
+ * Invocation exception.
  *
  * @author fredsuvn
  */
-public class InvokingException extends JieException {
+public class InvocationException extends JieException {
 
     /**
      * Empty constructor.
      */
-    public InvokingException() {
+    public InvocationException() {
     }
 
     /**
@@ -20,7 +20,7 @@ public class InvokingException extends JieException {
      *
      * @param message exception message
      */
-    public InvokingException(String message) {
+    public InvocationException(String message) {
         super(message);
     }
 
@@ -30,7 +30,7 @@ public class InvokingException extends JieException {
      * @param message exception message
      * @param cause   exception cause
      */
-    public InvokingException(String message, Throwable cause) {
+    public InvocationException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -39,7 +39,7 @@ public class InvokingException extends JieException {
      *
      * @param cause exception cause
      */
-    public InvokingException(Throwable cause) {
+    public InvocationException(Throwable cause) {
         super(cause);
     }
 }

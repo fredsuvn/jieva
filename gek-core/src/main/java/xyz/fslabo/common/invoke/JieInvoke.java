@@ -110,9 +110,9 @@ public class JieInvoke {
                 return method.invoke(inst, args);
             } catch (Exception e) {
                 if (e instanceof InvocationTargetException) {
-                    throw new InvokingException(e.getCause());
+                    throw new InvocationException(e.getCause());
                 }
-                throw new InvokingException(e);
+                throw new InvocationException(e);
             }
         }
     }
@@ -131,9 +131,9 @@ public class JieInvoke {
                 return constructor.newInstance(args);
             } catch (Exception e) {
                 if (e instanceof InvocationTargetException) {
-                    throw new InvokingException(e.getCause());
+                    throw new InvocationException(e.getCause());
                 }
-                throw new InvokingException(e);
+                throw new InvocationException(e);
             }
         }
     }
@@ -148,7 +148,7 @@ public class JieInvoke {
                 this.methodHandle = MethodHandles.lookup().unreflect(method);
                 this.isStatic = Modifier.isStatic(method.getModifiers());
             } catch (Exception e) {
-                throw new InvokingException(e);
+                throw new InvocationException(e);
             }
         }
 
@@ -157,7 +157,7 @@ public class JieInvoke {
                 this.methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
                 this.isStatic = true;
             } catch (Exception e) {
-                throw new InvokingException(e);
+                throw new InvocationException(e);
             }
         }
 
@@ -172,7 +172,7 @@ public class JieInvoke {
                 return isStatic ? JieInvoke.invokeStatic(methodHandle, args)
                     : JieInvoke.invoke(methodHandle, inst, args);
             } catch (Throwable e) {
-                throw new InvokingException(e);
+                throw new InvocationException(e);
             }
         }
     }

@@ -5,8 +5,8 @@ import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieConfig;
 import xyz.fslabo.common.base.JieSystem;
 import xyz.fslabo.common.coll.JieColl;
+import xyz.fslabo.common.invoke.InvocationException;
 import xyz.fslabo.common.invoke.Invoker;
-import xyz.fslabo.common.invoke.InvokingException;
 import xyz.fslabo.common.reflect.proxy.*;
 
 import java.lang.reflect.InvocationHandler;
@@ -159,7 +159,7 @@ public class JdkDynamicProxyBuilder implements ProxyBuilder {
         public @Nullable Object invoke(Object inst, Object[] args) throws Throwable {
             try {
                 return invoker.invoke(inst, args);
-            } catch (InvokingException e) {
+            } catch (InvocationException e) {
                 throw e.getCause();
             }
         }

@@ -3,7 +3,7 @@ package test;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolvingException;
-import xyz.fslabo.common.invoke.InvokingException;
+import xyz.fslabo.common.invoke.InvocationException;
 import xyz.fslabo.common.reflect.proxy.ProxyException;
 
 import static org.testng.Assert.expectThrows;
@@ -13,14 +13,14 @@ public class MiscTest {
     @Test
     public void testMisc() {
 
-        expectThrows(InvokingException.class, () -> {
-            throw new InvokingException();
+        expectThrows(InvocationException.class, () -> {
+            throw new InvocationException();
         });
-        expectThrows(InvokingException.class, () -> {
-            throw new InvokingException("");
+        expectThrows(InvocationException.class, () -> {
+            throw new InvocationException("");
         });
-        expectThrows(InvokingException.class, () -> {
-            throw new InvokingException("", new RuntimeException());
+        expectThrows(InvocationException.class, () -> {
+            throw new InvocationException("", new RuntimeException());
         });
 
         expectThrows(BeanResolvingException.class, () -> {

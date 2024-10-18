@@ -5,8 +5,8 @@ import test.Log;
 import xyz.fslabo.common.base.Jie;
 import xyz.fslabo.common.base.JieRandom;
 import xyz.fslabo.common.coll.JieArray;
+import xyz.fslabo.common.invoke.InvocationException;
 import xyz.fslabo.common.invoke.Invoker;
-import xyz.fslabo.common.invoke.InvokingException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -187,7 +187,7 @@ public class RandomTest {
                 expectThrows(IllegalStateException.class, () -> {
                     try {
                         supplyInvoker.invoke(s1, next);
-                    } catch (InvokingException e) {
+                    } catch (InvocationException e) {
                         throw e.getCause();
                     }
                 });

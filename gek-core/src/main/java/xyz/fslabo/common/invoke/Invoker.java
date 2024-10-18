@@ -22,7 +22,7 @@ public interface Invoker {
      * <p>
      * Note if underlying exception is wrapped by {@link InvocationTargetException} when calls
      * {@link #invoke(Object, Object...)}, the {@link InvocationTargetException} will be erased, actual cause from
-     * {@link InvocationTargetException#getCause()} will be wrapped by {@link InvokingException} then thrown.
+     * {@link InvocationTargetException#getCause()} will be wrapped by {@link InvocationException} then thrown.
      *
      * @param method given method
      * @return {@link Invoker} instance
@@ -36,7 +36,7 @@ public interface Invoker {
      * <p>
      * Note if underlying exception is wrapped by {@link InvocationTargetException} when calls
      * {@link #invoke(Object, Object...)}, the {@link InvocationTargetException} will be erased, actual cause from
-     * {@link InvocationTargetException#getCause()} will be wrapped by {@link InvokingException} then thrown.
+     * {@link InvocationTargetException#getCause()} will be wrapped by {@link InvocationException} then thrown.
      *
      * @param constructor given constructor
      * @return {@link Invoker} instance
@@ -85,16 +85,16 @@ public interface Invoker {
      * or {@link MethodHandle#invokeWithArguments(Object...)}. Otherwise, usage of the parameters is up to the
      * implementation.
      * <p>
-     * This method only throws {@link InvokingException} if any problem occurs, use {@link InvokingException#getCause()}
-     * to get underlying cause.
+     * This method only throws {@link InvocationException} if any problem occurs, use
+     * {@link InvocationException#getCause()} to get underlying cause.
      *
      * @param obj  specified object
      * @param args specified arguments
      * @return result of invoking
-     * @throws InvokingException wraps if any problem occurs
+     * @throws InvocationException wraps if any problem occurs
      */
     @Nullable
-    Object invoke(@Nullable Object obj, Object... args) throws InvokingException;
+    Object invoke(@Nullable Object obj, Object... args) throws InvocationException;
 }
 
 
