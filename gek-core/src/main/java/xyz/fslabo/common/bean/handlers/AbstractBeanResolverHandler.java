@@ -17,15 +17,15 @@ import java.util.*;
 
 /**
  * Base abstract bean resolving handler, provides a skeletal implementation of the {@link BeanResolver.Handler} to
- * minimize the effort required to implement the interface backed by "method-based" getters/setters.
+ * minimize the effort required to implement the interface.
  * <p>
- * This method uses {@link Class#getMethods()} to find out all methods, then put each of them into
- * {@link #resolveGetter(Method)} and {@link #resolveSetter(Method)} method to determine whether it is a getter/setter.
- * If it is, it will be resolved to a property descriptor, else it will be resolved to be a {@link MethodInfo}. Subtypes
- * can use {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create getter/setter.
+ * This abstract handler uses {@link Class#getMethods()} to find out all methods, then put each of them into
+ * {@link #resolveGetter(Method)} and {@link #resolveSetter(Method)} to determine whether it is a getter/setter. If it
+ * is, it will be resolved to a property descriptor, else it will be resolved to be a {@link MethodInfo}. Subtypes can
+ * use/override {@link #buildGetter(String, Method)} and {@link #buildSetter(String, Method)} to create getter/setter.
  * <p>
- * This method uses {@link #buildInvoker(Method)} to generate invokers for getters and setters, it has a default
- * implementation ({@link Invoker#handle(Method)}), override it to custom invoker generation.
+ * It uses {@link #buildInvoker(Method)} to generate invokers for getters and setters. By default, it is implemented
+ * through the {@link Invoker#handle(Method)}, and can be overridden.
  *
  * @author fredsuvn
  */

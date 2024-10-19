@@ -79,17 +79,17 @@ public interface BasePropertyInfo {
     Method getSetter();
 
     /**
-     * Returns backed field of this property, or null if it doesn't exist.
+     * Returns backing field of this property, or null if it doesn't exist.
      *
-     * @return backed field of this property, or null
+     * @return backing field of this property, or null
      */
     @Nullable
     Field getField();
 
     /**
-     * Returns annotations on backed field.
+     * Returns annotations on backing field.
      *
-     * @return annotations on backed field
+     * @return annotations on backing field
      */
     List<Annotation> getFieldAnnotations();
 
@@ -108,9 +108,9 @@ public interface BasePropertyInfo {
     List<Annotation> getSetterAnnotations();
 
     /**
-     * Returns annotations on getter, setter and backed field (in this order).
+     * Returns annotations on getter, setter and backing field (in this order).
      *
-     * @return annotations on getter, setter and backed field
+     * @return annotations on getter, setter and backing field
      */
     List<Annotation> getAnnotations();
 
