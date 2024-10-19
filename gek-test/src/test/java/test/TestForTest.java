@@ -5,6 +5,8 @@ import xyz.fslabo.test.JieTest;
 import xyz.fslabo.test.JieTestException;
 
 import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.expectThrows;
@@ -18,16 +20,12 @@ public class TestForTest {
     }
 
     @Test
-    public void testException() {
-        expectThrows(JieTestException.class, () -> {
-            throw new JieTestException("");
-        });
-        expectThrows(JieTestException.class, () -> {
-            throw new JieTestException(new RuntimeException());
-        });
-        expectThrows(JieTestException.class, () -> {
-            throw new JieTestException("", new RuntimeException());
-        });
+    public void testFile() throws Exception {
+        Path path = Paths.get("src", "test", "resources", "test.test");
+        byte[] data = {'1', '2', '3'};
+        JieTest.createFile(path, data);
+        expectThrows(IllegalStateException.class, () -> JieTest.createFile(path, data));
+        path.toFile().delete();
     }
 
     private static final class T {
@@ -35,5 +33,21 @@ public class TestForTest {
         private static void throwError() {
             throw new JieTestException();
         }
+    }
+
+    @Test
+    public void coverage() {
+        expectThrows(JieTestException.class, () -> {
+            throw new JieTestException();
+        });
+        expectThrows(JieTestException.class, () -> {
+            throw new JieTestException("");
+        });
+        expectThrows(JieTestException.class, () -> {
+            throw new JieTestException("", new RuntimeException());
+        });
+        expectThrows(JieTestException.class, () -> {
+            throw new JieTestException(new RuntimeException());
+        });
     }
 }
