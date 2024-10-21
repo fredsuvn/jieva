@@ -28,7 +28,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker reflect(Method method) {
-        return new OfMethod(method);
+        return Impls.ofMethod(method);
     }
 
     /**
@@ -42,7 +42,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker reflect(Constructor<?> constructor) {
-        return new OfConstructor(constructor);
+        return Impls.ofConstructor(constructor);
     }
 
     /**
@@ -52,7 +52,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker handle(Method method) {
-        return new OfMethodHandle(method);
+        return Impls.ofMethodHandle(method);
     }
 
     /**
@@ -63,7 +63,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker handle(Constructor<?> constructor) {
-        return new OfMethodHandle(constructor);
+        return Impls.ofMethodHandle(constructor);
     }
 
     /**
@@ -74,7 +74,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker handle(MethodHandle handle, boolean isStatic) {
-        return new OfMethodHandle(handle, isStatic);
+        return Impls.ofMethodHandle(handle, isStatic);
     }
 
     /**
