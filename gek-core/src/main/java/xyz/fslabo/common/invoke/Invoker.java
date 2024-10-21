@@ -28,7 +28,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker reflect(Method method) {
-        return new JieInvoke.OfMethod(method);
+        return new OfMethod(method);
     }
 
     /**
@@ -42,7 +42,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker reflect(Constructor<?> constructor) {
-        return new JieInvoke.OfConstructor(constructor);
+        return new OfConstructor(constructor);
     }
 
     /**
@@ -52,7 +52,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker handle(Method method) {
-        return new JieInvoke.OfMethodHandle(method);
+        return new OfMethodHandle(method);
     }
 
     /**
@@ -63,7 +63,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker handle(Constructor<?> constructor) {
-        return new JieInvoke.OfMethodHandle(constructor);
+        return new OfMethodHandle(constructor);
     }
 
     /**
@@ -74,7 +74,7 @@ public interface Invoker {
      * @return {@link Invoker} instance
      */
     static Invoker handle(MethodHandle handle, boolean isStatic) {
-        return new JieInvoke.OfMethodHandle(handle, isStatic);
+        return new OfMethodHandle(handle, isStatic);
     }
 
     /**
