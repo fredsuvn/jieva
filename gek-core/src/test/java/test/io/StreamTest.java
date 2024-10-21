@@ -57,21 +57,22 @@ public class StreamTest {
         expectThrows(IORuntimeException.class, () -> rafIn.mark(66));
 
         // chars
-        char[] chars = JieRandom.fill(new char[1024], '0', '9');
+        char[] chars = JieRandom.fill(new char[SOURCE_SIZE], '0', '9');
         byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
         InputStream charsIn = JieInput.wrap(new CharArrayReader(chars));
         testInput(charsIn, charBytes, false);
         charsIn.close();
         expectThrows(IOException.class, charsIn::read);
-        chars = JieRandom.fill(new char[1024], '\u4e00', '\u9fff');
+        // chinese
+        chars = JieRandom.fill(new char[SOURCE_SIZE], '\u4e00', '\u9fff');
         charBytes = new String(chars).getBytes(JieChars.UTF_8);
         charsIn = JieInput.wrap(new CharArrayReader(chars));
         testInput(charsIn, charBytes, false);
-        chars = new char[1024];
         // '0'
+        chars = new char[SOURCE_SIZE];
         Arrays.fill(chars, '0');
         charsIn = JieInput.wrap(new CharArrayReader(chars));
-        charsIn.read(new byte[1024]);
+        charsIn.read(new byte[SOURCE_SIZE]);
         // emoji: "\uD83D\uDD1E"
         for (int i = 0; i < chars.length; i += 2) {
             chars[i] = '\uD83D';
@@ -160,34 +161,41 @@ public class StreamTest {
         expectThrows(IOException.class, () -> rafOut.write(1));
 
         // chars
-        // char[] chars = JieRandom.fill(new char[1024], '0', '9');
+        // char[] dest = new char[SOURCE_SIZE];
+        // char[] chars = JieRandom.fill(new char[SOURCE_SIZE], '0', '9');
         // byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // OutputStream charsOut = JieOutput.wrapputStream(new CharArrayWriter());
+        // OutputStream charsOut = JieOutput.wrap(JieOutput.wrap(dest));
         // testOutput(charsOut, charBytes);
-        // charsIn.close();
-        // expectThrows(IOException.class, charsIn::read);
-        // chars = JieRandom.fill(new char[1024], '\u4e00', '\u9fff');
+        // assertEquals(chars, dest);
+        // charsOut.close();
+        // OutputStream charsOut1 = charsOut;
+        // expectThrows(IOException.class, () -> charsOut1.write(1));
+        // // chines
+        // chars = JieRandom.fill(new char[SOURCE_SIZE], '\u4e00', '\u9fff');
         // charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // charsIn = JieInput.wrapputStream(new CharArrayReader(chars));
-        // testInput(charsIn, charBytes, false);
-        // chars = new char[1024];
+        // charsOut = JieOutput.wrap(JieOutput.wrap(dest));
+        // testOutput(charsOut, charBytes);
+        // assertEquals(chars, dest);
         // // '0'
+        // chars = new char[SOURCE_SIZE];
         // Arrays.fill(chars, '0');
-        // charsIn = JieInput.wrapputStream(new CharArrayReader(chars));
-        // charsIn.read(new byte[1024]);
+        // charsOut = JieOutput.wrap(JieOutput.wrap(dest));
+        // charsOut.write(new byte[SOURCE_SIZE]);
+        // assertEquals(chars, dest);
         // // emoji: "\uD83D\uDD1E"
         // for (int i = 0; i < chars.length; i += 2) {
         //     chars[i] = '\uD83D';
         //     chars[i + 1] = '\uDD1E';
         // }
         // charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // charsIn = JieInput.wrapputStream(new CharArrayReader(chars));
-        // testInput(charsIn, charBytes, false);
+        // charsOut = JieOutput.wrap(JieOutput.wrap(dest));
+        // testOutput(charsOut, charBytes);
+        // assertEquals(chars, dest);
         // // error: U+DD88
-        // Arrays.fill(chars, '\uDD88');
-        // charsIn = JieInput.wrapputStream(new CharArrayReader(chars));
-        // expectThrows(IOException.class, charsIn::read);
-
+        // // Arrays.fill(chars, '\uDD88');
+        // // charsOut = JieOutput.wrap(JieOutput.wrap(dest));
+        // // OutputStream charsOut2 = charsOut;
+        // // expectThrows(IOException.class, ()->charsOut2.w);
 
         // error
         FakeRandomFile.SEEK_ERR = true;
@@ -204,6 +212,7 @@ public class StreamTest {
         out.write(data[1]);
         out.write(Arrays.copyOfRange(data, 2, data.length));
         out.write(Arrays.copyOfRange(data, 2, 2));
+        out.flush();
 
         expectThrows(IOException.class, () -> out.write(1));
         expectThrows(IOException.class, () -> out.write(new byte[10]));
