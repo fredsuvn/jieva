@@ -127,7 +127,7 @@ public class ProxyTest {
 
     @Test
     public void testAsmMisc() throws Exception {
-        Class<?> asmMisc = Class.forName("xyz.fslabo.common.reflect.proxy.impls.AsmMisc");
+        Class<?> asmMisc = Class.forName("xyz.fslabo.common.reflect.proxy.AsmMisc");
         Method method = asmMisc.getDeclaredMethod(
             "visitLoadPrimitiveParamAsObject", MethodVisitor.class, Class.class, int.class);
         JieTest.testThrow(NotPrimitiveException.class, method, null, null, Object.class, 1);

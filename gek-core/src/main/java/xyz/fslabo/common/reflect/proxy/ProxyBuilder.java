@@ -1,8 +1,5 @@
 package xyz.fslabo.common.reflect.proxy;
 
-import xyz.fslabo.common.reflect.proxy.impls.AsmProxyBuilder;
-import xyz.fslabo.common.reflect.proxy.impls.JdkDynamicProxyBuilder;
-
 import java.lang.reflect.Method;
 import java.util.List;
 

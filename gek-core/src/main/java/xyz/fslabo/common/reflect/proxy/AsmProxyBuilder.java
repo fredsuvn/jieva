@@ -1,4 +1,4 @@
-package xyz.fslabo.common.reflect.proxy.impls;
+package xyz.fslabo.common.reflect.proxy;
 
 import org.objectweb.asm.*;
 import xyz.fslabo.annotations.Nullable;
@@ -7,7 +7,6 @@ import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.reflect.JieJvm;
 import xyz.fslabo.common.reflect.JieReflect;
-import xyz.fslabo.common.reflect.proxy.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

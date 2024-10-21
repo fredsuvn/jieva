@@ -1,4 +1,4 @@
-package xyz.fslabo.common.reflect.proxy.impls;
+package xyz.fslabo.common.reflect.proxy;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.Jie;
@@ -7,7 +7,6 @@ import xyz.fslabo.common.base.JieSystem;
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.invoke.InvocationException;
 import xyz.fslabo.common.invoke.Invoker;
-import xyz.fslabo.common.reflect.proxy.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

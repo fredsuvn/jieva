@@ -1,4 +1,4 @@
-package xyz.fslabo.common.reflect.proxy.impls;
+package xyz.fslabo.common.reflect.proxy;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
