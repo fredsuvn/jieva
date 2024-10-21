@@ -25,11 +25,14 @@ import static org.testng.Assert.*;
 
 public class StreamTest {
 
-    public static final int SOURCE_SIZE = 1024;
-
     @Test
     public void testInput() throws Exception {
-        byte[] source = new byte[SOURCE_SIZE];
+        testInput(1024);
+        testInput(60);
+    }
+
+    private void testInput(int sourceSize) throws Exception {
+        byte[] source = new byte[sourceSize];
         JieRandom.fill(source);
 
         // bytes
@@ -60,13 +63,13 @@ public class StreamTest {
         expectThrows(IORuntimeException.class, () -> rafIn.mark(66));
 
         // chars
-        char[] chars = JieRandom.fill(new char[SOURCE_SIZE], '0', '9');
+        char[] chars = JieRandom.fill(new char[sourceSize], '0', '9');
         byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
         InputStream charsIn = JieInput.wrap(new CharArrayReader(chars));
         testInput(charsIn, charBytes, false);
         expectThrows(IOException.class, charsIn::read);
-        // chinese
-        chars = JieRandom.fill(new char[SOURCE_SIZE], '\u4e00', '\u9fff');
+        // chinese: '\u4e00' - '\u9fff'
+        chars = JieRandom.fill(new char[sourceSize], '\u4e00', '\u4e01');
         charBytes = new String(chars).getBytes(JieChars.UTF_8);
         charsIn = JieInput.wrap(new CharArrayReader(chars));
         testInput(charsIn, charBytes, false);
@@ -128,7 +131,12 @@ public class StreamTest {
 
     @Test
     public void testOutput() throws Exception {
-        byte[] source = new byte[SOURCE_SIZE];
+        testOutput(1024);
+        testOutput(60);
+    }
+
+    private void testOutput(int sourceSize) throws Exception {
+        byte[] source = new byte[sourceSize];
         Arrays.fill(source, (byte) 1);
 
         // bytes
@@ -160,16 +168,16 @@ public class StreamTest {
         expectThrows(IOException.class, () -> rafOut.write(1));
 
         // chars
-        char[] dest = new char[SOURCE_SIZE];
-        char[] chars = JieRandom.fill(new char[SOURCE_SIZE], '0', '9');
+        char[] dest = new char[sourceSize];
+        char[] chars = JieRandom.fill(new char[sourceSize], '0', '9');
         byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
         OutputStream charsOut = JieOutput.wrap(JieOutput.wrap(dest));
         testOutput(charsOut, charBytes);
         assertEquals(chars, dest);
         OutputStream charsOut1 = charsOut;
         expectThrows(IOException.class, () -> charsOut1.write(1));
-        // chines
-        chars = JieRandom.fill(new char[SOURCE_SIZE], '\u4e00', '\u9fff');
+        // chinese: '\u4e00' - '\u9fff'
+        chars = JieRandom.fill(new char[sourceSize], '\u4e00', '\u4e01');
         charBytes = new String(chars).getBytes(JieChars.UTF_8);
         charsOut = JieOutput.wrap(JieOutput.wrap(dest));
         testOutput(charsOut, charBytes);
@@ -188,20 +196,20 @@ public class StreamTest {
         OutputStream charsOut3 = charsOut;
         expectThrows(IOException.class, () -> charsOut3.write(1));
         // fake charset
-        byte[] fakeBytes = JieRandom.fill(new byte[1024]);
+        byte[] fakeBytes = JieRandom.fill(new byte[sourceSize]);
         char[] fakeChars = new char[fakeBytes.length * 2];
         for (int i = 0; i < fakeBytes.length; i++) {
             fakeChars[i * 2] = (char) fakeBytes[i];
             fakeChars[i * 2 + 1] = (char) fakeBytes[i];
         }
         char[] fakeDest = new char[fakeBytes.length * 2];
-        charsOut = JieOutput.wrap(JieOutput.wrap(fakeDest), new FakeCharset());
+        charsOut = JieOutput.wrap(JieOutput.wrap(fakeDest), new FakeCharset(2));
         testOutput(charsOut, fakeBytes);
         assertEquals(fakeChars, fakeDest);
         OutputStream charsOut4 = charsOut;
         expectThrows(IOException.class, () -> charsOut4.write(1));
         // error: 0xC1
-        byte[] errBytes = new byte[1024];
+        byte[] errBytes = new byte[sourceSize];
         Arrays.fill(errBytes, (byte) 0xC1);
         charsOut = JieOutput.wrap(JieOutput.wrap(dest));
         OutputStream charsOut5 = charsOut;
@@ -269,7 +277,12 @@ public class StreamTest {
 
     @Test
     public void testReader() throws Exception {
-        char[] source = new char[SOURCE_SIZE];
+        testReader(1024);
+        testReader(60);
+    }
+
+    private void testReader(int sourceSize) throws Exception {
+        char[] source = new char[sourceSize];
         JieRandom.fill(source);
 
         // chars
@@ -278,6 +291,7 @@ public class StreamTest {
             JieInput.wrap(source, 2, source.length - 10),
             Arrays.copyOfRange(source, 2, source.length - 8)
         );
+        assertTrue(JieInput.wrap(source).ready());
 
         // string
         testReader(JieInput.wrap(new String(source)), source);
@@ -295,33 +309,66 @@ public class StreamTest {
         JieTest.testThrow(IOException.class, read0, bufferIn, 99);
 
         // chars
-        // char[] chars = JieRandom.fill(new char[1024], '0', '9');
-        // byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // InputStream charsIn = JieInput.wrap(new CharArrayReader(chars));
-        // testInput(charsIn, charBytes, false);
-        // charsIn.close();
-        // expectThrows(IOException.class, charsIn::read);
-        // chars = JieRandom.fill(new char[1024], '\u4e00', '\u9fff');
-        // charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // charsIn = JieInput.wrap(new CharArrayReader(chars));
-        // testInput(charsIn, charBytes, false);
-        // chars = new char[1024];
-        // // '0'
-        // Arrays.fill(chars, '0');
-        // charsIn = JieInput.wrap(new CharArrayReader(chars));
-        // charsIn.read(new byte[1024]);
-        // // emoji: "\uD83D\uDD1E"
-        // for (int i = 0; i < chars.length; i += 2) {
-        //     chars[i] = '\uD83D';
-        //     chars[i + 1] = '\uDD1E';
-        // }
-        // charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // charsIn = JieInput.wrap(new CharArrayReader(chars));
-        // testInput(charsIn, charBytes, false);
-        // // error: U+DD88
-        // Arrays.fill(chars, '\uDD88');
-        // charsIn = JieInput.wrap(new CharArrayReader(chars));
-        // expectThrows(IOException.class, charsIn::read);
+        char[] chars = JieRandom.fill(new char[sourceSize], '0', '9');
+        byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        Reader charsIn = JieInput.wrap(JieInput.wrap(charBytes));
+        testReader(charsIn, chars);
+        expectThrows(IOException.class, charsIn::read);
+        // chinese: '\u4e00' - '\u9fff'
+        chars = JieRandom.fill(new char[sourceSize], '\u4e00', '\u4e01');
+        charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        charsIn = JieInput.wrap(JieInput.wrap(charBytes));
+        testReader(charsIn, chars);
+        expectThrows(IOException.class, charsIn::read);
+        // emoji: "\uD83D\uDD1E"
+        for (int i = 0; i < chars.length; i += 2) {
+            chars[i] = '\uD83D';
+            chars[i + 1] = '\uDD1E';
+        }
+        charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        charsIn = JieInput.wrap(JieInput.wrap(charBytes));
+        testReader(charsIn, chars);
+        expectThrows(IOException.class, charsIn::read);
+        // fake charset
+        byte[] fakeBytes = JieRandom.fill(new byte[sourceSize]);
+        char[] fakeChars = new char[fakeBytes.length * 3];
+        for (int i = 0; i < fakeBytes.length; i++) {
+            fakeChars[i * 3] = (char) fakeBytes[i];
+            fakeChars[i * 3 + 1] = (char) fakeBytes[i];
+            fakeChars[i * 3 + 2] = (char) fakeBytes[i];
+        }
+        charsIn = JieInput.wrap(JieInput.wrap(fakeBytes), new FakeCharset(3));
+        testReader(charsIn, fakeChars);
+        expectThrows(IOException.class, charsIn::read);
+        // error: 0xC1
+        Arrays.fill(charBytes, (byte) 0xC1);
+        charsIn = JieInput.wrap(JieInput.wrap(charBytes));
+        expectThrows(IOException.class, charsIn::read);
+        // ready
+        charsIn = JieInput.wrap(new InputStream() {
+            @Override
+            public int read() {
+                return 0;
+            }
+
+            @Override
+            public int available() {
+                return 1;
+            }
+        });
+        assertTrue(charsIn.ready());
+        charsIn = JieInput.wrap(new InputStream() {
+            @Override
+            public int read() {
+                return 0;
+            }
+
+            @Override
+            public int available() {
+                return 0;
+            }
+        });
+        assertFalse(charsIn.ready());
 
         // error
         expectThrows(NullPointerException.class, () -> JieInput.wrap((char[]) null, 2, source.length + 1));
@@ -332,7 +379,6 @@ public class StreamTest {
 
     private void testReader(Reader in, char[] source) throws Exception {
         char[] dest = new char[source.length];
-        assertTrue(in.ready());
         assertEquals(in.read(dest, 0, 0), 0);
         assertEquals((char) in.read(), source[0]);
         assertEquals((char) in.read(), source[1]);
@@ -360,7 +406,12 @@ public class StreamTest {
 
     @Test
     public void testWriter() throws Exception {
-        char[] source = new char[SOURCE_SIZE];
+        testWriter(1024);
+        testWriter(60);
+    }
+
+    private void testWriter(int sourceSize) throws Exception {
+        char[] source = new char[sourceSize];
         Arrays.fill(source, (char) 1);
 
         // chars
@@ -568,8 +619,11 @@ public class StreamTest {
 
     private static final class FakeCharset extends Charset {
 
-        private FakeCharset() {
+        private final int num;
+
+        private FakeCharset(int num) {
             super("fake", new String[0]);
+            this.num = num;
         }
 
         @Override
@@ -587,7 +641,7 @@ public class StreamTest {
             return null;
         }
 
-        private static final class FakeCharsetDecoder extends CharsetDecoder {
+        private final class FakeCharsetDecoder extends CharsetDecoder {
 
             private FakeCharsetDecoder(Charset cs, float averageCharsPerByte, float maxCharsPerByte) {
                 super(cs, averageCharsPerByte, maxCharsPerByte);
@@ -598,8 +652,9 @@ public class StreamTest {
                 while (in.hasRemaining()) {
                     if (out.remaining() >= 2) {
                         byte b = in.get();
-                        out.put((char) b);
-                        out.put((char) b);
+                        for (int i = 0; i < num; i++) {
+                            out.put((char) b);
+                        }
                     } else {
                         return CoderResult.OVERFLOW;
                     }

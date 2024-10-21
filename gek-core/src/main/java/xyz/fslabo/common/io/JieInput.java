@@ -6,10 +6,7 @@ import xyz.fslabo.common.base.JieChars;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.CodingErrorAction;
+import java.nio.charset.*;
 
 /**
  * Provides implementations and utilities for {@link InputStream}/{@link Reader}.
@@ -22,7 +19,7 @@ public class JieInput {
      * Wraps given array as an {@link InputStream}.
      * <p>
      * The returned stream is similar to {@link ByteArrayInputStream} but is not the same, its methods are not modified
-     * by {@code synchronized} and thus do not guarantee thread safety. It also supports mark/reset operations, and the
+     * by {@code synchronized} thus do not guarantee thread safety. It also supports mark/reset operations, and the
      * close method does nothing (similar to {@link ByteArrayInputStream}).
      *
      * @param array given array
@@ -36,7 +33,7 @@ public class JieInput {
      * Wraps given array as an {@link InputStream} from specified offset up to specified length.
      * <p>
      * The returned stream is similar to {@link ByteArrayInputStream} but is not the same, its methods are not modified
-     * by {@code synchronized} and thus do not guarantee thread safety. It also supports mark/reset operations, and the
+     * by {@code synchronized} thus do not guarantee thread safety. It also supports mark/reset operations, and the
      * close method does nothing (similar to {@link ByteArrayInputStream}).
      *
      * @param array  given array
@@ -109,7 +106,7 @@ public class JieInput {
      * @return given reader as an {@link InputStream}
      */
     public static InputStream wrap(Reader reader, Charset charset) {
-        return new CharsInputStream(reader, charset);
+        return new ReaderInputStream(reader, charset);
     }
 
     /**
@@ -164,6 +161,37 @@ public class JieInput {
      */
     public static Reader wrap(CharBuffer buffer) {
         return new BufferReader(buffer);
+    }
+
+    /**
+     * Wraps given stream as an {@link Reader} with {@link JieChars#defaultCharset()}.
+     * <p>
+     * The returned stream is similar to {@link InputStreamReader} but is not the same, its methods are not modified by
+     * {@code synchronized} thus do not guarantee thread safety. It does support mark/reset operations. The read
+     * position of the reader and stream may not correspond, the close method will close both reader and stream at their
+     * current positions.
+     *
+     * @param inputStream given stream
+     * @return given stream as an {@link Reader}
+     */
+    public static Reader wrap(InputStream inputStream) {
+        return wrap(inputStream, JieChars.defaultCharset());
+    }
+
+    /**
+     * Wraps given stream as an {@link Reader} with specified charset.
+     * <p>
+     * The returned stream is similar to {@link InputStreamReader} but is not the same, its methods are not modified by
+     * {@code synchronized} thus do not guarantee thread safety. It does support mark/reset operations. The read
+     * position of the reader and stream may not correspond, the close method will close both reader and stream at their
+     * current positions.
+     *
+     * @param inputStream given stream
+     * @param charset     specified charset
+     * @return given stream as an {@link Reader}
+     */
+    public static Reader wrap(InputStream inputStream, Charset charset) {
+        return new BytesReader(inputStream, charset);
     }
 
     private static final class BytesInputStream extends InputStream {
@@ -335,26 +363,26 @@ public class JieInput {
         }
     }
 
-    private static final class CharsInputStream extends InputStream {
+    private static final class ReaderInputStream extends InputStream {
 
         private final Reader reader;
         private final CharsetEncoder encoder;
-        private final CharBuffer charsBuffer;
-        private final ByteBuffer bytesBuffer;
+        private final CharBuffer charBuffer;
+        private final ByteBuffer byteBuffer;
         private boolean endOfInput;
         private boolean closed = false;
         private final byte[] buf = {0};
 
-        private CharsInputStream(Reader reader, CharsetEncoder encoder, int inBufferSize, int outBufferSize) {
+        private ReaderInputStream(Reader reader, CharsetEncoder encoder, int inBufferSize, int outBufferSize) {
             this.reader = reader;
             this.encoder = encoder;
-            this.charsBuffer = CharBuffer.allocate(inBufferSize);
-            this.charsBuffer.flip();
-            this.bytesBuffer = ByteBuffer.allocate(outBufferSize);
-            this.bytesBuffer.flip();
+            this.charBuffer = CharBuffer.allocate(inBufferSize);
+            this.charBuffer.flip();
+            this.byteBuffer = ByteBuffer.allocate(outBufferSize);
+            this.byteBuffer.flip();
         }
 
-        private CharsInputStream(Reader reader, Charset charset, int inBufferSize, int outBufferSize) {
+        private ReaderInputStream(Reader reader, Charset charset, int inBufferSize, int outBufferSize) {
             this(
                 reader,
                 charset.newEncoder()
@@ -365,14 +393,14 @@ public class JieInput {
             );
         }
 
-        CharsInputStream(Reader reader, Charset charset) {
+        ReaderInputStream(Reader reader, Charset charset) {
             this(reader, charset, 64, 64);
         }
 
         @Override
         public int read() throws IOException {
             int readNum = read(buf, 0, 1);
-            return readNum == -1 ? -1 : (buf[0] & 0xFF);
+            return readNum == -1 ? -1 : (buf[0] & 0xff);
         }
 
         @Override
@@ -397,7 +425,7 @@ public class JieInput {
 
         @Override
         public int available() {
-            return bytesBuffer.remaining();
+            return byteBuffer.remaining();
         }
 
         @Override
@@ -411,18 +439,18 @@ public class JieInput {
             int offset = off;
             int remaining = len;
             while (true) {
-                if (bytesBuffer.hasRemaining()) {
-                    int avail = Math.min(bytesBuffer.remaining(), remaining);
+                if (byteBuffer.hasRemaining()) {
+                    int avail = Math.min(byteBuffer.remaining(), remaining);
                     if (fillBytes) {
-                        bytesBuffer.get(b, offset, avail);
+                        byteBuffer.get(b, offset, avail);
                     } else {
-                        bytesBuffer.position(bytesBuffer.position() + avail);
+                        byteBuffer.position(byteBuffer.position() + avail);
                     }
                     offset += avail;
                     remaining -= avail;
                     readNum += avail;
                 } else if (endOfInput) {
-                    if (charsBuffer.hasRemaining()) {
+                    if (charBuffer.hasRemaining()) {
                         encodeCharBuffer();
                     } else {
                         break;
@@ -438,20 +466,20 @@ public class JieInput {
         }
 
         private void fillBuffer() throws IOException {
-            charsBuffer.compact();
-            int readSize = reader.read(charsBuffer);
+            charBuffer.compact();
+            int readSize = reader.read(charBuffer);
             if (readSize == -1) {
                 endOfInput = true;
             }
-            charsBuffer.flip();
+            charBuffer.flip();
             encodeCharBuffer();
         }
 
         private void encodeCharBuffer() throws IOException {
-            bytesBuffer.compact();
-            CoderResult coderResult = encoder.encode(charsBuffer, bytesBuffer, endOfInput);
+            byteBuffer.compact();
+            CoderResult coderResult = encoder.encode(charBuffer, byteBuffer, endOfInput);
             if (coderResult.isUnderflow() || coderResult.isOverflow()) {
-                bytesBuffer.flip();
+                byteBuffer.flip();
                 return;
             }
             throw new IOException("Chars encoding failed: " + coderResult);
@@ -567,8 +595,8 @@ public class JieInput {
         }
 
         @Override
-        public int read(char[] b, int off, int len) throws IOException {
-            IOMisc.checkReadBounds(b, off, len);
+        public int read(char[] c, int off, int len) throws IOException {
+            IOMisc.checkReadBounds(c, off, len);
             if (len <= 0) {
                 return 0;
             }
@@ -576,13 +604,13 @@ public class JieInput {
                 return -1;
             }
             int avail = Math.min(buffer.remaining(), len);
-            read0(b, off, avail);
+            read0(c, off, avail);
             return avail;
         }
 
-        private void read0(char[] b, int off, int avail) throws IOException {
+        private void read0(char[] c, int off, int avail) throws IOException {
             try {
-                buffer.get(b, off, avail);
+                buffer.get(c, off, avail);
             } catch (Exception e) {
                 throw new IOException(e);
             }
@@ -640,6 +668,137 @@ public class JieInput {
 
         @Override
         public void close() {
+        }
+    }
+
+    private static final class BytesReader extends Reader {
+
+        private final InputStream inputStream;
+        private final CharsetDecoder decoder;
+        private final ByteBuffer byteBuffer;
+        private final CharBuffer charBuffer;
+        private boolean endOfInput;
+        private boolean closed = false;
+        private final char[] cbuf = {0};
+
+        private BytesReader(InputStream inputStream, CharsetDecoder decoder, int inBufferSize, int outBufferSize) {
+            this.inputStream = inputStream;
+            this.decoder = decoder;
+            this.byteBuffer = ByteBuffer.allocate(inBufferSize);
+            this.byteBuffer.flip();
+            this.charBuffer = CharBuffer.allocate(outBufferSize);
+            this.charBuffer.flip();
+        }
+
+        private BytesReader(InputStream inputStream, Charset charset, int inBufferSize, int outBufferSize) {
+            this(
+                inputStream,
+                charset.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT),
+                inBufferSize,
+                outBufferSize
+            );
+        }
+
+        BytesReader(InputStream inputStream, Charset charset) {
+            this(inputStream, charset, 64, 64);
+        }
+
+        @Override
+        public int read() throws IOException {
+            int readNum = read(cbuf, 0, 1);
+            return readNum == -1 ? -1 : (cbuf[0] & 0xffff);
+        }
+
+        @Override
+        public int read(char[] c, int off, int len) throws IOException {
+            IOMisc.checkReadBounds(c, off, len);
+            checkClosed();
+            if (len <= 0) {
+                return 0;
+            }
+            int readNum = read0(c, off, len, true);
+            return readNum == 0 ? -1 : readNum;
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            checkClosed();
+            if (n <= 0) {
+                return 0;
+            }
+            return read0(null, 0, (int) n, false);
+        }
+
+        @Override
+        public boolean ready() throws IOException {
+            return inputStream.available() > 0;
+        }
+
+        @Override
+        public void close() throws IOException {
+            inputStream.close();
+            closed = true;
+        }
+
+        private int read0(@Nullable char[] c, int off, int len, boolean fill) throws IOException {
+            int readNum = 0;
+            int offset = off;
+            int remaining = len;
+            while (true) {
+                if (charBuffer.hasRemaining()) {
+                    int avail = Math.min(charBuffer.remaining(), remaining);
+                    if (fill) {
+                        charBuffer.get(c, offset, avail);
+                    } else {
+                        charBuffer.position(charBuffer.position() + avail);
+                    }
+                    offset += avail;
+                    remaining -= avail;
+                    readNum += avail;
+                } else if (endOfInput) {
+                    if (byteBuffer.hasRemaining()) {
+                        encodeByteBuffer();
+                    } else {
+                        break;
+                    }
+                } else {
+                    fillBuffer();
+                }
+                if (remaining <= 0) {
+                    break;
+                }
+            }
+            return readNum;
+        }
+
+        private void fillBuffer() throws IOException {
+            byteBuffer.compact();
+            int readSize = inputStream.read(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining());
+            if (readSize == -1) {
+                endOfInput = true;
+            } else {
+                byteBuffer.position(byteBuffer.position() + readSize);
+            }
+            byteBuffer.flip();
+            encodeByteBuffer();
+        }
+
+        private void encodeByteBuffer() throws IOException {
+            charBuffer.compact();
+            CoderResult coderResult = decoder.decode(byteBuffer, charBuffer, endOfInput);
+            if (coderResult.isUnderflow() || coderResult.isOverflow()) {
+                charBuffer.flip();
+                return;
+            }
+            throw new IOException("Bytes encoding failed: " + coderResult);
+        }
+
+        private void checkClosed() throws IOException {
+            if (closed) {
+                throw new IOException("Stream closed.");
+            }
         }
     }
 }
