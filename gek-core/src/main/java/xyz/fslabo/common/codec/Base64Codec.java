@@ -466,10 +466,10 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
 
     private InputStream inputToInputStream() {
         if (input instanceof byte[]) {
-            return JieIO.toInputStream((byte[]) input);
+            return JieIO.wrapIn((byte[]) input);
         }
         if (input instanceof ByteBuffer) {
-            return JieIO.toInputStream((ByteBuffer) input);
+            return JieIO.wrapIn((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return (InputStream) input;

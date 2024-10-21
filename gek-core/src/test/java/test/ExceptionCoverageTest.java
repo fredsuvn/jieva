@@ -5,6 +5,7 @@ import xyz.fslabo.common.base.ShouldNotHappenException;
 import xyz.fslabo.common.bean.BeanException;
 import xyz.fslabo.common.bean.BeanResolvingException;
 import xyz.fslabo.common.invoke.InvocationException;
+import xyz.fslabo.common.io.IORuntimeException;
 import xyz.fslabo.common.reflect.JvmException;
 import xyz.fslabo.common.reflect.ReflectionException;
 import xyz.fslabo.common.reflect.proxy.ProxyException;
@@ -91,6 +92,19 @@ public class ExceptionCoverageTest {
         });
         expectThrows(ReflectionException.class, () -> {
             throw new ReflectionException(new RuntimeException());
+        });
+
+        expectThrows(IORuntimeException.class, () -> {
+            throw new IORuntimeException();
+        });
+        expectThrows(IORuntimeException.class, () -> {
+            throw new IORuntimeException("");
+        });
+        expectThrows(IORuntimeException.class, () -> {
+            throw new IORuntimeException("", new RuntimeException());
+        });
+        expectThrows(IORuntimeException.class, () -> {
+            throw new IORuntimeException(new RuntimeException());
         });
     }
 }

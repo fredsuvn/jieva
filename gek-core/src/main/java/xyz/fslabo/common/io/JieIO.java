@@ -2,12 +2,10 @@ package xyz.fslabo.common.io;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.base.JieChars;
-import xyz.fslabo.common.base.JieCheck;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -477,6 +475,284 @@ public class JieIO {
     }
 
     /**
+     * Wraps given array as an {@link InputStream}.
+     * <p>
+     * The returned stream is similar to {@link ByteArrayInputStream} but is not the same, its methods are not modified
+     * by {@code synchronized} and thus do not guarantee thread safety. It also supports mark/reset operations, and the
+     * close method does nothing (similar to {@link ByteArrayInputStream}).
+     *
+     * @param array given array
+     * @return given array as an {@link InputStream}
+     */
+    public static InputStream wrapIn(byte[] array) {
+        return new BytesInputStream(array);
+    }
+
+    /**
+     * Wraps given array as an {@link InputStream} from specified offset up to specified length.
+     * <p>
+     * The returned stream is similar to {@link ByteArrayInputStream} but is not the same, its methods are not modified
+     * by {@code synchronized} and thus do not guarantee thread safety. It also supports mark/reset operations, and the
+     * close method does nothing (similar to {@link ByteArrayInputStream}).
+     *
+     * @param array  given array
+     * @param offset specified offset
+     * @param length specified length
+     * @return given array as an {@link InputStream}
+     */
+    public static InputStream wrapIn(byte[] array, int offset, int length) {
+        return new BytesInputStream(array, offset, length);
+    }
+
+    /**
+     * Wraps given buffer as an {@link InputStream}.
+     * <p>
+     * Returned stream does not guarantee thread safety. It supports mark/reset operations, and the close method does
+     * nothing.
+     *
+     * @param buffer given buffer
+     * @return given buffer as an {@link InputStream}
+     */
+    public static InputStream wrapIn(ByteBuffer buffer) {
+        return new BufferInputStream(buffer);
+    }
+
+    /**
+     * Wraps given random access file as an {@link InputStream} from specified initial file pointer.
+     * <p>
+     * Returned stream does not guarantee thread safety. It supports mark/reset operations, and first seeks to specified
+     * initial file pointer when creating the stream and re-seeks if calls reset method. The close method will close the
+     * file.
+     * <p>
+     * Note that if anything else seeks this file, it will affect this stream.
+     *
+     * @param random      given random access file
+     * @param initialSeek specified initial file pointer
+     * @return given random access file as an {@link InputStream}
+     * @throws IORuntimeException IO runtime exception
+     */
+    public static InputStream wrapIn(RandomAccessFile random, long initialSeek) throws IORuntimeException {
+        try {
+            return new RandomInputStream(random, initialSeek);
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
+        }
+    }
+
+    /**
+     * Wraps given reader as an {@link InputStream} with {@link JieChars#defaultCharset()}.
+     * <p>
+     * Returned stream does not guarantee thread safety. It does support mark/reset operations. The read position of the
+     * reader and stream may not correspond, the close method will close both reader and stream at their current
+     * positions.
+     *
+     * @param reader given reader
+     * @return given reader as an {@link InputStream}
+     */
+    public static InputStream wrapIn(Reader reader) {
+        return wrapIn(reader, JieChars.defaultCharset());
+    }
+
+    /**
+     * Wraps given reader as an {@link InputStream} with specified charset.
+     * <p>
+     * Returned stream does not guarantee thread safety. It does support mark/reset operations. The read position of the
+     * reader and stream may not correspond, the close method will close both reader and stream at their current
+     * positions.
+     *
+     * @param reader  given reader
+     * @param charset specified charset
+     * @return given reader as an {@link InputStream}
+     */
+    public static InputStream wrapIn(Reader reader, Charset charset) {
+        return new CharsInputStream(reader, charset);
+    }
+
+    /**
+     * Wraps given array as an {@link OutputStream}.
+     * <p>
+     * Returned stream does not guarantee thread safety, and the written data must not overflow the array. Close method
+     * does nothing.
+     *
+     * @param array given array
+     * @return given array as an {@link OutputStream}
+     */
+    public static OutputStream wrapOut(byte[] array) {
+        return new BytesOutputStream(array);
+    }
+
+    /**
+     * Wraps given array as {@link OutputStream} from specified offset up to specified length.
+     * <p>
+     * Returned stream does not guarantee thread safety, and the written data must not overflow the array. Close method
+     * does nothing.
+     *
+     * @param array  given array
+     * @param offset specified offset
+     * @param length specified length
+     * @return given array as an {@link OutputStream}
+     */
+    public static OutputStream wrapOut(byte[] array, int offset, int length) {
+        return new BytesOutputStream(array, offset, length);
+    }
+
+    /**
+     * Wraps given buffer as an {@link OutputStream}.
+     * <p>
+     * Returned stream does not guarantee thread safety, and the written data must not overflow the buffer. Close method
+     * does nothing.
+     *
+     * @param buffer given buffer
+     * @return given buffer as an {@link OutputStream}
+     */
+    public static OutputStream wrapOut(ByteBuffer buffer) {
+        return new BufferOutputStream(buffer);
+    }
+
+    /**
+     * Wraps given random access file as an {@link OutputStream} from specified initial file pointer.
+     * <p>
+     * Returned stream does not guarantee thread safety. It first seeks to specified initial file pointer when creating
+     * the stream. The close method will close the file.
+     * <p>
+     * Note that if anything else seeks this file, it will affect this stream.
+     *
+     * @param random      given random access file
+     * @param initialSeek specified initial file pointer
+     * @return given random access file as an {@link OutputStream}
+     * @throws IORuntimeException IO runtime exception
+     */
+    public static OutputStream wrapOut(RandomAccessFile random, long initialSeek) throws IORuntimeException {
+        try {
+            return new RandomOutputStream(random, initialSeek);
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
+        }
+    }
+
+    /**
+     * Wraps given char appender as an {@link OutputStream} with {@link JieChars#defaultCharset()}.
+     * <p>
+     * Returned stream does not guarantee thread safety. The written position of the appender and stream may not
+     * correspond, the close method will close both appender and stream at their current positions.
+     *
+     * @param appender given char appender
+     * @return given char appender as an {@link OutputStream}
+     */
+    public static OutputStream wrapOut(Appendable appender) {
+        return wrapOut(appender, JieChars.defaultCharset());
+    }
+
+    /**
+     * Wraps given char appender as an {@link OutputStream} with specified charset.
+     * <p>
+     * Returned stream does not guarantee thread safety. The written position of the appender and stream may not
+     * correspond, the close method will close both appender and stream at their current positions.
+     *
+     * @param appender given char appender
+     * @param charset  specified charset
+     * @return given char appender as an {@link OutputStream}
+     */
+    public static OutputStream wrapOut(Appendable appender, Charset charset) {
+        return new CharsOutputStream(appender, charset);
+    }
+
+    /**
+     * Wraps given array as an {@link Reader}.
+     * <p>
+     * The returned stream is similar to {@link CharArrayReader} but is not the same. Returned reader does not guarantee
+     * thread safety. It supports mark/reset operations, and the close method does nothing.
+     *
+     * @param array given array
+     * @return given array as an {@link Reader}
+     */
+    public static Reader wrapReader(char[] array) {
+        return new BufferReader(array);
+    }
+
+    /**
+     * Wraps given array as an {@link Reader} from specified offset up to specified length.
+     * <p>
+     * The returned stream is similar to {@link CharArrayReader} but is not the same. Returned reader does not guarantee
+     * thread safety. It supports mark/reset operations, and the close method does nothing.
+     *
+     * @param array  given array
+     * @param offset specified offset
+     * @param length specified length
+     * @return given array as an {@link Reader}
+     */
+    public static Reader wrapReader(char[] array, int offset, int length) {
+        return new BufferReader(array, offset, length);
+    }
+
+    /**
+     * Wraps given chars as an {@link Reader}.
+     * <p>
+     * The returned stream is similar to {@link StringReader} but is not the same. Returned reader does not guarantee
+     * thread safety. It supports mark/reset operations, and the close method does nothing.
+     *
+     * @param chars given chars
+     * @return given array as an {@link Reader}
+     */
+    public static Reader wrapReader(CharSequence chars) {
+        return new BufferReader(chars);
+    }
+
+    /**
+     * Wraps given buffer as an {@link Reader}.
+     * <p>
+     * Returned reader does not guarantee thread safety. It supports mark/reset operations, and the close method does
+     * nothing.
+     *
+     * @param buffer given buffer
+     * @return given buffer as an {@link Reader}
+     */
+    public static Reader wrapReader(CharBuffer buffer) {
+        return new BufferReader(buffer);
+    }
+
+    /**
+     * Wraps given array as an {@link Writer}.
+     * <p>
+     * Returned writer does not guarantee thread safety, and the written data must not overflow the buffer. Close method
+     * does nothing.
+     *
+     * @param array given array
+     * @return given array as an {@link Writer}
+     */
+    public static Writer wrapWriter(char[] array) {
+        return new BufferWriter(array);
+    }
+
+    /**
+     * Wraps given array as {@link Writer} from specified offset up to specified length.
+     * <p>
+     * Returned writer does not guarantee thread safety, and the written data must not overflow the buffer. Close method
+     * does nothing.
+     *
+     * @param array  given array
+     * @param offset specified offset
+     * @param length specified length
+     * @return given array as an {@link Writer}
+     */
+    public static Writer wrapWriter(char[] array, int offset, int length) {
+        return new BufferWriter(array, offset, length);
+    }
+
+    /**
+     * Wraps given buffer as an {@link Writer}.
+     * <p>
+     * Returned writer does not guarantee thread safety, and the written data must not overflow the buffer. Close method
+     * does nothing.
+     *
+     * @param buffer given buffer
+     * @return given buffer as an {@link Writer}
+     */
+    public static Writer wrapWriter(CharBuffer buffer) {
+        return new BufferWriter(buffer);
+    }
+
+    /**
      * Wraps given stream as {@link Reader} with {@link JieChars#defaultCharset()}.
      *
      * @param stream given stream
@@ -497,77 +773,6 @@ public class JieIO {
      */
     public static Reader toReader(InputStream stream, Charset charset) throws IORuntimeException {
         return new InputStreamReader(stream, charset);
-    }
-
-    /**
-     * Wraps given buffer as {@link Reader}.
-     *
-     * @param buffer given buffer
-     * @return given buffer as {@link Reader}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static Reader toReader(CharBuffer buffer) throws IORuntimeException {
-        return new CharBufferReader(buffer);
-    }
-
-    /**
-     * Wraps given reader as {@link InputStream} with {@link JieChars#defaultCharset()}. The returned stream doesn't
-     * support mark/reset methods.
-     *
-     * @param reader given reader
-     * @return given reader as {@link InputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static InputStream toInputStream(Reader reader) throws IORuntimeException {
-        return toInputStream(reader, JieChars.defaultCharset());
-    }
-
-    /**
-     * Wraps given reader as {@link InputStream} with specified charset. The returned stream doesn't support mark/reset
-     * methods.
-     *
-     * @param reader  given reader
-     * @param charset specified charset
-     * @return given reader as {@link InputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static InputStream toInputStream(Reader reader, Charset charset) throws IORuntimeException {
-        return new ReaderInputStream(reader, charset);
-    }
-
-    /**
-     * Wraps given array as {@link ByteArrayInputStream}.
-     *
-     * @param array given array
-     * @return given array as {@link ByteArrayInputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static ByteArrayInputStream toInputStream(byte[] array) throws IORuntimeException {
-        return new ByteArrayInputStream(array);
-    }
-
-    /**
-     * Wraps given array as {@link ByteArrayInputStream}, starting from given offset with specified length.
-     *
-     * @param array  given array
-     * @param offset given offset
-     * @param length specified length
-     * @return given array as {@link ByteArrayInputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static ByteArrayInputStream toInputStream(byte[] array, int offset, int length) throws IORuntimeException {
-        return new ByteArrayInputStream(array, offset, length);
-    }
-
-    /**
-     * Wraps given buffer as {@link InputStream}.
-     *
-     * @param buffer given buffer
-     * @return given buffer as {@link InputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static InputStream toInputStream(ByteBuffer buffer) throws IORuntimeException {
-        return new ByteBufferInputStream(buffer);
     }
 
     /**
@@ -594,129 +799,6 @@ public class JieIO {
     }
 
     /**
-     * Wraps given buffer as {@link Writer}.
-     *
-     * @param buffer given buffer
-     * @return given buffer as {@link Writer}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static Writer toWriter(CharBuffer buffer) throws IORuntimeException {
-        return new CharBufferWriter(buffer);
-    }
-
-    /**
-     * Wraps given appendable as {@link OutputStream} with {@link JieChars#defaultCharset()}.
-     * <p>
-     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid if given appendable is instance of
-     * {@link Writer}.
-     *
-     * @param appendable given appendable
-     * @return given appendable as {@link OutputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static OutputStream toOutputStream(Appendable appendable) throws IORuntimeException {
-        return toOutputStream(appendable, JieChars.defaultCharset());
-    }
-
-    /**
-     * Wraps given appendable as {@link OutputStream} with specified charset.
-     * <p>
-     * Note {@link OutputStream#flush()} and {@link OutputStream#close()} are valid if given appendable is instance of
-     * {@link Writer}.
-     *
-     * @param appendable given appendable
-     * @param charset    specified charset
-     * @return given appendable as {@link OutputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static OutputStream toOutputStream(Appendable appendable, Charset charset) throws IORuntimeException {
-        return new AppendableOutputStream(appendable, charset);
-    }
-
-    /**
-     * Wraps given array as {@link OutputStream}.
-     *
-     * @param array given array
-     * @return given array as {@link OutputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static OutputStream toOutputStream(byte[] array) throws IORuntimeException {
-        return new BytesWrapperOutputStream(array, 0, array.length);
-    }
-
-    /**
-     * Wraps given array as {@link OutputStream}, starting from given offset with specified length.
-     *
-     * @param array  given array
-     * @param offset given offset
-     * @param length specified length
-     * @return given array as {@link OutputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static OutputStream toOutputStream(byte[] array, int offset, int length) throws IORuntimeException {
-        JieCheck.checkRangeInBounds(offset, offset + length, 0, array.length);
-        return new BytesWrapperOutputStream(array, offset, length);
-    }
-
-    /**
-     * Wraps given buffer as {@link OutputStream}.
-     *
-     * @param buffer given buffer
-     * @return given buffer as {@link OutputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static OutputStream toOutputStream(ByteBuffer buffer) throws IORuntimeException {
-        return new ByteBufferOutputStream(buffer);
-    }
-
-    /**
-     * Limits given stream to a specified number for readable bytes. The returned stream doesn't support mark/reset
-     * methods.
-     *
-     * @param stream given stream
-     * @param number number of readable bytes, must &gt;= 0
-     * @return limited {@link InputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static InputStream limit(InputStream stream, long number) throws IORuntimeException {
-        if (number < 0) {
-            throw new IllegalArgumentException("number < 0.");
-        }
-        return new LimitedInputStream(stream, number);
-    }
-
-    /**
-     * Limits given stream to a specified number for writeable bytes.
-     *
-     * @param stream given stream
-     * @param number number of writeable bytes, must &gt;= 0
-     * @return limited {@link OutputStream}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static OutputStream limit(OutputStream stream, long number) throws IORuntimeException {
-        if (number < 0) {
-            throw new IllegalArgumentException("number < 0.");
-        }
-        return new LimitedOutputStream(stream, number);
-    }
-
-    /**
-     * Returns a {@link TransformInputStream} with source stream and transformer. This method is equivalent to
-     * ({@link #transform(InputStream, int, Function)}):
-     * <pre>
-     *     return transform(source, 0, transformer);
-     * </pre>
-     *
-     * @param source      source stream
-     * @param transformer given transformer
-     * @return a {@link TransformInputStream}
-     * @see #transform(InputStream, int, Function)
-     */
-    public static TransformInputStream transform(InputStream source, Function<byte[], byte[]> transformer) {
-        return transform(source, 0, transformer);
-    }
-
-    /**
      * Returns a {@link TransformInputStream} with source stream, block size and transformer.
      * <p>
      * Note the block size could be negative or {@code 0}, in this case all bytes would be read once from source stream
@@ -735,66 +817,6 @@ public class JieIO {
     public static TransformInputStream transform(
         InputStream source, int blockSize, Function<byte[], byte[]> transformer) {
         return new TransformInputStream(source, blockSize, transformer);
-    }
-
-    /**
-     * Wraps given random access file as an input stream, supports mark/reset.
-     * <p>
-     * Note this method will seek position of random access file to given offset immediately.
-     *
-     * @param random given random access file
-     * @return wrapped stream
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static InputStream toInputStream(RandomAccessFile random) throws IORuntimeException {
-        return toInputStream(random, 0, -1);
-    }
-
-    /**
-     * Wraps given random access file as an input stream, readable bytes from {@code offset} position to
-     * {@code (offset + length)}, supports mark/reset. {@code length} can be set to -1 if to read to end of the file.
-     * <p>
-     * Note this method will seek position of random access file to given offset immediately.
-     *
-     * @param random given random access file
-     * @param offset offset position to start read
-     * @param length length of readable bytes, or -1 to read to end of file
-     * @return wrapped stream
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static InputStream toInputStream(RandomAccessFile random, long offset, long length) throws IORuntimeException {
-        return new RandomInputStream(random, offset, length);
-    }
-
-    /**
-     * Wraps given random access file as an output stream. The stream will lock the file with exclusive lock by
-     * {@link FileChannel#tryLock(long, long, boolean)}.
-     * <p>
-     * Note this method will seek position of random access file to given offset immediately.
-     *
-     * @param random given random access file
-     * @return wrapped stream
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static OutputStream toOutputStream(RandomAccessFile random) throws IORuntimeException {
-        return toOutputStream(random, 0, -1);
-    }
-
-    /**
-     * Wraps given random access file as an output stream, written bytes from {@code offset} position to
-     * {@code (offset + length)}. {@code length} can be set to -1 if to write unlimitedly. The stream will lock the file
-     * with exclusive lock by {@link FileChannel#tryLock(long, long, boolean)}.
-     * <p>
-     * Note this method will seek position of random access file to given offset immediately.
-     *
-     * @param random given random access file
-     * @param offset offset position to start write
-     * @param length length of written bytes, or -1 to write unlimitedly
-     * @return wrapped stream
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static OutputStream toOutputStream(RandomAccessFile random, long offset, long length) throws IORuntimeException {
-        return new RandomOutputStream(random, offset, length);
     }
 
     /**

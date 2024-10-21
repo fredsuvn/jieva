@@ -2,7 +2,6 @@ package test.io;
 
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
-import test.TestUtil;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieRandom;
 import xyz.fslabo.common.io.BytesTransfer;
@@ -22,8 +21,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.expectThrows;
 
 public class IOTest {
-
-    private static final String DATA = TestUtil.buildRandomString(256, 256);
 
     @Test
     public void testEmpty() throws Exception {

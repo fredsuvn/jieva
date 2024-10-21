@@ -127,7 +127,7 @@ final class CharsTransferImpl implements CharsTransfer {
 
     private BufferOut toBufferOut(Object dst) {
         if (dst instanceof CharBuffer) {
-            return new AppendableBufferOut(JieIO.toWriter((CharBuffer) dst));
+            return new AppendableBufferOut(JieIO.wrapWriter((CharBuffer) dst));
         }
         if (dst instanceof Appendable) {
             return new AppendableBufferOut((Appendable) dst);

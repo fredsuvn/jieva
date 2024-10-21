@@ -19,27 +19,27 @@ dependencies {
   implementation project(":gek-test")
 }
 
-tasks.register('benchmark') {
-  //dependsOn compileTestJava
-  dependsOn compileJava
-  group = 'benchmark'
-  doLast {
-    javaexec {
-      main = 'benchmark.JmhRunner'
-      //classpath = sourceSets.test.runtimeClasspath
-      classpath = files(
-        rootProject.subprojects.findAll {
-          it.plugins.hasPlugin('java-library') || it.plugins.hasPlugin('org.jetbrains.kotlin.jvm')
-        }.collect { println("$it.name"); it.sourceSets.main.runtimeClasspath }
-        //project(':gek-annotations').sourceSets.main.runtimeClasspath,
-        //project(':gek-core').sourceSets.main.runtimeClasspath,
-        //project(':gek-kotlin').sourceSets.main.runtimeClasspath,
-        //project(':gek-test').sourceSets.main.runtimeClasspath,
-      )
-      args Arrays.asList(
-        //'cache',
-        'case',
-      )
-    }
-  }
-}
+//tasks.register('benchmark') {
+//  //dependsOn compileTestJava
+//  dependsOn compileJava
+//  group = 'benchmark'
+//  doLast {
+//    javaexec {
+//      main = 'benchmark.JmhRunner'
+//      //classpath = sourceSets.test.runtimeClasspath
+//      classpath = files(
+//        rootProject.subprojects.findAll {
+//          it.plugins.hasPlugin('java-library') || it.plugins.hasPlugin('org.jetbrains.kotlin.jvm')
+//        }.collect { println("$it.name"); it.sourceSets.main.runtimeClasspath }
+//        //project(':gek-annotations').sourceSets.main.runtimeClasspath,
+//        //project(':gek-core').sourceSets.main.runtimeClasspath,
+//        //project(':gek-kotlin').sourceSets.main.runtimeClasspath,
+//        //project(':gek-test').sourceSets.main.runtimeClasspath,
+//      )
+//      args Arrays.asList(
+//        //'cache',
+//        'case',
+//      )
+//    }
+//  }
+//}

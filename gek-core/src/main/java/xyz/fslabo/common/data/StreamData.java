@@ -66,7 +66,7 @@ final class StreamData implements GekData.OfStream {
 
     @Override
     public int write(ByteBuffer dest, int length) {
-        return (int) JieIO.transfer(stream, JieIO.toOutputStream(dest), length);
+        return (int) JieIO.transfer(stream, JieIO.wrapOut(dest), length);
     }
 
     @Override

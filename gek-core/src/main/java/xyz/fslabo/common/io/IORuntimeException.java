@@ -42,13 +42,4 @@ public class IORuntimeException extends RuntimeException {
     public IORuntimeException(Throwable cause) {
         super(cause);
     }
-
-    /**
-     * Constructs with exception cause.
-     *
-     * @param io exception cause
-     */
-    public IORuntimeException(IOException io) {
-        super(io.getMessage(), io.getCause());
-    }
 }
