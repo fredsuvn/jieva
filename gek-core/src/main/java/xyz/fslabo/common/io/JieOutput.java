@@ -223,7 +223,10 @@ public class JieOutput {
         private final Appendable appender;
         private final CharsetDecoder decoder;
         private final ByteBuffer bytesBuffer;
+
+        // Should be keep flush to empty.
         private final CharBuffer charsBuffer;
+
         private boolean closed = false;
         private final byte[] buf = {0};
 
@@ -231,16 +234,17 @@ public class JieOutput {
             this.appender = appender;
             this.decoder = decoder;
             this.bytesBuffer = ByteBuffer.allocate(inBufferSize);
+            this.bytesBuffer.flip();
             this.charsBuffer = CharBuffer.allocate(outBufferSize);
+            this.charsBuffer.flip();
         }
 
         private CharsOutputStream(Appendable appender, Charset charset, int inBufferSize, int outBufferSize) {
             this(
                 appender,
                 charset.newDecoder()
-                    .onMalformedInput(CodingErrorAction.REPLACE)
-                    .onUnmappableCharacter(CodingErrorAction.REPLACE)
-                    .replaceWith("?"),
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT),
                 inBufferSize,
                 outBufferSize
             );
@@ -267,23 +271,19 @@ public class JieOutput {
             int remaining = len;
             while (remaining > 0) {
                 bytesBuffer.compact();
+                int bytesLimit = bytesBuffer.position();
                 int avail = Math.min(bytesBuffer.remaining(), remaining);
                 bytesBuffer.put(b, offset, avail);
                 remaining -= avail;
                 offset += avail;
-                decodeByteBuffer(false);
-                writeChars();
+                bytesBuffer.flip();
+                decodeByteBuffer(bytesLimit, false);
             }
         }
 
         @Override
         public void flush() throws IOException {
             checkClosed();
-            while (bytesBuffer.hasRemaining()) {
-                decodeByteBuffer(false);
-                writeChars();
-            }
-            writeChars();
             if (appender instanceof Flushable) {
                 ((Flushable) appender).flush();
             }
@@ -294,16 +294,13 @@ public class JieOutput {
             if (closed) {
                 return;
             }
-            while (bytesBuffer.hasRemaining()) {
-                decodeByteBuffer(true);
-                writeChars();
-            }
-            writeChars();
             if (appender instanceof Closeable) {
                 ((Closeable) appender).close();
             } else if (appender instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) appender).close();
+                } catch (IOException e) {
+                    throw e;
                 } catch (Exception e) {
                     throw new IOException(e);
                 }
@@ -311,17 +308,25 @@ public class JieOutput {
             closed = true;
         }
 
-        private void decodeByteBuffer(boolean endOfInput) throws IOException {
-            charsBuffer.compact();
-            CoderResult coderResult = decoder.decode(bytesBuffer, charsBuffer, endOfInput);
-            if (coderResult.isUnderflow() || coderResult.isOverflow()) {
-                charsBuffer.flip();
-                return;
+        private void decodeByteBuffer(int bytesMark, boolean endOfInput) throws IOException {
+            while (true) {
+                charsBuffer.compact();
+                CoderResult coderResult = decoder.decode(bytesBuffer, charsBuffer, endOfInput);
+                if (coderResult.isUnderflow()) {
+                    charsBuffer.flip();
+                    flushCharBuffer(bytesMark);
+                    return;
+                }
+                if (coderResult.isOverflow()) {
+                    charsBuffer.flip();
+                    flushCharBuffer(bytesMark);
+                    continue;
+                }
+                throw new IOException("Chars decoding failed: " + coderResult);
             }
-            throw new IOException("Chars decoding failed: " + coderResult);
         }
 
-        private void writeChars() throws IOException {
+        private void flushCharBuffer(int bytesLimit) throws IOException {
             if (!charsBuffer.hasRemaining()) {
                 return;
             }
@@ -343,10 +348,19 @@ public class JieOutput {
                     }
                 }
             } catch (IOException e) {
+                rollback(bytesLimit);
                 throw e;
             } catch (Exception e) {
+                rollback(bytesLimit);
                 throw new IOException(e);
             }
+        }
+
+        private void rollback(int limit) {
+            bytesBuffer.position(0);
+            bytesBuffer.limit(limit);
+            charsBuffer.position(0);
+            charsBuffer.limit(0);
         }
 
         private void checkClosed() throws IOException {

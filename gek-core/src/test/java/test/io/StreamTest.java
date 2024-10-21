@@ -13,6 +13,10 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -53,7 +57,6 @@ public class StreamTest {
         RandomAccessFile raf = new FakeRandomFile(path.toFile(), "r", source);
         InputStream rafIn = JieInput.wrap(raf, 6);
         testInput(rafIn, Arrays.copyOfRange(source, 6, source.length), true);
-        rafIn.close();
         expectThrows(IORuntimeException.class, () -> rafIn.mark(66));
 
         // chars
@@ -61,18 +64,13 @@ public class StreamTest {
         byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
         InputStream charsIn = JieInput.wrap(new CharArrayReader(chars));
         testInput(charsIn, charBytes, false);
-        charsIn.close();
         expectThrows(IOException.class, charsIn::read);
         // chinese
         chars = JieRandom.fill(new char[SOURCE_SIZE], '\u4e00', '\u9fff');
         charBytes = new String(chars).getBytes(JieChars.UTF_8);
         charsIn = JieInput.wrap(new CharArrayReader(chars));
         testInput(charsIn, charBytes, false);
-        // '0'
-        chars = new char[SOURCE_SIZE];
-        Arrays.fill(chars, '0');
-        charsIn = JieInput.wrap(new CharArrayReader(chars));
-        charsIn.read(new byte[SOURCE_SIZE]);
+        expectThrows(IOException.class, charsIn::read);
         // emoji: "\uD83D\uDD1E"
         for (int i = 0; i < chars.length; i += 2) {
             chars[i] = '\uD83D';
@@ -81,6 +79,7 @@ public class StreamTest {
         charBytes = new String(chars).getBytes(JieChars.UTF_8);
         charsIn = JieInput.wrap(new CharArrayReader(chars));
         testInput(charsIn, charBytes, false);
+        expectThrows(IOException.class, charsIn::read);
         // error: U+DD88
         Arrays.fill(chars, '\uDD88');
         charsIn = JieInput.wrap(new CharArrayReader(chars));
@@ -161,41 +160,87 @@ public class StreamTest {
         expectThrows(IOException.class, () -> rafOut.write(1));
 
         // chars
-        // char[] dest = new char[SOURCE_SIZE];
-        // char[] chars = JieRandom.fill(new char[SOURCE_SIZE], '0', '9');
-        // byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // OutputStream charsOut = JieOutput.wrap(JieOutput.wrap(dest));
-        // testOutput(charsOut, charBytes);
-        // assertEquals(chars, dest);
-        // charsOut.close();
-        // OutputStream charsOut1 = charsOut;
-        // expectThrows(IOException.class, () -> charsOut1.write(1));
-        // // chines
-        // chars = JieRandom.fill(new char[SOURCE_SIZE], '\u4e00', '\u9fff');
-        // charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // charsOut = JieOutput.wrap(JieOutput.wrap(dest));
-        // testOutput(charsOut, charBytes);
-        // assertEquals(chars, dest);
-        // // '0'
-        // chars = new char[SOURCE_SIZE];
-        // Arrays.fill(chars, '0');
-        // charsOut = JieOutput.wrap(JieOutput.wrap(dest));
-        // charsOut.write(new byte[SOURCE_SIZE]);
-        // assertEquals(chars, dest);
-        // // emoji: "\uD83D\uDD1E"
-        // for (int i = 0; i < chars.length; i += 2) {
-        //     chars[i] = '\uD83D';
-        //     chars[i + 1] = '\uDD1E';
-        // }
-        // charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // charsOut = JieOutput.wrap(JieOutput.wrap(dest));
-        // testOutput(charsOut, charBytes);
-        // assertEquals(chars, dest);
-        // // error: U+DD88
-        // // Arrays.fill(chars, '\uDD88');
-        // // charsOut = JieOutput.wrap(JieOutput.wrap(dest));
-        // // OutputStream charsOut2 = charsOut;
-        // // expectThrows(IOException.class, ()->charsOut2.w);
+        char[] dest = new char[SOURCE_SIZE];
+        char[] chars = JieRandom.fill(new char[SOURCE_SIZE], '0', '9');
+        byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        OutputStream charsOut = JieOutput.wrap(JieOutput.wrap(dest));
+        testOutput(charsOut, charBytes);
+        assertEquals(chars, dest);
+        OutputStream charsOut1 = charsOut;
+        expectThrows(IOException.class, () -> charsOut1.write(1));
+        // chines
+        chars = JieRandom.fill(new char[SOURCE_SIZE], '\u4e00', '\u9fff');
+        charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        charsOut = JieOutput.wrap(JieOutput.wrap(dest));
+        testOutput(charsOut, charBytes);
+        assertEquals(chars, dest);
+        OutputStream charsOut2 = charsOut;
+        expectThrows(IOException.class, () -> charsOut2.write(1));
+        // emoji: "\uD83D\uDD1E"
+        for (int i = 0; i < chars.length; i += 2) {
+            chars[i] = '\uD83D';
+            chars[i + 1] = '\uDD1E';
+        }
+        charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        charsOut = JieOutput.wrap(JieOutput.wrap(dest));
+        testOutput(charsOut, charBytes);
+        assertEquals(chars, dest);
+        OutputStream charsOut3 = charsOut;
+        expectThrows(IOException.class, () -> charsOut3.write(1));
+        // fake charset
+        byte[] fakeBytes = JieRandom.fill(new byte[1024]);
+        char[] fakeChars = new char[fakeBytes.length * 2];
+        for (int i = 0; i < fakeBytes.length; i++) {
+            fakeChars[i * 2] = (char) fakeBytes[i];
+            fakeChars[i * 2 + 1] = (char) fakeBytes[i];
+        }
+        char[] fakeDest = new char[fakeBytes.length * 2];
+        charsOut = JieOutput.wrap(JieOutput.wrap(fakeDest), new FakeCharset());
+        testOutput(charsOut, fakeBytes);
+        assertEquals(fakeChars, fakeDest);
+        OutputStream charsOut4 = charsOut;
+        expectThrows(IOException.class, () -> charsOut4.write(1));
+        // error: 0xC1
+        byte[] errBytes = new byte[1024];
+        Arrays.fill(errBytes, (byte) 0xC1);
+        charsOut = JieOutput.wrap(JieOutput.wrap(dest));
+        OutputStream charsOut5 = charsOut;
+        expectThrows(IOException.class, () -> charsOut5.write(errBytes));
+        // StringBuilder
+        StringBuilder sb = new StringBuilder();
+        charsOut = JieOutput.wrap(sb);
+        charsOut.write("中文".getBytes(JieChars.UTF_8));
+        charsOut.flush();
+        assertEquals(sb.toString(), "中文");
+        StringBuffer sbuf = new StringBuffer();
+        charsOut = JieOutput.wrap(sbuf);
+        charsOut.write("中文".getBytes(JieChars.UTF_8));
+        charsOut.flush();
+        assertEquals(sbuf.toString(), "中文");
+        CharBuffer cb = CharBuffer.allocate(10);
+        charsOut = JieOutput.wrap((Appendable) cb);
+        charsOut.write("中文".getBytes(JieChars.UTF_8));
+        charsOut.flush();
+        cb.flip();
+        assertEquals(cb.toString(), "中文");
+        // appender
+        AutoCloseAppender aa = new AutoCloseAppender();
+        charsOut = JieOutput.wrap(aa);
+        charsOut.write(1);
+        charsOut.close();
+        charsOut = JieOutput.wrap(aa);
+        aa.err = 1;
+        OutputStream charsOut6 = charsOut;
+        expectThrows(IOException.class, () -> charsOut6.write(1));
+        expectThrows(IOException.class, charsOut::close);
+        charsOut = JieOutput.wrap(aa);
+        aa.err = 2;
+        OutputStream charsOut7 = charsOut;
+        expectThrows(IOException.class, () -> charsOut7.write(1));
+        expectThrows(IOException.class, charsOut::close);
+        OnlyAppender oa = new OnlyAppender();
+        charsOut = JieOutput.wrap(oa);
+        charsOut.close();
 
         // error
         FakeRandomFile.SEEK_ERR = true;
@@ -218,6 +263,7 @@ public class StreamTest {
         expectThrows(IOException.class, () -> out.write(new byte[10]));
 
         out.flush();
+        out.close();
         out.close();
     }
 
@@ -517,6 +563,105 @@ public class StreamTest {
             if (close) {
                 throw new IOException("Stream closed.");
             }
+        }
+    }
+
+    private static final class FakeCharset extends Charset {
+
+        private FakeCharset() {
+            super("fake", new String[0]);
+        }
+
+        @Override
+        public boolean contains(Charset cs) {
+            return false;
+        }
+
+        @Override
+        public CharsetDecoder newDecoder() {
+            return new FakeCharsetDecoder(this, 1f, 1f);
+        }
+
+        @Override
+        public CharsetEncoder newEncoder() {
+            return null;
+        }
+
+        private static final class FakeCharsetDecoder extends CharsetDecoder {
+
+            private FakeCharsetDecoder(Charset cs, float averageCharsPerByte, float maxCharsPerByte) {
+                super(cs, averageCharsPerByte, maxCharsPerByte);
+            }
+
+            @Override
+            protected CoderResult decodeLoop(ByteBuffer in, CharBuffer out) {
+                while (in.hasRemaining()) {
+                    if (out.remaining() >= 2) {
+                        byte b = in.get();
+                        out.put((char) b);
+                        out.put((char) b);
+                    } else {
+                        return CoderResult.OVERFLOW;
+                    }
+                }
+                return CoderResult.UNDERFLOW;
+            }
+        }
+    }
+
+    private static final class AutoCloseAppender implements Appendable, AutoCloseable {
+
+        private int err = 0;
+
+        @Override
+        public Appendable append(CharSequence csq) throws IOException {
+            return null;
+        }
+
+        @Override
+        public Appendable append(CharSequence csq, int start, int end) throws IOException {
+            return null;
+        }
+
+        @Override
+        public Appendable append(char c) throws IOException {
+            switch (err) {
+                case 1:
+                    throw new IOException();
+                case 2:
+                    throw new IllegalStateException();
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public void close() throws Exception {
+            switch (err) {
+                case 1:
+                    throw new IOException();
+                case 2:
+                    throw new IllegalStateException();
+                default:
+            }
+        }
+    }
+
+    private static final class OnlyAppender implements Appendable {
+
+        @Override
+        public Appendable append(CharSequence csq) throws IOException {
+            return null;
+        }
+
+        @Override
+        public Appendable append(CharSequence csq, int start, int end) throws IOException {
+            return null;
+        }
+
+        @Override
+        public Appendable append(char c) throws IOException {
+            return null;
         }
     }
 }
