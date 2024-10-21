@@ -1,6 +1,7 @@
 package xyz.fslabo.common.file;
 
-import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieInput;
+import xyz.fslabo.common.io.JieOutput;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -74,7 +75,7 @@ final class FileAccImpl implements FileAcc {
         checkOpened();
         checkStatus();
         hasStream = true;
-        InputStream ris = JieIO.wrapIn(raf, position);
+        InputStream ris = JieInput.wrap(raf, position);
         return new BindedInputStream(ris);
     }
 
@@ -83,7 +84,7 @@ final class FileAccImpl implements FileAcc {
         checkOpened();
         checkStatus();
         hasStream = true;
-        OutputStream ros = JieIO.wrapOut(raf, position);
+        OutputStream ros = JieOutput.wrap(raf, position);
         return new BindedOutputStream(ros);
     }
 

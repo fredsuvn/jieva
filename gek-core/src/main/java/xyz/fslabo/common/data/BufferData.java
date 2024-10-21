@@ -3,6 +3,7 @@ package xyz.fslabo.common.data;
 import xyz.fslabo.common.base.JieCheck;
 import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieInput;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -73,12 +74,12 @@ final class BufferData implements GekData.OfBuffer {
 
     @Override
     public long write(OutputStream dest) {
-        return JieIO.transfer(JieIO.wrapIn(buffer), dest);
+        return JieIO.transfer(JieInput.wrap(buffer), dest);
     }
 
     @Override
     public long write(OutputStream dest, long length) {
-        return JieIO.transfer(JieIO.wrapIn(buffer), dest, length);
+        return JieIO.transfer(JieInput.wrap(buffer), dest, length);
     }
 
     @Override
@@ -91,6 +92,6 @@ final class BufferData implements GekData.OfBuffer {
 
     @Override
     public InputStream asInputStream() {
-        return JieIO.wrapIn(buffer);
+        return JieInput.wrap(buffer);
     }
 }

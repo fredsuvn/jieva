@@ -3,6 +3,8 @@ package xyz.fslabo.common.codec;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieInput;
+import xyz.fslabo.common.io.JieOutput;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -128,7 +130,7 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
                     return doEncode(ByteBuffer.wrap(src), dest);
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
-                    return doEncode(JieIO.wrapIn(src), dest);
+                    return doEncode(JieInput.wrap(src), dest);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -142,7 +144,7 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
                     return doEncode(src, dest);
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
-                    return doEncode(JieIO.wrapIn(src), dest);
+                    return doEncode(JieInput.wrap(src), dest);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -150,10 +152,10 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
                 InputStream src = (InputStream) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    return doEncode(src, JieIO.wrapOut(dest));
+                    return doEncode(src, JieOutput.wrap(dest));
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    return doEncode(src, JieIO.wrapOut(dest));
+                    return doEncode(src, JieOutput.wrap(dest));
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
                     return doEncode(src, dest);
@@ -209,7 +211,7 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
                     return doDecode(ByteBuffer.wrap(src), dest);
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
-                    return doDecode(JieIO.wrapIn(src), dest);
+                    return doDecode(JieInput.wrap(src), dest);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -223,7 +225,7 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
                     return doDecode(src, dest);
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
-                    return doDecode(JieIO.wrapIn(src), dest);
+                    return doDecode(JieInput.wrap(src), dest);
                 } else {
                     throw new CodecException("Unknown output type: " + output.getClass());
                 }
@@ -231,10 +233,10 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
                 InputStream src = (InputStream) input;
                 if (output instanceof byte[]) {
                     byte[] dest = (byte[]) output;
-                    return doDecode(src, JieIO.wrapOut(dest));
+                    return doDecode(src, JieOutput.wrap(dest));
                 } else if (output instanceof ByteBuffer) {
                     ByteBuffer dest = (ByteBuffer) output;
-                    return doDecode(src, JieIO.wrapOut(dest));
+                    return doDecode(src, JieOutput.wrap(dest));
                 } else if (output instanceof OutputStream) {
                     OutputStream dest = (OutputStream) output;
                     return doDecode(src, dest);
@@ -361,10 +363,10 @@ public class HexCodec implements CodecConfigurator<HexCodec> {
 
     private InputStream inputToInputStream() {
         if (input instanceof byte[]) {
-            return JieIO.wrapIn((byte[]) input);
+            return JieInput.wrap((byte[]) input);
         }
         if (input instanceof ByteBuffer) {
-            return JieIO.wrapIn((ByteBuffer) input);
+            return JieInput.wrap((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return (InputStream) input;

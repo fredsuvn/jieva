@@ -2,6 +2,8 @@ package xyz.fslabo.common.base;
 
 import xyz.fslabo.common.coll.JieColl;
 import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieInput;
+import xyz.fslabo.common.io.JieOutput;
 
 import java.io.File;
 import java.io.IOException;
@@ -413,10 +415,10 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
 
     private static InputStream inputToStream(Object in) {
         if (in instanceof byte[]) {
-            return JieIO.wrapIn((byte[]) in);
+            return JieInput.wrap((byte[]) in);
         }
         if (in instanceof ByteBuffer) {
-            return JieIO.wrapIn((ByteBuffer) in);
+            return JieInput.wrap((ByteBuffer) in);
         }
         if (in instanceof InputStream) {
             return (InputStream) in;
@@ -426,10 +428,10 @@ public abstract class ProcessStarter implements BaseStarter<Process, ProcessStar
 
     private static OutputStream outputToStream(Object out) {
         if (out instanceof byte[]) {
-            return JieIO.wrapOut((byte[]) out);
+            return JieOutput.wrap((byte[]) out);
         }
         if (out instanceof ByteBuffer) {
-            return JieIO.wrapOut((ByteBuffer) out);
+            return JieOutput.wrap((ByteBuffer) out);
         }
         if (out instanceof OutputStream) {
             return (OutputStream) out;

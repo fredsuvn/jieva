@@ -2,6 +2,7 @@ package xyz.fslabo.common.data;
 
 import xyz.fslabo.common.base.JieCheck;
 import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieOutput;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -66,7 +67,7 @@ final class StreamData implements GekData.OfStream {
 
     @Override
     public int write(ByteBuffer dest, int length) {
-        return (int) JieIO.transfer(stream, JieIO.wrapOut(dest), length);
+        return (int) JieIO.transfer(stream, JieOutput.wrap(dest), length);
     }
 
     @Override

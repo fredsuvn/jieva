@@ -125,10 +125,10 @@ final class BytesTransferImpl implements BytesTransfer {
             return new OutputSteamBufferOut((OutputStream) dst);
         }
         if (dst instanceof byte[]) {
-            return new OutputSteamBufferOut(JieIO.wrapOut((byte[]) dst));
+            return new OutputSteamBufferOut(JieOutput.wrap((byte[]) dst));
         }
         if (dst instanceof ByteBuffer) {
-            return new OutputSteamBufferOut(JieIO.wrapOut((ByteBuffer) dst));
+            return new OutputSteamBufferOut(JieOutput.wrap((ByteBuffer) dst));
         }
         throw new IORuntimeException("Unexpected destination type: " + dst.getClass());
     }

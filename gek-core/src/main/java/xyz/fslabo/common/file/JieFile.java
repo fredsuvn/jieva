@@ -2,6 +2,8 @@ package xyz.fslabo.common.file;
 
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieInput;
+import xyz.fslabo.common.io.JieOutput;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -37,7 +39,7 @@ public class JieFile {
      */
     public static byte[] readBytes(Path path, long offset, long length) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
-            return JieIO.read(JieIO.wrapIn(random, offset));
+            return JieIO.read(JieInput.wrap(random, offset));
         } catch (Exception e) {
             throw new FileException(e);
         }
@@ -92,7 +94,7 @@ public class JieFile {
      */
     public static String readString(Path path, long offset, long length, Charset charset) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "r")) {
-            return JieIO.readString(JieIO.wrapIn(random, offset), charset);
+            return JieIO.readString(JieInput.wrap(random, offset), charset);
         } catch (Exception e) {
             throw new FileException(e);
         }
@@ -119,7 +121,7 @@ public class JieFile {
      */
     public static void writeBytes(Path path, long offset, long length, InputStream data) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
-            OutputStream dest = JieIO.wrapOut(random, offset);
+            OutputStream dest = JieOutput.wrap(random, offset);
             JieIO.transfer(data, dest);
             dest.flush();
         } catch (Exception e) {
@@ -176,7 +178,7 @@ public class JieFile {
      */
     public static void writeString(Path path, long offset, long length, CharSequence data, Charset charset) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
-            Writer writer = JieIO.toWriter(JieIO.wrapOut(random, offset), charset);
+            Writer writer = JieIO.toWriter(JieOutput.wrap(random, offset), charset);
             writer.append(data);
             writer.flush();
         } catch (Exception e) {

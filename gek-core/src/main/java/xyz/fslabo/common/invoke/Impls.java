@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-class Impls {
+final class Impls {
 
     static Invoker ofConstructor(Constructor<?> constructor) {
         return new OfConstructor(constructor);

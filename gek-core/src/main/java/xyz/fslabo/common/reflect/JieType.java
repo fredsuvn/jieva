@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Utilities for types.
+ * Provides implementations and utilities for {@link Type}.
  *
  * @author fredsuvn
  */

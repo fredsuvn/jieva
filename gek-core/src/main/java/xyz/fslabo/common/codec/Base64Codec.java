@@ -5,6 +5,7 @@ import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.io.JieBuffer;
 import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieInput;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -466,10 +467,10 @@ public class Base64Codec implements CodecConfigurator<Base64Codec> {
 
     private InputStream inputToInputStream() {
         if (input instanceof byte[]) {
-            return JieIO.wrapIn((byte[]) input);
+            return JieInput.wrap((byte[]) input);
         }
         if (input instanceof ByteBuffer) {
-            return JieIO.wrapIn((ByteBuffer) input);
+            return JieInput.wrap((ByteBuffer) input);
         }
         if (input instanceof InputStream) {
             return (InputStream) input;

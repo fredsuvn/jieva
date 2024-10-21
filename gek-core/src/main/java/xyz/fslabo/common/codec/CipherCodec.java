@@ -2,6 +2,7 @@ package xyz.fslabo.common.codec;
 
 import xyz.fslabo.annotations.Nullable;
 import xyz.fslabo.common.io.JieIO;
+import xyz.fslabo.common.io.JieInput;
 
 import javax.crypto.Cipher;
 import java.io.InputStream;
@@ -247,7 +248,7 @@ public class CipherCodec implements CodecConfigurator<CipherCodec> {
             initCipher(cipher);
             InputStream source;
             if (input instanceof ByteBuffer) {
-                source = JieIO.wrapIn((ByteBuffer) input);
+                source = JieInput.wrap((ByteBuffer) input);
             } else if (input instanceof InputStream) {
                 source = (InputStream) input;
             } else {
