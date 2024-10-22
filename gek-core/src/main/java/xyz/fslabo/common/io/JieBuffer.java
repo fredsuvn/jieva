@@ -1,6 +1,7 @@
 package xyz.fslabo.common.io;
 
 import xyz.fslabo.annotations.Nullable;
+import xyz.fslabo.common.base.JieBytes;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieCheck;
 
@@ -19,6 +20,8 @@ import java.util.function.IntFunction;
  * @author fresduvn
  */
 public class JieBuffer {
+
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(JieBytes.emptyBytes());
 
     /**
      * Reads all bytes from source buffer into an array. Returns the array, or null if no data read out and reaches to
@@ -657,5 +660,14 @@ public class JieBuffer {
             return buffer.array();
         }
         return read(buffer);
+    }
+
+    /**
+     * Returns an empty byte buffer.
+     *
+     * @return an empty byte buffer
+     */
+    public static ByteBuffer emptyBuffer() {
+        return EMPTY_BUFFER;
     }
 }
