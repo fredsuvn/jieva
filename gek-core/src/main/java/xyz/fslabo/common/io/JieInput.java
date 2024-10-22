@@ -367,8 +367,8 @@ public class JieInput {
 
         private final Reader reader;
         private final CharsetEncoder encoder;
-        private final CharBuffer charBuffer;
-        private final ByteBuffer byteBuffer;
+        private final CharBuffer inBuffer;
+        private final ByteBuffer outBuffer;
         private boolean endOfInput;
         private boolean closed = false;
         private final byte[] buf = {0};
@@ -376,10 +376,10 @@ public class JieInput {
         private ReaderInputStream(Reader reader, CharsetEncoder encoder, int inBufferSize, int outBufferSize) {
             this.reader = reader;
             this.encoder = encoder;
-            this.charBuffer = CharBuffer.allocate(inBufferSize);
-            this.charBuffer.flip();
-            this.byteBuffer = ByteBuffer.allocate(outBufferSize);
-            this.byteBuffer.flip();
+            this.inBuffer = CharBuffer.allocate(inBufferSize);
+            this.inBuffer.flip();
+            this.outBuffer = ByteBuffer.allocate(outBufferSize);
+            this.outBuffer.flip();
         }
 
         private ReaderInputStream(Reader reader, Charset charset, int inBufferSize, int outBufferSize) {
@@ -425,7 +425,7 @@ public class JieInput {
 
         @Override
         public int available() {
-            return byteBuffer.remaining();
+            return outBuffer.remaining();
         }
 
         @Override
@@ -439,19 +439,19 @@ public class JieInput {
             int offset = off;
             int remaining = len;
             while (true) {
-                if (byteBuffer.hasRemaining()) {
-                    int avail = Math.min(byteBuffer.remaining(), remaining);
+                if (outBuffer.hasRemaining()) {
+                    int avail = Math.min(outBuffer.remaining(), remaining);
                     if (fillBytes) {
-                        byteBuffer.get(b, offset, avail);
+                        outBuffer.get(b, offset, avail);
                     } else {
-                        byteBuffer.position(byteBuffer.position() + avail);
+                        outBuffer.position(outBuffer.position() + avail);
                     }
                     offset += avail;
                     remaining -= avail;
                     readNum += avail;
                 } else if (endOfInput) {
-                    if (charBuffer.hasRemaining()) {
-                        encodeCharBuffer();
+                    if (inBuffer.hasRemaining()) {
+                        encodeBuffer();
                     } else {
                         break;
                     }
@@ -466,20 +466,20 @@ public class JieInput {
         }
 
         private void fillBuffer() throws IOException {
-            charBuffer.compact();
-            int readSize = reader.read(charBuffer);
+            inBuffer.compact();
+            int readSize = reader.read(inBuffer);
             if (readSize == -1) {
                 endOfInput = true;
             }
-            charBuffer.flip();
-            encodeCharBuffer();
+            inBuffer.flip();
+            encodeBuffer();
         }
 
-        private void encodeCharBuffer() throws IOException {
-            byteBuffer.compact();
-            CoderResult coderResult = encoder.encode(charBuffer, byteBuffer, endOfInput);
+        private void encodeBuffer() throws IOException {
+            outBuffer.compact();
+            CoderResult coderResult = encoder.encode(inBuffer, outBuffer, endOfInput);
             if (coderResult.isUnderflow() || coderResult.isOverflow()) {
-                byteBuffer.flip();
+                outBuffer.flip();
                 return;
             }
             throw new IOException("Chars encoding failed: " + coderResult);
@@ -675,8 +675,8 @@ public class JieInput {
 
         private final InputStream inputStream;
         private final CharsetDecoder decoder;
-        private final ByteBuffer byteBuffer;
-        private final CharBuffer charBuffer;
+        private final ByteBuffer inBuffer;
+        private final CharBuffer outBuffer;
         private boolean endOfInput;
         private boolean closed = false;
         private final char[] cbuf = {0};
@@ -684,10 +684,10 @@ public class JieInput {
         private BytesReader(InputStream inputStream, CharsetDecoder decoder, int inBufferSize, int outBufferSize) {
             this.inputStream = inputStream;
             this.decoder = decoder;
-            this.byteBuffer = ByteBuffer.allocate(inBufferSize);
-            this.byteBuffer.flip();
-            this.charBuffer = CharBuffer.allocate(outBufferSize);
-            this.charBuffer.flip();
+            this.inBuffer = ByteBuffer.allocate(inBufferSize);
+            this.inBuffer.flip();
+            this.outBuffer = CharBuffer.allocate(outBufferSize);
+            this.outBuffer.flip();
         }
 
         private BytesReader(InputStream inputStream, Charset charset, int inBufferSize, int outBufferSize) {
@@ -747,19 +747,19 @@ public class JieInput {
             int offset = off;
             int remaining = len;
             while (true) {
-                if (charBuffer.hasRemaining()) {
-                    int avail = Math.min(charBuffer.remaining(), remaining);
+                if (outBuffer.hasRemaining()) {
+                    int avail = Math.min(outBuffer.remaining(), remaining);
                     if (fill) {
-                        charBuffer.get(c, offset, avail);
+                        outBuffer.get(c, offset, avail);
                     } else {
-                        charBuffer.position(charBuffer.position() + avail);
+                        outBuffer.position(outBuffer.position() + avail);
                     }
                     offset += avail;
                     remaining -= avail;
                     readNum += avail;
                 } else if (endOfInput) {
-                    if (byteBuffer.hasRemaining()) {
-                        encodeByteBuffer();
+                    if (inBuffer.hasRemaining()) {
+                        encodeBuffer();
                     } else {
                         break;
                     }
@@ -774,25 +774,25 @@ public class JieInput {
         }
 
         private void fillBuffer() throws IOException {
-            byteBuffer.compact();
-            int readSize = inputStream.read(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining());
+            inBuffer.compact();
+            int readSize = inputStream.read(inBuffer.array(), inBuffer.position(), inBuffer.remaining());
             if (readSize == -1) {
                 endOfInput = true;
             } else {
-                byteBuffer.position(byteBuffer.position() + readSize);
+                inBuffer.position(inBuffer.position() + readSize);
             }
-            byteBuffer.flip();
-            encodeByteBuffer();
+            inBuffer.flip();
+            encodeBuffer();
         }
 
-        private void encodeByteBuffer() throws IOException {
-            charBuffer.compact();
-            CoderResult coderResult = decoder.decode(byteBuffer, charBuffer, endOfInput);
+        private void encodeBuffer() throws IOException {
+            outBuffer.compact();
+            CoderResult coderResult = decoder.decode(inBuffer, outBuffer, endOfInput);
             if (coderResult.isUnderflow() || coderResult.isOverflow()) {
-                charBuffer.flip();
+                outBuffer.flip();
                 return;
             }
-            throw new IOException("Bytes encoding failed: " + coderResult);
+            throw new IOException("Bytes decoding failed: " + coderResult);
         }
 
         private void checkClosed() throws IOException {

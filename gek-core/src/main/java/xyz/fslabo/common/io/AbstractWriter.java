@@ -27,8 +27,9 @@ public abstract class AbstractWriter extends Writer {
      * Writes a char.
      *
      * @param c a char
+     * @throws Exception may any exception
      */
-    protected abstract void doWrite(char c);
+    protected abstract void doWrite(char c) throws Exception;
 
     /**
      * Writes chars in given array from specified offset up to specified length.
@@ -38,8 +39,9 @@ public abstract class AbstractWriter extends Writer {
      * @param cbuf given array
      * @param off  specified offset
      * @param len  specified length
+     * @throws Exception may any exception
      */
-    protected abstract void doWrite(char[] cbuf, int off, int len);
+    protected abstract void doWrite(char[] cbuf, int off, int len) throws Exception;
 
     /**
      * Writes chars in given string from specified offset up to specified length.
@@ -49,8 +51,9 @@ public abstract class AbstractWriter extends Writer {
      * @param str given string
      * @param off specified offset
      * @param len specified length
+     * @throws Exception may any exception
      */
-    protected abstract void doWrite(String str, int off, int len);
+    protected abstract void doWrite(String str, int off, int len) throws Exception;
 
     /**
      * Writes chars in given char sequences from specified start index inclusive to end index exclusive.
@@ -60,8 +63,9 @@ public abstract class AbstractWriter extends Writer {
      * @param csq   given char sequences
      * @param start specified start index inclusive
      * @param end   specified end index exclusive
+     * @throws Exception may any exception
      */
-    protected abstract void doAppend(CharSequence csq, int start, int end);
+    protected abstract void doAppend(CharSequence csq, int start, int end) throws Exception;
 
     @Override
     public void write(int c) throws IOException {

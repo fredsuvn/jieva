@@ -475,52 +475,6 @@ public class JieIO {
     }
 
     /**
-     * Wraps given stream as {@link Reader} with {@link JieChars#defaultCharset()}.
-     *
-     * @param stream given stream
-     * @return given stream as {@link Reader}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static Reader toReader(InputStream stream) throws IORuntimeException {
-        return toReader(stream, JieChars.defaultCharset());
-    }
-
-    /**
-     * Wraps given stream as {@link Reader} with specified charset.
-     *
-     * @param stream  given stream
-     * @param charset specified charset
-     * @return given stream as {@link Reader}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static Reader toReader(InputStream stream, Charset charset) throws IORuntimeException {
-        return new InputStreamReader(stream, charset);
-    }
-
-    /**
-     * Wraps given stream as {@link Writer} with {@link JieChars#defaultCharset()}.
-     *
-     * @param stream given stream
-     * @return given stream as {@link Writer}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static Writer toWriter(OutputStream stream) throws IORuntimeException {
-        return toWriter(stream, JieChars.defaultCharset());
-    }
-
-    /**
-     * Wraps given stream as {@link Writer} with {@link JieChars#defaultCharset()}.
-     *
-     * @param stream  given stream
-     * @param charset specified charset
-     * @return given stream as {@link Writer}
-     * @throws IORuntimeException IO runtime exception
-     */
-    public static Writer toWriter(OutputStream stream, Charset charset) throws IORuntimeException {
-        return new OutputStreamWriter(stream, charset);
-    }
-
-    /**
      * Returns a {@link TransformInputStream} with source stream, block size and transformer.
      * <p>
      * Note the block size could be negative or {@code 0}, in this case all bytes would be read once from source stream

@@ -178,7 +178,7 @@ public class JieFile {
      */
     public static void writeString(Path path, long offset, long length, CharSequence data, Charset charset) {
         try (RandomAccessFile random = new RandomAccessFile(path.toFile(), "rw")) {
-            Writer writer = JieIO.toWriter(JieOutput.wrap(random, offset), charset);
+            Writer writer = JieOutput.wrap(JieOutput.wrap(random, offset), charset);
             writer.append(data);
             writer.flush();
         } catch (Exception e) {

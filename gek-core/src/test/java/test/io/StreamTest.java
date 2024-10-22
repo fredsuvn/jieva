@@ -3,6 +3,7 @@ package test.io;
 import org.testng.annotations.Test;
 import xyz.fslabo.common.base.JieChars;
 import xyz.fslabo.common.base.JieRandom;
+import xyz.fslabo.common.base.JieString;
 import xyz.fslabo.common.io.AbstractWriter;
 import xyz.fslabo.common.io.IORuntimeException;
 import xyz.fslabo.common.io.JieInput;
@@ -29,6 +30,13 @@ public class StreamTest {
     public void testInput() throws Exception {
         testInput(1024);
         testInput(60);
+        testInput(34);
+
+        // error
+        expectThrows(NullPointerException.class, () -> JieInput.wrap((byte[]) null, 2, +1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(new byte[0], 2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(new byte[0], -2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(new byte[0], 2, -1));
     }
 
     private void testInput(int sourceSize) throws Exception {
@@ -92,10 +100,6 @@ public class StreamTest {
         FakeRandomFile.SEEK_ERR = true;
         expectThrows(IORuntimeException.class, () -> JieInput.wrap(raf, 6));
         FakeRandomFile.SEEK_ERR = false;
-        expectThrows(NullPointerException.class, () -> JieInput.wrap((byte[]) null, 2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(source, 2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(source, -2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(source, 2, -(source.length + 1)));
     }
 
     private void testInput(InputStream in, byte[] source, boolean available) throws Exception {
@@ -133,6 +137,13 @@ public class StreamTest {
     public void testOutput() throws Exception {
         testOutput(1024);
         testOutput(60);
+        testOutput(34);
+
+        // error
+        expectThrows(NullPointerException.class, () -> JieOutput.wrap((byte[]) null, 2, +1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new byte[0], 2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new byte[0], -2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new byte[0], 2, -1));
     }
 
     private void testOutput(int sourceSize) throws Exception {
@@ -140,9 +151,9 @@ public class StreamTest {
         Arrays.fill(source, (byte) 1);
 
         // bytes
-        OutputStream byteOut = JieOutput.wrap(source);
+        OutputStream bytesOut = JieOutput.wrap(source);
         byte[] data = JieRandom.fill(new byte[source.length]);
-        testOutput(byteOut, data);
+        testOutput(bytesOut, data);
         assertEquals(data, source);
         Arrays.fill(source, (byte) 1);
         data = JieRandom.fill(new byte[source.length - 10]);
@@ -254,10 +265,6 @@ public class StreamTest {
         FakeRandomFile.SEEK_ERR = true;
         expectThrows(IORuntimeException.class, () -> JieOutput.wrap(raf, 6));
         FakeRandomFile.SEEK_ERR = false;
-        expectThrows(NullPointerException.class, () -> JieOutput.wrap((byte[]) null, 2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(source, 2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(source, -2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(source, 2, -(source.length + 1)));
     }
 
     private void testOutput(OutputStream out, byte[] data) throws Exception {
@@ -279,6 +286,13 @@ public class StreamTest {
     public void testReader() throws Exception {
         testReader(1024);
         testReader(60);
+        testReader(34);
+
+        // error
+        expectThrows(NullPointerException.class, () -> JieInput.wrap((char[]) null, 2, +1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(new char[0], 2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(new char[0], -2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(new char[0], 2, -1));
     }
 
     private void testReader(int sourceSize) throws Exception {
@@ -308,7 +322,7 @@ public class StreamTest {
         read0 = bufferInClass.getDeclaredMethod("skip0", int.class);
         JieTest.testThrow(IOException.class, read0, bufferIn, 99);
 
-        // chars
+        // bytes
         char[] chars = JieRandom.fill(new char[sourceSize], '0', '9');
         byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
         Reader charsIn = JieInput.wrap(JieInput.wrap(charBytes));
@@ -369,12 +383,6 @@ public class StreamTest {
             }
         });
         assertFalse(charsIn.ready());
-
-        // error
-        expectThrows(NullPointerException.class, () -> JieInput.wrap((char[]) null, 2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(source, 2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(source, -2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieInput.wrap(source, 2, -(source.length + 1)));
     }
 
     private void testReader(Reader in, char[] source) throws Exception {
@@ -408,6 +416,17 @@ public class StreamTest {
     public void testWriter() throws Exception {
         testWriter(1024);
         testWriter(60);
+        testWriter(34);
+
+        // error
+        expectThrows(NullPointerException.class, () -> JieOutput.wrap((char[]) null, 2, +1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new char[0], 2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new char[0], -2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new char[0], 2, -1));
+        expectThrows(NullPointerException.class, () -> JieOutput.wrap(new char[100]).write((String) null, 2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new char[100]).write("", 2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new char[100]).write("", -2, 1));
+        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(new char[100]).write("", 2, -1));
     }
 
     private void testWriter(int sourceSize) throws Exception {
@@ -468,47 +487,53 @@ public class StreamTest {
         expectThrows(IOException.class, () -> absOut.append("123"));
         expectThrows(IOException.class, () -> absOut.write("123"));
 
-        // chars
-        // char[] chars = JieRandom.fill(new char[1024], '0', '9');
-        // byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // OutputStream charsOut = JieOutput.wrapputStream(new CharArrayWriter());
-        // testOutput(charsOut, charBytes);
-        // charsIn.close();
-        // expectThrows(IOException.class, charsIn::read);
-        // chars = JieRandom.fill(new char[1024], '\u4e00', '\u9fff');
-        // charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // charsIn = JieInput.wrapputStream(new CharArrayReader(chars));
-        // testInput(charsIn, charBytes, false);
-        // chars = new char[1024];
-        // // '0'
-        // Arrays.fill(chars, '0');
-        // charsIn = JieInput.wrapputStream(new CharArrayReader(chars));
-        // charsIn.read(new byte[1024]);
-        // // emoji: "\uD83D\uDD1E"
-        // for (int i = 0; i < chars.length; i += 2) {
-        //     chars[i] = '\uD83D';
-        //     chars[i + 1] = '\uDD1E';
-        // }
-        // charBytes = new String(chars).getBytes(JieChars.UTF_8);
-        // charsIn = JieInput.wrapputStream(new CharArrayReader(chars));
-        // testInput(charsIn, charBytes, false);
-        // // error: U+DD88
-        // Arrays.fill(chars, '\uDD88');
-        // charsIn = JieInput.wrapputStream(new CharArrayReader(chars));
-        // expectThrows(IOException.class, charsIn::read);
-
-        // error
-        expectThrows(NullPointerException.class, () -> JieOutput.wrap((char[]) null, 2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(source, 2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(source, -2, source.length + 1));
-        expectThrows(IndexOutOfBoundsException.class, () -> JieOutput.wrap(source, 2, -(source.length + 1)));
+        // bytes
+        char[] chars = JieRandom.fill(new char[sourceSize], '0', '9');
+        byte[] charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        byte[] dest = new byte[charBytes.length];
+        Writer bytesOut = JieOutput.wrap(JieOutput.wrap(dest));
+        testWriter(bytesOut, chars);
+        assertEquals(charBytes, dest);
+        Writer bytesOut1 = bytesOut;
+        expectThrows(IOException.class, () -> bytesOut1.write(1));
+        // chinese: '\u4e00' - '\u9fff'
+        chars = JieRandom.fill(new char[sourceSize], '\u4e00', '\u4e01');
+        charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        dest = new byte[charBytes.length];
+        bytesOut = JieOutput.wrap(JieOutput.wrap(dest));
+        testWriter(bytesOut, chars);
+        assertEquals(charBytes, dest);
+        Writer bytesOut2 = bytesOut;
+        expectThrows(IOException.class, () -> bytesOut2.write(1));
+        // emoji: "\uD83D\uDD1E"
+        for (int i = 0; i < chars.length; i += 2) {
+            chars[i] = '\uD83D';
+            chars[i + 1] = '\uDD1E';
+        }
+        charBytes = new String(chars).getBytes(JieChars.UTF_8);
+        dest = new byte[charBytes.length];
+        bytesOut = JieOutput.wrap(JieOutput.wrap(dest));
+        testWriter(bytesOut, chars);
+        assertEquals(charBytes, dest);
+        Writer bytesOut3 = bytesOut;
+        expectThrows(IOException.class, () -> bytesOut3.write(1));
+        // error: U+DD88
+        dest = new byte[charBytes.length];
+        bytesOut = JieOutput.wrap(JieOutput.wrap(dest));
+        Writer bytesOut4 = bytesOut;
+        expectThrows(IOException.class, () -> bytesOut4.write('\uDD88'));
+        // close
+        bytesOut.close();
+        expectThrows(IOException.class, () -> bytesOut4.write(1));
+        bytesOut.close();
     }
 
     private void testWriter(Writer out, char[] data) throws Exception {
         out.write(data[0]);
         out.append(data[1]);
         out.write(new String(data, 2, 1));
-        out.write(Arrays.copyOfRange(data, 3, 10));
+        out.write(Arrays.copyOfRange(data, 3, 6));
+        out.append(JieString.asChars(data, 6, 10));
         out.append(new String(data, 10, 10));
         out.write(Arrays.copyOfRange(data, 20, data.length));
         out.write(new char[0]);

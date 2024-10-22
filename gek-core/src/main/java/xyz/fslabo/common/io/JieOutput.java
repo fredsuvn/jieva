@@ -5,10 +5,7 @@ import xyz.fslabo.common.base.JieChars;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.CodingErrorAction;
+import java.nio.charset.*;
 
 /**
  * Provides implementations and utilities for {@link OutputStream}/{@link Writer}.
@@ -103,7 +100,7 @@ public class JieOutput {
      * @return given char appender as an {@link OutputStream}
      */
     public static OutputStream wrap(Appendable appender, Charset charset) {
-        return new CharsOutputStream(appender, charset);
+        return new AppenderOutputStream(appender, charset);
     }
 
     /**
@@ -145,6 +142,35 @@ public class JieOutput {
      */
     public static Writer wrap(CharBuffer buffer) {
         return new BufferWriter(buffer);
+    }
+
+    /**
+     * Wraps given stream as an {@link Writer} with {@link JieChars#defaultCharset()}.
+     * <p>
+     * The returned stream is similar to {@link OutputStreamWriter} but is not the same, its methods are not modified by
+     * {@code synchronized} thus do not guarantee thread safety. The write position of the writer and stream may not
+     * correspond, the close method will close both writer and stream at their current positions.
+     *
+     * @param outputStream given stream
+     * @return given stream as an {@link Writer}
+     */
+    public static Writer wrap(OutputStream outputStream) {
+        return wrap(outputStream, JieChars.defaultCharset());
+    }
+
+    /**
+     * Wraps given stream as an {@link Writer} with specified charset.
+     * <p>
+     * The returned stream is similar to {@link OutputStreamWriter} but is not the same, its methods are not modified by
+     * {@code synchronized} thus do not guarantee thread safety. The write position of the writer and stream may not
+     * correspond, the close method will close both writer and stream at their current positions.
+     *
+     * @param outputStream given stream
+     * @param charset      specified charset
+     * @return given stream as an {@link Writer}
+     */
+    public static Writer wrap(OutputStream outputStream, Charset charset) {
+        return new BytesWriter(outputStream, charset);
     }
 
     private static final class BytesOutputStream extends OutputStream {
@@ -218,28 +244,28 @@ public class JieOutput {
         }
     }
 
-    private static final class CharsOutputStream extends OutputStream {
+    private static final class AppenderOutputStream extends OutputStream {
 
         private final Appendable appender;
         private final CharsetDecoder decoder;
-        private final ByteBuffer bytesBuffer;
+        private final ByteBuffer inBuffer;
 
         // Should be keep flush to empty.
-        private final CharBuffer charsBuffer;
+        private final CharBuffer outBuffer;
 
         private boolean closed = false;
         private final byte[] buf = {0};
 
-        private CharsOutputStream(Appendable appender, CharsetDecoder decoder, int inBufferSize, int outBufferSize) {
+        private AppenderOutputStream(Appendable appender, CharsetDecoder decoder, int inBufferSize, int outBufferSize) {
             this.appender = appender;
             this.decoder = decoder;
-            this.bytesBuffer = ByteBuffer.allocate(inBufferSize);
-            this.bytesBuffer.flip();
-            this.charsBuffer = CharBuffer.allocate(outBufferSize);
-            this.charsBuffer.flip();
+            this.inBuffer = ByteBuffer.allocate(inBufferSize);
+            this.inBuffer.flip();
+            this.outBuffer = CharBuffer.allocate(outBufferSize);
+            this.outBuffer.flip();
         }
 
-        private CharsOutputStream(Appendable appender, Charset charset, int inBufferSize, int outBufferSize) {
+        private AppenderOutputStream(Appendable appender, Charset charset, int inBufferSize, int outBufferSize) {
             this(
                 appender,
                 charset.newDecoder()
@@ -250,7 +276,7 @@ public class JieOutput {
             );
         }
 
-        CharsOutputStream(Appendable appender, Charset charset) {
+        AppenderOutputStream(Appendable appender, Charset charset) {
             this(appender, charset, 64, 64);
         }
 
@@ -270,14 +296,14 @@ public class JieOutput {
             int offset = off;
             int remaining = len;
             while (remaining > 0) {
-                bytesBuffer.compact();
-                int bytesLimit = bytesBuffer.position();
-                int avail = Math.min(bytesBuffer.remaining(), remaining);
-                bytesBuffer.put(b, offset, avail);
+                inBuffer.compact();
+                int rollbackLimit = inBuffer.position();
+                int avail = Math.min(inBuffer.remaining(), remaining);
+                inBuffer.put(b, offset, avail);
                 remaining -= avail;
                 offset += avail;
-                bytesBuffer.flip();
-                decodeByteBuffer(bytesLimit, false);
+                inBuffer.flip();
+                decodeBuffer(rollbackLimit, false);
             }
         }
 
@@ -308,59 +334,59 @@ public class JieOutput {
             closed = true;
         }
 
-        private void decodeByteBuffer(int bytesMark, boolean endOfInput) throws IOException {
+        private void decodeBuffer(int rollbackLimit, boolean endOfInput) throws IOException {
             while (true) {
-                charsBuffer.compact();
-                CoderResult coderResult = decoder.decode(bytesBuffer, charsBuffer, endOfInput);
+                outBuffer.compact();
+                CoderResult coderResult = decoder.decode(inBuffer, outBuffer, endOfInput);
                 if (coderResult.isUnderflow()) {
-                    charsBuffer.flip();
-                    flushCharBuffer(bytesMark);
+                    outBuffer.flip();
+                    flushBuffer(rollbackLimit);
                     return;
                 }
                 if (coderResult.isOverflow()) {
-                    charsBuffer.flip();
-                    flushCharBuffer(bytesMark);
+                    outBuffer.flip();
+                    flushBuffer(rollbackLimit);
                     continue;
                 }
-                throw new IOException("Chars decoding failed: " + coderResult);
+                throw new IOException("Bytes decoding failed: " + coderResult);
             }
         }
 
-        private void flushCharBuffer(int bytesLimit) throws IOException {
-            if (!charsBuffer.hasRemaining()) {
+        private void flushBuffer(int rollbackLimit) throws IOException {
+            if (!outBuffer.hasRemaining()) {
                 return;
             }
             try {
                 if (appender instanceof Writer) {
-                    ((Writer) appender).write(charsBuffer.array(), charsBuffer.position(), charsBuffer.remaining());
-                    charsBuffer.position(charsBuffer.limit());
+                    ((Writer) appender).write(outBuffer.array(), outBuffer.position(), outBuffer.remaining());
+                    outBuffer.position(outBuffer.limit());
                 } else if (appender instanceof StringBuilder) {
-                    ((StringBuilder) appender).append(charsBuffer.array(), charsBuffer.position(), charsBuffer.remaining());
-                    charsBuffer.position(charsBuffer.limit());
+                    ((StringBuilder) appender).append(outBuffer.array(), outBuffer.position(), outBuffer.remaining());
+                    outBuffer.position(outBuffer.limit());
                 } else if (appender instanceof StringBuffer) {
-                    ((StringBuffer) appender).append(charsBuffer.array(), charsBuffer.position(), charsBuffer.remaining());
-                    charsBuffer.position(charsBuffer.limit());
+                    ((StringBuffer) appender).append(outBuffer.array(), outBuffer.position(), outBuffer.remaining());
+                    outBuffer.position(outBuffer.limit());
                 } else if (appender instanceof CharBuffer) {
-                    ((CharBuffer) appender).put(charsBuffer);
+                    ((CharBuffer) appender).put(outBuffer);
                 } else {
-                    while (charsBuffer.hasRemaining()) {
-                        appender.append(charsBuffer.get());
+                    while (outBuffer.hasRemaining()) {
+                        appender.append(outBuffer.get());
                     }
                 }
             } catch (IOException e) {
-                rollback(bytesLimit);
+                rollbackBuffer(rollbackLimit);
                 throw e;
             } catch (Exception e) {
-                rollback(bytesLimit);
+                rollbackBuffer(rollbackLimit);
                 throw new IOException(e);
             }
         }
 
-        private void rollback(int limit) {
-            bytesBuffer.position(0);
-            bytesBuffer.limit(limit);
-            charsBuffer.position(0);
-            charsBuffer.limit(0);
+        private void rollbackBuffer(int limit) {
+            inBuffer.position(0);
+            inBuffer.limit(limit);
+            outBuffer.position(0);
+            outBuffer.limit(0);
         }
 
         private void checkClosed() throws IOException {
@@ -427,8 +453,8 @@ public class JieOutput {
         }
 
         @Override
-        protected void doWrite(char[] cbuf, int off, int len) {
-            buffer.put(cbuf, off, len);
+        protected void doWrite(char[] c, int off, int len) {
+            buffer.put(c, off, len);
         }
 
         @Override
@@ -447,6 +473,148 @@ public class JieOutput {
 
         @Override
         public void close() throws IOException {
+        }
+    }
+
+    private static final class BytesWriter extends AbstractWriter {
+
+        private final OutputStream outputStream;
+        private final CharsetEncoder encoder;
+        private final CharBuffer inBuffer;
+
+        // Should be keep flush to empty.
+        private final ByteBuffer outBuffer;
+
+        private boolean closed = false;
+        private final char[] cbuf = {0};
+
+        private BytesWriter(OutputStream outputStream, CharsetEncoder encoder, int inBufferSize, int outBufferSize) {
+            this.outputStream = outputStream;
+            this.encoder = encoder;
+            this.inBuffer = CharBuffer.allocate(inBufferSize);
+            this.inBuffer.flip();
+            this.outBuffer = ByteBuffer.allocate(outBufferSize);
+            this.outBuffer.flip();
+        }
+
+        private BytesWriter(OutputStream outputStream, Charset charset, int inBufferSize, int outBufferSize) {
+            this(
+                outputStream,
+                charset.newEncoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT),
+                inBufferSize,
+                outBufferSize
+            );
+        }
+
+        BytesWriter(OutputStream outputStream, Charset charset) {
+            this(outputStream, charset, 64, 64);
+        }
+
+        @Override
+        protected void doWrite(char c) throws Exception {
+            cbuf[0] = c;
+            doWrite(cbuf, 0, 1);
+        }
+
+        @Override
+        protected void doWrite(char[] c, int off, int len) throws Exception {
+            doWrite0(c, off, len);
+        }
+
+        @Override
+        protected void doWrite(String str, int off, int len) throws Exception {
+            doWrite0(str, off, len);
+        }
+
+        @Override
+        protected void doAppend(CharSequence csq, int start, int end) throws Exception {
+            doWrite0(csq, start, end - start);
+        }
+
+        private void doWrite0(Object c, int off, int len) throws Exception {
+            checkClosed();
+            int offset = off;
+            int remaining = len;
+            while (remaining > 0) {
+                inBuffer.compact();
+                int rollbackLimit = inBuffer.position();
+                int avail = Math.min(inBuffer.remaining(), remaining);
+                if (c instanceof char[]) {
+                    inBuffer.put((char[]) c, offset, avail);
+                } else if (c instanceof String) {
+                    inBuffer.put((String) c, offset, offset + avail);
+                } else {
+                    CharSequence cs = (CharSequence) c;
+                    for (int i = 0; i < avail; i++) {
+                        inBuffer.put(cs.charAt(i + offset));
+                    }
+                }
+                remaining -= avail;
+                offset += avail;
+                inBuffer.flip();
+                encodeBuffer(rollbackLimit, false);
+            }
+        }
+
+        @Override
+        public void flush() throws IOException {
+            checkClosed();
+            outputStream.flush();
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (closed) {
+                return;
+            }
+            outputStream.close();
+            closed = true;
+        }
+
+        private void encodeBuffer(int rollbackLimit, boolean endOfInput) throws IOException {
+            while (true) {
+                outBuffer.compact();
+                CoderResult coderResult = encoder.encode(inBuffer, outBuffer, endOfInput);
+                if (coderResult.isUnderflow()) {
+                    outBuffer.flip();
+                    flushBuffer(rollbackLimit);
+                    return;
+                }
+                if (coderResult.isOverflow()) {
+                    outBuffer.flip();
+                    flushBuffer(rollbackLimit);
+                    continue;
+                }
+                throw new IOException("Chars encoding failed: " + coderResult);
+            }
+        }
+
+        private void flushBuffer(int rollbackLimit) throws IOException {
+            if (!outBuffer.hasRemaining()) {
+                return;
+            }
+            try {
+                outputStream.write(outBuffer.array(), outBuffer.position(), outBuffer.remaining());
+                outBuffer.position(outBuffer.position() + outBuffer.remaining());
+            } catch (IOException e) {
+                rollbackBuffer(rollbackLimit);
+                throw e;
+            }
+        }
+
+        private void rollbackBuffer(int limit) {
+            inBuffer.position(0);
+            inBuffer.limit(limit);
+            outBuffer.position(0);
+            outBuffer.limit(0);
+        }
+
+        private void checkClosed() throws IOException {
+            if (closed) {
+                throw new IOException("Stream closed.");
+            }
         }
     }
 }
