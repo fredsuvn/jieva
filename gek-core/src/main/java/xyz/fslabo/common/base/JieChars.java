@@ -2,12 +2,11 @@ package xyz.fslabo.common.base;
 
 import xyz.fslabo.annotations.Nullable;
 
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Utilities for char array, {@link CharBuffer}, {@link Charset}, etc.
+ * Provides utilities for {@code character}/{@link Charset}.
  *
  * @author fredsuvn
  */
@@ -22,8 +21,6 @@ public class JieChars {
      * Charset: ISO-8859-1.
      */
     public static final Charset ISO_8859_1 = StandardCharsets.ISO_8859_1;
-
-    private volatile static Charset NATIVE_CHARSET = null;
 
     /**
      * Returns default charset: {@link #UTF_8}.
@@ -44,68 +41,64 @@ public class JieChars {
     }
 
     /**
-     * Returns current system's charset. Generally is JVM environment 's charset not native charset.
+     * Returns the default charset of this Java virtual machine. It is equivalent to {@link Charset#defaultCharset()}.
      *
-     * @return current system's charset.
-     * @see #nativeCharset()
+     * @return the default charset of this Java virtual machine
+     * @see Charset#defaultCharset()
      */
-    public static Charset systemCharset() {
+    public static Charset jvmCharset() {
         return Charset.defaultCharset();
     }
 
     /**
-     * Returns charset of current native environment. Generally is charset of local native OS, not JVM charset.
-     *
-     * @return charset of current native environment
-     * @see #systemCharset()
-     */
-    @Nullable
-    public static Charset nativeCharset() {
-        if (NATIVE_CHARSET != null) {
-            return NATIVE_CHARSET;
-        }
-        Charset nativeChars = nativeCharset0();
-        NATIVE_CHARSET = nativeChars;
-        return nativeChars;
-    }
-
-    /**
-     * Returns native charset.
-     * This will search following system properties in order:
+     * Returns the default charset of current native environment, which is typically the current OS.
+     * <p>
+     * This method is <b>not</b> equivalent to {@link #jvmCharset()}, it will search the system properties in the
+     * following order:
      * <ul>
      *     <li>native.encoding</li>
      *     <li>sun.jnu.encoding</li>
      *     <li>file.encoding</li>
      * </ul>
-     * If still not found, return null.
+     * It may return {@code null} if not found.
+     *
+     * @return the default charset of current native environment
      */
     @Nullable
-    private static Charset nativeCharset0() {
-        String encoding = JieSystem.getNativeEncoding();
-        if (encoding != null) {
-            try {
-                return Charset.forName(encoding);
-            } catch (Exception e) {
-                //do nothing
-            }
+    public static Charset nativeCharset() {
+        return Natives.NATIVE_CHARSET;
+    }
+
+    /**
+     * Returns the charset with specified charset name, may be {@code null} if the search fails.
+     *
+     * @param name specified charset name
+     * @return the charset with specified charset name
+     */
+    @Nullable
+    public static Charset charset(String name) {
+        try {
+            return Charset.forName(name);
+        } catch (Exception e) {
+            return null;
         }
-        encoding = System.getProperty("sun.jnu.encoding");
-        if (encoding != null) {
-            try {
-                return Charset.forName(encoding);
-            } catch (Exception e) {
-                //do nothing
+    }
+
+    private static final class Natives {
+
+        private static final Charset NATIVE_CHARSET = searchNativeCharset();
+
+        @Nullable
+        private static Charset searchNativeCharset() {
+            Charset result = charset(JieSystem.getNativeEncoding());
+            if (result != null) {
+                return result;
             }
-        }
-        encoding = JieSystem.getFileEncoding();
-        if (encoding != null) {
-            try {
-                return Charset.forName(encoding);
-            } catch (Exception e) {
-                //do nothing
+            result = charset(System.getProperty("sun.jnu.encoding"));
+            if (result != null) {
+                return result;
             }
+            return charset(JieSystem.getFileEncoding());
         }
-        // not found:
-        return null;
     }
 }

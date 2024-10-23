@@ -1,7 +1,7 @@
 package xyz.fslabo.common.base;
 
 /**
- * Utilities for bytes, etc.
+ * Provides utilities for {@code bytes}.
  *
  * @author fredsuvn
  */
