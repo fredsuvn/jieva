@@ -159,7 +159,7 @@ public interface BytesTransfer {
      * smaller than this value.
      * <p>
      * Note that the {@link ByteBuffer} passed as the argument is not always a new instance; it may be reused. And the
-     * returned {@link ByteBuffer} should also be treated as potentially reusable.
+     * returned {@link ByteBuffer} will also be treated as potentially reusable.
      * <p>
      * This is a setting method.
      *

@@ -7,7 +7,8 @@ import java.util.Arrays;
 
 /**
  * This class is used to build bytes, provides an API compatible with {@link ByteArrayOutputStream}, but with no
- * guarantee of synchronization. It is {@code byte} version of {@link StringBuilder}.
+ * guarantee of synchronization. It is {@code byte} version of {@link StringBuilder} and an implementation of
+ * {@link OutputStream}.
  * <p>
  * Like {@link ByteArrayOutputStream}, this class also has a buffer space to store the bytes, and close method has no
  * effect. The methods in this class can be called after the stream has been closed without generating an IOException.
