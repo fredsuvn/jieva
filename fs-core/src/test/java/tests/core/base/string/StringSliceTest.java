@@ -3,7 +3,7 @@ package tests.core.base.string;
 import internal.utils.TestPrint;
 import org.junit.jupiter.api.Test;
 import space.sunqian.fs.base.exception.UnreachablePointException;
-import space.sunqian.fs.base.string.StringView;
+import space.sunqian.fs.base.string.StringSlice;
 import space.sunqian.fs.collect.ListKit;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class StringViewTest implements TestPrint {
+public class StringSliceTest implements TestPrint {
 
     @Test
     public void testStringView() throws Exception {
@@ -25,7 +25,7 @@ public class StringViewTest implements TestPrint {
         testStringView(fullString, ListKit.list("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
         testStringView(fullString, ListKit.list("0", "1", "2", "3", "", "4", "", "5", "", "6", "7", "8", "9"));
         testStringView(fullString, ListKit.list("0", "1", "2", "3", "", "4", "", "5678", "", "", "9", "", ""));
-        StringView sv = StringView.of(strings);
+        StringSlice sv = StringSlice.of(strings);
         assertThrows(IndexOutOfBoundsException.class, () -> sv.charAt(-1));
         assertThrows(IndexOutOfBoundsException.class, () -> sv.subSequence(-1, 5));
         assertThrows(IndexOutOfBoundsException.class, () -> sv.subSequence(0, 11));
@@ -37,14 +37,14 @@ public class StringViewTest implements TestPrint {
     }
 
     private void testStringView(String fullString, List<String> strings) {
-        testStringView(StringView.of(strings), fullString);
-        testStringView(StringView.of(fullString.toCharArray()), fullString);
+        testStringView(StringSlice.of(strings), fullString);
+        testStringView(StringSlice.of(fullString.toCharArray()), fullString);
         char[] charArray = new char[fullString.length() + 2];
         System.arraycopy(fullString.toCharArray(), 0, charArray, 1, fullString.length());
-        testStringView(StringView.of(charArray, 1, fullString.length() + 1), fullString);
+        testStringView(StringSlice.of(charArray, 1, fullString.length() + 1), fullString);
     }
 
-    private void testStringView(StringView sv, String fullString) {
+    private void testStringView(StringSlice sv, String fullString) {
         assertEquals(sv.length(), fullString.length());
         assertEquals(sv.toString(), fullString);
         for (int i = 0; i < 10; i++) {

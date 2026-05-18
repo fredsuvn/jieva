@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.fs.base.chars.CharsKit;
-import space.sunqian.fs.base.string.StringView;
+import space.sunqian.fs.base.string.StringSlice;
 import space.sunqian.fs.collect.ListKit;
 import space.sunqian.fs.collect.MapKit;
 import space.sunqian.fs.data.DataFormattingException;
@@ -310,7 +310,7 @@ public class JsonTest implements TestPrint {
         }
         {
             // string
-            StringView a = StringView.of("123");
+            StringSlice a = StringSlice.of("123");
             String jsonA = jsonMapper.writeValueAsString(a.toString());
             assertEquals(jsonA, formatter.format(a));
             assertEquals(a.toString(), parser.parse(jsonA).asString());

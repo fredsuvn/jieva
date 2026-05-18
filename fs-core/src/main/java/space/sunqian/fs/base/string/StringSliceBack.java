@@ -6,13 +6,13 @@ import space.sunqian.annotation.ValueClass;
 import space.sunqian.fs.base.Checker;
 import space.sunqian.fs.base.exception.UnreachablePointException;
 
-final class StringViewBack {
+final class StringSliceBack {
 
-    static @Nonnull StringView newView(@Nonnull CharSequence @Nonnull @RetainedParam ... strings) {
+    static @Nonnull StringSlice newSlice(@Nonnull CharSequence @Nonnull @RetainedParam ... strings) {
         return new OfCharSequence(strings);
     }
 
-    static @Nonnull StringView newView(
+    static @Nonnull StringSlice newSlice(
         char @Nonnull @RetainedParam [] chars,
         int start,
         int end
@@ -20,7 +20,7 @@ final class StringViewBack {
         return new OfCharArray(chars, start, end);
     }
 
-    private static final class OfCharSequence implements StringView {
+    private static final class OfCharSequence implements StringSlice {
 
         private final @Nonnull CharSequence[] chars;
         private final int length;
@@ -103,7 +103,7 @@ final class StringViewBack {
         }
     }
 
-    private static final class OfCharArray implements StringView {
+    private static final class OfCharArray implements StringSlice {
 
         private final char[] chars;
         private final int start;
@@ -143,6 +143,6 @@ final class StringViewBack {
         }
     }
 
-    private StringViewBack() {
+    private StringSliceBack() {
     }
 }

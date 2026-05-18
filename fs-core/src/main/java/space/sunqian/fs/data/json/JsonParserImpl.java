@@ -5,7 +5,7 @@ import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.base.number.NumberKit;
-import space.sunqian.fs.base.string.StringView;
+import space.sunqian.fs.base.string.StringSlice;
 import space.sunqian.fs.data.DataParsingException;
 import space.sunqian.fs.io.IOKit;
 
@@ -62,7 +62,7 @@ enum JsonParserImpl implements JsonParser {
 
     @Override
     public @Nonnull JsonData parse(char @Nonnull [] chars) throws DataParsingException {
-        return parse(StringView.of(chars));
+        return parse(StringSlice.of(chars));
     }
 
     @Override
@@ -430,7 +430,8 @@ enum JsonParserImpl implements JsonParser {
         private int index = 0;
         private int length = 0;
 
-        private final @Nonnull StringBuilder builder = new StringBuilder(1024);;
+        private final @Nonnull StringBuilder builder = new StringBuilder(1024);
+        ;
 
         private OfReader(@Nonnull Reader reader) {
             this.reader = reader;
@@ -478,7 +479,7 @@ enum JsonParserImpl implements JsonParser {
                 }
                 if (i == -2) {
                     int count = length - start;
-                    //StringBuilder builder = new StringBuilder(count);
+                    // StringBuilder builder = new StringBuilder(count);
                     builder.setLength(0);
                     builder.append(buffer, start, count);
                     return nextStringWithBuilder(builder);
@@ -489,7 +490,7 @@ enum JsonParserImpl implements JsonParser {
                         return new String(buffer, start, index - 1 - start);
                     case '\\':
                         int count = index - 1 - start;
-                        //StringBuilder builder = new StringBuilder(count);
+                        // StringBuilder builder = new StringBuilder(count);
                         builder.setLength(0);
                         builder.append(buffer, start, count);
                         parseEscape(builder);
@@ -549,7 +550,7 @@ enum JsonParserImpl implements JsonParser {
                 }
                 if (i == -2) {
                     int count = length - start;
-                    //StringBuilder builder = new StringBuilder(count);
+                    // StringBuilder builder = new StringBuilder(count);
                     builder.setLength(0);
                     builder.append(buffer, start, count);
                     return nextNumberWithBuilder(builder);
