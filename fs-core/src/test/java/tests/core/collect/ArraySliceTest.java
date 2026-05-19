@@ -21,7 +21,7 @@ public class ArraySliceTest {
         boolean[] array = new boolean[]{true, false, true, false};
         BooleanArraySlice slice = BooleanArraySlice.of(array, 1, 3);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(3, slice.endIndex());
         assertEquals(2, slice.length());
@@ -46,7 +46,7 @@ public class ArraySliceTest {
         byte[] array = new byte[]{1, 2, 3, 4, 5};
         ByteArraySlice slice = ByteArraySlice.of(array, 1, 4);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(4, slice.endIndex());
         assertEquals(3, slice.length());
@@ -72,7 +72,7 @@ public class ArraySliceTest {
         char[] array = new char[]{'a', 'b', 'c', 'd', 'e'};
         CharArraySlice slice = CharArraySlice.of(array, 1, 4);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(4, slice.endIndex());
         assertEquals(3, slice.length());
@@ -98,7 +98,7 @@ public class ArraySliceTest {
         short[] array = new short[]{1, 2, 3, 4, 5};
         ShortArraySlice slice = ShortArraySlice.of(array, 1, 4);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(4, slice.endIndex());
         assertEquals(3, slice.length());
@@ -124,7 +124,7 @@ public class ArraySliceTest {
         int[] array = new int[]{1, 2, 3, 4, 5};
         IntArraySlice slice = IntArraySlice.of(array, 1, 4);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(4, slice.endIndex());
         assertEquals(3, slice.length());
@@ -150,7 +150,7 @@ public class ArraySliceTest {
         long[] array = new long[]{1, 2, 3, 4, 5};
         LongArraySlice slice = LongArraySlice.of(array, 1, 4);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(4, slice.endIndex());
         assertEquals(3, slice.length());
@@ -176,7 +176,7 @@ public class ArraySliceTest {
         float[] array = new float[]{1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
         FloatArraySlice slice = FloatArraySlice.of(array, 1, 4);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(4, slice.endIndex());
         assertEquals(3, slice.length());
@@ -202,7 +202,7 @@ public class ArraySliceTest {
         double[] array = new double[]{1.0, 2.0, 3.0, 4.0, 5.0};
         DoubleArraySlice slice = DoubleArraySlice.of(array, 1, 4);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(4, slice.endIndex());
         assertEquals(3, slice.length());
@@ -228,7 +228,7 @@ public class ArraySliceTest {
         String[] array = new String[]{"a", "b", "c", "d", "e"};
         ObjectArraySlice<String> slice = ObjectArraySlice.of(array, 1, 4);
 
-        assertEquals(array, slice.array());
+        assertEquals(array, slice.source());
         assertEquals(1, slice.startIndex());
         assertEquals(4, slice.endIndex());
         assertEquals(3, slice.length());

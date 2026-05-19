@@ -8,7 +8,7 @@ import space.sunqian.fs.base.Checker;
  *
  * @author sunqian
  */
-public class BooleanArraySlice implements ArraySlice<boolean[]> {
+public final class BooleanArraySlice implements ArraySlice<boolean[]> {
 
     /**
      * Returns a new {@link BooleanArraySlice} from the specified array, start index, and end index.
@@ -39,7 +39,7 @@ public class BooleanArraySlice implements ArraySlice<boolean[]> {
     }
 
     @Override
-    public boolean @Nonnull [] array() {
+    public boolean @Nonnull [] source() {
         return array;
     }
 

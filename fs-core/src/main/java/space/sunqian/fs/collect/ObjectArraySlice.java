@@ -3,7 +3,7 @@ package space.sunqian.fs.collect;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.fs.base.Checker;
 
-public class ObjectArraySlice<T> implements ArraySlice<T[]> {
+public final class ObjectArraySlice<T> implements ArraySlice<T[]> {
 
     /**
      * Returns a new {@link ObjectArraySlice} from the specified array, start index, and end index.
@@ -35,7 +35,7 @@ public class ObjectArraySlice<T> implements ArraySlice<T[]> {
     }
 
     @Override
-    public T @Nonnull [] array() {
+    public T @Nonnull [] source() {
         return array;
     }
 

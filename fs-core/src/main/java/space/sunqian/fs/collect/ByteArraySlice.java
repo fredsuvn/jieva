@@ -3,7 +3,7 @@ package space.sunqian.fs.collect;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.fs.base.Checker;
 
-public class ByteArraySlice implements ArraySlice<byte[]> {
+public final class ByteArraySlice implements ArraySlice<byte[]> {
 
     /**
      * Returns a new {@link ByteArraySlice} from the specified array, start index, and end index.
@@ -34,7 +34,7 @@ public class ByteArraySlice implements ArraySlice<byte[]> {
     }
 
     @Override
-    public byte @Nonnull [] array() {
+    public byte @Nonnull [] source() {
         return array;
     }
 

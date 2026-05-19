@@ -1,11 +1,12 @@
 package space.sunqian.fs.collect;
 
 import space.sunqian.annotation.Nonnull;
+import space.sunqian.fs.base.lang.Slice;
 
 /**
- * This interface represents a slice of an array, defined by a start index inclusive, and an end index exclusive. It is
- * a view of the original array, and any modification to the slice will be reflected in the original array, and vice
- * versa.
+ * This interface represents a {@link Slice} of an array, defined by a start index inclusive, and an end index
+ * exclusive. It is a view of the original array, and any modification to the slice will be reflected in the original
+ * array, and vice versa.
  * <p>
  * Subtypes:
  * <ul>
@@ -23,15 +24,15 @@ import space.sunqian.annotation.Nonnull;
  * @param <A> the type of the array to slice
  * @author sunqian
  */
-public interface ArraySlice<A> {
+public interface ArraySlice<A> extends Slice<A> {
 
     /**
-     * Returns the array to slice.
+     * Returns the source array of the slice.
      *
-     * @return the array to slice
+     * @return the source array of the slice
      */
     @Nonnull
-    A array();
+    A source();
 
     /**
      * Returns the start index of the slice.

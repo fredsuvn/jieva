@@ -3,7 +3,7 @@ package space.sunqian.fs.collect;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.fs.base.Checker;
 
-public class ShortArraySlice implements ArraySlice<short[]> {
+public final class ShortArraySlice implements ArraySlice<short[]> {
 
     /**
      * Returns a new {@link ShortArraySlice} from the specified array, start index, and end index.
@@ -34,7 +34,7 @@ public class ShortArraySlice implements ArraySlice<short[]> {
     }
 
     @Override
-    public short @Nonnull [] array() {
+    public short @Nonnull [] source() {
         return array;
     }
 
