@@ -7,7 +7,7 @@
  * </ul>
  * Interfaces:
  * <ul>
- *     <li>{@link space.sunqian.fs.base.string.StringSlice}</li>
+ *     <li>{@link space.sunqian.fs.base.string.StringView}</li>
  *     <li>{@link space.sunqian.fs.base.string.NameFormatter}</li>
  *     <li>{@link space.sunqian.fs.base.string.NameMapper}</li>
  * </ul>

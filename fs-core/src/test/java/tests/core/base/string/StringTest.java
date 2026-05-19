@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.base.exception.UnknownArrayTypeException;
 import space.sunqian.fs.base.string.StringKit;
-import space.sunqian.fs.base.string.StringSlice;
+import space.sunqian.fs.base.string.StringView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,11 +25,11 @@ public class StringTest implements DataGen, TestPrint {
     @Test
     public void testIndexOf() {
         testIndexOf("123", "123");
-        testIndexOf(StringSlice.of("123"), "123");
-        testIndexOf(StringSlice.of("123"), "1234");
-        assertEquals(3, StringKit.indexOf(StringSlice.of("123"), "", 100));
-        assertEquals(StringKit.indexOf("123", StringSlice.of("2")), "123".indexOf("2"));
-        assertEquals(StringKit.lastIndexOf("123", StringSlice.of("2")), "123".lastIndexOf("2"));
+        testIndexOf(StringView.of("123"), "123");
+        testIndexOf(StringView.of("123"), "1234");
+        assertEquals(3, StringKit.indexOf(StringView.of("123"), "", 100));
+        assertEquals(StringKit.indexOf("123", StringView.of("2")), "123".indexOf("2"));
+        assertEquals(StringKit.lastIndexOf("123", StringView.of("2")), "123".lastIndexOf("2"));
     }
 
     private void testIndexOf(CharSequence chars, CharSequence subChars) {
@@ -164,13 +164,13 @@ public class StringTest implements DataGen, TestPrint {
     @Test
     public void testCharsCopy() {
         testCharsCopy("12345");
-        testCharsCopy(StringSlice.of("12345"));
+        testCharsCopy(StringView.of("12345"));
 
         // Test error cases for String
         testCharsCopyErrorCases("12345");
 
         // Test error cases for StringView
-        testCharsCopyErrorCases(StringSlice.of("12345"));
+        testCharsCopyErrorCases(StringView.of("12345"));
     }
 
     private void testCharsCopyErrorCases(CharSequence chars) {

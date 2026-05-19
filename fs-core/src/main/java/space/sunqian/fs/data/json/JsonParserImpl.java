@@ -5,7 +5,7 @@ import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.base.number.NumberKit;
-import space.sunqian.fs.base.string.StringSlice;
+import space.sunqian.fs.base.string.StringView;
 import space.sunqian.fs.data.DataParsingException;
 import space.sunqian.fs.io.IOKit;
 
@@ -62,7 +62,7 @@ enum JsonParserImpl implements JsonParser {
 
     @Override
     public @Nonnull JsonData parse(char @Nonnull [] chars) throws DataParsingException {
-        return parse(StringSlice.of(chars));
+        return parse(StringView.of(chars));
     }
 
     @Override

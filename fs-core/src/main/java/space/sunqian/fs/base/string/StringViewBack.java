@@ -6,13 +6,13 @@ import space.sunqian.annotation.ValueClass;
 import space.sunqian.fs.base.Checker;
 import space.sunqian.fs.base.exception.UnreachablePointException;
 
-final class StringSliceBack {
+final class StringViewBack {
 
-    static @Nonnull StringSlice newSlice(@Nonnull CharSequence @Nonnull @RetainedParam ... strings) {
-        return new OfCharSequence(strings);
+    static @Nonnull StringView newView(@Nonnull CharSequence @Nonnull @RetainedParam ... strings) {
+        return new OfMultiCharSequence(strings);
     }
 
-    static @Nonnull StringSlice newSlice(
+    static @Nonnull StringView newView(
         char @Nonnull @RetainedParam [] chars,
         int start,
         int end
@@ -20,12 +20,12 @@ final class StringSliceBack {
         return new OfCharArray(chars, start, end);
     }
 
-    private static final class OfCharSequence implements StringSlice {
+    private static final class OfMultiCharSequence implements StringView {
 
         private final @Nonnull CharSequence[] chars;
         private final int length;
 
-        private OfCharSequence(@Nonnull CharSequence[] chars) {
+        private OfMultiCharSequence(@Nonnull CharSequence[] chars) {
             this.chars = chars;
             int c = 0;
             for (CharSequence aChar : chars) {
@@ -66,7 +66,7 @@ final class StringSliceBack {
             for (int i = 1, j = startNode.charsIndex + 1; i < subChars.length - 1; i++, j++) {
                 subChars[i] = chars[j];
             }
-            return new OfCharSequence(subChars);
+            return new OfMultiCharSequence(subChars);
         }
 
         @Override
@@ -103,9 +103,9 @@ final class StringSliceBack {
         }
     }
 
-    private static final class OfCharArray implements StringSlice {
+    private static final class OfCharArray implements StringView {
 
-        private final char[] chars;
+        private final char @Nonnull [] chars;
         private final int start;
         private final int end;
 
@@ -143,6 +143,6 @@ final class StringSliceBack {
         }
     }
 
-    private StringSliceBack() {
+    private StringViewBack() {
     }
 }
