@@ -6,7 +6,6 @@ import internal.utils.ReadOps;
 import internal.utils.TestReader;
 import org.junit.jupiter.api.Test;
 import space.sunqian.annotation.Nonnull;
-import space.sunqian.fs.base.chars.CharsBuilder;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.io.BufferKit;
 import space.sunqian.fs.io.CharReader;
@@ -15,6 +14,7 @@ import space.sunqian.fs.io.IOKit;
 import space.sunqian.fs.io.IORuntimeException;
 
 import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -267,7 +267,7 @@ public class CharReaderTest implements DataGen {
     private void testReadCharsTo(Supplier<CharReader> supplier, char[] data, int readSize) {
         {
             // to writer
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             if (data.length == 0) {
                 CharReader reader = supplier.get();
                 assertEquals(-1, reader.readTo(builder));
@@ -638,7 +638,7 @@ public class CharReaderTest implements DataGen {
                 CharSegment s0 = reader.available();
                 assertFalse(s0.end());
                 assertEquals(0, BufferKit.copyContent(s0.data()).length);
-                CharsBuilder builder = new CharsBuilder();
+                CharArrayWriter builder = new CharArrayWriter();
                 while (true) {
                     CharSegment s1 = reader.available();
                     builder.append(s1.data());
@@ -656,7 +656,7 @@ public class CharReaderTest implements DataGen {
         }
         {
             // to output stream
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             CharReader reader1 = supplier.get();
             assertEquals(reader1.availableTo(builder), preKnown ? size : 0);
             while (true) {
@@ -935,7 +935,7 @@ public class CharReaderTest implements DataGen {
     private void testAsReader(int size) throws Exception {
         char[] data = randomChars(size, 'a', 'z');
         byte[] bytes = new String(data).getBytes(CharsKit.defaultCharset());
-        CharsBuilder builder = new CharsBuilder(size);
+        CharArrayWriter builder = new CharArrayWriter(size);
         {
             // reader
             FakeFile file = new FakeFile(bytes);
@@ -1011,7 +1011,7 @@ public class CharReaderTest implements DataGen {
         }
     }
 
-    public static void testReadToBuilder(CharReader reader, char[] data, CharsBuilder builder) {
+    public static void testReadToBuilder(CharReader reader, char[] data, CharArrayWriter builder) {
         builder.reset();
         Reader asIn = reader.asReader();
         reader.readTo(builder, 1);

@@ -6,7 +6,6 @@ import internal.utils.ErrorOutputStream;
 import internal.utils.Materials;
 import org.junit.jupiter.api.Test;
 import space.sunqian.fs.base.bytes.BytesBuilder;
-import space.sunqian.fs.base.chars.CharsBuilder;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.collect.ArrayKit;
 import space.sunqian.fs.io.BufferKit;
@@ -518,7 +517,7 @@ public class BufferTest implements DataGen {
         {
             // heap buffer to appender
             char[] data = randomChars(totalSize);
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             CharBuffer src = CharBuffer.wrap(data);
             assertEquals(BufferKit.readTo(src, builder), totalSize == 0 ? -1 : totalSize);
             assertArrayEquals(builder.toCharArray(), data);
@@ -532,7 +531,7 @@ public class BufferTest implements DataGen {
         {
             // direct buffer to appender
             char[] data = randomChars(totalSize);
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             CharBuffer src = BufferKit.copyDirect(data);
             assertEquals(BufferKit.readTo(src, builder), totalSize == 0 ? -1 : totalSize);
             assertArrayEquals(builder.toCharArray(), data);

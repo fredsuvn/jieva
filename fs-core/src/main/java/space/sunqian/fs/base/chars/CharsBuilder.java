@@ -4,71 +4,70 @@ import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.base.Checker;
-import space.sunqian.fs.io.BufferKit;
-import space.sunqian.fs.io.IOKit;
-import space.sunqian.fs.io.IORuntimeException;
+import space.sunqian.fs.base.string.StringSlice;
 
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
- * {@code CharsBuilder} is used to build char arrays and their derived objects by appending char data. It is similar to
- * {@link CharArrayWriter}, provides compatible methods, but is not thread-safe. This class is also the subtype of the
- * {@link Writer} and {@link CharSequence}, but the {@code close()} method has no effect.
+ * {@code CharsBuilder} is used to build {@link String}, char array, and their derived objects by appending char data.
+ * It is similar to {@link java.io.CharArrayWriter} and {@link StringBuilder}, but is not thread-safe. This class is
+ * also the subtype of the {@link Writer}, but it has no effect on {@code close()} and {@code flush()} methods.
+ * <p>
+ * {@code CharsBuilder} uses a segmented storage strategy for efficient memory management and avoids frequent array
+ * copying during large data appends. It holds a list of segments, each segment is a char array, using
+ * {@link #CharsBuilder(int)} and {@link #CharsBuilder(int, int)} can specify the capacity for them.
  *
  * @author sunqian
  */
-public class CharsBuilder extends Writer implements CharSequence {
+public class CharsBuilder extends Writer {
 
-    // Max array size.
-    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+    private final @Nonnull List<Object> segmentList;
+    private final int segmentCapacity;
+    private char[] segment;
+    private int segmentOff = 0;
 
-    private final int maxSize;
-
-    private char @Nonnull [] buf;
-    private int count;
+    private int length = 0;
 
     /**
-     * Constructs with 32-chars initial capacity.
+     * Constructs with 64-chars initial segment capacity.
      */
     public CharsBuilder() {
-        this(32);
+        this(64);
     }
 
     /**
-     * Constructs with the specified initial capacity in chars.
+     * Constructs with the specified initial segment capacity in chars.
      *
-     * @param initialCapacity the specified initial capacity in chars
-     * @throws IllegalArgumentException if size is negative
+     * @param initialSegmentCapacity the specified initial segment capacity in chars
+     * @throws IllegalArgumentException if the capacity is not positive
      */
-    public CharsBuilder(int initialCapacity) throws IllegalArgumentException {
-        this(initialCapacity, MAX_ARRAY_SIZE);
+    public CharsBuilder(int initialSegmentCapacity) throws IllegalArgumentException {
+        this(initialSegmentCapacity, -1);
     }
 
     /**
-     * Constructs with the specified initial capacity and the max capacity in bytes.
+     * Constructs with the specified initial segment capacity and initial segment list capacity.
      *
-     * @param initialCapacity the specified initial capacity in bytes
-     * @param maxCapacity     the max capacity in bytes
-     * @throws IllegalArgumentException if the {@code initialCapacity < 0} or {@code maxCapacity < 0} or
-     *                                  {@code initialCapacity > maxCapacity}
+     * @param initialSegmentCapacity     the specified initial segment capacity in chars
+     * @param initialSegmentListCapacity the initial capacity of the segment list, or -1 for default
+     * @throws IllegalArgumentException if the segment capacity is not positive, or the list capacity is neither -1 nor
+     *                                  positive
      */
-    public CharsBuilder(int initialCapacity, int maxCapacity) throws IllegalArgumentException {
-        if (initialCapacity < 0) {
-            throw new IllegalArgumentException("Negative initial capacity: " + initialCapacity + ".");
-        }
-        if (maxCapacity < 0) {
-            throw new IllegalArgumentException("Negative max capacity: " + maxCapacity + ".");
-        }
-        if (initialCapacity > maxCapacity) {
-            throw new IllegalArgumentException("Initial capacity must <= max capacity!");
-        }
-        buf = new char[initialCapacity];
-        this.maxSize = maxCapacity;
+    public CharsBuilder(
+        int initialSegmentCapacity,
+        int initialSegmentListCapacity
+    ) throws IllegalArgumentException {
+        Checker.checkArgument(initialSegmentCapacity > 0, "initialSegmentCapacity must > 0");
+        Checker.checkArgument(
+            initialSegmentListCapacity == -1 || initialSegmentListCapacity > 0,
+            "initialSegmentListCapacity must be -1 or > 0"
+        );
+        this.segmentCapacity = initialSegmentCapacity;
+        this.segmentList = initialSegmentListCapacity == -1 ? new ArrayList<>() : new ArrayList<>(initialSegmentListCapacity);
     }
 
     /**
@@ -76,119 +75,260 @@ public class CharsBuilder extends Writer implements CharSequence {
      *
      * @param b the specified char
      */
+    @Override
     public void write(int b) {
-        ensureCapacity(count + 1);
-        buf[count] = (char) b;
-        count += 1;
+        prepareBuffer();
+        segment[segmentOff++] = (char) b;
+        length++;
     }
 
     /**
      * Appends all chars from the given array.
      *
-     * @param cbuf the given array
+     * @param arr the given array
      */
-    public void write(char @Nonnull [] cbuf) {
-        ensureCapacity(count + cbuf.length);
-        System.arraycopy(cbuf, 0, buf, count, cbuf.length);
-        count += cbuf.length;
+    @Override
+    public void write(char @Nonnull [] arr) {
+        write(arr, 0, arr.length);
     }
 
     /**
      * Appends the specified number of chars from the given array, starting at the specified offset.
      *
-     * @param cbuf the given array
-     * @param off  the specified offset
-     * @param len  the specified number
-     * @throws IndexOutOfBoundsException if the offset or number is out of bounds
+     * @param arr the given array
+     * @param off the specified offset
+     * @param len the specified number of chars to append
+     * @throws IndexOutOfBoundsException if the offset or length is out of bounds
      */
-    public void write(char @Nonnull [] cbuf, int off, int len) throws IndexOutOfBoundsException {
-        Checker.checkOffLen(off, len, cbuf.length);
-        ensureCapacity(count + len);
-        System.arraycopy(cbuf, off, buf, count, len);
-        count += len;
+    @Override
+    public void write(char @Nonnull [] arr, int off, int len) throws IndexOutOfBoundsException {
+        Checker.checkOffLen(off, len, arr.length);
+        if (len == 0) {
+            return;
+        }
+        prepareBuffer();
+        int copyLength = Math.min(segment.length - segmentOff, len);
+        System.arraycopy(arr, off, segment, segmentOff, copyLength);
+        segmentOff += copyLength;
+        if (copyLength < len) {
+            segmentList.add(segment);
+            segment = null;
+            int restLen = len - copyLength;
+            if (restLen >= segmentCapacity) {
+                segmentList.add(Arrays.copyOfRange(arr, off + copyLength, off + len));
+            } else {
+                prepareBuffer();
+                System.arraycopy(arr, off + copyLength, segment, segmentOff, restLen);
+                segmentOff += restLen;
+            }
+        }
+        length += len;
     }
 
     /**
-     * Writes the appended data of this builder to the specified writer.
+     * Appends all chars from the given string.
      *
-     * @param out the specified writer
-     * @throws IORuntimeException if an I/O error occurs
+     * @param str the given string
      */
-    public void writeTo(@Nonnull Writer out) throws IORuntimeException {
-        try {
-            out.write(buf, 0, count);
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
+    @Override
+    public void write(@Nonnull String str) {
+        if (segment == null) {
+            segmentList.add(str);
+        } else if (segmentOff == segment.length) {
+            segmentList.add(segment);
+            segment = null;
+            segmentList.add(str);
+        } else {
+            int copyLength = Math.min(segment.length - segmentOff, str.length());
+            str.getChars(0, copyLength, segment, segmentOff);
+            segmentOff += copyLength;
+            if (copyLength < str.length()) {
+                segmentList.add(segment);
+                segment = null;
+                segmentList.add(StringSlice.of(str, copyLength, str.length()));
+            }
         }
+        length += str.length();
     }
 
     /**
-     * Writes the appended buffered data of this builder to the specified buffer.
+     * Appends the specified number of chars from the given string, starting at the specified offset.
      *
-     * @param out the specified buffer
-     * @throws IORuntimeException if an I/O error occurs
+     * @param str the given string
+     * @param off the specified offset
+     * @param len the specified number of chars to append
+     * @throws IndexOutOfBoundsException if the offset or length is out of bounds
      */
-    public void writeTo(@Nonnull CharBuffer out) throws IORuntimeException {
-        try {
-            out.put(buf, 0, count);
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
+    @Override
+    public void write(@Nonnull String str, int off, int len) throws IndexOutOfBoundsException {
+        Checker.checkOffLen(off, len, str.length());
+        if (len == 0) {
+            return;
         }
+        if (segment == null) {
+            segmentList.add(StringSlice.of(str, off, off + len));
+        } else if (segmentOff == segment.length) {
+            segmentList.add(segment);
+            segment = null;
+            segmentList.add(StringSlice.of(str, off, off + len));
+        } else {
+            int copyLength = Math.min(segment.length - segmentOff, len);
+            str.getChars(off, off + copyLength, segment, segmentOff);
+            segmentOff += copyLength;
+            if (copyLength < len) {
+                segmentList.add(segment);
+                segment = null;
+                segmentList.add(StringSlice.of(str, off + copyLength, off + len));
+            }
+        }
+        length += len;
+    }
+
+    /**
+     * Appends the specified char to this builder.
+     *
+     * @param c the specified char
+     * @return this builder
+     */
+    @Override
+    public @Nonnull CharsBuilder append(char c) {
+        return append((int) c);
+    }
+
+    /**
+     * Appends the specified char to this builder.
+     *
+     * @param c the specified char
+     * @return this builder
+     */
+    public @Nonnull CharsBuilder append(int c) {
+        write(c);
+        return this;
+    }
+
+    /**
+     * Appends the given char sequence to this builder.
+     *
+     * @param csq the given char sequence, if it is {@code null}, then it will be considered as {@code "null"}.
+     * @return this builder
+     */
+    @Override
+    public @Nonnull CharsBuilder append(@Nullable CharSequence csq) {
+        if (csq == null) {
+            write(Fs.NULL_STRING);
+            return this;
+        }
+        if (csq instanceof String) {
+            write((String) csq);
+            return this;
+        }
+        append0(csq, 0, csq.length());
+        return this;
+    }
+
+    /**
+     * Appends the specified subsequence of the given char sequence to this builder.
+     *
+     * @param csq   the given char sequence, if it is {@code null}, then it will be considered as {@code "null"}.
+     * @param start the start index of the subsequence, inclusive
+     * @param end   the end index of the subsequence, exclusive
+     * @return this builder
+     * @throws IndexOutOfBoundsException if the start or end index is out of bounds
+     */
+    @Override
+    public @Nonnull CharsBuilder append(
+        @Nullable CharSequence csq, int start, int end
+    ) throws IndexOutOfBoundsException {
+        if (csq == null) {
+            write(Fs.NULL_STRING, start, end - start);
+            return this;
+        }
+        if (csq instanceof String) {
+            write((String) csq, start, end - start);
+            return this;
+        }
+        append0(csq, start, end);
+        return this;
+    }
+
+    private void append0(@Nonnull CharSequence csq, int start, int end) throws IndexOutOfBoundsException {
+        Checker.checkStartEnd(start, end, csq.length());
+        if (end - start == 0) {
+            return;
+        }
+        prepareBuffer();
+        int len = end - start;
+        int copyLength = Math.min(segment.length - segmentOff, len);
+        for (int i = 0; i < copyLength; i++) {
+            segment[segmentOff++] = csq.charAt(start + i);
+        }
+        if (copyLength < len) {
+            segmentList.add(segment);
+            segment = null;
+            int restLen = len - copyLength;
+            if (restLen >= segmentCapacity) {
+                char[] bigSeg = new char[restLen];
+                for (int i = 0; i < restLen; i++) {
+                    bigSeg[i] = csq.charAt(start + copyLength + i);
+                }
+                segmentList.add(bigSeg);
+            } else {
+                prepareBuffer();
+                for (int i = 0; i < restLen; i++) {
+                    segment[segmentOff++] = csq.charAt(start + copyLength + i);
+                }
+            }
+        }
+        length += len;
+    }
+
+    /**
+     * Appends all chars from the given array.
+     *
+     * @param arr the given array
+     * @return this builder
+     */
+    public @Nonnull CharsBuilder append(char @Nonnull [] arr) {
+        write(arr);
+        return this;
+    }
+
+    /**
+     * Appends the specified number of chars from the given array, starting at the specified offset.
+     *
+     * @param arr the given array
+     * @param off the specified offset
+     * @param len the specified number of chars to append
+     * @return this builder
+     * @throws IndexOutOfBoundsException if the offset or length is out of bounds
+     */
+    public @Nonnull CharsBuilder append(char @Nonnull [] arr, int off, int len) throws IndexOutOfBoundsException {
+        write(arr, off, len);
+        return this;
+    }
+
+    private void prepareBuffer() {
+        if (segment == null) {
+            refreshBuffer();
+        } else if (segmentOff == segment.length) {
+            segmentList.add(segment);
+            refreshBuffer();
+        }
+    }
+
+    private void refreshBuffer() {
+        segment = new char[segmentCapacity];
+        segmentOff = 0;
     }
 
     /**
      * Resets this builder, the appended data will be discarded.
-     * <p>
-     * This method doesn't guarantee releasing the allocated space for the appended data. To trim and release the unused
-     * space, use {@link #trim()}.
      */
     public void reset() {
-        count = 0;
-    }
-
-    /**
-     * Trims and releases the allocated but unused space.
-     */
-    public void trim() {
-        if (count < buf.length) {
-            buf = Arrays.copyOf(buf, count);
-        }
-    }
-
-    /**
-     * Returns the size of appended data.
-     *
-     * @return the size of appended data
-     */
-    public int size() {
-        return count;
-    }
-
-    /**
-     * Returns a new array containing a copy of the appended data.
-     *
-     * @return a new array containing a copy of the appended data
-     */
-    public char @Nonnull [] toCharArray() {
-        return Arrays.copyOf(buf, count);
-    }
-
-    /**
-     * Returns a new buffer containing a copy of the appended data.
-     *
-     * @return a new buffer containing a copy of the appended data
-     */
-    public @Nonnull CharBuffer toCharBuffer() {
-        return CharBuffer.wrap(toCharArray());
-    }
-
-    /**
-     * Returns a string from a copy of the appended data.
-     *
-     * @return a string from a copy of the appended data
-     */
-    public @Nonnull String toString() {
-        return new String(buf, 0, count);
+        segmentList.clear();
+        length = 0;
+        segment = null;
+        segmentOff = 0;
     }
 
     /**
@@ -206,228 +346,52 @@ public class CharsBuilder extends Writer implements CharSequence {
     }
 
     /**
-     * Appends the specified char to this builder.
+     * Returns a new array containing a copy of the appended data.
      *
-     * @param c the specified char
-     * @return this builder
+     * @return a new array containing a copy of the appended data
      */
-    public @Nonnull CharsBuilder append(int c) {
-        write(c);
-        return this;
-    }
-
-    /**
-     * Appends the specified char to this builder.
-     *
-     * @param c the specified char
-     * @return this builder
-     */
-    public @Nonnull CharsBuilder append(char c) {
-        write(c);
-        return this;
-    }
-
-    /**
-     * Appends all chars from the given array.
-     *
-     * @param chars the given array
-     * @return this builder
-     */
-    public @Nonnull CharsBuilder append(char @Nonnull [] chars) {
-        write(chars);
-        return this;
-    }
-
-    /**
-     * Appends the specified number of chars from the given array, starting at the specified offset.
-     *
-     * @param chars  the given array
-     * @param offset the specified offset
-     * @param length the specified number
-     * @return this builder
-     * @throws IndexOutOfBoundsException if the offset or number is out of bounds
-     */
-    public @Nonnull CharsBuilder append(
-        char @Nonnull [] chars, int offset, int length
-    ) throws IndexOutOfBoundsException {
-        write(chars, offset, length);
-        return this;
-    }
-
-    /**
-     * Reads and appends all chars from the given buffer.
-     *
-     * @param chars the given buffer
-     * @return this builder
-     */
-    public @Nonnull CharsBuilder append(@Nonnull CharBuffer chars) {
-        int remaining = chars.remaining();
-        if (remaining == 0) {
-            return this;
-        }
-        if (chars.hasArray()) {
-            write(chars.array(), BufferKit.arrayStartIndex(chars), chars.remaining());
-            chars.position(chars.position() + chars.remaining());
-        } else {
-            char[] data = new char[remaining];
-            chars.get(data);
-            write(data);
-        }
-        return this;
-    }
-
-    /**
-     * Reads and appends all chars from the given reader.
-     *
-     * @param reader the given reader
-     * @return this builder
-     * @throws IORuntimeException if an I/O error occurs
-     */
-    public @Nonnull CharsBuilder append(@Nonnull Reader reader) throws IORuntimeException {
-        return append(reader, IOKit.bufferSize());
-    }
-
-    /**
-     * Reads and appends all chars from the given reader with the specified buffer size for each reading.
-     *
-     * @param reader  the given reader
-     * @param bufSize the specified buffer size for each reading
-     * @return this builder
-     * @throws IllegalArgumentException if the buffer size {@code <= 0}
-     * @throws IORuntimeException       if an I/O error occurs
-     */
-    public @Nonnull CharsBuilder append(
-        @Nonnull Reader reader, int bufSize
-    ) throws IllegalArgumentException, IORuntimeException {
-        if (bufSize <= 0) {
-            throw new IllegalArgumentException("The buffer size must > 0.");
-        }
-        char[] buffer = new char[bufSize];
-        while (true) {
-            try {
-                int readSize = reader.read(buffer);
-                if (readSize < 0) {
-                    return this;
-                }
-                write(buffer, 0, readSize);
-            } catch (Exception e) {
-                throw new IORuntimeException(e);
+    @SuppressWarnings("PatternVariableCanBeUsed")
+    public char @Nonnull [] toCharArray() {
+        char[] result = new char[length];
+        int off = 0;
+        for (Object obj : segmentList) {
+            if (obj instanceof char[]) {
+                char[] arr = (char[]) obj;
+                System.arraycopy(arr, 0, result, off, arr.length);
+                off += arr.length;
+                continue;
             }
+            if (obj instanceof String) {
+                String str = (String) obj;
+                str.getChars(0, str.length(), result, off);
+                off += str.length();
+                continue;
+            }
+            StringSlice slice = (StringSlice) obj;
+            slice.source().getChars(slice.startIndex(), slice.endIndex(), result, off);
+            off += slice.length();
         }
+        if (segment != null) {
+            System.arraycopy(segment, 0, result, off, segmentOff);
+        }
+        return result;
     }
 
     /**
-     * Appends all chars from the given builder.
+     * Returns a new buffer containing a copy of the appended data.
      *
-     * @param builder the given reader
-     * @return this builder
+     * @return a new buffer containing a copy of the appended data
      */
-    public @Nonnull CharsBuilder append(@Nonnull CharsBuilder builder) {
-        write(builder.buf, 0, builder.count);
-        return this;
+    public @Nonnull CharBuffer toCharBuffer() {
+        return CharBuffer.wrap(toCharArray());
     }
 
     /**
-     * Appends the given char sequence to this builder, or {@code "null"} if the given char sequence is {@code null}.
+     * Returns a string from a copy of the appended data.
      *
-     * @param csq the given char sequence
-     * @return this builder
-     * @throws IOException if an I/O error occurs
+     * @return a string from a copy of the appended data
      */
-    @Override
-    public @Nonnull CharsBuilder append(@Nullable CharSequence csq) throws IOException {
-        if (csq == null) {
-            write(Fs.NULL_STRING);
-            return this;
-        }
-        ensureCapacity(count + csq.length());
-        if (csq instanceof String) {
-            ((String) csq).getChars(0, csq.length(), buf, count);
-            count += csq.length();
-            return this;
-        }
-        for (int i = 0; i < csq.length(); i++) {
-            buf[count++] = csq.charAt(i);
-        }
-        return this;
-    }
-
-    /**
-     * Appends the specified subsequence of the given char sequence to this builder, or {@code "null"} if the given char
-     * sequence is {@code null}.
-     *
-     * @param csq   the given char sequence
-     * @param start the start index of the subsequence, inclusive
-     * @param end   the end index of the subsequence, exclusive
-     * @return this builder
-     * @throws IndexOutOfBoundsException if the start or end index is out of bounds
-     * @throws IOException               if an I/O error occurs
-     */
-    @Override
-    public @Nonnull CharsBuilder append(
-        @Nullable CharSequence csq, int start, int end
-    ) throws IndexOutOfBoundsException, IOException {
-        if (csq == null) {
-            write(Fs.NULL_STRING);
-            return this;
-        }
-        Checker.checkInBounds(start, end, 0, csq.length());
-        int length = end - start;
-        ensureCapacity(count + length);
-        if (csq instanceof String) {
-            ((String) csq).getChars(start, end, buf, count);
-            count += length;
-            return this;
-        }
-        for (int i = start; i < end; i++) {
-            buf[count++] = csq.charAt(i);
-        }
-        return this;
-    }
-
-    @Override
-    public int length() {
-        return count;
-    }
-
-    @Override
-    public char charAt(int index) throws IndexOutOfBoundsException {
-        if (index >= count) {
-            throw new IndexOutOfBoundsException("Index out of bounds: " + index + ".");
-        }
-        return buf[index];
-    }
-
-    @Override
-    public @Nonnull CharSequence subSequence(int start, int end) {
-        return toString().subSequence(start, end);
-    }
-
-    private void ensureCapacity(int minCapacity) {
-        if (buf.length < minCapacity) {
-            grow(minCapacity);
-        }
-    }
-
-    private void grow(int minCapacity) {
-        if (minCapacity < 0 || minCapacity > maxSize) {
-            throw new IllegalStateException("Buffer out of size: " + minCapacity + ".");
-        }
-        int oldCapacity = buf.length;
-        int newCapacity;
-        if (oldCapacity == 0) {
-            newCapacity = minCapacity;
-        } else {
-            newCapacity = oldCapacity * 2;
-        }
-        newCapacity = newCapacity(newCapacity, minCapacity);
-        buf = Arrays.copyOf(buf, newCapacity);
-    }
-
-    private int newCapacity(int newCapacity, int minCapacity) {
-        if (newCapacity <= 0 || newCapacity > maxSize) {
-            return maxSize;
-        }
-        return Math.max(newCapacity, minCapacity);
+    public @Nonnull String toString() {
+        return new String(toCharArray());
     }
 }

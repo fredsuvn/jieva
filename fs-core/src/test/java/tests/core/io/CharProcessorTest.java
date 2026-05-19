@@ -6,7 +6,6 @@ import internal.utils.ErrorOutputStream;
 import internal.utils.ReadOps;
 import internal.utils.TestReader;
 import org.junit.jupiter.api.Test;
-import space.sunqian.fs.base.chars.CharsBuilder;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.base.value.IntVar;
 import space.sunqian.fs.io.BufferKit;
@@ -18,6 +17,7 @@ import space.sunqian.fs.io.IOKit;
 import space.sunqian.fs.io.IORuntimeException;
 
 import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -114,7 +114,7 @@ public class CharProcessorTest implements DataGen, Asserter {
         }
         {
             // to OutputStream
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             assertEquals(
                 CharProcessor.from(data).readBlockSize(readBlockSize).processTo(builder),
                 totalSize == 0 ? -1 : totalSize
@@ -400,13 +400,13 @@ public class CharProcessorTest implements DataGen, Asserter {
             Reader in = CharProcessor.from(data).readBlockSize(readBlockSize)
                 .transformer(CharTransformer.empty())
                 .asReader();
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             while (true) {
                 int next = in.read();
                 if (next < 0) {
                     break;
                 }
-                builder.append(next);
+                builder.write(next);
             }
             assertArrayEquals(builder.toCharArray(), data);
             assertEquals(-1, in.read());
@@ -517,7 +517,7 @@ public class CharProcessorTest implements DataGen, Asserter {
     private void testResidualSizeTransformer(int totalSize, int readBlockSize, int blockSize) throws Exception {
         IntVar endCount = IntVar.of(0);
         char[] data = randomChars(totalSize);
-        CharsBuilder builder = new CharsBuilder();
+        CharArrayWriter builder = new CharArrayWriter();
         {
             // FixedSizeHandler
             assertEquals(
@@ -574,7 +574,7 @@ public class CharProcessorTest implements DataGen, Asserter {
     private void testBufferedTransformer(int totalSize, int readBlockSize) throws Exception {
         IntVar endCount = IntVar.of(0);
         char[] data = randomChars(totalSize);
-        CharsBuilder builder = new CharsBuilder();
+        CharArrayWriter builder = new CharArrayWriter();
         {
             // BufferedHandler
             assertEquals(

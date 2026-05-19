@@ -7,7 +7,6 @@ import internal.utils.TestReader;
 import org.junit.jupiter.api.Test;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.fs.base.bytes.BytesBuilder;
-import space.sunqian.fs.base.chars.CharsBuilder;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.base.value.IntVar;
 import space.sunqian.fs.io.ByteReader;
@@ -771,7 +770,7 @@ public class IOImplsTest implements DataGen {
         }
         {
             // chars
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             char[] chars = randomChars(dataSize, '0', '9');
             byte[] charBytes = new String(chars).getBytes(CharsKit.UTF_8);
             OutputStream out = IOKit.newOutputStream(builder);
@@ -891,9 +890,9 @@ public class IOImplsTest implements DataGen {
 
         // limited
         assertThrows(IOException.class, () ->
-            IOKit.limitedWriter(new CharsBuilder(), 0).write(1));
+            IOKit.limitedWriter(new CharArrayWriter(), 0).write(1));
         assertThrows(IOException.class, () ->
-            IOKit.limitedWriter(new CharsBuilder(), 0).write(new char[1]));
+            IOKit.limitedWriter(new CharArrayWriter(), 0).write(new char[1]));
     }
 
     private void testWriter(int dataSize) throws Exception {
@@ -953,7 +952,7 @@ public class IOImplsTest implements DataGen {
             // limited
             char[] data = randomChars(dataSize);
             ;
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             testWriter(
                 IOKit.limitedWriter(builder, data.length),
                 data,

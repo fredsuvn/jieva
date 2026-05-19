@@ -1,7 +1,5 @@
 package internal.samples;
 
-import space.sunqian.fs.base.bytes.BytesBuilder;
-import space.sunqian.fs.base.chars.CharsBuilder;
 import space.sunqian.fs.io.ByteIOOperator;
 import space.sunqian.fs.io.ByteReader;
 import space.sunqian.fs.io.ByteSegment;
@@ -49,12 +47,6 @@ import java.nio.charset.StandardCharsets;
  *   <li>
  *     {@link CharIOOperator}: Char IO operator for advanced character operations like transfer
  *   </li>
- *   <li>
- *     {@link BytesBuilder}: Byte builder for building byte arrays efficiently
- *   </li>
- *   <li>
- *     {@link CharsBuilder}: Char builder for building character sequences efficiently
- *   </li>
  * </ul>
  */
 public class IOSample {
@@ -64,7 +56,6 @@ public class IOSample {
         demonstrateCharReader();
         demonstrateByteIOOperator();
         demonstrateCharIOOperator();
-        demonstrateBuilders();
     }
 
     /**
@@ -201,49 +192,5 @@ public class IOSample {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Demonstrates BytesBuilder and CharsBuilder usage for building data.
-     */
-    public static void demonstrateBuilders() throws Exception {
-        System.out.println("\n=== Builders Usage ===");
-
-        // BytesBuilder example
-        System.out.println("BytesBuilder example:");
-        BytesBuilder bytesBuilder = new BytesBuilder();
-        bytesBuilder.append("Hello, ".getBytes(StandardCharsets.UTF_8));
-        bytesBuilder.append("BytesBuilder!".getBytes(StandardCharsets.UTF_8));
-        bytesBuilder.append("\nThis is a test.".getBytes(StandardCharsets.UTF_8));
-        byte[] bytesResult = bytesBuilder.toByteArray();
-        System.out.println("BytesBuilder result: " + new String(bytesResult, StandardCharsets.UTF_8));
-        System.out.println("BytesBuilder size: " + bytesBuilder.size());
-
-        // CharsBuilder example
-        System.out.println("\nCharsBuilder example:");
-        CharsBuilder charsBuilder = new CharsBuilder();
-        charsBuilder.append("Hello, ");
-        charsBuilder.append("CharsBuilder!");
-        charsBuilder.append("\nThis is a test.");
-        String charsResult = charsBuilder.toString();
-        System.out.println("CharsBuilder result: " + charsResult);
-        System.out.println("CharsBuilder size: " + charsBuilder.size());
-
-        // CharsBuilder with appender
-        System.out.println("\nCharsBuilder with appender example:");
-        CharsBuilder appenderBuilder = new CharsBuilder();
-        appenderBuilder.append("Line 1\n");
-        appenderBuilder.append("Line 2\n");
-        appenderBuilder.append("Line 3");
-        System.out.println("CharsBuilder with appender result:\n" + appenderBuilder.toString());
-        System.out.println("CharsBuilder with appender size: " + appenderBuilder.size());
-
-        // CharsBuilder with different append methods
-        System.out.println("\nCharsBuilder with different append methods example:");
-        CharsBuilder advancedBuilder = new CharsBuilder();
-        advancedBuilder.append("Number: " + 42 + ", ");
-        advancedBuilder.append("Boolean: " + true + ", ");
-        advancedBuilder.append("Double: " + 3.14);
-        System.out.println("Advanced CharsBuilder result: " + advancedBuilder.toString());
     }
 }

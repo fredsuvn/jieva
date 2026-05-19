@@ -7,7 +7,6 @@ import internal.utils.ReadOps;
 import internal.utils.TestInputStream;
 import org.junit.jupiter.api.Test;
 import space.sunqian.fs.base.bytes.BytesBuilder;
-import space.sunqian.fs.base.chars.CharsBuilder;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.io.IOKit;
 import space.sunqian.fs.io.IOMode;
@@ -183,7 +182,7 @@ public class IOKitTest implements DataGen {
     }
 
     private void testReaderForCharsToAppender(char[] data) throws Exception {
-        CharsBuilder builder = new CharsBuilder();
+        CharArrayWriter builder = new CharArrayWriter();
         assertEquals(IOKit.readTo(new CharArrayReader(data), builder), data.length);
         assertArrayEquals(data, builder.toCharArray());
         builder.reset();
@@ -260,7 +259,7 @@ public class IOKitTest implements DataGen {
 
     private void testWriteToAppender() throws Exception {
         char[] data = randomChars(1024);
-        CharsBuilder appender1 = new CharsBuilder();
+        CharArrayWriter appender1 = new CharArrayWriter();
         IOKit.write(appender1, data);
         assertArrayEquals(appender1.toCharArray(), data);
         appender1.reset();
@@ -268,7 +267,7 @@ public class IOKitTest implements DataGen {
         assertArrayEquals(appender1.toCharArray(), Arrays.copyOfRange(data, 33, 33 + 99));
         class Appender implements Appendable {
 
-            private final CharsBuilder appender = new CharsBuilder();
+            private final CharArrayWriter appender = new CharArrayWriter();
 
             @Override
             public Appendable append(CharSequence csq) throws IOException {

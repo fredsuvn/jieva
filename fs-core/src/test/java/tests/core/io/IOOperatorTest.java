@@ -9,7 +9,6 @@ import internal.utils.TestReader;
 import org.junit.jupiter.api.Test;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.fs.base.bytes.BytesBuilder;
-import space.sunqian.fs.base.chars.CharsBuilder;
 import space.sunqian.fs.io.BufferKit;
 import space.sunqian.fs.io.IOKit;
 import space.sunqian.fs.io.IOOperator;
@@ -17,6 +16,7 @@ import space.sunqian.fs.io.IORuntimeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -1248,7 +1248,7 @@ public class IOOperatorTest implements DataGen {
         {
             // size 0: reader to appender
             char[] data = new char[0];
-            CharsBuilder bb = new CharsBuilder();
+            CharArrayWriter bb = new CharArrayWriter();
             assertEquals(
                 -1,
                 IOKit.readTo(new CharArrayReader(data), bb)
@@ -1401,7 +1401,7 @@ public class IOOperatorTest implements DataGen {
 
     private void testReadCharsToReaderToAppender(IOOperator reader, int totalSize, int readSize) throws Exception {
         char[] data = randomChars(totalSize);
-        CharsBuilder builder = new CharsBuilder();
+        CharArrayWriter builder = new CharArrayWriter();
         assertEquals(
             reader.readTo(new CharArrayReader(data), builder),
             totalSize
@@ -1533,7 +1533,7 @@ public class IOOperatorTest implements DataGen {
             assertNull(IOKit.available(empty, 1));
             assertNull(IOKit.availableString(empty));
             assertNull(IOKit.availableString(empty, 1));
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             assertEquals(-1, IOKit.availableTo(empty, builder));
             assertEquals(-1, IOKit.availableTo(empty, builder, 1));
             assertEquals(-1, IOKit.availableTo(empty, new char[1]));
@@ -1597,7 +1597,7 @@ public class IOOperatorTest implements DataGen {
         {
             // available chars
             In in1 = new In();
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             char[] s1 = IOKit.available(in1);
             assertArrayEquals(s1, empty);
             while (true) {
@@ -1605,7 +1605,7 @@ public class IOOperatorTest implements DataGen {
                 if (b == null) {
                     break;
                 }
-                builder.append(b);
+                builder.write(b);
             }
             assertArrayEquals(builder.toCharArray(), src);
             builder.reset();
@@ -1629,7 +1629,7 @@ public class IOOperatorTest implements DataGen {
                 if (b == null) {
                     break;
                 }
-                builder.append(b);
+                builder.write(b);
             }
             assertArrayEquals(builder.toCharArray(), src);
             builder.reset();
@@ -1649,7 +1649,7 @@ public class IOOperatorTest implements DataGen {
         {
             // available to Appender
             In in1 = new In();
-            CharsBuilder builder = new CharsBuilder();
+            CharArrayWriter builder = new CharArrayWriter();
             assertEquals(0, IOKit.availableTo(in1, builder));
             while (true) {
                 long readSize = IOKit.availableTo(in1, builder);
