@@ -19,11 +19,15 @@ public class CharsBuilderJmh extends AbstractJmhBenchmark implements DataGen {
 
     @Param({
         "8",
-        "32",
-        "128",
+        "64",
         "1024"
     })
     private int dataLength;
+    @Param({
+        "128",
+        "1024"
+    })
+    private int maxBlockSize;
     @Param({
         "byCharsBuilder",
         "byStringBuilder",
@@ -35,8 +39,8 @@ public class CharsBuilderJmh extends AbstractJmhBenchmark implements DataGen {
         this.data = new ArrayList<>(dataLength);
         Random random = new Random();
         Rog<Object> rog = Rog.newBuilder()
-            .weight(50, () -> randomChars(random.nextInt(1024) + 2))
-            .weight(50, () -> new String(randomChars(random.nextInt(1024) + 2)))
+            .weight(50, () -> randomChars(random.nextInt(maxBlockSize) + 2))
+            .weight(50, () -> new String(randomChars(random.nextInt(maxBlockSize) + 2)))
             .build();
         for (int i = 0; i < dataLength; i++) {
             data.add(rog.next());

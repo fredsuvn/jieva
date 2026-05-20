@@ -5,7 +5,9 @@ import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.base.Checker;
 import space.sunqian.fs.base.string.StringSlice;
+import space.sunqian.fs.io.BufferKit;
 
+import java.io.CharArrayWriter;
 import java.io.Writer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
@@ -14,8 +16,8 @@ import java.util.List;
 
 /**
  * {@code CharsBuilder} is used to build {@link String}, char array, and their derived objects by appending char data.
- * It is similar to {@link java.io.CharArrayWriter} and {@link StringBuilder}, but is not thread-safe. This class is
- * also the subtype of the {@link Writer}, but it has no effect on {@code close()} and {@code flush()} methods.
+ * It is similar to {@link CharArrayWriter} and {@link StringBuilder}, but is not thread-safe. and it has no effect on
+ * {@code close()} and {@code flush()} methods.
  * <p>
  * {@code CharsBuilder} uses a segmented storage strategy for efficient memory management and avoids frequent array
  * copying during large data appends. It holds a list of segments, each segment is a char array, using
@@ -304,6 +306,28 @@ public class CharsBuilder extends Writer {
      */
     public @Nonnull CharsBuilder append(char @Nonnull [] arr, int off, int len) throws IndexOutOfBoundsException {
         write(arr, off, len);
+        return this;
+    }
+
+    /**
+     * Reads and appends all char data from the given buffer. Note the buffer will be advanced to the end.
+     *
+     * @param buffer the given buffer
+     * @return this builder
+     */
+    public @Nonnull CharsBuilder append(@Nonnull CharBuffer buffer) {
+        int remaining = buffer.remaining();
+        if (remaining == 0) {
+            return this;
+        }
+        if (buffer.hasArray()) {
+            write(buffer.array(), BufferKit.arrayStartIndex(buffer), buffer.remaining());
+            buffer.position(buffer.position() + buffer.remaining());
+        } else {
+            char[] data = new char[remaining];
+            buffer.get(data);
+            write(data);
+        }
         return this;
     }
 

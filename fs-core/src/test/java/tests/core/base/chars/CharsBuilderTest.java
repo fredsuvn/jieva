@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import space.sunqian.fs.base.chars.CharsBuilder;
 import space.sunqian.fs.base.string.StringView;
 
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,12 +71,13 @@ public class CharsBuilderTest implements DataGen {
         }
     }
 
-
     private void testCharsBuilder(CharsBuilder charsBuilder, StringBuilder stringBuilder) {
         charsBuilder.append('a');
         stringBuilder.append('a');
         char[] d1 = randomChars(8);
         char[] d2 = randomChars(256);
+        charsBuilder.append((int) d1[0]);
+        stringBuilder.append(d1[0]);
         charsBuilder.append(d1);
         stringBuilder.append(d1);
         charsBuilder.append(d2);
@@ -112,6 +115,30 @@ public class CharsBuilderTest implements DataGen {
         stringBuilder.append((CharSequence) null);
         charsBuilder.append((CharSequence) null, 1, 2);
         stringBuilder.append((CharSequence) null, 1, 2);
+        charsBuilder.append(CharBuffer.allocate(0));
+        stringBuilder.append(CharBuffer.allocate(0));
+        {
+            // buffer
+            CharBuffer buf1 = CharBuffer.wrap(d1, 1, 5);
+            assertEquals(5, buf1.remaining());
+            CharBuffer buf2 = CharBuffer.wrap(d1, 1, 5);
+            charsBuilder.append(buf1);
+            assertEquals(0, buf1.remaining());
+            stringBuilder.append(buf2);
+            byte[] bb = "0123456789".getBytes(StandardCharsets.UTF_8);
+            ByteBuffer bb1 = ByteBuffer.allocateDirect(bb.length);
+            bb1.put(bb);
+            bb1.flip();
+            ByteBuffer bb2 = ByteBuffer.allocateDirect(bb.length);
+            bb2.put(bb);
+            bb2.flip();
+            CharBuffer buf3 = bb1.asCharBuffer();
+            CharBuffer buf4 = bb2.asCharBuffer();
+            assertEquals(5, buf3.remaining());
+            charsBuilder.append(buf3);
+            assertEquals(0, buf3.remaining());
+            stringBuilder.append(buf4);
+        }
         assertEquals(charsBuilder.toString(), stringBuilder.toString());
         assertArrayEquals(charsBuilder.toCharArray(), stringBuilder.toString().toCharArray());
         assertEquals(charsBuilder.toCharBuffer(), CharBuffer.wrap(stringBuilder.toString().toCharArray()));
