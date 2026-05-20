@@ -27,6 +27,11 @@ import java.util.List;
  */
 public class CharsBuilder extends Writer {
 
+    /**
+     * The default initial segment capacity.
+     */
+    public static final int DEFAULT_SEGMENT_CAPACITY = 64;
+
     private final @Nonnull List<Object> segmentList;
     private final int segmentCapacity;
     private char[] segment;
@@ -35,16 +40,16 @@ public class CharsBuilder extends Writer {
     private int length = 0;
 
     /**
-     * Constructs with 64-chars initial segment capacity.
+     * Constructs with the default initial segment capacity ({@link #DEFAULT_SEGMENT_CAPACITY}).
      */
     public CharsBuilder() {
-        this(64);
+        this(DEFAULT_SEGMENT_CAPACITY);
     }
 
     /**
-     * Constructs with the specified initial segment capacity in chars.
+     * Constructs with the specified initial segment capacity and default initial segment list capacity ({@code -1}).
      *
-     * @param initialSegmentCapacity the specified initial segment capacity in chars
+     * @param initialSegmentCapacity the specified initial segment capacity
      * @throws IllegalArgumentException if the capacity is not positive
      */
     public CharsBuilder(int initialSegmentCapacity) throws IllegalArgumentException {
@@ -54,10 +59,10 @@ public class CharsBuilder extends Writer {
     /**
      * Constructs with the specified initial segment capacity and initial segment list capacity.
      *
-     * @param initialSegmentCapacity     the specified initial segment capacity in chars
-     * @param initialSegmentListCapacity the initial capacity of the segment list, or -1 for default
-     * @throws IllegalArgumentException if the segment capacity is not positive, or the list capacity is neither -1 nor
-     *                                  positive
+     * @param initialSegmentCapacity     the specified initial segment capacity
+     * @param initialSegmentListCapacity the initial capacity of the segment list, or {@code -1} for default
+     * @throws IllegalArgumentException if the segment capacity is not positive, or the list capacity is neither
+     *                                  {@code -1} nor positive
      */
     public CharsBuilder(
         int initialSegmentCapacity,

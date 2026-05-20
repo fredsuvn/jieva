@@ -26,6 +26,11 @@ import java.util.List;
  */
 public class BytesBuilder extends OutputStream {
 
+    /**
+     * The default initial segment capacity.
+     */
+    public static final int DEFAULT_SEGMENT_CAPACITY = 64;
+
     private final @Nonnull List<byte[]> segmentList;
     private final int segmentCapacity;
     private byte[] segment;
@@ -34,16 +39,16 @@ public class BytesBuilder extends OutputStream {
     private int length = 0;
 
     /**
-     * Constructs with 64-bytes initial segment capacity.
+     * Constructs with the default initial segment capacity ({@link #DEFAULT_SEGMENT_CAPACITY}).
      */
     public BytesBuilder() {
-        this(64);
+        this(DEFAULT_SEGMENT_CAPACITY);
     }
 
     /**
-     * Constructs with the specified initial segment capacity in bytes.
+     * Constructs with the specified initial segment capacity and default segment list capacity ({@code -1}).
      *
-     * @param initialSegmentCapacity the specified initial segment capacity in bytes
+     * @param initialSegmentCapacity the specified initial segment capacity
      * @throws IllegalArgumentException if the capacity is not positive
      */
     public BytesBuilder(int initialSegmentCapacity) throws IllegalArgumentException {
@@ -53,10 +58,10 @@ public class BytesBuilder extends OutputStream {
     /**
      * Constructs with the specified initial segment capacity and initial segment list capacity.
      *
-     * @param initialSegmentCapacity     the specified initial segment capacity in bytes
-     * @param initialSegmentListCapacity the initial capacity of the segment list, or -1 for default
-     * @throws IllegalArgumentException if the segment capacity is not positive, or the list capacity is neither -1 nor
-     *                                  positive
+     * @param initialSegmentCapacity     the specified initial segment capacity
+     * @param initialSegmentListCapacity the initial capacity of the segment list, or {@code -1} for default
+     * @throws IllegalArgumentException if the segment capacity is not positive, or the list capacity is neither
+     *                                  {@code -1} nor positive
      */
     public BytesBuilder(
         int initialSegmentCapacity,

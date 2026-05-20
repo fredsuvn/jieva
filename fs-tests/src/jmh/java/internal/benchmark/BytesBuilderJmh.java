@@ -19,7 +19,7 @@ public class BytesBuilderJmh extends AbstractJmhBenchmark implements DataGen {
 
     @Param({
         "8",
-        "64",
+        "32",
         "1024"
     })
     private int dataLength;
