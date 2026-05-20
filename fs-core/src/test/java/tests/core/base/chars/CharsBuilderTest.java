@@ -139,6 +139,7 @@ public class CharsBuilderTest implements DataGen {
             assertEquals(0, buf3.remaining());
             stringBuilder.append(buf4);
         }
+        assertEquals(charsBuilder.length(), stringBuilder.length());
         assertEquals(charsBuilder.toString(), stringBuilder.toString());
         assertArrayEquals(charsBuilder.toCharArray(), stringBuilder.toString().toCharArray());
         assertEquals(charsBuilder.toCharBuffer(), CharBuffer.wrap(stringBuilder.toString().toCharArray()));

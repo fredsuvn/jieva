@@ -370,6 +370,15 @@ public class CharsBuilder extends Writer {
     }
 
     /**
+     * Returns the length of appended data.
+     *
+     * @return the length of appended data
+     */
+    public int length() {
+        return length;
+    }
+
+    /**
      * Returns a new array containing a copy of the appended data.
      *
      * @return a new array containing a copy of the appended data
