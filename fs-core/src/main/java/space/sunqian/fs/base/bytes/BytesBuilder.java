@@ -4,71 +4,71 @@ import space.sunqian.annotation.Nonnull;
 import space.sunqian.fs.base.Checker;
 import space.sunqian.fs.base.chars.CharsKit;
 import space.sunqian.fs.io.BufferKit;
-import space.sunqian.fs.io.IOKit;
-import space.sunqian.fs.io.IORuntimeException;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@code BytesBuilder} is used to build byte arrays and their derived objects by appending byte data. It is similar to
- * {@link ByteArrayOutputStream}, provides compatible methods, but is not thread-safe. This class also extends the
- * {@link OutputStream}, but the {@code close()} method has no effect.
+ * {@link ByteArrayOutputStream}, provides compatible methods, but is not thread-safe, and the {@code close()} method
+ * has no effect.
+ * <p>
+ * {@code BytesBuilder} uses a segmented storage strategy for efficient memory management and avoids frequent array
+ * copying during large data appends. It holds a list of segments, each segment is a byte array, using
+ * {@link #BytesBuilder(int)} and {@link #BytesBuilder(int, int)} can specify the capacity for them.
  *
  * @author sunqian
  */
 public class BytesBuilder extends OutputStream {
 
-    // Max array size.
-    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+    private final @Nonnull List<byte[]> segmentList;
+    private final int segmentCapacity;
+    private byte[] segment;
+    private int segmentOff = 0;
 
-    private final int maxSize;
-
-    private byte @Nonnull [] buf;
-    private int count;
+    private int length = 0;
 
     /**
-     * Constructs with 32-bytes initial capacity.
+     * Constructs with 64-bytes initial segment capacity.
      */
     public BytesBuilder() {
-        this(32);
+        this(64);
     }
 
     /**
-     * Constructs with the specified initial capacity in bytes.
+     * Constructs with the specified initial segment capacity in bytes.
      *
-     * @param initialCapacity the specified initial capacity in bytes
-     * @throws IllegalArgumentException if size is negative
+     * @param initialSegmentCapacity the specified initial segment capacity in bytes
+     * @throws IllegalArgumentException if the capacity is not positive
      */
-    public BytesBuilder(int initialCapacity) throws IllegalArgumentException {
-        this(initialCapacity, MAX_ARRAY_SIZE);
+    public BytesBuilder(int initialSegmentCapacity) throws IllegalArgumentException {
+        this(initialSegmentCapacity, -1);
     }
 
     /**
-     * Constructs with the specified initial capacity and the max capacity in bytes.
+     * Constructs with the specified initial segment capacity and initial segment list capacity.
      *
-     * @param initialCapacity the specified initial capacity in bytes
-     * @param maxCapacity     the max capacity in bytes
-     * @throws IllegalArgumentException if the {@code initialCapacity < 0} or {@code maxCapacity < 0} or
-     *                                  {@code initialCapacity > maxCapacity}
+     * @param initialSegmentCapacity     the specified initial segment capacity in bytes
+     * @param initialSegmentListCapacity the initial capacity of the segment list, or -1 for default
+     * @throws IllegalArgumentException if the segment capacity is not positive, or the list capacity is neither -1 nor
+     *                                  positive
      */
-    public BytesBuilder(int initialCapacity, int maxCapacity) throws IllegalArgumentException {
-        if (initialCapacity < 0) {
-            throw new IllegalArgumentException("Negative initial capacity: " + initialCapacity + ".");
-        }
-        if (maxCapacity < 0) {
-            throw new IllegalArgumentException("Negative max capacity: " + maxCapacity + ".");
-        }
-        if (initialCapacity > maxCapacity) {
-            throw new IllegalArgumentException("Initial capacity must <= max capacity!");
-        }
-        buf = new byte[initialCapacity];
-        this.maxSize = maxCapacity;
+    public BytesBuilder(
+        int initialSegmentCapacity,
+        int initialSegmentListCapacity
+    ) throws IllegalArgumentException {
+        Checker.checkArgument(initialSegmentCapacity > 0, "initialSegmentCapacity must > 0");
+        Checker.checkArgument(
+            initialSegmentListCapacity == -1 || initialSegmentListCapacity > 0,
+            "initialSegmentListCapacity must be -1 or > 0"
+        );
+        this.segmentCapacity = initialSegmentCapacity;
+        this.segmentList = initialSegmentListCapacity == -1 ? new ArrayList<>() : new ArrayList<>(initialSegmentListCapacity);
     }
 
     /**
@@ -78,153 +78,52 @@ public class BytesBuilder extends OutputStream {
      */
     @Override
     public void write(int b) {
-        ensureCapacity(count + 1);
-        buf[count] = (byte) b;
-        count += 1;
+        prepareBuffer();
+        segment[segmentOff++] = (byte) b;
+        length++;
     }
 
     /**
      * Appends all bytes from the given array.
      *
-     * @param b the given array
+     * @param arr the given array
      */
     @Override
-    public void write(byte @Nonnull [] b) {
-        ensureCapacity(count + b.length);
-        System.arraycopy(b, 0, buf, count, b.length);
-        count += b.length;
+    public void write(byte @Nonnull [] arr) {
+        write(arr, 0, arr.length);
     }
 
     /**
      * Appends the specified number of bytes from the given array, starting at the specified offset.
      *
-     * @param b   the given array
+     * @param arr the given array
      * @param off the specified offset
-     * @param len the specified number
-     * @throws IndexOutOfBoundsException if the offset or number is out of bounds
+     * @param len the specified number of bytes to append
+     * @throws IndexOutOfBoundsException if the offset or length is out of bounds
      */
     @Override
-    public void write(byte @Nonnull [] b, int off, int len) throws IndexOutOfBoundsException {
-        Checker.checkOffLen(off, len, b.length);
-        ensureCapacity(count + len);
-        System.arraycopy(b, off, buf, count, len);
-        count += len;
-    }
-
-    /**
-     * Writes the appended data of this builder to the specified output stream.
-     *
-     * @param out the specified output stream
-     * @throws IORuntimeException if an I/O error occurs
-     */
-    public void writeTo(@Nonnull OutputStream out) throws IORuntimeException {
-        try {
-            out.write(buf, 0, count);
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
+    public void write(byte @Nonnull [] arr, int off, int len) throws IndexOutOfBoundsException {
+        Checker.checkOffLen(off, len, arr.length);
+        if (len == 0) {
+            return;
         }
-    }
-
-    /**
-     * Writes the appended buffered data of this builder to the specified buffer.
-     *
-     * @param out the specified buffer
-     * @throws IORuntimeException if an I/O error occurs
-     */
-    public void writeTo(@Nonnull ByteBuffer out) throws IORuntimeException {
-        try {
-            out.put(buf, 0, count);
-        } catch (Exception e) {
-            throw new IORuntimeException(e);
+        prepareBuffer();
+        int copyLength = Math.min(segment.length - segmentOff, len);
+        System.arraycopy(arr, off, segment, segmentOff, copyLength);
+        segmentOff += copyLength;
+        if (copyLength < len) {
+            segmentList.add(segment);
+            segment = null;
+            int restLen = len - copyLength;
+            if (restLen >= segmentCapacity) {
+                segmentList.add(Arrays.copyOfRange(arr, off + copyLength, off + len));
+            } else {
+                prepareBuffer();
+                System.arraycopy(arr, off + copyLength, segment, segmentOff, restLen);
+                segmentOff += restLen;
+            }
         }
-    }
-
-    /**
-     * Resets this builder, the appended data will be discarded.
-     * <p>
-     * This method doesn't guarantee releasing the allocated space for the appended data. To trim and release the unused
-     * space, use {@link #trim()}.
-     */
-    public void reset() {
-        count = 0;
-    }
-
-    /**
-     * Trims and releases the allocated but unused space.
-     */
-    public void trim() {
-        if (count < buf.length) {
-            buf = Arrays.copyOf(buf, count);
-        }
-    }
-
-    /**
-     * Returns the size of appended data.
-     *
-     * @return the size of appended data
-     */
-    public int size() {
-        return count;
-    }
-
-    /**
-     * Returns a new array containing a copy of the appended data.
-     *
-     * @return a new array containing a copy of the appended data
-     */
-    public byte @Nonnull [] toByteArray() {
-        return Arrays.copyOf(buf, count);
-    }
-
-    /**
-     * Returns a new buffer containing a copy of the appended data.
-     *
-     * @return a new buffer containing a copy of the appended data
-     */
-    public @Nonnull ByteBuffer toByteBuffer() {
-        return ByteBuffer.wrap(toByteArray());
-    }
-
-    /**
-     * Returns a string decoded from the appended data using {@link CharsKit#defaultCharset()}. Note that the behavior
-     * of this method is <b>different</b> from {@link ByteArrayOutputStream#toString()}
-     *
-     * @return a string decoded from the appended data using {@link CharsKit#defaultCharset()}
-     * @see ByteArrayOutputStream#toString()
-     */
-    @Override
-    public @Nonnull String toString() {
-        return toString(CharsKit.defaultCharset());
-    }
-
-    /**
-     * Returns a string decoded from the appended data using the specified charset. This is a compatible method of
-     * {@link ByteArrayOutputStream#toString(String)}.
-     *
-     * @param charsetName name of the specified charset
-     * @return a string decoded from the appended data using the specified charset
-     * @throws UnsupportedEncodingException If the named charset is not supported
-     * @see ByteArrayOutputStream#toString(String)
-     */
-    public @Nonnull String toString(@Nonnull String charsetName) throws UnsupportedEncodingException {
-        return new String(buf, 0, count, charsetName);
-    }
-
-    /**
-     * Returns a string decoded from the appended data using the specified charset.
-     *
-     * @param charset the specified charset
-     * @return a string decoded from the appended data using the specified charset
-     */
-    public @Nonnull String toString(@Nonnull Charset charset) {
-        return new String(buf, 0, count, charset);
-    }
-
-    /**
-     * No effect for this builder.
-     */
-    @Override
-    public void close() {
+        length += len;
     }
 
     /**
@@ -233,7 +132,7 @@ public class BytesBuilder extends OutputStream {
      * @param b the specified byte
      * @return this builder
      */
-    public BytesBuilder append(int b) {
+    public @Nonnull BytesBuilder append(int b) {
         write(b);
         return this;
     }
@@ -265,9 +164,9 @@ public class BytesBuilder extends OutputStream {
      *
      * @param bytes  the given array
      * @param offset the specified offset
-     * @param length the specified number
+     * @param length the specified number of bytes to append
      * @return this builder
-     * @throws IndexOutOfBoundsException if the offset or number is out of bounds
+     * @throws IndexOutOfBoundsException if the offset or length is out of bounds
      */
     public @Nonnull BytesBuilder append(byte @Nonnull [] bytes, int offset, int length) throws IndexOutOfBoundsException {
         write(bytes, offset, length);
@@ -275,103 +174,118 @@ public class BytesBuilder extends OutputStream {
     }
 
     /**
-     * Reads and appends all bytes from the given buffer.
+     * Reads and appends all byte data from the given buffer. Note the buffer will be advanced to the end.
      *
-     * @param bytes the given buffer
+     * @param buffer the given buffer
      * @return this builder
      */
-    public @Nonnull BytesBuilder append(@Nonnull ByteBuffer bytes) {
-        int remaining = bytes.remaining();
+    public @Nonnull BytesBuilder append(@Nonnull ByteBuffer buffer) {
+        int remaining = buffer.remaining();
         if (remaining == 0) {
             return this;
         }
-        if (bytes.hasArray()) {
-            write(bytes.array(), BufferKit.arrayStartIndex(bytes), bytes.remaining());
-            bytes.position(bytes.position() + bytes.remaining());
+        if (buffer.hasArray()) {
+            write(buffer.array(), BufferKit.arrayStartIndex(buffer), buffer.remaining());
+            buffer.position(buffer.position() + buffer.remaining());
         } else {
             byte[] data = new byte[remaining];
-            bytes.get(data);
+            buffer.get(data);
             write(data);
         }
         return this;
     }
 
-    /**
-     * Reads and appends all bytes from the given stream.
-     *
-     * @param in the given stream
-     * @return this builder
-     * @throws IORuntimeException if an I/O error occurs
-     */
-    public @Nonnull BytesBuilder append(@Nonnull InputStream in) throws IORuntimeException {
-        return append(in, IOKit.bufferSize());
+    private void prepareBuffer() {
+        if (segment == null) {
+            refreshBuffer();
+        } else if (segmentOff == segment.length) {
+            segmentList.add(segment);
+            refreshBuffer();
+        }
+    }
+
+    private void refreshBuffer() {
+        segment = new byte[segmentCapacity];
+        segmentOff = 0;
     }
 
     /**
-     * Reads and appends all bytes from the given stream with the specified buffer size for each reading.
-     *
-     * @param in      the given stream
-     * @param bufSize the specified buffer size for each reading
-     * @return this builder
-     * @throws IllegalArgumentException if the buffer size {@code <=0}
-     * @throws IORuntimeException       if an I/O error occurs
+     * Resets this builder, the appended data will be discarded.
      */
-    public @Nonnull BytesBuilder append(
-        @Nonnull InputStream in, int bufSize
-    ) throws IllegalArgumentException, IORuntimeException {
-        if (bufSize <= 0) {
-            throw new IllegalArgumentException("The buffer size must > 0.");
-        }
-        byte[] buffer = new byte[bufSize];
-        while (true) {
-            try {
-                int readSize = in.read(buffer);
-                if (readSize < 0) {
-                    return this;
-                }
-                write(buffer, 0, readSize);
-            } catch (Exception e) {
-                throw new IORuntimeException(e);
-            }
-        }
+    public void reset() {
+        segmentList.clear();
+        length = 0;
+        segment = null;
+        segmentOff = 0;
     }
 
     /**
-     * Appends all bytes from the given builder.
-     *
-     * @param builder the given builder
-     * @return this builder
+     * No effect for this builder.
      */
-    public @Nonnull BytesBuilder append(@Nonnull BytesBuilder builder) {
-        write(builder.buf, 0, builder.count);
-        return this;
+    @Override
+    public void flush() {
     }
 
-    private void ensureCapacity(int minCapacity) {
-        if (buf.length < minCapacity) {
-            grow(minCapacity);
-        }
+    /**
+     * No effect for this builder.
+     */
+    @Override
+    public void close() {
     }
 
-    private void grow(int minCapacity) {
-        if (minCapacity < 0 || minCapacity > maxSize) {
-            throw new IllegalStateException("Buffer out of size: " + minCapacity + ".");
-        }
-        int oldCapacity = buf.length;
-        int newCapacity;
-        if (oldCapacity == 0) {
-            newCapacity = minCapacity;
-        } else {
-            newCapacity = oldCapacity * 2;
-        }
-        newCapacity = newCapacity(newCapacity, minCapacity);
-        buf = Arrays.copyOf(buf, newCapacity);
+    /**
+     * Returns the length of appended data.
+     *
+     * @return the length of appended data
+     */
+    public int length() {
+        return length;
     }
 
-    private int newCapacity(int newCapacity, int minCapacity) {
-        if (newCapacity <= 0 || newCapacity > maxSize) {
-            return maxSize;
+    /**
+     * Returns a new array containing a copy of the appended data.
+     *
+     * @return a new array containing a copy of the appended data
+     */
+    public byte @Nonnull [] toByteArray() {
+        byte[] result = new byte[length];
+        int off = 0;
+        for (byte[] seg : segmentList) {
+            System.arraycopy(seg, 0, result, off, seg.length);
+            off += seg.length;
         }
-        return Math.max(newCapacity, minCapacity);
+        if (segment != null) {
+            System.arraycopy(segment, 0, result, off, segmentOff);
+        }
+        return result;
+    }
+
+    /**
+     * Returns a new buffer containing a copy of the appended data.
+     *
+     * @return a new buffer containing a copy of the appended data
+     */
+    public @Nonnull ByteBuffer toByteBuffer() {
+        return ByteBuffer.wrap(toByteArray());
+    }
+
+    /**
+     * Returns a string decoded from the appended data using {@link CharsKit#defaultCharset()}.
+     *
+     * @return a string decoded from the appended data using {@link CharsKit#defaultCharset()}
+     */
+    @Override
+    public @Nonnull String toString() {
+        return toString(Charset.defaultCharset());
+    }
+
+    /**
+     * Returns a string decoded from the appended data using the specified charset.
+     *
+     * @param charset the specified charset
+     * @return a string decoded from the appended data using the specified charset
+     */
+    public @Nonnull String toString(@Nonnull Charset charset) {
+        return new String(toByteArray(), charset);
     }
 }
