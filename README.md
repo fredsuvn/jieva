@@ -161,6 +161,8 @@ CharReader charReader = CharReader.from(reader);
 // Building data
 BytesBuilder bytesBuilder = new BytesBuilder();
 bytesBuilder.append("Hello".getBytes(StandardCharsets.UTF_8));
+CharsBuilder charsBuilder = new CharsBuilder();
+charsBuilder.append("Hello");
 ```
 
 ### Dependency Injection
