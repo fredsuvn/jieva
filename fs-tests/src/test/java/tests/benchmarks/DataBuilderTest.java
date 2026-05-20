@@ -3,12 +3,16 @@ package tests.benchmarks;
 import internal.utils.DataGen;
 import org.junit.jupiter.api.Test;
 import space.sunqian.fs.base.chars.CharsBuilder;
+import space.sunqian.fs.base.random.Rog;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DataBuilderTest implements DataGen {
-
-    private static final int DATA_TIMES = 15;
 
     // @Test
     // public void testBytesAppender() throws Exception {
@@ -63,32 +67,55 @@ public class DataBuilderTest implements DataGen {
 
     @Test
     public void testBuildForString() throws Exception {
-        char[] data = randomChars(32);
-        char[] dataSum = new char[data.length * DATA_TIMES];
-        for (int i = 0; i < DATA_TIMES; i++) {
-            System.arraycopy(data, 0, dataSum, i * data.length, data.length);
-        }
-        int mid = data.length / 2;
-        char[] d1 = Arrays.copyOfRange(data, 0, mid);
-        String d2 = new String(Arrays.copyOfRange(data, mid, data.length));
+        testBuildForString(8);
+        testBuildForString(32);
+        testBuildForString(128);
+        testBuildForString(1024);
     }
 
-    private String byCharsBuilder(char[] d1, String d2) throws Exception {
+    private void testBuildForString(int dataLength) throws Exception {
+        List<Object> data = new ArrayList<>(dataLength);
+        Random random = new Random();
+        Rog<Object> rog = Rog.newBuilder()
+            .weight(50, () -> randomChars(random.nextInt(1024) + 2))
+            .weight(50, () -> new String(randomChars(random.nextInt(1024) + 2)))
+            .build();
+        for (int i = 0; i < dataLength; i++) {
+            data.add(rog.next());
+        }
+        String result = data.stream().map(e -> {
+            if (e instanceof char[]) {
+                return new String((char[]) e);
+            }
+            return e.toString();
+        }).collect(Collectors.joining(""));
+        assertEquals(result, byCharsBuilder(data));
+        assertEquals(result, byStringBuilder(data));
+    }
+
+    private String byCharsBuilder(List<Object> data) throws Exception {
         CharsBuilder appender = new CharsBuilder();
-        for (int i = 0; i < DATA_TIMES; i++) {
-            appender.append(d1[0]);
-            appender.append(d1, 1, d1.length - 1);
-            appender.append(d2);
+        for (Object datum : data) {
+            if (datum instanceof char[]) {
+                char[] chars = (char[]) datum;
+                appender.append(chars[0]);
+                appender.append(chars, 1, chars.length - 1);
+                continue;
+            }
+            appender.append((String) datum);
         }
         return appender.toString();
     }
 
-    private String byStringBuilder(char[] d1, String d2) throws Exception {
+    private String byStringBuilder(List<Object> data) throws Exception {
         StringBuilder appender = new StringBuilder();
-        for (int i = 0; i < DATA_TIMES; i++) {
-            appender.append(d1[0]);
-            appender.append(d1, 1, d1.length - 1);
-            appender.append(d2);
+        for (Object datum : data) {
+            if (datum instanceof char[]) {
+                char[] chars = (char[]) datum;
+                appender.append(chars);
+                continue;
+            }
+            appender.append((String) datum);
         }
         return appender.toString();
     }

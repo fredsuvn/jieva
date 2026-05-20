@@ -7,22 +7,23 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 import space.sunqian.fs.base.chars.CharsBuilder;
+import space.sunqian.fs.base.random.Rog;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class CharsBuilderJmh extends AbstractJmhBenchmark implements DataGen {
 
-    private final char[] data = randomChars(32);
-    private char[] d1;
-    private String d2;
-    private char[] dataSum;
+    private List<Object> data;
 
     @Param({
-        "5",
-        "50",
-        "200"
+        "8",
+        "32",
+        "128",
+        "1024"
     })
-    private int dataTimes;
+    private int dataLength;
     @Param({
         "byCharsBuilder",
         "byStringBuilder",
@@ -31,13 +32,15 @@ public class CharsBuilderJmh extends AbstractJmhBenchmark implements DataGen {
 
     @Setup(Level.Trial)
     public void setup() {
-        this.dataSum = new char[data.length * dataTimes];
-        for (int i = 0; i < dataTimes; i++) {
-            System.arraycopy(data, 0, dataSum, i * data.length, data.length);
+        this.data = new ArrayList<>(dataLength);
+        Random random = new Random();
+        Rog<Object> rog = Rog.newBuilder()
+            .weight(50, () -> randomChars(random.nextInt(1024) + 2))
+            .weight(50, () -> new String(randomChars(random.nextInt(1024) + 2)))
+            .build();
+        for (int i = 0; i < dataLength; i++) {
+            data.add(rog.next());
         }
-        int mid = data.length / 2;
-        d1 = Arrays.copyOfRange(data, 0, mid);
-        d2 = new String(Arrays.copyOfRange(data, mid, data.length));
     }
 
     @Benchmark
@@ -51,20 +54,27 @@ public class CharsBuilderJmh extends AbstractJmhBenchmark implements DataGen {
 
     private String byCharsBuilder() throws Exception {
         CharsBuilder appender = new CharsBuilder();
-        for (int i = 0; i < dataTimes; i++) {
-            appender.append(d1[0]);
-            appender.append(d1, 1, d1.length - 1);
-            appender.append(d2);
+        for (Object datum : data) {
+            if (datum instanceof char[]) {
+                char[] chars = (char[]) datum;
+                appender.append(chars[0]);
+                appender.append(chars, 1, chars.length - 1);
+                continue;
+            }
+            appender.append((String) datum);
         }
         return appender.toString();
     }
 
     private String byStringBuilder() throws Exception {
         StringBuilder appender = new StringBuilder();
-        for (int i = 0; i < dataTimes; i++) {
-            appender.append(d1[0]);
-            appender.append(d1, 1, d1.length - 1);
-            appender.append(d2);
+        for (Object datum : data) {
+            if (datum instanceof char[]) {
+                char[] chars = (char[]) datum;
+                appender.append(chars);
+                continue;
+            }
+            appender.append((String) datum);
         }
         return appender.toString();
     }
