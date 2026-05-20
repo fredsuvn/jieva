@@ -435,7 +435,7 @@ public class TcpTest implements DataGen, TestPrint {
                         builders[thread.num].append(bytes);
                         context.writeBytes(bytes);
                     }
-                    if (builders[thread.num].size() == data.length) {
+                    if (builders[thread.num].length() == data.length) {
                         readLatches[thread.num].countDown();
                     }
                     assertSame(context.attachment(), attachment);
@@ -509,7 +509,7 @@ public class TcpTest implements DataGen, TestPrint {
                 if (bytes != null) {
                     b.append(bytes);
                 }
-                if (b.size() == data.length) {
+                if (b.length() == data.length) {
                     break;
                 }
             }

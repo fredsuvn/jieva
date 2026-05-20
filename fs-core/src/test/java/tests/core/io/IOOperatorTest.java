@@ -156,17 +156,17 @@ public class IOOperatorTest implements DataGen {
                 -1,
                 IOKit.readTo(new ByteArrayInputStream(data), bb)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
             assertEquals(
                 0,
                 IOKit.readTo(new ByteArrayInputStream(data), bb, 0)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
             assertEquals(
                 -1,
                 IOKit.readTo(new ByteArrayInputStream(data), bb, 11)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
         }
         {
             // size 0: stream to channel
@@ -177,17 +177,17 @@ public class IOOperatorTest implements DataGen {
                 -1,
                 IOKit.readTo(new ByteArrayInputStream(data), channel)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
             assertEquals(
                 0,
                 IOKit.readTo(new ByteArrayInputStream(data), channel, 0)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
             assertEquals(
                 -1,
                 IOKit.readTo(new ByteArrayInputStream(data), channel, 11)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
         }
         {
             // size 0: stream to array
@@ -275,17 +275,17 @@ public class IOOperatorTest implements DataGen {
                 -1,
                 IOKit.readTo(Channels.newChannel(new ByteArrayInputStream(data)), Channels.newChannel(bb))
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
             assertEquals(
                 0,
                 IOKit.readTo(Channels.newChannel(new ByteArrayInputStream(data)), Channels.newChannel(bb), 0)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
             assertEquals(
                 -1,
                 IOKit.readTo(Channels.newChannel(new ByteArrayInputStream(data)), Channels.newChannel(bb), 11)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
         }
         {
             // size 0: channel to stream
@@ -296,17 +296,17 @@ public class IOOperatorTest implements DataGen {
                 -1,
                 IOKit.readTo(channel, bb)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
             assertEquals(
                 0,
                 IOKit.readTo(channel, bb, 0)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
             assertEquals(
                 -1,
                 IOKit.readTo(channel, bb, 11)
             );
-            assertEquals(0, bb.size());
+            assertEquals(0, bb.length());
         }
         {
             // size 0: channel to array
