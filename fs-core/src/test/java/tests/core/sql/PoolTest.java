@@ -1,12 +1,12 @@
-package tests.core.utils.jdbc;
+package tests.core.sql;
 
 import internal.annotations.J17Only;
 import org.junit.jupiter.api.Test;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.base.value.IntVar;
 import space.sunqian.fs.base.value.Var;
-import space.sunqian.fs.utils.jdbc.SimpleJdbcPool;
-import space.sunqian.fs.utils.jdbc.SqlRuntimeException;
+import space.sunqian.fs.sql.SimpleJdbcPool;
+import space.sunqian.fs.sql.SqlRuntimeException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

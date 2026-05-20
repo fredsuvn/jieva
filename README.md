@@ -224,7 +224,7 @@ Explore the [samples directory](fs-tests/src/samples) for detailed usage example
 | `JsonSample` | JSON parsing and formatting |
 | `CacheSample` | Lightweight caching utilities |
 | `EventBusSample` | Event-driven communication |
-| `JdbcSample` | JDBC utilities |
+| `SqlSample` | SQL and JDBC utilities |
 | `CodecSample` | Base64, Hex encoding utilities |
 
 ---

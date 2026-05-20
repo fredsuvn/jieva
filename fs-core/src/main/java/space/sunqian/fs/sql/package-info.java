@@ -24,23 +24,23 @@
  * }</pre>
  * Core interfaces:
  * <ul>
- *     <li>{@link space.sunqian.fs.utils.jdbc.SimpleJdbcPool}</li>
- *     <li>{@link space.sunqian.fs.utils.jdbc.SqlBuilder}</li>
- *     <li>{@link space.sunqian.fs.utils.jdbc.PreparedSql}</li>
- *     <li>{@link space.sunqian.fs.utils.jdbc.PreparedBatchSql}</li>
- *     <li>{@link space.sunqian.fs.utils.jdbc.SqlQuery}</li>
- *     <li>{@link space.sunqian.fs.utils.jdbc.SqlInsert}</li>
- *     <li>{@link space.sunqian.fs.utils.jdbc.SqlUpdate}</li>
- *     <li>{@link space.sunqian.fs.utils.jdbc.SqlOperation}</li>
- *     <li>{@link space.sunqian.fs.utils.jdbc.SqlBatch}</li>
+ *     <li>{@link space.sunqian.fs.sql.SimpleJdbcPool}</li>
+ *     <li>{@link space.sunqian.fs.sql.SqlBuilder}</li>
+ *     <li>{@link space.sunqian.fs.sql.PreparedSql}</li>
+ *     <li>{@link space.sunqian.fs.sql.PreparedBatchSql}</li>
+ *     <li>{@link space.sunqian.fs.sql.SqlQuery}</li>
+ *     <li>{@link space.sunqian.fs.sql.SqlInsert}</li>
+ *     <li>{@link space.sunqian.fs.sql.SqlUpdate}</li>
+ *     <li>{@link space.sunqian.fs.sql.SqlOperation}</li>
+ *     <li>{@link space.sunqian.fs.sql.SqlBatch}</li>
  * </ul>
  * Utility classes:
  * <ul>
- *     <li>{@link space.sunqian.fs.utils.jdbc.JdbcKit}</li>
+ *     <li>{@link space.sunqian.fs.sql.SqlKit}</li>
  * </ul>
  * Runtime exceptions for SQL operations:
  * <ul>
- *     <li>{@link space.sunqian.fs.utils.jdbc.SqlRuntimeException}</li>
+ *     <li>{@link space.sunqian.fs.sql.SqlRuntimeException}</li>
  * </ul>
  */
-package space.sunqian.fs.utils.jdbc;
+package space.sunqian.fs.sql;

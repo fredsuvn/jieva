@@ -1,6 +1,6 @@
 package internal.samples;
 
-import space.sunqian.fs.utils.jdbc.JdbcKit;
+import space.sunqian.fs.sql.SqlKit;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Sample: JDBC Utilities Usage
+ * Sample: SQL and JDBC Utilities Usage
  * <p>
  * Purpose: Demonstrate how to use the JDBC utilities provided by fs-core module.
  * <p>
@@ -29,11 +29,11 @@ import java.sql.Statement;
  * Key Classes:
  * <ul>
  *   <li>
- *     {@link JdbcKit}: JDBC utilities for result set processing
+ *     {@link SqlKit}: SQL and JDBC utilities for result set processing
  *   </li>
  * </ul>
  */
-public class JdbcSample {
+public class SqlSample {
 
     public static void main(String[] args) {
         // Note: This is a demonstration only. You would need to provide actual database connection details.

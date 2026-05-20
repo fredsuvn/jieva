@@ -1,4 +1,4 @@
-package tests.core.utils.jdbc;
+package tests.core.sql;
 
 import internal.annotations.J17Only;
 import lombok.AllArgsConstructor;
@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Test;
 import space.sunqian.fs.collect.ListKit;
 import space.sunqian.fs.object.convert.ObjectConverter;
 import space.sunqian.fs.reflect.TypeRef;
-import space.sunqian.fs.utils.jdbc.JdbcKit;
-import space.sunqian.fs.utils.jdbc.PreparedBatchSql;
-import space.sunqian.fs.utils.jdbc.PreparedSql;
-import space.sunqian.fs.utils.jdbc.SqlBatch;
-import space.sunqian.fs.utils.jdbc.SqlBuilder;
-import space.sunqian.fs.utils.jdbc.SqlInsert;
-import space.sunqian.fs.utils.jdbc.SqlQuery;
-import space.sunqian.fs.utils.jdbc.SqlRuntimeException;
-import space.sunqian.fs.utils.jdbc.SqlUpdate;
+import space.sunqian.fs.sql.PreparedBatchSql;
+import space.sunqian.fs.sql.PreparedSql;
+import space.sunqian.fs.sql.SqlBatch;
+import space.sunqian.fs.sql.SqlBuilder;
+import space.sunqian.fs.sql.SqlInsert;
+import space.sunqian.fs.sql.SqlKit;
+import space.sunqian.fs.sql.SqlQuery;
+import space.sunqian.fs.sql.SqlRuntimeException;
+import space.sunqian.fs.sql.SqlUpdate;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -312,7 +312,7 @@ public class SqlTest {
             .append("SELECT * FROM `user` WHERE id = ", 1L)
             .build()
             .query(User.class, h2Connection)
-            .first(JdbcKit.defaultNameMapper());
+            .first(SqlKit.defaultNameMapper());
         assertEquals(1L, eve.getId());
         assertEquals("Eve", eve.getName());
         assertEquals(28, eve.getAge());
@@ -349,7 +349,7 @@ public class SqlTest {
             .build()
             .query(User.class, h2Connection);
         assertNull(deletedQuery.first(
-            JdbcKit.defaultNameMapper(),
+            SqlKit.defaultNameMapper(),
             ObjectConverter.defaultConverter()
         ));
     }
@@ -378,7 +378,7 @@ public class SqlTest {
             .build()
             .query(new TypeRef<User>() {}, h2Connection)
             .list(
-                JdbcKit.defaultNameMapper()
+                SqlKit.defaultNameMapper()
             )
             .get(0);
         assertEquals(1L, bob.getId());

@@ -1,4 +1,4 @@
-package space.sunqian.fs.utils.jdbc;
+package space.sunqian.fs.sql;
 
 import space.sunqian.annotation.Immutable;
 import space.sunqian.annotation.Nonnull;
@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Utilities for JDBC and SQL.
+ * Utilities for SQL and JDBC.
  *
  * @author sunqian
  */
-public class JdbcKit {
+public class SqlKit {
 
     /**
      * Return the default name mapper to map the column name to the field name of the element type. The default name
@@ -272,6 +272,6 @@ public class JdbcKit {
         }
     }
 
-    private JdbcKit() {
+    private SqlKit() {
     }
 }

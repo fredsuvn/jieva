@@ -1,4 +1,4 @@
-package tests.core.utils.jdbc;
+package tests.core.sql;
 
 import internal.annotations.J17Only;
 import lombok.Data;
@@ -7,8 +7,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.reflect.TypeRef;
-import space.sunqian.fs.utils.jdbc.JdbcKit;
-import space.sunqian.fs.utils.jdbc.SqlRuntimeException;
+import space.sunqian.fs.sql.SqlKit;
+import space.sunqian.fs.sql.SqlRuntimeException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -81,7 +81,7 @@ public class JdbcTest {
         );
         // default name mapper for Class<User>
         ResultSet resultSet = preparedStatement.executeQuery();
-        List<User> users = JdbcKit.toObject(
+        List<User> users = SqlKit.toObject(
             resultSet,
             User.class
         );
@@ -96,7 +96,7 @@ public class JdbcTest {
         );
         // default name mapper for TypeRef<User>
         ResultSet resultSet = preparedStatement.executeQuery();
-        List<Map<String, Object>> users = JdbcKit.toObject(
+        List<Map<String, Object>> users = SqlKit.toObject(
             resultSet,
             new TypeRef<Map<String, Object>>() {}
         );
@@ -111,7 +111,7 @@ public class JdbcTest {
         );
         // default name mapper for Type
         ResultSet resultSet = preparedStatement.executeQuery();
-        List<Map<String, Object>> users = Fs.as(JdbcKit.toObject(
+        List<Map<String, Object>> users = Fs.as(SqlKit.toObject(
             resultSet,
             new TypeRef<Map<String, Object>>() {}.type()
         ));
@@ -126,7 +126,7 @@ public class JdbcTest {
         );
         // lower case name mapper
         ResultSet resultSet = preparedStatement.executeQuery();
-        List<User> users = JdbcKit.toObject(
+        List<User> users = SqlKit.toObject(
             resultSet,
             User.class,
             s ->
