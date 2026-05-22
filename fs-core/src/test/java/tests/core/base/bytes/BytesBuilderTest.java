@@ -82,6 +82,8 @@ public class BytesBuilderTest implements DataGen {
         output.write(d2);
         bytesBuilder.append(new byte[0]);
         output.write(new byte[0]);
+        bytesBuilder.append(new byte[1], 0, 0);
+        output.write(new byte[1], 0, 0);
         bytesBuilder.append(d2, 8, 16);
         output.write(d2, 8, 16);
         bytesBuilder.append(d2, 6, 222);

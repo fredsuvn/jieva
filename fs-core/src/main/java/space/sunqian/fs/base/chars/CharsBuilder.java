@@ -19,13 +19,14 @@ import java.util.List;
  * It is similar to {@link CharArrayWriter} and {@link StringBuilder}, but is not thread-safe. and it has no effect on
  * {@code close()} and {@code flush()} methods.
  * <p>
- * {@code CharsBuilder} uses a segmented storage strategy for efficient memory management and avoids frequent array
- * copying during large data appends. It holds a list of segments, each segment is a char array, using
- * {@link #CharsBuilder(int)} and {@link #CharsBuilder(int, int)} can specify the capacity for them.
+ * It is different from {@link StringBuilder} in that it does not use array copying to ensure and grow the internal
+ * buffer. Instead, it holds a list of segments to store the appended data, each segment is a char array or a string or
+ * a {@link StringSlice}, using {@link #CharsBuilder(int)} and {@link #CharsBuilder(int, int)} can specify the capacity
+ * for them.
  *
  * @author sunqian
  */
-public class CharsBuilder extends Writer {
+public final class CharsBuilder extends Writer {
 
     /**
      * The default initial segment capacity.
@@ -96,7 +97,10 @@ public class CharsBuilder extends Writer {
      */
     @Override
     public void write(char @Nonnull [] arr) {
-        write(arr, 0, arr.length);
+        if (arr.length == 0) {
+            return;
+        }
+        write0(arr, 0, arr.length);
     }
 
     /**
@@ -113,6 +117,10 @@ public class CharsBuilder extends Writer {
         if (len == 0) {
             return;
         }
+        write0(arr, off, len);
+    }
+
+    private void write0(char @Nonnull [] arr, int off, int len) throws IndexOutOfBoundsException {
         prepareBuffer();
         int copyLength = Math.min(segment.length - segmentOff, len);
         System.arraycopy(arr, off, segment, segmentOff, copyLength);
@@ -139,6 +147,13 @@ public class CharsBuilder extends Writer {
      */
     @Override
     public void write(@Nonnull String str) {
+        if (str.isEmpty()) {
+            return;
+        }
+        write0(str);
+    }
+
+    private void write0(@Nonnull String str) {
         if (segment == null) {
             segmentList.add(str);
         } else if (segmentOff == segment.length) {
@@ -172,6 +187,10 @@ public class CharsBuilder extends Writer {
         if (len == 0) {
             return;
         }
+        write0(str, off, len);
+    }
+
+    private void write0(@Nonnull String str, int off, int len) throws IndexOutOfBoundsException {
         if (segment == null) {
             segmentList.add(StringSlice.of(str, off, off + len));
         } else if (segmentOff == segment.length) {
@@ -219,14 +238,18 @@ public class CharsBuilder extends Writer {
      * @param csq the given char sequence, if it is {@code null}, then it will be considered as {@code "null"}.
      * @return this builder
      */
+    @SuppressWarnings("SizeReplaceableByIsEmpty")
     @Override
     public @Nonnull CharsBuilder append(@Nullable CharSequence csq) {
         if (csq == null) {
-            write(Fs.NULL_STRING);
+            write0(Fs.NULL_STRING);
+            return this;
+        }
+        if (csq.length() == 0) {
             return this;
         }
         if (csq instanceof String) {
-            write((String) csq);
+            write0((String) csq);
             return this;
         }
         append0(csq, 0, csq.length());
@@ -242,6 +265,7 @@ public class CharsBuilder extends Writer {
      * @return this builder
      * @throws IndexOutOfBoundsException if the start or end index is out of bounds
      */
+    @SuppressWarnings("SizeReplaceableByIsEmpty")
     @Override
     public @Nonnull CharsBuilder append(
         @Nullable CharSequence csq, int start, int end
@@ -250,8 +274,12 @@ public class CharsBuilder extends Writer {
             write(Fs.NULL_STRING, start, end - start);
             return this;
         }
+        Checker.checkStartEnd(start, end, csq.length());
+        if (csq.length() == 0) {
+            return this;
+        }
         if (csq instanceof String) {
-            write((String) csq, start, end - start);
+            write0((String) csq, start, end - start);
             return this;
         }
         append0(csq, start, end);
@@ -259,10 +287,6 @@ public class CharsBuilder extends Writer {
     }
 
     private void append0(@Nonnull CharSequence csq, int start, int end) throws IndexOutOfBoundsException {
-        Checker.checkStartEnd(start, end, csq.length());
-        if (end - start == 0) {
-            return;
-        }
         prepareBuffer();
         int len = end - start;
         int copyLength = Math.min(segment.length - segmentOff, len);
@@ -326,12 +350,12 @@ public class CharsBuilder extends Writer {
             return this;
         }
         if (buffer.hasArray()) {
-            write(buffer.array(), BufferKit.arrayStartIndex(buffer), buffer.remaining());
+            write0(buffer.array(), BufferKit.arrayStartIndex(buffer), buffer.remaining());
             buffer.position(buffer.position() + buffer.remaining());
         } else {
             char[] data = new char[remaining];
             buffer.get(data);
-            write(data);
+            write0(data, 0, remaining);
         }
         return this;
     }

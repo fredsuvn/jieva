@@ -84,6 +84,8 @@ public class CharsBuilderTest implements DataGen {
         stringBuilder.append(d2);
         charsBuilder.append(new char[0]);
         stringBuilder.append(new char[0]);
+        charsBuilder.append(new char[1], 0, 0);
+        stringBuilder.append(new char[1], 0, 0);
         charsBuilder.append(d2, 8, 16);
         stringBuilder.append(d2, 8, 16);
         charsBuilder.append(d2, 6, 222);
@@ -108,6 +110,10 @@ public class CharsBuilderTest implements DataGen {
         stringBuilder.append(new String(d2), 23, 233);
         charsBuilder.append("");
         stringBuilder.append("");
+        charsBuilder.write("");
+        stringBuilder.append("");
+        charsBuilder.write("123");
+        stringBuilder.append("123");
         charsBuilder.append("", 0, 0);
         stringBuilder.append("", 0, 0);
         charsBuilder.write("", 0, 0);

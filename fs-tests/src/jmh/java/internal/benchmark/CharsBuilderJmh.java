@@ -19,11 +19,13 @@ public class CharsBuilderJmh extends AbstractJmhBenchmark implements DataGen {
 
     @Param({
         "8",
+        "32",
         "64",
         "1024"
     })
     private int dataLength;
     @Param({
+        "32",
         "128",
         "1024"
     })

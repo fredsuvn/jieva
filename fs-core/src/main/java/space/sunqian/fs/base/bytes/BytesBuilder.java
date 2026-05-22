@@ -18,13 +18,13 @@ import java.util.List;
  * {@link ByteArrayOutputStream}, provides compatible methods, but is not thread-safe, and the {@code close()} method
  * has no effect.
  * <p>
- * {@code BytesBuilder} uses a segmented storage strategy for efficient memory management and avoids frequent array
- * copying during large data appends. It holds a list of segments, each segment is a byte array, using
- * {@link #BytesBuilder(int)} and {@link #BytesBuilder(int, int)} can specify the capacity for them.
+ * It is different from {@link ByteArrayOutputStream} in that it does not use frequent array copying to ensure and grow
+ * the internal buffer. Instead, it holds a list of segments to store the appended data, each segment is a byte array,
+ * using {@link #BytesBuilder(int)} and {@link #BytesBuilder(int, int)} can specify the capacity for them.
  *
  * @author sunqian
  */
-public class BytesBuilder extends OutputStream {
+public final class BytesBuilder extends OutputStream {
 
     /**
      * The default initial segment capacity.
@@ -95,7 +95,10 @@ public class BytesBuilder extends OutputStream {
      */
     @Override
     public void write(byte @Nonnull [] arr) {
-        write(arr, 0, arr.length);
+        if (arr.length == 0) {
+            return;
+        }
+        write0(arr, 0, arr.length);
     }
 
     /**
@@ -112,6 +115,10 @@ public class BytesBuilder extends OutputStream {
         if (len == 0) {
             return;
         }
+        write0(arr, off, len);
+    }
+
+    private void write0(byte @Nonnull [] arr, int off, int len) throws IndexOutOfBoundsException {
         prepareBuffer();
         int copyLength = Math.min(segment.length - segmentOff, len);
         System.arraycopy(arr, off, segment, segmentOff, copyLength);
@@ -190,12 +197,12 @@ public class BytesBuilder extends OutputStream {
             return this;
         }
         if (buffer.hasArray()) {
-            write(buffer.array(), BufferKit.arrayStartIndex(buffer), buffer.remaining());
+            write0(buffer.array(), BufferKit.arrayStartIndex(buffer), buffer.remaining());
             buffer.position(buffer.position() + buffer.remaining());
         } else {
             byte[] data = new byte[remaining];
             buffer.get(data);
-            write(data);
+            write0(data, 0, remaining);
         }
         return this;
     }
