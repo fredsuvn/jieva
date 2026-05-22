@@ -1,12 +1,20 @@
 package space.sunqian.fs.sql;
 
+import space.sunqian.annotation.Immutable;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
+import space.sunqian.annotation.RetainedParam;
+import space.sunqian.fs.base.chars.CharsBuilder;
+import space.sunqian.fs.collect.ListKit;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * This interface is used for building SQL in method chaining. For example:
+ * This class is used for building SQL in method chaining. For example:
  * <pre>{@code
  * // simple sql:
  * List<User> users = SqlBuilder.newBuilder()
@@ -28,15 +36,21 @@ import java.util.List;
  * @author sunqian
  * @see PreparedSql
  */
-public interface SqlBuilder {
+public final class SqlBuilder {
 
     /**
      * Returns a new instance of {@link SqlBuilder}.
      *
      * @return a new instance of {@link SqlBuilder}
      */
-    static @Nonnull SqlBuilder newBuilder() {
-        return SqlBack.newBuilder();
+    public static @Nonnull SqlBuilder newBuilder() {
+        return new SqlBuilder();
+    }
+
+    private final @Nonnull CharsBuilder sqlBuilder = new CharsBuilder();
+    private @Nullable List<Object> parameters;
+
+    private SqlBuilder() {
     }
 
     /**
@@ -45,8 +59,10 @@ public interface SqlBuilder {
      * @param sql the given raw string to append
      * @return this builder
      */
-    @Nonnull
-    SqlBuilder append(@Nonnull String sql);
+    public @Nonnull SqlBuilder append(@Nonnull String sql) {
+        sqlBuilder.append(sql);
+        return this;
+    }
 
     /**
      * Appends a parameterized string to the current SQL.
@@ -60,8 +76,47 @@ public interface SqlBuilder {
      * @param param the given parameter value to bind
      * @return this builder
      */
-    @Nonnull
-    SqlBuilder append(@Nonnull String sql, @Nullable Object param);
+    public @Nonnull SqlBuilder append(@Nonnull String sql, @Nullable Object param) {
+        sqlBuilder.append(sql);
+        if (param instanceof Collection<?>) {
+            @SuppressWarnings("PatternVariableCanBeUsed")
+            Collection<?> collection = (Collection<?>) param;
+            parameters().addAll(collection);
+            sqlBuilder.append(join(collection));
+        } else if (param instanceof Iterable<?>) {
+            @SuppressWarnings("PatternVariableCanBeUsed")
+            Iterable<?> iterable = (Iterable<?>) param;
+            Collection<?> collection = ListKit.toList(iterable);
+            parameters().addAll(collection);
+            sqlBuilder.append(join(collection));
+        } else {
+            // Handle single parameter
+            sqlBuilder.append("?");
+            parameters().add(param);
+        }
+        return this;
+    }
+
+    private @Nonnull List<Object> parameters() {
+        if (parameters == null) {
+            parameters = new ArrayList<>();
+        }
+        return parameters;
+    }
+
+    private @Nonnull String join(Collection<?> collection) {
+        if (collection.isEmpty()) {
+            return "";
+        }
+        int size = collection.size();
+        char[] chars = new char[size * 2 - 1];
+        chars[0] = '?';
+        for (int i = 1; i < chars.length; i += 2) {
+            chars[i] = ',';
+            chars[i + 1] = '?';
+        }
+        return new String(chars);
+    }
 
     /**
      * Conditionally appends a raw string to the current SQL.
@@ -72,7 +127,7 @@ public interface SqlBuilder {
      * @param sql       the given raw string to append if condition is {@code true}
      * @return this builder
      */
-    default @Nonnull SqlBuilder appendIf(boolean condition, @Nonnull String sql) {
+    public @Nonnull SqlBuilder appendIf(boolean condition, @Nonnull String sql) {
         if (condition) {
             append(sql);
         }
@@ -93,7 +148,7 @@ public interface SqlBuilder {
      * @param param     the given parameter value to bind if condition is {@code true}
      * @return this builder
      */
-    default @Nonnull SqlBuilder appendIf(boolean condition, @Nonnull String sql, @Nullable Object param) {
+    public @Nonnull SqlBuilder appendIf(boolean condition, @Nonnull String sql, @Nullable Object param) {
         if (condition) {
             append(sql, param);
         }
@@ -105,8 +160,12 @@ public interface SqlBuilder {
      *
      * @return the prepared SQL ready for execution
      */
-    @Nonnull
-    PreparedSql build();
+    public @Nonnull PreparedSql build() {
+        return new PreparedSqlImpl(
+            sqlBuilder.toString(),
+            parameters == null ? Collections.emptyList() : parameters
+        );
+    }
 
     /**
      * Builds and returns the final prepared SQL for batch execution. The returned {@link PreparedBatchSql} object is
@@ -116,6 +175,62 @@ public interface SqlBuilder {
      *
      * @return the prepared SQL ready for execution for batch execution
      */
-    @Nonnull
-    PreparedBatchSql buildBatch();
+    public @Nonnull PreparedBatchSql buildBatch() {
+        return new PreparedBatchSqlImpl(sqlBuilder.toString());
+    }
+
+    private static final class PreparedSqlImpl implements PreparedSql {
+
+        private final @Nonnull String preparedSql;
+        private final @Nonnull List<Object> parameters;
+
+        private PreparedSqlImpl(@Nonnull String preparedSql, @Nonnull @RetainedParam List<Object> parameters) {
+            this.preparedSql = preparedSql;
+            this.parameters = parameters;
+        }
+
+        @Override
+        public @Nonnull String preparedSql() {
+            return preparedSql;
+        }
+
+        @Override
+        public @Nonnull @Immutable List<Object> parameters() {
+            return parameters;
+        }
+    }
+
+    private static final class PreparedBatchSqlImpl implements PreparedBatchSql {
+
+        private final @Nonnull String preparedSql;
+        private final @Nonnull List<List<Object>> batchedParameters = new ArrayList<>();
+
+        private @Nullable Connection connection;
+
+        private PreparedBatchSqlImpl(@Nonnull String preparedSql) {
+            this.preparedSql = preparedSql;
+        }
+
+        @Override
+        public @Nonnull String preparedSql() {
+            return preparedSql;
+        }
+
+        @Override
+        public @Nonnull @Immutable List<@Nonnull List<Object>> batchParameters() {
+            return Collections.unmodifiableList(batchedParameters);
+        }
+
+        @Override
+        public @Nonnull PreparedBatchSql batchParameters(@Nonnull List<@Nonnull List<Object>> batchParameters) {
+            batchedParameters.addAll(batchParameters);
+            return this;
+        }
+
+        @Override
+        public @Nonnull PreparedBatchSql parameters(@Nonnull List<Object> parameters) {
+            batchedParameters.add(parameters);
+            return this;
+        }
+    }
 }

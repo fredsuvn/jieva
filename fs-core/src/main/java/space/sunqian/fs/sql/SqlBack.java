@@ -1,19 +1,13 @@
 package space.sunqian.fs.sql;
 
-import space.sunqian.annotation.Immutable;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
-import space.sunqian.annotation.RetainedParam;
-import space.sunqian.fs.collect.ListKit;
 
 import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 final class SqlBack {
@@ -46,10 +40,6 @@ final class SqlBack {
         return statement;
     }
 
-    static @Nonnull SqlBuilder newBuilder() {
-        return new SqlBuilderImpl();
-    }
-
     static <T> @Nonnull SqlQuery<T> newQuery(
         @Nonnull Statement statement,
         @Nonnull Type type
@@ -71,129 +61,6 @@ final class SqlBack {
         @Nonnull Statement statement
     ) {
         return new SqlBatchImpl(statement);
-    }
-
-    private static final class SqlBuilderImpl implements SqlBuilder {
-
-        private final @Nonnull StringBuilder sqlBuilder = new StringBuilder();
-        private @Nullable List<Object> parameters;
-
-        @Override
-        public @Nonnull SqlBuilder append(@Nonnull String sql) {
-            sqlBuilder.append(sql);
-            return this;
-        }
-
-        @Override
-        public @Nonnull SqlBuilder append(@Nonnull String sql, @Nullable Object param) {
-            sqlBuilder.append(sql);
-            if (param instanceof Collection<?>) {
-                @SuppressWarnings("PatternVariableCanBeUsed")
-                Collection<?> collection = (Collection<?>) param;
-                parameters().addAll(collection);
-                sqlBuilder.append(join(collection));
-            } else if (param instanceof Iterable<?>) {
-                @SuppressWarnings("PatternVariableCanBeUsed")
-                Iterable<?> iterable = (Iterable<?>) param;
-                Collection<?> collection = ListKit.toList(iterable);
-                parameters().addAll(collection);
-                sqlBuilder.append(join(collection));
-            } else {
-                // Handle single parameter
-                sqlBuilder.append("?");
-                parameters().add(param);
-            }
-            return this;
-        }
-
-        private @Nonnull List<Object> parameters() {
-            if (parameters == null) {
-                parameters = new ArrayList<>();
-            }
-            return parameters;
-        }
-
-        private @Nonnull String join(Collection<?> collection) {
-            if (collection.isEmpty()) {
-                return "";
-            }
-            int size = collection.size();
-            char[] chars = new char[size * 2 - 1];
-            chars[0] = '?';
-            for (int i = 1; i < chars.length; i += 2) {
-                chars[i] = ',';
-                chars[i + 1] = '?';
-            }
-            return new String(chars);
-        }
-
-        @Override
-        public @Nonnull PreparedSql build() {
-            return new PreparedSqlImpl(
-                sqlBuilder.toString(),
-                parameters == null ? Collections.emptyList() : parameters
-            );
-        }
-
-        @Override
-        public @Nonnull PreparedBatchSql buildBatch() {
-            return new PreparedBatchSqlImpl(sqlBuilder.toString());
-        }
-    }
-
-    private static final class PreparedSqlImpl implements PreparedSql {
-
-        private final @Nonnull String preparedSql;
-        private final @Nonnull List<Object> parameters;
-
-        private PreparedSqlImpl(@Nonnull String preparedSql, @Nonnull @RetainedParam List<Object> parameters) {
-            this.preparedSql = preparedSql;
-            this.parameters = parameters;
-        }
-
-        @Override
-        public @Nonnull String preparedSql() {
-            return preparedSql;
-        }
-
-        @Override
-        public @Nonnull @Immutable List<Object> parameters() {
-            return parameters;
-        }
-    }
-
-    private static final class PreparedBatchSqlImpl implements PreparedBatchSql {
-
-        private final @Nonnull String preparedSql;
-        private final @Nonnull List<List<Object>> batchedParameters = new ArrayList<>();
-
-        private @Nullable Connection connection;
-
-        private PreparedBatchSqlImpl(@Nonnull String preparedSql) {
-            this.preparedSql = preparedSql;
-        }
-
-        @Override
-        public @Nonnull String preparedSql() {
-            return preparedSql;
-        }
-
-        @Override
-        public @Nonnull @Immutable List<@Nonnull List<Object>> batchParameters() {
-            return Collections.unmodifiableList(batchedParameters);
-        }
-
-        @Override
-        public @Nonnull PreparedBatchSql batchParameters(@Nonnull List<@Nonnull List<Object>> batchParameters) {
-            batchedParameters.addAll(batchParameters);
-            return this;
-        }
-
-        @Override
-        public @Nonnull PreparedBatchSql parameters(@Nonnull List<Object> parameters) {
-            batchedParameters.add(parameters);
-            return this;
-        }
     }
 
     private static final class SqlQueryImpl<T> implements SqlQuery<T> {
