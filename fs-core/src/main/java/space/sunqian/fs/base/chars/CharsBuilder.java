@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author sunqian
  */
-public class CharsBuilder extends Writer {
+public final class CharsBuilder extends Writer {
 
     /**
      * The default initial segment capacity.

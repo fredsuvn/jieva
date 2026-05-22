@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author sunqian
  */
-public class BytesBuilder extends OutputStream {
+public final class BytesBuilder extends OutputStream {
 
     /**
      * The default initial segment capacity.
