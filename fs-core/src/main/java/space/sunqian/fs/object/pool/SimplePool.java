@@ -14,11 +14,13 @@ import java.util.function.Supplier;
 /**
  * Simple object pool interface, provides methods for acquiring, releasing objects. If the pool is closed due to some
  * exception, the {@link #unreleasedObjects()} can be still invoked to get the list of unreleased objects.
+ * <p>
+ * This interface extends {@link Supplier}, so it can be used as a supplier of objects.
  *
  * @param <T> the type of objects in the pool
  * @author sunqian
  */
-public interface SimplePool<T> {
+public interface SimplePool<T> extends Supplier<T> {
 
     /**
      * Returns a builder for {@link SimplePool}.
@@ -41,6 +43,7 @@ public interface SimplePool<T> {
      * @throws ObjectPoolException if failed to acquire object
      */
     @Nullable
+    @Override
     T get() throws ObjectPoolException;
 
     /**
