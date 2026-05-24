@@ -3,7 +3,7 @@ package tests.core.sql;
 import internal.annotations.J17Also;
 import internal.utils.Mocker;
 import org.junit.jupiter.api.Test;
-import space.sunqian.fs.sql.SimpleJdbcPool;
+import space.sunqian.fs.sql.SimpleSqlConnectionPool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,7 +33,7 @@ public class PooledConnectionTest {
     @Test
     public void testConnectionWrapperFunctionality() throws Exception {
         // Create pool with mocked connection factory
-        SimpleJdbcPool pool = SimpleJdbcPool.newBuilder()
+        SimpleSqlConnectionPool pool = SimpleSqlConnectionPool.newBuilder()
             .driverClassName("DB_DRIVER")
             .url("DB_URL")
             .username("DB_USER")
@@ -47,7 +47,7 @@ public class PooledConnectionTest {
             .build();
 
         // Get connection and verify it's not closed
-        Connection conn = pool.getConnection();
+        Connection conn = pool.get();
         assertFalse(conn.isClosed());
 
         // Test all connection methods except close and isClosed

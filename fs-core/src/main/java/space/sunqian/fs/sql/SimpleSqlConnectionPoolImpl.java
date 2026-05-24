@@ -3,7 +3,6 @@ package space.sunqian.fs.sql;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.Fs;
-import space.sunqian.fs.base.function.VoidCallable;
 import space.sunqian.fs.object.pool.SimplePool;
 
 import java.sql.Connection;
@@ -11,14 +10,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-final class SimpleJdbcPoolImpl implements SimpleJdbcPool {
+final class SimpleSqlConnectionPoolImpl implements SimpleSqlConnectionPool {
 
     private final @Nonnull SimplePool<@Nonnull Connection> pool;
-    private final @Nonnull ConnectionWrapperFactory connectionWrapperFactory;
+    // private final @Nonnull ConnectionWrapperFactory connectionWrapperFactory;
 
-    SimpleJdbcPoolImpl(
+    SimpleSqlConnectionPoolImpl(
         @Nonnull String url,
         @Nullable String username,
         @Nullable String password,
@@ -31,36 +29,34 @@ final class SimpleJdbcPoolImpl implements SimpleJdbcPool {
         int maxSize,
         @Nonnull Duration idleTimeout
     ) {
-        this.connectionWrapperFactory = connectionWrapperFactory;
+        // this.connectionWrapperFactory = connectionWrapperFactory;
         Fs.uncheck(() -> Class.forName(driver));
         pool = SimplePool.<Connection>newBuilder()
             .coreSize(coreSize)
             .maxSize(maxSize)
             .idleTimeout(idleTimeout)
-            .supplier(() -> connectionFactory.create(driver, url, username, password))
+            .supplier(() -> {
+                Connection conn = connectionFactory.create(driver, url, username, password);
+                return connectionWrapperFactory.wrap(conn, this);
+            })
             .discarder(closer)
             .validator(validator)
             .build();
     }
 
     @Override
-    public @Nullable Connection getConnection() throws SqlRuntimeException {
-        Connection connection = pool.get();
-        return connection == null ? null : connectionWrapperFactory.wrap(connection, pool);
+    public @Nullable Connection get() throws SqlRuntimeException {
+        return Fs.uncheck(pool::get, SqlRuntimeException::new);
     }
 
     @Override
     public void clean() throws SqlRuntimeException {
-        pool.clean();
+        Fs.uncheck(pool::clean, SqlRuntimeException::new);
     }
 
     @Override
     public void close() throws SqlRuntimeException {
-        pool.close();
-        List<VoidCallable> callables = pool.unreleasedObjects().stream()
-            .map(c -> (VoidCallable) c::close)
-            .collect(Collectors.toList());
-        Fs.uncheck(callables, SqlRuntimeException::new);
+        Fs.uncheck(pool::close, SqlRuntimeException::new);
     }
 
     @Override
@@ -81,5 +77,15 @@ final class SimpleJdbcPoolImpl implements SimpleJdbcPool {
     @Override
     public int activeSize() {
         return pool.activeSize();
+    }
+
+    @Override
+    public boolean release(@Nonnull Connection obj) throws SqlRuntimeException {
+        return Fs.uncheck(() -> pool.release(obj), SqlRuntimeException::new);
+    }
+
+    @Override
+    public @Nonnull List<@Nonnull Connection> unreleasedObjects() {
+        return pool.unreleasedObjects();
     }
 }

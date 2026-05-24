@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 final class AsmConnectionWrapperFactory {
 
-    static final @Nonnull SimpleJdbcPool.ConnectionWrapperFactory INST = AsmGenerator.newWrapperFactory();
+    static final @Nonnull SimpleSqlConnectionPool.ConnectionWrapperFactory INST = AsmGenerator.newWrapperFactory();
 
     private AsmConnectionWrapperFactory() {
     }
@@ -34,7 +34,9 @@ final class AsmConnectionWrapperFactory {
         private static final @Nonnull String PROVIDER_NAME = buildClassName("PooledConnectionWrapperFactory");
         // Connection
         private static final @Nonnull String CONNECTION_INTERNAL_NAME = JvmKit.toInternalName(Connection.class);
+        private static final @Nonnull String CONNECTION_WRAPPER_INTERNAL_NAME = JvmKit.toInternalName(ConnectionWrapper.class);
         private static final @Nonnull String CONNECTION_DESCRIPTOR = JvmKit.toDescriptor(Connection.class);
+        private static final @Nonnull String CONNECTION_WRAPPER_DESCRIPTOR = JvmKit.toDescriptor(ConnectionWrapper.class);
         // SimplePool
         private static final @Nonnull String POOL_INTERNAL_NAME = JvmKit.toInternalName(SimplePool.class);
         private static final @Nonnull String POOL_DESCRIPTOR = JvmKit.toDescriptor(SimplePool.class);
@@ -45,15 +47,15 @@ final class AsmConnectionWrapperFactory {
         private static final @Nonnull String @Nonnull [] SQL_EXCEPTIONS = {SQL_EXCEPTION_INTERNAL_NAME};
         private static final @Nonnull String @Nonnull [] SQL_CLIENT_EXCEPTIONS = {SQL_CLIENT_EXCEPTION_INTERNAL_NAME};
         // Provider
-        private static final @Nonnull String PROVIDER_INTERNAL_NAME = JvmKit.toInternalName(SimpleJdbcPool.ConnectionWrapperFactory.class);
-        private static final @Nonnull String PROVIDER_DESCRIPTOR = JvmKit.toDescriptor(SimpleJdbcPool.ConnectionWrapperFactory.class);
+        private static final @Nonnull String PROVIDER_INTERNAL_NAME = JvmKit.toInternalName(SimpleSqlConnectionPool.ConnectionWrapperFactory.class);
+        private static final @Nonnull String PROVIDER_DESCRIPTOR = JvmKit.toDescriptor(SimpleSqlConnectionPool.ConnectionWrapperFactory.class);
         // Others
         private static final @Nonnull String STRING_DESCRIPTOR = JvmKit.toDescriptor(String.class);
         // fields
         private static final @Nonnull String FIELD_DELEGATE = "delegate";
         private static final @Nonnull String FIELD_POOL = "pool";
 
-        static SimpleJdbcPool.ConnectionWrapperFactory newWrapperFactory() throws SqlRuntimeException {
+        static SimpleSqlConnectionPool.ConnectionWrapperFactory newWrapperFactory() throws SqlRuntimeException {
             byte[] pooledBytes = PooledAsm.bytecode();
             byte[] providerBytes = ProviderAsm.bytecode();
             DynamicClassLoader classLoader = new DynamicClassLoader();
@@ -62,7 +64,7 @@ final class AsmConnectionWrapperFactory {
             Object inst = Fs.uncheck(() ->
                     providerClass.getMethod("getInstance").invoke(null),
                 SqlRuntimeException::new);
-            return (SimpleJdbcPool.ConnectionWrapperFactory) inst;
+            return (SimpleSqlConnectionPool.ConnectionWrapperFactory) inst;
         }
 
         private static class ProviderAsm {
@@ -126,8 +128,8 @@ final class AsmConnectionWrapperFactory {
                     methodVisitor = classWriter.visitMethod(
                         Opcodes.ACC_PUBLIC,
                         "wrap",
-                        "(" + CONNECTION_DESCRIPTOR + POOL_DESCRIPTOR + ")" + CONNECTION_DESCRIPTOR,
-                        "(" + CONNECTION_DESCRIPTOR + POOL_SIGNATURE + ")" + CONNECTION_DESCRIPTOR,
+                        "(" + CONNECTION_DESCRIPTOR + POOL_DESCRIPTOR + ")" + CONNECTION_WRAPPER_DESCRIPTOR,
+                        "(" + CONNECTION_DESCRIPTOR + POOL_SIGNATURE + ")" + CONNECTION_WRAPPER_DESCRIPTOR,
                         new String[]{JvmKit.toInternalName(SqlRuntimeException.class)}
                     );
                     methodVisitor.visitCode();
@@ -178,7 +180,7 @@ final class AsmConnectionWrapperFactory {
                     POOLED_NAME,
                     null,
                     AsmKit.OBJECT_NAME,
-                    new String[]{CONNECTION_INTERNAL_NAME}
+                    new String[]{CONNECTION_WRAPPER_INTERNAL_NAME}
                 );
                 return classWriter;
             }
@@ -280,7 +282,8 @@ final class AsmConnectionWrapperFactory {
                      * @Override
                      * public synchronized void close() throws SQLException {
                      *     closed = true;
-                     *     pool.release(delegate);
+                     *     //pool.release(delegate);
+                     *     pool.release(this);
                      * }
                      */
                     methodVisitor = classWriter.visitMethod(
@@ -306,12 +309,12 @@ final class AsmConnectionWrapperFactory {
                         POOL_DESCRIPTOR
                     );
                     methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-                    methodVisitor.visitFieldInsn(
-                        Opcodes.GETFIELD,
-                        POOLED_NAME,
-                        FIELD_DELEGATE,
-                        CONNECTION_DESCRIPTOR
-                    );
+                    // methodVisitor.visitFieldInsn(
+                    //     Opcodes.GETFIELD,
+                    //     POOLED_NAME,
+                    //     FIELD_DELEGATE,
+                    //     CONNECTION_DESCRIPTOR
+                    // );
                     methodVisitor.visitMethodInsn(
                         Opcodes.INVOKEINTERFACE,
                         POOL_INTERNAL_NAME,
@@ -437,6 +440,31 @@ final class AsmConnectionWrapperFactory {
                     methodVisitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                     methodVisitor.visitInsn(Opcodes.RETURN);
                     methodVisitor.visitMaxs(4, 1);
+                    methodVisitor.visitEnd();
+                }
+                {
+                    /*
+                     * @Override
+                     * public synchronized Connection getWrappedConnection() {
+                     *     return delegate;
+                     * }
+                     */
+                    methodVisitor = classWriter.visitMethod(
+                        Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNCHRONIZED,
+                        "getWrappedConnection",
+                        "()Ljava/sql/Connection;",
+                        null,
+                        null
+                    );
+                    methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
+                    methodVisitor.visitFieldInsn(
+                        Opcodes.GETFIELD,
+                        POOLED_NAME,
+                        FIELD_DELEGATE,
+                        CONNECTION_DESCRIPTOR
+                    );
+                    methodVisitor.visitInsn(Opcodes.ARETURN);
+                    methodVisitor.visitMaxs(1, 0);
                     methodVisitor.visitEnd();
                 }
             }

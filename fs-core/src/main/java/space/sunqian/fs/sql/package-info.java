@@ -2,13 +2,13 @@
  * This package provides JDBC and SQL utilities for database operations, for example:
  * <pre>{@code
  * // Quickly create a connection pool to get a connection:
- * SimpleJdbcPool pool = SimpleJdbcPool.newBuilder()
+ * SimpleSqlConnectionPool pool = SimpleSqlConnectionPool.newBuilder()
  *     .driverClassName(className)
  *     .url(url)
  *     .username(username)
  *     .password(password)
  *     .build();
- * Connection connection = pool.getConnection();
+ * Connection connection = pool.get();
  * // Using SqlBuilder for fluent SQL construction:
  * List<User> users = SqlBuilder.newBuilder()
  *     .append("SELECT * FROM `users` WHERE 1=1")
@@ -24,7 +24,8 @@
  * }</pre>
  * Core interfaces:
  * <ul>
- *     <li>{@link space.sunqian.fs.sql.SimpleJdbcPool}</li>
+ *     <li>{@link space.sunqian.fs.sql.SimpleSqlConnectionPool}</li>
+ *     <li>{@link space.sunqian.fs.sql.ConnectionWrapper}</li>
  *     <li>{@link space.sunqian.fs.sql.SqlBuilder}</li>
  *     <li>{@link space.sunqian.fs.sql.PreparedSql}</li>
  *     <li>{@link space.sunqian.fs.sql.PreparedBatchSql}</li>

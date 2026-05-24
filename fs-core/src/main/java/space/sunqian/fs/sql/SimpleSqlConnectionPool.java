@@ -9,16 +9,17 @@ import space.sunqian.fs.object.pool.SimplePool;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.Duration;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * Simple JDBC connection pool interface that provides methods for acquiring and releasing database connections. This
- * pool is built on top of {@link SimplePool} and does not introduce any third-party dependencies.
+ * Simple SQL pool interface that provides methods for acquiring and releasing database connections. This pool is built
+ * on top of {@link SimplePool} and does not introduce any third-party dependencies.
  * <p>
  * Example usage:
  * <pre>{@code
- * SimpleJdbcPool pool = SimpleJdbcPool.newBuilder()
+ * SimpleSqlConnectionPool pool = SimpleSqlConnectionPool.newBuilder()
  *     .url("jdbc:h2:mem:test")
  *     .username("sa")
  *     //.password("password")
@@ -30,7 +31,7 @@ import java.util.function.Predicate;
  *
  * try {
  *     // acquire a connection from the pool
- *     Connection connection = pool.getConnection();
+ *     Connection connection = pool.get();
  * } finally {
  *     // release the connection back to the pool, not actually close it
  *     connection.close();
@@ -39,12 +40,12 @@ import java.util.function.Predicate;
  *
  * @author sunqian
  */
-public interface SimpleJdbcPool {
+public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
 
     /**
-     * Returns a builder for {@link SimpleJdbcPool}.
+     * Returns a builder for {@link SimpleSqlConnectionPool}.
      *
-     * @return a builder for {@link SimpleJdbcPool}
+     * @return a builder for {@link SimpleSqlConnectionPool}
      */
     static @Nonnull Builder newBuilder() {
         return new Builder();
@@ -59,7 +60,8 @@ public interface SimpleJdbcPool {
      * @throws SqlRuntimeException if failed to acquire connection
      */
     @Nullable
-    Connection getConnection() throws SqlRuntimeException;
+    @Override
+    Connection get() throws SqlRuntimeException;
 
     /**
      * Cleans the pool, removing idle connections that have timed out or been invalidated, or over the core size, adding
@@ -69,21 +71,52 @@ public interface SimpleJdbcPool {
      *
      * @throws SqlRuntimeException if any exception occurs during the clean process
      */
+    @Override
     void clean() throws SqlRuntimeException;
 
     /**
-     * Closes the pool and releases all resources. After calling this method, the pool cannot be used anymore. This
-     * method will close all connections in the pool, including idle and active connections.
-     *
-     * @throws SqlRuntimeException if any exception occurs during the close process
+     * Closes the pool. The idle connections will be discarded by configured discarder, and the active connections will
+     * not be discarded. If this process is failed, the pool will be in a closed state, and the
+     * {@link #unreleasedObjects()} will return the list of unreleased connections, including idle connections and
+     * active connections.
      */
-    void close() throws SqlRuntimeException;
+    @Override
+    void close();
+
+    /**
+     * Closes the pool and releases all connections, including idle and active connections. Any exception that occurs
+     * during the close process will be ignored. The logic of this method like this:
+     * <pre>{@code
+     * close();
+     * for (Connection unreleasedObject : unreleasedObjects()) {
+     *     ConnectionWrapper connectionWrapper = (ConnectionWrapper) unreleasedObject;
+     *     try {
+     *         connectionWrapper.getWrappedConnection().close();
+     *     } catch (Exception e) {
+     *         // nop
+     *     }
+     * }
+     * }</pre>
+     */
+    // default void closeAll() {
+    //     close();
+    //     List<Connection> unreleasedObjects = unreleasedObjects();
+    //     for (Connection unreleasedObject : unreleasedObjects) {
+    //         ConnectionWrapper connectionWrapper = (ConnectionWrapper) unreleasedObject;
+    //         try {
+    //             connectionWrapper.getWrappedConnection().close();
+    //         } catch (Exception e) {
+    //             // nop
+    //         }
+    //     }
+    // }
 
     /**
      * Returns {@code true} if this pool is closed, {@code false} otherwise.
      *
      * @return {@code true} if this pool is closed, {@code false} otherwise
      */
+    @Override
     boolean isClosed();
 
     /**
@@ -91,6 +124,7 @@ public interface SimpleJdbcPool {
      *
      * @return the total number of connections in this pool
      */
+    @Override
     int size();
 
     /**
@@ -98,6 +132,7 @@ public interface SimpleJdbcPool {
      *
      * @return the number of idle connections in this pool
      */
+    @Override
     int idleSize();
 
     /**
@@ -106,7 +141,30 @@ public interface SimpleJdbcPool {
      *
      * @return the number of active connections in this pool
      */
+    @Override
     int activeSize();
+
+    /**
+     * Releases the given connection back to the pool. This method will not close the connection, but will return it to
+     * the pool for reuse later. This method has the same effect as {@link Connection#close()} of the {@link Connection}
+     * instances which come from this pool.
+     *
+     * @param obj the connection to release
+     * @return {@code true} if the connection is successfully released, {@code false} otherwise
+     * @throws SqlRuntimeException if any exception occurs during the release process
+     */
+    @Override
+    boolean release(@Nonnull Connection obj) throws SqlRuntimeException;
+
+    /**
+     * Returns the list of unreleased connections after the pool is closed, including idle connections and active
+     * connections. If the pool is not closed, this method will return an empty list.
+     *
+     * @return the list of unreleased connections after the pool is closed, or an empty list if the pool is not closed
+     */
+    @Override
+    @Nonnull
+    List<@Nonnull Connection> unreleasedObjects();
 
     /**
      * Factory interface for creating database connections.
@@ -150,13 +208,13 @@ public interface SimpleJdbcPool {
          * @throws SqlRuntimeException if failed to wrap
          */
         @Nonnull
-        Connection wrap(
+        ConnectionWrapper wrap(
             @Nonnull Connection origin, @Nonnull SimplePool<Connection> pool
         ) throws SqlRuntimeException;
     }
 
     /**
-     * Builder class for {@link SimpleJdbcPool}.
+     * Builder class for {@link SimpleSqlConnectionPool}.
      */
     class Builder {
 
@@ -165,7 +223,10 @@ public interface SimpleJdbcPool {
             Fs.uncheck(connection::close, SqlRuntimeException::new);
         // default connection validation
         private static final @Nonnull Predicate<@Nonnull Connection> VALIDATOR = connection ->
-            Fs.uncheck(() -> connection.isValid(1), SqlRuntimeException::new);
+            Fs.uncheck(() -> {
+                ConnectionWrapper wrapper = (ConnectionWrapper) connection;
+                return wrapper.getWrappedConnection().isValid(1);
+            }, SqlRuntimeException::new);
 
         // JDBC configuration
         private @Nullable String url;
@@ -324,20 +385,20 @@ public interface SimpleJdbcPool {
         }
 
         /**
-         * Builds and returns a new {@link SimpleJdbcPool}.
+         * Builds and returns a new {@link SimpleSqlConnectionPool}.
          *
-         * @return the built new {@link SimpleJdbcPool}
+         * @return the built new {@link SimpleSqlConnectionPool}
          * @throws IllegalArgumentException if some configuration is invalid
          * @throws SqlRuntimeException      if failed to build the pool
          */
-        public @Nonnull SimpleJdbcPool build() throws IllegalArgumentException, SqlRuntimeException {
+        public @Nonnull SimpleSqlConnectionPool build() throws IllegalArgumentException, SqlRuntimeException {
             if (url == null) {
                 throw new IllegalArgumentException("The url for JDBC connection must be set.");
             }
             if (driver == null) {
                 throw new IllegalArgumentException("The driver class name for JDBC connection must be set.");
             }
-            return new SimpleJdbcPoolImpl(
+            return new SimpleSqlConnectionPoolImpl(
                 url, username, password, driver,
                 connectionFactory == null ? new ConnectionFactoryImpl() : connectionFactory,
                 connectionWrapperFactory == null ? AsmConnectionWrapperFactory.INST : connectionWrapperFactory,
