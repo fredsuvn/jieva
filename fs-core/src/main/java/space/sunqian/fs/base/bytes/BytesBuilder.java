@@ -31,7 +31,7 @@ public final class BytesBuilder extends OutputStream {
      */
     public static final int DEFAULT_SEGMENT_CAPACITY = 64;
 
-    private final @Nonnull List<byte[]> segmentList;
+    private final @Nonnull List<byte @Nonnull []> segmentList;
     private final int segmentCapacity;
     private byte[] segment;
     private int segmentOff = 0;

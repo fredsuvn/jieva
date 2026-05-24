@@ -33,7 +33,7 @@ public final class CharsBuilder extends Writer {
      */
     public static final int DEFAULT_SEGMENT_CAPACITY = 64;
 
-    private final @Nonnull List<Object> segmentList;
+    private final @Nonnull List<@Nonnull Object> segmentList;
     private final int segmentCapacity;
     private char[] segment;
     private int segmentOff = 0;
