@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -59,8 +60,8 @@ public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
      * @return the acquired connection, or {@code null} if no connection is available
      * @throws SqlRuntimeException if failed to acquire connection
      */
-    @Nullable
     @Override
+    @Nullable
     Connection get() throws SqlRuntimeException;
 
     /**
@@ -75,41 +76,23 @@ public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
     void clean() throws SqlRuntimeException;
 
     /**
-     * Closes the pool. The idle connections will be discarded by configured discarder, and the active connections will
-     * not be discarded. If this process is failed, the pool will be in a closed state, and the
-     * {@link #unreleasedObjects()} will return the list of unreleased connections, including idle connections and
-     * active connections.
+     * Closes the pool. The idle connections will be closed, but the active connections will not be closed. If this
+     * process is failed, no error thrown, and the pool will be in a closed state. The {@link #unreleasedObjects()} will
+     * return the list of unreleased connections, including idle connections and active connections.
      */
     @Override
     void close();
 
     /**
-     * Closes the pool and releases all connections, including idle and active connections. Any exception that occurs
-     * during the close process will be ignored. The logic of this method like this:
-     * <pre>{@code
-     * close();
-     * for (Connection unreleasedObject : unreleasedObjects()) {
-     *     ConnectionWrapper connectionWrapper = (ConnectionWrapper) unreleasedObject;
-     *     try {
-     *         connectionWrapper.getWrappedConnection().close();
-     *     } catch (Exception e) {
-     *         // nop
-     *     }
-     * }
-     * }</pre>
+     * Closes the pool and closes all connections, including idle and active connections. Returns a {@link Map}
+     * containing connections that were not closed normally due to an exception. If there is no error occurs during the
+     * close processing, an empty {@link Map} will be returned.
+     *
+     * @return a {@link Map} containing connections that were not closed normally due to an exception
      */
-    // default void closeAll() {
-    //     close();
-    //     List<Connection> unreleasedObjects = unreleasedObjects();
-    //     for (Connection unreleasedObject : unreleasedObjects) {
-    //         ConnectionWrapper connectionWrapper = (ConnectionWrapper) unreleasedObject;
-    //         try {
-    //             connectionWrapper.getWrappedConnection().close();
-    //         } catch (Exception e) {
-    //             // nop
-    //         }
-    //     }
-    // }
+    @Override
+    @Nonnull
+    Map<@Nonnull Connection, ? extends @Nonnull Throwable> closeAll();
 
     /**
      * Returns {@code true} if this pool is closed, {@code false} otherwise.
@@ -218,6 +201,15 @@ public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
      */
     class Builder {
 
+        /**
+         * Default core size of the pool: {@code 5}.
+         */
+        public static final int DEFAULT_CORE_SIZE = 5;
+        /**
+         * Default max size of the pool: {@code 10}.
+         */
+        public static final int DEFAULT_MAX_SIZE = 10;
+
         // default connection closer
         private static final @Nonnull Consumer<@Nonnull Connection> CLOSER = connection ->
             Fs.uncheck(connection::close, SqlRuntimeException::new);
@@ -235,8 +227,8 @@ public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
         private @Nullable String driver;
 
         // Pool configuration
-        private int coreSize = 5;
-        private int maxSize = 10;
+        private int coreSize = DEFAULT_CORE_SIZE;
+        private int maxSize = DEFAULT_MAX_SIZE;
         private @Nonnull Duration idleTimeout = Duration.ofMinutes(5);
         private @Nullable ConnectionFactory connectionFactory = null;
         private @Nullable ConnectionWrapperFactory connectionWrapperFactory = null;
@@ -289,7 +281,7 @@ public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
 
         /**
          * Sets the core size of the connection pool. This is the minimum number of connections that will be maintained
-         * in the pool. Default is {@code 5}.
+         * in the pool. Default is {@link #DEFAULT_CORE_SIZE}.
          *
          * @param coreSize the core size of the connection pool
          * @return this builder
@@ -303,7 +295,7 @@ public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
 
         /**
          * Sets the maximum size of the connection pool. This is the maximum number of connections that can be created
-         * in the pool. Default is {@code 10}.
+         * in the pool. Default is {@link #DEFAULT_MAX_SIZE}.
          *
          * @param maxSize the maximum size of the connection pool
          * @return this builder
@@ -400,15 +392,14 @@ public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
             }
             return new SimpleSqlConnectionPoolImpl(
                 url, username, password, driver,
-                connectionFactory == null ? new ConnectionFactoryImpl() : connectionFactory,
+                connectionFactory == null ? DefaultConnectionFactory.INST : connectionFactory,
                 connectionWrapperFactory == null ? AsmConnectionWrapperFactory.INST : connectionWrapperFactory,
                 closer, validator, coreSize, maxSize, idleTimeout
             );
         }
 
-        private static final class ConnectionFactoryImpl implements ConnectionFactory {
-
-            private volatile @Nullable Class<?> driverClass;
+        private enum DefaultConnectionFactory implements ConnectionFactory {
+            INST;
 
             @Override
             public synchronized @Nonnull Connection create(
@@ -417,11 +408,8 @@ public interface SimpleSqlConnectionPool extends SimplePool<Connection> {
                 @Nullable String username,
                 @Nullable String password
             ) throws SqlRuntimeException {
-
-                if (driverClass == null) {
-                    driverClass = Fs.uncheck(() -> Class.forName(driverClassName), SqlRuntimeException::new);
-                }
                 return Fs.uncheck(() -> {
+                        Class.forName(driverClassName);
                         Connection realConnection;
                         if (username != null && password != null) {
                             realConnection = DriverManager.getConnection(url, username, password);

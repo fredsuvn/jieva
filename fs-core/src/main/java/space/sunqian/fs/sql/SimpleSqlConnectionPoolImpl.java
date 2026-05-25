@@ -8,6 +8,7 @@ import space.sunqian.fs.object.pool.SimplePool;
 import java.sql.Connection;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -39,7 +40,7 @@ final class SimpleSqlConnectionPoolImpl implements SimpleSqlConnectionPool {
                 Connection conn = connectionFactory.create(driver, url, username, password);
                 return connectionWrapperFactory.wrap(conn, this);
             })
-            .discarder(closer)
+            .destroyer(closer)
             .validator(validator)
             .build();
     }
@@ -57,6 +58,11 @@ final class SimpleSqlConnectionPoolImpl implements SimpleSqlConnectionPool {
     @Override
     public void close() throws SqlRuntimeException {
         Fs.uncheck(pool::close, SqlRuntimeException::new);
+    }
+
+    @Override
+    public @Nonnull Map<@Nonnull Connection, ? extends @Nonnull Throwable> closeAll() {
+        return pool.closeAll();
     }
 
     @Override

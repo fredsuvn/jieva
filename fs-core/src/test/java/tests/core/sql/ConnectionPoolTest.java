@@ -57,6 +57,7 @@ public class ConnectionPoolTest {
 
         // Test returning connection to pool
         conn1.close();
+        conn1.close();
         Connection conn5 = pool.get();
         assertNotNull(conn5);
         assertSame(conn1, conn5);
@@ -234,5 +235,16 @@ public class ConnectionPoolTest {
         assertSame(c1, c3);
 
         pool.close();
+    }
+
+    @Test
+    public void testCloseAll() throws Exception {
+        SimpleSqlConnectionPool pool = SimpleSqlConnectionPool.newBuilder()
+            .driverClassName(DB_DRIVER)
+            .url(DB_URL)
+            .username(DB_USER)
+            .password(DB_PASSWORD)
+            .build();
+        assertEquals(0, pool.closeAll().size());
     }
 }
