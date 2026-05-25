@@ -7,6 +7,7 @@ import space.sunqian.fs.Fs;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -73,11 +74,21 @@ public interface SimplePool<T> extends Supplier<T> {
     void clean() throws ObjectPoolException;
 
     /**
-     * Closes the pool. The idle objects will be discarded by configured discarder, and the active objects will not be
-     * discarded. If this process is failed, the pool will be in a closed state, and the {@link #unreleasedObjects()}
-     * will return the list of unreleased objects, including idle objects and active objects.
+     * Closes the pool. The idle objects will be destroyed, but the active objects will not be destroyed. If this
+     * process is failed, no error thrown, and the pool will be in a closed state. The {@link #unreleasedObjects()} will
+     * return the list of unreleased objects, including idle objects and active objects.
      */
     void close();
+
+    /**
+     * Closes the pool and destroys all objects, including idle and active objects. Returns a {@link Map} containing
+     * objects that were not destroyed normally due to an exception. If there is no error occurs during the close
+     * processing, an empty {@link Map} will be returned.
+     *
+     * @return a {@link Map} containing objects that were not destroyed normally due to an exception
+     */
+    @Nonnull
+    Map<@Nonnull T, ? extends @Nonnull Throwable> closeAll();
 
     /**
      * Returns whether the pool is closed.
@@ -135,7 +146,7 @@ public interface SimplePool<T> extends Supplier<T> {
 
         private Supplier<? extends @Nonnull T> supplier;
         private @Nonnull Predicate<? super @Nonnull T> validator = t -> true;
-        private @Nonnull Consumer<? super @Nonnull T> discarder = t -> {};
+        private @Nonnull Consumer<? super @Nonnull T> destroyer = t -> {};
 
         /**
          * Sets the supplier for creating new objects.
@@ -160,13 +171,13 @@ public interface SimplePool<T> extends Supplier<T> {
         }
 
         /**
-         * Sets the discarder for destroying objects.
+         * Sets the destroyer for destroying objects.
          *
-         * @param discarder the discarder for destroying objects
+         * @param destroyer the destroyer for destroying objects
          * @return this builder
          */
-        public @Nonnull Builder<T> discarder(@Nonnull Consumer<? super @Nonnull T> discarder) {
-            this.discarder = discarder;
+        public @Nonnull Builder<T> destroyer(@Nonnull Consumer<? super @Nonnull T> destroyer) {
+            this.destroyer = destroyer;
             return this;
         }
 
@@ -243,7 +254,7 @@ public interface SimplePool<T> extends Supplier<T> {
                 throw new IllegalArgumentException("Supplier must be set.");
             }
             return Fs.as(new SimplePoolImpl<>(
-                coreSize, Math.max(coreSize, maxSize), idleTimeoutMillis, supplier, validator, discarder
+                coreSize, Math.max(coreSize, maxSize), idleTimeoutMillis, supplier, validator, destroyer
             ));
         }
     }

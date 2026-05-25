@@ -13,6 +13,7 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -23,12 +24,10 @@ public class PoolTest implements Asserter, TestPrint {
 
     @Test
     public void testSimplePool() throws Exception {
-        class X {}
-
         testNormalCase();
         testInitFailed();
         testInitFailedAndDiscardFailed();
-        testDiscardFailed();
+        testDestroyFailed();
         testValidatorFalse();
         testReleaseValidatorFalse();
         testReleaseError();
@@ -37,6 +36,7 @@ public class PoolTest implements Asserter, TestPrint {
         testCleanNoTimeout();
         testCleanError();
         testIllegalArguments();
+        testCloseAll();
     }
 
     @Test
@@ -51,7 +51,7 @@ public class PoolTest implements Asserter, TestPrint {
         class X {}
 
         IntVar counter = IntVar.of(0);
-        IntVar discardCounter = IntVar.of(0);
+        IntVar destroyCounter = IntVar.of(0);
         X[] xs = new X[5];
         SimplePool<X> pool = SimplePool.newBuilder()
             .coreSize(2)
@@ -61,7 +61,7 @@ public class PoolTest implements Asserter, TestPrint {
                 counter.incrementAndGet();
                 return new X();
             })
-            .discarder(t -> discardCounter.incrementAndGet())
+            .destroyer(t -> destroyCounter.incrementAndGet())
             .build();
 
         assertFalse(pool.isClosed());
@@ -163,7 +163,7 @@ public class PoolTest implements Asserter, TestPrint {
                 }
                 return xs[count] = new X();
             })
-            .discarder(t -> {throw new ObjectPoolException();})
+            .destroyer(t -> {throw new ObjectPoolException();})
             .build();
 
         assertTrue(pool.isClosed());
@@ -175,7 +175,7 @@ public class PoolTest implements Asserter, TestPrint {
         assertNull(xs[4]);
     }
 
-    private void testDiscardFailed() {
+    private void testDestroyFailed() {
         class X {}
 
         IntVar counter = IntVar.of(0);
@@ -191,7 +191,7 @@ public class PoolTest implements Asserter, TestPrint {
                 return xs[count] = new X();
             })
             .validator(t -> true)
-            .discarder(t -> {throw new ObjectPoolException();})
+            .destroyer(t -> {throw new ObjectPoolException();})
             .build();
 
         assertTrue(pool.isClosed());
@@ -432,5 +432,30 @@ public class PoolTest implements Asserter, TestPrint {
         assertThrows(IllegalArgumentException.class, () -> SimplePool.newBuilder().idleTimeout(-1));
         assertThrows(IllegalArgumentException.class, () -> SimplePool.newBuilder().idleTimeout(Duration.ofHours(-1)));
         assertThrows(IllegalArgumentException.class, () -> SimplePool.newBuilder().build());
+    }
+
+    private void testCloseAll() {
+        class X {}
+        {
+            SimplePool<X> pool = SimplePool.newBuilder()
+                .supplier(() -> new X())
+                .build();
+            assertEquals(0, pool.closeAll().size());
+        }
+        {
+            SimplePool<X> pool = SimplePool.newBuilder()
+                .supplier(() -> new X())
+                .coreSize(5)
+                .maxSize(5)
+                .destroyer(x -> {throw new XException();})
+                .build();
+            assertEquals(5, pool.closeAll().size());
+            pool.closeAll().forEach((x, e) -> {
+                assertInstanceOf(XException.class, e);
+            });
+        }
+    }
+
+    private static final class XException extends RuntimeException {
     }
 }

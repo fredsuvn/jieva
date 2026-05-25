@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -20,7 +21,7 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
     private final long idleTimeoutMillis;
     private final @Nonnull Supplier<? extends @Nonnull T> supplier;
     private final @Nonnull Predicate<? super @Nonnull T> validator;
-    private final @Nonnull Consumer<? super @Nonnull T> discarder;
+    private final @Nonnull Consumer<? super @Nonnull T> destroyer;
 
     // objects
     private final @Nonnull Map<@Nonnull T, @Nonnull Status> idleMap = new IdentityHashMap<>();
@@ -33,7 +34,7 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
         int coreSize, int maxSize, long idleTimeoutMillis,
         @Nonnull Supplier<? extends @Nonnull T> supplier,
         @Nonnull Predicate<? super @Nonnull T> validator,
-        @Nonnull Consumer<? super @Nonnull T> discarder
+        @Nonnull Consumer<? super @Nonnull T> destroyer
     ) throws ObjectPoolException {
 
         this.coreSize = coreSize;
@@ -41,7 +42,7 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
         this.idleTimeoutMillis = idleTimeoutMillis;
         this.supplier = supplier;
         this.validator = validator;
-        this.discarder = discarder;
+        this.destroyer = destroyer;
 
         // initialize core objects
         try {
@@ -68,7 +69,7 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
                 Map.Entry<T, Status> entry = idleIt.next();
                 T obj = entry.getKey();
                 if (!validator.test(obj)) {
-                    discarder.accept(obj);
+                    destroyer.accept(obj);
                     idleIt.remove();
                     totalSize--;
                 } else {
@@ -111,7 +112,7 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
                 status.idle();
                 idleMap.put(obj, status);
             } else {
-                discarder.accept(obj);
+                destroyer.accept(obj);
                 totalSize--;
             }
             return true;
@@ -132,7 +133,7 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
                 Map.Entry<T, Status> entry = idleIt.next();
                 T obj = entry.getKey();
                 if (!validator.test(obj)) {
-                    discarder.accept(obj);
+                    destroyer.accept(obj);
                     idleIt.remove();
                     totalSize--;
                     continue;
@@ -140,7 +141,7 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
                 if (totalSize > coreSize) {
                     Status status = entry.getValue();
                     if (status.isIdleTimeout()) {
-                        discarder.accept(obj);
+                        destroyer.accept(obj);
                         idleIt.remove();
                         totalSize--;
                     }
@@ -173,7 +174,7 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
                 Map.Entry<T, Status> entry = idleIt.next();
                 T obj = entry.getKey();
                 try {
-                    discarder.accept(obj);
+                    destroyer.accept(obj);
                     idleIt.remove();
                     totalSize--;
                 } catch (Exception e) {
@@ -184,6 +185,24 @@ final class SimplePoolImpl<T> implements SimplePool<T> {
             totalSize = 0;
             closed = true;
         }
+    }
+
+    @Override
+    public @Nonnull Map<T, ? extends @Nonnull Throwable> closeAll() {
+        close();
+        List<T> unreleasedObjects = unreleasedObjects();
+        if (unreleasedObjects.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<T, Throwable> map = new LinkedHashMap<>(unreleasedObjects.size());
+        for (T obj : unreleasedObjects) {
+            try {
+                destroyer.accept(obj);
+            } catch (Throwable e) {
+                map.put(obj, e);
+            }
+        }
+        return map;
     }
 
     @Override
