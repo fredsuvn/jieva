@@ -1,6 +1,6 @@
 package internal.samples;
 
-import space.sunqian.fs.utils.eventbus.SimpleEventBus;
+import space.sunqian.fs.utils.eventbus.EventBus;
 
 /**
  * Sample: Event Bus Usage
@@ -20,7 +20,7 @@ import space.sunqian.fs.utils.eventbus.SimpleEventBus;
  * Key Classes:
  * <ul>
  *   <li>
- *     {@link SimpleEventBus}: The main event bus interface
+ *     {@link EventBus}: The main event bus interface
  *   </li>
  * </ul>
  */
@@ -28,7 +28,7 @@ public class EventBusSample {
 
     public static void main(String[] args) {
         // Create event bus
-        SimpleEventBus eventBus = SimpleEventBus.newEventBus();
+        EventBus eventBus = EventBus.newEventBus();
 
         // Register String event subscriber
         eventBus.register(String.class, event -> {

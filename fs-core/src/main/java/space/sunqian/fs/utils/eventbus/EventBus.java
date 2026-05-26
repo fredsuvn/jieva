@@ -9,12 +9,12 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 /**
- * This interface is a simplified event bus interface. It provides simple methods to register and unregister event
- * subscribers with the specified event type, and post methods to post events with the specified event type.
+ * This is the event bus interface. It provides methods to register and unregister event subscribers with the specified
+ * event type, and post methods to post events with the specified event type.
  *
  * @author sunqian
  */
-public interface SimpleEventBus {
+public interface EventBus {
 
     /**
      * Creates a new event bus, all event consuming will be executed in the post thread. It is same as
@@ -22,7 +22,7 @@ public interface SimpleEventBus {
      *
      * @return a new event bus
      */
-    static @Nonnull SimpleEventBus newEventBus() {
+    static @Nonnull EventBus newEventBus() {
         return newEventBus(Runnable::run);
     }
 
@@ -32,8 +32,8 @@ public interface SimpleEventBus {
      * @param executor the executor to execute event subscribers
      * @return a new event bus
      */
-    static @Nonnull SimpleEventBus newEventBus(@Nonnull Executor executor) {
-        return new SimpleEventBusImpl(executor);
+    static @Nonnull EventBus newEventBus(@Nonnull Executor executor) {
+        return new EventBusImpl(executor);
     }
 
     /**

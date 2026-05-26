@@ -12,13 +12,13 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
-final class SimpleEventBusImpl implements SimpleEventBus {
+final class EventBusImpl implements EventBus {
 
     private volatile Map<@Nonnull Type, @Nonnull List<@Nonnull Consumer<@Nonnull ?>>> subscriberMap
         = Collections.emptyMap();
     private final @Nonnull Executor executor;
 
-    SimpleEventBusImpl(@Nonnull Executor executor) {
+    EventBusImpl(@Nonnull Executor executor) {
         this.executor = executor;
     }
 

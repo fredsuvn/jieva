@@ -5,8 +5,8 @@ import space.sunqian.fs.base.value.IntVar;
 import space.sunqian.fs.base.value.Var;
 import space.sunqian.fs.collect.ListKit;
 import space.sunqian.fs.collect.MapKit;
+import space.sunqian.fs.utils.eventbus.EventBus;
 import space.sunqian.fs.utils.eventbus.EventBusException;
-import space.sunqian.fs.utils.eventbus.SimpleEventBus;
 
 import java.util.function.Consumer;
 
@@ -17,7 +17,7 @@ public class EventBusTest {
 
     @Test
     public void testEventBusWithIntegerEvents() throws Exception {
-        SimpleEventBus eventBus = SimpleEventBus.newEventBus();
+        EventBus eventBus = EventBus.newEventBus();
         IntVar iCounter = IntVar.of(0);
 
         Consumer<Integer> iConsumer1 = integer -> {
@@ -39,7 +39,7 @@ public class EventBusTest {
 
     @Test
     public void testEventBusWithExceptionHandling() throws Exception {
-        SimpleEventBus eventBus = SimpleEventBus.newEventBus();
+        EventBus eventBus = EventBus.newEventBus();
         IntVar iCounter = IntVar.of(0);
 
         Consumer<Integer> iConsumer1 = integer -> {
@@ -58,7 +58,7 @@ public class EventBusTest {
 
     @Test
     public void testEventBusWithChainDispatchMode() throws Exception {
-        SimpleEventBus eventBus = SimpleEventBus.newEventBus();
+        EventBus eventBus = EventBus.newEventBus();
         IntVar iCounter = IntVar.of(0);
 
         Consumer<Integer> iConsumer1 = integer -> {
@@ -72,15 +72,15 @@ public class EventBusTest {
         eventBus.register(Integer.class, iConsumer1);
         eventBus.register(Integer.class, iConsumer2);
 
-        eventBus.post(1, SimpleEventBus.DispatchMode.CHAIN);
+        eventBus.post(1, EventBus.DispatchMode.CHAIN);
         assertEquals(2, iCounter.get());
-        eventBus.post(3, SimpleEventBus.DispatchMode.CHAIN);
+        eventBus.post(3, EventBus.DispatchMode.CHAIN);
         assertEquals(2, iCounter.get());
     }
 
     @Test
     public void testEventBusWithStringEvents() throws Exception {
-        SimpleEventBus eventBus = SimpleEventBus.newEventBus();
+        EventBus eventBus = EventBus.newEventBus();
         Var<String> strVar = Var.of("");
 
         Consumer<String> strConsumer = strVar::set;
@@ -96,7 +96,7 @@ public class EventBusTest {
 
     @Test
     public void testEventBusWithUnregister() throws Exception {
-        SimpleEventBus eventBus = SimpleEventBus.newEventBus();
+        EventBus eventBus = EventBus.newEventBus();
         IntVar iCounter = IntVar.of(0);
         Var<String> strVar = Var.of("");
 
@@ -117,7 +117,7 @@ public class EventBusTest {
         eventBus.unregister(iConsumer1);
         eventBus.post(3);
         assertEquals(3, iCounter.get());
-        eventBus.post(3, SimpleEventBus.DispatchMode.CHAIN);
+        eventBus.post(3, EventBus.DispatchMode.CHAIN);
         assertEquals(6, iCounter.get());
 
         // Unregister all consumers
