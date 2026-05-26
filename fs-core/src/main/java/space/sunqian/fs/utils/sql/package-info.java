@@ -24,24 +24,24 @@
  * }</pre>
  * Core interfaces:
  * <ul>
- *     <li>{@link space.sunqian.fs.sql.SimpleSqlConnectionPool}</li>
- *     <li>{@link space.sunqian.fs.sql.ConnectionWrapper}</li>
- *     <li>{@link space.sunqian.fs.sql.SqlBuilder}</li>
- *     <li>{@link space.sunqian.fs.sql.PreparedSql}</li>
- *     <li>{@link space.sunqian.fs.sql.PreparedBatchSql}</li>
- *     <li>{@link space.sunqian.fs.sql.SqlQuery}</li>
- *     <li>{@link space.sunqian.fs.sql.SqlInsert}</li>
- *     <li>{@link space.sunqian.fs.sql.SqlUpdate}</li>
- *     <li>{@link space.sunqian.fs.sql.SqlOperation}</li>
- *     <li>{@link space.sunqian.fs.sql.SqlBatch}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SimpleSqlConnectionPool}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.ConnectionWrapper}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SqlBuilder}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.PreparedSql}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.PreparedBatchSql}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SqlQuery}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SqlInsert}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SqlUpdate}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SqlOperation}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SqlBatch}</li>
  * </ul>
  * Utility classes:
  * <ul>
- *     <li>{@link space.sunqian.fs.sql.SqlKit}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SqlKit}</li>
  * </ul>
  * Runtime exceptions for SQL operations:
  * <ul>
- *     <li>{@link space.sunqian.fs.sql.SqlRuntimeException}</li>
+ *     <li>{@link space.sunqian.fs.utils.sql.SqlRuntimeException}</li>
  * </ul>
  */
-package space.sunqian.fs.sql;
+package space.sunqian.fs.utils.sql;

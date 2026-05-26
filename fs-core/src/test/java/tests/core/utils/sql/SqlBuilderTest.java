@@ -1,40 +1,23 @@
-package tests.core.sql;
+package tests.core.utils.sql;
 
 import internal.annotations.J17Only;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import space.sunqian.fs.collect.ListKit;
-import space.sunqian.fs.object.convert.ObjectConverter;
-import space.sunqian.fs.reflect.TypeRef;
-import space.sunqian.fs.sql.PreparedBatchSql;
-import space.sunqian.fs.sql.PreparedSql;
-import space.sunqian.fs.sql.SqlBatch;
-import space.sunqian.fs.sql.SqlBuilder;
-import space.sunqian.fs.sql.SqlInsert;
-import space.sunqian.fs.sql.SqlKit;
-import space.sunqian.fs.sql.SqlQuery;
-import space.sunqian.fs.sql.SqlRuntimeException;
-import space.sunqian.fs.sql.SqlUpdate;
+import space.sunqian.fs.utils.sql.PreparedBatchSql;
+import space.sunqian.fs.utils.sql.PreparedSql;
+import space.sunqian.fs.utils.sql.SqlBuilder;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @J17Only
 public class SqlBuilderTest {

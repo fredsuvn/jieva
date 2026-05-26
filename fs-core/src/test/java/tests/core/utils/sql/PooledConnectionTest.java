@@ -1,9 +1,9 @@
-package tests.core.sql;
+package tests.core.utils.sql;
 
 import internal.annotations.J17Also;
 import internal.utils.Mocker;
 import org.junit.jupiter.api.Test;
-import space.sunqian.fs.sql.SimpleSqlConnectionPool;
+import space.sunqian.fs.utils.sql.SimpleSqlConnectionPool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

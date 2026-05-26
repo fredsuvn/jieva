@@ -266,9 +266,8 @@ _fs-core_ is organized into functional packages:
 * **Dynamic Programming** (`space.sunqian.fs.dynamic`, `space.sunqian.fs.invoke`)
 * **Dependency Injection** (`space.sunqian.fs.di`): Lightweight DI container
 * **Reflection** (`space.sunqian.fs.reflect`): Reflection utilities and type handling
-* **SQL Utilities** (`space.sunqian.fs.sql`): SQL and JDBC utilities
 * **Third-party Integration** (`space.sunqian.fs.third`): Integration with third-party libraries
-* **Utilities** (`space.sunqian.fs.utils`): Codec, event bus, versioning
+* **Utilities** (`space.sunqian.fs.utils`): Codec, event bus, SQL and versioning
 
 ==== Object Manipulation Package
 

@@ -19,7 +19,6 @@
  *     <li>{@link space.sunqian.fs.net}</li>
  *     <li>{@link space.sunqian.fs.object}</li>
  *     <li>{@link space.sunqian.fs.reflect}</li>
- *     <li>{@link space.sunqian.fs.sql}</li>
  *     <li>{@link space.sunqian.fs.third}</li>
  *     <li>{@link space.sunqian.fs.utils}</li>
  * </ul>

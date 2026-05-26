@@ -1,4 +1,4 @@
-package tests.core.sql;
+package tests.core.utils.sql;
 
 import internal.annotations.J17Only;
 import lombok.Data;
@@ -7,8 +7,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.reflect.TypeRef;
-import space.sunqian.fs.sql.SqlKit;
-import space.sunqian.fs.sql.SqlRuntimeException;
+import space.sunqian.fs.utils.sql.SqlKit;
+import space.sunqian.fs.utils.sql.SqlRuntimeException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

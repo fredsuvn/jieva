@@ -1,6 +1,6 @@
 package internal.samples;
 
-import space.sunqian.fs.sql.SqlKit;
+import space.sunqian.fs.utils.sql.SqlKit;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,7 +11,7 @@ import java.sql.Statement;
 /**
  * Sample: SQL and JDBC Utilities Usage
  * <p>
- * Purpose: Demonstrate how to use the JDBC utilities provided by fs-core module.
+ * Purpose: Demonstrate how to use the SQL and JDBC utilities provided by fs-core module.
  * <p>
  * Use Cases:
  * <ul>

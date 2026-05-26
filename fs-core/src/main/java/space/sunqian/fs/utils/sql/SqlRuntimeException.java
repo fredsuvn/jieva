@@ -1,4 +1,4 @@
-package space.sunqian.fs.sql;
+package space.sunqian.fs.utils.sql;
 
 import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.base.exception.FsRuntimeException;

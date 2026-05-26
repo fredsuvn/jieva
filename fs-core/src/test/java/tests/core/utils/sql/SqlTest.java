@@ -1,4 +1,4 @@
-package tests.core.sql;
+package tests.core.utils.sql;
 
 import internal.annotations.J17Only;
 import lombok.AllArgsConstructor;
@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Test;
 import space.sunqian.fs.collect.ListKit;
 import space.sunqian.fs.object.convert.ObjectConverter;
 import space.sunqian.fs.reflect.TypeRef;
-import space.sunqian.fs.sql.PreparedBatchSql;
-import space.sunqian.fs.sql.PreparedSql;
-import space.sunqian.fs.sql.SqlBatch;
-import space.sunqian.fs.sql.SqlBuilder;
-import space.sunqian.fs.sql.SqlInsert;
-import space.sunqian.fs.sql.SqlKit;
-import space.sunqian.fs.sql.SqlQuery;
-import space.sunqian.fs.sql.SqlRuntimeException;
-import space.sunqian.fs.sql.SqlUpdate;
+import space.sunqian.fs.utils.sql.PreparedBatchSql;
+import space.sunqian.fs.utils.sql.PreparedSql;
+import space.sunqian.fs.utils.sql.SqlBatch;
+import space.sunqian.fs.utils.sql.SqlBuilder;
+import space.sunqian.fs.utils.sql.SqlInsert;
+import space.sunqian.fs.utils.sql.SqlKit;
+import space.sunqian.fs.utils.sql.SqlQuery;
+import space.sunqian.fs.utils.sql.SqlRuntimeException;
+import space.sunqian.fs.utils.sql.SqlUpdate;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
