@@ -3,7 +3,6 @@ package space.sunqian.fs.io;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
 
-import java.io.Closeable;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.CharBuffer;
@@ -14,7 +13,7 @@ import java.nio.CharBuffer;
  *
  * @author sunqian
  */
-public interface CharReader extends Closeable {
+public interface CharReader extends SimpleCloseable {
 
     /**
      * Wraps the given reader as a new {@link CharReader}.

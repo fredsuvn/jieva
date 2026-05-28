@@ -12,6 +12,7 @@ import space.sunqian.fs.io.IOKit;
 import space.sunqian.fs.io.IOMode;
 import space.sunqian.fs.io.IOOperator;
 import space.sunqian.fs.io.IORuntimeException;
+import space.sunqian.fs.io.SimpleCloseable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class IOKitTest implements DataGen {
+public class IOTest implements DataGen {
 
     @Test
     public void testReader() throws Exception {
@@ -806,5 +807,16 @@ public class IOKitTest implements DataGen {
         );
         in.reset();
         out.reset();
+    }
+
+    @Test
+    public void testSimpleCloseable() {
+        class X implements SimpleCloseable {
+            @Override
+            public void close() throws IORuntimeException {
+            }
+        }
+        X x = new X();
+        x.close();
     }
 }

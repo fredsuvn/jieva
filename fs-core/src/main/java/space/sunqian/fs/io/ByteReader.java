@@ -3,7 +3,6 @@ package space.sunqian.fs.io;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
 
-import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -16,7 +15,7 @@ import java.nio.channels.WritableByteChannel;
  *
  * @author sunqian
  */
-public interface ByteReader extends Closeable {
+public interface ByteReader extends SimpleCloseable {
 
     /**
      * Wraps the given stream as a new {@link ByteReader}.
