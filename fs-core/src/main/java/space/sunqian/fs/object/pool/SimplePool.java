@@ -3,6 +3,7 @@ package space.sunqian.fs.object.pool;
 import space.sunqian.annotation.Immutable;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
+import space.sunqian.annotation.ThreadSafe;
 import space.sunqian.fs.Fs;
 
 import java.time.Duration;
@@ -13,14 +14,24 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Simple object pool interface, provides methods for acquiring, releasing objects. If the pool is closed due to some
- * exception, the {@link #unreleasedObjects()} can be still invoked to get the list of unreleased objects.
+ * Simple object pool interface, provides methods for pooling objects.
+ * <p>
+ * The pooling objects has 2 states:
+ * <ul>
+ *     <li>active: the object is used, typically via {@link #get()} method;</li>
+ *     <li>idle: the object is not used and prepared in the pool, using {@link #release(Object)} method can return
+ *     active object to idle state;</li>
+ * </ul>
+ * <p>
+ * If the pool is closed due to some exception, the {@link #unreleasedObjects()} can be still invoked to get the list of
+ * unreleased objects.
  * <p>
  * This interface extends {@link Supplier}, so it can be used as a supplier of objects.
  *
  * @param <T> the type of objects in the pool
  * @author sunqian
  */
+@ThreadSafe
 public interface SimplePool<T> extends Supplier<T> {
 
     /**
@@ -34,36 +45,38 @@ public interface SimplePool<T> extends Supplier<T> {
     }
 
     /**
-     * Acquires an object from the pool, or {@code null} if no object is available.
+     * Gets an object from the pool, or {@code null} if no object is available.
      * <p>
-     * If any exception occurs during the acquisition process, {@link #close()} will be invoked to close this pool and
-     * the {@link #unreleasedObjects()} will return the list of unreleased objects, including idle objects and active
+     * If any exception occurs during this operation, {@link #close()} will be invoked to close this pool and the
+     * {@link #unreleasedObjects()} will return the list of unreleased objects, including idle objects and active
      * objects.
      *
-     * @return the acquired object, or {@code null} if no object is available
-     * @throws ObjectPoolException if failed to acquire object
+     * @return the object from the pool, or {@code null} if no object is available
+     * @throws ObjectPoolException if failed to get object
      */
     @Nullable
     @Override
     T get() throws ObjectPoolException;
 
     /**
-     * Releases the given object to the pool. Returns {@code true} if the object is released successfully, {@code false}
-     * otherwise. If the object is not acquired from this pool, this method will do nothing just return {@code false}.
+     * Releases the given active object to the pool. Returns {@code true} if the object is released successfully,
+     * {@code false} otherwise. If the object is not acquired from this pool, this method will do nothing just return
+     * {@code false}.
      * <p>
      * If any exception occurs during the release process, {@link #close()} will be invoked to close this pool and the
      * {@link #unreleasedObjects()} will return the list of unreleased objects, including idle objects and active
      * objects.
      *
-     * @param obj the given object to release
+     * @param obj the given active object to release
      * @return {@code true} if the object is released successfully, {@code false} otherwise
      * @throws ObjectPoolException if failed to release object
      */
     boolean release(@Nonnull T obj) throws ObjectPoolException;
 
     /**
-     * Cleans the pool, removing idle objects that idle timeout or invalidated by validator, or over the core size,
-     * adding new objects up to the core size if necessary. The active objects will not be cleaned.
+     * Cleans the pool, removing idle objects that idle timeout or invalidated. If the current pool has a specified core
+     * size and the idle objects count is over or less than the core size, removing idle objects or adding new prepared
+     * objects up to the core size. The active objects will not be cleaned.
      * <p>
      * If any exception occurs during the clean process, {@link #close()} will be invoked to close this pool and the
      * {@link #unreleasedObjects()} will return the list of unreleased objects, including idle objects and active
