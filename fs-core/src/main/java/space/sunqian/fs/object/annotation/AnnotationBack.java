@@ -92,6 +92,11 @@ final class AnnotationBack {
             }
             return null;
         }
+
+        @Override
+        public boolean isEmpty() {
+            return annotationList.isEmpty();
+        }
     }
 
     private static final class MultiAnnotationSet implements AnnotationSet {
@@ -156,6 +161,11 @@ final class AnnotationBack {
             }
             return null;
         }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
     }
 
     private enum EmptySet implements AnnotationSet {
@@ -184,6 +194,11 @@ final class AnnotationBack {
         @Override
         public <T extends Annotation, D extends AnnotationDetail<T>> @Nullable D getDetailByAnnotationType(@Nonnull Class<T> annotationClass) {
             return null;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
         }
     }
 

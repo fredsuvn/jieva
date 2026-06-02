@@ -140,4 +140,11 @@ public interface AnnotationSet {
     <T extends Annotation, D extends AnnotationDetail<T>> @Nullable D getDetailByAnnotationType(
         @Nonnull Class<T> annotationClass
     );
+
+    /**
+     * Returns whether this {@link AnnotationSet} is empty.
+     *
+     * @return whether this {@link AnnotationSet} is empty
+     */
+    boolean isEmpty();
 }

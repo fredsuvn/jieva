@@ -30,9 +30,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AnnotationTest implements Asserter, TestPrint {
 
@@ -127,6 +129,7 @@ public class AnnotationTest implements Asserter, TestPrint {
             Arrays.asList(da, db, ndb),
             multiSet.details()
         );
+        assertFalse(multiSet.isEmpty());
         assertSame(pa, multiSet.get(DatePattern.class));
         assertSame(da, multiSet.getDetail(DatePatternDetail.class));
         assertSame(nb, multiSet.get(NumberPattern.class));
@@ -144,7 +147,9 @@ public class AnnotationTest implements Asserter, TestPrint {
         assertNull(multiSet.getDetail(D.class));
 
         assertSame(annotationSetA, AnnotationSet.multiSet(annotationSetA));
+        assertFalse(annotationSetA.isEmpty());
         assertSame(AnnotationSet.emptySet(), AnnotationSet.multiSet());
+        assertTrue(AnnotationSet.emptySet().isEmpty());
     }
 
     @Test
@@ -155,6 +160,7 @@ public class AnnotationTest implements Asserter, TestPrint {
         assertNull(empty.get(NumberPattern.class));
         assertNull(empty.getDetail(DatePatternDetail.class));
         assertNull(empty.getDetailByAnnotationType(Nullable.class));
+        assertTrue(empty.isEmpty());
     }
 
     public static class X {
