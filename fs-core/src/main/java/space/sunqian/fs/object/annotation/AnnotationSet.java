@@ -42,12 +42,39 @@ public interface AnnotationSet {
     /**
      * Returns a new {@link AnnotationSet} whose contents are come from the given {@link AnnotationSet}s. The search
      * order of the search method is the order of the given {@link AnnotationSet}s.
+     * <p>
+     * If the given {@link AnnotationSet}s is empty, returns an empty {@link AnnotationSet}; if the given
+     * {@link AnnotationSet}s is only one, returns the only {@link AnnotationSet}; otherwise, returns a new multi
+     * {@link AnnotationSet}.
      *
      * @param annotationSets the given {@link AnnotationSet}s
      * @return a new {@link AnnotationSet} whose contents are come from the given {@link AnnotationSet}s
      */
+    static @Nonnull AnnotationSet multiSet(@Nonnull List<@Nonnull AnnotationSet> annotationSets) {
+        return multiSet(annotationSets.toArray(new AnnotationSet[0]));
+    }
+
+    /**
+     * Returns a new {@link AnnotationSet} whose contents are come from the given {@link AnnotationSet}s. The search
+     * order of the search method is the order of the given {@link AnnotationSet}s.
+     * <p>
+     * If the given {@link AnnotationSet}s is empty, returns an empty {@link AnnotationSet}; if the given
+     * {@link AnnotationSet}s is only one, returns the only {@link AnnotationSet}; otherwise, returns a new multi
+     * {@link AnnotationSet}.
+     *
+     * @param annotationSets the given {@link AnnotationSet}s
+     * @return a new {@link AnnotationSet} whose contents are come from the given {@link AnnotationSet}s
+     */
+    @SuppressWarnings("EnhancedSwitchMigration")
     static @Nonnull AnnotationSet multiSet(@Nonnull AnnotationSet @Nonnull @RetainedParam ... annotationSets) {
-        return AnnotationBack.multiSet(annotationSets);
+        switch (annotationSets.length) {
+            case 0:
+                return emptySet();
+            case 1:
+                return annotationSets[0];
+            default:
+                return AnnotationBack.multiSet(annotationSets);
+        }
     }
 
     /**
