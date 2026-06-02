@@ -26,7 +26,7 @@ final class AnnotationBack {
         return new AnnotationSetImpl(annotatedElement);
     }
 
-    static @Nonnull AnnotationSet multiSet(@Nonnull AnnotationSet @Nonnull @RetainedParam [] annotationSets) {
+    static @Nonnull AnnotationSet multiSet(@Nonnull List<@Nonnull AnnotationSet> annotationSets) {
         return new MultiAnnotationSet(annotationSets);
     }
 
@@ -101,9 +101,9 @@ final class AnnotationBack {
 
     private static final class MultiAnnotationSet implements AnnotationSet {
 
-        private final @Nonnull AnnotationSet @Nonnull [] annotationSets;
+        private final @Nonnull List<@Nonnull AnnotationSet> annotationSets;
 
-        private MultiAnnotationSet(@Nonnull AnnotationSet @Nonnull @RetainedParam [] annotationSets) {
+        private MultiAnnotationSet(@Nonnull @RetainedParam List<@Nonnull AnnotationSet> annotationSets) {
             this.annotationSets = annotationSets;
         }
 

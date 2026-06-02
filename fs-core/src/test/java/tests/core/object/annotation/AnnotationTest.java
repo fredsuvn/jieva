@@ -5,7 +5,6 @@ import internal.utils.TestPrint;
 import org.junit.jupiter.api.Test;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
-import space.sunqian.fs.collect.ListKit;
 import space.sunqian.fs.object.annotation.AnnotationDetail;
 import space.sunqian.fs.object.annotation.AnnotationSet;
 import space.sunqian.fs.object.annotation.DatePattern;
@@ -120,7 +119,7 @@ public class AnnotationTest implements Asserter, TestPrint {
         DatePatternDetail db = annotationSetB.getDetail(DatePatternDetail.class);
         NumberPattern nb = annotationSetB.get(NumberPattern.class);
         NumberPatternDetail ndb = annotationSetB.getDetail(NumberPatternDetail.class);
-        AnnotationSet multiSet = AnnotationSet.multiSet(ListKit.list(annotationSetA, annotationSetB));
+        AnnotationSet multiSet = AnnotationSet.multiSet(annotationSetA, annotationSetB);
         assertEquals(
             Arrays.asList(pa, pb, nb),
             multiSet.annotations()
@@ -148,7 +147,11 @@ public class AnnotationTest implements Asserter, TestPrint {
 
         assertSame(annotationSetA, AnnotationSet.multiSet(annotationSetA));
         assertFalse(annotationSetA.isEmpty());
+        assertSame(annotationSetA, AnnotationSet.multiSet(annotationSetA, AnnotationSet.emptySet()));
+        assertFalse(annotationSetA.isEmpty());
         assertSame(AnnotationSet.emptySet(), AnnotationSet.multiSet());
+        assertTrue(AnnotationSet.emptySet().isEmpty());
+        assertSame(AnnotationSet.emptySet(), AnnotationSet.multiSet(AnnotationSet.emptySet(), AnnotationSet.emptySet()));
         assertTrue(AnnotationSet.emptySet().isEmpty());
     }
 

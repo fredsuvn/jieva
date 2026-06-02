@@ -5,10 +5,12 @@ import space.sunqian.annotation.Immutable;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
 import space.sunqian.annotation.RetainedParam;
+import space.sunqian.fs.collect.ListKit;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents a collection of annotations along with their detailed information.
@@ -50,8 +52,23 @@ public interface AnnotationSet {
      * @param annotationSets the given {@link AnnotationSet}s
      * @return a new {@link AnnotationSet} whose contents are come from the given {@link AnnotationSet}s
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     static @Nonnull AnnotationSet multiSet(@Nonnull List<@Nonnull AnnotationSet> annotationSets) {
-        return multiSet(annotationSets.toArray(new AnnotationSet[0]));
+        switch (annotationSets.size()) {
+            case 0:
+                return emptySet();
+            case 1:
+                return annotationSets.get(0);
+            default:
+                for (AnnotationSet as : annotationSets) {
+                    if (as.isEmpty()) {
+                        return multiSet(annotationSets.stream()
+                            .filter(a -> !a.isEmpty())
+                            .collect(Collectors.toList()));
+                    }
+                }
+                return AnnotationBack.multiSet(annotationSets);
+        }
     }
 
     /**
@@ -65,16 +82,8 @@ public interface AnnotationSet {
      * @param annotationSets the given {@link AnnotationSet}s
      * @return a new {@link AnnotationSet} whose contents are come from the given {@link AnnotationSet}s
      */
-    @SuppressWarnings("EnhancedSwitchMigration")
     static @Nonnull AnnotationSet multiSet(@Nonnull AnnotationSet @Nonnull @RetainedParam ... annotationSets) {
-        switch (annotationSets.length) {
-            case 0:
-                return emptySet();
-            case 1:
-                return annotationSets[0];
-            default:
-                return AnnotationBack.multiSet(annotationSets);
-        }
+        return multiSet(ListKit.list(annotationSets));
     }
 
     /**
