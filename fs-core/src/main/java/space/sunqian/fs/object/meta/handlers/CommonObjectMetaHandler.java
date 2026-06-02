@@ -12,8 +12,8 @@ import java.util.Objects;
 /**
  * This is a common implementation of {@link ObjectMetaIntrospector.Handler} which basically follows the <a
  * href="https://www.oracle.com/java/technologies/javase/javabeans-spec.html">JavaBeans</a> style, inheriting from
- * {@link AbstractObjectMetaHandler} and overriding the {@link AbstractObjectMetaHandler#introspectAccessor(Method)}
- * method.
+ * {@link AbstractObjectMetaHandler} and overriding the
+ * {@link AbstractObjectMetaHandler#introspectAccessor(Method, ObjectMetaIntrospector.Context)} method.
  * <p>
  * This implementation resolves {@code getXxx} or {@code isXxx} methods as getters, and {@code setXxx} methods as
  * setters, according to lower camel case naming conventions. It always creates new instance of {@link ObjectMeta} on
@@ -37,7 +37,10 @@ public class CommonObjectMetaHandler extends AbstractObjectMetaHandler {
 
     @SuppressWarnings("EnhancedSwitchMigration")
     @Override
-    protected @Nullable AccessorInfo introspectAccessor(@Nonnull Method method) {
+    protected @Nullable AccessorInfo introspectAccessor(
+        @Nonnull Method method,
+        ObjectMetaIntrospector.@Nonnull Context context
+    ) {
         int parameterCount = method.getParameterCount();
         switch (parameterCount) {
             case 0:// maybe getter

@@ -5,6 +5,7 @@ import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.collect.MapKit;
 import space.sunqian.fs.invoke.Invocable;
+import space.sunqian.fs.object.annotation.AnnotationSet;
 import space.sunqian.fs.object.meta.ObjectMetaIntrospector;
 import space.sunqian.fs.reflect.TypeKit;
 
@@ -12,8 +13,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,9 +25,10 @@ import java.util.Set;
  * implement the interface.
  * <p>
  * This class uses {@link Class#getMethods()} to find out all accessible methods without synthetic methods, passes each
- * of them to {@link #introspectAccessor(Method)} to introspect property accessor infos. Then, this class processes the
- * property accessor infos to the property meta infos. The subclasses only needs to implement the
- * {@link #introspectAccessor(Method)}.
+ * of them to {@link #introspectAccessor(Method, ObjectMetaIntrospector.Context)} to introspect property meta info. And,
+ * uses {@link #introspectAnnotations(Class, ObjectMetaIntrospector.Context)} to introspect the annotations on the type
+ * declaration. The subclasses only needs to implement the
+ * {@link #introspectAccessor(Method, ObjectMetaIntrospector.Context)}.
  *
  * @author sunqian
  */
@@ -77,7 +81,7 @@ public abstract class AbstractObjectMetaHandler implements ObjectMetaIntrospecto
             if (method.isSynthetic()) {
                 continue;
             }
-            AccessorInfo accessorInfo = introspectAccessor(method);
+            AccessorInfo accessorInfo = introspectAccessor(method, context);
             if (accessorInfo == null) {
                 continue;
             }
@@ -114,18 +118,63 @@ public abstract class AbstractObjectMetaHandler implements ObjectMetaIntrospecto
             propertyBase.field = field;
             context.propertyBaseMap().put(propertyName, propertyBase);
         });
+
+        // find all annotations on the type.
+        context.annotations().add(introspectAnnotations(rawType, context));
+
         return true;
     }
 
     /**
      * Introspects and returns the given method to an accessor info, or {@code null} if the given method is not a data
      * property.
+     * <p>
+     * By default, this method should be implemented.
      *
-     * @param method the given method
+     * @param method  the given method
+     * @param context the context for introspection
      * @return the accessor info introspected from the given method, or {@code null} if the given method is not a data
      * property
      */
-    protected abstract @Nullable AccessorInfo introspectAccessor(@Nonnull Method method);
+    protected abstract @Nullable AccessorInfo introspectAccessor(
+        @Nonnull Method method,
+        ObjectMetaIntrospector.@Nonnull Context context
+    );
+
+    /**
+     * Introspects and returns the annotations on the type declaration of the object to be introspected, or empty set if
+     * the type has no annotation.
+     * <p>
+     * By default, this method iterates over all interfaces and super types of the given raw type, and returns a
+     * {@link AnnotationSet} contains all the annotations found on those types.
+     *
+     * @param rawType the raw type of the object to be introspected
+     * @param context the context for introspection
+     * @return the annotations on the type declaration of the object to be introspected, or empty set if the type has no
+     * annotation
+     */
+    protected @Nonnull AnnotationSet introspectAnnotations(
+        Class<?> rawType,
+        ObjectMetaIntrospector.@Nonnull Context context
+    ) {
+        List<AnnotationSet> annotations = new ArrayList<>();
+        searchAnnotations(rawType, annotations);
+        return AnnotationSet.multiSet(annotations);
+    }
+
+    private void searchAnnotations(@Nonnull Class<?> type, @Nonnull List<@Nonnull AnnotationSet> annotations) {
+        AnnotationSet as = AnnotationSet.from(type);
+        if (!as.isEmpty()) {
+            annotations.add(as);
+        }
+        for (Class<?> anInterface : type.getInterfaces()) {
+            searchAnnotations(anInterface, annotations);
+        }
+        Class<?> superClass = type.getSuperclass();
+        if (superClass != null) {
+            searchAnnotations(superClass, annotations);
+        }
+    }
 
     /**
      * Property accessor info, introspected from the specified {@link Method}.

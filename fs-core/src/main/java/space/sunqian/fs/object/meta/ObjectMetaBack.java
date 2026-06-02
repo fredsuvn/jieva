@@ -16,6 +16,7 @@ import space.sunqian.fs.third.ThirdKit;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,6 +106,7 @@ final class ObjectMetaBack {
 
         private final @Nonnull Type type;
         private final @Nonnull Map<@Nonnull String, @Nonnull PropertyMetaBase> properties = new LinkedHashMap<>();
+        private final @Nonnull List<@Nonnull AnnotationSet> annotations = new ArrayList<>();
 
         MetaBuilder(@Nonnull Type type) {
             this.type = type;
@@ -120,9 +122,14 @@ final class ObjectMetaBack {
             return properties;
         }
 
+        @Override
+        public @Nonnull List<@Nonnull AnnotationSet> annotations() {
+            return annotations;
+        }
+
         @Nonnull
         ObjectMeta build(@Nonnull ObjectMetaIntrospector introspector) {
-            return new ObjectMetaImpl(introspector, type, properties);
+            return new ObjectMetaImpl(introspector, type, properties, annotations);
         }
 
         private static final class ObjectMetaImpl implements ObjectMeta {
@@ -130,17 +137,20 @@ final class ObjectMetaBack {
             private final @Nonnull ObjectMetaIntrospector introspector;
             private final @Nonnull Type type;
             private final @Nonnull Map<@Nonnull String, @Nonnull PropertyMeta> properties;
+            private final @Nonnull AnnotationSet annotations;
 
             private ObjectMetaImpl(
                 @Nonnull ObjectMetaIntrospector introspector,
                 @Nonnull Type type,
-                @Nonnull Map<@Nonnull String, @Nonnull PropertyMetaBase> propBases
+                @Nonnull Map<@Nonnull String, @Nonnull PropertyMetaBase> propBases,
+                @Nonnull List<@Nonnull AnnotationSet> annotations
             ) {
                 this.introspector = introspector;
                 this.type = type;
                 Map<@Nonnull String, @Nonnull PropertyMeta> props = new LinkedHashMap<>();
                 propBases.forEach((name, propBase) -> props.put(name, new PropertyMetaImpl(propBase)));
                 this.properties = Collections.unmodifiableMap(props);
+                this.annotations = AnnotationSet.multiSet(annotations);
             }
 
             @Override
@@ -156,6 +166,11 @@ final class ObjectMetaBack {
             @Override
             public @Nonnull Map<@Nonnull String, @Nonnull PropertyMeta> properties() {
                 return properties;
+            }
+
+            @Override
+            public @Nonnull AnnotationSet annotations() {
+                return annotations;
             }
 
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
@@ -199,11 +214,11 @@ final class ObjectMetaBack {
                     this.getter = propertyBase.getter();
                     this.setter = propertyBase.setter();
                     this.getterAnnotations = getterMethod == null ?
-                        AnnotationSet.emptySet() : AnnotationSet.newSet(getterMethod);
+                        AnnotationSet.emptySet() : AnnotationSet.from(getterMethod);
                     this.setterAnnotations = setterMethod == null ?
-                        AnnotationSet.emptySet() : AnnotationSet.newSet(setterMethod);
+                        AnnotationSet.emptySet() : AnnotationSet.from(setterMethod);
                     this.fieldAnnotations = field == null ?
-                        AnnotationSet.emptySet() : AnnotationSet.newSet(field);
+                        AnnotationSet.emptySet() : AnnotationSet.from(field);
                     annotations = AnnotationSet.multiSet(getterAnnotations, setterAnnotations, fieldAnnotations);
                 }
 

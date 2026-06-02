@@ -7,6 +7,7 @@ import space.sunqian.fs.Fs;
 import space.sunqian.fs.cache.CacheFunction;
 import space.sunqian.fs.cache.SimpleCache;
 import space.sunqian.fs.collect.ListKit;
+import space.sunqian.fs.object.annotation.AnnotationSet;
 import space.sunqian.fs.object.meta.handlers.AbstractObjectMetaHandler;
 import space.sunqian.fs.object.meta.handlers.CommonObjectMetaHandler;
 import space.sunqian.fs.object.meta.handlers.RecordMetaHandler;
@@ -139,14 +140,15 @@ public interface ObjectMetaIntrospector {
          * logic.
          * <p>
          * The given {@link Context} instance provides the introspected type via {@link Context#objectType()}. The
-         * introspected properties should be stored in {@link Context#propertyBaseMap()}. Subsequent handlers can read
-         * the property base info placed by the previous handler and then replace or reprocess it.
+         * introspected properties and annotation sets should be stored in {@link Context#propertyBaseMap()} and
+         * {@link Context#annotations()}. Subsequent handlers can read the property base info and annotation sets placed
+         * by the previous handler and then replace or reprocess it.
          * <p>
          * Returns {@code false} to prevent subsequent handlers from introspecting further, or {@code true} to continue
          * introspecting.
          *
-         * @param context the given context
-         * @return whether to continue introspecting
+         * @param context the context for introspection
+         * @return whether to continue introspecting further
          * @throws Exception for any error during introspection
          */
         boolean introspect(@Nonnull Context context) throws Exception;
@@ -177,5 +179,16 @@ public interface ObjectMetaIntrospector {
          */
         @Nonnull
         Map<@Nonnull String, @Nonnull PropertyMetaBase> propertyBaseMap();
+
+        /**
+         * Returns a mutable list for storing and reading annotation sets.
+         * <p>
+         * Throughout the whole introspection process, the list stores and shares annotation sets for all handlers. Each
+         * handler can add, remove, or reprocess that annotation sets.
+         *
+         * @return a mutable list for storing and reading annotation sets
+         */
+        @Nonnull
+        List<@Nonnull AnnotationSet> annotations();
     }
 }

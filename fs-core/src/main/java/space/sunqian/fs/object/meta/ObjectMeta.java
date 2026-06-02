@@ -3,6 +3,7 @@ package space.sunqian.fs.object.meta;
 import space.sunqian.annotation.Immutable;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
+import space.sunqian.fs.object.annotation.AnnotationSet;
 
 import java.beans.BeanInfo;
 import java.lang.reflect.Type;
@@ -68,6 +69,15 @@ public interface ObjectMeta extends DataMeta {
     default @Nullable PropertyMeta getProperty(String name) {
         return properties().get(name);
     }
+
+    /**
+     * Returns the {@link AnnotationSet} annotated on the type described by this {@link ObjectMeta}.
+     *
+     * @return the {@link AnnotationSet} annotated on the type described by this {@link ObjectMeta}
+     */
+    @Nonnull
+    @Immutable
+    AnnotationSet annotations();
 
     @Override
     default boolean isMapMeta() {

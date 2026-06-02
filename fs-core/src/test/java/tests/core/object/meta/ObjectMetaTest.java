@@ -24,12 +24,19 @@ import space.sunqian.fs.object.meta.PropertyMetaBase;
 import space.sunqian.fs.object.meta.handlers.CommonObjectMetaHandler;
 import space.sunqian.fs.reflect.TypeRef;
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -90,6 +97,8 @@ public class ObjectMetaTest implements TestPrint {
         bGetter = TestData.class.getDeclaredMethod("isB");
         bbGetter = TestData.class.getDeclaredMethod("isBb");
         BBGetter = TestData.class.getDeclaredMethod("isBB");
+
+        assertSame(AnnotationSet.emptySet(), testDataMeta.annotations());
     }
 
     @Test
@@ -357,6 +366,13 @@ public class ObjectMetaTest implements TestPrint {
         testAnnotationProp4(meta);
         testAnnotationProp5(meta);
         testAnnotationProp6(meta);
+
+        assertEquals(
+            ListKit.list(
+                Ann00.class, Ann02.class, Ann03.class, Ann01.class
+            ),
+            meta.annotations().annotations().stream().map(Annotation::annotationType).collect(Collectors.toList())
+        );
     }
 
     private void testAnnotationProp1(ObjectMeta meta) {
@@ -597,9 +613,22 @@ public class ObjectMetaTest implements TestPrint {
         public String publicField;
     }
 
+    @Ann01
+    public static class ForAnnotationBase {
+    }
+
+    @Ann02
+    public interface ForAnnotationInter extends ForAnnotationInterBase {
+    }
+
+    @Ann03
+    public interface ForAnnotationInterBase {
+    }
+
+    @Ann00
     @Data
     @NoArgsConstructor
-    public static class ForAnnotation {
+    public static class ForAnnotation extends ForAnnotationBase implements ForAnnotationInter {
 
         @Nonnull
         private String prop1;
@@ -623,6 +652,26 @@ public class ObjectMetaTest implements TestPrint {
 
         public void setProp6(String prop6) {
         }
+    }
+
+    @Target({TYPE, FIELD, METHOD})
+    @Retention(RUNTIME)
+    public @interface Ann00 {
+    }
+
+    @Target({TYPE, FIELD, METHOD})
+    @Retention(RUNTIME)
+    public @interface Ann01 {
+    }
+
+    @Target({TYPE, FIELD, METHOD})
+    @Retention(RUNTIME)
+    public @interface Ann02 {
+    }
+
+    @Target({TYPE, FIELD, METHOD})
+    @Retention(RUNTIME)
+    public @interface Ann03 {
     }
 
     private static final class TestPropertyMeta implements PropertyMeta {
