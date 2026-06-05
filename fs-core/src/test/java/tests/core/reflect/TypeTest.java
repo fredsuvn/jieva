@@ -57,12 +57,10 @@ public class TypeTest {
     @Test
     public void testLastName() throws Exception {
         assertEquals(TypeKit.getLastName(TypeKit.class), TypeKit.class.getSimpleName());
-        Method method = TypeKit.class.getDeclaredMethod("getLastName", String.class);
-        method.setAccessible(true);
-        assertEquals("123", method.invoke(null, "123"));
-        assertEquals("123", method.invoke(null, ".123"));
-        assertEquals("23", method.invoke(null, ".1.23"));
-        assertEquals("3", method.invoke(null, ".12.3"));
+        assertEquals("123", TypeKit.getLastName("123"));
+        assertEquals("123", TypeKit.getLastName(".123"));
+        assertEquals("23", TypeKit.getLastName(".1.23"));
+        assertEquals("3", TypeKit.getLastName(".12.3"));
     }
 
     @Test

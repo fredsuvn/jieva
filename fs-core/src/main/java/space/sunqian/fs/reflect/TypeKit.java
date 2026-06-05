@@ -113,8 +113,9 @@ public class TypeKit {
     }
 
     /**
-     * Returns the last name of the given type. The last name is sub-string after last dot(.) For example: the last name
-     * of {@code java.lang.String} is {@code String}.
+     * Returns the last name of the given type. The last name is sub-string after last dot(.). For example: the last
+     * name of {@code java.lang.String} is {@code String}. If the name of the given type does not contain any dot,
+     * returns the given type name itself.
      *
      * @param type the given type
      * @return the last name of given type
@@ -124,8 +125,19 @@ public class TypeKit {
         return getLastName(className);
     }
 
-    private static @Nonnull String getLastName(@Nonnull String typeName) {
+    /**
+     * Returns the last name of the given type name. The last name is sub-string after last dot(.). For example: the
+     * last name of {@code java.lang.String} is {@code String}. If the given type name does not contain any dot, returns
+     * the given type name itself.
+     *
+     * @param typeName the given type name
+     * @return the last name of given type name
+     */
+    public static @Nonnull String getLastName(@Nonnull String typeName) {
         int index = typeName.lastIndexOf('.');
+        // if (index == -1) {
+        //     return typeName;
+        // }
         return typeName.substring(index + 1);
     }
 
