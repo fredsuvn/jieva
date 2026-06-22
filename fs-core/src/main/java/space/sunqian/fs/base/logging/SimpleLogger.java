@@ -220,7 +220,8 @@ public interface SimpleLogger {
         /**
          * The level for tracing, it is the lowest level.
          */
-        TRACE(0);;
+        TRACE(0),
+        ;
 
         private final int value;
 
