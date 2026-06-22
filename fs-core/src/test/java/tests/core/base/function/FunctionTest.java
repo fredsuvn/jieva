@@ -33,4 +33,12 @@ public class FunctionTest {
         DoubleCallable call = () -> 66;
         assertEquals(call.callAsDouble(), call.call());
     }
+
+    // @Test
+    // public void testFunctionalException() throws Exception {
+    //     assertThrows(FunctionalException.class, () -> {throw new FunctionalException();});
+    //     assertThrows(FunctionalException.class, () -> {throw new FunctionalException("", new RuntimeException());});
+    //     assertThrows(FunctionalException.class, () -> {throw new FunctionalException("", new RuntimeException());});
+    //     assertThrows(FunctionalException.class, () -> {throw new FunctionalException(new RuntimeException());});
+    // }
 }
