@@ -2,6 +2,7 @@ package tests.core.object.annotation;
 
 import internal.utils.Asserter;
 import internal.utils.TestPrint;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
@@ -9,6 +10,7 @@ import space.sunqian.fs.object.annotation.AnnotationDetail;
 import space.sunqian.fs.object.annotation.AnnotationSet;
 import space.sunqian.fs.object.annotation.DatePattern;
 import space.sunqian.fs.object.annotation.DatePatternDetail;
+import space.sunqian.fs.object.annotation.DetailType;
 import space.sunqian.fs.object.annotation.NumberPattern;
 import space.sunqian.fs.object.annotation.NumberPatternDetail;
 import space.sunqian.fs.object.annotation.SimpleAnnotationDetail;
@@ -30,12 +32,29 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AnnotationTest implements Asserter, TestPrint {
+
+    @Test
+    public void testDetail() throws Exception {
+        DatePattern datePattern = D.class.getDeclaredField("a").getAnnotation(DatePattern.class);
+        assertEquals("yyyy-MM-dd", datePattern.value());
+        assertInstanceOf(DatePatternDetail.class, AnnotationDetail.newDetail(datePattern));
+        NumberPattern numberPattern = D.class.getDeclaredField("b").getAnnotation(NumberPattern.class);
+        assertEquals("#.0000", numberPattern.value());
+        assertInstanceOf(NumberPatternDetail.class, AnnotationDetail.newDetail(numberPattern));
+        XAnn xAnn = D.class.getDeclaredField("x").getAnnotation(XAnn.class);
+        assertInstanceOf(SimpleAnnotationDetail.class, AnnotationDetail.newDetail(xAnn));
+        YAnn yAnn = D.class.getDeclaredField("y").getAnnotation(YAnn.class);
+        assertInstanceOf(YAnnDetail.class, AnnotationDetail.newDetail(yAnn));
+        Nullable nullable = D.class.getDeclaredField("n").getAnnotation(Nullable.class);
+        assertInstanceOf(SimpleAnnotationDetail.class, AnnotationDetail.newDetail(nullable));
+    }
 
     @Test
     public void testAnnotationSet() throws Exception {
@@ -139,7 +158,7 @@ public class AnnotationTest implements Asserter, TestPrint {
         class D implements AnnotationDetail<Nullable> {
 
             @Override
-            public Nullable annotation() {
+            public @NonNull Nullable annotation() {
                 return null;
             }
         }
@@ -200,5 +219,42 @@ public class AnnotationTest implements Asserter, TestPrint {
         @DatePattern(zoneId = "Asia/Shanghai")
         @NumberPattern("#.0000")
         private String b;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @DetailType(XAnnDetail.class)
+    public @interface XAnn {
+    }
+
+    public static class XAnnDetail {
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @DetailType(YAnnDetail.class)
+    public @interface YAnn {
+    }
+
+    public static class YAnnDetail {
+
+        public YAnnDetail(YAnn yAnn) {
+        }
+    }
+
+    public static class D {
+
+        @DatePattern("yyyy-MM-dd")
+        private String a;
+
+        @NumberPattern("#.0000")
+        private String b;
+
+        @XAnn
+        private String x;
+
+        @YAnn
+        private String y;
+
+        @Nullable
+        private String n;
     }
 }

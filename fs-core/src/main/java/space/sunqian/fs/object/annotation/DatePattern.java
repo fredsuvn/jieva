@@ -19,6 +19,9 @@ import java.time.ZoneId;
  * }</pre>
  * It is typically available for the default {@link ObjectConverter} and {@link ObjectCopier} and their handlers when
  * converting to a non-map object.
+ * <p>
+ * This annotation is annotated with {@link DetailType} with the detail type {@link DatePatternDetail}, that means the
+ * detail type for this annotation is {@link DatePatternDetail}.
  *
  * @author sunqian
  */
@@ -31,6 +34,7 @@ import java.time.ZoneId;
     ElementType.LOCAL_VARIABLE,
     ElementType.TYPE_USE,
 })
+@DetailType(DatePatternDetail.class)
 public @interface DatePattern {
 
     /**

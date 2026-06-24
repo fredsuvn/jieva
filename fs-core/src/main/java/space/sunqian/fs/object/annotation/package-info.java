@@ -4,6 +4,7 @@
  * <p>
  * The annotations in this package:
  * <ul>
+ *     <li>{@link space.sunqian.fs.object.annotation.DetailType}</li>
  *     <li>{@link space.sunqian.fs.object.annotation.DatePattern}</li>
  *     <li>{@link space.sunqian.fs.object.annotation.NumberPattern}</li>
  * </ul>

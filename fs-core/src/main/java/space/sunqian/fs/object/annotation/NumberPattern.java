@@ -18,6 +18,9 @@ import java.lang.annotation.Target;
  * }</pre>
  * It is typically available for the default {@link ObjectConverter} and {@link ObjectCopier} and their handlers when
  * converting to a non-map object.
+ * <p>
+ * This annotation is annotated with {@link DetailType} with the detail type {@link NumberPatternDetail}, that means the
+ * detail type for this annotation is {@link NumberPatternDetail}.
  *
  * @author sunqian
  */
@@ -30,6 +33,7 @@ import java.lang.annotation.Target;
     ElementType.LOCAL_VARIABLE,
     ElementType.TYPE_USE,
 })
+@DetailType(NumberPatternDetail.class)
 public @interface NumberPattern {
 
     /**

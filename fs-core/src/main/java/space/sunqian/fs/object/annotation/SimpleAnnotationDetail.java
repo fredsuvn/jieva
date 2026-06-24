@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
  * @param <T> the type of the annotation instance
  * @author sunqian
  */
+@SuppressWarnings("ClassCanBeRecord")
 public class SimpleAnnotationDetail<T extends Annotation> implements AnnotationDetail<T> {
 
     private final @Nonnull T annotation;
