@@ -234,9 +234,17 @@ public class AnnotationTest implements Asserter, TestPrint {
     public @interface YAnn {
     }
 
-    public static class YAnnDetail {
+    public static class YAnnDetail implements AnnotationDetail<YAnn> {
+
+        private final YAnn ann;
 
         public YAnnDetail(YAnn yAnn) {
+            this.ann = yAnn;
+        }
+
+        @Override
+        public @Nonnull YAnn annotation() {
+            return ann;
         }
     }
 
