@@ -57,7 +57,7 @@ public class AnnotationTest implements Asserter, TestPrint {
     }
 
     @Test
-    public void testAnnotationSet() throws Exception {
+    public void testAnnotationGroup() throws Exception {
         Field fieldA = X.class.getDeclaredField("a");
         AnnotationGroup annotationGroupA = AnnotationGroup.from(fieldA);
         testAnnotations(annotationGroupA);
@@ -127,7 +127,7 @@ public class AnnotationTest implements Asserter, TestPrint {
     }
 
     @Test
-    public void testMultiAnnotationSet() throws Exception {
+    public void testCombineAnnotationGroup() throws Exception {
         Field fieldA = M.class.getDeclaredField("a");
         AnnotationGroup annotationGroupA = AnnotationGroup.from(fieldA);
         DatePattern pa = annotationGroupA.annotation(DatePattern.class);
@@ -175,7 +175,7 @@ public class AnnotationTest implements Asserter, TestPrint {
     }
 
     @Test
-    public void testEmptySet() {
+    public void testEmptyAnnotationGroup() {
         AnnotationGroup empty = AnnotationGroup.empty();
         assertEquals(Collections.emptyList(), empty.annotations());
         assertEquals(Collections.emptyList(), empty.details());
