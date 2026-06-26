@@ -10,7 +10,7 @@
  * </ul>
  * The enhanced classes in this package:
  * <ul>
- *     <li>{@link space.sunqian.fs.object.annotation.AnnotationSet}</li>
+ *     <li>{@link space.sunqian.fs.object.annotation.AnnotationGroup}</li>
  *     <li>{@link space.sunqian.fs.object.annotation.AnnotationDetail}</li>
  *     <li>{@link space.sunqian.fs.object.annotation.DatePatternDetail}</li>
  *     <li>{@link space.sunqian.fs.object.annotation.NumberPatternDetail}</li>

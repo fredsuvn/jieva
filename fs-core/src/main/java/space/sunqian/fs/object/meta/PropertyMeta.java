@@ -4,7 +4,7 @@ import space.sunqian.annotation.Immutable;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.invoke.Invocable;
-import space.sunqian.fs.object.annotation.AnnotationSet;
+import space.sunqian.fs.object.annotation.AnnotationGroup;
 
 /**
  * This interface represents the property meta info of {@link ObjectMeta}. It is very similar to the simple property of
@@ -44,44 +44,44 @@ public interface PropertyMeta extends PropertyMetaBase {
     }
 
     /**
-     * Returns the {@link AnnotationSet} on the getter method of this property. If this property doesn't have a getter
-     * method, an empty {@link AnnotationSet} will be returned.
+     * Returns the {@link AnnotationGroup} on the getter method of this property. If this property doesn't have a getter
+     * method, an empty {@link AnnotationGroup} will be returned.
      *
-     * @return the {@link AnnotationSet} on the getter method of this property
+     * @return the {@link AnnotationGroup} on the getter method of this property
      */
     @Nonnull
     @Immutable
-    AnnotationSet getterAnnotations();
+    AnnotationGroup getterAnnotations();
 
     /**
-     * Returns the {@link AnnotationSet} on the setter method of this property. If this property doesn't have a setter
-     * method, an empty {@link AnnotationSet} will be returned.
+     * Returns the {@link AnnotationGroup} on the setter method of this property. If this property doesn't have a setter
+     * method, an empty {@link AnnotationGroup} will be returned.
      *
-     * @return the {@link AnnotationSet} on the setter method of this property
+     * @return the {@link AnnotationGroup} on the setter method of this property
      */
     @Nonnull
     @Immutable
-    AnnotationSet setterAnnotations();
+    AnnotationGroup setterAnnotations();
 
     /**
-     * Returns the {@link AnnotationSet} on the backing field of this property. If this property doesn't have a backing
-     * field, an empty {@link AnnotationSet} will be returned.
+     * Returns the {@link AnnotationGroup} on the backing field of this property. If this property doesn't have a
+     * backing field, an empty {@link AnnotationGroup} will be returned.
      *
-     * @return the {@link AnnotationSet} on the backing field of this property
+     * @return the {@link AnnotationGroup} on the backing field of this property
      */
     @Nonnull
     @Immutable
-    AnnotationSet fieldAnnotations();
+    AnnotationGroup fieldAnnotations();
 
     /**
-     * Returns the {@link AnnotationSet} on getter method, setter method and backing field of this property, and the
+     * Returns the {@link AnnotationGroup} on getter method, setter method and backing field of this property, and the
      * searching order is that order.
      *
-     * @return the {@link AnnotationSet} on getter method, setter method and backing field of this property
+     * @return the {@link AnnotationGroup} on getter method, setter method and backing field of this property
      */
     @Nonnull
     @Immutable
-    AnnotationSet annotations();
+    AnnotationGroup annotations();
 
     // /**
     //  * Finds and returns the annotation of the specified type on getter method, setter method or backing field of this

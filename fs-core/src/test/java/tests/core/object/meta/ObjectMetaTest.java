@@ -14,7 +14,7 @@ import space.sunqian.fs.cache.SimpleCache;
 import space.sunqian.fs.collect.ListKit;
 import space.sunqian.fs.collect.SetKit;
 import space.sunqian.fs.invoke.Invocable;
-import space.sunqian.fs.object.annotation.AnnotationSet;
+import space.sunqian.fs.object.annotation.AnnotationGroup;
 import space.sunqian.fs.object.meta.DataMetaException;
 import space.sunqian.fs.object.meta.MetaKit;
 import space.sunqian.fs.object.meta.ObjectMeta;
@@ -98,7 +98,7 @@ public class ObjectMetaTest implements TestPrint {
         bbGetter = TestData.class.getDeclaredMethod("isBb");
         BBGetter = TestData.class.getDeclaredMethod("isBB");
 
-        assertSame(AnnotationSet.emptySet(), testDataMeta.annotations());
+        assertSame(AnnotationGroup.empty(), testDataMeta.annotations());
     }
 
     @Test
@@ -378,10 +378,10 @@ public class ObjectMetaTest implements TestPrint {
     private void testAnnotationProp1(ObjectMeta meta) {
         PropertyMeta prop1 = meta.getProperty("prop1");
         assertNotNull(prop1);
-        Nonnull a1 = prop1.annotations().get(Nonnull.class);
+        Nonnull a1 = prop1.annotations().annotation(Nonnull.class);
         assertNotNull(a1);
         assertEquals(Nonnull.class, a1.annotationType());
-        assertNull(prop1.annotations().get(Nullable.class));
+        assertNull(prop1.annotations().annotation(Nullable.class));
         assertEquals(ListKit.list(a1), prop1.fieldAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop1.getterAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop1.setterAnnotations().annotations());
@@ -390,10 +390,10 @@ public class ObjectMetaTest implements TestPrint {
     private void testAnnotationProp2(ObjectMeta meta) {
         PropertyMeta prop2 = meta.getProperty("prop2");
         assertNotNull(prop2);
-        Nonnull a2 = prop2.annotations().get(Nonnull.class);
+        Nonnull a2 = prop2.annotations().annotation(Nonnull.class);
         assertNotNull(a2);
         assertEquals(Nonnull.class, a2.annotationType());
-        assertNull(prop2.annotations().get(Nullable.class));
+        assertNull(prop2.annotations().annotation(Nullable.class));
         assertEquals(Collections.emptyList(), prop2.fieldAnnotations().annotations());
         assertEquals(ListKit.list(a2), prop2.getterAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop2.setterAnnotations().annotations());
@@ -402,10 +402,10 @@ public class ObjectMetaTest implements TestPrint {
     private void testAnnotationProp3(ObjectMeta meta) {
         PropertyMeta prop3 = meta.getProperty("prop3");
         assertNotNull(prop3);
-        Nonnull a3 = prop3.annotations().get(Nonnull.class);
+        Nonnull a3 = prop3.annotations().annotation(Nonnull.class);
         assertNotNull(a3);
         assertEquals(Nonnull.class, a3.annotationType());
-        assertNull(prop3.annotations().get(Nullable.class));
+        assertNull(prop3.annotations().annotation(Nullable.class));
         assertEquals(Collections.emptyList(), prop3.fieldAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop3.getterAnnotations().annotations());
         assertEquals(ListKit.list(a3), prop3.setterAnnotations().annotations());
@@ -414,8 +414,8 @@ public class ObjectMetaTest implements TestPrint {
     private void testAnnotationProp4(ObjectMeta meta) {
         PropertyMeta prop4 = meta.getProperty("prop4");
         assertNotNull(prop4);
-        assertNull(prop4.annotations().get(Nonnull.class));
-        assertNull(prop4.annotations().get(Nullable.class));
+        assertNull(prop4.annotations().annotation(Nonnull.class));
+        assertNull(prop4.annotations().annotation(Nullable.class));
         assertEquals(Collections.emptyList(), prop4.fieldAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop4.getterAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop4.setterAnnotations().annotations());
@@ -424,8 +424,8 @@ public class ObjectMetaTest implements TestPrint {
     private void testAnnotationProp5(ObjectMeta meta) {
         PropertyMeta prop5 = meta.getProperty("prop5");
         assertNotNull(prop5);
-        assertNull(prop5.annotations().get(Nonnull.class));
-        assertNull(prop5.annotations().get(Nullable.class));
+        assertNull(prop5.annotations().annotation(Nonnull.class));
+        assertNull(prop5.annotations().annotation(Nullable.class));
         assertEquals(Collections.emptyList(), prop5.fieldAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop5.getterAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop5.setterAnnotations().annotations());
@@ -434,8 +434,8 @@ public class ObjectMetaTest implements TestPrint {
     private void testAnnotationProp6(ObjectMeta meta) {
         PropertyMeta prop6 = meta.getProperty("prop6");
         assertNotNull(prop6);
-        assertNull(prop6.annotations().get(Nonnull.class));
-        assertNull(prop6.annotations().get(Nullable.class));
+        assertNull(prop6.annotations().annotation(Nonnull.class));
+        assertNull(prop6.annotations().annotation(Nullable.class));
         assertEquals(Collections.emptyList(), prop6.fieldAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop6.getterAnnotations().annotations());
         assertEquals(Collections.emptyList(), prop6.setterAnnotations().annotations());
@@ -690,22 +690,22 @@ public class ObjectMetaTest implements TestPrint {
         }
 
         @Override
-        public @Nonnull AnnotationSet getterAnnotations() {
+        public @Nonnull AnnotationGroup getterAnnotations() {
             return null;
         }
 
         @Override
-        public @Nonnull AnnotationSet setterAnnotations() {
+        public @Nonnull AnnotationGroup setterAnnotations() {
             return null;
         }
 
         @Override
-        public @Nonnull AnnotationSet fieldAnnotations() {
+        public @Nonnull AnnotationGroup fieldAnnotations() {
             return null;
         }
 
         @Override
-        public @Nonnull AnnotationSet annotations() {
+        public @Nonnull AnnotationGroup annotations() {
             return null;
         }
 

@@ -7,7 +7,7 @@ import space.sunqian.fs.Fs;
 import space.sunqian.fs.cache.CacheFunction;
 import space.sunqian.fs.cache.SimpleCache;
 import space.sunqian.fs.collect.ListKit;
-import space.sunqian.fs.object.annotation.AnnotationSet;
+import space.sunqian.fs.object.annotation.AnnotationGroup;
 import space.sunqian.fs.object.meta.handlers.AbstractObjectMetaHandler;
 import space.sunqian.fs.object.meta.handlers.CommonObjectMetaHandler;
 import space.sunqian.fs.object.meta.handlers.RecordMetaHandler;
@@ -189,6 +189,6 @@ public interface ObjectMetaIntrospector {
          * @return a mutable list for storing and reading annotation sets
          */
         @Nonnull
-        List<@Nonnull AnnotationSet> annotations();
+        List<@Nonnull AnnotationGroup> annotations();
     }
 }

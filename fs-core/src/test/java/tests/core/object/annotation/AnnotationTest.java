@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.object.annotation.AnnotationDetail;
-import space.sunqian.fs.object.annotation.AnnotationSet;
+import space.sunqian.fs.object.annotation.AnnotationGroup;
 import space.sunqian.fs.object.annotation.DatePattern;
 import space.sunqian.fs.object.annotation.DatePatternDetail;
 import space.sunqian.fs.object.annotation.DetailType;
@@ -59,48 +59,48 @@ public class AnnotationTest implements Asserter, TestPrint {
     @Test
     public void testAnnotationSet() throws Exception {
         Field fieldA = X.class.getDeclaredField("a");
-        AnnotationSet annotationSetA = AnnotationSet.from(fieldA);
-        testAnnotations(annotationSetA);
-        testDetails(annotationSetA);
+        AnnotationGroup annotationGroupA = AnnotationGroup.from(fieldA);
+        testAnnotations(annotationGroupA);
+        testDetails(annotationGroupA);
         Field fieldB = X.class.getDeclaredField("b");
-        AnnotationSet annotationSetB = AnnotationSet.from(fieldB);
-        testFieldB(annotationSetB);
+        AnnotationGroup annotationGroupB = AnnotationGroup.from(fieldB);
+        testFieldB(annotationGroupB);
     }
 
-    private void testAnnotations(AnnotationSet annotationSet) throws Exception {
-        List<Annotation> annotations = annotationSet.annotations();
+    private void testAnnotations(AnnotationGroup annotationGroup) throws Exception {
+        List<Annotation> annotations = annotationGroup.annotations();
         assertEquals(4, annotations.size());
         assertNotNull(annotations.stream().filter(a -> a instanceof NumberPattern).findFirst().orElse(null));
         assertNotNull(annotations.stream().filter(a -> a instanceof DatePattern).findFirst().orElse(null));
         assertNotNull(annotations.stream().filter(a -> a instanceof Nullable).findFirst().orElse(null));
         assertNotNull(annotations.stream().filter(a -> a instanceof AS).findFirst().orElse(null));
-        NumberPattern numberPattern = annotationSet.get(NumberPattern.class);
+        NumberPattern numberPattern = annotationGroup.annotation(NumberPattern.class);
         assertEquals("#.0000", numberPattern.value());
-        DatePattern datePattern = annotationSet.get(DatePattern.class);
+        DatePattern datePattern = annotationGroup.annotation(DatePattern.class);
         assertEquals("yyyy-MM-dd", datePattern.value());
         assertEquals("", datePattern.zoneId());
-        Nullable nullable = annotationSet.get(Nullable.class);
-        AS as = annotationSet.get(AS.class);
+        Nullable nullable = annotationGroup.annotation(Nullable.class);
+        AS as = annotationGroup.annotation(AS.class);
         assertEquals(3, as.value().length);
         assertEquals("1", as.value()[0].value());
         assertEquals("2", as.value()[1].value());
         assertEquals("3", as.value()[2].value());
-        assertNull(annotationSet.get(Nonnull.class));
+        assertNull(annotationGroup.annotation(Nonnull.class));
     }
 
-    private void testDetails(AnnotationSet annotationSet) throws Exception {
-        List<AnnotationDetail<?>> details = annotationSet.details();
+    private void testDetails(AnnotationGroup annotationGroup) throws Exception {
+        List<AnnotationDetail<?>> details = annotationGroup.details();
         assertEquals(4, details.size());
         assertNotNull(details.stream().filter(a -> a instanceof NumberPatternDetail).findFirst().orElse(null));
         assertNotNull(details.stream().filter(a -> a instanceof DatePatternDetail).findFirst().orElse(null));
         assertEquals(2, details.stream().filter(a -> a instanceof SimpleAnnotationDetail<?>).collect(Collectors.toList()).size());
-        NumberPatternDetail numberPattern = annotationSet.getDetail(NumberPatternDetail.class);
-        assertSame(annotationSet.get(NumberPattern.class), numberPattern.annotation());
+        NumberPatternDetail numberPattern = annotationGroup.detail(NumberPatternDetail.class);
+        assertSame(annotationGroup.annotation(NumberPattern.class), numberPattern.annotation());
         assertEquals("11.1122", numberPattern.formatter().format(11.11223344).toString());
         assertSame(ConvertOption.NUMBER_FORMATTER, numberPattern.option().key());
         assertSame(numberPattern.formatter(), numberPattern.option().value());
-        DatePatternDetail datePattern = annotationSet.getDetail(DatePatternDetail.class);
-        assertSame(annotationSet.get(DatePattern.class), datePattern.annotation());
+        DatePatternDetail datePattern = annotationGroup.detail(DatePatternDetail.class);
+        assertSame(annotationGroup.annotation(DatePattern.class), datePattern.annotation());
         assertEquals(ZoneId.systemDefault(), datePattern.zoneId());
         Date date = new Date();
         assertEquals(
@@ -109,36 +109,36 @@ public class AnnotationTest implements Asserter, TestPrint {
         );
         assertSame(ConvertOption.DATE_FORMATTER, datePattern.option().key());
         assertSame(datePattern.formatter(), datePattern.option().value());
-        SimpleAnnotationDetail<?> nullable = annotationSet.getDetail(SimpleAnnotationDetail.class);
-        assertSame(annotationSet.get(Nullable.class), nullable.annotation());
-        SimpleAnnotationDetail<AS> as = annotationSet.getDetailByAnnotationType(AS.class);
-        assertSame(annotationSet.get(AS.class), as.annotation());
-        assertNull(annotationSet.getDetailByAnnotationType(Nonnull.class));
+        SimpleAnnotationDetail<?> nullable = annotationGroup.detail(SimpleAnnotationDetail.class);
+        assertSame(annotationGroup.annotation(Nullable.class), nullable.annotation());
+        SimpleAnnotationDetail<AS> as = annotationGroup.detailFor(AS.class);
+        assertSame(annotationGroup.annotation(AS.class), as.annotation());
+        assertNull(annotationGroup.detailFor(Nonnull.class));
     }
 
-    private void testFieldB(AnnotationSet annotationSet) throws Exception {
-        NumberPatternDetail numberPattern = annotationSet.getDetail(NumberPatternDetail.class);
+    private void testFieldB(AnnotationGroup annotationGroup) throws Exception {
+        NumberPatternDetail numberPattern = annotationGroup.detail(NumberPatternDetail.class);
         assertEquals(
             new DecimalFormat(numberPattern.annotation().value()).format(11.11223344),
             numberPattern.formatter().format(11.11223344).toString()
         );
-        DatePatternDetail datePattern = annotationSet.getDetail(DatePatternDetail.class);
+        DatePatternDetail datePattern = annotationGroup.detail(DatePatternDetail.class);
         assertEquals(ZoneId.of("Asia/Shanghai"), datePattern.zoneId());
     }
 
     @Test
     public void testMultiAnnotationSet() throws Exception {
         Field fieldA = M.class.getDeclaredField("a");
-        AnnotationSet annotationSetA = AnnotationSet.from(fieldA);
-        DatePattern pa = annotationSetA.get(DatePattern.class);
-        DatePatternDetail da = annotationSetA.getDetail(DatePatternDetail.class);
+        AnnotationGroup annotationGroupA = AnnotationGroup.from(fieldA);
+        DatePattern pa = annotationGroupA.annotation(DatePattern.class);
+        DatePatternDetail da = annotationGroupA.detail(DatePatternDetail.class);
         Field fieldB = M.class.getDeclaredField("b");
-        AnnotationSet annotationSetB = AnnotationSet.from(fieldB);
-        DatePattern pb = annotationSetB.get(DatePattern.class);
-        DatePatternDetail db = annotationSetB.getDetail(DatePatternDetail.class);
-        NumberPattern nb = annotationSetB.get(NumberPattern.class);
-        NumberPatternDetail ndb = annotationSetB.getDetail(NumberPatternDetail.class);
-        AnnotationSet multiSet = AnnotationSet.multiSet(annotationSetA, annotationSetB);
+        AnnotationGroup annotationGroupB = AnnotationGroup.from(fieldB);
+        DatePattern pb = annotationGroupB.annotation(DatePattern.class);
+        DatePatternDetail db = annotationGroupB.detail(DatePatternDetail.class);
+        NumberPattern nb = annotationGroupB.annotation(NumberPattern.class);
+        NumberPatternDetail ndb = annotationGroupB.detail(NumberPatternDetail.class);
+        AnnotationGroup multiSet = AnnotationGroup.combine(annotationGroupA, annotationGroupB);
         assertEquals(
             Arrays.asList(pa, pb, nb),
             multiSet.annotations()
@@ -148,13 +148,13 @@ public class AnnotationTest implements Asserter, TestPrint {
             multiSet.details()
         );
         assertFalse(multiSet.isEmpty());
-        assertSame(pa, multiSet.get(DatePattern.class));
-        assertSame(da, multiSet.getDetail(DatePatternDetail.class));
-        assertSame(nb, multiSet.get(NumberPattern.class));
-        assertSame(ndb, multiSet.getDetail(NumberPatternDetail.class));
-        assertSame(ndb, multiSet.getDetailByAnnotationType(NumberPattern.class));
-        assertNull(multiSet.get(Nullable.class));
-        assertNull(multiSet.getDetailByAnnotationType(Nullable.class));
+        assertSame(pa, multiSet.annotation(DatePattern.class));
+        assertSame(da, multiSet.detail(DatePatternDetail.class));
+        assertSame(nb, multiSet.annotation(NumberPattern.class));
+        assertSame(ndb, multiSet.detail(NumberPatternDetail.class));
+        assertSame(ndb, multiSet.detailFor(NumberPattern.class));
+        assertNull(multiSet.annotation(Nullable.class));
+        assertNull(multiSet.detailFor(Nullable.class));
         class D implements AnnotationDetail<Nullable> {
 
             @Override
@@ -162,26 +162,26 @@ public class AnnotationTest implements Asserter, TestPrint {
                 return null;
             }
         }
-        assertNull(multiSet.getDetail(D.class));
+        assertNull(multiSet.detail(D.class));
 
-        assertSame(annotationSetA, AnnotationSet.multiSet(annotationSetA));
-        assertFalse(annotationSetA.isEmpty());
-        assertSame(annotationSetA, AnnotationSet.multiSet(annotationSetA, AnnotationSet.emptySet()));
-        assertFalse(annotationSetA.isEmpty());
-        assertSame(AnnotationSet.emptySet(), AnnotationSet.multiSet());
-        assertTrue(AnnotationSet.emptySet().isEmpty());
-        assertSame(AnnotationSet.emptySet(), AnnotationSet.multiSet(AnnotationSet.emptySet(), AnnotationSet.emptySet()));
-        assertTrue(AnnotationSet.emptySet().isEmpty());
+        assertSame(annotationGroupA, AnnotationGroup.combine(annotationGroupA));
+        assertFalse(annotationGroupA.isEmpty());
+        assertSame(annotationGroupA, AnnotationGroup.combine(annotationGroupA, AnnotationGroup.empty()));
+        assertFalse(annotationGroupA.isEmpty());
+        assertSame(AnnotationGroup.empty(), AnnotationGroup.combine());
+        assertTrue(AnnotationGroup.empty().isEmpty());
+        assertSame(AnnotationGroup.empty(), AnnotationGroup.combine(AnnotationGroup.empty(), AnnotationGroup.empty()));
+        assertTrue(AnnotationGroup.empty().isEmpty());
     }
 
     @Test
     public void testEmptySet() {
-        AnnotationSet empty = AnnotationSet.emptySet();
+        AnnotationGroup empty = AnnotationGroup.empty();
         assertEquals(Collections.emptyList(), empty.annotations());
         assertEquals(Collections.emptyList(), empty.details());
-        assertNull(empty.get(NumberPattern.class));
-        assertNull(empty.getDetail(DatePatternDetail.class));
-        assertNull(empty.getDetailByAnnotationType(Nullable.class));
+        assertNull(empty.annotation(NumberPattern.class));
+        assertNull(empty.detail(DatePatternDetail.class));
+        assertNull(empty.detailFor(Nullable.class));
         assertTrue(empty.isEmpty());
     }
 

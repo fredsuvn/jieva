@@ -15,33 +15,33 @@ import java.util.function.Function;
 
 final class AnnotationBack {
 
-    static @Nonnull AnnotationSet getSet(
+    static @Nonnull AnnotationGroup getGroup(
         @Nonnull AnnotatedElement annotatedElement,
-        @Nonnull Function<@Nonnull AnnotatedElement, @Nonnull AnnotationSet> function
+        @Nonnull Function<@Nonnull AnnotatedElement, @Nonnull AnnotationGroup> function
     ) {
         return Cache.get(annotatedElement, function);
     }
 
-    static @Nonnull AnnotationSet newSet(@Nonnull AnnotatedElement annotatedElement) {
-        return new AnnotationSetImpl(annotatedElement);
+    static @Nonnull AnnotationGroup newGroup(@Nonnull AnnotatedElement annotatedElement) {
+        return new AnnotationGroupImpl(annotatedElement);
     }
 
-    static @Nonnull AnnotationSet multiSet(@Nonnull List<@Nonnull AnnotationSet> annotationSets) {
-        return new MultiAnnotationSet(annotationSets);
+    static @Nonnull AnnotationGroup combine(@Nonnull List<@Nonnull AnnotationGroup> annotationGroups) {
+        return new CombinedAnnotationGroup(annotationGroups);
     }
 
-    static @Nonnull AnnotationSet emptySet() {
-        return EmptySet.INST;
+    static @Nonnull AnnotationGroup empty() {
+        return EmptyGroup.INST;
     }
 
-    private static final class AnnotationSetImpl implements AnnotationSet {
+    private static final class AnnotationGroupImpl implements AnnotationGroup {
 
         private final @Nonnull Annotation @Nonnull [] annotations;
         private final @Nonnull List<@Nonnull Annotation> annotationList;
         private final @Nonnull AnnotationDetail<?> @Nonnull [] details;
         private final @Nonnull List<@Nonnull AnnotationDetail<?>> detailList;
 
-        private AnnotationSetImpl(@Nonnull AnnotatedElement annotatedElement) {
+        private AnnotationGroupImpl(@Nonnull AnnotatedElement annotatedElement) {
             this.annotations = annotatedElement.getAnnotations();
             this.annotationList = Fs.list(annotations);
             this.details = new AnnotationDetail<?>[this.annotations.length];
@@ -57,7 +57,7 @@ final class AnnotationBack {
         }
 
         @Override
-        public <T extends Annotation> @Nullable T get(@Nonnull Class<T> annotationClass) {
+        public <T extends Annotation> @Nullable T annotation(@Nonnull Class<T> annotationClass) {
             return Fs.as(
                 annotationList.stream()
                     .filter(a -> a.annotationType().equals(annotationClass))
@@ -72,7 +72,7 @@ final class AnnotationBack {
         }
 
         @Override
-        public <D extends AnnotationDetail<?>> @Nullable D getDetail(@Nonnull Class<D> detailClass) {
+        public <D extends AnnotationDetail<?>> @Nullable D detail(@Nonnull Class<D> detailClass) {
             return Fs.as(
                 detailList.stream()
                     .filter(a -> a.getClass().equals(detailClass))
@@ -82,7 +82,7 @@ final class AnnotationBack {
         }
 
         @Override
-        public <T extends Annotation, D extends AnnotationDetail<T>> D getDetailByAnnotationType(
+        public <T extends Annotation, D extends AnnotationDetail<T>> D detailFor(
             @Nonnull Class<T> annotationClass
         ) {
             for (int i = 0; i < annotations.length; i++) {
@@ -99,28 +99,28 @@ final class AnnotationBack {
         }
     }
 
-    private static final class MultiAnnotationSet implements AnnotationSet {
+    private static final class CombinedAnnotationGroup implements AnnotationGroup {
 
-        private final @Nonnull List<@Nonnull AnnotationSet> annotationSets;
+        private final @Nonnull List<@Nonnull AnnotationGroup> annotationGroups;
 
-        private MultiAnnotationSet(@Nonnull @RetainedParam List<@Nonnull AnnotationSet> annotationSets) {
-            this.annotationSets = annotationSets;
+        private CombinedAnnotationGroup(@Nonnull @RetainedParam List<@Nonnull AnnotationGroup> annotationGroups) {
+            this.annotationGroups = annotationGroups;
         }
 
         @Override
         public @Nonnull List<@Nonnull Annotation> annotations() {
             ArrayList<Annotation> annotationList = new ArrayList<>();
-            for (AnnotationSet annotationSet : annotationSets) {
-                annotationList.addAll(annotationSet.annotations());
+            for (AnnotationGroup annotationGroup : annotationGroups) {
+                annotationList.addAll(annotationGroup.annotations());
             }
             annotationList.trimToSize();
             return annotationList;
         }
 
         @Override
-        public <T extends Annotation> @Nullable T get(@Nonnull Class<T> annotationClass) {
-            for (AnnotationSet annotationSet : annotationSets) {
-                T ret = annotationSet.get(annotationClass);
+        public <T extends Annotation> @Nullable T annotation(@Nonnull Class<T> annotationClass) {
+            for (AnnotationGroup annotationGroup : annotationGroups) {
+                T ret = annotationGroup.annotation(annotationClass);
                 if (ret != null) {
                     return ret;
                 }
@@ -131,17 +131,17 @@ final class AnnotationBack {
         @Override
         public @Nonnull List<@Nonnull AnnotationDetail<?>> details() {
             ArrayList<AnnotationDetail<?>> annotationDetailList = new ArrayList<>();
-            for (AnnotationSet annotationSet : annotationSets) {
-                annotationDetailList.addAll(annotationSet.details());
+            for (AnnotationGroup annotationGroup : annotationGroups) {
+                annotationDetailList.addAll(annotationGroup.details());
             }
             annotationDetailList.trimToSize();
             return annotationDetailList;
         }
 
         @Override
-        public <D extends AnnotationDetail<?>> @Nullable D getDetail(@Nonnull Class<D> detailClass) {
-            for (AnnotationSet annotationSet : annotationSets) {
-                D ret = annotationSet.getDetail(detailClass);
+        public <D extends AnnotationDetail<?>> @Nullable D detail(@Nonnull Class<D> detailClass) {
+            for (AnnotationGroup annotationGroup : annotationGroups) {
+                D ret = annotationGroup.detail(detailClass);
                 if (ret != null) {
                     return ret;
                 }
@@ -150,11 +150,11 @@ final class AnnotationBack {
         }
 
         @Override
-        public <T extends Annotation, D extends AnnotationDetail<T>> @Nullable D getDetailByAnnotationType(
+        public <T extends Annotation, D extends AnnotationDetail<T>> @Nullable D detailFor(
             @Nonnull Class<T> annotationClass
         ) {
-            for (AnnotationSet annotationSet : annotationSets) {
-                D ret = annotationSet.getDetailByAnnotationType(annotationClass);
+            for (AnnotationGroup annotationGroup : annotationGroups) {
+                D ret = annotationGroup.detailFor(annotationClass);
                 if (ret != null) {
                     return ret;
                 }
@@ -168,7 +168,7 @@ final class AnnotationBack {
         }
     }
 
-    private enum EmptySet implements AnnotationSet {
+    private enum EmptyGroup implements AnnotationGroup {
         INST;
 
         @Override
@@ -177,7 +177,7 @@ final class AnnotationBack {
         }
 
         @Override
-        public <T extends Annotation> @Nullable T get(@Nonnull Class<T> annotationClass) {
+        public <T extends Annotation> @Nullable T annotation(@Nonnull Class<T> annotationClass) {
             return null;
         }
 
@@ -187,12 +187,12 @@ final class AnnotationBack {
         }
 
         @Override
-        public <D extends AnnotationDetail<?>> @Nullable D getDetail(@Nonnull Class<D> detailClass) {
+        public <D extends AnnotationDetail<?>> @Nullable D detail(@Nonnull Class<D> detailClass) {
             return null;
         }
 
         @Override
-        public <T extends Annotation, D extends AnnotationDetail<T>> @Nullable D getDetailByAnnotationType(@Nonnull Class<T> annotationClass) {
+        public <T extends Annotation, D extends AnnotationDetail<T>> @Nullable D detailFor(@Nonnull Class<T> annotationClass) {
             return null;
         }
 
@@ -206,16 +206,16 @@ final class AnnotationBack {
 
         private static final @Nonnull SimpleCache<
             @Nonnull AnnotatedElement,
-            @Nonnull AnnotationSet
+            @Nonnull AnnotationGroup
             > CACHE = SimpleCache.ofSoft();
 
         static {
             Fs.registerGlobalCache(CACHE);
         }
 
-        private static @Nonnull AnnotationSet get(
+        private static @Nonnull AnnotationGroup get(
             @Nonnull AnnotatedElement annotatedElement,
-            @Nonnull Function<@Nonnull AnnotatedElement, @Nonnull AnnotationSet> function
+            @Nonnull Function<@Nonnull AnnotatedElement, @Nonnull AnnotationGroup> function
         ) {
             return CACHE.get(annotatedElement, function);
         }

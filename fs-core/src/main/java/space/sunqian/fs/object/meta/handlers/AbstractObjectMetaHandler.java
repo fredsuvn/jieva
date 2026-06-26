@@ -5,7 +5,7 @@ import space.sunqian.annotation.Nullable;
 import space.sunqian.fs.Fs;
 import space.sunqian.fs.collect.MapKit;
 import space.sunqian.fs.invoke.Invocable;
-import space.sunqian.fs.object.annotation.AnnotationSet;
+import space.sunqian.fs.object.annotation.AnnotationGroup;
 import space.sunqian.fs.object.meta.ObjectMetaIntrospector;
 import space.sunqian.fs.reflect.TypeKit;
 
@@ -146,24 +146,24 @@ public abstract class AbstractObjectMetaHandler implements ObjectMetaIntrospecto
      * the type has no annotation.
      * <p>
      * By default, this method iterates over all interfaces and super types of the given raw type, and returns a
-     * {@link AnnotationSet} contains all the annotations found on those types.
+     * {@link AnnotationGroup} contains all the annotations found on those types.
      *
      * @param rawType the raw type of the object to be introspected
      * @param context the context for introspection
      * @return the annotations on the type declaration of the object to be introspected, or empty set if the type has no
      * annotation
      */
-    protected @Nonnull AnnotationSet introspectAnnotations(
+    protected @Nonnull AnnotationGroup introspectAnnotations(
         Class<?> rawType,
         ObjectMetaIntrospector.@Nonnull Context context
     ) {
-        List<AnnotationSet> annotations = new ArrayList<>();
+        List<AnnotationGroup> annotations = new ArrayList<>();
         searchAnnotations(rawType, annotations);
-        return AnnotationSet.multiSet(annotations);
+        return AnnotationGroup.combine(annotations);
     }
 
-    private void searchAnnotations(@Nonnull Class<?> type, @Nonnull List<@Nonnull AnnotationSet> annotations) {
-        AnnotationSet as = AnnotationSet.from(type);
+    private void searchAnnotations(@Nonnull Class<?> type, @Nonnull List<@Nonnull AnnotationGroup> annotations) {
+        AnnotationGroup as = AnnotationGroup.from(type);
         if (!as.isEmpty()) {
             annotations.add(as);
         }

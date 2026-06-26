@@ -303,7 +303,7 @@ final class JsonFormatterBack {
             appender.append(':');
             if (value != null) {
                 if (value instanceof Date || value instanceof TemporalAccessor) {
-                    DatePatternDetail datePattern = property.annotations().getDetailByAnnotationType(DatePattern.class);
+                    DatePatternDetail datePattern = property.annotations().detailFor(DatePattern.class);
                     if (datePattern != null) {
                         String dateString = objectConverter.convert(
                             value,
@@ -315,7 +315,7 @@ final class JsonFormatterBack {
                     }
                 }
                 if (value instanceof Number) {
-                    NumberPatternDetail numberPattern = property.annotations().getDetailByAnnotationType(NumberPattern.class);
+                    NumberPatternDetail numberPattern = property.annotations().detailFor(NumberPattern.class);
                     if (numberPattern != null) {
                         String numString = objectConverter.convert(
                             value,

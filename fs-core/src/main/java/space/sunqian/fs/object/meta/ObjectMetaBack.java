@@ -8,7 +8,7 @@ import space.sunqian.fs.base.FsLoader;
 import space.sunqian.fs.cache.CacheFunction;
 import space.sunqian.fs.cache.SimpleCache;
 import space.sunqian.fs.invoke.Invocable;
-import space.sunqian.fs.object.annotation.AnnotationSet;
+import space.sunqian.fs.object.annotation.AnnotationGroup;
 import space.sunqian.fs.object.meta.handlers.CommonObjectMetaHandler;
 import space.sunqian.fs.object.meta.handlers.RecordMetaHandler;
 import space.sunqian.fs.third.ThirdKit;
@@ -106,7 +106,7 @@ final class ObjectMetaBack {
 
         private final @Nonnull Type type;
         private final @Nonnull Map<@Nonnull String, @Nonnull PropertyMetaBase> properties = new LinkedHashMap<>();
-        private final @Nonnull List<@Nonnull AnnotationSet> annotations = new ArrayList<>();
+        private final @Nonnull List<@Nonnull AnnotationGroup> annotations = new ArrayList<>();
 
         MetaBuilder(@Nonnull Type type) {
             this.type = type;
@@ -123,7 +123,7 @@ final class ObjectMetaBack {
         }
 
         @Override
-        public @Nonnull List<@Nonnull AnnotationSet> annotations() {
+        public @Nonnull List<@Nonnull AnnotationGroup> annotations() {
             return annotations;
         }
 
@@ -137,20 +137,20 @@ final class ObjectMetaBack {
             private final @Nonnull ObjectMetaIntrospector introspector;
             private final @Nonnull Type type;
             private final @Nonnull Map<@Nonnull String, @Nonnull PropertyMeta> properties;
-            private final @Nonnull AnnotationSet annotations;
+            private final @Nonnull AnnotationGroup annotations;
 
             private ObjectMetaImpl(
                 @Nonnull ObjectMetaIntrospector introspector,
                 @Nonnull Type type,
                 @Nonnull Map<@Nonnull String, @Nonnull PropertyMetaBase> propBases,
-                @Nonnull List<@Nonnull AnnotationSet> annotations
+                @Nonnull List<@Nonnull AnnotationGroup> annotations
             ) {
                 this.introspector = introspector;
                 this.type = type;
                 Map<@Nonnull String, @Nonnull PropertyMeta> props = new LinkedHashMap<>();
                 propBases.forEach((name, propBase) -> props.put(name, new PropertyMetaImpl(propBase)));
                 this.properties = Collections.unmodifiableMap(props);
-                this.annotations = AnnotationSet.multiSet(annotations);
+                this.annotations = AnnotationGroup.combine(annotations);
             }
 
             @Override
@@ -169,7 +169,7 @@ final class ObjectMetaBack {
             }
 
             @Override
-            public @Nonnull AnnotationSet annotations() {
+            public @Nonnull AnnotationGroup annotations() {
                 return annotations;
             }
 
@@ -200,10 +200,10 @@ final class ObjectMetaBack {
                 private final @Nullable Invocable setter;
 
                 // annotations:
-                private final @Nonnull AnnotationSet getterAnnotations;
-                private final @Nonnull AnnotationSet setterAnnotations;
-                private final @Nonnull AnnotationSet fieldAnnotations;
-                private final @Nonnull AnnotationSet annotations;
+                private final @Nonnull AnnotationGroup getterAnnotations;
+                private final @Nonnull AnnotationGroup setterAnnotations;
+                private final @Nonnull AnnotationGroup fieldAnnotations;
+                private final @Nonnull AnnotationGroup annotations;
 
                 private PropertyMetaImpl(@Nonnull PropertyMetaBase propertyBase) {
                     this.name = propertyBase.name();
@@ -214,12 +214,12 @@ final class ObjectMetaBack {
                     this.getter = propertyBase.getter();
                     this.setter = propertyBase.setter();
                     this.getterAnnotations = getterMethod == null ?
-                        AnnotationSet.emptySet() : AnnotationSet.from(getterMethod);
+                        AnnotationGroup.empty() : AnnotationGroup.from(getterMethod);
                     this.setterAnnotations = setterMethod == null ?
-                        AnnotationSet.emptySet() : AnnotationSet.from(setterMethod);
+                        AnnotationGroup.empty() : AnnotationGroup.from(setterMethod);
                     this.fieldAnnotations = field == null ?
-                        AnnotationSet.emptySet() : AnnotationSet.from(field);
-                    annotations = AnnotationSet.multiSet(getterAnnotations, setterAnnotations, fieldAnnotations);
+                        AnnotationGroup.empty() : AnnotationGroup.from(field);
+                    annotations = AnnotationGroup.combine(getterAnnotations, setterAnnotations, fieldAnnotations);
                 }
 
                 @Override
@@ -263,12 +263,12 @@ final class ObjectMetaBack {
                 }
 
                 @Override
-                public @Nonnull AnnotationSet fieldAnnotations() {
+                public @Nonnull AnnotationGroup fieldAnnotations() {
                     return fieldAnnotations;
                 }
 
                 @Override
-                public @Nonnull AnnotationSet annotations() {
+                public @Nonnull AnnotationGroup annotations() {
                     return annotations;
                 }
 
@@ -278,12 +278,12 @@ final class ObjectMetaBack {
                 // }
 
                 @Override
-                public @Nonnull AnnotationSet getterAnnotations() {
+                public @Nonnull AnnotationGroup getterAnnotations() {
                     return getterAnnotations;
                 }
 
                 @Override
-                public @Nonnull AnnotationSet setterAnnotations() {
+                public @Nonnull AnnotationGroup setterAnnotations() {
                     return setterAnnotations;
                 }
 

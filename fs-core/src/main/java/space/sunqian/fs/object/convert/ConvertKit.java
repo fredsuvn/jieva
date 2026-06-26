@@ -3,20 +3,14 @@ package space.sunqian.fs.object.convert;
 import space.sunqian.annotation.Nonnull;
 import space.sunqian.annotation.Nullable;
 import space.sunqian.annotation.RetainedParam;
-import space.sunqian.fs.base.date.DateFormatter;
-import space.sunqian.fs.base.number.NumberFormatter;
 import space.sunqian.fs.base.option.Option;
 import space.sunqian.fs.base.option.OptionKit;
-import space.sunqian.fs.cache.SimpleCache;
 import space.sunqian.fs.object.annotation.AnnotationDetail;
-import space.sunqian.fs.object.annotation.DatePattern;
 import space.sunqian.fs.object.annotation.DatePatternDetail;
-import space.sunqian.fs.object.annotation.NumberPattern;
 import space.sunqian.fs.object.annotation.NumberPatternDetail;
 import space.sunqian.fs.object.meta.PropertyMeta;
 
 import java.lang.annotation.Annotation;
-import java.time.ZoneId;
 
 /**
  * Utilities for object conversion.
@@ -138,13 +132,13 @@ public class ConvertKit {
      * @return the annotation for the given type from the source property if it exists, otherwise from the destination
      * property
      */
-    public static <A extends Annotation, S extends AnnotationDetail<A>> @Nullable S getAnnotationDetail(
+    public static <A extends Annotation, S extends AnnotationDetail<A>> @Nullable S annotationDetailFor(
         @Nonnull Class<A> annotationType,
         @Nonnull PropertyMeta srcProperty,
         @Nonnull PropertyMeta dstProperty
     ) {
-        S srcAnnotation = srcProperty.annotations().getDetailByAnnotationType(annotationType);
-        S dstAnnotation = dstProperty.annotations().getDetailByAnnotationType(annotationType);
+        S srcAnnotation = srcProperty.annotations().detailFor(annotationType);
+        S dstAnnotation = dstProperty.annotations().detailFor(annotationType);
         if (dstAnnotation == null) {
             return srcAnnotation;
         } else {
