@@ -56,11 +56,25 @@ public class TypeTest {
 
     @Test
     public void testLastName() throws Exception {
-        assertEquals(TypeKit.getLastName(TypeKit.class), TypeKit.class.getSimpleName());
+        assertEquals(TypeKit.class.getSimpleName(), TypeKit.getLastName(TypeKit.class));
         assertEquals("123", TypeKit.getLastName("123"));
         assertEquals("123", TypeKit.getLastName(".123"));
         assertEquals("23", TypeKit.getLastName(".1.23"));
         assertEquals("3", TypeKit.getLastName(".12.3"));
+        assertEquals(TypeKit.class.getSimpleName(), TypeKit.getLastName(TypeKit.class, true));
+        assertEquals(TypeKit.class.getSimpleName(), TypeKit.getLastName(TypeKit.class, false));
+        assertEquals("123", TypeKit.getLastName("123", true));
+        assertEquals("123", TypeKit.getLastName("123", false));
+        assertEquals("String", TypeKit.getLastName("a.$.b.String", true));
+        assertEquals("String", TypeKit.getLastName("a.$.b.String", false));
+        assertEquals("Sub", TypeKit.getLastName("a.$.b.String$Sub", true));
+        assertEquals("String$Sub", TypeKit.getLastName("a.$.b.String$Sub", false));
+        assertEquals(TypeTest.class.getSimpleName() + "$Sub", TypeKit.getLastName(Sub.class));
+        assertEquals(TypeTest.class.getSimpleName() + "$Sub", TypeKit.getLastName(Sub.class, false));
+        assertEquals(Sub.class.getSimpleName(), TypeKit.getLastName(Sub.class, true));
+        assertEquals(TypeTest.class.getSimpleName() + "$Sub$SubSub", TypeKit.getLastName(Sub.SubSub.class));
+        assertEquals(TypeTest.class.getSimpleName() + "$Sub$SubSub", TypeKit.getLastName(Sub.SubSub.class, false));
+        assertEquals(Sub.SubSub.class.getSimpleName(), TypeKit.getLastName(Sub.SubSub.class, true));
     }
 
     @Test
@@ -550,5 +564,10 @@ public class TypeTest {
     }
 
     public static class MappingCls3 extends MappingCls2<CharSequence> {
+    }
+
+    public static class Sub {
+        public static class SubSub {
+        }
     }
 }

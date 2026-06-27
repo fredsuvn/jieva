@@ -113,9 +113,10 @@ public class TypeKit {
     }
 
     /**
-     * Returns the last name of the given type. The last name is sub-string after last dot(.). For example: the last
-     * name of {@code java.lang.String} is {@code String}. If the name of the given type does not contain any dot,
-     * returns the given type name itself.
+     * Returns the last name of the given type.
+     * <p>
+     * The last name is substring after last dot(.). For example: the last name of {@code java.lang.String} is
+     * {@code String}. If the name of the given type does not contain any dot, returns the given type name itself.
      *
      * @param type the given type
      * @return the last name of given type
@@ -126,19 +127,72 @@ public class TypeKit {
     }
 
     /**
-     * Returns the last name of the given type name. The last name is sub-string after last dot(.). For example: the
-     * last name of {@code java.lang.String} is {@code String}. If the given type name does not contain any dot, returns
-     * the given type name itself.
+     * Returns the last name of the given type name.
+     * <p>
+     * The last name is substring after last dot(.). For example: the last name of {@code java.lang.String} is
+     * {@code String}. If the given type name does not contain any dot, returns the given type name itself.
      *
      * @param typeName the given type name
      * @return the last name of given type name
      */
     public static @Nonnull String getLastName(@Nonnull String typeName) {
+        return getLastNameAfterDot(typeName);
+    }
+
+    /**
+     * Returns the last name of the given type.
+     * <p>
+     * If the {@code afterDollar} is {@code true} and the last index of dot is before the last index of dollar sign ($),
+     * then returns the substring after last dollar sign ({@code $}). For example:
+     * {@code getLastName("java.lang.String$Sub", true)} returns {@code Sub}.
+     * <p>
+     * If the {@code afterDollar} is {@code false}, then this method is equivalent to {@link #getLastName(Type)}. For
+     * example: {@code getLastName("java.lang.String$Sub", false)} returns {@code String$Sub}.
+     *
+     * @param type        the given type
+     * @param afterDollar whether to return the substring after last dollar sign ({@code $})
+     * @return the last name of given type
+     */
+    public static @Nonnull String getLastName(@Nonnull Type type, boolean afterDollar) {
+        return getLastName(type.getTypeName(), afterDollar);
+    }
+
+    /**
+     * Returns the last name of the given type name.
+     * <p>
+     * If the {@code afterDollar} is {@code true} and the last index of dot is before the last index of dollar sign ($),
+     * then returns the substring after last dollar sign ({@code $}). For example:
+     * {@code getLastName("java.lang.String$Sub", true)} returns {@code Sub}.
+     * <p>
+     * If the {@code afterDollar} is {@code false}, then this method is equivalent to {@link #getLastName(String)}. For
+     * example: {@code getLastName("java.lang.String$Sub", false)} returns {@code String$Sub}.
+     *
+     * @param typeName    the given type name
+     * @param afterDollar whether to return the substring after last dollar sign ({@code $})
+     * @return the last name of given type name
+     */
+    public static @Nonnull String getLastName(@Nonnull String typeName, boolean afterDollar) {
+        return afterDollar ? getLastNameAfterDollar(typeName) : getLastNameAfterDot(typeName);
+    }
+
+    private static @Nonnull String getLastNameAfterDot(@Nonnull String typeName) {
         int index = typeName.lastIndexOf('.');
         // if (index == -1) {
         //     return typeName;
         // }
         return typeName.substring(index + 1);
+    }
+
+    private static @Nonnull String getLastNameAfterDollar(@Nonnull String typeName) {
+        int dollarIndex = typeName.lastIndexOf('$');
+        if (dollarIndex < 0) {
+            return getLastNameAfterDot(typeName);
+        }
+        int index = typeName.lastIndexOf('.');
+        if (dollarIndex < index) {
+            return typeName.substring(index + 1);
+        }
+        return typeName.substring(dollarIndex + 1);
     }
 
     /**
