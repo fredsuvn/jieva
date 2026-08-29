@@ -108,6 +108,7 @@ public interface SqlParameter {
      *
      * @return the value of the parameter, which can be {@code null}
      */
+    @Nullable
     Object value();
 
     /**
