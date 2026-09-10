@@ -92,6 +92,7 @@ public final class Span {
         if (!(o instanceof Span)) {
             return false;
         }
+        @SuppressWarnings("PatternVariableCanBeUsed")
         Span span = (Span) o;
         return startIndex == span.startIndex && endIndex == span.endIndex;
     }

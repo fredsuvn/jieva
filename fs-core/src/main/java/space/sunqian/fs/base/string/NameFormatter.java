@@ -1,6 +1,7 @@
 package space.sunqian.fs.base.string;
 
 import space.sunqian.annotation.Nonnull;
+import space.sunqian.annotation.ThreadSafe;
 import space.sunqian.fs.base.value.Span;
 
 import java.util.Objects;
@@ -11,25 +12,36 @@ import java.util.Objects;
  *
  * @author sunqian
  */
+@ThreadSafe
 public interface NameFormatter {
 
     /**
-     * Returns a new {@link NameFormatter} for lower camel case (e.g. {@code someName}). The returned instance applies
-     * the lower camel case to parse letters in {@code a-z} and {@code A-Z}, but treats digits ({@code 0-9}) and other
-     * characters as separate words.
+     * Returns a new {@link NameFormatter} that splits the input into words based on case changes, digits, and
+     * non-alphabetic characters, and then formats them in lower camel case.
+     * <p>
+     * For example, {@code "AbcDef123Ghj"} is split into {@code "Abc"}, {@code "Def"}, {@code "123"}, and {@code "Ghj"},
+     * and formatted as {@code "abcDef123Ghj"}.
+     * <p>
+     * Only letters {@code a-z} and {@code A-Z} participate in camel case conversion (first word lowercased, subsequent
+     * words capitalized). Digits and other characters act as word separators and remain unchanged in the output.
      *
-     * @return a new {@link NameFormatter} for lower camel case (e.g. {@code someName})
+     * @return a new {@link NameFormatter} for lower camel case
      */
     static @Nonnull NameFormatter lowerCamel() {
         return NameFormatterBack.camelCase(false);
     }
 
     /**
-     * Returns a new {@link NameFormatter} for upper camel case (e.g. {@code SomeName}), also called pascal case. The
-     * returned instance applies the upper camel case to parse letters in {@code a-z} and {@code A-Z}, but treats digits
-     * ({@code 0-9}) and other characters as separate words.
+     * Returns a new {@link NameFormatter} that splits the input into words based on case changes, digits, and
+     * non-alphabetic characters, and then formats them in upper camel case.
+     * <p>
+     * For example, {@code "abcDef123Ghj"} is split into {@code "abc"}, {@code "Def"}, {@code "123"}, and {@code "Ghj"},
+     * and formatted as {@code "AbcDef123Ghj"}.
+     * <p>
+     * Only letters {@code a-z} and {@code A-Z} participate in camel case conversion (each word capitalized). Digits and
+     * other characters act as word separators and remain unchanged in the output.
      *
-     * @return a new {@link NameFormatter} for upper camel case (e.g. {@code SomeName})
+     * @return a new {@link NameFormatter} for upper camel case
      */
     static @Nonnull NameFormatter upperCamel() {
         return NameFormatterBack.camelCase(true);
@@ -190,21 +202,21 @@ public interface NameFormatter {
     ) throws NameFormatException;
 
     /**
-     * Converts the given original name from this name formatter to the specified name formatter. This method is
-     * equivalent to: {@code toFormatter.format(origin, tokenize(name))}.
+     * Converts the given original name from this formatter to the specified target formatter. This method is equivalent
+     * to: {@code toFormatter.format(origin, tokenize(origin))}.
      *
-     * @param origin      the given name
-     * @param toFormatter the specified name formatter to convert to
+     * @param origin the given original name
+     * @param target the specified target formatter to convert to
      * @return the converted name
      * @throws NameFormatException if the conversion is not supported for the given name
      */
     default @Nonnull String format(
-        @Nonnull CharSequence origin, @Nonnull NameFormatter toFormatter
+        @Nonnull CharSequence origin, @Nonnull NameFormatter target
     ) throws NameFormatException {
-        if (Objects.equals(this, toFormatter)) {
+        if (Objects.equals(this, target)) {
             return origin.toString();
         }
-        return toFormatter.format(origin, tokenize(origin));
+        return target.format(origin, tokenize(origin));
     }
 
     /**

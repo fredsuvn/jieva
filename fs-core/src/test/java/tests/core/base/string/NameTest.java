@@ -94,8 +94,8 @@ public class NameTest {
         assertArrayEquals(format.parse("AA0中BcDe0"), ArrayKit.array("AA", "0", "中", "Bc", "De", "0"));
         assertArrayEquals(format.parse("AA0中BcDe中"), ArrayKit.array("AA", "0", "中", "Bc", "De", "中"));
         assertArrayEquals(
-            format.parse("AaBcDe/中01AabBb"),
-            ArrayKit.array("Aa", "Bc", "De", "/中", "01", "Aab", "Bb")
+            format.parse("AaBcDe/中01AabBb12345abcde"),
+            ArrayKit.array("Aa", "Bc", "De", "/中", "01", "Aab", "Bb", "12345", "abcde")
         );
     }
 
@@ -123,8 +123,8 @@ public class NameTest {
         assertArrayEquals(format.parse("AA0中BcDe0"), ArrayKit.array("AA", "0", "中", "Bc", "De", "0"));
         assertArrayEquals(format.parse("AA0中BcDe中"), ArrayKit.array("AA", "0", "中", "Bc", "De", "中"));
         assertArrayEquals(
-            format.parse("AaBcDe/中01AabBb"),
-            ArrayKit.array("Aa", "Bc", "De", "/中", "01", "Aab", "Bb")
+            format.parse("AaBcDe/中01AabBb12345abcde"),
+            ArrayKit.array("Aa", "Bc", "De", "/中", "01", "Aab", "Bb", "12345", "abcde")
         );
     }
 
